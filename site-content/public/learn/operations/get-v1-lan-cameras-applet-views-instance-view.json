@@ -1,0 +1,40 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Inspect an installed applet's selected camera view",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_cameras_applet_views_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan-cameras/applet-views/{instance}/{view}",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/applet-views/{instance}/{view}",
+  "capability": "lan_camera",
+  "returns": "view, camera, saved, position and revision when saved",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "view": {
+     "description": "The view in /v1/lan-cameras/applet-views/{instance}/{view}",
+     "type": "string"
+    },
+    "instance": {
+     "description": "The instance in /v1/lan-cameras/applet-views/{instance}/{view}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "instance",
+    "view"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

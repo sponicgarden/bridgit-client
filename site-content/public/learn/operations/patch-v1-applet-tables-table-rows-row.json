@@ -1,0 +1,55 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Update declared columns of this applet principal's own row; preserves its id and other columns",
+  "method": "PATCH",
+  "auth": true,
+  "mcp_tool": "applet_tables_rows_patch",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "set",
+   "description": "Declared column ids to replacement values; null clears a column",
+   "type": "object",
+   "required": true
+  }],
+  "example": "PATCH /v1/applet/tables/results/rows/abc {\"set\":{\"payload\":{\"score\":4}}}",
+  "idempotent": false,
+  "path": "/v1/applet/tables/{table}/rows/{row}",
+  "capability": "applet_data",
+  "returns": "updated row",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "set": {
+     "description": "Declared column ids to replacement values; null clears a column",
+     "type": "object"
+    },
+    "row": {
+     "description": "The row in /v1/applet/tables/{table}/rows/{row}",
+     "type": "string"
+    },
+    "table": {
+     "description": "The table in /v1/applet/tables/{table}/rows/{row}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "table",
+    "row",
+    "set"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "not_found",
+   "row_not_found",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,137 @@
+{
+  "format": "bridgit-template/1",
+  "id": "voice-notebook",
+  "version": "2.0.0",
+  "kind": "applet",
+  "name": "Voice notebook",
+  "summary": "Record one bounded offline transcript, check the words and save the note on the phone.",
+  "runtime": {
+    "adapter": "android.package.v1",
+    "applet_key": "voice-notebook",
+    "supports_dynamic_execution": false
+  },
+  "config_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {}
+  },
+  "defaults": {},
+  "processing": {
+    "tables": [
+      {
+        "id": "notes",
+        "label": "Notes",
+        "columns": {
+          "text": {
+            "type": "text",
+            "label": "Note"
+          },
+          "source_at": {
+            "type": "time",
+            "label": "Recorded at"
+          }
+        },
+        "keep_days": 365,
+        "max_rows": 1000,
+        "share_with_installer": false
+      }
+    ]
+  },
+  "permissions": {
+    "required": [
+      "interactions",
+      "mic"
+    ],
+    "optional": [],
+    "remote": [],
+    "automatic_grants": false
+  },
+  "ui": {
+    "inputs": {},
+    "card": {
+      "title": "Voice notebook",
+      "sources": {
+        "clip": {
+          "reply": "clip"
+        },
+        "notes": {
+          "table": "notes",
+          "limit": 20
+        }
+      },
+      "states": {
+        "empty": "No recording yet. Tap only when ready to speak."
+      },
+      "pieces": [
+        {
+          "type": "header",
+          "eyebrow": "Bridgit applet",
+          "text": "Catch a thought before it slips away."
+        },
+        {
+          "type": "buttons",
+          "items": [
+            {
+              "label": "Record 10 seconds",
+              "style": "primary",
+              "into": "clip",
+              "do": {
+                "method": "POST",
+                "path": "/v1/mic/record",
+                "body": {
+                  "duration_seconds": 10,
+                  "transcribe": true,
+                  "return_audio": false
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "draft",
+          "id": "note",
+          "label": "Note",
+          "value": {
+            "$source": "clip.transcript"
+          },
+          "max": 1024
+        },
+        {
+          "type": "buttons",
+          "items": [
+            {
+              "label": "Save note",
+              "confirm": "Save this note on the phone?",
+              "do": {
+                "record": "notes",
+                "row": {
+                  "text": {
+                    "$draft": "note"
+                  },
+                  "source_at": {
+                    "$source": "clip.recorded_at"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "timeline",
+          "items": {
+            "$source": "notes.items"
+          },
+          "time": "at",
+          "label": "text",
+          "limit": 10,
+          "empty": "No saved notes yet."
+        },
+        {
+          "type": "note",
+          "text": "Records ten seconds only when you tap. Review the words before saving. Saved notes stay on this phone."
+        }
+      ]
+    }
+  }
+}

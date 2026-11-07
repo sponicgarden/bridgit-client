@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Supplemental owner settings, model-key presence and consent requirements",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_settings",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/settings",
+  "idempotent": false,
+  "path": "/v1/owner/settings",
+  "capability": "owner_features",
+  "returns": "update_offers,remote,own_keys provider/configured flags,configuration_grant; no key suffixes or tokens",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

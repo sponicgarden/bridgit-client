@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Remote viewing and photo-sharing policy status",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "remote_view",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/remote-view",
+  "idempotent": false,
+  "path": "/v1/remote-view",
+  "capability": "owner_features",
+  "returns": "configured,enabled,linked,dog_photo,viewer_issuance=owner_only,link_requires_google_consent; never link codes or viewer tokens",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

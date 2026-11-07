@@ -1,0 +1,77 @@
+{
+ "detail_url": "/v1/discover?id=v1.controls&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.controls.json",
+ "title": "controls",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.controls.json",
+ "prerequisites": ["Check v1.controls supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Set Do Not Disturb, with optional restoration",
+   "path": "/v1/phone/dnd",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-phone-dnd.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-phone-dnd.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "phone_dnd"
+  },
+  {
+   "summary": "Change ringer or volume",
+   "path": "/v1/phone/sound",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-phone-sound.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-phone-sound.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "phone_sound"
+  },
+  {
+   "summary": "Set brightness or automatic brightness",
+   "path": "/v1/phone/brightness",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-phone-brightness.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-phone-brightness.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "phone_brightness"
+  },
+  {
+   "summary": "Turn battery saver on or off (needs a one-time USB grant, see /phone/battery controls) or set the screen timeout, with optional restoration",
+   "path": "/v1/phone/power",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-phone-power.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-phone-power.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "phone_power"
+  },
+  {
+   "summary": "Restore pending timed phone changes, preserving subsequent manual changes",
+   "path": "/v1/phone/undo",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-phone-undo.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-phone-undo.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "phone_undo"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.controls",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "act",
+ "capability_ids": ["v1.controls"]
+}

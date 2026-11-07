@@ -1,0 +1,178 @@
+{
+  "format": "bridgit-template/1",
+  "id": "room-change-watcher",
+  "version": "2.0.0",
+  "kind": "applet",
+  "name": "Room change watcher",
+  "summary": "A free image-change trigger with an explicit interpretation boundary.",
+  "runtime": {
+    "adapter": "android.package.v1",
+    "applet_key": "room-change-watcher",
+    "supports_dynamic_execution": false
+  },
+  "config_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "camera",
+      "interval_s",
+      "sensitivity"
+    ],
+    "properties": {
+      "camera": {
+        "type": "string",
+        "enum": [
+          "rear",
+          "front"
+        ]
+      },
+      "interval_s": {
+        "type": "integer",
+        "minimum": 30,
+        "maximum": 3600
+      },
+      "sensitivity": {
+        "type": "string",
+        "enum": [
+          "low",
+          "normal",
+          "high"
+        ]
+      }
+    }
+  },
+  "defaults": {
+    "camera": "rear",
+    "interval_s": 30,
+    "sensitivity": "normal"
+  },
+  "processing": {
+    "watches": [
+      {
+        "id": "main",
+        "request": {
+          "label": "Room image changes",
+          "data": [
+            "camera"
+          ],
+          "camera": {
+            "$input": "camera"
+          },
+          "model": "none",
+          "interval_s": {
+            "$input": "interval_s"
+          },
+          "window": 1,
+          "min_readings": 1,
+          "expires_in_s": 3600,
+          "repeat": true,
+          "cooldown_s": 120,
+          "local": {
+            "change_check": true,
+            "sensitivity": {
+              "$input": "sensitivity"
+            },
+            "max_reuse_s": 300
+          }
+        }
+      }
+    ]
+  },
+  "permissions": {
+    "required": [
+      "camera",
+      "interactions",
+      "watches"
+    ],
+    "optional": [],
+    "remote": [],
+    "automatic_grants": false
+  },
+  "ui": {
+    "inputs": {
+      "camera": {
+        "label": "Camera",
+        "help": "The phone camera that faces the room."
+      },
+      "interval_s": {
+        "label": "Seconds between checks",
+        "help": "30 to 3600. Every check is free: it compares pictures on the phone."
+      },
+      "sensitivity": {
+        "label": "How big a change counts",
+        "help": "Low ignores small changes like shadows; high notices more."
+      }
+    },
+    "card": {
+      "title": "Room change watcher",
+      "sources": {
+        "status": {
+          "watch": {
+            "$watch": "main"
+          },
+          "read": "status"
+        }
+      },
+      "fresh_s": 120,
+      "states": {
+        "empty": "No baseline or checks yet. Nothing observed is different from no change."
+      },
+      "pieces": [
+        {
+          "type": "header",
+          "eyebrow": "Bridgit applet",
+          "text": "See when the room's picture changes."
+        },
+        {
+          "type": "metrics",
+          "items": [
+            {
+              "label": "Checks",
+              "value": {
+                "$source": "status.checks"
+              },
+              "format": "number"
+            },
+            {
+              "label": "Change matches",
+              "value": {
+                "$source": "status.matches"
+              },
+              "format": "number"
+            }
+          ]
+        },
+        {
+          "type": "timeline",
+          "items": {
+            "$source": "status.recent_checks"
+          },
+          "time": "at",
+          "label": "matched",
+          "label_format": "words",
+          "label_words": {
+            "true": "Image changed",
+            "false": "No change"
+          },
+          "limit": 10,
+          "empty": "No checks yet."
+        },
+        {
+          "type": "note",
+          "text": "Image change is not person or danger detection. Changes can be light or shadows."
+        },
+        {
+          "type": "buttons",
+          "items": [
+            {
+              "label": "Pause",
+              "do": {
+                "pause_applet": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

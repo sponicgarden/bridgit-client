@@ -1,0 +1,47 @@
+{
+ "detail_url": "/v1/discover?id=v1.gallery_video&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.gallery_video.json",
+ "title": "gallery video",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.gallery_video.json",
+ "prerequisites": ["Check v1.gallery_video supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Accessible videos and metadata",
+   "path": "/v1/gallery/videos/recent",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-gallery-videos-recent.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-gallery-videos-recent.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "gallery_videos_recent"
+  },
+  {
+   "summary": "Accessible video raw, or a JPEG frame",
+   "path": "/v1/gallery/video/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-gallery-video-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-gallery-video-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "gallery_video"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.gallery_video",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "remember",
+ "capability_ids": ["v1.gallery_video"]
+}

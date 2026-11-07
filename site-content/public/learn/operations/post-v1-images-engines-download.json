@@ -1,0 +1,46 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Start downloading an opt-in engine's model now (on Wi-Fi), so the first find with it doesn't wait. A find or crop that names it starts the download too",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "images_engines_download",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "engine",
+   "description": "An engine from GET /v1/images/engines, for example on_device_detector or on_device_outline",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/images/engines/download {\"engine\":\"on_device_outline\"}",
+  "idempotent": true,
+  "path": "/v1/images/engines/download",
+  "capability": "find_crop",
+  "returns": "The engine as GET /v1/images/engines shows it",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "engine": {
+     "description": "An engine from GET /v1/images/engines, for example on_device_detector or on_device_outline",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": ["engine"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "capability_disabled",
+   "not_supported"
+  ],
+  "requires": null
+ }
+}

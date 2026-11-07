@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "What's switched on and ready, and why not",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "capabilities",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/capabilities",
+  "idempotent": false,
+  "path": "/v1/capabilities",
+  "capability": "status",
+  "returns": "per capability: title, enabled (the phone switch), ready (the device can do it), agent_allowed (the owner lets you use it), blocked_reason, details. Usable only when agent_allowed, enabled and ready are all true. enabled false means the owner's switch is off; blocked_reason names other known causes (agent_not_allowed, a missing Android permission, no_hardware) and can be null. Also notifications, callback {set, host}, listener",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

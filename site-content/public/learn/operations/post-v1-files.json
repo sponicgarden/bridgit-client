@@ -1,0 +1,73 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Receive a file on the phone (25 MB maximum)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "files_receive",
+  "query": [{
+   "name": "filename",
+   "description": "Filename for raw-body uploads (or name= for HTTP compatibility)",
+   "type": "string",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "name",
+    "description": "Filename, no path",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "mime",
+    "description": "MIME type",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "data_base64",
+    "description": "File bytes; or send raw body with ?name=...",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/files",
+  "idempotent": true,
+  "path": "/v1/files",
+  "capability": "files",
+  "returns": "Receive a file on the phone (25 MB maximum)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "data_base64": {
+     "description": "File bytes; or send raw body with ?name=...",
+     "type": "string"
+    },
+    "filename": {
+     "description": "Filename for raw-body uploads (or name= for HTTP compatibility)",
+     "type": "string"
+    },
+    "mime": {
+     "description": "MIME type",
+     "type": "string"
+    },
+    "name": {
+     "description": "Filename, no path",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": ["name"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

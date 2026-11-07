@@ -1,0 +1,111 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Fetch the same template origin. An unchanged applet gets an owner update review; a customized applet gets a local three-way upgrade task. Nothing applies automatically or calls a model. Read development first",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applets_installed_template_upgrade",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "package",
+    "description": "The applet file itself: a bridgit-template/1 definition with runtime.adapter bridgit.package.v1 (legacy alias android.package.v1; see https://bridgit.cc/learn/builder/applet-packages.md)",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "url",
+    "description": "Instead of package: an https://bridgit.cc/\u2026 package file (for example a recipe's applet.json)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "template",
+    "description": "Instead of package: a template registry key (with revision)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "revision",
+    "description": "With template: the immutable revision",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "bundled",
+    "description": "Instead of package/url/template: a built-in applet id (including a-sorta-fairytale-about-me, chef-helper, insurance-inventory, exercise-check); downloads its registry release",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "config",
+    "description": "Values for the applet's blanks (config_schema); the rest use defaults. The owner can still change them on the review screen",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "expected_revision",
+    "description": "revision from development; use url, template+revision or bundled, not an inline package",
+    "type": "integer",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/applets/installed/ai0123456789abcd/template-upgrade {\"url\":\"https://bridgit.cc/recipes/voice-notebook/applet.json\",\"expected_revision\":1}",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/template-upgrade",
+  "capability": "applet_install",
+  "returns": "status:awaiting_owner with id (pending review), review and expected_revision for unchanged applets; otherwise task{id, type:applet.template_upgrade, status:needs_agent|needs_verification, expected_revision, candidate, conflicts, incoming, guide} or status:up_to_date; no automatic activation",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "template": {
+     "description": "Instead of package: a template registry key (with revision)",
+     "type": "string"
+    },
+    "expected_revision": {
+     "description": "revision from development; use url, template+revision or bundled, not an inline package",
+     "type": "integer"
+    },
+    "package": {
+     "description": "The applet file itself: a bridgit-template/1 definition with runtime.adapter bridgit.package.v1 (legacy alias android.package.v1; see https://bridgit.cc/learn/builder/applet-packages.md)",
+     "type": "object"
+    },
+    "bundled": {
+     "description": "Instead of package/url/template: a built-in applet id (including a-sorta-fairytale-about-me, chef-helper, insurance-inventory, exercise-check); downloads its registry release",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/applets/installed/{id}/template-upgrade",
+     "type": "string"
+    },
+    "config": {
+     "description": "Values for the applet's blanks (config_schema); the rest use defaults. The owner can still change them on the review screen",
+     "type": "object"
+    },
+    "url": {
+     "description": "Instead of package: an https://bridgit.cc/\u2026 package file (for example a recipe's applet.json)",
+     "type": "string"
+    },
+    "revision": {
+     "description": "With template: the immutable revision",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "id",
+    "expected_revision"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "conflict",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

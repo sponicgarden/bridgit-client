@@ -1,0 +1,85 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Generate a fairytale illustration through the Make Fairytale Image registry task and present it as a full-screen HTML interaction card; existing Azure account quota applies. Requires interactions access too. Stop suppresses late cards.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "story_image",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "wait_for_reveal",
+    "description": "Prepare now and display after /story/reveal",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "presentation_token",
+    "description": "Token from /story or /story/presentation; Stop invalidates it",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "title",
+    "description": "Story title, at most 160 characters",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "narration",
+    "description": "Completed story, at most 8000 characters",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "request_id",
+    "description": "Stable idempotency key for this story image, 8\u2013128 letters/digits/dash/underscore; reuse on an unknown outcome",
+    "type": "string",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/story/image {\"presentation_token\":\"1\",\"title\":\"The tiny kingdom\",\"narration\":\"Once upon a time\u2026\",\"request_id\":\"fairytale-12345678\"}",
+  "idempotent": false,
+  "path": "/v1/story/image",
+  "capability": "judgment",
+  "returns": "interaction_id, task_key, model, quota, display {shown_as, full_screen, missing?, fix?}; picture bytes stay on the phone and do not cross the card response bridge",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "presentation_token": {
+     "description": "Token from /story or /story/presentation; Stop invalidates it",
+     "type": "string"
+    },
+    "narration": {
+     "description": "Completed story, at most 8000 characters",
+     "type": "string"
+    },
+    "wait_for_reveal": {
+     "description": "Prepare now and display after /story/reveal",
+     "type": "boolean"
+    },
+    "title": {
+     "description": "Story title, at most 160 characters",
+     "type": "string"
+    },
+    "request_id": {
+     "description": "Stable idempotency key for this story image, 8\u2013128 letters/digits/dash/underscore; reuse on an unknown outcome",
+     "type": "string"
+    }
+   },
+   "required": [
+    "presentation_token",
+    "title",
+    "narration",
+    "request_id"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

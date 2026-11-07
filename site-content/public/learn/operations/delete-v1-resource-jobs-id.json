@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Cancel your resource job; SDK-managed transfers may continue after the waiter is cancelled",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "resource_jobs_cancel",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/resource-jobs/r123",
+  "idempotent": false,
+  "path": "/v1/resource-jobs/{id}",
+  "capability": "owner_features",
+  "returns": "status; cancellation is best effort for Android/ML Kit managed transfers",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/resource-jobs/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

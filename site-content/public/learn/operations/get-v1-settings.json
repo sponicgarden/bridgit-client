@@ -1,0 +1,87 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Every Bridgit setting and the phone settings it manages: value, type, range, and whether you may change it",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "settings_get",
+  "query": [
+   {
+    "name": "section",
+    "description": "Only this section",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "features",
+     "listener",
+     "privacy",
+     "log",
+     "alerts",
+     "appearance",
+     "speaker",
+     "listening",
+     "captures",
+     "security",
+     "notifications",
+     "phone",
+     "android",
+     "agent",
+     "device"
+    ]
+   },
+   {
+    "name": "key",
+    "description": "Only this setting, e.g. appearance.theme",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/settings?section=phone",
+  "idempotent": false,
+  "path": "/v1/settings",
+  "capability": "settings",
+  "returns": "can_write, write_blocked_reason, write_blocked_why, sections, settings[key, section, type, value, description, enum, min, max, writable, locked_reason, why]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "section": {
+     "description": "Only this section",
+     "type": "string",
+     "enum": [
+      "features",
+      "listener",
+      "privacy",
+      "log",
+      "alerts",
+      "appearance",
+      "speaker",
+      "listening",
+      "captures",
+      "security",
+      "notifications",
+      "phone",
+      "android",
+      "agent",
+      "device"
+     ]
+    },
+    "key": {
+     "description": "Only this setting, e.g. appearance.theme",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "invalid_parameter",
+   "not_found"
+  ],
+  "requires": null
+ }
+}

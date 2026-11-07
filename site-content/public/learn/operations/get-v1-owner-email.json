@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Whether the owner has verified their email. Bridgit works for 24 hours from the first agent call; after that, until they do, only the status endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes) and feedback keep working, plus the control tools capabilities, events, operation.get and feedback.create; every other call answers email_required",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_email_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/email",
+  "idempotent": false,
+  "path": "/v1/owner/email",
+  "capability": "status",
+  "returns": "status (verified, grace or required), state (none, pending or confirmed), email (masked, e.g. w***@gmail.com, or null), grace_ends_at (ISO time, or null before the first call), hours_left, required_after_hours (24), how",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

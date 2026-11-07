@@ -1,0 +1,42 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Accessible video raw, or a JPEG frame",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "gallery_video",
+  "query": [{
+   "name": "frame_at_s",
+   "description": "Optional frame position in seconds",
+   "type": "number",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/gallery/video/{id}",
+  "idempotent": false,
+  "path": "/v1/gallery/video/{id}",
+  "capability": "gallery_video",
+  "returns": "Accessible video raw, or a JPEG frame",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "id": {
+     "description": "The id in /v1/gallery/video/{id}",
+     "type": "string"
+    },
+    "frame_at_s": {
+     "description": "Optional frame position in seconds",
+     "type": "number"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

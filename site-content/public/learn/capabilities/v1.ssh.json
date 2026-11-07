@@ -1,0 +1,97 @@
+{
+ "detail_url": "/v1/discover?id=v1.ssh&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.ssh.json",
+ "title": "ssh",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.ssh.json",
+ "prerequisites": ["Check v1.ssh supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "List this agent's SSH connections without credentials or a network probe",
+   "path": "/v1/ssh/connections",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-ssh-connections.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-ssh-connections.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "ssh_connections"
+  },
+  {
+   "summary": "Observe an SSH host key without sending credentials; verify it independently before enrollment",
+   "path": "/v1/ssh/probe",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-ssh-probe.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-ssh-probe.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "ssh_probe"
+  },
+  {
+   "summary": "Verify authentication and save or fully replace this agent's SSH connection",
+   "path": "/v1/ssh/connections/save",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-ssh-connections-save.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-ssh-connections-save.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "ssh_connections_save"
+  },
+  {
+   "summary": "Forget this agent's connection and credentials; active operations disconnect",
+   "path": "/v1/ssh/connections/remove",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-ssh-connections-remove.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-ssh-connections-remove.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "ssh_connections_remove"
+  },
+  {
+   "summary": "Verify the saved host key and credentials without running a command",
+   "path": "/v1/ssh/test",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-ssh-test.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-ssh-test.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "ssh_test"
+  },
+  {
+   "summary": "Run a remote command with this connection's exec permission; can be scheduled",
+   "path": "/v1/ssh/exec",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-ssh-exec.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-ssh-exec.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "ssh_exec"
+  },
+  {
+   "summary": "Granular SFTP operations; files_read or files_write permission; can be scheduled",
+   "path": "/v1/ssh/files",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-ssh-files.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-ssh-files.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "ssh_files"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.ssh",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v1.ssh"]
+}

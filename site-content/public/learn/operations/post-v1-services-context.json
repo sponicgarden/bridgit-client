@@ -1,0 +1,114 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read one location-context service from GET /v1/services: places, airquality, pollen, timezone, maps, streetview, weathergoogle, osm, wikipedia or openmeteo. No implicit phone-location read; send explicit coordinates. Provider keys stay write-only.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "services_context",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "service",
+    "description": "Context service id from GET /v1/services",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "latitude",
+    "description": "-90 to 90",
+    "type": "number",
+    "required": true
+   },
+   {
+    "name": "longitude",
+    "description": "-180 to 180",
+    "type": "number",
+    "required": true
+   },
+   {
+    "name": "radius_m",
+    "description": "1\u20131000; default 500",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "1\u201310; default 5",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "timestamp",
+    "description": "Unix seconds for time-zone lookup",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "days",
+    "description": "1\u20135 pollen days; default 1",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "heading",
+    "description": "0\u2013360 for Street View",
+    "type": "number",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/services/context {\"service\":\"places\",\"latitude\":52.2297,\"longitude\":21.0122,\"radius_m\":500,\"limit\":5}",
+  "idempotent": false,
+  "path": "/v1/services/context",
+  "capability": "judgment",
+  "returns": "service, source, fetched_at, data (provider JSON or bounded image), attribution, data_use, cost_usd (conservative budget reserve), cost_basis, key (shared or own); context_key_required means configure its provider. An enabled Google API is not proof of a configured key.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "radius_m": {
+     "description": "1\u20131000; default 500",
+     "type": "number"
+    },
+    "heading": {
+     "description": "0\u2013360 for Street View",
+     "type": "number"
+    },
+    "service": {
+     "description": "Context service id from GET /v1/services",
+     "type": "string"
+    },
+    "latitude": {
+     "description": "-90 to 90",
+     "type": "number"
+    },
+    "limit": {
+     "description": "1\u201310; default 5",
+     "type": "integer"
+    },
+    "days": {
+     "description": "1\u20135 pollen days; default 1",
+     "type": "integer"
+    },
+    "longitude": {
+     "description": "-180 to 180",
+     "type": "number"
+    },
+    "timestamp": {
+     "description": "Unix seconds for time-zone lookup",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "service",
+    "latitude",
+    "longitude"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

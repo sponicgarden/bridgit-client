@@ -1,0 +1,188 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Every call this phone made to a server off the device: destination, purpose, which agent caused it, the data categories sent, bytes, status, time, and a redacted preview of what was sent and received",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "outbound_list",
+  "query": [
+   {
+    "name": "since",
+    "description": "Outbound id (exclusive) or ISO time",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "until",
+    "description": "Outbound id or ISO time",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "destination",
+    "description": "Text in the host or service name, e.g. met.no, jev, relay",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "agent",
+    "description": "Comma list of agent names or ids; me; phone or owner for calls nobody's agent caused",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "category",
+    "description": "Comma list of data categories, any of them, e.g. location_1km,image,install_id",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "method",
+    "description": "GET, POST, SEND (relay frames)\u2026",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "result",
+    "description": "ok or error",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "ok",
+     "error"
+    ]
+   },
+   {
+    "name": "q",
+    "description": "Text in the purpose, path or sent preview",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "period",
+    "description": "today, 24h, 7d or 30d (since overrides it)",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "today",
+     "24h",
+     "7d",
+     "30d"
+    ]
+   },
+   {
+    "name": "limit",
+    "description": "1-500, default 100",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "order",
+    "description": "desc (default) or asc",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "desc",
+     "asc"
+    ]
+   },
+   {
+    "name": "cursor",
+    "description": "next_cursor from the previous page",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "bodies",
+    "description": "false leaves out the sent/received previews (default true)",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/outbound?destination=met.no&limit=20",
+  "idempotent": false,
+  "path": "/v1/outbound",
+  "capability": "outbound",
+  "returns": "entries[id, at, destination{host, service}, method, path, purpose, agent, agent_id, categories[], bytes_sent, bytes_received, status, ok, error, duration_ms, query, headers (secrets redacted), sent_sha256, sent{type, preview}, received{type, preview}], next_cursor, latest_id, recording{on, changed_at, changed_by, note}, scope{sees: own|all}, coverage{recorded[], not_recorded[]}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "cursor": {
+     "description": "next_cursor from the previous page",
+     "type": "string"
+    },
+    "agent": {
+     "description": "Comma list of agent names or ids; me; phone or owner for calls nobody's agent caused",
+     "type": "string"
+    },
+    "period": {
+     "description": "today, 24h, 7d or 30d (since overrides it)",
+     "type": "string",
+     "enum": [
+      "today",
+      "24h",
+      "7d",
+      "30d"
+     ]
+    },
+    "method": {
+     "description": "GET, POST, SEND (relay frames)\u2026",
+     "type": "string"
+    },
+    "bodies": {
+     "description": "false leaves out the sent/received previews (default true)",
+     "type": "boolean"
+    },
+    "destination": {
+     "description": "Text in the host or service name, e.g. met.no, jev, relay",
+     "type": "string"
+    },
+    "result": {
+     "description": "ok or error",
+     "type": "string",
+     "enum": [
+      "ok",
+      "error"
+     ]
+    },
+    "q": {
+     "description": "Text in the purpose, path or sent preview",
+     "type": "string"
+    },
+    "limit": {
+     "description": "1-500, default 100",
+     "type": "integer"
+    },
+    "until": {
+     "description": "Outbound id or ISO time",
+     "type": "string"
+    },
+    "category": {
+     "description": "Comma list of data categories, any of them, e.g. location_1km,image,install_id",
+     "type": "string"
+    },
+    "since": {
+     "description": "Outbound id (exclusive) or ISO time",
+     "type": "string"
+    },
+    "order": {
+     "description": "desc (default) or asc",
+     "type": "string",
+     "enum": [
+      "desc",
+      "asc"
+     ]
+    }
+   },
+   "required": []
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

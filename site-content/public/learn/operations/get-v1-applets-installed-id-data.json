@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Discover an applet's saved data without running it: uniform schemas, row counts, choice/status counts, batch outcomes, export and original-photo URLs. Works for existing and future templates; owner control keys need no extra approval",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_data_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/installed/ai0123456789abcd/data",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/data",
+  "capability": "applet_install",
+  "returns": "contract:bridgit-applet-data/2, instance_id, access, complete, excluded_tables[], tables[{id,label,columns,count,choice_counts,rows_url}], photos[{ref,available,url,archive_path}], media_complete, batches, export_url, archive_url, consistency, next",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/applets/installed/{id}/data",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

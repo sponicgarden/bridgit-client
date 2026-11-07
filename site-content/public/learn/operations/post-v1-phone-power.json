@@ -1,0 +1,64 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Turn battery saver on or off (needs a one-time USB grant, see /phone/battery controls) or set the screen timeout, with optional restoration",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "phone_power",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "battery_saver",
+    "description": "true turns battery saver on; Android keeps it off while charging",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "screen_timeout_seconds",
+    "description": "15\u20131800",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "duration_minutes",
+    "description": "Optional timed restoration, 1\u20131440 minutes; null leaves the change in place",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/phone/power",
+  "idempotent": true,
+  "path": "/v1/phone/power",
+  "capability": "controls",
+  "returns": "Turn battery saver on or off (needs a one-time USB grant, see /phone/battery controls) or set the screen timeout, with optional restoration",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "screen_timeout_seconds": {
+     "description": "15\u20131800",
+     "type": "integer"
+    },
+    "battery_saver": {
+     "description": "true turns battery saver on; Android keeps it off while charging",
+     "type": "boolean"
+    },
+    "duration_minutes": {
+     "description": "Optional timed restoration, 1\u20131440 minutes; null leaves the change in place",
+     "type": "integer"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

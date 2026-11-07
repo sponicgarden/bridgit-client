@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UPD-04: Bridgit shares through its FileProvider only verified update APKs, transfers, and applet exports the
+     owner chose to share in the share sheet (applet-share, cleared after a day). -->
+<paths>
+    <cache-path name="updates" path="updates/" />
+    <files-path name="transfers" path="transfers/" />
+    <cache-path name="applet-share" path="applet-share/" />
+</paths>

@@ -1,0 +1,32 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Fetch your key with a 6-digit code shown on the phone (alternative to the setup prompt)",
+  "method": "POST",
+  "auth": false,
+  "mcp_tool": null,
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "code",
+   "description": "6-digit code from the phone",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/pair {\"code\":\"482913\"}",
+  "idempotent": false,
+  "path": "/v1/pair",
+  "capability": "status",
+  "returns": "key, agent, base_url (once per pairing window)",
+  "errors": [
+   "pairing_closed",
+   "unauthorized",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

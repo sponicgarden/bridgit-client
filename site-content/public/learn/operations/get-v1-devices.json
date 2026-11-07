@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Host and owner-configured external devices, supported actions and access status",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "devices",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/devices",
+  "idempotent": false,
+  "path": "/v1/devices",
+  "capability": "status",
+  "returns": "devices: host Android device, cameras visible to your lan_camera grant and your own LAN enrollments when lan_control is granted and enabled; SSH profiles when ssh is granted and enabled; ids, names, configured state, availability (not_checked until an action), advertised pan/tilt and exact action paths/bodies. No credentials. Inventory is passive and does not scan the LAN.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

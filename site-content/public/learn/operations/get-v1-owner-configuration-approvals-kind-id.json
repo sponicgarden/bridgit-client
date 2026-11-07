@@ -1,0 +1,40 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Inspect one exact pending applet, schedule, workflow, operation or control-session request",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_approvals_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/approvals/{kind}/{id}",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/approvals/{kind}/{id}",
+  "capability": "owner_features",
+  "returns": "kind,id,expected_digest,can_decide,can_decline,blocked_reason,review; credentials never returned",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "description": "The kind in /v1/owner/configuration/approvals/{kind}/{id}",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/approvals/{kind}/{id}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "kind",
+    "id"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

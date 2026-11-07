@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One picked screenshot (FBK-04 item 6): 72dp thumbnail, 48dp remove target on its corner. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="84dp"
+    android:layout_height="84dp"
+    android:layout_marginEnd="4dp">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom|start"
+        android:background="@drawable/feedback_bg_thumb"
+        android:padding="1dp"
+        android:scaleType="centerCrop" />
+
+    <ImageButton
+        android:id="@+id/remove"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|end"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="center"
+        android:src="@drawable/feedback_ic_remove" />
+</FrameLayout>

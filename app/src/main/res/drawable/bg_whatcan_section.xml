@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Banner for the two parts of What can Bridgit do?, in the Home status card's blue. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="?attr/colorPrimaryContainer" />
+    <corners android:radius="16dp" />
+</shape>

@@ -1,0 +1,68 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Hand the phone an action manifest once: any action it can take (any /v1 call you're allowed, plus download, play, show, send and delete of saved files), each with its own schedule. The owner approves each new manifest once on the phone; then it runs by itself and results arrive as schedule.* events",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "schedule_set",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "manifest",
+    "description": "{timezone?, actions:[{id, name?, when, do, save_as?, send_to?}]} (see GET /v1/guide → schedule)",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "url",
+    "description": "Instead of manifest: a public https:// URL the phone polls for the manifest (ETag honoured)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "poll_minutes",
+    "description": "With url: how often to check, 15-1440 (default 60)",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/schedule {\"manifest\":{\"actions\":[{\"id\":\"pics\",\"when\":{\"start\":\"2026-11-02T16:34\",\"every_minutes\":7,\"count\":3},\"do\":{\"call\":\"POST /v1/camera/snapshot\",\"query\":{\"raw\":\"1\"}},\"send_to\":{\"url\":\"https://example.com/in\"}}]}}",
+  "idempotent": true,
+  "path": "/v1/schedule",
+  "capability": "schedule",
+  "returns": "status (awaiting_owner, or active when identical to the running manifest), digest, actions[{id, summary}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "manifest": {
+     "description": "{timezone?, actions:[{id, name?, when, do, save_as?, send_to?}]} (see GET /v1/guide → schedule)",
+     "type": "object"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "poll_minutes": {
+     "description": "With url: how often to check, 15-1440 (default 60)",
+     "type": "integer"
+    },
+    "url": {
+     "description": "Instead of manifest: a public https:// URL the phone polls for the manifest (ETag honoured)",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "invalid_parameter",
+   "agent_not_allowed"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Applets screen tabs (owner, 4 Nov 2026): Portals, Applets and Cards. -->
+<resources>
+    <string name="modify_applet">Modify applet</string>
+    <string name="create_applet">Create an applet</string>
+    <string name="applets_tab_portals">Portals</string>
+    <string name="applets_tab_config">Applets</string>
+    <string name="applets_tab_cards">Cards</string>
+
+    <string name="applets_installed_header">Installed</string>
+    <string name="applets_installed_empty">No installed applets</string>
+    <string name="applets_available_header">Available</string>
+    <!-- Applets that come with Bridgit (5 Nov 2026), under Available until installed. -->
+    <string name="applets_bundled_inventory_title">Insurance inventory</string>
+    <string name="applets_bundled_inventory_desc">Photo inventory for your insurer.</string>
+    <string name="applets_bundled_exercise_title">Exercise check</string>
+    <string name="applets_bundled_review_cd">Review %1$s</string>
+    <string name="applets_bundled_exercise_desc">Camera-based rep counting.</string>
+
+    <string name="applets_portal_pick">Portal</string>
+    <string name="applets_portal_account">Your account menu</string>
+    <string name="applets_portal_account_open">Your account</string>
+    <string name="applets_portal_sign_out">Sign out</string>
+    <string name="applets_portal_reload">Reload portal</string>
+    <string name="applets_portal_open_browser">Open in browser</string>
+    <string name="applets_portal_empty_title">No portals yet</string>
+    <string name="applets_portal_empty_body">Portals for this device’s applets show here when enabled. Open Applets to install or configure an applet.</string>
+    <string name="applets_portal_open_applets">Go to Applets</string>
+    <string name="applets_portal_link">Link this phone to the web</string>
+
+    <string name="applets_cards_header">Card library</string>
+    <string name="applets_cards_library">Library</string>
+    <string name="applets_cards_intro">Rich cards control agents can show on this phone. Tap one to try it; your answer stays here.</string>
+    <string name="applets_card_note">Try it out: your answer stays on this phone.</string>
+    <string name="applets_card_answered_title">Answer received</string>
+    <string name="applets_card_answered_body">This was a try-out, so the answer stays on this phone.</string>
+    <string name="applets_cards_files">Files</string>
+    <string name="applets_cards_shared">Shared</string>
+    <string name="applets_bundled_chef_title">Chef’s Helper</string>
+    <string name="applets_bundled_chef_desc">Spoken tips while you cook.</string>
+    <string name="applets_manage_named">Manage %1$s</string>
+    <string name="applets_modify_named">Modify %1$s</string>
+    <string name="applets_stop_named">Stop %1$s</string>
+    <string name="applets_build_instructions">Build instructions</string>
+    <string name="applets_connections_summary">Messages and services</string>
+    <string name="applets_tools_header">Tools</string>
+    <string name="applets_status_enabled">Enabled</string>
+    <string name="applet_handoff_copied">Prompt copied. Paste it in %1$s if the chat is empty.</string>
+</resources>

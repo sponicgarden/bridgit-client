@@ -1,0 +1,57 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "A tally watch's counts: today, the last 7 days, what's going on now, typical gaps, rules, and the episodes",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "watches_tally",
+  "query": [
+   {
+    "name": "days",
+    "description": "Episodes from the last this many days, 1-30 (default 1)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "label",
+    "description": "Only this label's episodes",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/watches/w0123456789ab/tally?days=7&label=eating",
+  "idempotent": false,
+  "path": "/v1/watches/{id}/tally",
+  "capability": "watches",
+  "returns": "watch_id, label, track, labels, watching_since, last_seen_at, today {date, checks, watched_minutes, labels {<label>: {episodes, minutes, readings}}}, days [same, newest first, up to 7], ongoing {<label>: {since, minutes}}, last {<label>: when its last episode ended}, typical_gap_minutes {<label>: median minutes between starts, 7 days, 3+ episodes}, rules [{id, last_fired_at}], rules_fired, episodes [{label, start, end, minutes, readings, ongoing}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "days": {
+     "description": "Episodes from the last this many days, 1-30 (default 1)",
+     "type": "integer"
+    },
+    "id": {
+     "description": "The id in /v1/watches/{id}/tally",
+     "type": "string"
+    },
+    "label": {
+     "description": "Only this label's episodes",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

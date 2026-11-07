@@ -1,0 +1,75 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "story",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "mode",
+    "description": "kind or wild",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "frame_capture_ids",
+    "description": "2\u20138 kept camera frame capture ids",
+    "type": "array",
+    "required": true
+   },
+   {
+    "name": "portrait_capture_id",
+    "description": "Kept portrait capture id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "context",
+    "description": "Optional context already read through /services/context; treated as untrusted observations",
+    "type": "object",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/story {\"mode\":\"kind\",\"frame_capture_ids\":[\"cap_one\",\"cap_two\"],\"portrait_capture_id\":\"cap_portrait\"}",
+  "idempotent": false,
+  "path": "/v1/story",
+  "capability": "judgment",
+  "returns": "title, narration, inventory, mode, model, cost_usd, elapsed_ms, presentation_token; saves a declared story row for the bundled fairytale applet",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "mode": {
+     "description": "kind or wild",
+     "type": "string"
+    },
+    "portrait_capture_id": {
+     "description": "Kept portrait capture id",
+     "type": "string"
+    },
+    "frame_capture_ids": {
+     "description": "2\u20138 kept camera frame capture ids",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "context": {
+     "description": "Optional context already read through /services/context; treated as untrusted observations",
+     "type": "object"
+    }
+   },
+   "required": [
+    "mode",
+    "frame_capture_ids",
+    "portrait_capture_id"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

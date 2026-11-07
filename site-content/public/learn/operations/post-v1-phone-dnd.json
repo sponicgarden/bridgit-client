@@ -1,0 +1,54 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set Do Not Disturb, with optional restoration",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "phone_dnd",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "mode",
+    "description": "off, priority, alarms or none (none mutes alarms)",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "duration_minutes",
+    "description": "Optional timed restoration, 1\u20131440 minutes; null leaves the change in place",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/phone/dnd",
+  "idempotent": true,
+  "path": "/v1/phone/dnd",
+  "capability": "controls",
+  "returns": "Set Do Not Disturb, with optional restoration",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "mode": {
+     "description": "off, priority, alarms or none (none mutes alarms)",
+     "type": "string"
+    },
+    "duration_minutes": {
+     "description": "Optional timed restoration, 1\u20131440 minutes; null leaves the change in place",
+     "type": "integer"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": ["mode"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

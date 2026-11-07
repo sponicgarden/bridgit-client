@@ -1,0 +1,202 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Take a photo now",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "camera_snapshot",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "viewfinder",
+    "description": "Optional visible capture/review; native card, portal and MCP-App captures always require it",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "group_photo",
+    "description": "Offer a spoken GO shutter using approved on-device microphone access",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "instructions",
+    "description": "Short framing instructions above the live preview, up to 240 characters",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "countdown_seconds",
+    "description": "0\u201310 seconds after the visible shutter is tapped",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "camera",
+    "description": "rear (default) or front",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "rear",
+     "front"
+    ]
+   },
+   {
+    "name": "return_image",
+    "description": "false returns capture metadata only; requires store:[memory] or another enabled retention destination; default true",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "flash",
+    "description": "Fire the flash (default false)",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "zoom",
+    "description": "Zoom ratio, e.g. 0.5 (ultra-wide), 1, 2, 5 (telephoto); the range is in /v1/capabilities after the first photo",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "max_width_px",
+    "description": "Width limit, 64-20000, or null for full size (default 2048 unless size is given)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "store",
+    "description": "Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or \"none\" = only return it. Default: your POST /v1/captures/storage choice, else only returned",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "size",
+    "description": "Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "agent",
+     "thumb",
+     "large",
+     "original"
+    ]
+   },
+   {
+    "name": "max_edge_px",
+    "description": "Long edge limit, 64-20000; overrides the preset",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "quality",
+    "description": "JPEG quality 40-100",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "raw",
+    "description": "1 = return the image bytes, details in X-Bridgit-* headers",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/camera/snapshot {\"camera\":\"rear\",\"zoom\":2}",
+  "idempotent": true,
+  "path": "/v1/camera/snapshot",
+  "capability": "camera",
+  "returns": "captured_at, width_px, height_px, format, size_bytes, data_base64 (or JPEG bytes with raw=1); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "instructions": {
+     "description": "Short framing instructions above the live preview, up to 240 characters",
+     "type": "string"
+    },
+    "return_image": {
+     "description": "false returns capture metadata only; requires store:[memory] or another enabled retention destination; default true",
+     "type": "boolean"
+    },
+    "max_edge_px": {
+     "description": "Long edge limit, 64-20000; overrides the preset",
+     "type": "integer"
+    },
+    "countdown_seconds": {
+     "description": "0\u201310 seconds after the visible shutter is tapped",
+     "type": "integer"
+    },
+    "zoom": {
+     "description": "Zoom ratio, e.g. 0.5 (ultra-wide), 1, 2, 5 (telephoto); the range is in /v1/capabilities after the first photo",
+     "type": "number"
+    },
+    "store": {
+     "description": "Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or \"none\" = only return it. Default: your POST /v1/captures/storage choice, else only returned",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "group_photo": {
+     "description": "Offer a spoken GO shutter using approved on-device microphone access",
+     "type": "boolean"
+    },
+    "quality": {
+     "description": "JPEG quality 40-100",
+     "type": "integer"
+    },
+    "max_width_px": {
+     "description": "Width limit, 64-20000, or null for full size (default 2048 unless size is given)",
+     "type": "integer"
+    },
+    "size": {
+     "description": "Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original",
+     "type": "string",
+     "enum": [
+      "agent",
+      "thumb",
+      "large",
+      "original"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "viewfinder": {
+     "description": "Optional visible capture/review; native card, portal and MCP-App captures always require it",
+     "type": "boolean"
+    },
+    "camera": {
+     "description": "rear (default) or front",
+     "type": "string",
+     "enum": [
+      "rear",
+      "front"
+     ]
+    },
+    "flash": {
+     "description": "Fire the flash (default false)",
+     "type": "boolean"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "permission_denied",
+   "notifications_required",
+   "device_locked",
+   "sensor_busy",
+   "capture_cancelled",
+   "viewfinder_required",
+   "capture_timeout",
+   "service_start_blocked",
+   "payload_too_large"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- UI-02 "success" roles (not part of Material 3). -->
+    <attr name="colorSuccess" format="color" />
+    <attr name="colorSuccessContainer" format="color" />
+    <attr name="colorOnSuccessContainer" format="color" />
+    <!-- A budget that may run out (Installed applets design pass): light and dark each pass 4.5:1 on the surface. -->
+    <attr name="colorWarning" format="color" />
+    <!-- The three button roles (Cards inbox and card controls): filled for the one main action, tonal for the
+         rest, text for quiet ones like Close. Set in Theme.Bridgit so code can build them by attribute. -->
+    <attr name="bridgitPillStyle" format="reference" />
+    <attr name="bridgitPillTonalStyle" format="reference" />
+    <attr name="bridgitPillTextStyle" format="reference" />
+</resources>

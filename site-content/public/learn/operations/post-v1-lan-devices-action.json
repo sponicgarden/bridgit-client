@@ -1,0 +1,79 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Run a fixed supported action on this agent's enrolled device",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_devices_action",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "device",
+    "description": "Enrolled device id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "action",
+    "description": "Use this device's advertised actions",
+    "type": "string",
+    "required": true,
+    "enum": [
+     "status",
+     "relay_on",
+     "relay_off",
+     "dhcp_leases"
+    ]
+   },
+   {
+    "name": "channel",
+    "description": "Shelly relay channel 0..3; must be advertised by device; default 0",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/lan/devices/action {\"device\":\"net:example\",\"action\":\"status\"}",
+  "idempotent": true,
+  "path": "/v1/lan/devices/action",
+  "capability": "lan_control",
+  "returns": "device, action, availability=online, checked_at, result; failures do not prove offline. Camera snapshots/move use existing lan_camera endpoints.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "channel": {
+     "description": "Shelly relay channel 0..3; must be advertised by device; default 0",
+     "type": "integer"
+    },
+    "action": {
+     "description": "Use this device's advertised actions",
+     "type": "string",
+     "enum": [
+      "status",
+      "relay_on",
+      "relay_off",
+      "dhcp_leases"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "device": {
+     "description": "Enrolled device id",
+     "type": "string"
+    }
+   },
+   "required": [
+    "device",
+    "action"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Remove your manifest (approved and waiting) and, unless keep_assets=true, your saved files",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "schedule_remove",
+  "query": [{
+   "name": "keep_assets",
+   "description": "Keep saved files (default false)",
+   "type": "boolean",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/schedule",
+  "idempotent": false,
+  "path": "/v1/schedule",
+  "capability": "schedule",
+  "returns": "removed",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"keep_assets": {
+    "description": "Keep saved files (default false)",
+    "type": "boolean"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

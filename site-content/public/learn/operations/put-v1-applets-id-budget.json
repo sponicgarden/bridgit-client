@@ -1,0 +1,59 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set an installed applet's money limits (all the owner's phones share them): each {id?, usd 0.01-100, per hour|day|week|month, check_at?}; within the owner's ceiling",
+  "method": "PUT",
+  "auth": true,
+  "mcp_tool": "applets_budget_set",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "limits",
+   "description": "[{id, usd, per, check_at}] \u2014 the new limits, replacing the old ones",
+   "type": "array",
+   "required": true
+  }],
+  "example": "PUT /v1/applets/ai0123456789abcd/budget {\"limits\":[{\"id\":\"l2\",\"usd\":3,\"per\":\"month\",\"check_at\":[0.5]}]}",
+  "idempotent": true,
+  "path": "/v1/applets/{id}/budget",
+  "capability": "budgets",
+  "returns": "the applet's budget as GET /v1/applets/{id}/budget returns it (after the change)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/applets/{id}/budget",
+     "type": "string"
+    },
+    "limits": {
+     "description": "[{id, usd, per, check_at}] \u2014 the new limits, replacing the old ones",
+     "type": "array",
+     "items": {"type": "object"}
+    }
+   },
+   "required": [
+    "id",
+    "limits"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter",
+   "agents_may_not_change",
+   "over_ceiling",
+   "rate_limited",
+   "out_of_range",
+   "capability_disabled",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

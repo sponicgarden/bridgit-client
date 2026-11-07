@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Interaction detail (UI-16): Bridgit-drawn header, title, image, text, controls, answer. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        app:menu="@menu/interactions_detail_menu"
+        app:navigationContentDescription="@string/interactions_back"
+        app:navigationIcon="@drawable/ic_back"
+        app:subtitleTextAppearance="?attr/textAppearanceBodySmall"
+        app:titleTextAppearance="?attr/textAppearanceTitleSmall" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/back_to_questions" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp" android:text="@string/interactions_back_to_questions" android:visibility="gone" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="24dp">
+
+            <!-- Header drawn by Bridgit, not by the agent: a shaded panel, so it reads apart from the agent's content. -->
+            <LinearLayout
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/design_bg_panel"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="8dp"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:minHeight="56dp"
+                android:orientation="horizontal">
+
+                <cc.bridgit.app.ui.common.AgentAvatarView
+                    android:id="@+id/avatar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="12dp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:importantForAccessibility="no"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/from"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAccessibility="no"
+                        android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+                    <TextView
+                        android:id="@+id/time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAccessibility="no"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:accessibilityLiveRegion="polite"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:textAppearance="?attr/textAppearanceLabelMedium" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:accessibilityLiveRegion="polite"
+                android:background="@drawable/interactions_bg_banner"
+                android:padding="12dp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:accessibilityHeading="true"
+                android:textAppearance="?attr/textAppearanceTitleLarge" />
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:adjustViewBounds="true"
+                android:background="?attr/selectableItemBackground"
+                android:scaleType="fitCenter"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:autoLink="none"
+                android:linksClickable="false"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textIsSelectable="true" />
+
+            <LinearLayout
+                android:id="@+id/controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/answer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:accessibilityLiveRegion="polite"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+<!-- CAP-34 HTML card: one bordered box that fills the screen under the toolbar. The toolbar holds the app
+         controls (back, play aloud) and says who sent the card; everything about the interaction (the agent's
+         page, its status, Back to questions, Dismiss) sits inside the border. The page can never cover
+         Bridgit's strip at the bottom of the box. Shown instead of the scroll above for kind html. -->
+    <LinearLayout
+        android:id="@+id/card_box"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/interactions_bg_card_frame"
+        android:orientation="vertical"
+        android:padding="1dp"
+        android:visibility="gone">
+
+        <!-- #0005: position in a stack of cards. Only shown with 2+ cards, so a single card never looks swipeable (#0008). -->
+        <LinearLayout
+            android:id="@+id/stack_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/stack_prev"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/interactions_stack_prev"
+                android:rotation="90"
+                android:src="@drawable/interactions_ic_expand"
+                app:tint="?attr/colorOnSurfaceVariant" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/stack_dots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:orientation="horizontal" />
+
+                <TextView
+                    android:id="@+id/stack_position"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:accessibilityLiveRegion="polite"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/stack_next"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/interactions_stack_next"
+                android:rotation="-90"
+                android:src="@drawable/interactions_ic_expand"
+                app:tint="?attr/colorOnSurfaceVariant" />
+        </LinearLayout>
+
+        <!-- The agent's page lives only inside this frame (never fullscreen). -->
+        <FrameLayout
+            android:id="@+id/card_frame"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Bridgit's strip inside the border: status, answer note, interaction actions. -->
+        <LinearLayout
+            android:id="@+id/card_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurfaceContainer"
+            android:orientation="vertical"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp">
+
+            <!-- #0005: what each swipe sends, for a waiting card the agent made swipe-answerable. -->
+            <LinearLayout
+                android:id="@+id/swipe_hints"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/swipe_left"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:textAppearance="?attr/textAppearanceLabelLarge"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <TextView
+                    android:id="@+id/swipe_right"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:textAppearance="?attr/textAppearanceLabelLarge"
+                    android:textColor="?attr/colorPrimary" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/card_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:accessibilityLiveRegion="polite"
+                android:ellipsize="end"
+                android:maxLines="3"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/card_actions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/card_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:accessibilityLiveRegion="polite"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:textAppearance="?attr/textAppearanceLabelMedium" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/card_back_to_questions"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:text="@string/interactions_back_to_questions"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/card_dismiss"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:minHeight="48dp"
+                    android:text="@string/interactions_card_dismiss"
+                    app:icon="@drawable/ic_close" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

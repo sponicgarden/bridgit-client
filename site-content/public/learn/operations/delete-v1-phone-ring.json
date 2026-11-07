@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Stop ringing and vibration",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "phone_ring_delete",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/phone/ring",
+  "idempotent": false,
+  "path": "/v1/phone/ring",
+  "capability": "ring",
+  "returns": "Stop ringing and vibration",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,114 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Record an MP4, returned raw (HTTP: 40 MB maximum; MCP: 6 MB, may stop early)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "camera_video_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "camera",
+    "description": "rear or front",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "duration_seconds",
+    "description": "1\u201330, default 10",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "audio",
+    "description": "false by default; true also requires microphone grant",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "resolution",
+    "description": "720p or 1080p",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "viewfinder",
+    "description": "Opt into visible capture and review; always enforced for card/portal/MCP-App actions",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "instructions",
+    "description": "Short framing instructions above the live preview, up to 240 characters",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "countdown_seconds",
+    "description": "0\u201310, starts after the owner presses the visible shutter",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "extract_frames",
+    "description": "0 (raw video, default) or 1\u20138: record then extract spaced JPEG frames into caller-owned capture memory and return JSON frames[{capture_id,...}]; person-started captures retain video_capture_id for optional replay/delete; automatic captures delete the video",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/camera/video",
+  "idempotent": true,
+  "path": "/v1/camera/video",
+  "capability": "video",
+  "returns": "Record an MP4, returned raw (HTTP: 40 MB maximum; MCP: 6 MB, may stop early)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "duration_seconds": {
+     "description": "1\u201330, default 10",
+     "type": "integer"
+    },
+    "instructions": {
+     "description": "Short framing instructions above the live preview, up to 240 characters",
+     "type": "string"
+    },
+    "extract_frames": {
+     "description": "0 (raw video, default) or 1\u20138: record then extract spaced JPEG frames into caller-owned capture memory and return JSON frames[{capture_id,...}]; person-started captures retain video_capture_id for optional replay/delete; automatic captures delete the video",
+     "type": "integer"
+    },
+    "countdown_seconds": {
+     "description": "0\u201310, starts after the owner presses the visible shutter",
+     "type": "integer"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "viewfinder": {
+     "description": "Opt into visible capture and review; always enforced for card/portal/MCP-App actions",
+     "type": "boolean"
+    },
+    "audio": {
+     "description": "false by default; true also requires microphone grant",
+     "type": "boolean"
+    },
+    "camera": {
+     "description": "rear or front",
+     "type": "string"
+    },
+    "resolution": {
+     "description": "720p or 1080p",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

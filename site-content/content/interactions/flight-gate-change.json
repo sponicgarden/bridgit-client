@@ -1,0 +1,15 @@
+{
+  "kind": "notice",
+  "title": "Gate change: FR 2417 now leaves from B14",
+  "text": "Moved from A3. B14 is a 9 minute walk; boarding starts 16:10. Seat 14C is unchanged.",
+  "priority": "urgent",
+  "speak": true,
+  "controls": [
+    {
+      "type": "link",
+      "id": "pass",
+      "label": "Boarding pass",
+      "url": "https://example.com/boarding/FR2417"
+    }
+  ]
+}

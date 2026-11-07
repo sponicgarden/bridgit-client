@@ -1,0 +1,91 @@
+{
+ "detail_url": "/v1/discover?id=v1.camera&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.camera.json",
+ "title": "camera",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.camera.json",
+ "prerequisites": ["Check v1.camera supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [
+  "pet-monitor",
+  "room-change-watcher",
+  "situation-counter"
+ ],
+ "operations": [
+  {
+   "summary": "Take a photo now",
+   "path": "/v1/camera/snapshot",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-camera-snapshot.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-camera-snapshot.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "camera_snapshot"
+  },
+  {
+   "summary": "Open the camera ahead of a photo, so your next snapshot fires in about 0.3 s",
+   "path": "/v1/camera/arm",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-camera-arm.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-camera-arm.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "camera_arm"
+  },
+  {
+   "summary": "Track a person's body for up to 2 minutes: the phone finds 33 body points in every camera frame (ML Kit, offline and free; no picture leaves the phone). Read the frames as they come with GET /v1/camera/pose/{id}",
+   "path": "/v1/camera/pose/start",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-camera-pose-start.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-camera-pose-start.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "camera_pose_start"
+  },
+  {
+   "summary": "Read a body tracking session: its state and the frames since an index (each frame is the 33 points as [x, y, v, ...]: x and y fractions of the upright picture, v how sure the point is in view), plus the latest preview picture",
+   "path": "/v1/camera/pose/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-camera-pose-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-camera-pose-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "camera_pose"
+  },
+  {
+   "summary": "A small picture from a body tracking session (one is kept every half second), the one nearest a time, for a replay",
+   "path": "/v1/camera/pose/{id}/picture",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-camera-pose-id-picture.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-camera-pose-id-picture.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "camera_pose_picture"
+  },
+  {
+   "summary": "Stop a body tracking session early and free the camera; its frames stay readable for 15 minutes",
+   "path": "/v1/camera/pose/{id}/stop",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-camera-pose-id-stop.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-camera-pose-id-stop.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "camera_pose_stop"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.camera",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "sense",
+ "capability_ids": ["v1.camera"]
+}

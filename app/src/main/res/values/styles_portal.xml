@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Linked devices pause pill (Sol 6.1 spec, 5 Nov 2026): 48dp tall to touch, 36dp drawn (the background is inset 6dp
+         top and bottom in PortalActivity), 14sp medium, wraps instead of clipping. match_parent in the wrap_content strip
+         (with baselineAligned off) keeps both pills the height of the taller one when one label wraps on a narrow phone. -->
+    <style name="LinkedPausePill">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:drawablePadding">6dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+</resources>

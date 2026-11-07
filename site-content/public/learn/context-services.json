@@ -1,0 +1,426 @@
+{
+ "schema": "bridgit-context-services/1",
+ "services": [
+  {
+   "call": {
+    "path": "/v1/services/context",
+    "request": {
+     "service": "places",
+     "latitude": 52.2297,
+     "longitude": 21.0122
+    },
+    "method": "POST",
+    "required_capability": "judgment"
+   },
+   "provider": "googlemaps",
+   "configuration": {
+    "read": "/v1/settings/ai-keys",
+    "shared_key_may_be_unconfigured": true,
+    "credential_provider": "googlemaps",
+    "write": "/v1/settings/ai-keys",
+    "write_only": true
+   },
+   "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+   "inputs": [
+    "latitude",
+    "longitude",
+    "radius_m",
+    "limit"
+   ],
+   "name": "Google Places Nearby Search",
+   "paid": true,
+   "description": "Nearby named places and types; map context, not proof of what is visible.",
+   "id": "places",
+   "availability": {
+    "configuration_only": true,
+    "live_provider_check": false
+   },
+   "pricing": {
+    "budget_reserve_per_call": 0.032,
+    "automatic_provider_cutoff": false,
+    "free_monthly_events": 5000,
+    "shared_allowance_enforced": true,
+    "currency": "USD",
+    "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+    "free_allowance_scope": "provider_billing_account_not_per_user",
+    "checked_on": "2026-11-06"
+   }
+  },
+  {
+   "call": {
+    "path": "/v1/services/context",
+    "request": {
+     "service": "airquality",
+     "latitude": 52.2297,
+     "longitude": 21.0122
+    },
+    "method": "POST",
+    "required_capability": "judgment"
+   },
+   "provider": "googlemaps",
+   "configuration": {
+    "read": "/v1/settings/ai-keys",
+    "shared_key_may_be_unconfigured": true,
+    "credential_provider": "googlemaps",
+    "write": "/v1/settings/ai-keys",
+    "write_only": true
+   },
+   "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+   "inputs": [
+    "latitude",
+    "longitude"
+   ],
+   "name": "Google Air Quality",
+   "paid": true,
+   "description": "Hourly air-quality indices; modeled area conditions, not a personal health assessment.",
+   "id": "airquality",
+   "availability": {
+    "configuration_only": true,
+    "live_provider_check": false
+   },
+   "pricing": {
+    "budget_reserve_per_call": 0.005,
+    "automatic_provider_cutoff": false,
+    "free_monthly_events": 10000,
+    "shared_allowance_enforced": true,
+    "currency": "USD",
+    "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+    "free_allowance_scope": "provider_billing_account_not_per_user",
+    "checked_on": "2026-11-06"
+   }
+  },
+  {
+   "call": {
+    "path": "/v1/services/context",
+    "request": {
+     "service": "pollen",
+     "latitude": 52.2297,
+     "longitude": 21.0122
+    },
+    "method": "POST",
+    "required_capability": "judgment"
+   },
+   "provider": "googlemaps",
+   "configuration": {
+    "read": "/v1/settings/ai-keys",
+    "shared_key_may_be_unconfigured": true,
+    "credential_provider": "googlemaps",
+    "write": "/v1/settings/ai-keys",
+    "write_only": true
+   },
+   "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+   "inputs": [
+    "latitude",
+    "longitude"
+   ],
+   "name": "Google Pollen",
+   "paid": true,
+   "description": "Daily pollen forecasts; availability varies by region.",
+   "id": "pollen",
+   "availability": {
+    "configuration_only": true,
+    "live_provider_check": false
+   },
+   "pricing": {
+    "budget_reserve_per_call": 0.01,
+    "automatic_provider_cutoff": false,
+    "free_monthly_events": 5000,
+    "shared_allowance_enforced": true,
+    "currency": "USD",
+    "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+    "free_allowance_scope": "provider_billing_account_not_per_user",
+    "checked_on": "2026-11-06"
+   }
+  },
+  {
+   "call": {
+    "path": "/v1/services/context",
+    "request": {
+     "service": "timezone",
+     "latitude": 52.2297,
+     "longitude": 21.0122
+    },
+    "method": "POST",
+    "required_capability": "judgment"
+   },
+   "provider": "googlemaps",
+   "configuration": {
+    "read": "/v1/settings/ai-keys",
+    "shared_key_may_be_unconfigured": true,
+    "credential_provider": "googlemaps",
+    "write": "/v1/settings/ai-keys",
+    "write_only": true
+   },
+   "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+   "inputs": [
+    "latitude",
+    "longitude",
+    "timestamp"
+   ],
+   "name": "Google Time Zone",
+   "paid": true,
+   "description": "Time-zone identifier and UTC/daylight-saving offsets at a coordinate and timestamp.",
+   "id": "timezone",
+   "availability": {
+    "configuration_only": true,
+    "live_provider_check": false
+   },
+   "pricing": {
+    "budget_reserve_per_call": 0.005,
+    "automatic_provider_cutoff": false,
+    "free_monthly_events": 10000,
+    "shared_allowance_enforced": true,
+    "currency": "USD",
+    "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+    "free_allowance_scope": "provider_billing_account_not_per_user",
+    "checked_on": "2026-11-06"
+   }
+  },
+  {
+   "call": {
+    "path": "/v1/services/context",
+    "request": {
+     "service": "maps",
+     "latitude": 52.2297,
+     "longitude": 21.0122
+    },
+    "method": "POST",
+    "required_capability": "judgment"
+   },
+   "provider": "googlemaps",
+   "configuration": {
+    "read": "/v1/settings/ai-keys",
+    "shared_key_may_be_unconfigured": true,
+    "credential_provider": "googlemaps",
+    "write": "/v1/settings/ai-keys",
+    "write_only": true
+   },
+   "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+   "inputs": [
+    "latitude",
+    "longitude"
+   ],
+   "name": "Google satellite map",
+   "paid": true,
+   "description": "Static satellite image of the surroundings; not live imagery.",
+   "id": "maps",
+   "availability": {
+    "configuration_only": true,
+    "live_provider_check": false
+   },
+   "pricing": {
+    "budget_reserve_per_call": 0.002,
+    "automatic_provider_cutoff": false,
+    "free_monthly_events": 10000,
+    "shared_allowance_enforced": true,
+    "currency": "USD",
+    "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+    "free_allowance_scope": "provider_billing_account_not_per_user",
+    "checked_on": "2026-11-06"
+   }
+  },
+  {
+   "call": {
+    "path": "/v1/services/context",
+    "request": {
+     "service": "streetview",
+     "latitude": 52.2297,
+     "longitude": 21.0122
+    },
+    "method": "POST",
+    "required_capability": "judgment"
+   },
+   "provider": "googlemaps",
+   "configuration": {
+    "read": "/v1/settings/ai-keys",
+    "shared_key_may_be_unconfigured": true,
+    "credential_provider": "googlemaps",
+    "write": "/v1/settings/ai-keys",
+    "write_only": true
+   },
+   "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+   "inputs": [
+    "latitude",
+    "longitude"
+   ],
+   "name": "Google Street View",
+   "paid": true,
+   "description": "Street-level image when coverage exists; metadata reports capture date when available.",
+   "id": "streetview",
+   "availability": {
+    "configuration_only": true,
+    "live_provider_check": false
+   },
+   "pricing": {
+    "budget_reserve_per_call": 0.007,
+    "automatic_provider_cutoff": false,
+    "free_monthly_events": 10000,
+    "shared_allowance_enforced": true,
+    "currency": "USD",
+    "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+    "free_allowance_scope": "provider_billing_account_not_per_user",
+    "checked_on": "2026-11-06"
+   }
+  },
+  {
+   "call": {
+    "path": "/v1/services/context",
+    "request": {
+     "service": "weathergoogle",
+     "latitude": 52.2297,
+     "longitude": 21.0122
+    },
+    "method": "POST",
+    "required_capability": "judgment"
+   },
+   "provider": "googlemaps",
+   "configuration": {
+    "read": "/v1/settings/ai-keys",
+    "shared_key_may_be_unconfigured": true,
+    "credential_provider": "googlemaps",
+    "write": "/v1/settings/ai-keys",
+    "write_only": true
+   },
+   "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+   "inputs": [
+    "latitude",
+    "longitude"
+   ],
+   "name": "Google Weather",
+   "paid": true,
+   "description": "Current weather, temperature, wind and conditions.",
+   "id": "weathergoogle",
+   "availability": {
+    "configuration_only": true,
+    "live_provider_check": false
+   },
+   "pricing": {
+    "budget_reserve_per_call": 0.00015,
+    "automatic_provider_cutoff": false,
+    "free_monthly_events": 10000,
+    "shared_allowance_enforced": true,
+    "currency": "USD",
+    "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+    "free_allowance_scope": "provider_billing_account_not_per_user",
+    "checked_on": "2026-11-06"
+   }
+  },
+  {
+   "call": {
+    "path": "/v1/services/context",
+    "request": {
+     "service": "osm",
+     "latitude": 52.2297,
+     "longitude": 21.0122
+    },
+    "method": "POST",
+    "required_capability": "judgment"
+   },
+   "provider": "osm",
+   "configuration": null,
+   "data_use": "Attribute OpenStreetMap contributors; ODbL.",
+   "inputs": [
+    "latitude",
+    "longitude"
+   ],
+   "name": "OpenStreetMap surroundings",
+   "paid": false,
+   "description": "Nearby mapped parks, waterways, amenities and landmarks from Overpass.",
+   "id": "osm",
+   "availability": {
+    "configuration_only": true,
+    "live_provider_check": false
+   },
+   "pricing": {
+    "budget_reserve_per_call": 0,
+    "automatic_provider_cutoff": false,
+    "free_monthly_events": null,
+    "shared_allowance_enforced": false,
+    "currency": "USD",
+    "source": null,
+    "free_allowance_scope": null,
+    "checked_on": "2026-11-06"
+   }
+  },
+  {
+   "call": {
+    "path": "/v1/services/context",
+    "request": {
+     "service": "wikipedia",
+     "latitude": 52.2297,
+     "longitude": 21.0122
+    },
+    "method": "POST",
+    "required_capability": "judgment"
+   },
+   "provider": "wikipedia",
+   "configuration": null,
+   "data_use": "Follow article licensing and attribution; nearby does not mean visible.",
+   "inputs": [
+    "latitude",
+    "longitude"
+   ],
+   "name": "Wikipedia nearby places",
+   "paid": false,
+   "description": "Nearby geotagged articles for historical and cultural research.",
+   "id": "wikipedia",
+   "availability": {
+    "configuration_only": true,
+    "live_provider_check": false
+   },
+   "pricing": {
+    "budget_reserve_per_call": 0,
+    "automatic_provider_cutoff": false,
+    "free_monthly_events": null,
+    "shared_allowance_enforced": false,
+    "currency": "USD",
+    "source": null,
+    "free_allowance_scope": null,
+    "checked_on": "2026-11-06"
+   }
+  },
+  {
+   "call": {
+    "path": "/v1/services/context",
+    "request": {
+     "service": "openmeteo",
+     "latitude": 52.2297,
+     "longitude": 21.0122
+    },
+    "method": "POST",
+    "required_capability": "judgment"
+   },
+   "provider": "openmeteo",
+   "configuration": {
+    "read": "/v1/settings/ai-keys",
+    "shared_key_may_be_unconfigured": true,
+    "credential_provider": "openmeteo",
+    "write": "/v1/settings/ai-keys",
+    "write_only": true
+   },
+   "data_use": "Attribute Open-Meteo; use the licensed customer API for commercial workloads.",
+   "inputs": [
+    "latitude",
+    "longitude"
+   ],
+   "name": "Open-Meteo weather",
+   "paid": true,
+   "description": "Weather and sunrise/sunset; commercial use requires a customer API subscription.",
+   "id": "openmeteo",
+   "availability": {
+    "configuration_only": true,
+    "live_provider_check": false
+   },
+   "pricing": {
+    "budget_reserve_per_call": 0.001,
+    "automatic_provider_cutoff": false,
+    "free_monthly_events": null,
+    "shared_allowance_enforced": false,
+    "currency": "USD",
+    "source": "https://open-meteo.com/en/pricing",
+    "free_allowance_scope": null,
+    "checked_on": "2026-11-06"
+   }
+  }
+ ]
+}

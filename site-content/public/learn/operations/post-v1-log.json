@@ -1,0 +1,67 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Write a note to the agent channel",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "log_note",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "message",
+    "description": "Up to 1 KB",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "level",
+    "description": "debug, info (default), warn, error",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "data",
+    "description": "Up to 4 KB of JSON",
+    "type": "object",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/log {\"message\":\"checked fridge photo, milk low\"}",
+  "idempotent": true,
+  "path": "/v1/log",
+  "capability": "log",
+  "returns": "id",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "data": {
+     "description": "Up to 4 KB of JSON",
+     "type": "object"
+    },
+    "level": {
+     "description": "debug, info (default), warn, error",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "message": {
+     "description": "Up to 1 KB",
+     "type": "string"
+    }
+   },
+   "required": ["message"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

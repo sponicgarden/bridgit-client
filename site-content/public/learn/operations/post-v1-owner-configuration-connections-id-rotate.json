@@ -1,0 +1,57 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Rotate the Standard Webhooks signing key to a receiver-provisioned value; previous key remains for 24 hours; same-value retries do not rotate again; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_connections_rotate",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "signing_secret",
+   "description": "whsec_ + base64 of 32 random bytes known to the receiver",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/owner/configuration/connections/{id}/rotate {\"signing_secret\":\"<receiver-generated whsec key>\"}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/connections/{id}/rotate",
+  "capability": "owner_features",
+  "returns": "safe configured status; neither old nor new key returned",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "signing_secret": {
+     "description": "whsec_ + base64 of 32 random bytes known to the receiver",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/connections/{id}/rotate",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "signing_secret",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

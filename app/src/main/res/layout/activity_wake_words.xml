@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Wake words (8.23, CAP-47): switch and status, the offline speech model, the owner's wake words, and the add form. -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="64dp"
+            app:navigationContentDescription="@string/cd_back"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="@string/listening_title" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false">
+
+            <!-- The speech model's header and card move to the top while it isn't downloaded yet (WakeWordsActivity.placeModel). -->
+            <LinearLayout
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
+
+                <!-- What wake words do: read-only, so the welcome page's gradient panel and accent line. -->
+                <LinearLayout
+                    style="@style/Widget.Bridgit.InfoPanel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/wake_intro"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <View
+                        style="@style/Widget.Bridgit.Rule"
+                        android:layout_marginTop="12dp" />
+                </LinearLayout>
+
+                <!-- Switch and live status. -->
+                <LinearLayout
+                    style="@style/Widget.Bridgit.Panel"
+                    android:padding="16dp">
+
+                        <LinearLayout
+                            android:id="@+id/switchRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackground"
+                            android:baselineAligned="false"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:minHeight="48dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="12dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/tour_ic_mic"
+                                app:tint="?attr/colorPrimary" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/wake_listen_switch"
+                                android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/toggle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false"
+                                android:importantForAccessibility="no" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:baselineAligned="false"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp">
+
+                            <View
+                                android:id="@+id/statusDot"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:layout_marginStart="7dp"
+                                android:layout_marginEnd="19dp"
+                                android:background="@drawable/wake_dot" />
+
+                            <TextView
+                                android:id="@+id/status"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textAppearance="?attr/textAppearanceBodyMedium" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/lastHit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="36dp"
+                            android:paddingTop="4dp"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:visibility="gone" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/fix"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="36dp"
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/mute"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="36dp"
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/Widget.Bridgit.Panel"
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        style="@style/Widget.Bridgit.SectionHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="0dp"
+                        android:text="@string/wake_section_words" />
+
+                <TextView
+                    android:id="@+id/count"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="8dp"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <LinearLayout
+                    android:id="@+id/words"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+                </LinearLayout>
+
+                <!-- Add form. -->
+                <LinearLayout
+                    android:id="@+id/addCard"
+                    style="@style/Widget.Bridgit.Panel"
+                    android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingBottom="12dp"
+                            android:text="@string/wake_add_title"
+                            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/phraseLayout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/wake_phrase_hint"
+                            app:helperText="@string/wake_phrase_helper">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/phrase"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:imeOptions="actionDone"
+                                android:inputType="textNoSuggestions"
+                                android:maxLines="1" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/agentLayout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:hint="@string/wake_agent_hint">
+
+                            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                                android:id="@+id/agent"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/clip"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/wake_send_audio" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/add"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:text="@string/wake_add"
+                            app:icon="@drawable/ic_add" />
+                </LinearLayout>
+
+                <!-- "Listen for any sounds": no wake word, one agent, how loud, clip or not. -->
+                <LinearLayout
+                    style="@style/Widget.Bridgit.Panel"
+                    android:padding="16dp">
+                        <TextView
+                            style="@style/Widget.Bridgit.SectionHeader"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="0dp"
+                            android:text="@string/sounds_section" />
+
+                        <LinearLayout
+                            android:id="@+id/soundRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackground"
+                            android:baselineAligned="false"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:minHeight="48dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="12dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/interactions_ic_play"
+                                app:tint="?attr/colorPrimary" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/cap_sounds"
+                                android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/soundToggle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false"
+                                android:importantForAccessibility="no" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:baselineAligned="false"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp">
+
+                            <View
+                                android:id="@+id/soundDot"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:layout_marginStart="7dp"
+                                android:layout_marginEnd="19dp"
+                                android:background="@drawable/wake_dot" />
+
+                            <TextView
+                                android:id="@+id/soundStatus"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textAppearance="?attr/textAppearanceBodyMedium" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="8dp"
+                            android:text="@string/sounds_explain"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/soundAgentLayout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:hint="@string/sounds_agent_hint">
+
+                            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                                android:id="@+id/soundAgent"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="4dp"
+                            android:text="@string/sounds_how_loud"
+                            android:textAppearance="?attr/textAppearanceLabelLarge" />
+
+                        <com.google.android.material.button.MaterialButtonToggleGroup
+                            android:id="@+id/sensitivity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:selectionRequired="true"
+                            app:singleSelection="true">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/sensQuiet"
+                                style="@style/Widget.Bridgit.Segment"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/sounds_quiet" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/sensNormal"
+                                style="@style/Widget.Bridgit.Segment"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/sounds_normal" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/sensLoud"
+                                style="@style/Widget.Bridgit.Segment"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/sounds_loud" />
+                        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/soundClip"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/sounds_send_clip" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/modelHeader"
+                    style="@style/Widget.Bridgit.SectionHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="24dp"
+                    android:text="@string/wake_section_model" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/modelCard"
+                    style="@style/Widget.Bridgit.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/modelTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                        <TextView
+                            android:id="@+id/modelName"
+                            style="@style/Widget.Bridgit.MonoChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp" />
+
+                        <TextView
+                            android:id="@+id/modelDetail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="8dp"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:visibility="gone"
+                            app:trackCornerRadius="4dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/modelAction"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

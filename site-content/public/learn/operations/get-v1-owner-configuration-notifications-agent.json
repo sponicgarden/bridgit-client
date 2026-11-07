@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read an agent's selected notification-app packages and available native choices; no notification content",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_notifications_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/notifications/{agent}",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/notifications/{agent}",
+  "capability": "owner_features",
+  "returns": "agent_id,packages,available,android_access_granted; selection does not grant notification-read/reply or OS consent",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"agent": {
+    "description": "The agent in /v1/owner/configuration/notifications/{agent}",
+    "type": "string"
+   }},
+   "required": ["agent"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

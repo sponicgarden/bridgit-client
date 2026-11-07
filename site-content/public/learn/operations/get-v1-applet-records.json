@@ -1,0 +1,60 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your own records on the phone, in key order with their values, about 48 KB a page (pass next as after for the next page)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applet_records_list",
+  "query": [
+   {
+    "name": "prefix",
+    "description": "Only keys that start with this (e.g. item.)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "after",
+    "description": "Start after this key (the last page's next)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "keys_only",
+    "description": "true leaves values out",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applet/records?prefix=item.",
+  "idempotent": false,
+  "path": "/v1/applet/records",
+  "capability": "applet_data",
+  "returns": "records [{key, value, updated_at, chars}], next (null at the end), count, total_chars, max_records, max_total_chars",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "prefix": {
+     "description": "Only keys that start with this (e.g. item.)",
+     "type": "string"
+    },
+    "keys_only": {
+     "description": "true leaves values out",
+     "type": "boolean"
+    },
+    "after": {
+     "description": "Start after this key (the last page's next)",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

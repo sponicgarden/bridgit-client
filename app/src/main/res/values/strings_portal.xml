@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bridgit Portal (iPhone & iPad): a read-only viewer that reaches this phone through the relay. -->
+<resources>
+    <string name="more_portal">Linked devices</string>
+    <!-- Linked devices and Pair a device (owner, 5 Nov 2026). -->
+    <string name="cap_portal">Bridgit Portal</string>
+    <string name="cap_portal_desc">Read-only data for the Bridgit Portal app on your iPhone or iPad: Home, network devices, activity, control agents and applets.</string>
+    <string name="portal_title">Bridgit Portal</string>
+    <string name="portal_hero_body">The Bridgit Portal app shows this phone\'s Home, network devices, activity, control agents and applets, live. It only reads: it can\'t take photos, record, tap or change settings.</string>
+    <string name="portal_pair">Show a pairing code</string>
+    <string name="portal_pairing">Setting up…</string>
+    <string name="portal_pair_failed_title">Can\'t show pairing code</string>
+    <string name="portal_approve_failed_title">Can\'t approve request</string>
+    <string name="portal_failed">Couldn\'t set up the portal: %1$s</string>
+    <string name="portal_scan_title">Scan with the Bridgit Portal app</string>
+    <string name="portal_scan_body">On the iPhone or iPad, open Bridgit Portal and scan this code. On an Android phone, open Bridgit › More › Linked devices › Pair a device › View another phone\'s Home. Or copy the link and send it. It\'s shown only now. Keep it private: whoever has it can see this phone until you disconnect it here.</string>
+    <string name="portal_qr_desc">Pairing code for %1$s</string>
+    <string name="portal_copy">Copy link</string>
+    <string name="portal_share">Share</string>
+    <string name="portal_done">Done</string>
+    <!-- Share: subject and message around the pairing link. %1$s = this phone's name, %2$s = the bridgit.cc/portalpairing page, %3$s = the link. -->
+    <string name="portal_share_subject">Pair with %1$s in Bridgit Portal</string>
+    <string name="portal_share_text">"You're invited to view %1$s in Bridgit Portal.\n\nThe link at the bottom works once, on one iPhone, iPad or Android phone. It expires in 24 hours if nobody uses it.\n\n\nHOW TO CONNECT\n\n1.  Get the Bridgit Portal app (iPhone, iPad or Android):\n    %2$s\n\n2.  Copy the pairing link at the bottom of this message.\n\n3.  Paste it into the app:\n    •  iPhone or iPad: tap Paste a sign-in or pairing link.\n    •  Android: open Bridgit › More › Linked devices › Pair a device › View another phone\'s Home.\n\n\nYOUR PAIRING LINK\n\n%3$s"</string>
+    <string name="portal_copied">Link copied</string>
+    <!-- The pairing sheet once the portal has made its first call. %1$s = what it calls itself ("iPhone 16 Pro"), %2$s = phone/tablet. -->
+    <string name="portal_connected_body">%1$s can now view this %2$s\'s Home in Bridgit Portal.</string>
+    <string name="portal_connected_someone">Your device</string>
+    <string name="portal_connected_text">It now shows on Linked devices. Tap it there to disconnect it at any time.</string>
+    <string name="portal_disconnect">Disconnect</string>
+    <!-- Agents tab: portal pairings only view the phone, so they aren't listed as agents; one row links to More › Linked devices. -->
+    <string name="portal_agents_row">Viewing through Bridgit Portal: %1$s</string>
+    <string name="portal_disconnect_title">Disconnect %1$s?</string>
+    <string name="portal_disconnect_body">The iPhone or iPad paired as %1$s stops seeing this %2$s right away. You can pair it again later.</string>
+    <string name="portal_request_title">Bridgit Portal wants to view this phone</string>
+    <string name="portal_request_text">%1$s on %2$s asks to see this phone. Tap to allow or deny.</string>
+    <string name="portal_request_dialog_title">Allow %1$s to view this %2$s?</string>
+    <string name="portal_request_dialog_body">%1$s, signed in as %2$s, asks to see this %3$s through Bridgit Portal: Home, network devices, activity, control agents and applets. It only reads; it can\'t take photos, record, tap or change settings. You can disconnect it here any time.</string>
+    <string name="portal_request_allow">Allow</string>
+    <string name="portal_request_deny">Deny</string>
+    <string name="portal_request_allowed">%1$s can now view this %2$s</string>
+    <string name="portal_request_denied">Denied</string>
+    <string name="portal_request_expired">That request has expired. Ask again from the iPhone or iPad.</string>
+    <string name="portal_viewing">Read-only · updated %1$s</string>
+    <string name="portal_viewing_waiting">Read-only · connecting…</string>
+    <string name="portal_viewing_failed">Can\'t reach it: %1$s Showing data from %2$s.</string>
+    <string name="portal_viewing_failed_never">Can\'t reach it: %1$s</string>
+    <string name="portal_read_only">Read-only view of %1$s. Switch to this %2$s to change anything.</string>
+    <string name="portal_chooser_title">Phones</string>
+    <string name="portal_chooser_done">Done</string>
+    <string name="portal_chooser_waiting_pill">Waiting</string>
+    <string name="portal_chooser_battery">%1$d%%</string>
+    <string name="portal_chooser_battery_charging">%1$d%% charging</string>
+    <string name="portal_chooser_selected">Shown on Home now</string>
+    <string name="portal_chooser_card_desc">%1$s. %2$s. %3$s</string>
+    <string name="portal_chooser_this">This phone</string>
+    <string name="portal_chooser_hub">Hub · this phone is its satellite</string>
+    <string name="connected_hub_portal">Hub · this phone is its portal</string>
+    <string name="portal_chooser_add">Linked devices and pairing…</string>
+    <string name="portal_scan_add_title">Add a phone</string>
+    <string name="portal_scan_add_body">On the other phone, open Bridgit › More › Linked devices › Pair a device › Let a phone view this one, then point this camera at its code. Or paste its link below. This phone then shows that phone\'s Home, read-only.</string>
+    <string name="portal_scan_preview">Camera view for scanning the pairing code</string>
+    <string name="portal_scan_paste_hint">Or paste the bridgitportal:// link</string>
+    <string name="portal_scan_use_link">Use this link</string>
+    <string name="portal_scan_confirm_title">View %1$s?</string>
+    <string name="portal_scan_confirm_body">This phone will show %1$s\'s Home, network devices and activity, read-only, through the relay. Remove it any time on More › Linked devices.</string>
+    <string name="portal_scan_confirm_ok">View it</string>
+    <string name="portal_scan_checking">Checking the link…</string>
+    <string name="portal_scan_not_link">That isn\'t a Bridgit Portal pairing code.</string>
+    <string name="portal_scan_failed">Couldn\'t reach that phone: %1$s</string>
+    <string name="portal_scan_no_camera">Allow the camera to scan, or paste the link.</string>
+    <string name="portal_other_add">Scan or paste its code</string>
+    <string name="portal_other_remove">Remove</string>
+    <string name="portal_other_remove_body">This %2$s forgets the link to %1$s. To stop it for good, disconnect this %2$s on %1$s too.</string>
+    <string name="portal_relay_note">Uses the relay (More › Relay). Pairing turns it on if it\'s off.</string>
+    <!-- Linked devices and Pair a device (owner, 5 Nov 2026) -->
+    <string name="linked_title">Linked devices</string>
+    <!-- Pause pills: the label shows the state; TalkBack reads "Pause satellite connections, switch, off, enabled". -->
+    <string name="linked_pause_satellites">Pause satellite connections</string>
+    <string name="linked_pause_hubs">Pause hub connections</string>
+    <plurals name="linked_pill_satellites_enabled">
+        <item quantity="one">%d Satellite Enabled</item>
+        <item quantity="other">%d Satellites Enabled</item>
+    </plurals>
+    <plurals name="linked_pill_satellites_disabled">
+        <item quantity="one">%d Satellite Disabled</item>
+        <item quantity="other">%d Satellites Disabled</item>
+    </plurals>
+    <plurals name="linked_pill_hubs_enabled">
+        <item quantity="one">%d Hub Enabled</item>
+        <item quantity="other">%d Hubs Enabled</item>
+    </plurals>
+    <plurals name="linked_pill_hubs_disabled">
+        <item quantity="one">%d Hub Disabled</item>
+        <item quantity="other">%d Hubs Disabled</item>
+    </plurals>
+    <string name="linked_pill_state_on">enabled</string>
+    <string name="linked_pill_state_paused">paused</string>
+    <string name="linked_paused_status">paused</string>
+    <string name="linked_hint">Tap a device to see it, show its Home or unlink it.</string>
+    <string name="linked_hint_alone">Nothing is linked to this %1$s yet.</string>
+    <string name="linked_pair_body">Link a hub, a satellite or an iPhone or iPad to this phone.</string>
+    <string name="linked_role_hub">Hub</string>
+    <string name="linked_role_portal">Portal</string>
+    <string name="linked_role_satellite">Satellite</string>
+    <!-- A Bridgit Portal viewing this phone: a satellite that can only look (owner, 5 Nov 2026). -->
+    <string name="linked_role_view_only">View-only satellite</string>
+    <string name="linked_role_this">This %1$s</string>
+    <string name="linked_close">Close</string>
+    <string name="linked_home_now">Home now shows %1$s</string>
+    <string name="linked_hub_satellite">This %1$s is its satellite.</string>
+    <string name="linked_hub_waiting">It hasn\'t sent its Home yet. Make sure the hub is on and has the latest Bridgit; it checks in every 5 minutes.</string>
+    <string name="linked_viewer_body">Views this %1$s\'s Home through Bridgit Portal. Read-only.</string>
+    <!-- Device dialog (LinkedDeviceSheet): one status word per kind, agreeing with the map's online/offline. -->
+    <string name="linked_status_online">Online</string>
+    <string name="linked_status_offline">Offline</string>
+    <string name="linked_status_not_checked">Not checked</string>
+    <string name="linked_status_paused">Paused</string>
+    <string name="linked_status_not_found">Not found in the last scan</string>
+    <string name="linked_fact_last_seen">Last seen: %1$s</string>
+    <string name="linked_fact_last_found">Last found: %1$s</string>
+    <string name="linked_fact_shared">Applets shared: %1$s</string>
+    <string name="linked_fact_unlinked">Unlinked on the satellite</string>
+    <plurals name="linked_n_photo_applets">
+        <item quantity="one">%d photo applet</item>
+        <item quantity="other">%d photo applets</item>
+    </plurals>
+    <plurals name="linked_n_portals">
+        <item quantity="one">%d portal</item>
+        <item quantity="other">%d portals</item>
+    </plurals>
+    <string name="portal_chooser_hub_waiting">Hub · waiting for it to check in</string>
+    <string name="portal_chooser_waiting_title">%1$s hasn\'t checked in yet</string>
+    <string name="linked_hub_stale">It hasn\'t checked in for a while, so it may be off, asleep or off Tailscale. If it is on and doesn\'t show this %1$s as its satellite, pair again.</string>
+    <string name="linked_hub_forgotten">Bridgit is running on that phone, but it no longer checks in with this one: it doesn\'t list this %1$s as its satellite. The copy of Bridgit that paired with this %1$s was removed, reset or reinstalled. Tap Pair again, then scan the code with the hub.</string>
+    <string name="linked_hub_forgotten_status">doesn\'t list this %1$s</string>
+    <string name="portal_chooser_hub_forgotten">Hub · doesn\'t list this phone, pair again</string>
+    <string name="portal_chooser_forgotten_title">%1$s doesn\'t list this phone</string>
+    <string name="portal_chooser_hub_stale">Hub · not checking in, pair again</string>
+    <string name="portal_chooser_stale_title">%1$s stopped checking in</string>
+    <string name="linked_pair_again">Pair again</string>
+    <string name="linkpair_title">Pair a device</string>
+    <string name="linked_pair_button">Pair</string>
+    <string name="linked_role_network">Network</string>
+    <string name="linked_net_added">Added to Bridgit</string>
+    <string name="linked_net_seen">Seen on this network</string>
+    <string name="linked_net_address">Address: %1$s</string>
+    <string name="linked_net_open">Network devices</string>
+    <string name="linkpair_group_join">This phone joins another</string>
+    <string name="linkpair_group_host">Another device joins this phone</string>
+    <string name="linkpair_join_satellite">Make this phone a satellite of a hub</string>
+    <string name="linkpair_view_hub">View another phone\'s Home from this one</string>
+    <string name="linkpair_view_hub_body">This phone becomes a portal: it shows the other phone\'s Home, network devices and activity, read-only. You can switch between phones from the Home hexagon.</string>
+    <string name="linkpair_add_satellite">Add a satellite to this phone</string>
+    <string name="linkpair_let_view">Let an iPhone, iPad or phone view this one</string>
+    <string name="linkpair_paste">Paste link</string>
+    <string name="linkpair_add_device">Add a device to this phone</string>
+    <string name="linkpair_add_device_body">To let an iPhone, iPad or another phone view this phone, show a code for it to scan. To add a spare Bridgit phone, scan the code shown on that phone.</string>
+    <string name="linkpair_show_code">Show pairing code</string>
+    <string name="linkpair_scan_its_code">Scan its code</string>
+    <!-- Linked devices' device sheet (DeviceDetailSheet), as the iOS Portal shows a phone; spec docs/design/linked-device-sheet.md. -->
+    <string name="linked_battery_percent">%1$d%%</string>
+    <string name="linked_battery_a11y">Battery %1$d%%</string>
+    <string name="linked_battery_charging_a11y">Battery %1$d%%, charging</string>
+    <string name="linked_where">Where</string>
+    <string name="linked_network_address">Network address</string>
+    <string name="linked_services">Services</string>
+    <string name="linked_connected">Connected</string>
+    <string name="linked_close_details">Close device details</string>
+    <string name="linked_status_live">Live</string>
+    <string name="linked_pill_offline_ago">Offline · %1$s</string>
+    <string name="linked_n_of_m">%1$d of %2$d</string>
+    <string name="linked_tile_features">Features on</string>
+    <string name="linked_tile_agents">Control agents</string>
+    <string name="linked_tile_applets">Applets running</string>
+    <string name="linked_tile_network">Network devices</string>
+    <string name="linked_conn_adb">ADB</string>
+    <string name="linked_conn_relay">Relay</string>
+    <string name="linked_conn_tailscale">Tailscale</string>
+    <string name="linked_conn_wifi">Wi-Fi</string>
+    <string name="linked_service_clef">Clef</string>
+    <string name="linked_service_jev">Jev</string>
+    <string name="linked_service_weather">Weather</string>
+    <string name="linked_service_ready">Ready</string>
+    <string name="linked_service_on">On</string>
+    <string name="linked_service_off">Off</string>
+    <string name="linked_service_blocked">Needs access</string>
+    <string name="linked_conn_this_title">This %1$s</string>
+    <string name="linked_conn_this_body">This is the device in your hand.</string>
+    <plurals name="linked_hub_for">
+        <item quantity="one">Hub for %d satellite</item>
+        <item quantity="other">Hub for %d satellites</item>
+    </plurals>
+    <string name="linked_view_only_part">(%1$d view-only)</string>
+    <string name="linked_this_satellite_of">Satellite of %1$s.</string>
+    <string name="linked_this_view_only_of">View-only satellite of %1$s.</string>
+    <string name="linked_view">View</string>
+    <string name="linked_view_this_caption">Opens this %1$s\'s Home.</string>
+    <string name="linked_view_hub_caption">Opens this hub\'s Home.</string>
+    <string name="linked_hub_view_only">This %1$s is its view-only satellite.</string>
+    <string name="linked_hub_uses">Uses its %1$s and %2$s.</string>
+    <string name="linked_updated_ago">Updated %1$s</string>
+    <string name="linked_conn_hub_live">Hub connected</string>
+    <string name="linked_conn_hub_live_body">This %1$s is linked to this hub.</string>
+    <string name="linked_conn_hub_off">Hub offline</string>
+    <string name="linked_conn_hub_off_body">This hub hasn\'t checked in recently.</string>
+    <string name="linked_conn_sat_live">Satellite connected</string>
+    <string name="linked_conn_sat_live_body">This satellite is available to its permitted control agents.</string>
+    <string name="linked_conn_sat_off">Satellite offline</string>
+    <string name="linked_conn_sat_off_body">This satellite is not currently reachable.</string>
+    <string name="linked_conn_portal_live">Portal connected</string>
+    <string name="linked_conn_portal_off">Portal offline</string>
+</resources>

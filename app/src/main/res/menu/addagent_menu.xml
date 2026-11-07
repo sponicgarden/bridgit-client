@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Add agent overflow (ui-spec 5.4). Shown on the setup prompt step only. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/addagent_copy_key" android:title="@string/addagent_copy_key" app:showAsAction="never" />
+    <item android:id="@+id/addagent_pair" android:title="@string/addagent_pair" app:showAsAction="never" />
+    <!-- Report a bug / Request a feature go here in P1b. -->
+</menu>

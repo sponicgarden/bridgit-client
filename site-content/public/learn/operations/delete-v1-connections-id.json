@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Revoke a connection and cancel queued sends; requires configuration authority",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "connections_delete",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/connections/connection-id",
+  "idempotent": false,
+  "path": "/v1/connections/{id}",
+  "capability": "connections",
+  "returns": "revoked:true",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/connections/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

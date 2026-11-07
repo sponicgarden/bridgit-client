@@ -1,0 +1,39 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Pause or resume your approved actions",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "schedule_pause",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "paused",
+   "description": "true pauses, false resumes",
+   "type": "boolean",
+   "required": true
+  }],
+  "example": "POST /v1/schedule/pause {\"paused\":true}",
+  "idempotent": false,
+  "path": "/v1/schedule/pause",
+  "capability": "schedule",
+  "returns": "paused",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"paused": {
+    "description": "true pauses, false resumes",
+    "type": "boolean"
+   }},
+   "required": ["paused"]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

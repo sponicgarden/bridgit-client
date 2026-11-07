@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The owner's connections (webhooks out to Home Assistant, Discord, ntfy, Telegram, n8n\u2026) you can send to: id, name and service, never the address or secrets",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "connections_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/connections",
+  "idempotent": false,
+  "path": "/v1/connections",
+  "capability": "connections",
+  "returns": "connections [{id, name, preset, service, photos (takes a photo file), needs_text, private_network, enabled, failing}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

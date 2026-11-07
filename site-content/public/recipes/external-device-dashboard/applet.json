@@ -1,0 +1,81 @@
+{
+  "format": "bridgit-template/1",
+  "id": "external-device-dashboard",
+  "version": "2.0.0",
+  "kind": "applet",
+  "name": "External device dashboard",
+  "summary": "List only the agent’s enrolled LAN devices; keep availability honest.",
+  "runtime": {
+    "adapter": "android.package.v1",
+    "applet_key": "external-device-dashboard",
+    "supports_dynamic_execution": false
+  },
+  "config_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {}
+  },
+  "defaults": {},
+  "processing": {},
+  "permissions": {
+    "required": [
+      "interactions",
+      "lan_control"
+    ],
+    "optional": [],
+    "remote": [],
+    "automatic_grants": false
+  },
+  "ui": {
+    "inputs": {},
+    "card": {
+      "title": "External device dashboard",
+      "sources": {
+        "lan": {
+          "call": {
+            "method": "GET",
+            "path": "/v1/lan/devices"
+          }
+        }
+      },
+      "states": {
+        "empty": "No devices enrolled for this agent. Listing does not probe the network."
+      },
+      "pieces": [
+        {
+          "type": "header",
+          "eyebrow": "Bridgit applet",
+          "text": "Your shared devices at a glance."
+        },
+        {
+          "type": "devices",
+          "items": {
+            "$source": "lan.devices"
+          },
+          "name": "name",
+          "kind": "adapter",
+          "availability": "availability",
+          "checked_at": "verified_at",
+          "empty": "No devices enrolled yet."
+        },
+        {
+          "type": "note",
+          "text": "Listing does not probe devices. No hardware is controlled here."
+        },
+        {
+          "type": "buttons",
+          "items": [
+            {
+              "label": "Refresh",
+              "style": "primary",
+              "do": {
+                "refresh": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

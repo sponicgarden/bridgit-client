@@ -1,0 +1,55 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Run a shell command as Android's shell user (agents with Agent Super Powers)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "adb_shell",
+  "query": [],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [
+   {
+    "name": "command",
+    "description": "Shell command, 1-8000 characters",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "timeout_seconds",
+    "description": "1-120, default 30",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/adb/shell {\"command\":\"input keyevent KEYCODE_HOME\"}",
+  "idempotent": false,
+  "path": "/v1/adb/shell",
+  "capability": "adb",
+  "returns": "exit_code, output, truncated, timed_out",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "timeout_seconds": {
+     "description": "1-120, default 30",
+     "type": "integer"
+    },
+    "command": {
+     "description": "Shell command, 1-8000 characters",
+     "type": "string"
+    }
+   },
+   "required": ["command"]
+  },
+  "errors": [
+   "capability_disabled",
+   "service_start_blocked",
+   "forbidden",
+   "invalid_parameter"
+  ],
+  "requires": "super_powers"
+ }
+}

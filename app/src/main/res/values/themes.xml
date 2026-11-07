@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Material 3, dynamic colour off (UI-02), light/dark from values(-night)/colors.xml. -->
+    <style name="Theme.Bridgit" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/b_primary</item>
+        <item name="colorOnPrimary">@color/b_on_primary</item>
+        <item name="colorPrimaryContainer">@color/b_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/b_on_primary_container</item>
+        <item name="colorSecondary">@color/b_secondary</item>
+        <item name="colorOnSecondary">@color/b_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/b_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/b_on_secondary_container</item>
+        <item name="colorTertiary">@color/b_secondary</item>
+        <item name="colorTertiaryContainer">@color/b_secondary_container</item>
+        <item name="colorOnTertiaryContainer">@color/b_on_secondary_container</item>
+        <item name="android:colorBackground">@color/b_surface</item>
+        <item name="colorSurface">@color/b_surface</item>
+        <item name="colorOnSurface">@color/b_on_surface</item>
+        <item name="colorOnBackground">@color/b_on_surface</item>
+        <item name="colorSurfaceContainer">@color/b_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/b_surface_container_high</item>
+        <item name="colorSurfaceContainerHighest">@color/b_surface_container_highest</item>
+        <item name="colorSurfaceContainerLow">@color/b_surface_container_low</item>
+        <item name="colorSurfaceContainerLowest">@color/b_surface_container_lowest</item>
+        <item name="colorSurfaceVariant">@color/b_surface_container_high</item>
+        <item name="colorOnSurfaceVariant">@color/b_on_surface_variant</item>
+        <item name="colorOutline">@color/b_outline</item>
+        <item name="colorOutlineVariant">@color/b_outline_variant</item>
+        <item name="colorError">@color/b_error</item>
+        <item name="colorOnError">@color/b_on_error</item>
+        <item name="colorErrorContainer">@color/b_error_container</item>
+        <item name="colorOnErrorContainer">@color/b_on_error_container</item>
+        <item name="colorSuccess">@color/b_success</item>
+        <item name="colorSuccessContainer">@color/b_success_container</item>
+        <item name="colorOnSuccessContainer">@color/b_on_success_container</item>
+        <item name="colorWarning">@color/b_warning</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Bridgit.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Bridgit.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Bridgit.Large</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Bridgit.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Bridgit.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Bridgit.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Bridgit.Label</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Bridgit.Label</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Bridgit.Supporting</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Bridgit.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Bridgit.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Bridgit.TitleSmall</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Bridgit.OutlinedButton</item>
+        <item name="bridgitPillStyle">@style/Widget.Bridgit.Pill</item>
+        <item name="bridgitPillTonalStyle">@style/Widget.Bridgit.Pill.Tonal</item>
+        <item name="bridgitPillTextStyle">@style/Widget.Bridgit.Pill.Text</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">@bool/light_bars</item>
+        <item name="android:windowLightNavigationBar">@bool/light_bars</item>
+        <!-- The full-window launch_splash layout owns the centered logo/wordmark.
+             Keep the system icon slot empty so it cannot show a tiny duplicate first. -->
+        <item name="android:windowSplashScreenBackground" tools:targetApi="31">@color/b_surface</item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="31">@drawable/splash_icon</item>
+    </style>
+
+    <!-- UI-03: monospace only for technical values. System monospace in 1.3.0 (Q7: JetBrains Mono not bundled yet). -->
+    <style name="TextAppearance.Bridgit.Mono" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">monospace</item>
+        <item name="fontFamily">monospace</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="TextAppearance.Bridgit.Mono.Prompt">
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+    <!-- Mono chip: endpoint, code, size, duration (ui-spec 3). -->
+    <style name="Widget.Bridgit.MonoChip" parent="">
+        <item name="android:textAppearance">@style/TextAppearance.Bridgit.Mono</item>
+        <item name="android:background">@drawable/bg_mono_chip</item>
+        <item name="android:paddingStart">6dp</item>
+        <item name="android:paddingEnd">6dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <!-- Selected navigation uses the shared Lilac frost tonal surface. -->
+    <style name="Widget.Bridgit.NavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">?attr/colorPrimaryContainer</item>
+    </style>
+
+    <style name="Widget.Bridgit.OutlinedButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="backgroundTint">@color/toggle_checked_bg</item>
+    </style>
+
+    <!-- Pill buttons: 40dp to the eye, 48dp to the finger (insets), fully round, one text size. -->
+    <style name="Widget.Bridgit.Pill" parent="Widget.Material3.Button">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+    <style name="Widget.Bridgit.Pill.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="backgroundTint">?attr/colorSurfaceContainerHighest</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="iconTint">?attr/colorOnSurface</item>
+    </style>
+    <style name="Widget.Bridgit.Pill.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <!-- Compact top tabs (Applets: Portals / Config / Cards). -->
+    <style name="TextAppearance.Bridgit.Tab" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:textSize">15sp</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <!-- One segment of a two- or three-way switch (Inbox / Library...): checked text in onPrimaryContainer, so the
+         label never falls back to Material's gold on blue. -->
+    <style name="Widget.Bridgit.Segment" parent="Widget.Bridgit.OutlinedButton">
+        <item name="android:textColor">@color/toggle_checked_fg</item>
+        <item name="strokeColor">?attr/colorOutlineVariant</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <style name="Widget.Bridgit.CameraChoice" parent="Widget.Bridgit.OutlinedButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:ellipsize">none</item>
+        <item name="android:textColor">@color/toggle_checked_fg</item>
+        <item name="strokeColor">?attr/colorOutline</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <!-- Selected filter chips in blue (primary container); gold is for live states only. -->
+    <style name="Widget.Bridgit.FilterChip" parent="Widget.Material3.Chip.Filter">
+        <item name="chipBackgroundColor">@color/activity_filter_chip_bg</item>
+    </style>
+
+    <!-- Tighter filter chips for one-row filter bars (Cards inbox): no check mark, less padding, so the row fits. -->
+    <style name="Widget.Bridgit.FilterChip.Compact">
+        <item name="checkedIconVisible">false</item>
+        <item name="chipStartPadding">6dp</item>
+        <item name="chipEndPadding">6dp</item>
+        <item name="textStartPadding">4dp</item>
+        <item name="textEndPadding">4dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/toggle_checked_fg</item>
+    </style>
+
+    <!-- Filter chips that read as filters (design pass, 4 Nov 2026): a "Filter:" label before the row, a check mark
+         on the chosen one, outlined when not chosen. 32dp to the eye, 48dp to the finger. -->
+    <style name="Widget.Bridgit.FilterChip.Labelled">
+        <item name="checkedIconVisible">true</item>
+        <item name="chipStrokeColor">?attr/colorOutline</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/toggle_checked_fg</item>
+        <item name="checkedIconTint">?attr/colorOnPrimaryContainer</item>
+        <item name="chipMinHeight">32dp</item>
+    </style>
+
+    <style name="Widget.Bridgit.Card" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="contentPadding">16dp</item>
+    </style>
+
+    <!-- The app icon's rounded square (iOS proportions: corners about 22% of the side). -->
+    <style name="ShapeAppearance.Bridgit.AppIcon" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">22.5%</item>
+    </style>
+    <!-- Rounds only the top corners, for a picture at the top of a Widget.Bridgit.Card. -->
+    <style name="ShapeAppearance.Bridgit.CardTop" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">12dp</item>
+        <item name="cornerSizeTopRight">12dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <!-- Section heading, as "THINGS TO TRY" on the welcome page: small caps, wide spacing, primary colour. -->
+    <style name="Widget.Bridgit.SectionHeader" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:accessibilityHeading">true</item>
+    </style>
+
+    <style name="Widget.Bridgit.LibraryHeader" parent="SettingsHeader">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="android:paddingTop">10dp</item>
+    </style>
+
+    <!-- Shaded panel that groups one section's rows (Settings, Access, More...). Put the heading inside it. -->
+    <style name="Widget.Bridgit.Panel" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@drawable/design_bg_panel</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:paddingBottom">4dp</item>
+    </style>
+
+    <!-- Library: one surface, aligned rows, with no nested card padding. -->
+    <style name="Widget.Bridgit.LibrarySection" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_marginHorizontal">16dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+    <style name="Widget.Bridgit.LibraryRow" parent="Widget.Bridgit.Card">
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
+        <item name="contentPadding">12dp</item>
+        <item name="android:layout_marginHorizontal">0dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+    <!-- Flat sections for preferences: spacing and rules, without card outlines. -->
+    <style name="Widget.Bridgit.SettingsSection" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:divider">@drawable/settings_divider</item>
+        <item name="android:showDividers">middle</item>
+    </style>
+
+    <!-- Gradient panel for text that is only read (explanations, how-it-works, tips). -->
+    <style name="Widget.Bridgit.InfoPanel" parent="">
+        <item name="android:background">@drawable/design_bg_info</item>
+        <item name="android:padding">14dp</item>
+    </style>
+
+    <!-- Lavender-to-amber accent line under a screen's lead text. -->
+    <style name="Widget.Bridgit.Rule" parent="">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">3dp</item>
+        <item name="android:background">@drawable/design_rule</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+    <style name="ShapeAppearance.Bridgit.Small" parent="ShapeAppearance.Material3.Corner.Small"><item name="cornerSize">8dp</item></style>
+    <style name="ShapeAppearance.Bridgit.Medium" parent="ShapeAppearance.Material3.Corner.Medium"><item name="cornerSize">12dp</item></style>
+    <style name="ShapeAppearance.Bridgit.Large" parent="ShapeAppearance.Material3.Corner.Large"><item name="cornerSize">16dp</item></style>
+    <style name="TextAppearance.Bridgit.BodyLarge" parent="TextAppearance.Material3.BodyLarge"><item name="android:textSize">16sp</item></style>
+    <style name="TextAppearance.Bridgit.BodyMedium" parent="TextAppearance.Material3.BodyMedium"><item name="android:textSize">15sp</item></style>
+    <style name="TextAppearance.Bridgit.BodySmall" parent="TextAppearance.Material3.BodySmall"><item name="android:textSize">14sp</item></style>
+    <style name="TextAppearance.Bridgit.Label" parent="TextAppearance.Material3.LabelLarge"><item name="android:textSize">14sp</item></style>
+    <style name="TextAppearance.Bridgit.Supporting" parent="TextAppearance.Material3.LabelSmall"><item name="android:textSize">12sp</item></style>
+    <style name="TextAppearance.Bridgit.TitleLarge" parent="TextAppearance.Material3.TitleLarge"><item name="android:textSize">24sp</item></style>
+    <style name="TextAppearance.Bridgit.TitleMedium" parent="TextAppearance.Material3.TitleMedium"><item name="android:textSize">18sp</item></style>
+    <style name="TextAppearance.Bridgit.TitleSmall" parent="TextAppearance.Material3.TitleSmall"><item name="android:textSize">16sp</item></style>
+</resources>

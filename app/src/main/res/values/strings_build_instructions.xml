@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="build_instructions_title">Build instructions</string>
+    <string name="build_instructions_send">Send to agent</string>
+    <string name="build_instructions_help">Copy or share this prompt into your agent’s chat, then describe the applet you want. Connect the agent in Agents if you haven’t already.</string>
+    <string name="build_instructions_copy">Copy prompt</string>
+    <string name="build_instructions_copied">Prompt copied</string>
+    <string name="build_instructions_queued">Queued for %1$s</string>
+    <string name="build_instructions_unavailable">No active agent available</string>
+    <string name="build_instructions_failed">Couldn’t send. Try again.</string>
+</resources>

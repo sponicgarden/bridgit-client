@@ -1,0 +1,73 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your events, oldest first: answers, closes, expiries, switch changes. interaction.renotified records an explicit card reminder. Repeated phone answers emit interaction.answered with resubmission=true and previous_answer; agents decide whether to accept the change. An answer given after the question expired comes as interaction.answered with late=true. action.executed: one of your HTML cards ran Bridgit.act (interaction_id, method, path, status, ok, error)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "events",
+  "query": [
+   {
+    "name": "since",
+    "description": "next_cursor from the last call; omit for the newest 50 (still oldest first)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "wait",
+    "description": "With since: hold up to 55 s for a new event",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "types",
+    "description": "Comma list, e.g. interaction.answered",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "At most this many events, 1 to 100: the newest N without since (default 50), the first N after the cursor with it (default 100)",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/events?since=0&wait=55",
+  "idempotent": false,
+  "path": "/v1/events",
+  "capability": "interactions",
+  "returns": "events[id, type, at, data], next_cursor",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "wait": {
+     "description": "With since: hold up to 55 s for a new event",
+     "type": "integer"
+    },
+    "types": {
+     "description": "Comma list, e.g. interaction.answered",
+     "type": "string"
+    },
+    "limit": {
+     "description": "At most this many events, 1 to 100: the newest N without since (default 50), the first N after the cursor with it (default 100)",
+     "type": "integer"
+    },
+    "since": {
+     "description": "next_cursor from the last call; omit for the newest 50 (still oldest first)",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "invalid_parameter",
+   "too_many_waits"
+  ],
+  "requires": null
+ }
+}

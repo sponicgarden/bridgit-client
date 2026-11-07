@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- City tour (8.25, D30). Plain English, second person, no emoji (UI-06). -->
+<resources>
+    <string name="tour_title">City tour</string>
+    <string name="tour_back">Back</string>
+    <string name="tour_intro">Pick a kind of tour and a control agent. Every %1$s your control agent gets where you are, which way you face and your new photos, and tells you about what\'s around you. Ask it anything out loud.</string>
+
+    <!-- Setup -->
+    <string name="tour_kinds_header">Kind of tour</string>
+    <string name="tour_kinds_hint">Pick one or more.</string>
+    <string name="tour_agent_header">Control agent</string>
+    <string name="tour_no_agents">No control agent ready for tours. Add a control agent or enable Tour, Location, Interactions and Speaker in its Permissions.</string>
+    <string name="tour_add_agent">Add control agent</string>
+    <string name="tour_interval_header">How often</string>
+    <string name="tour_needed_header">What\'s needed</string>
+    <string name="tour_ready">Everything is ready.</string>
+    <string name="tour_optional_header">Optional</string>
+    <string name="tour_start">Start tour</string>
+    <string name="tour_start_hint_kinds">Pick at least one kind of tour.</string>
+    <string name="tour_start_hint_agent">Pick a control agent.</string>
+    <string name="tour_start_hint_needed">Fix what\'s needed above first.</string>
+    <string name="tour_start_failed">Couldn\'t start the tour: %1$s</string>
+    <string name="tour_cd_agent">%1$s, %2$s</string>
+
+    <string name="tour_interval_30">30 s</string>
+    <string name="tour_interval_60">1 min</string>
+    <string name="tour_interval_120">2 min</string>
+    <string name="tour_interval_300">5 min</string>
+    <string name="tour_interval_word_30">30 seconds</string>
+    <string name="tour_interval_word_60">minute</string>
+    <string name="tour_interval_word_120">2 minutes</string>
+    <string name="tour_interval_word_300">5 minutes</string>
+
+    <!-- What's needed: the fixes -->
+    <string name="tour_fix_turn_on">Turn on</string>
+    <string name="tour_fix_allow">Allow</string>
+    <string name="tour_fix_open_settings">Open settings</string>
+    <string name="tour_need_location_switch">Location switch is off</string>
+    <string name="tour_need_location_permission">Bridgit can\'t use your location yet</string>
+    <string name="tour_need_location_setting">Android\'s Location is off</string>
+    <string name="tour_need_speaker_switch">Speaker switch is off</string>
+    <string name="tour_need_listener">Bridgit is paused, so your control agent can\'t hear from it</string>
+    <string name="tour_fix_resume">Resume</string>
+    <string name="tour_resumed_audit">You resumed the listener from City tour</string>
+    <string name="tour_need_notifications">Notifications are off</string>
+    <string name="tour_opt_gallery">Gallery switch is off, so your new photos aren\'t sent</string>
+    <string name="tour_opt_mic">Microphone permission isn\'t allowed yet, so you can\'t ask out loud</string>
+
+    <!-- Running -->
+    <string name="tour_with">City tour with %1$s</string>
+    <string name="tour_paused_label">Paused. Your control agent gets no updates until you resume.</string>
+    <string name="tour_started">Started %1$s</string>
+    <plurals name="tour_updates"><item quantity="one">%d update</item><item quantity="other">%d updates</item></plurals>
+    <plurals name="tour_photos_sent"><item quantity="one">%d photo sent</item><item quantity="other">%d photos sent</item></plurals>
+    <string name="tour_metres">%1$d m</string>
+    <string name="tour_km">%1$.1f km</string>
+    <string name="tour_facing">Facing %1$s (%2$d°)</string>
+    <string name="tour_facing_unknown">Direction not known yet</string>
+    <string name="tour_cd_facing">Facing %1$s, %2$d degrees</string>
+    <string name="tour_accuracy">Location accurate to %1$d m</string>
+    <string name="tour_no_fix">No location fix yet</string>
+    <string name="tour_now_playing">Now playing</string>
+    <string name="tour_last_said">Last said</string>
+    <string name="tour_nothing_playing">Nothing yet. %1$s talks after the next update.</string>
+    <string name="tour_history_header">What was said</string>
+    <string name="tour_history_empty">Nothing said yet.</string>
+    <string name="tour_you">You</string>
+    <string name="tour_cd_said">%1$s at %2$s: %3$s</string>
+
+    <!-- Controls -->
+    <string name="tour_ask">Hold to ask</string>
+    <string name="tour_ask_listening">Listening. Let go to send.</string>
+    <string name="tour_ask_cd">Ask a question out loud. Hold, or tap to start and tap again to send.</string>
+    <string name="tour_ask_cd_listening">Listening. Tap to send.</string>
+    <string name="tour_announce_listening">Listening</string>
+    <string name="tour_announce_sent">Sent</string>
+    <string name="tour_ask_heard_nothing">Didn\'t catch that. Try again, or type your question.</string>
+    <string name="tour_ask_unavailable">Speech recognition isn\'t available on this phone. Type your question instead.</string>
+    <string name="tour_type">Type</string>
+    <string name="tour_photo">Photo</string>
+    <string name="tour_photo_cd">Take a photo and send it to your control agent</string>
+    <string name="tour_said_photo">(sent a photo)</string>
+    <string name="tour_photo_sent">Photo sent to %1$s</string>
+    <string name="tour_photo_failed">Couldn\'t save the photo. Try again.</string>
+    <string name="tour_photo_no_camera">No camera app on this phone.</string>
+    <string name="tour_type_cd">Type a question</string>
+    <string name="tour_type_title">Ask %1$s</string>
+    <string name="tour_type_hint">Your question</string>
+    <string name="tour_send">Send</string>
+    <string name="tour_cancel">Cancel</string>
+    <string name="tour_pause">Pause</string>
+    <string name="tour_resume">Resume</string>
+    <string name="tour_skip">Skip</string>
+    <string name="tour_skip_cd">Skip what\'s playing</string>
+    <string name="tour_end">End tour</string>
+    <string name="tour_end_confirm">End the tour? %1$s gets a summary.</string>
+    <string name="tour_end_reason">you ended it</string>
+    <string name="tour_ended">Tour ended.</string>
+
+    <!-- Applets (owner, 27 Oct 2026; an Interactions subtab since 30 Oct) and Home -->
+    <string name="nav_applets">Applets</string>
+    <string name="applets_intro">Ready-made things to do with a control agent.</string>
+    <string name="applets_city_tour_desc">A guided walk: your control agent tells you about what\'s around you, and you can ask it questions out loud.</string>
+    <string name="applets_build_title">How to build a Bridgit applet</string>
+    <string name="applets_build_desc">Start with a useful idea, choose a recipe, and let your control agent build it with the phone’s existing features.</string>
+    <string name="applets_build_open">Open instructions</string>
+    <string name="applets_build_share">Share</string>
+    <string name="applets_build_share_title">Send the applet instructions to</string>
+    <string name="applets_build_share_text">"Help me build a useful Bridgit applet.\n\n\nSTART\n\n•  Ask what I want it to do.\n•  Read https://bridgit.cc/learn/start.md first: it picks the recipe, the first calls and what done looks like. Details only if needed: https://bridgit.cc/learn/catalog-index.json.\n•  Follow only the selected capability details and the closest recipe at https://bridgit.cc/recipes/.\n•  Full instructions: %1$s\n\n\nHOW TO BUILD IT\n\n•  Prefer existing APIs, phone-resident watches or owner-approved schedules.\n•  Make an attractive HTML card adapted from the recipe template. Ordinary applets need no native build.\n•  Keep phone work, remote model calls and controller integrations separate.\n\n\nBEFORE YOU RUN IT\n\n•  Confirm my authorization and the installed API, grants, switches, permissions and device prerequisites.\n\n\nWHEN YOU REPORT BACK\n\n•  Show source freshness, errors and unknown coverage honestly.\n•  Verify the answer and the actual pause/stop state; explain retained data.\n•  Report what works, what was tested and any remaining integration.\n•  Do not treat a saved answer as proof that a controller action completed.\n\n—\nSent from Bridgit · bridgit.cc"</string>
+    <string name="applets_running_with">Running with %1$s</string>
+    <string name="applets_paused_with">Paused with %1$s</string>
+    <string name="tour_home_card">City tour with %1$s · %2$s</string>
+    <string name="tour_home_open">Open</string>
+    <string name="tour_home_paused">Paused</string>
+    <string name="tour_need_interactions_switch">Interactions switch is off, so your control agent can\'t read tour events</string>
+    <string name="tour_need_agent_listening">%1$s isn\'t listening for Bridgit events, so it won\'t hear the tour. Copy the prompt and paste it into %1$s\'s chat.</string>
+    <string name="tour_fix_copy_prompt">Copy prompt</string>
+    <string name="tour_prompt_copied">Copied. Paste it into %1$s\'s chat.</string>
+    <string name="tour_waiting_agent">%1$s hasn\'t picked up the tour yet. It may not be listening for Bridgit events. Copy the prompt and paste it into %1$s\'s chat.</string>
+</resources>

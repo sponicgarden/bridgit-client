@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read alert-address enrollment status; verification remains a real email step",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_email_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/email",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/email",
+  "capability": "owner_features",
+  "returns": "email,state,human_verification_required",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

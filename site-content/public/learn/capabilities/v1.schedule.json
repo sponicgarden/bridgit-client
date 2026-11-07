@@ -1,0 +1,117 @@
+{
+ "detail_url": "/v1/discover?id=v1.schedule&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.schedule.json",
+ "title": "schedule",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.schedule.json",
+ "prerequisites": ["Check v1.schedule supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": ["daily-briefing-panel"],
+ "operations": [
+  {
+   "summary": "Your exact approved and pending action manifests for inspection or resubmission",
+   "path": "/v1/schedule/manifest",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-schedule-manifest.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-schedule-manifest.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "schedule_manifest"
+  },
+  {
+   "summary": "Hand the phone an action manifest once: any action it can take (any /v1 call you're allowed, plus download, play, show, send and delete of saved files), each with its own schedule. The owner approves each new manifest once on the phone; then it runs by itself and results arrive as schedule.* events",
+   "path": "/v1/schedule",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-schedule.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-schedule.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "schedule_set"
+  },
+  {
+   "summary": "Your manifest: what's approved, what's waiting for the owner, each action's next run and last result, and your saved files",
+   "path": "/v1/schedule",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-schedule.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-schedule.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "schedule_get"
+  },
+  {
+   "summary": "Run one approved action now, outside its timetable (its 'after' chain doesn't follow)",
+   "path": "/v1/schedule/run/{id}",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-schedule-run-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-schedule-run-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "schedule_run"
+  },
+  {
+   "summary": "Pause or resume your approved actions",
+   "path": "/v1/schedule/pause",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-schedule-pause.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-schedule-pause.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "schedule_pause"
+  },
+  {
+   "summary": "Remove your manifest (approved and waiting) and, unless keep_assets=true, your saved files",
+   "path": "/v1/schedule",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-schedule.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-schedule.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "schedule_remove"
+  },
+  {
+   "summary": "Files your actions saved (downloads and kept results), up to 100 / 100 MB, kept 30 days",
+   "path": "/v1/schedule/assets",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-schedule-assets.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-schedule-assets.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "schedule_assets_list"
+  },
+  {
+   "summary": "One saved file's bytes, e.g. a photo a scheduled action took",
+   "path": "/v1/schedule/assets/{name}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-schedule-assets-name.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-schedule-assets-name.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "schedule_asset_get"
+  },
+  {
+   "summary": "Delete one saved file",
+   "path": "/v1/schedule/assets/{name}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-schedule-assets-name.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-schedule-assets-name.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "schedule_asset_delete"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.schedule",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "run",
+ "capability_ids": ["v1.schedule"]
+}

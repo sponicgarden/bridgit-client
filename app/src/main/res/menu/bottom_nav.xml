@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 1.5 (D26): Activity moved to More. Owner, 30 Oct 2026: Agents is a tab again; Applets is a subtab of Interactions.
+     Owner, 5 Nov 2026: Camera takes the middle slot, Agents moves right, Devices moved to More (Network device monitor). -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@id/interactions" android:icon="@drawable/ic_nav_home" android:title="@string/nav_interactions" />
+    <item android:id="@id/home" android:icon="@drawable/ic_nav_device" android:title="@string/nav_home" />
+    <item android:id="@id/camera" android:icon="@drawable/ic_nav_camera" android:title="@string/nav_camera" />
+    <item android:id="@id/agents" android:icon="@drawable/ic_nav_agents" android:title="@string/nav_agents" />
+    <item android:id="@id/more" android:icon="@drawable/ic_nav_more" android:title="@string/nav_more" />
+</menu>

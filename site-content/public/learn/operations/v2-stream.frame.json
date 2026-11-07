@@ -1,0 +1,69 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_stream_frame",
+  "idempotency_required": false,
+  "documentation": "https://bridgit.cc/learn/operations/v2-stream.frame.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-stream.frame.json",
+  "required_arguments": ["id"],
+  "http": {
+   "path": "/v2/call",
+   "headers": {"Authorization": "Bearer <your key>"},
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {"id": {
+     "description": "The id returned when it was created",
+     "type": "string"
+    }},
+    "required": ["id"]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {"id": {
+       "description": "The id returned when it was created",
+       "type": "string"
+      }},
+      "required": ["id"]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["stream.frame"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id returned when it was created",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_stream_frame"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "stream.frame"
+ }
+}

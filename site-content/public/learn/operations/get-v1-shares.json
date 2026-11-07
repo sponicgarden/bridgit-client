@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your shares transfers, retained 30 days on the phone",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "shares_list",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/shares",
+  "idempotent": false,
+  "path": "/v1/shares",
+  "capability": "shares",
+  "returns": "Your shares transfers, retained 30 days on the phone",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

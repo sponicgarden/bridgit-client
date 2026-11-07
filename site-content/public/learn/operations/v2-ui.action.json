@@ -1,0 +1,272 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_ui_action",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-ui.action.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-ui.action.json",
+  "required_arguments": [
+   "idempotency_key",
+   "session_id",
+   "fence",
+   "observation_id",
+   "type"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "description": "ref is required for tap, long_press, set_text and scroll; text is required for set_text",
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "expect": {
+      "description": "Postcondition: give package, text or both",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "package": {
+        "description": "App that must be in front",
+        "type": "string",
+        "maxLength": 256
+       },
+       "text": {
+        "description": "Text that must be visible",
+        "type": "string",
+        "maxLength": 512
+       }
+      },
+      "required": []
+     },
+     "ref": {
+      "description": "Element ref from the observation. Required for tap, long_press, set_text and scroll",
+      "type": "string",
+      "maxLength": 64
+     },
+     "observation_id": {
+      "description": "From the latest screen.observe",
+      "type": "string"
+     },
+     "session_id": {
+      "description": "A control session id from session.request, once the owner approved it",
+      "type": "string"
+     },
+     "text": {
+      "description": "Required for set_text",
+      "type": "string",
+      "maxLength": 4096
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "tap",
+       "long_press",
+       "set_text",
+       "scroll",
+       "back",
+       "home"
+      ]
+     },
+     "fence": {
+      "description": "The session's current fence, from session.list or screen.observe",
+      "type": "string"
+     },
+     "direction": {
+      "description": "For scroll (default forward)",
+      "type": "string",
+      "enum": [
+       "forward",
+       "backward"
+      ]
+     }
+    },
+    "required": [
+     "session_id",
+     "fence",
+     "observation_id",
+     "type"
+    ]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "description": "ref is required for tap, long_press, set_text and scroll; text is required for set_text",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "expect": {
+        "description": "Postcondition: give package, text or both",
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+         "package": {
+          "description": "App that must be in front",
+          "type": "string",
+          "maxLength": 256
+         },
+         "text": {
+          "description": "Text that must be visible",
+          "type": "string",
+          "maxLength": 512
+         }
+        },
+        "required": []
+       },
+       "ref": {
+        "description": "Element ref from the observation. Required for tap, long_press, set_text and scroll",
+        "type": "string",
+        "maxLength": 64
+       },
+       "observation_id": {
+        "description": "From the latest screen.observe",
+        "type": "string"
+       },
+       "session_id": {
+        "description": "A control session id from session.request, once the owner approved it",
+        "type": "string"
+       },
+       "text": {
+        "description": "Required for set_text",
+        "type": "string",
+        "maxLength": 4096
+       },
+       "type": {
+        "type": "string",
+        "enum": [
+         "tap",
+         "long_press",
+         "set_text",
+         "scroll",
+         "back",
+         "home"
+        ]
+       },
+       "fence": {
+        "description": "The session's current fence, from session.list or screen.observe",
+        "type": "string"
+       },
+       "direction": {
+        "description": "For scroll (default forward)",
+        "type": "string",
+        "enum": [
+         "forward",
+         "backward"
+        ]
+       }
+      },
+      "required": [
+       "session_id",
+       "fence",
+       "observation_id",
+       "type"
+      ]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["ui.action"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "description": "ref is required for tap, long_press, set_text and scroll; text is required for set_text",
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "expect": {
+     "description": "Postcondition: give package, text or both",
+     "additionalProperties": false,
+     "type": "object",
+     "properties": {
+      "package": {
+       "description": "App that must be in front",
+       "type": "string",
+       "maxLength": 256
+      },
+      "text": {
+       "description": "Text that must be visible",
+       "type": "string",
+       "maxLength": 512
+      }
+     },
+     "required": []
+    },
+    "ref": {
+     "description": "Element ref from the observation. Required for tap, long_press, set_text and scroll",
+     "type": "string",
+     "maxLength": 64
+    },
+    "observation_id": {
+     "description": "From the latest screen.observe",
+     "type": "string"
+    },
+    "session_id": {
+     "description": "A control session id from session.request, once the owner approved it",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    },
+    "text": {
+     "description": "Required for set_text",
+     "type": "string",
+     "maxLength": 4096
+    },
+    "type": {
+     "type": "string",
+     "enum": [
+      "tap",
+      "long_press",
+      "set_text",
+      "scroll",
+      "back",
+      "home"
+     ]
+    },
+    "fence": {
+     "description": "The session's current fence, from session.list or screen.observe",
+     "type": "string"
+    },
+    "direction": {
+     "description": "For scroll (default forward)",
+     "type": "string",
+     "enum": [
+      "forward",
+      "backward"
+     ]
+    }
+   },
+   "required": [
+    "idempotency_key",
+    "session_id",
+    "fence",
+    "observation_id",
+    "type"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_ui_action"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "ui.action"
+ }
+}

@@ -1,0 +1,101 @@
+{
+  "format": "bridgit-template/1",
+  "id": "insurance-inventory",
+  "version": "3.0.0",
+  "kind": "applet",
+  "name": "Insurance inventory",
+  "summary": "Its screen is its web portal (Applets › Portals, or bridgit.cc on a computer). Photograph your things as fast as you like, then tap Create inventory. Each photo is read for every item: brand and model where it can, condition, what it would cost new and what it's worth used, and whether it's likely insurable. Grouped by category with totals, ready to share with an insurer as a PDF.",
+  "runtime": {"adapter": "android.package.v1", "applet_key": "insurance-inventory", "supports_dynamic_execution": false},
+  "config_schema": {"type": "object", "properties": {}, "required": [], "additionalProperties": false},
+  "defaults": {},
+  "processing": {
+    "tables": [
+      {"id": "photos", "label": "Photos", "keep_days": 3650, "max_rows": 1000,
+       "columns": {
+         "photo": {"type": "photo", "label": "Photo"},
+         "status": {"type": "choice", "label": "Status", "options": ["new", "reading", "done", "failed"]},
+         "items": {"type": "integer", "label": "Items"},
+         "taken_at": {"type": "time", "label": "Taken"}}},
+      {"id": "items", "label": "Items", "keep_days": 3650, "max_rows": 1000,
+       "columns": {
+         "label": {"type": "text", "label": "Item"},
+         "category": {"type": "text", "label": "Category"},
+         "brand": {"type": "text", "label": "Brand"},
+         "model": {"type": "text", "label": "Model"},
+         "quantity": {"type": "integer", "label": "Qty"},
+         "condition": {"type": "text", "label": "Condition"},
+         "new_usd": {"type": "number", "label": "New"},
+         "used_usd": {"type": "number", "label": "Used"},
+         "insurable": {"type": "boolean", "label": "Insurable"},
+         "note": {"type": "text", "label": "Note"},
+         "confidence": {"type": "number", "label": "Confidence"},
+         "box": {"type": "text", "label": "Box"},
+         "photo": {"type": "photo", "label": "Photo"}}}
+    ],
+    "flows": [
+      {"id": "read", "name": "Read one photo", "max_paid_per_day": 300,
+       "trigger": {"type": "called", "with": {"row": "text", "photo": "text"}},
+       "steps": [
+         {"id": "look", "type": "appraise", "photo": {"$trigger": "with.photo"}, "max_items": 30},
+         {"id": "rec", "type": "record", "table": "items", "for_each": {"$step": "look.items"},
+          "row": {
+            "label": {"$item": "label"}, "category": {"$item": "category"}, "brand": {"$item": "brand"},
+            "model": {"$item": "model"}, "quantity": {"$item": "quantity"}, "condition": {"$item": "condition"},
+            "new_usd": {"$item": "new_usd"}, "used_usd": {"$item": "used_usd"}, "insurable": {"$item": "insurable"},
+            "note": {"$item": "insurable_note"}, "confidence": {"$item": "confidence"}, "box": {"$item": "box"},
+            "photo": {"$trigger": "with.photo"}}},
+         {"id": "mark", "type": "update", "table": "photos", "row": {"$trigger": "with.row"},
+          "set": {"status": "done", "items": {"$step": "rec.count"}}}
+       ]}
+    ]
+  },
+  "permissions": {"required": ["camera", "interactions", "workflows", "decisions"], "optional": [], "remote": [], "automatic_grants": false},
+  "ui": {
+    "inputs": {},
+    "portal": {"include": "always", "tables": ["photos", "items"], "actions": ["camera", "create", "export", "csv"]},
+    "card": {
+      "title": "Home inventory",
+      "sources": {
+        "photos": {"table": "photos", "limit": 500},
+        "items": {"table": "items", "limit": 500},
+        "reading": {"batch": "create"}
+      },
+      "states": {"empty": "No photos yet. Tap Take photos and photograph your things, as many and as fast as you like."},
+      "pieces": [
+        {"type": "header", "eyebrow": "Bridgit applet", "text": "Photograph your things, then create the inventory."},
+        {"type": "buttons", "items": [
+          {"id": "camera", "label": "Take photos", "style": "primary",
+           "do": {"camera": {"table": "photos", "photo": "photo", "row": {"status": "new"}, "size": "large", "lens": "back"}}}]},
+        {"type": "buttons", "items": [
+          {"id": "create", "label": "Create inventory", "style": "primary",
+           "do": {"flow": {"$flow": "read"}, "for_each": {"$source": "photos"},
+                  "only_if": {"item": "status", "is_not": "done"},
+                  "with": {"row": {"$item": "id"}, "photo": {"$item": "photo"}}, "max": 200, "progress": "Reading"}}]},
+        {"type": "gallery", "photos": {"$source": "photos"}, "photo": "photo", "caption": "status",
+         "words": {"new": "New", "reading": "Reading…", "done": "Done", "failed": "Couldn't read"},
+         "caption_count": "items", "limit": 24, "empty": "No photos yet."},
+        {"type": "table", "rows": {"$source": "items"}, "limit": 500,
+         "group_by": "category", "totals": ["new_usd", "used_usd"],
+         "columns": [
+           {"key": "label", "label": "Item"},
+           {"key": "new_usd", "label": "New", "format": "money", "currency": "USD"},
+           {"key": "used_usd", "label": "Used", "format": "money", "currency": "USD"}],
+         "marks": {"insurable": {"true": "Insurable", "false": "Not insurable"}},
+         "photo": {"column": "photo", "box": "box"},
+         "owner_edit": true, "owner_delete": true,
+         "empty": "Items appear here as photos are read."},
+        {"type": "buttons", "items": [
+          {"id": "export", "label": "Share PDF", "style": "plain",
+           "do": {"step": {"type": "share", "table": "items", "as": "pdf", "title": "Home inventory",
+                           "columns": ["label", "brand", "model", "quantity", "condition",
+                                       {"key": "new_usd", "label": "New", "format": "money", "currency": "USD"},
+                                       {"key": "used_usd", "label": "Used", "format": "money", "currency": "USD"},
+                                       {"key": "insurable", "label": "Insurable", "format": "yes_no"}, "note"],
+                           "group_by": "category", "totals": ["new_usd", "used_usd"], "photos": "thumbs"}}},
+          {"id": "csv", "label": "Share CSV", "style": "plain",
+           "do": {"step": {"type": "share", "table": "items", "as": "csv", "title": "Home inventory"}}}]},
+        {"type": "note", "text": "Prices are a model's estimates, not an appraisal. Each photo is read once by a cloud vision model, about half a cent a photo."}
+      ]
+    }
+  }
+}

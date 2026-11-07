@@ -1,0 +1,51 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Bounded discovery on the Android host's direct local network",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_discover",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "hosts",
+    "description": "Optional literal private IPv4 targets, at most 254; no other networks",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "subnet",
+    "description": "Probe the direct /24.. /30 subnet on TCP 80,443,554,2020; default false",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/lan/discover {\"hosts\":[\"192.168.1.1\"]}",
+  "idempotent": false,
+  "path": "/v1/lan/discover",
+  "capability": "lan_discovery",
+  "returns": "network, total_devices, total_categories, categories[id,title,count,device_ids], devices[id,name,type,category,model,identifier,services,brand,verified=false,enrolled=false], observations, methods, limits, complete=false; untrusted partial observations, never a complete online inventory",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "subnet": {
+     "description": "Probe the direct /24.. /30 subnet on TCP 80,443,554,2020; default false",
+     "type": "boolean"
+    },
+    "hosts": {
+     "description": "Optional literal private IPv4 targets, at most 254; no other networks",
+     "type": "array",
+     "items": {"type": "string"}
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

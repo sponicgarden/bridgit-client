@@ -1,0 +1,1736 @@
+{
+  "documentation_revision": 1,
+  "api_revision": 54,
+  "about": "Authored recipe composition metadata; operation truth remains generated Endpoints/OpenAPI and installed guide. Examples are synthetic, never live evidence.",
+  "recipes": [
+    {
+      "id": "pet-monitor",
+      "title": "Pet activity monitor",
+      "summary": "A photo-based activity tally with explicit gaps, plus an offline control card.",
+      "category": "run",
+      "capability_ids": [
+        "v1.watches",
+        "v1.camera",
+        "v1.interactions"
+      ],
+      "support": {
+        "source_api_revision": 54,
+        "tested_contract_api_revision": 54,
+        "minimum_recipe_api_revision": 54,
+        "released": "unknown; compare public changes and installed health",
+        "installed": "unknown",
+        "ready": null,
+        "requirements": "GET /v1/health, /v1/capabilities and installed /v1/guide must confirm every operation and grant. Source support alone is insufficient."
+      },
+      "execution": {
+        "phone": [
+          "Timer → bounded camera snapshot → free local change filter → Clef choice → persistent watch tally → HTML card reads tally and state.",
+          "The phone continues watching with the controller offline; remote model inference still needs internet. Pausing preserves the tally and does not extend expiry."
+        ],
+        "controller": [
+          "Create the watch and save the returned watch_id. To point the card at it, replace \"resource_id\":null inside the card's /*RECIPE*/ ... /*END RECIPE*/ block with \"resource_id\":\"<watch_id>\" before posting card_request.",
+          "The no-meal rule fires on the phone at 18:00 local phone time. In the installed package it runs the Dinner check flow (photo of the bowl, Clef says full, eaten from or not in view, then the matching notice); the card's Check bowl now runs the same flow. The flow needs Jev and Clef questions on in Agent permissions (off by default; the install review lists it). In the plain watch it posts the notice directly. To reach an owner who is away from the phone, also read the watch.rule event (callback_url or GET /v1/events) and pass it to the owner's own chat, or use native Pet Monitor's portal (see boundaries).",
+          "Changes to the watch definition require snapshotting the old tally, stopping it, and recreating; the new watch has a new tally."
+        ],
+        "server": "Only explicit decision-model/weather requests leave the phone; direct or relay transport still requires a running reachable phone."
+      },
+      "boundaries": [
+        "Public composition is a generic watch, not the native Pet Monitor. It does not inherit native camera selection, dual-model comparisons, pet history/portal, microphone classifier, camera search or feeding.",
+        "Samples show visible activity only. A missed pet is unknown coverage; cached classifications are reused evidence, not new model observations.",
+        "A generic watch shows results on the phone itself (cards, speech) and to its controlling agent. A remote web view for the owner exists only for the native Pet Monitor (see https://bridgit.cc/learn/applet-backends.md)."
+      ],
+      "lifecycle": {
+        "start": "POST /v1/watches with the start example; retain the returned watch_id. Then render/post the card with resource_id.",
+        "update": "GET state/tally first. To change the definition, export required history, DELETE old watch, POST revised definition. No watch PATCH exists.",
+        "pause": "POST /v1/watches/{id}/pause with {\"paused\":true}; resume with false. Confirm user_paused from the returned metadata. Expiry is unchanged.",
+        "stop": "DELETE /v1/watches/{id}; confirm deleted equals the saved id and watch.ended reason deleted. Archive needed tally BEFORE deletion. Cancel the interaction separately."
+      },
+      "failure": [
+        "Camera locked/busy: record an error gap and retry at a later slot; never classify it as resting.",
+        "Budget/quota/model failure: inspect recent_checks and watch.ended. The template never turns an unavailable reading into zero episodes."
+      ],
+      "cost": [
+        "The installed package's Dinner check adds at most 10 paid Clef calls a day (one photo each), whether the 18:00 rule or Check bowl now starts it.",
+        "At most 10 paid Clef calls an hour for this watch. Worst case, running all day every day, that is about 7,200 photos and $0.76 a month at Clef's ~$0.000105 a photo. That fits the default monthly budget ($1.50, shared by all the phone's agents); budgets differ per account, so read GET /v1/limits and scale max_paid_per_hour to the real value. Unchanged scenes reuse the last answer for free, so real use is usually much lower.",
+        "Clef's free allowance (about 970 photos a day) is shared by all of Bridgit: keep the change check on and the cap low. Check usage.paid_cost_usd and skipped_over_paid_cap; a quiet scene still refreshes within 900 seconds."
+      ],
+      "extensions": [
+        "Use an enrolled lan:<id> camera after grant checks.",
+        "Tune episode gaps and confidence with labeled samples before interpreting totals.",
+        "Add a no-water rule ({fewer_than:1, of:\"drinking\", by:\"18:00\"}) or a none_for_s rule for long gaps between meals."
+      ],
+      "examples": [
+        {
+          "id": "start",
+          "request": {
+            "method": "POST",
+            "path": "/v1/watches",
+            "body": {
+              "label": "Pet activity samples",
+              "data": [
+                "camera"
+              ],
+              "camera": "rear",
+              "questions": {
+                "pet": {
+                  "type": "noul",
+                  "instructions": "Is an animal visible in this photo?"
+                },
+                "activity": {
+                  "type": "choice",
+                  "instructions": "Classify only the visible animal in this photo. If absent or ambiguous choose unclear. Do not infer identity or health.",
+                  "criteria": {
+                    "resting": "An animal is lying still.",
+                    "eating": "An animal visibly eats at a bowl.",
+                    "drinking": "An animal visibly drinks at a bowl.",
+                    "other": "Visible activity fits none of those.",
+                    "unclear": "Absent, occluded or uncertain."
+                  }
+                }
+              },
+              "model": "clef",
+              "interval_s": 30,
+              "window": 1,
+              "min_readings": 1,
+              "expires_in_s": 604800,
+              "repeat": true,
+              "local": {
+                "change_check": true,
+                "sensitivity": "high",
+                "learn_noise": true,
+                "max_reuse_s": 900
+              },
+              "max_paid_per_hour": 10,
+              "tally": {
+                "track": "activity",
+                "labels": [
+                  "resting",
+                  "eating",
+                  "drinking",
+                  "other"
+                ],
+                "min_confidence": 0.8,
+                "keep_days": 30,
+                "seen": {
+                  "answer": "pet",
+                  "min": 0.6
+                }
+              },
+              "rules": [
+                {
+                  "id": "no-meal-by-6pm",
+                  "when": {
+                    "fewer_than": 1,
+                    "of": "eating",
+                    "by": "18:00"
+                  },
+                  "do": {
+                    "method": "POST",
+                    "path": "/v1/interactions",
+                    "body": {
+                      "kind": "notice",
+                      "title": "No meal seen yet",
+                      "text": "{message}"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "response": {
+            "status": 201,
+            "body": {
+              "watch_id": "w0123456789ab",
+              "label": "Pet activity samples",
+              "user_paused": false,
+              "created_at": "2026-11-04T10:00:00Z",
+              "expires_at": "2026-11-11T10:00:00Z",
+              "interval_s": 30,
+              "data": [
+                "camera"
+              ],
+              "checks": 0,
+              "matches": 0,
+              "last_match_at": null,
+              "readings_held": 0,
+              "last_check": null,
+              "usage": {
+                "model": "clef",
+                "answered_locally": 0,
+                "paid_calls": 0,
+                "paid_cost_usd": 0,
+                "paid_calls_last_hour": 0,
+                "max_paid_per_hour": 10,
+                "skipped_over_paid_cap": 0,
+                "change_check": true
+              },
+              "tally_today": null,
+              "rules_fired": 0,
+              "spec": {
+                "interval_s": 30,
+                "question": null,
+                "data": [
+                  "camera"
+                ],
+                "expires_in_s": 604800,
+                "questions": {
+                  "activity": {
+                    "instructions": "Classify only the visible animal in this photo. If absent or ambiguous choose unclear. Do not infer identity or health.",
+                    "criteria": {
+                      "other": "Visible activity fits none of those.",
+                      "drinking": "An animal visibly drinks at a bowl.",
+                      "resting": "An animal is lying still.",
+                      "unclear": "Absent, occluded or uncertain.",
+                      "eating": "An animal visibly eats at a bowl."
+                    },
+                    "type": "choice"
+                  },
+                  "pet": {
+                    "instructions": "Is an animal visible in this photo?",
+                    "type": "noul"
+                  }
+                },
+                "paid_calls_per_hour_at_most": 10,
+                "label": "Pet activity samples",
+                "min_readings": 1,
+                "max_paid_per_hour": 10,
+                "local": {
+                  "max_reuse_s": 900,
+                  "learn_noise": true,
+                  "sensitivity": "high",
+                  "change_check": true
+                },
+                "callback_url": null,
+                "cooldown_s": 600,
+                "repeat": true,
+                "context": null,
+                "model": "clef",
+                "window": 1,
+                "callback_when": [],
+                "camera": "rear",
+                "tally": {
+                  "kind": "choice",
+                  "gap_s": 90,
+                  "min_episode_readings": 1,
+                  "min_confidence": 0.8,
+                  "rules": [
+                    {
+                      "id": "no-meal-by-6pm",
+                      "do": {
+                        "path": "/v1/interactions",
+                        "method": "POST",
+                        "body": {
+                          "kind": "notice",
+                          "text": "{message}",
+                          "title": "No meal seen yet"
+                        }
+                      },
+                      "when": {
+                        "fewer_than": 1,
+                        "of": "eating",
+                        "by": "18:00"
+                      }
+                    }
+                  ],
+                  "track": "activity",
+                  "seen": {
+                    "min": 0.6,
+                    "answer": "pet"
+                  },
+                  "labels": [
+                    "resting",
+                    "eating",
+                    "drinking",
+                    "other"
+                  ],
+                  "keep_days": 30
+                }
+              },
+              "callback_secret": null,
+              "first_check_in_s": 0,
+              "delivery": "watch.matched and watch.ended go to your registered callback if you have one, and to GET /v1/events (both need the interactions permission); watch.rule (a rule fired) goes the same way"
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        },
+        {
+          "id": "tally",
+          "request": {
+            "method": "GET",
+            "path": "/v1/watches/w0123456789ab/tally"
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "watch_id": "w0123456789ab",
+              "label": "Pet activity samples",
+              "track": "activity",
+              "labels": [
+                "resting",
+                "eating",
+                "drinking",
+                "other"
+              ],
+              "watching_since": "2026-11-04T07:00:00Z",
+              "last_seen_at": "2026-11-04T15:42:30Z",
+              "today": {
+                "date": "2026-11-04",
+                "checks": 412,
+                "watched_minutes": 96,
+                "labels": {
+                  "eating": {
+                    "episodes": 2,
+                    "minutes": 7,
+                    "readings": 15
+                  },
+                  "drinking": {
+                    "episodes": 3,
+                    "minutes": 4,
+                    "readings": 9
+                  },
+                  "resting": {
+                    "episodes": 4,
+                    "minutes": 71,
+                    "readings": 140
+                  },
+                  "other": {
+                    "episodes": 5,
+                    "minutes": 14,
+                    "readings": 29
+                  }
+                }
+              },
+              "days": [
+                {
+                  "date": "2026-11-04",
+                  "checks": 412,
+                  "watched_minutes": 96,
+                  "labels": {
+                    "eating": {
+                      "episodes": 2,
+                      "minutes": 7,
+                      "readings": 15
+                    },
+                    "drinking": {
+                      "episodes": 3,
+                      "minutes": 4,
+                      "readings": 9
+                    },
+                    "resting": {
+                      "episodes": 4,
+                      "minutes": 71,
+                      "readings": 140
+                    },
+                    "other": {
+                      "episodes": 5,
+                      "minutes": 14,
+                      "readings": 29
+                    }
+                  }
+                }
+              ],
+              "ongoing": {
+                "resting": {
+                  "since": "2026-11-04T15:20:00Z",
+                  "minutes": 22
+                }
+              },
+              "last": {
+                "eating": "2026-11-04T12:10:30Z",
+                "drinking": "2026-11-04T14:55:00Z",
+                "other": "2026-11-04T15:18:00Z"
+              },
+              "typical_gap_minutes": {},
+              "rules": [
+                {
+                  "id": "no-meal-by-6pm",
+                  "last_fired_at": null
+                }
+              ],
+              "rules_fired": 0,
+              "episodes": [
+                {
+                  "label": "eating",
+                  "start": "2026-11-04T12:07:00Z",
+                  "end": "2026-11-04T12:10:30Z",
+                  "minutes": 4,
+                  "readings": 8,
+                  "ongoing": false
+                },
+                {
+                  "label": "resting",
+                  "start": "2026-11-04T15:20:00Z",
+                  "end": null,
+                  "minutes": 22,
+                  "readings": 44,
+                  "ongoing": true
+                }
+              ]
+            }
+          },
+          "evidence": "Synthetic contract fixture shaped from the endpoint's documented reply, not a device observation."
+        },
+        {
+          "id": "stop",
+          "request": {
+            "method": "DELETE",
+            "path": "/v1/watches/w0123456789ab"
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "deleted": "w0123456789ab"
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        }
+      ],
+      "card": {
+        "mode": "watch",
+        "refresh_label": "Read activity history",
+        "read_suffix": "/tally",
+        "freshness_seconds": 120,
+        "empty": "No visible activity samples yet. Gaps and absence are unknown coverage.",
+        "owner_intro": "A little window into your pet’s day.",
+        "owner_note": "Sampled observations, not continuous coverage. Gaps and absence are unknown."
+      },
+      "evidence": [
+        "app/src/main/java/cc/bridgit/app/api/Endpoints.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardRules.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardActions.kt",
+        "app/src/main/java/cc/bridgit/app/dog/DogMonitor.kt",
+        "app/src/main/java/cc/bridgit/app/dog/DogChecks.kt",
+        "app/src/main/java/cc/bridgit/app/dog/DogAudio.kt",
+        "app/src/main/java/cc/bridgit/app/dog/DogCamera.kt",
+        "app/src/main/java/cc/bridgit/app/dog/PetCameraSearch.kt",
+        "app/src/main/java/cc/bridgit/app/watch/WatchModule.kt",
+        "app/src/main/java/cc/bridgit/app/watch/WatchTally.kt",
+        "app/src/main/java/cc/bridgit/app/remoteview/RemoteViewDog.kt",
+        "app/src/main/java/cc/bridgit/app/remoteview/RemoteView.kt"
+      ],
+      "start": {
+        "fits": "Count what the camera sees over the day and nudge the owner when something did not happen: pet meals, feeder visits, bird-feeder visits.",
+        "ideas": [
+          "pet",
+          "dog",
+          "cat",
+          "bird",
+          "feeder",
+          "bowl",
+          "meal",
+          "meals",
+          "eat",
+          "eating",
+          "drink",
+          "count",
+          "times",
+          "daily",
+          "nudge"
+        ],
+        "owner_turns_on": [
+          "Watches",
+          "Camera",
+          "Interactions"
+        ],
+        "you_decide": {
+          "question": "What should it count, and by when should the owner hear if it did not happen?",
+          "default": "Meals and drinks at the bowls, with a notice at 18:00 if no meal was seen (the start example)."
+        },
+        "first_calls": [
+          "GET /v1/capabilities",
+          "GET /v1/limits",
+          "POST /v1/applets/validate {\"url\":\"https://bridgit.cc/recipes/pet-monitor/applet.json\",\"config\":{\"camera\":\"rear\",\"interval_s\":60,\"max_paid_per_hour\":<from GET /v1/limits>}}: read review (what the owner will see), warnings and package",
+          "POST /v1/applets/install with the same body (needs your Install applets permission); the owner approves once on the phone; wait for applet.installed (with instance_id) in GET /v1/events",
+          "Only if you lack Install applets: POST /v1/watches with examples[start]; save watch_id; then POST /v1/interactions with card_request from recipe_url, resource_id set to watch_id"
+        ],
+        "adapt": "Change the activity criteria and tally labels together, and the rule's of/by. Keep model clef, the change check on and max_paid_per_hour from GET /v1/limits. To change it: fill other blanks in config, or fetch the applet.json, edit it (card pieces, flows, tables) and send it as {\"package\": …}; validate returns the complete file.",
+        "done_when": [
+          "applet.installed arrived and GET /v1/applets/installed shows it active",
+          "The card is on the phone and Refresh shows the tally",
+          "Check bowl now shows a bowl notice and the card's Bowl at last check updates",
+          "The owner knows the 18:00 dinner check and how to Pause or Remove it (Applets › Installed applets)"
+        ],
+        "examples": [
+          "start"
+        ]
+      }
+    },
+    {
+      "id": "receipt-scanner",
+      "title": "Receipt scanner",
+      "summary": "Read a selected receipt locally, check the text and save it on the phone.",
+      "category": "run",
+      "capability_ids": [
+        "v1.ocr",
+        "v1.gallery",
+        "v1.interactions"
+      ],
+      "support": {
+        "source_api_revision": 54,
+        "tested_contract_api_revision": 54,
+        "minimum_recipe_api_revision": 54,
+        "released": "unknown; compare public changes and installed health",
+        "installed": "unknown",
+        "ready": null,
+        "requirements": "GET /v1/health, /v1/capabilities and installed /v1/guide must confirm every operation and grant. Source support alone is insufficient."
+      },
+      "execution": {
+        "phone": [
+          "Owner-selected gallery image → on-device Latin OCR → controller validates totals/date/currency → HTML confirmation.",
+          "OCR is local. The card can run OCR through Bridgit.act while the controller is offline, but categorizing, deduplicating and storing a ledger need the controller."
+        ],
+        "controller": [
+          "Select the authorized gallery_id, populate the card configuration, save only an owner-confirmed answer.",
+          "Controller owns durable receipt storage and deduplication; respond acknowledges a request, not a saved ledger entry."
+        ],
+        "server": "Only explicit decision-model/weather requests leave the phone; direct or relay transport still requires a running reachable phone."
+      },
+      "boundaries": [
+        "OCR text is not a verified accounting record. This recipe does not pay, submit expenses, or infer a currency.",
+        "gallery_id 42 is a synthetic fixture: substitute the image ID returned by the owner-authorized gallery listing. No camera capture occurs on opening the template."
+      ],
+      "lifecycle": {
+        "start": "Configure card data, POST the generated HTML interaction; this does not automatically capture or poll.",
+        "update": "Owner explicitly refreshes; controller stores approved data and posts a replacement card as needed, cancelling old pending cards.",
+        "pause": "The Pause button suspends this card’s controls and suppresses results from a pending refresh. There is no background job in this starter; an in-flight capture may finish. Controller integrations must separately pause their jobs.",
+        "stop": "The Stop button stops this card, suppresses late results, and requests controller shutdown through one response. Confirm/close the controller job and DELETE the interaction separately. Local stop is not proof that an external process stopped."
+      },
+      "failure": [
+        "No image/grant/model access: show error, retain previous draft with its timestamp.",
+        "Blurred/empty text: request another owner-selected image; never invent a missing amount."
+      ],
+      "cost": [
+        "OCR has no paid remote inference. An optional controller model has its own costs and privacy boundary."
+      ],
+      "extensions": [
+        "Add barcode recognition to match products.",
+        "Capture a receipt with POST /v1/camera/snapshot, then pass its returned data_base64 to /v1/ocr."
+      ],
+      "examples": [
+        {
+          "id": "read",
+          "request": {
+            "method": "POST",
+            "path": "/v1/ocr",
+            "body": {
+              "gallery_id": 42
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "text": "CORNER SHOP\n2026-11-04\nTOTAL 12.50 EUR",
+              "script": "Latin",
+              "on_device": true
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        }
+      ],
+      "card": {
+        "mode": "ocr",
+        "refresh_label": "Read selected receipt",
+        "gallery_id": null,
+        "freshness_seconds": 300,
+        "empty": "Select an authorized receipt image before reading.",
+        "owner_intro": "Turn a receipt into a draft you can check.",
+        "owner_note": "Check the amount, date and currency before requesting a save."
+      },
+      "evidence": [
+        "app/src/main/java/cc/bridgit/app/api/Endpoints.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardRules.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardActions.kt",
+        "app/src/main/java/cc/bridgit/app/planned/MediaFeatures.kt"
+      ],
+      "start": {
+        "fits": "Read text from a photo on the phone and let the owner correct it: receipts, labels, letters, menus.",
+        "ideas": [
+          "receipt",
+          "receipts",
+          "scan",
+          "text",
+          "read",
+          "label",
+          "letter",
+          "document",
+          "menu",
+          "expense",
+          "ocr",
+          "invoice"
+        ],
+        "owner_turns_on": [
+          "On-device text recognition",
+          "Gallery",
+          "Interactions"
+        ],
+        "you_decide": {
+          "question": "Which photo should it read?",
+          "default": "The newest gallery photo the owner picks; nothing is uploaded."
+        },
+        "first_calls": [
+          "GET /v1/capabilities",
+          "POST /v1/applets/validate {\"url\":\"https://bridgit.cc/recipes/receipt-scanner/applet.json\",\"config\":{}}: read review (what the owner will see), warnings and package",
+          "POST /v1/applets/install with the same body (needs your Install applets permission); the owner approves once on the phone; wait for applet.installed (with instance_id) in GET /v1/events",
+          "Only if you lack Install applets: GET /v1/gallery/recent to pick the photo; then POST /v1/ocr with examples[read]; then POST /v1/interactions with card_request from recipe_url"
+        ],
+        "adapt": "Change the card's fields to what the owner wants kept (shop, total, date). Save only what the owner confirms on the card. To change it: fill other blanks in config, or fetch the applet.json, edit it (card pieces, flows, tables) and send it as {\"package\": …}; validate returns the complete file.",
+        "done_when": [
+          "applet.installed arrived and GET /v1/applets/installed shows it active",
+          "The card is on the phone; the owner picked a receipt and saved the confirmed text as a row",
+          "The owner knows where the rows are (Installed applets › Data) and how to Remove it"
+        ],
+        "examples": [
+          "read"
+        ]
+      }
+    },
+    {
+      "id": "voice-notebook",
+      "title": "Voice notebook",
+      "summary": "Record one bounded offline transcript, check the words and save the note on the phone.",
+      "category": "run",
+      "capability_ids": [
+        "v1.mic",
+        "v1.interactions"
+      ],
+      "support": {
+        "source_api_revision": 54,
+        "tested_contract_api_revision": 54,
+        "minimum_recipe_api_revision": 54,
+        "released": "unknown; compare public changes and installed health",
+        "installed": "unknown",
+        "ready": null,
+        "requirements": "GET /v1/health, /v1/capabilities and installed /v1/guide must confirm every operation and grant. Source support alone is insufficient."
+      },
+      "execution": {
+        "phone": [
+          "Explicit owner tap → 10-second microphone clip → installed Android on-device speech recognizer → editable notebook draft → one answer.",
+          "No cloud fallback. The card can capture/transcribe without the controller, but saving the notebook requires the controller or another explicitly authorized storage integration."
+        ],
+        "controller": [
+          "Controller persists returned transcript only after the owner answers. Do not store credentials or notebooks in example pages."
+        ],
+        "server": "Only explicit decision-model/weather requests leave the phone; direct or relay transport still requires a running reachable phone."
+      },
+      "boundaries": [
+        "Not an always-listening notebook. It captures only a bounded clip on a deliberate tap.",
+        "On-device recognition availability depends on Android and installed language resources. Empty transcript is not silence evidence."
+      ],
+      "lifecycle": {
+        "start": "Configure card data, POST the generated HTML interaction; this does not automatically capture or poll.",
+        "update": "Owner explicitly refreshes; controller stores approved data and posts a replacement card as needed, cancelling old pending cards.",
+        "pause": "The Pause button suspends this card’s controls and suppresses results from a pending refresh. There is no background job in this starter; an in-flight capture may finish. Controller integrations must separately pause their jobs.",
+        "stop": "The Stop button stops this card, suppresses late results, and requests controller shutdown through one response. Confirm/close the controller job and DELETE the interaction separately. Local stop is not proof that an external process stopped."
+      },
+      "failure": [
+        "No offline recognizer: not_supported before recording. Unsupported language or capture error: show the actual error and let the owner retry.",
+        "With return_audio=false, transcription failure fails the request; there is no audio fallback to upload."
+      ],
+      "cost": [
+        "No Jev/Clef call. Local microphone and speech consume battery; keep clips bounded."
+      ],
+      "extensions": [
+        "Add a separate optional controller summarizer after the owner approves the transcript.",
+        "Use the separate owner-enabled wake-word system for hands-free collection; that is not silently enabled by this recipe."
+      ],
+      "examples": [
+        {
+          "id": "record",
+          "request": {
+            "method": "POST",
+            "path": "/v1/mic/record",
+            "body": {
+              "duration_seconds": 10,
+              "transcribe": true,
+              "return_audio": false,
+              "language": "en-US",
+              "store": []
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "recorded_at": "2026-11-04T10:00:00Z",
+              "duration_seconds": 10,
+              "format": "m4a",
+              "sample_rate_hz": 44100,
+              "size_bytes": 81200,
+              "transcript": "Buy oats on the way home.",
+              "on_device": true
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        }
+      ],
+      "card": {
+        "mode": "voice",
+        "refresh_label": "Record 10 seconds",
+        "freshness_seconds": 300,
+        "empty": "No recording yet. Tap only when ready to speak.",
+        "owner_intro": "Catch a thought before it slips away.",
+        "owner_note": "Records ten seconds only when you tap. Review the words before requesting a save."
+      },
+      "evidence": [
+        "app/src/main/java/cc/bridgit/app/api/Endpoints.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardRules.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardActions.kt",
+        "app/src/main/java/cc/bridgit/app/capability/Modules.kt",
+        "app/src/main/java/cc/bridgit/app/planned/Transcriber.kt",
+        "app/src/main/java/cc/bridgit/app/planned/TranscriptionResult.kt"
+      ],
+      "start": {
+        "fits": "Record a short spoken note on the phone and turn it into text you keep: memos, shopping lists, journal lines.",
+        "ideas": [
+          "voice",
+          "note",
+          "notes",
+          "memo",
+          "dictate",
+          "dictation",
+          "speak",
+          "record",
+          "journal",
+          "notebook",
+          "audio",
+          "list"
+        ],
+        "owner_turns_on": [
+          "Microphone",
+          "Interactions"
+        ],
+        "you_decide": {
+          "question": "Where should the saved text go?",
+          "default": "Back to you as a card answer; you store it."
+        },
+        "first_calls": [
+          "GET /v1/capabilities",
+          "POST /v1/applets/validate {\"url\":\"https://bridgit.cc/recipes/voice-notebook/applet.json\",\"config\":{}}: read review (what the owner will see), warnings and package",
+          "POST /v1/applets/install with the same body (needs your Install applets permission); the owner approves once on the phone; wait for applet.installed (with instance_id) in GET /v1/events",
+          "Only if you lack Install applets: POST /v1/mic/record with examples[record]; then POST /v1/interactions with card_request from recipe_url"
+        ],
+        "adapt": "Change the recording length (up to the example's bound) and what the card asks before saving. To change it: fill other blanks in config, or fetch the applet.json, edit it (card pieces, flows, tables) and send it as {\"package\": …}; validate returns the complete file.",
+        "done_when": [
+          "applet.installed arrived and GET /v1/applets/installed shows it active",
+          "The card is on the phone; a recording became a transcript the owner saved as a note",
+          "The owner knows where the notes are (Installed applets › Data) and how to Remove it"
+        ],
+        "examples": [
+          "record"
+        ]
+      }
+    },
+    {
+      "id": "room-change-watcher",
+      "title": "Room change watcher",
+      "summary": "A free image-change trigger with an explicit interpretation boundary.",
+      "category": "run",
+      "capability_ids": [
+        "v1.watches",
+        "v1.camera",
+        "v1.interactions"
+      ],
+      "support": {
+        "source_api_revision": 54,
+        "tested_contract_api_revision": 54,
+        "minimum_recipe_api_revision": 54,
+        "released": "unknown; compare public changes and installed health",
+        "installed": "unknown",
+        "ready": null,
+        "requirements": "GET /v1/health, /v1/capabilities and installed /v1/guide must confirm every operation and grant. Source support alone is insufficient."
+      },
+      "execution": {
+        "phone": [
+          "Timer → camera → free local image comparison → watch.matched event → controller inspection or offline status card.",
+          "model none makes no Jev/Clef calls and establishes a baseline before reporting changes."
+        ],
+        "controller": [
+          "Receive events, avoid duplicate processing by event ID/sequence, persist meaningful history.",
+          "Controller model interpretation and alerts are optional integrations, not features of the change filter."
+        ],
+        "server": "Only explicit decision-model/weather requests leave the phone; direct or relay transport still requires a running reachable phone."
+      },
+      "boundaries": [
+        "A changed image is not an intrusion, person count, danger or proof that something happened outside the frame.",
+        "The latest state and recent checks are bounded; controller must persist event history it needs."
+      ],
+      "lifecycle": {
+        "start": "POST /v1/watches with the start example; retain the returned watch_id. Then render/post the card with resource_id.",
+        "update": "GET state/tally first. To change the definition, export required history, DELETE old watch, POST revised definition. No watch PATCH exists.",
+        "pause": "POST /v1/watches/{id}/pause with {\"paused\":true}; resume with false. Confirm user_paused from the returned metadata. Expiry is unchanged.",
+        "stop": "DELETE /v1/watches/{id}; confirm deleted equals the saved id and watch.ended reason deleted. Archive needed tally BEFORE deletion. Cancel the interaction separately."
+      },
+      "failure": [
+        "Lights, shadows and movement can trigger changes. Tune sensitivity using known examples.",
+        "Locked/busy camera is an error gap; first baseline does not count as a change."
+      ],
+      "cost": [
+        "Free local comparison, no paid calls. Captures use battery and require camera permissions and an unlocked phone for built-in cameras."
+      ],
+      "extensions": [
+        "Escalate only selected changes to a controller model, with a fresh capture.",
+        "For a specific yes/no condition, change model to clef and set a paid-call cap; stop/recreate to update."
+      ],
+      "examples": [
+        {
+          "id": "start",
+          "request": {
+            "method": "POST",
+            "path": "/v1/watches",
+            "body": {
+              "label": "Room image changes",
+              "data": [
+                "camera"
+              ],
+              "camera": "rear",
+              "model": "none",
+              "interval_s": 30,
+              "window": 1,
+              "min_readings": 1,
+              "expires_in_s": 3600,
+              "repeat": true,
+              "cooldown_s": 120,
+              "local": {
+                "change_check": true,
+                "sensitivity": "normal",
+                "max_reuse_s": 300
+              }
+            }
+          },
+          "response": {
+            "status": 201,
+            "body": {
+              "watch_id": "w0123456789ab",
+              "label": "Room image changes",
+              "user_paused": false,
+              "created_at": "2026-11-04T10:00:00Z",
+              "expires_at": "2026-11-04T11:00:00Z",
+              "interval_s": 30,
+              "data": [
+                "camera"
+              ],
+              "checks": 0,
+              "matches": 0,
+              "last_match_at": null,
+              "readings_held": 0,
+              "last_check": null,
+              "usage": {
+                "model": "none",
+                "answered_locally": 0,
+                "paid_calls": 0,
+                "paid_cost_usd": 0,
+                "paid_calls_last_hour": 0,
+                "max_paid_per_hour": null,
+                "skipped_over_paid_cap": 0,
+                "change_check": true
+              },
+              "spec": {
+                "interval_s": 30,
+                "question": null,
+                "data": [
+                  "camera"
+                ],
+                "expires_in_s": 3600,
+                "questions": {},
+                "paid_calls_per_hour_at_most": 0,
+                "label": "Room image changes",
+                "min_readings": 1,
+                "max_paid_per_hour": null,
+                "local": {
+                  "max_reuse_s": 300,
+                  "learn_noise": true,
+                  "sensitivity": "normal",
+                  "change_check": true
+                },
+                "callback_url": null,
+                "cooldown_s": 120,
+                "repeat": true,
+                "context": null,
+                "model": "none",
+                "window": 1,
+                "callback_when": [],
+                "camera": "rear",
+                "tally": null
+              },
+              "callback_secret": null,
+              "first_check_in_s": 0,
+              "delivery": "watch.matched and watch.ended go to your registered callback if you have one, and to GET /v1/events (both need the interactions permission)"
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        },
+        {
+          "id": "ask",
+          "request": {
+            "method": "POST",
+            "path": "/v1/watches",
+            "body": {
+              "label": "Plant needs water",
+              "data": [
+                "camera"
+              ],
+              "camera": "rear",
+              "model": "clef",
+              "question": "Does the plant look wilted, or does its soil look dry?",
+              "interval_s": 3600,
+              "expires_in_s": 7776000,
+              "local": {
+                "change_check": true,
+                "sensitivity": "normal",
+                "max_reuse_s": 3600
+              },
+              "max_paid_per_hour": 2,
+              "tally": {
+                "keep_days": 30
+              },
+              "rules": [
+                {
+                  "id": "needs-water",
+                  "when": {
+                    "at_least": 1,
+                    "of": "match",
+                    "within_s": 3600
+                  },
+                  "do": {
+                    "method": "POST",
+                    "path": "/v1/interactions",
+                    "body": {
+                      "kind": "notice",
+                      "title": "Plant may need water",
+                      "text": "{message}"
+                    }
+                  },
+                  "cooldown_s": 43200
+                }
+              ]
+            }
+          },
+          "response": {
+            "status": 201,
+            "body": {
+              "watch_id": "w0123456789ac",
+              "label": "Plant needs water",
+              "user_paused": false,
+              "expires_at": "2027-02-02T10:00:00Z",
+              "interval_s": 3600,
+              "data": [
+                "camera"
+              ],
+              "checks": 0,
+              "usage": {
+                "model": "clef",
+                "paid_calls": 0,
+                "max_paid_per_hour": 2,
+                "change_check": true
+              },
+              "first_check_in_s": 0
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation: the question variant (Clef yes/no question, 90-day tally, notice rule)."
+        },
+        {
+          "id": "stop",
+          "request": {
+            "method": "DELETE",
+            "path": "/v1/watches/w0123456789ab"
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "deleted": "w0123456789ab"
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        }
+      ],
+      "card": {
+        "mode": "watch",
+        "refresh_label": "Read recent checks",
+        "read_suffix": "",
+        "freshness_seconds": 120,
+        "empty": "No baseline or checks yet. Nothing observed is different from no change.",
+        "owner_intro": "See when the room’s picture changes.",
+        "owner_note": "Image changes can be light or shadows. They do not identify a person or danger."
+      },
+      "evidence": [
+        "app/src/main/java/cc/bridgit/app/api/Endpoints.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardRules.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardActions.kt",
+        "app/src/main/java/cc/bridgit/app/watch/WatchRules.kt",
+        "app/src/main/java/cc/bridgit/app/watch/Watches.kt"
+      ],
+      "start": {
+        "fits": "Tell the owner when something the camera sees changes or looks a certain way: a plant that needs water, a door left open, a parcel at the door, a room that changed.",
+        "ideas": [
+          "plant",
+          "plants",
+          "water",
+          "watering",
+          "soil",
+          "wilt",
+          "wilting",
+          "droop",
+          "door",
+          "parcel",
+          "package",
+          "delivery",
+          "room",
+          "change",
+          "changes",
+          "notice",
+          "look",
+          "looks",
+          "garden",
+          "tell",
+          "alert",
+          "camera"
+        ],
+        "owner_turns_on": [
+          "Watches",
+          "Camera",
+          "Interactions"
+        ],
+        "you_decide": {
+          "question": "Should the phone only notice that the picture changed (free), or ask Clef a yes/no question about each changed photo?",
+          "default": "For 'does it look X?' ideas (plant dry, door open, parcel there) send examples[ask] with your own question; for 'did anything change?' send examples[start]."
+        },
+        "first_calls": [
+          "GET /v1/capabilities",
+          "GET /v1/limits",
+          "POST /v1/applets/validate {\"url\":\"https://bridgit.cc/recipes/room-change-watcher/applet.json\",\"config\":{\"camera\":\"rear\",\"interval_s\":60,\"sensitivity\":\"normal\"}}: read review (what the owner will see), warnings and package",
+          "POST /v1/applets/install with the same body (needs your Install applets permission); the owner approves once on the phone; wait for applet.installed (with instance_id) in GET /v1/events",
+          "Only if you lack Install applets: POST /v1/watches with examples[ask] (or [start]); save watch_id; then POST /v1/interactions with card_request from recipe_url, resource_id set to watch_id"
+        ],
+        "adapt": "Change the question to the owner's idea; keep it a yes/no about what is visible. examples[ask] checks every hour, reuses the last answer while the picture is unchanged, counts yes answers in a tally for 90 days and posts a notice card on the phone at most every 12 hours when the answer is yes. Set max_paid_per_hour from GET /v1/limits. Aim the back camera at the thing to watch; each yes also reaches you as a watch event (GET /v1/events). To change it: fill other blanks in config, or fetch the applet.json, edit it (card pieces, flows, tables) and send it as {\"package\": …}; validate returns the complete file.",
+        "done_when": [
+          "applet.installed arrived and GET /v1/applets/installed shows it active",
+          "The card is on the phone and shows the first checks",
+          "The owner knows how they will hear about changes and how to Pause or Remove it"
+        ],
+        "examples": [
+          "start",
+          "ask"
+        ]
+      }
+    },
+    {
+      "id": "daily-briefing-panel",
+      "title": "Daily briefing panel",
+      "summary": "An owner-approved reminder and a card that reads current weather on demand.",
+      "category": "run",
+      "capability_ids": [
+        "v1.schedule",
+        "v1.weather",
+        "v1.interactions"
+      ],
+      "support": {
+        "source_api_revision": 54,
+        "tested_contract_api_revision": 54,
+        "minimum_recipe_api_revision": 54,
+        "released": "unknown; compare public changes and installed health",
+        "installed": "unknown",
+        "ready": null,
+        "requirements": "GET /v1/health, /v1/capabilities and installed /v1/guide must confirm every operation and grant. Source support alone is insufficient."
+      },
+      "execution": {
+        "phone": [
+          "Approved daily schedule → local reminder → owner opens the card → explicit weather refresh → panel renders source timestamps.",
+          "An approved schedule runs without the controller while the listener is active. Android doze can delay it. Weather needs internet."
+        ],
+        "controller": [
+          "Generate the briefing card, post the manifest, wait for owner approval, and verify next run/status.",
+          "Maintain one schedule manifest per agent; merge with the existing submitted manifest rather than overwriting unrelated actions."
+        ],
+        "server": "Only explicit decision-model/weather requests leave the phone; direct or relay transport still requires a running reachable phone."
+      },
+      "boundaries": [
+        "The local schedule cannot template arbitrary API responses into rich HTML. A fresh multi-source digest needs controller code to gather, summarize and publish a new card.",
+        "This complete starter is a reminder plus on-demand weather panel. Calendar/mail aggregation is an optional separately authorized integration."
+      ],
+      "lifecycle": {
+        "start": "Inspect existing /v1/schedule/manifest, merge actions, submit start_request, wait for owner approval; GET /v1/schedule must show active. Post generated card separately.",
+        "update": "Resubmit merged replacement manifest; new content requires approval. GET status confirms which digest is active.",
+        "pause": "POST /v1/schedule/pause {\"paused\":true}; affects this agent’s entire manifest, not just the reminder. Resume with false.",
+        "stop": "Remove only the reminder from a replacement manifest if other actions exist. DELETE /v1/schedule only if this agent has a dedicated recipe manifest. Cancel the card separately; keep_assets=true preserves saved files."
+      },
+      "failure": [
+        "awaiting_owner is not running: inspect /v1/schedule until active.",
+        "Weather stale=true or expired expires_at: show stale status, not fresh conditions; upstream_failed retains no invented forecast."
+      ],
+      "cost": [
+        "No decision-model call in this starter. MET Norway weather is an external service and returns attribution."
+      ],
+      "extensions": [
+        "Controller can combine authorized calendar and task data, with a separate timestamp per source.",
+        "Send a new card and cancel the old one after replacing; do not open unlimited pending questions."
+      ],
+      "examples": [
+        {
+          "id": "pause",
+          "request": {
+            "method": "POST",
+            "path": "/v1/schedule/pause",
+            "body": {
+              "paused": true
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "paused": true
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        },
+        {
+          "id": "resume",
+          "request": {
+            "method": "POST",
+            "path": "/v1/schedule/pause",
+            "body": {
+              "paused": false
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "paused": false
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        },
+        {
+          "id": "stop",
+          "request": {
+            "method": "DELETE",
+            "path": "/v1/schedule",
+            "query": {
+              "keep_assets": true
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "removed": true
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        }
+      ],
+      "card": {
+        "mode": "weather",
+        "refresh_label": "Refresh weather",
+        "freshness_seconds": 900,
+        "empty": "No forecast fetched. Weather requires internet and owner permission.",
+        "owner_intro": "A quick look at the day ahead.",
+        "owner_note": "Weather needs internet. The daily reminder is managed separately from this card."
+      },
+      "evidence": [
+        "app/src/main/java/cc/bridgit/app/api/Endpoints.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardRules.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardActions.kt",
+        "app/src/main/java/cc/bridgit/app/schedule/ScheduleModule.kt",
+        "app/src/main/java/cc/bridgit/app/schedule/ScheduleRules.kt",
+        "app/src/main/java/cc/bridgit/app/weather/WeatherModule.kt"
+      ],
+      "start_request": {
+        "method": "POST",
+        "path": "/v1/schedule",
+        "body": {
+          "manifest": {
+            "timezone": "Europe/Warsaw",
+            "actions": [
+              {
+                "id": "briefing-reminder",
+                "when": {
+                  "daily": [
+                    "08:00"
+                  ],
+                  "count": 7
+                },
+                "do": {
+                  "call": "POST /v1/interactions",
+                  "body": {
+                    "kind": "notice",
+                    "title": "Daily briefing",
+                    "text": "Your briefing is ready to refresh. Open the briefing card.",
+                    "no_takeover": true
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "start": {
+        "fits": "A daily reminder or summary at a set time, with a card the owner can open: morning weather, a nightly checklist, a weekly reminder.",
+        "ideas": [
+          "daily",
+          "morning",
+          "evening",
+          "reminder",
+          "remind",
+          "briefing",
+          "summary",
+          "weather",
+          "every",
+          "day",
+          "schedule",
+          "routine",
+          "checklist",
+          "weekly"
+        ],
+        "owner_turns_on": [
+          "Scheduled actions",
+          "Weather",
+          "Interactions"
+        ],
+        "you_decide": {
+          "question": "What time, and what should the reminder say?",
+          "default": "08:00 daily for a week, with a card that reads the weather (the start request)."
+        },
+        "first_calls": [
+          "GET /v1/capabilities",
+          "POST /v1/applets/validate {\"url\":\"https://bridgit.cc/recipes/daily-briefing-panel/applet.json\",\"config\":{\"time\":\"08:00\",\"timezone\":\"<the owner's timezone>\"}}: read review (what the owner will see), warnings and package",
+          "POST /v1/applets/install with the same body (needs your Install applets permission); the owner approves once on the phone; wait for applet.installed (with instance_id) in GET /v1/events",
+          "Only if you lack Install applets: GET /v1/schedule/manifest; merge your action into it; then POST /v1/schedule with start_request; the owner approves it on the phone; then POST /v1/interactions with card_request from recipe_url"
+        ],
+        "adapt": "Change the timetable and the action's text. Keep any actions already in the owner's manifest. To change it: fill other blanks in config, or fetch the applet.json, edit it (card pieces, flows, tables) and send it as {\"package\": …}; validate returns the complete file.",
+        "done_when": [
+          "applet.installed arrived and GET /v1/applets/installed shows it active",
+          "The card is on the phone and Refresh shows the weather",
+          "The owner knows when the reminder comes and how to Pause or Remove it"
+        ],
+        "examples": [
+          "start_request"
+        ]
+      }
+    },
+    {
+      "id": "external-device-dashboard",
+      "title": "External device dashboard",
+      "summary": "List only the agent’s enrolled LAN devices; keep availability honest.",
+      "category": "run",
+      "capability_ids": [
+        "v1.lan_control",
+        "v1.interactions"
+      ],
+      "support": {
+        "source_api_revision": 54,
+        "tested_contract_api_revision": 54,
+        "minimum_recipe_api_revision": 54,
+        "released": "unknown; compare public changes and installed health",
+        "installed": "unknown",
+        "ready": null,
+        "requirements": "GET /v1/health, /v1/capabilities and installed /v1/guide must confirm every operation and grant. Source support alone is insufficient."
+      },
+      "execution": {
+        "phone": [
+          "Explicit refresh → phone returns enrolled device inventory without a probe → dashboard.",
+          "The phone must be on the supported direct LAN for an authorized status action; the controller may connect remotely through direct or relay transport."
+        ],
+        "controller": [
+          "Controller or owner performs credentialed verification/enrollment using supported adapters; not part of this learning example.",
+          "Retain checked_at per successful status response. Stop polling on pause/stop and cancel the card."
+        ],
+        "server": "Only explicit decision-model/weather requests leave the phone; direct or relay transport still requires a running reachable phone."
+      },
+      "boundaries": [
+        "Listing does not test devices: availability=not_checked is not online. Discovery is partial and unverified; enrollment is separate.",
+        "No enrollment credentials are embedded. No relay switch, motor, light or other physical action is run by the template."
+      ],
+      "lifecycle": {
+        "start": "Configure card data, POST the generated HTML interaction; this does not automatically capture or poll.",
+        "update": "Owner explicitly refreshes; controller stores approved data and posts a replacement card as needed, cancelling old pending cards.",
+        "pause": "The Pause button suspends this card’s controls and suppresses results from a pending refresh. There is no background job in this starter; an in-flight capture may finish. Controller integrations must separately pause their jobs.",
+        "stop": "The Stop button stops this card, suppresses late results, and requests controller shutdown through one response. Confirm/close the controller job and DELETE the interaction separately. Local stop is not proof that an external process stopped."
+      },
+      "failure": [
+        "No enrolled devices: show empty. A failed status call does not prove a device is offline.",
+        "Unsupported adapter: display its actual advertised actions, do not substitute arbitrary URLs or claim universal smart-home support."
+      ],
+      "cost": [
+        "No remote inference. LAN availability depends on phone/network and owner-approved enrollment."
+      ],
+      "extensions": [
+        "After explicit authorization, add status for one enrolled ID using POST /v1/lan/devices/action.",
+        "Use only that device’s advertised action schema; keep physical control separate from reading inventory."
+      ],
+      "examples": [
+        {
+          "id": "list-empty",
+          "request": {
+            "method": "GET",
+            "path": "/v1/lan/devices"
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "devices": [],
+              "adapters": [
+                {
+                  "id": "shelly_gen1",
+                  "actions": [
+                    "status",
+                    "relay_on",
+                    "relay_off"
+                  ],
+                  "implemented": true,
+                  "enrollment": "/v1/lan/devices/enroll",
+                  "limitations": "Gen1 HTTP Basic or no auth; relay devices only, 1..4 channels; MAC checked before control"
+                },
+                {
+                  "id": "openwrt_ubus",
+                  "actions": [
+                    "status",
+                    "dhcp_leases"
+                  ],
+                  "implemented": true,
+                  "enrollment": "/v1/lan/devices/enroll",
+                  "limitations": "rpcd ubus session login; system.board and dhcp.ipv4leases ACLs; read-only, no router settings changes"
+                },
+                {
+                  "id": "tapo_onvif",
+                  "actions": [
+                    "status"
+                  ],
+                  "implemented": true,
+                  "enrollment": "/v1/lan/devices/enroll",
+                  "limitations": "Tapo-style fixed ONVIF port 2020 and RTSP stream1/2; not arbitrary ONVIF cameras; capture and PTZ require lan_camera"
+                }
+              ],
+              "camera_inventory": "/v1/lan-cameras"
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        }
+      ],
+      "card": {
+        "mode": "lan",
+        "refresh_label": "Refresh enrolled devices",
+        "freshness_seconds": 120,
+        "empty": "No devices enrolled for this agent. Listing does not probe the network.",
+        "owner_intro": "Your shared devices at a glance.",
+        "owner_note": "This list does not test device availability. No hardware is controlled here."
+      },
+      "evidence": [
+        "app/src/main/java/cc/bridgit/app/api/Endpoints.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardRules.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardActions.kt",
+        "app/src/main/java/cc/bridgit/app/lan/LanModule.kt",
+        "app/src/main/java/cc/bridgit/app/lan/LanRules.kt"
+      ],
+      "start": {
+        "fits": "Show the owner's smart devices that are already added to Bridgit on one card: smart plugs, relays, routers.",
+        "ideas": [
+          "plug",
+          "relay",
+          "switch",
+          "light",
+          "lights",
+          "shelly",
+          "device",
+          "devices",
+          "smart",
+          "home",
+          "dashboard",
+          "turn"
+        ],
+        "owner_turns_on": [
+          "Local device control",
+          "Interactions"
+        ],
+        "you_decide": {
+          "question": "Which of the owner's added devices belong on the card?",
+          "default": "All devices the owner gave you; none if the list is empty."
+        },
+        "first_calls": [
+          "GET /v1/capabilities",
+          "GET /v1/lan/devices",
+          "POST /v1/applets/validate {\"url\":\"https://bridgit.cc/recipes/external-device-dashboard/applet.json\",\"config\":{}}: read review (what the owner will see), warnings and package",
+          "POST /v1/applets/install with the same body (needs your Install applets permission); the owner approves once on the phone; wait for applet.installed (with instance_id) in GET /v1/events",
+          "Only if you lack Install applets: GET /v1/lan/devices with examples[list-empty]; then POST /v1/interactions with card_request from recipe_url"
+        ],
+        "adapt": "If the list is empty, ask the owner to add the device in Bridgit first; you cannot add it for them. To change it: fill other blanks in config, or fetch the applet.json, edit it (card pieces, flows, tables) and send it as {\"package\": …}; validate returns the complete file.",
+        "done_when": [
+          "applet.installed arrived and GET /v1/applets/installed shows it active",
+          "The card is on the phone and lists the owner's devices with when each was last checked",
+          "The owner knows how to Remove it"
+        ],
+        "examples": [
+          "list-empty"
+        ]
+      }
+    },
+    {
+      "id": "situation-counter",
+      "title": "Situation counter",
+      "summary": "Spot and count one camera situation, like a pot boiling over or a dog licking itself.",
+      "category": "run",
+      "capability_ids": [
+        "v1.watches",
+        "v1.camera",
+        "v1.interactions"
+      ],
+      "support": {
+        "source_api_revision": 71,
+        "tested_contract_api_revision": 71,
+        "minimum_recipe_api_revision": 71,
+        "released": "unknown; compare public changes and installed health",
+        "installed": "unknown",
+        "ready": null,
+        "requirements": "GET /v1/health, /v1/capabilities and installed /v1/guide must confirm every operation and grant, and the installed API revision must be at least 71 (situation in POST /v1/watches). Source support alone is insufficient."
+      },
+      "execution": {
+        "phone": [
+          "Timer → camera → free local change check → Clef yes/no on changed photos → episode tally on the phone → watch.matched event and, for alert situations, an urgent owner notice.",
+          "The phone expands situation into the tuned question, the tally (track = the situation id, or \"situation\" for own words) and the alert rule; unchanged photos reuse the last answer for free."
+        ],
+        "controller": [
+          "Optional: read GET /v1/watches/{id}/tally to archive day totals; the card and the count work with no agent.",
+          "Pick the situation with the owner: a library id from GET /v1/situations or the owner's own words."
+        ],
+        "server": "Only Clef photo checks leave the phone (model left out, so Clef is the default for a camera watch); direct or relay transport still requires a running reachable phone."
+      },
+      "boundaries": [
+        "A count is sampled photos judged by a model, not continuous coverage or proof: gaps, a locked camera or the thing being out of frame are unknown, not zero.",
+        "It does not diagnose health or detect fire: a smoke or boiling-over count is a nudge, not a safety alarm."
+      ],
+      "lifecycle": {
+        "start": "POST /v1/watches with the start example; retain the returned watch_id. Then render/post the card with resource_id.",
+        "update": "GET /v1/watches/{id}/tally first. To change the situation or timing, archive the tally, DELETE the old watch, POST the revised body. No watch PATCH exists.",
+        "pause": "POST /v1/watches/{id}/pause with {\"paused\":true}; resume with false. Confirm user_paused from the returned metadata. Expiry is unchanged.",
+        "stop": "DELETE /v1/watches/{id}; confirm deleted equals the saved id and watch.ended reason deleted. Archive needed tally BEFORE deletion. Cancel the interaction separately."
+      },
+      "failure": [
+        "Own words that look like an id (lowercase_with_underscores) but aren't in the library are refused: describe it with spaces instead.",
+        "A busy or locked camera is a gap; poor light, glare and odd angles cause misses and false counts. Aim the camera and try a known example first."
+      ],
+      "cost": [
+        "Clef photo checks from the phone's model budget: at most max_paid_per_hour (30 here, under the 50-an-hour limit some phones have) an hour; unchanged pictures reuse the last answer for free. Read GET /v1/limits and lower the cap or lengthen interval_s for long runs."
+      ],
+      "extensions": [
+        "Send {\"situation\": {\"describe\": \"...\", \"alert\": true}} to count own words and notify the owner when one starts.",
+        "Add callback_when on the situation id, or rules, to reach a controller or show other notices; min and count_only_while tune what counts."
+      ],
+      "examples": [
+        {
+          "id": "start",
+          "request": {
+            "method": "POST",
+            "path": "/v1/watches",
+            "body": {
+              "situation": "pot_boiling_over",
+              "data": [
+                "camera"
+              ],
+              "camera": "rear",
+              "interval_s": 20,
+              "expires_in_s": 7776000,
+              "max_paid_per_hour": 30,
+              "local": {
+                "change_check": true,
+                "sensitivity": "normal",
+                "max_reuse_s": 300
+              }
+            }
+          },
+          "response": {
+            "status": 201,
+            "body": {
+              "watch_id": "wsituation01",
+              "label": "Pot boiling over",
+              "user_paused": false,
+              "created_at": "2026-11-04T10:00:00Z",
+              "expires_at": "2027-02-02T10:00:00Z",
+              "interval_s": 20,
+              "data": [
+                "camera"
+              ],
+              "checks": 0,
+              "matches": 0,
+              "last_match_at": null,
+              "readings_held": 0,
+              "last_check": null,
+              "usage": {
+                "model": "clef",
+                "answered_locally": 0,
+                "paid_calls": 0,
+                "paid_cost_usd": 0,
+                "paid_calls_last_hour": 0,
+                "max_paid_per_hour": 30,
+                "skipped_over_paid_cap": 0,
+                "change_check": true
+              },
+              "spec": {
+                "interval_s": 20,
+                "question": null,
+                "data": [
+                  "camera"
+                ],
+                "expires_in_s": 7776000,
+                "questions": {
+                  "pot_boiling_over": {
+                    "instructions": "Is a pot or pan on the stove boiling over, with liquid or foam spilling over its rim? Judge from the newest photo: how likely is it that this is happening in it now?",
+                    "type": "noul"
+                  }
+                },
+                "paid_calls_per_hour_at_most": 30,
+                "label": "Pot boiling over",
+                "min_readings": 1,
+                "max_paid_per_hour": 30,
+                "local": {
+                  "max_reuse_s": 300,
+                  "learn_noise": true,
+                  "sensitivity": "normal",
+                  "change_check": true
+                },
+                "callback_url": null,
+                "cooldown_s": 600,
+                "repeat": true,
+                "context": null,
+                "model": "clef",
+                "window": 1,
+                "callback_when": [],
+                "camera": "rear",
+                "tally": {
+                  "min": 0.7,
+                  "gap_s": 180,
+                  "kind": "noul",
+                  "min_episode_readings": 1,
+                  "rules": [
+                    {
+                      "cooldown_s": 300,
+                      "id": "alert",
+                      "do": {
+                        "path": "/v1/interactions",
+                        "method": "POST",
+                        "body": {
+                          "kind": "notice",
+                          "text": "Seen on the camera just now.",
+                          "title": "Pot boiling over",
+                          "priority": "urgent"
+                        }
+                      },
+                      "when": {
+                        "of": "pot_boiling_over",
+                        "within_s": 120,
+                        "at_least": 1
+                      }
+                    }
+                  ],
+                  "track": "pot_boiling_over",
+                  "seen": null,
+                  "labels": null,
+                  "keep_days": 30
+                },
+                "situation": "pot_boiling_over"
+              },
+              "tally_today": null,
+              "rules_fired": 0,
+              "callback_secret": null,
+              "first_check_in_s": 0,
+              "delivery": "watch.matched and watch.ended go to your registered callback if you have one, and to GET /v1/events (both need the interactions permission); watch.rule (a rule fired) goes the same way"
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        },
+        {
+          "id": "own-words",
+          "request": {
+            "method": "POST",
+            "path": "/v1/watches",
+            "body": {
+              "situation": {
+                "describe": "the cat is sleeping on the armchair",
+                "alert": false
+              },
+              "data": [
+                "camera"
+              ],
+              "camera": "rear",
+              "interval_s": 60,
+              "expires_in_s": 2592000,
+              "max_paid_per_hour": 20,
+              "local": {
+                "change_check": true,
+                "sensitivity": "normal",
+                "max_reuse_s": 900
+              }
+            }
+          },
+          "response": {
+            "status": 201,
+            "body": {
+              "watch_id": "wsituation02",
+              "label": "The cat is sleeping on the armchair",
+              "user_paused": false,
+              "created_at": "2026-11-04T10:00:00Z",
+              "expires_at": "2026-12-04T10:00:00Z",
+              "interval_s": 60,
+              "data": [
+                "camera"
+              ],
+              "checks": 0,
+              "matches": 0,
+              "last_match_at": null,
+              "readings_held": 0,
+              "last_check": null,
+              "usage": {
+                "model": "clef",
+                "answered_locally": 0,
+                "paid_calls": 0,
+                "paid_cost_usd": 0,
+                "paid_calls_last_hour": 0,
+                "max_paid_per_hour": 20,
+                "skipped_over_paid_cap": 0,
+                "change_check": true
+              },
+              "spec": {
+                "interval_s": 60,
+                "question": null,
+                "data": [
+                  "camera"
+                ],
+                "expires_in_s": 2592000,
+                "questions": {
+                  "situation": {
+                    "instructions": "Does the photo show this: the cat is sleeping on the armchair? Judge from the newest photo: how likely is it that this is happening in it now?",
+                    "type": "noul"
+                  }
+                },
+                "paid_calls_per_hour_at_most": 20,
+                "label": "The cat is sleeping on the armchair",
+                "min_readings": 1,
+                "max_paid_per_hour": 20,
+                "local": {
+                  "max_reuse_s": 900,
+                  "learn_noise": true,
+                  "sensitivity": "normal",
+                  "change_check": true
+                },
+                "callback_url": null,
+                "cooldown_s": 600,
+                "repeat": true,
+                "context": null,
+                "model": "clef",
+                "window": 1,
+                "callback_when": [],
+                "camera": "rear",
+                "tally": {
+                  "min": 0.7,
+                  "gap_s": 180,
+                  "kind": "noul",
+                  "min_episode_readings": 1,
+                  "rules": [],
+                  "track": "situation",
+                  "seen": null,
+                  "labels": null,
+                  "keep_days": 30
+                },
+                "situation": "situation"
+              },
+              "tally_today": null,
+              "rules_fired": 0,
+              "callback_secret": null,
+              "first_check_in_s": 0,
+              "delivery": "watch.matched and watch.ended go to your registered callback if you have one, and to GET /v1/events (both need the interactions permission); watch.rule (a rule fired) goes the same way"
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation: own words count under the track id \"situation\"."
+        },
+        {
+          "id": "stop",
+          "request": {
+            "method": "DELETE",
+            "path": "/v1/watches/wsituation01"
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "deleted": "wsituation01"
+            }
+          },
+          "evidence": "Synthetic contract fixture, not a device observation."
+        }
+      ],
+      "card": {
+        "mode": "watch",
+        "refresh_label": "Read today’s count",
+        "read_suffix": "/tally",
+        "count_heading": "Today’s count",
+        "freshness_seconds": 120,
+        "empty": "No checks yet today. Not seen is not the same as didn’t happen.",
+        "owner_intro": "Counts how often the camera sees one situation today.",
+        "owner_note": "Sampled photos judged by a model. Gaps and things out of frame are unknown, and it is not a safety alarm."
+      },
+      "evidence": [
+        "app/src/main/java/cc/bridgit/app/watch/Situations.kt",
+        "app/src/main/java/cc/bridgit/app/watch/WatchRules.kt",
+        "app/src/main/java/cc/bridgit/app/watch/WatchTally.kt",
+        "app/src/main/java/cc/bridgit/app/watch/Watches.kt",
+        "app/src/main/java/cc/bridgit/app/interact/CardActions.kt"
+      ],
+      "start": {
+        "fits": "Spot and count a common picture situation on the camera: a pot boiling over, smoke, water on the floor, the dog licking or scratching itself, the dog on the couch, the cat on the counter, sunlight in the room, lights left on, or one described in the owner's words.",
+        "ideas": [
+          "situation",
+          "situations",
+          "boil",
+          "boiling",
+          "pot",
+          "stove",
+          "smoke",
+          "smoky",
+          "lick",
+          "licking",
+          "licks",
+          "itself",
+          "scratch",
+          "scratching",
+          "itch",
+          "couch",
+          "sofa",
+          "counter",
+          "sunlight",
+          "sunny",
+          "sun",
+          "lights",
+          "puddle",
+          "spill",
+          "leak",
+          "often",
+          "spot",
+          "spots",
+          "episodes"
+        ],
+        "owner_turns_on": [
+          "Watches",
+          "Camera",
+          "Interactions"
+        ],
+        "you_decide": {
+          "question": "Which situation should the camera count: a library id (GET /v1/situations) or the owner's own words?",
+          "default": "pot_boiling_over with the back camera every 20 seconds (the start example); own words go in situation as a sentence with spaces."
+        },
+        "first_calls": [
+          "GET /v1/capabilities",
+          "GET /v1/limits",
+          "GET /v1/situations",
+          "POST /v1/applets/validate {\"url\":\"https://bridgit.cc/recipes/situation-counter/applet.json\",\"config\":{\"situation\":\"<a library id or the owner's words>\"}}: read review (what the owner will see), warnings and package",
+          "POST /v1/applets/install with the same body (needs your Install applets permission); the owner approves once on the phone; wait for applet.installed (with instance_id) in GET /v1/events",
+          "Only if you lack Install applets: POST /v1/watches with examples[start] (situation set to the owner's pick); save watch_id; then POST /v1/interactions with card_request from recipe_url, resource_id set to watch_id"
+        ],
+        "adapt": "Set situation to the library id or the owner's words; leave question, questions and tally out (the phone fills them in). Alert situations (pot_boiling_over, smoke_in_room, water_on_floor) also send the owner an urgent notice when an episode starts; {\"id\": ..., \"alert\": false} turns that off. Set max_paid_per_hour from GET /v1/limits and use the library's interval_s for slow situations (sunlight, lights: 300). To change it: fill other blanks in config, or fetch the applet.json, edit it (card pieces, flows, tables) and send it as {\"package\": …}; validate returns the complete file.",
+        "done_when": [
+          "applet.installed arrived and GET /v1/applets/installed shows it active",
+          "The card is on the phone and Refresh shows today's count",
+          "The owner knows which situation is counted, whether it alerts, and how to Pause or Remove it"
+        ],
+        "examples": [
+          "start",
+          "own-words"
+        ]
+      }
+    }
+  ]
+}

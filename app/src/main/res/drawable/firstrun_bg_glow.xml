@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Native first-run pages: the same plum glow at the top as page 1, fading into the app surface. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:centerY="0.45"
+        android:startColor="@color/firstrun_glow_top"
+        android:centerColor="@color/b_surface"
+        android:endColor="@color/b_surface" />
+</shape>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Applets › Config (owner, 4 Nov 2026): installed applets at the top, the ones you can add below.
+     The Pet monitor card moves between the two panels in code (installed = its web portal is on, or it runs). -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintWidth_max="840dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="0dp"
+        android:paddingBottom="16dp">
+
+        <LinearLayout
+            android:id="@+id/installed_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="8dp">
+                <TextView
+                    style="@style/Widget.Bridgit.AppletHeading"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
+                    android:text="@string/applets_installed_header" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/create_applet"
+                    style="?attr/bridgitPillTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="@string/create_applet"
+                    android:textSize="14sp"
+                    app:icon="@drawable/ic_add"
+                    app:iconSize="16dp"
+                    app:iconPadding="4dp"
+                    app:iconGravity="textStart" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/installed_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/applets_installed_empty"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/installed_list"
+                android:divider="@drawable/applet_row_divider"
+                android:showDividers="middle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Apps agents built from tally watches (3 Nov 2026); hidden while there are none. -->
+            <LinearLayout
+                android:id="@+id/agent_apps_panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/agent_apps_list"
+                android:divider="@drawable/applet_row_divider"
+                android:showDividers="middle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp">
+
+            <TextView
+                style="@style/Widget.Bridgit.AppletHeading"
+                android:text="@string/applets_available_header" />
+
+            <LinearLayout
+                android:id="@+id/available_list"
+                android:divider="@drawable/applet_row_divider"
+                android:showDividers="middle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <!-- Pet monitor (owner, 2 Nov 2026). -->
+            <LinearLayout
+                android:id="@+id/dog_monitor"
+                style="@style/Widget.Bridgit.AppletRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="0dp"
+
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        style="@style/Widget.Bridgit.AppletIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/dog_ic_paw"
+                        app:tint="?attr/colorPrimary" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <cc.bridgit.app.ui.common.FlowRow
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dog_title"
+                            android:textSize="16sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="?attr/colorOnSurface" />
+                        <TextView
+                            android:id="@+id/dog_monitor_running"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:accessibilityLiveRegion="polite"
+                            android:background="@drawable/tour_bg_chip"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:text="@string/dog_notif_title"
+                            android:textSize="14sp"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:visibility="gone" />
+                        </cc.bridgit.app.ui.common.FlowRow>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/applets_dog_desc"
+                            android:textSize="14sp"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
+                        android:layout_marginStart="8dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_chevron"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+                </LinearLayout>
+            </LinearLayout>
+            </LinearLayout>
+
+            <TextView style="@style/Widget.Bridgit.AppletHeading" android:text="@string/applets_tools_header" />
+            <LinearLayout android:id="@+id/connections_card" style="@style/Widget.Bridgit.AppletRow">
+                <ImageView style="@style/Widget.Bridgit.AppletIcon" android:src="@drawable/ic_network_link" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/Widget.Bridgit.AppletTitle" android:text="@string/connections_title" />
+                    <TextView android:id="@+id/connections_summary" style="@style/Widget.Bridgit.AppletSecondary" android:text="@string/applets_connections_summary" />
+                </LinearLayout>
+                <ImageView android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp" android:layout_marginStart="8dp" android:importantForAccessibility="no" android:src="@drawable/ic_chevron" app:tint="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginStart="68dp" android:layout_marginEnd="16dp" android:background="?attr/colorOutlineVariant" />
+            <LinearLayout android:id="@+id/build_applet" style="@style/Widget.Bridgit.AppletRow">
+                <ImageView style="@style/Widget.Bridgit.AppletIcon" android:src="@drawable/ic_nav_applets" />
+                <TextView style="@style/Widget.Bridgit.AppletTitle" android:layout_width="0dp" android:layout_weight="1" android:text="@string/applets_build_instructions" />
+                <ImageView android:importantForAccessibility="no" android:layout_width="48dp" android:layout_height="48dp" android:layout_marginStart="8dp" android:padding="12dp" android:background="?attr/selectableItemBackgroundBorderless" android:src="@drawable/ic_chevron" app:tint="?attr/colorPrimary" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

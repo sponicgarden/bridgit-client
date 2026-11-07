@@ -1,0 +1,39 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Remembered devices on the phone's current network, the same payload as GET /v1/lan/discovered; no scan, no switch needed (like the phone's Network devices screen). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "portal_devices",
+  "query": [{
+   "name": "client",
+   "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+   "type": "string",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/portal/devices",
+  "idempotent": false,
+  "path": "/v1/portal/devices",
+  "capability": "portal",
+  "returns": "the GET /v1/lan/discovered payload: total_devices, connected_devices, unconnected_devices, categories, devices; every brand logo_url points at GET /v1/portal/brands/{id}/logo; plus added: the devices added to Bridgit (id, name, host, kind, state, applets, checks; no credentials)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"client": {
+    "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+    "type": "string"
+   }},
+   "required": []
+  },
+  "errors": [
+   "not_supported",
+   "conflict"
+  ],
+  "requires": null
+ }
+}

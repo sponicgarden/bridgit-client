@@ -1,0 +1,166 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_app_foreground",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-app.foreground.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-app.foreground.json",
+  "required_arguments": [
+   "idempotency_key",
+   "reason"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "description": "Bring Bridgit or a discovered target forward using app.foreground authority; applet/portal targets also need applet_portals. Minimum 1 second between switches, maximum 12 per minute per device. Result foreground confirms the requested target is visible; otherwise a notification fallback may need an owner tap. Does not unlock or grant OS consent.",
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "reason": {
+      "description": "Required audit reason",
+      "type": "string",
+      "maxLength": 256
+     },
+     "target": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "id": {
+        "description": "Exact id from app.foreground.targets",
+        "type": "string",
+        "maxLength": 200
+       },
+       "type": {
+        "type": "string",
+        "enum": [
+         "screen",
+         "card",
+         "applet",
+         "portal"
+        ]
+       }
+      },
+      "required": [
+       "type",
+       "id"
+      ]
+     }
+    },
+    "required": ["reason"]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "description": "Bring Bridgit or a discovered target forward using app.foreground authority; applet/portal targets also need applet_portals. Minimum 1 second between switches, maximum 12 per minute per device. Result foreground confirms the requested target is visible; otherwise a notification fallback may need an owner tap. Does not unlock or grant OS consent.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "reason": {
+        "description": "Required audit reason",
+        "type": "string",
+        "maxLength": 256
+       },
+       "target": {
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+         "id": {
+          "description": "Exact id from app.foreground.targets",
+          "type": "string",
+          "maxLength": 200
+         },
+         "type": {
+          "type": "string",
+          "enum": [
+           "screen",
+           "card",
+           "applet",
+           "portal"
+          ]
+         }
+        },
+        "required": [
+         "type",
+         "id"
+        ]
+       }
+      },
+      "required": ["reason"]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["app.foreground"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "description": "Bring Bridgit or a discovered target forward using app.foreground authority; applet/portal targets also need applet_portals. Minimum 1 second between switches, maximum 12 per minute per device. Result foreground confirms the requested target is visible; otherwise a notification fallback may need an owner tap. Does not unlock or grant OS consent.",
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "reason": {
+     "description": "Required audit reason",
+     "type": "string",
+     "maxLength": 256
+    },
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    },
+    "target": {
+     "additionalProperties": false,
+     "type": "object",
+     "properties": {
+      "id": {
+       "description": "Exact id from app.foreground.targets",
+       "type": "string",
+       "maxLength": 200
+      },
+      "type": {
+       "type": "string",
+       "enum": [
+        "screen",
+        "card",
+        "applet",
+        "portal"
+       ]
+      }
+     },
+     "required": [
+      "type",
+      "id"
+     ]
+    }
+   },
+   "required": [
+    "idempotency_key",
+    "reason"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_app_foreground"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "app.foreground"
+ }
+}

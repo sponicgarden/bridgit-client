@@ -1,0 +1,158 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Analysis of what left the phone, in one call: a plain-language headline, totals, trends by hour or day, the biggest destinations, agents and calls, destinations first seen in the window, failures, and for each destination the data categories, purposes and agents it received",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "outbound_summary",
+  "query": [
+   {
+    "name": "since",
+    "description": "Outbound id (exclusive) or ISO time",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "until",
+    "description": "Outbound id or ISO time",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "destination",
+    "description": "Text in the host or service name, e.g. met.no, jev, relay",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "agent",
+    "description": "Comma list of agent names or ids; me; phone or owner for calls nobody's agent caused",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "category",
+    "description": "Comma list of data categories, any of them, e.g. location_1km,image,install_id",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "method",
+    "description": "GET, POST, SEND (relay frames)\u2026",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "result",
+    "description": "ok or error",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "ok",
+     "error"
+    ]
+   },
+   {
+    "name": "q",
+    "description": "Text in the purpose, path or sent preview",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "period",
+    "description": "today, 24h, 7d or 30d (default 30d; since overrides it)",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "today",
+     "24h",
+     "7d",
+     "30d"
+    ]
+   },
+   {
+    "name": "bucket",
+    "description": "Trend step: hour or day (default hour for windows up to 48 h)",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "hour",
+     "day"
+    ]
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/outbound/summary?period=today",
+  "idempotent": false,
+  "path": "/v1/outbound/summary",
+  "capability": "outbound",
+  "returns": "headline (\"Since 00:00 today: 7 calls sent 4.9 KB to 3 destinations: ...\"), window{since, until, bucket}, totals{calls, failed, bytes_sent, bytes_received, categories[], destinations, agents}, by_destination[{service, host, calls, failed, bytes, categories[], purposes[], agents[], first_at, last_at, new}], by_category[{category, destinations[], agents[]}], by_agent[{agent, destinations[]}], by_purpose[], by_day[], by_time[], biggest{destinations[], agents[], calls[]}, new_destinations[{host, first_at, categories[]}], failures{count, by_destination[], by_error[], recent[]}, recording{on, changed_at, changed_by}, scope, coverage",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "result": {
+     "description": "ok or error",
+     "type": "string",
+     "enum": [
+      "ok",
+      "error"
+     ]
+    },
+    "bucket": {
+     "description": "Trend step: hour or day (default hour for windows up to 48 h)",
+     "type": "string",
+     "enum": [
+      "hour",
+      "day"
+     ]
+    },
+    "q": {
+     "description": "Text in the purpose, path or sent preview",
+     "type": "string"
+    },
+    "agent": {
+     "description": "Comma list of agent names or ids; me; phone or owner for calls nobody's agent caused",
+     "type": "string"
+    },
+    "period": {
+     "description": "today, 24h, 7d or 30d (default 30d; since overrides it)",
+     "type": "string",
+     "enum": [
+      "today",
+      "24h",
+      "7d",
+      "30d"
+     ]
+    },
+    "method": {
+     "description": "GET, POST, SEND (relay frames)\u2026",
+     "type": "string"
+    },
+    "destination": {
+     "description": "Text in the host or service name, e.g. met.no, jev, relay",
+     "type": "string"
+    },
+    "until": {
+     "description": "Outbound id or ISO time",
+     "type": "string"
+    },
+    "category": {
+     "description": "Comma list of data categories, any of them, e.g. location_1km,image,install_id",
+     "type": "string"
+    },
+    "since": {
+     "description": "Outbound id (exclusive) or ISO time",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

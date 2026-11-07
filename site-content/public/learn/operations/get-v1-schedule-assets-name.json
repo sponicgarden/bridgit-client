@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "One saved file's bytes, e.g. a photo a scheduled action took",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "schedule_asset_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/schedule/assets/garden",
+  "idempotent": false,
+  "path": "/v1/schedule/assets/{name}",
+  "capability": "schedule",
+  "returns": "The raw bytes with their Content-Type",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"name": {
+    "description": "The name in /v1/schedule/assets/{name}",
+    "type": "string"
+   }},
+   "required": ["name"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

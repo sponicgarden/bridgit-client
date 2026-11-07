@@ -1,0 +1,75 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Approve or decline the exact inspected request using native activation and current delegated authority; existing action scopes required; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_approvals_post",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "approve",
+    "description": "true approves; false declines",
+    "type": "boolean",
+    "required": true
+   },
+   {
+    "name": "expected_digest",
+    "description": "Exact SHA-256 digest from the preceding review; changed requests conflict",
+    "type": "string",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/owner/configuration/approvals/{kind}/{id} {\"approve\":true,\"expected_digest\":\"<digest from review>\"}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/approvals/{kind}/{id}",
+  "capability": "owner_features",
+  "returns": "kind,id,approved,result with actual native status; no initial control grants, OS permission or account verification bypass",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "expected_digest": {
+     "description": "Exact SHA-256 digest from the preceding review; changed requests conflict",
+     "type": "string"
+    },
+    "kind": {
+     "description": "The kind in /v1/owner/configuration/approvals/{kind}/{id}",
+     "type": "string"
+    },
+    "approve": {
+     "description": "true approves; false declines",
+     "type": "boolean"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/approvals/{kind}/{id}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "kind",
+    "id",
+    "approve",
+    "expected_digest",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

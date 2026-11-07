@@ -1,0 +1,28 @@
+{
+  "kind": "question",
+  "title": "Dentist check-up: which slot?",
+  "text": "Dr. Nowak has three openings next week. All 30 minutes, 10 min by tram. Your calendar is free for each.",
+  "controls": [
+    {
+      "type": "button",
+      "id": "tue_0830",
+      "label": "Tue 11 Nov, 8:30"
+    },
+    {
+      "type": "button",
+      "id": "thu_1000",
+      "label": "Thu 13 Nov, 10:00",
+      "style": "primary"
+    },
+    {
+      "type": "button",
+      "id": "fri_1630",
+      "label": "Fri 14 Nov, 16:30"
+    },
+    {
+      "type": "button",
+      "id": "none",
+      "label": "None of these"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Review your kept video without recording anything; Play/Pause, Done and Delete",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "camera_video_review",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "capture_id",
+   "description": "Caller-accessible video/mp4 capture id",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/camera/video/review",
+  "idempotent": true,
+  "path": "/v1/camera/video/review",
+  "capability": "video",
+  "returns": "Review your kept video without recording anything; Play/Pause, Done and Delete",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "capture_id": {
+     "description": "Caller-accessible video/mp4 capture id",
+     "type": "string"
+    }
+   },
+   "required": ["capture_id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

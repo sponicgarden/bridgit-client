@@ -1,0 +1,50 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your interactions, newest first",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "interactions_list",
+  "query": [
+   {
+    "name": "status",
+    "description": "pending, seen, answered, dismissed, expired or cancelled",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "1-100, default 50",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/interactions?status=answered",
+  "idempotent": false,
+  "path": "/v1/interactions",
+  "capability": "interactions",
+  "returns": "interactions[]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "limit": {
+     "description": "1-100, default 50",
+     "type": "integer"
+    },
+    "status": {
+     "description": "pending, seen, answered, dismissed, expired or cancelled",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

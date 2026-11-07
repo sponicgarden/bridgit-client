@@ -1,0 +1,47 @@
+{
+ "detail_url": "/v1/discover?id=v1.flashlight&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.flashlight.json",
+ "title": "flashlight",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.flashlight.json",
+ "prerequisites": ["Check v1.flashlight supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Whether the torch is on",
+   "path": "/v1/flashlight",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-flashlight.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-flashlight.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "flashlight_get"
+  },
+  {
+   "summary": "Set torch with mandatory auto-off",
+   "path": "/v1/flashlight",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-flashlight.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-flashlight.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "flashlight_post"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.flashlight",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "act",
+ "capability_ids": ["v1.flashlight"]
+}

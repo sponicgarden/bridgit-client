@@ -1,0 +1,47 @@
+{
+ "detail_url": "/v1/discover?id=v1.lan_camera_speaker&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.lan_camera_speaker.json",
+ "title": "lan camera speaker",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.lan_camera_speaker.json",
+ "prerequisites": ["Check v1.lan_camera_speaker supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Send a bounded supplied audio clip to a supported enrolled camera speaker",
+   "path": "/v1/lan-cameras/audio/play",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-audio-play.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-audio-play.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_audio_play"
+  },
+  {
+   "summary": "Verify and privately store or clear this camera's separate Tapo cloud-password credential",
+   "path": "/v1/lan-cameras/talk-account",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-talk-account.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-talk-account.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_talk_account"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.lan_camera_speaker",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "interact",
+ "capability_ids": ["v1.lan_camera_speaker"]
+}

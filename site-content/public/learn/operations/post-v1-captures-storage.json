@@ -1,0 +1,89 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Choose where your captures go, in any combination: memory, phone files, upload; and how long memory keeps them (within the owner's limits)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "captures_storage_set",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "store",
+    "description": "Any of memory, files, upload; [] = only return captures; null = back to the defaults (clips in memory, the rest only returned)",
+    "type": "array",
+    "required": true
+   },
+   {
+    "name": "kinds",
+    "description": "Only these kinds: camera, screen, mic, wakewords, sounds; null = all",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "upload_url",
+    "description": "Where uploads go (POST, the capture as the body, X-Bridgit-Capture-Id/Kind/Agent/Captured-At headers). Tailnet always; public HTTPS when the owner allows internet callbacks. Needed with upload",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "upload_headers",
+    "description": "Up to 8 extra headers for the upload, e.g. {\"Authorization\": \"Bearer ...\"}; never shown back",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "keep_minutes",
+    "description": "How long memory keeps them, 1 to the owner's limit (default 10, owner limit 1440 unless changed)",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/captures/storage {\"store\":[\"memory\",\"files\",\"upload\"],\"upload_url\":\"https://example.com/in\",\"keep_minutes\":120}",
+  "idempotent": true,
+  "path": "/v1/captures/storage",
+  "capability": "captures",
+  "returns": "as GET /v1/captures/storage",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "keep_minutes": {
+     "description": "How long memory keeps them, 1 to the owner's limit (default 10, owner limit 1440 unless changed)",
+     "type": "integer"
+    },
+    "upload_url": {
+     "description": "Where uploads go (POST, the capture as the body, X-Bridgit-Capture-Id/Kind/Agent/Captured-At headers). Tailnet always; public HTTPS when the owner allows internet callbacks. Needed with upload",
+     "type": "string"
+    },
+    "upload_headers": {
+     "description": "Up to 8 extra headers for the upload, e.g. {\"Authorization\": \"Bearer ...\"}; never shown back",
+     "type": "object"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "kinds": {
+     "description": "Only these kinds: camera, screen, mic, wakewords, sounds; null = all",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "store": {
+     "description": "Any of memory, files, upload; [] = only return captures; null = back to the defaults (clips in memory, the rest only returned)",
+     "type": "array",
+     "items": {"type": "string"}
+    }
+   },
+   "required": ["store"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "One of your records",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applet_records_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applet/records/item.k3j9",
+  "idempotent": false,
+  "path": "/v1/applet/records/{key}",
+  "capability": "applet_data",
+  "returns": "key, value, updated_at, chars",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"key": {
+    "description": "The key in /v1/applet/records/{key}",
+    "type": "string"
+   }},
+   "required": ["key"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

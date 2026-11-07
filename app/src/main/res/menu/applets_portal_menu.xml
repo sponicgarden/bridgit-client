@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Portal account stays beside the tabs; page actions belong to the picker row. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/portal_menu_account" android:orderInCategory="102" android:visible="false"
+        android:title="@string/applets_portal_account" app:showAsAction="always"
+        app:actionLayout="@layout/portal_toolbar_account" />
+</menu>

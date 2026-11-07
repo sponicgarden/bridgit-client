@@ -1,0 +1,40 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Effective model and choices for a stable applet package; set/clear with service.model.set",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "services_models_effective",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/services/models/{applet_id}/{task_key}",
+  "idempotent": false,
+  "path": "/v1/services/models/{applet_id}/{task_key}",
+  "capability": "owner_features",
+  "returns": "applet_id,task_key,source,models,available_models,override,inherits,enabled,scope",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "task_key": {
+     "description": "The task_key in /v1/services/models/{applet_id}/{task_key}",
+     "type": "string"
+    },
+    "applet_id": {
+     "description": "The applet_id in /v1/services/models/{applet_id}/{task_key}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "applet_id",
+    "task_key"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

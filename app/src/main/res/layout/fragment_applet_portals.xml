@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Applets › Portals (owner, 4 Nov 2026): a web view into an applet's portal on bridgit.cc/myapps.
+     The picker shows when there is more than one portal; one portal shows its name instead. Reload and Open in browser sit to the right of the picker; the account circle stays in the top toolbar.
+     The page hides its own header row in the app, which saves vertical space. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/portal_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:background="@color/portal_bar"
+        android:elevation="0dp"
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="0dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="0dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/portal_picker"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/applets_portal_pick"
+            android:theme="@style/ThemeOverlay.Bridgit.PortalPicker"
+            app:boxBackgroundColor="@color/portal_card"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxStrokeColor="@color/portal_picker_stroke"
+            app:endIconTint="@color/portal_ink">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/portal_choice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:maxLines="1"
+            android:ellipsize="end"
+                android:inputType="none"
+                android:minHeight="48dp"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium"
+                app:dropDownBackgroundTint="@color/portal_card"
+                android:textColor="@color/portal_ink" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/portal_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_weight="1"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/portal_ink" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/portal_reload"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/applets_portal_reload"
+            android:src="@drawable/ic_refresh"
+            app:tint="@color/portal_bar_action" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/portal_open_browser"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/applets_portal_open_browser"
+            android:src="@drawable/interactions_ic_open"
+            app:tint="@color/portal_bar_action" />
+    </LinearLayout>
+
+    <!-- A firm line under the picker: the picker belongs to the app, the page below is the portal. -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/portal_rule"
+        android:elevation="0dp" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/portal_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/portal_frame"
+        android:background="@color/portal_paper"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- No portal yet: how to get one. -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/portal_empty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone">
+
+        <LinearLayout
+            style="@style/Widget.Bridgit.Panel"
+            android:layout_marginTop="8dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                style="@style/SettingsHeader"
+                android:paddingBottom="8dp"
+                android:text="@string/applets_portal_empty_title" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:text="@string/applets_portal_empty_body"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/portal_open_applets"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:minHeight="48dp"
+                android:text="@string/applets_portal_open_applets" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/portal_link"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:minHeight="48dp"
+                android:text="@string/applets_portal_link" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

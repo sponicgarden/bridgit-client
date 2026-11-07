@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Remembered devices on the current LAN; no scan",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_discovered",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan/discovered",
+  "idempotent": false,
+  "path": "/v1/lan/discovered",
+  "capability": "lan_discovery",
+  "returns": "total_devices, connected_devices, unconnected_devices, categories with counts, devices with connected, connection_state and last_seen (Unix milliseconds); observed within two minutes is not proof of current reachability",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

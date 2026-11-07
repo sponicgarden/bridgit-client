@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Agent detail overflow (ui-spec 5.5). -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/agents_rename" android:title="@string/agents_rename" app:showAsAction="never" />
+    <!-- Report a bug / Request a feature: appended from menu/feedback_overflow.xml (FBK-01). -->
+</menu>

@@ -1,0 +1,57 @@
+{
+ "detail_url": "/v1/discover?id=v1.outbound&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.outbound.json",
+ "title": "outbound",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.outbound.json",
+ "prerequisites": ["Check v1.outbound supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Every call this phone made to a server off the device: destination, purpose, which agent caused it, the data categories sent, bytes, status, time, and a redacted preview of what was sent and received",
+   "path": "/v1/outbound",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-outbound.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-outbound.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "outbound_list"
+  },
+  {
+   "summary": "Analysis of what left the phone, in one call: a plain-language headline, totals, trends by hour or day, the biggest destinations, agents and calls, destinations first seen in the window, failures, and for each destination the data categories, purposes and agents it received",
+   "path": "/v1/outbound/summary",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-outbound-summary.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-outbound-summary.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "outbound_summary"
+  },
+  {
+   "summary": "One outbound entry with its previews",
+   "path": "/v1/outbound/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-outbound-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-outbound-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "outbound_entry"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.outbound",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v1.outbound"]
+}

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Stop this caller's active video recording",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "camera_video_delete",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/camera/video",
+  "idempotent": false,
+  "path": "/v1/camera/video",
+  "capability": "video",
+  "returns": "stopped",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

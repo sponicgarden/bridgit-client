@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shaded section panel: groups a small-caps heading with its rows or cards. The standard for every list screen. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="?attr/colorSurfaceContainer" />
+    <stroke android:width="1dp" android:color="?attr/colorOutlineVariant" />
+    <corners android:radius="16dp" />
+</shape>

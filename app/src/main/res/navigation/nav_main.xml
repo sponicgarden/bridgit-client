@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/interactions">
+
+    <fragment android:id="@+id/home" android:name="cc.bridgit.app.ui.home.HomeFragment" android:label="@string/nav_home" />
+    <!-- Owner, 5 Nov 2026: the Camera tab; Devices is now More › Network device monitor (a pushed screen). -->
+    <fragment android:id="@+id/camera" android:name="cc.bridgit.app.ui.camera.CameraFragment" android:label="@string/nav_camera" />
+    <fragment android:id="@+id/cameras" android:name="cc.bridgit.app.lancamera.LanCamerasFragment" android:label="@string/nav_cameras" />
+    <!-- 1.5 (D26): Interactions tab and detail. -->
+    <fragment android:id="@+id/interactions" android:name="cc.bridgit.app.ui.interactions.InteractionsFragment" android:label="@string/nav_interactions" />
+    <fragment android:id="@+id/interactionDetail" android:name="cc.bridgit.app.ui.interactions.InteractionDetailFragment">
+        <argument android:name="interactionId" app:argType="long" />
+        <!-- CAP-56: opened by a takeover; once answered it shows the next waiting card or steps aside. -->
+        <argument android:name="arrival" app:argType="boolean" android:defaultValue="false" />
+    </fragment>
+    <!-- City tour (8.25, D30): setup and the running tour. Full screen. -->
+    <fragment android:id="@+id/tour" android:name="cc.bridgit.app.ui.tour.TourFragment" />
+    <!-- Pet monitor applet (owner, 2 Nov 2026). Full screen. -->
+    <fragment android:id="@+id/dogMonitor" android:name="cc.bridgit.app.ui.tour.DogMonitorFragment" />
+    <!-- One HTML card from Applets › Cards (owner, 4 Nov 2026). Full screen. -->
+    <fragment android:id="@+id/cardPreview" android:name="cc.bridgit.app.ui.applets.CardPreviewFragment">
+        <argument android:name="cardId" app:argType="string" />
+    </fragment>
+    <!-- Owner, 30 Oct 2026: Agents is a tab again; Applets lives in the Interactions screen as a subtab. -->
+    <fragment android:id="@+id/agents" android:name="cc.bridgit.app.ui.agents.AgentsFragment" android:label="@string/nav_agents" />
+    <!-- Not a tab since 1.5 (D26): opened from More, Home's Today card and Agent detail. -->
+    <fragment android:id="@+id/activity" android:name="cc.bridgit.app.ui.activity.ActivityFragment" android:label="@string/nav_activity" />
+    <fragment android:id="@+id/more" android:name="cc.bridgit.app.ui.more.MoreFragment" android:label="@string/nav_more" />
+
+    <fragment android:id="@+id/agentDetail" android:name="cc.bridgit.app.ui.agents.AgentDetailFragment">
+        <argument android:name="agentId" app:argType="string" />
+    </fragment>
+    <!-- Full-screen flows (no bottom bar). agentId set = show the setup prompt for that agent (rotate / resume). -->
+    <fragment android:id="@+id/addAgent" android:name="cc.bridgit.app.ui.addagent.AddAgentFragment">
+        <argument android:name="agentId" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="fromRotate" app:argType="boolean" android:defaultValue="false" />
+    </fragment>
+    <fragment android:id="@+id/pairCode" android:name="cc.bridgit.app.ui.addagent.PairCodeFragment" />
+    <fragment android:id="@+id/sshConnections" android:name="cc.bridgit.app.ssh.SshFragment" android:label="@string/ssh_title" />
+    <fragment android:id="@+id/networkDevices" android:name="cc.bridgit.app.lan.NetworkDevicesFragment" android:label="@string/network_devices_title" />
+    <fragment android:id="@+id/features" android:name="cc.bridgit.app.ui.more.FeaturesFragment" />
+    <!-- kind: "hardware" (camera, microphone, photos, screenshots) or "software" (notifications, battery, installs, ADB). -->
+    <fragment android:id="@+id/access" android:name="cc.bridgit.app.ui.more.AccessFragment">
+        <argument android:name="kind" app:argType="string" android:defaultValue="hardware" />
+    </fragment>
+    <!-- Maximum powers: every switch on, then each Android permission in one guided pass. agentId = the agent just given every grant.
+         auto = start at once and move on after each step without Continue taps (Max Agentic Control on Home). -->
+    <fragment android:id="@+id/powers" android:name="cc.bridgit.app.ui.power.PowersFragment">
+        <argument android:name="agentId" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="auto" app:argType="boolean" android:defaultValue="false" />
+    </fragment>
+    <fragment android:id="@+id/adbSetup" android:name="cc.bridgit.app.ui.adb.AdbSetupFragment" />
+    <fragment android:id="@+id/tailscaleSetup" android:name="cc.bridgit.app.ui.tailscale.TailscaleSetupFragment" />
+    <fragment android:id="@+id/settings" android:name="cc.bridgit.app.ui.more.SettingsFragment" />
+    <!-- P1b feedback (section 11). reportForm: kind = "bug" | "feature"; optional logEntryId attaches one log entry. -->
+    <fragment android:id="@+id/reportForm" android:name="cc.bridgit.app.ui.feedback.ReportFormFragment">
+        <argument android:name="kind" app:argType="string" android:defaultValue="bug" />
+        <argument android:name="screen" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="screenContext" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="logEntryId" app:argType="long" android:defaultValue="-1L" />
+    </fragment>
+    <fragment android:id="@+id/myReports" android:name="cc.bridgit.app.ui.feedback.MyReportsFragment" />
+    <fragment android:id="@+id/reportDetail" android:name="cc.bridgit.app.ui.feedback.ReportDetailFragment">
+        <argument android:name="reportId" app:argType="long" />
+    </fragment>
+    <fragment android:id="@+id/whatCan" android:name="cc.bridgit.app.ui.more.WhatCanFragment" />
+    <fragment android:id="@+id/firstRun" android:name="cc.bridgit.app.ui.firstrun.FirstRunFragment" />
+</navigation>

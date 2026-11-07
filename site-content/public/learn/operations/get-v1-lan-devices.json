@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "This agent's enrolled devices and adapter/action schemas",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_devices",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan/devices",
+  "idempotent": false,
+  "path": "/v1/lan/devices",
+  "capability": "lan_control",
+  "returns": "devices[id,name,host,adapter,enrolled,verified_at,availability=not_checked,actions], adapters; no credentials, no probe",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

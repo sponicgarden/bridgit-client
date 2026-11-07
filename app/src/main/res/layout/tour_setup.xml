@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- City tour setup (8.25 step 1, TOUR-01): how it works in a gradient panel, then one shaded panel per choice. -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="16dp">
+
+        <!-- Read-only explanation: the welcome page's gradient panel and accent line. -->
+        <LinearLayout
+            style="@style/Widget.Bridgit.InfoPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="12dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/intro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnSurface" />
+
+            <View
+                style="@style/Widget.Bridgit.Rule"
+                android:layout_marginTop="12dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Widget.Bridgit.Panel"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                style="@style/Widget.Bridgit.SectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="14dp"
+                android:paddingBottom="4dp"
+                android:text="@string/tour_kinds_header" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/tour_kinds_hint"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/kinds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Widget.Bridgit.Panel"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                style="@style/Widget.Bridgit.SectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="14dp"
+                android:paddingBottom="4dp"
+                android:text="@string/tour_agent_header" />
+
+            <LinearLayout
+                android:id="@+id/agents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/no_agents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/tour_no_agents"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/add_agent"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/tour_add_agent"
+                android:visibility="gone"
+                app:icon="@drawable/ic_add" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Widget.Bridgit.Panel"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                style="@style/Widget.Bridgit.SectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="14dp"
+                android:paddingBottom="4dp"
+                android:text="@string/tour_interval_header" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/intervals"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:selectionRequired="true"
+                app:singleSelection="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Widget.Bridgit.Panel"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                style="@style/Widget.Bridgit.SectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="14dp"
+                android:paddingBottom="4dp"
+                android:text="@string/tour_needed_header" />
+
+            <LinearLayout
+                android:id="@+id/needed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityLiveRegion="polite"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/ready"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:text="@string/tour_ready"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnSurface"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_check"
+                app:drawableTint="?attr/colorSuccess" />
+
+            <TextView
+                android:id="@+id/optional_header"
+                style="@style/Widget.Bridgit.SectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="2dp"
+                android:text="@string/tour_optional_header"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/optional"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/start"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="16dp"
+            android:minHeight="56dp"
+            android:text="@string/tour_start"
+            app:icon="@drawable/tour_ic_walk" />
+
+        <TextView
+            android:id="@+id/start_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:accessibilityLiveRegion="polite"
+            android:gravity="center_horizontal"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

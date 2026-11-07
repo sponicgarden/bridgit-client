@@ -1,0 +1,248 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Prefer a native question for simple choices, normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "interactions_send",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "kind",
+    "description": "notice (one-way), question, html (a card you draw; answer comes from Bridgit.respond), pieces (a card the phone draws from pieces and sources; no HTML) or text (a live text panel you stream into with /v1/text/stream)",
+    "type": "string",
+    "required": true,
+    "enum": [
+     "notice",
+     "question",
+     "html",
+     "pieces",
+     "text"
+    ]
+   },
+   {
+    "name": "pieces",
+    "description": "kind=pieces: 1-24 pieces (header, status, text, note, metrics, table, timeline, gallery, video, people, devices, draft, buttons), values as {\"$source\":\"<source>.<path>\"}. See https://bridgit.cc/learn/builder/applet-packages.md",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "sources",
+    "description": "kind=pieces: up to 8 named sources: {\"watch\":\"<your watch id>\",\"read\":\"tally\"|\"status\"} or {\"call\":{\"path\":\"/v1/...\",\"query\":{}},\"every_s\":60-3600} (GET only)",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "fresh_s",
+    "description": "kind=pieces: 30-86400; older data shows the card as stale",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "states",
+    "description": "kind=pieces: your own words for the card states empty, loading, stale, paused, error",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "title",
+    "description": "Up to 80 characters",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "text",
+    "description": "Up to 2,000 characters",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "image",
+    "description": "{\"gallery_id\"} or {\"data_base64\"}, up to 2 MB",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "html",
+    "description": "kind=html: the card's HTML, up to 256 KB. Runs offline: no network, only data:image/* images; call Bridgit.respond(value) once per question view (up to 16 KB) to answer; value is a JSON string or a plain object/array, which is serialized for you. window.Bridget is the same object (the only name on 1.6.269 and older). After persistence, bridgit:answered lets the card show its confirmation; the trusted Back to questions control reloads the question for resubmission. Bridgit.act({method, path, query?, body?}) runs one of your own endpoints on the phone right away, as you, with your grants and the owner's switches, e.g. await Bridgit.act({path:'/v1/flashlight', body:{on:true, auto_off_seconds:1}}) resolves to {ok, status, body}. A request is at most 16 KB (bigger: error request_too_big, so send a capture_id or gallery_id, never photo bytes) and a JSON reply over 64 KB comes back ok: false, error reply_too_big with the fix (ask for less). You get an action.executed event for each call, so it works while you're offline. A single card can't be swiped: show progress as text (\"Step 2 of 5\"), not swipe or segment bars. Complete pages: GET /v1/samples. A card app that decides or watches (Jev for text, Clef for photos and sound, POST /v1/watches with the free camera change check): https://bridgit.cc/learn/decisions.md",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "controls",
+    "description": "Question: 1-6 of {type: button|text|choice|link, id, label, style?, placeholder?, options?, url?, package?}. Notice: links only",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "description": "normal or urgent",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "normal",
+     "urgent"
+    ]
+   },
+   {
+    "name": "speak",
+    "description": "Read it aloud on the phone",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "no_takeover",
+    "description": "No takeover: true delivers this interaction to the Inbox and notifications without opening it, even while Bridgit is in front. Default false: opens automatically, subject to the owner setting and Android Display over other apps permission",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "follow_up",
+    "description": "Card flows: true when you will post another card once the owner answers or closes this one. The card screen says \"Waiting for the next card\u2026\" and stays up to 30 s; your next card replaces it in place, and Bridgit steps back to what the owner was doing only after the last card of the flow. Post the next card as soon as the answer or dismissed event arrives; leave it out (or false) on the last card. If the owner answered from the notification without the card on screen, nothing is held and the next card opens as usual. Ignored with no_takeover",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "expires_in_seconds",
+    "description": "60 to 604800, default 86400. After it, waits return expired and you get interaction.expired, but a question stays on the owner's phone and they can still answer it late (interaction.answered with late=true)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "stack",
+    "description": "kind=html: 1-32 letters, digits, - or _. Your cards with the same stack id form one stack the owner swipes through (drag left = next, right = previous) with \"n of m\" and a peek of the next card; each card keeps its own id, wait and answer. Up to 10 cards per stack id; an open stack counts as one of your 5 open questions. Leave it out for a single card, which is never swipeable. Don't rely on horizontal scrolling inside a stacked card. Wait on GET /v1/events?types=interaction.answered rather than one wait per card",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "stack_index",
+    "description": "kind=html with stack: position 0-9 (default: after the cards already posted)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "swipe_answer",
+    "description": "kind=html with stack: {\"left\": label, \"right\": label} (1-20 characters each). While the card waits, a swipe answers it and moves on: answer.data = {\"swipe\": \"left\"|\"right\", \"label\": ...}. Bridgit shows both labels under the card",
+    "type": "object",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/interactions {\"kind\":\"question\",\"title\":\"Pay this invoice?\",\"controls\":[{\"type\":\"button\",\"id\":\"yes\",\"label\":\"Pay\",\"style\":\"primary\"},{\"type\":\"button\",\"id\":\"no\",\"label\":\"Not now\"}]}",
+  "idempotent": true,
+  "path": "/v1/interactions",
+  "capability": "interactions",
+  "returns": "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen, missing?: [open_on_arrival, display_over_other_apps], fix?}. When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "image": {
+     "description": "{\"gallery_id\"} or {\"data_base64\"}, up to 2 MB",
+     "type": "object"
+    },
+    "stack": {
+     "description": "kind=html: 1-32 letters, digits, - or _. Your cards with the same stack id form one stack the owner swipes through (drag left = next, right = previous) with \"n of m\" and a peek of the next card; each card keeps its own id, wait and answer. Up to 10 cards per stack id; an open stack counts as one of your 5 open questions. Leave it out for a single card, which is never swipeable. Don't rely on horizontal scrolling inside a stacked card. Wait on GET /v1/events?types=interaction.answered rather than one wait per card",
+     "type": "string"
+    },
+    "controls": {
+     "description": "Question: 1-6 of {type: button|text|choice|link, id, label, style?, placeholder?, options?, url?, package?}. Notice: links only",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "stack_index": {
+     "description": "kind=html with stack: position 0-9 (default: after the cards already posted)",
+     "type": "integer"
+    },
+    "sources": {
+     "description": "kind=pieces: up to 8 named sources: {\"watch\":\"<your watch id>\",\"read\":\"tally\"|\"status\"} or {\"call\":{\"path\":\"/v1/...\",\"query\":{}},\"every_s\":60-3600} (GET only)",
+     "type": "object"
+    },
+    "kind": {
+     "description": "notice (one-way), question, html (a card you draw; answer comes from Bridgit.respond), pieces (a card the phone draws from pieces and sources; no HTML) or text (a live text panel you stream into with /v1/text/stream)",
+     "type": "string",
+     "enum": [
+      "notice",
+      "question",
+      "html",
+      "pieces",
+      "text"
+     ]
+    },
+    "fresh_s": {
+     "description": "kind=pieces: 30-86400; older data shows the card as stale",
+     "type": "integer"
+    },
+    "title": {
+     "description": "Up to 80 characters",
+     "type": "string"
+    },
+    "priority": {
+     "description": "normal or urgent",
+     "type": "string",
+     "enum": [
+      "normal",
+      "urgent"
+     ]
+    },
+    "states": {
+     "description": "kind=pieces: your own words for the card states empty, loading, stale, paused, error",
+     "type": "object"
+    },
+    "follow_up": {
+     "description": "Card flows: true when you will post another card once the owner answers or closes this one. The card screen says \"Waiting for the next card\u2026\" and stays up to 30 s; your next card replaces it in place, and Bridgit steps back to what the owner was doing only after the last card of the flow. Post the next card as soon as the answer or dismissed event arrives; leave it out (or false) on the last card. If the owner answered from the notification without the card on screen, nothing is held and the next card opens as usual. Ignored with no_takeover",
+     "type": "boolean"
+    },
+    "pieces": {
+     "description": "kind=pieces: 1-24 pieces (header, status, text, note, metrics, table, timeline, gallery, video, people, devices, draft, buttons), values as {\"$source\":\"<source>.<path>\"}. See https://bridgit.cc/learn/builder/applet-packages.md",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "expires_in_seconds": {
+     "description": "60 to 604800, default 86400. After it, waits return expired and you get interaction.expired, but a question stays on the owner's phone and they can still answer it late (interaction.answered with late=true)",
+     "type": "integer"
+    },
+    "no_takeover": {
+     "description": "No takeover: true delivers this interaction to the Inbox and notifications without opening it, even while Bridgit is in front. Default false: opens automatically, subject to the owner setting and Android Display over other apps permission",
+     "type": "boolean"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "html": {
+     "description": "kind=html: the card's HTML, up to 256 KB. Runs offline: no network, only data:image/* images; call Bridgit.respond(value) once per question view (up to 16 KB) to answer; value is a JSON string or a plain object/array, which is serialized for you. window.Bridget is the same object (the only name on 1.6.269 and older). After persistence, bridgit:answered lets the card show its confirmation; the trusted Back to questions control reloads the question for resubmission. Bridgit.act({method, path, query?, body?}) runs one of your own endpoints on the phone right away, as you, with your grants and the owner's switches, e.g. await Bridgit.act({path:'/v1/flashlight', body:{on:true, auto_off_seconds:1}}) resolves to {ok, status, body}. A request is at most 16 KB (bigger: error request_too_big, so send a capture_id or gallery_id, never photo bytes) and a JSON reply over 64 KB comes back ok: false, error reply_too_big with the fix (ask for less). You get an action.executed event for each call, so it works while you're offline. A single card can't be swiped: show progress as text (\"Step 2 of 5\"), not swipe or segment bars. Complete pages: GET /v1/samples. A card app that decides or watches (Jev for text, Clef for photos and sound, POST /v1/watches with the free camera change check): https://bridgit.cc/learn/decisions.md",
+     "type": "string"
+    },
+    "speak": {
+     "description": "Read it aloud on the phone",
+     "type": "boolean"
+    },
+    "text": {
+     "description": "Up to 2,000 characters",
+     "type": "string"
+    },
+    "swipe_answer": {
+     "description": "kind=html with stack: {\"left\": label, \"right\": label} (1-20 characters each). While the card waits, a swipe answers it and moves on: answer.data = {\"swipe\": \"left\"|\"right\", \"label\": ...}. Bridgit shows both labels under the card",
+     "type": "object"
+    }
+   },
+   "required": [
+    "kind",
+    "title"
+   ]
+  },
+  "errors": [
+   "capability_disabled",
+   "notifications_required",
+   "invalid_parameter",
+   "payload_too_large",
+   "too_many_open",
+   "photo_not_found"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,5 @@
+<resources>
+    <color name="network_category_start">@color/b_surface_container</color>
+    <color name="network_category_end">@color/b_surface_container</color>
+    <color name="network_category_text">@color/b_on_surface</color>
+</resources>

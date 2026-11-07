@@ -1,0 +1,92 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Record an audio clip",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "mic_record",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "transcribe",
+    "description": "Use only Android on-device recognition; no cloud fallback",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "return_audio",
+    "description": "true by default; false requires transcribe=true",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "language",
+    "description": "Optional offline language, e.g. en-US",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "duration_seconds",
+    "description": "Whole seconds, 1-120",
+    "type": "integer",
+    "required": true
+   },
+   {
+    "name": "store",
+    "description": "Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or \"none\" = only return it. Default: your POST /v1/captures/storage choice, else only returned",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/mic/record {\"duration_seconds\":5}",
+  "idempotent": true,
+  "path": "/v1/mic/record",
+  "capability": "mic",
+  "returns": "recorded_at, duration_seconds, format (m4a), sample_rate_hz, size_bytes, data_base64; capture {capture_id, stored, url, memory_until, file} when kept",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "transcribe": {
+     "description": "Use only Android on-device recognition; no cloud fallback",
+     "type": "boolean"
+    },
+    "duration_seconds": {
+     "description": "Whole seconds, 1-120",
+     "type": "integer"
+    },
+    "return_audio": {
+     "description": "true by default; false requires transcribe=true",
+     "type": "boolean"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "language": {
+     "description": "Optional offline language, e.g. en-US",
+     "type": "string"
+    },
+    "store": {
+     "description": "Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or \"none\" = only return it. Default: your POST /v1/captures/storage choice, else only returned",
+     "type": "array",
+     "items": {"type": "string"}
+    }
+   },
+   "required": ["duration_seconds"]
+  },
+  "errors": [
+   "capability_disabled",
+   "permission_denied",
+   "notifications_required",
+   "sensor_busy",
+   "capture_timeout",
+   "service_start_blocked"
+  ],
+  "requires": null
+ }
+}

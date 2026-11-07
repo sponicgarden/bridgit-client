@@ -1,0 +1,107 @@
+{
+ "detail_url": "/v1/discover?id=v1.log&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.log.json",
+ "title": "log",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.log.json",
+ "prerequisites": ["Check v1.log supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Read the log; with order=asc&since=<id>&wait=55 it follows new entries",
+   "path": "/v1/log",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-log.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-log.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "log_read"
+  },
+  {
+   "summary": "One log entry",
+   "path": "/v1/log/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-log-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-log-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "log_entry"
+  },
+  {
+   "summary": "Counts, errors and p50/p95 time per agent and endpoint",
+   "path": "/v1/log/stats",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-log-stats.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-log-stats.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "log_stats"
+  },
+  {
+   "summary": "Every matching entry as JSONL or CSV; direct HTTP streams without a total size cap; MCP/relay envelopes capped at 8 MiB",
+   "path": "/v1/log/export",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-log-export.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-log-export.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "log_export"
+  },
+  {
+   "summary": "Snapshot of Android logcat visible to Bridgit's app UID; requires Fixer Mode",
+   "path": "/v1/log/device",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-log-device.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-log-device.json",
+   "control_scope": null,
+   "requires_power": "FIXER",
+   "tool": "log_device"
+  },
+  {
+   "summary": "Android 11+ Bridgit process exits, crashes and ANRs; Fixer Mode; Android-managed history",
+   "path": "/v1/log/exits",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-log-exits.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-log-exits.json",
+   "control_scope": null,
+   "requires_power": "FIXER",
+   "tool": "log_exits"
+  },
+  {
+   "summary": "Write a note to the agent channel",
+   "path": "/v1/log",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-log.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-log.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "log_note"
+  },
+  {
+   "summary": "Deprecated alias of /v1/log?channel=audit (removed in v3)",
+   "path": "/v1/audit",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-audit.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-audit.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "audit"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.log",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "remember",
+ "capability_ids": ["v1.log"]
+}

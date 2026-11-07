@@ -1,0 +1,73 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Call one function an open portal's page exposes (GET \u2026/portal lists them) and wait for its answer. The page decides what it does and what the screen shows",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applets_portal_call",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "function",
+    "description": "The function's name",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "args",
+    "description": "Its arguments (≤ 16 KB)",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "timeout_s",
+    "description": "1-30 seconds to wait for the answer (default 10)",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/applets/ai0123456789abcd/portal/call {\"function\":\"show_day\",\"args\":{\"date\":\"2026-11-05\"}}",
+  "idempotent": false,
+  "path": "/v1/applets/{id}/portal/call",
+  "capability": "applet_portals",
+  "returns": "ok true with result, or ok false with error (timed_out true when the page didn't answer in time)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "args": {
+     "description": "Its arguments (≤ 16 KB)",
+     "type": "object"
+    },
+    "timeout_s": {
+     "description": "1-30 seconds to wait for the answer (default 10)",
+     "type": "integer"
+    },
+    "function": {
+     "description": "The function's name",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/applets/{id}/portal/call",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "function"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "not_supported",
+   "conflict",
+   "invalid_parameter",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

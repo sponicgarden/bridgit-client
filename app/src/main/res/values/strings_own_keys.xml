@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Your own AI keys (Settings): judgment/OwnKeys.kt. -->
+<resources>
+    <string name="settings_own_keys">Your own AI keys</string>
+    <string name="own_keys_what">When are they used?</string>
+    <string name="own_keys_what_desc">Only when Bridgit\'s shared Jev and Clef allowance runs out. Then this phone\'s watches, Pet monitor and control agent questions keep working on your key, billed to your account. Keys stay encrypted on this phone and pass through bridgit.cc for each call without being stored. Control agents can\'t see them.</string>
+    <string name="own_key_typesafe">TypeSafe (Jev)</string>
+    <string name="own_key_typesafe_desc">Your TypeSafe API key, from typesafe.ai. Answers Jev questions.</string>
+    <string name="own_key_cloudflare">Cloudflare (Clef)</string>
+    <string name="own_key_cloudflare_desc">Your Cloudflare account ID and an API token with Workers AI permission. Answers Clef questions (images, audio, video).</string>
+    <string name="own_key_openrouter">OpenRouter</string>
+    <string name="own_key_openrouter_desc">Your OpenRouter API key, from openrouter.ai/keys. Answers Jev and Clef questions with GLM 5.3 Flash when there\'s no TypeSafe or Cloudflare key (photos yes, audio and video no).</string>
+    <string name="own_key_api_key">API key</string>
+    <string name="own_key_cf_account">Account ID (32 characters)</string>
+    <string name="own_key_cf_token">API token</string>
+    <string name="own_key_none">Not set</string>
+    <string name="own_key_saved">Saved (%1$s)</string>
+    <string name="own_key_invalid">That doesn\'t look right. Paste the whole value, without spaces.</string>
+    <string name="own_key_save">Save</string>
+    <string name="own_key_remove">Remove</string>
+    <string name="own_key_saved_toast">%1$s key saved</string>
+    <string name="own_key_removed_toast">%1$s key removed</string>
+    <string name="settings_changed_own_key_set">You saved your own %1$s key</string>
+    <string name="settings_changed_own_key_removed">You removed your own %1$s key</string>
+</resources>

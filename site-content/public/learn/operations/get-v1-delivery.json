@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your alert/callback delivery status and permitted destination ids",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "delivery",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/delivery",
+  "idempotent": false,
+  "path": "/v1/delivery",
+  "capability": "owner_features",
+  "returns": "outbox status, attempts, next_at, last error; destinations id/name/enabled only, no URL or signing secrets; alert list URL",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

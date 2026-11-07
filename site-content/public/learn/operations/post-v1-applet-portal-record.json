@@ -1,0 +1,71 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "From an installed applet's card: send one result to the applet's private web portal (the kind its package declares in ui.portal.records, e.g. a workout). Words and numbers only, never free text or pictures; it goes only while the owner has the applet's web portal on",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applet_portal_record",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "label",
+    "description": "One lowercase word (a-z, 0-9, _ or -), e.g. moderate",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "metrics",
+    "description": "Up to 16 numbers under lowercase keys, e.g. {\"score\": 72, \"calories\": 9.4}",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "items",
+    "description": "Up to 20 {label, count?, seconds?}, e.g. [{\"label\":\"squats\",\"count\":12,\"seconds\":20}]",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "answers",
+    "description": "Up to 8 {value (a word), confidence 0-100}",
+    "type": "object",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/applet/portal/record {\"label\":\"moderate\",\"metrics\":{\"score\":72},\"items\":[{\"label\":\"squats\",\"count\":12}]}",
+  "idempotent": false,
+  "path": "/v1/applet/portal/record",
+  "capability": "applet_data",
+  "returns": "portal on (sent with the next push) | not_linked (kept until this device is linked to the portal account) | off (not sent: the owner hasn't turned the portal on), queued, record",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "answers": {
+     "description": "Up to 8 {value (a word), confidence 0-100}",
+     "type": "object"
+    },
+    "label": {
+     "description": "One lowercase word (a-z, 0-9, _ or -), e.g. moderate",
+     "type": "string"
+    },
+    "metrics": {
+     "description": "Up to 16 numbers under lowercase keys, e.g. {\"score\": 72, \"calories\": 9.4}",
+     "type": "object"
+    },
+    "items": {
+     "description": "Up to 20 {label, count?, seconds?}, e.g. [{\"label\":\"squats\",\"count\":12,\"seconds\":20}]",
+     "type": "array",
+     "items": {"type": "object"}
+    }
+   },
+   "required": []
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

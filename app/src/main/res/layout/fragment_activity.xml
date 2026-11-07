@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Activity (UI-17, ui-spec 5.7): search, filter chips, day-grouped log list. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="64dp"
+        app:menu="@menu/activity_toolbar"
+        app:navigationContentDescription="@string/agents_back"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="@string/activity_title"
+        app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/search_layout"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="8dp"
+        app:boxBackgroundColor="?attr/colorSurfaceContainer"
+        app:boxCornerRadiusBottomEnd="28dp"
+        app:boxCornerRadiusBottomStart="28dp"
+        app:boxCornerRadiusTopEnd="28dp"
+        app:boxCornerRadiusTopStart="28dp"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
+        app:endIconMode="clear_text"
+        app:hintEnabled="false"
+        app:startIconContentDescription="@null"
+        app:startIconDrawable="@drawable/ic_search">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/activity_search_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:minHeight="48dp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Last 24 hours (moved from Home): requests, photos, clips, errors. Normal mode only. -->
+    <TextView
+        android:id="@+id/today"
+        style="@style/Widget.Bridgit.InfoPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="8dp"
+        android:padding="10dp"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:visibility="gone" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:chipSpacingHorizontal="8dp"
+            app:singleLine="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_agent"
+                app:chipBackgroundColor="@color/activity_filter_chip_bg"
+                style="@style/Widget.Bridgit.FilterChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                app:checkedIconVisible="false"
+                android:text="@string/activity_chip_agent"
+                app:closeIcon="@drawable/activity_ic_drop"
+                app:closeIconVisible="true" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_type"
+                app:chipBackgroundColor="@color/activity_filter_chip_bg"
+                style="@style/Widget.Bridgit.FilterChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                app:checkedIconVisible="false"
+                android:text="@string/activity_chip_type"
+                app:closeIcon="@drawable/activity_ic_drop"
+                app:closeIconVisible="true" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_errors"
+                app:chipBackgroundColor="@color/activity_filter_chip_bg"
+                style="@style/Widget.Bridgit.FilterChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/activity_chip_errors" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_level"
+                app:chipBackgroundColor="@color/activity_filter_chip_bg"
+                style="@style/Widget.Bridgit.FilterChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                app:checkedIconVisible="false"
+                android:text="@string/activity_chip_level"
+                android:visibility="gone"
+                app:closeIcon="@drawable/activity_ic_drop"
+                app:closeIconVisible="true" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_live"
+                style="@style/Widget.Bridgit.FilterChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/activity_chip_live"
+                app:checkedIconVisible="false"
+                app:chipBackgroundColor="@color/activity_live_chip_bg"
+                app:chipIcon="@drawable/activity_dot_gold"
+                app:chipIconSize="8dp"
+                app:chipIconVisible="true"
+                app:iconStartPadding="8dp" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:indeterminate="true"
+        android:visibility="invisible" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp"
+            tools:listitem="@layout/row_log_entry" />
+
+        <LinearLayout
+            android:id="@+id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Bridgit.InfoPanel"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="16dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_nav_activity"
+                app:tint="?attr/colorOnSurfaceVariant" />
+
+            <TextView
+                android:id="@+id/empty_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/empty_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/clear_filters"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/activity_clear_filters" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/new_pill"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="8dp"
+            android:accessibilityLiveRegion="polite"
+            android:visibility="gone"
+            app:elevation="2dp" />
+    </FrameLayout>
+</LinearLayout>

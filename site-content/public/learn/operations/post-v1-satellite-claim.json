@@ -1,0 +1,40 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Phone to phone: a hub trades a satellite pairing link's one-time code for its key. Not for agents.",
+  "method": "POST",
+  "auth": false,
+  "mcp_tool": null,
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "token",
+    "description": "The claim=sct_\u2026 value from the satellite's pairing link",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "hub_name",
+    "description": "The hub's name, shown on the satellite",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/satellite/claim {\"token\":\"sct_\u2026\",\"hub_name\":\"Kitchen tablet\"}",
+  "idempotent": false,
+  "path": "/v1/satellite/claim",
+  "capability": "status",
+  "returns": "key (the hub's own agent key, locked to the calling Tailscale address), name (this phone's name), agent (the hub link's name)",
+  "errors": [
+   "pairing_closed",
+   "unauthorized",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

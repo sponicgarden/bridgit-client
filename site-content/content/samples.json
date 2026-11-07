@@ -1,0 +1,707 @@
+{
+  "about": "Bridgit interaction samples: complete request bodies for POST /v1/interactions, one or more per kind, with the reply and the answer each one produces. Source: site-content/content/samples.json plus the card pages in site-content/public/samples/. scripts/samples.mjs builds site-content/public/samples/samples.json, which the app serves at GET /v1/samples.",
+  "api_revision": 122,
+  "conventions": {
+    "create": "POST /v1/interactions with the sample's request as the JSON body. Reply 201: {\"interaction_id\": <number>, \"status\": \"pending\", \"expires_at\": \"<ISO-8601>\"}.",
+    "wait": "GET /v1/interactions/{interaction_id}?wait=55 returns when the owner answers, closes it, or after 55 s (status still pending). The same answer arrives as an interaction.answered event on GET /v1/events.",
+    "answer_question": "kind=question: answer = {\"button\": <button id or null>, \"values\": {<text or choice control id>: <string>}}.",
+    "answer_html": "kind=html: answer = {\"button\": null, \"values\": {}, \"data\": <the value the page passed to Bridget.respond>}.",
+    "resubmission": "The owner can reopen an answered card and answer again: a new interaction.answered event with \"resubmission\": true and \"previous_answer\".",
+    "html_cards": "An html card runs offline: inline CSS and JS only, pictures as data:image/* URLs, no forms, no network. Bridgit.respond(JSON string) answers once (window.Bridget on 1.6.269 and older) (16 KB max). Bridgit then fires bridgit:answered on document (cancelable; detail = {answer, close_after_ms}); calling preventDefault() lets the card show its own confirmation. The card closes about 5 s later. The CARD object at the top of each sample page holds all its text, so a new card is the same page with a different CARD object.",
+    "progress": "A single card can't be swiped. Progress through a series is the text \"Step n of m\" (the pill in these samples), not Stories-style segment bars, which suggest a swipe that does nothing.",
+    "user_visible_tests": "Always present user-visible tests and connection checks as rich, attractive kind=html cards adapted from the supplied templates; start with html-connection-test for pairing checks. Keep native question samples for API compatibility testing only."
+  },
+  "samples": [
+    {
+      "id": "pieces-status",
+      "kind": "pieces",
+      "title": "Pieces card: live phone status, no HTML",
+      "summary": "A card made of pieces that Bridgit draws in its own style: a header, metric tiles read from one GET call every 5 minutes, a note and a Refresh button. You write no HTML, CSS or script; loading, stale and error states are automatic. Prefer pieces for status panels, lists, photos and tables; use an html card only when pieces can't draw it.",
+      "request": {
+        "kind": "pieces",
+        "title": "Phone status",
+        "fresh_s": 900,
+        "sources": {
+          "battery": {
+            "call": {
+              "method": "GET",
+              "path": "/v1/phone/battery"
+            },
+            "every_s": 300
+          }
+        },
+        "pieces": [
+          {
+            "type": "header",
+            "text": "Your agent keeps this up to date."
+          },
+          {
+            "type": "metrics",
+            "items": [
+              {
+                "label": "Battery",
+                "value": {
+                  "$source": "battery.percent"
+                },
+                "format": "number",
+                "unit": "%"
+              },
+              {
+                "label": "Charging",
+                "value": {
+                  "$source": "battery.charging"
+                },
+                "format": "yes_no"
+              },
+              {
+                "label": "Temperature",
+                "value": {
+                  "$source": "battery.temperature_c"
+                },
+                "format": "celsius"
+              }
+            ]
+          },
+          {
+            "type": "note",
+            "text": "Read from the phone every 5 minutes while the card is open."
+          },
+          {
+            "type": "buttons",
+            "items": [
+              {
+                "label": "Refresh",
+                "style": "primary",
+                "do": {
+                  "refresh": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "answer": null,
+      "events": [
+        "interaction.seen",
+        "interaction.dismissed"
+      ],
+      "notes": [
+        "Sources may name only your own watches and GET calls you are allowed to make (here: the phone module).",
+        "The same pieces, sources and buttons are what an applet package's ui.card uses; see https://bridgit.cc/learn/builder/applet-packages.md."
+      ]
+    },
+    {
+      "id": "notice",
+      "kind": "notice",
+      "title": "Notice with links, read aloud",
+      "summary": "One-way message. Only link controls (https:, geo:, tel:, mailto: or an app package). No answer.",
+      "request": {
+        "kind": "notice",
+        "title": "Your train leaves in 40 minutes",
+        "text": "Platform 4, coach C, seat 21. It's a 12-minute walk from where you are.",
+        "priority": "urgent",
+        "speak": true,
+        "controls": [
+          {
+            "type": "link",
+            "id": "ticket",
+            "label": "Open the ticket",
+            "url": "https://bridgit.cc/demo/"
+          },
+          {
+            "type": "link",
+            "id": "map",
+            "label": "Walk to the station",
+            "url": "geo:0,0?q=Lisboa+Santa+Apolonia"
+          }
+        ]
+      },
+      "answer": null,
+      "events": [
+        "interaction.seen when the owner opens it (GET then shows status seen and seen_at)",
+        "interaction.dismissed when they close it"
+      ],
+      "notes": [
+        "priority urgent shows a heads-up; speak reads the title and text aloud (silent when the phone is on silent).",
+        "At most 30 notices per hour per agent."
+      ]
+    },
+    {
+      "id": "question-buttons",
+      "kind": "question",
+      "title": "Yes / no question",
+      "summary": "One tap answers it. Up to 6 controls; style primary marks the main button.",
+      "request": {
+        "kind": "question",
+        "title": "Pay the electricity bill?",
+        "text": "EDP, 48.20 EUR, due Friday. Paid from the usual account.",
+        "controls": [
+          {
+            "type": "button",
+            "id": "pay",
+            "label": "Pay it",
+            "style": "primary"
+          },
+          {
+            "type": "button",
+            "id": "later",
+            "label": "Not now"
+          }
+        ],
+        "expires_in_seconds": 3600
+      },
+      "answer": {
+        "button": "pay",
+        "values": {}
+      },
+      "events": [
+        "interaction.answered {\"interaction_id\", \"answer\"}"
+      ],
+      "notes": [
+        "After expires_in_seconds a wait returns status expired, but the owner can still answer late (interaction.answered with \"late\": true)."
+      ]
+    },
+    {
+      "id": "question-form",
+      "kind": "question",
+      "title": "Choice, text box, link and buttons",
+      "summary": "Every control type in one question: choice (2-8 options), text, link and button.",
+      "request": {
+        "kind": "question",
+        "title": "Where should we eat tonight?",
+        "text": "Three places near you with a table at 8.",
+        "controls": [
+          {
+            "type": "choice",
+            "id": "place",
+            "label": "Pick one",
+            "options": [
+              "Taberna da Rua",
+              "Sushi Bar 7",
+              "Pizzeria Luzia"
+            ]
+          },
+          {
+            "type": "text",
+            "id": "note",
+            "label": "Anything to tell them?",
+            "placeholder": "Allergies, a birthday"
+          },
+          {
+            "type": "link",
+            "id": "menu",
+            "label": "See the menus",
+            "url": "https://bridgit.cc/demo/"
+          },
+          {
+            "type": "button",
+            "id": "book",
+            "label": "Book it",
+            "style": "primary"
+          },
+          {
+            "type": "button",
+            "id": "skip",
+            "label": "Cook at home"
+          }
+        ]
+      },
+      "answer": {
+        "button": "book",
+        "values": {
+          "place": "Sushi Bar 7",
+          "note": "One vegetarian"
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "values only holds the fields the owner filled in. Text answers are up to 2,000 characters."
+      ]
+    },
+    {
+      "id": "question-photo",
+      "kind": "question",
+      "title": "Question with a photo",
+      "summary": "image.data_base64 (a JPEG or PNG, up to 2 MB) or image.gallery_id (from GET /v1/image/last).",
+      "request": {
+        "kind": "question",
+        "title": "Did I see that right?",
+        "text": "I think this is a blue mug on a wooden desk.",
+        "image": {
+          "data_base64": "{{sample-photo.jpg}}"
+        },
+        "speak": true,
+        "controls": [
+          {
+            "type": "button",
+            "id": "yes",
+            "label": "Spot on",
+            "style": "primary"
+          },
+          {
+            "type": "button",
+            "id": "no",
+            "label": "Not quite"
+          },
+          {
+            "type": "text",
+            "id": "actually",
+            "label": "What is it really?",
+            "placeholder": "Optional"
+          }
+        ]
+      },
+      "answer": {
+        "button": "no",
+        "values": {
+          "actually": "A teapot"
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "Images are for notices and questions; an html card puts its picture in the page as a data:image URL."
+      ]
+    },
+    {
+      "id": "html-agenda",
+      "kind": "html",
+      "title": "HTML card: demo agenda",
+      "summary": "The action card page with a numbered list: the demo's opening card.",
+      "html_file": "action-card.html",
+      "card": {
+        "pill": "Bridgit demo",
+        "icon": "✨",
+        "title": "6 things, about 5 minutes",
+        "text": "A quick show of what I can do through your phone. Before each one you can tap Do it or Skip.",
+        "list": [
+          "Flash the light",
+          "Back photo: what I see",
+          "Front photo: how am I feeling?",
+          "Say \"Double\"",
+          "Game: Guess My Story",
+          "Rock paper scissors"
+        ],
+        "buttons": [
+          {
+            "id": "start",
+            "label": "Start",
+            "style": "primary"
+          },
+          {
+            "id": "later",
+            "label": "Not now",
+            "style": "quiet"
+          }
+        ],
+        "data": {
+          "step": 0
+        },
+        "sending": "Starting…",
+        "done_title": "Here we go",
+        "done_text": "The first step is on its way."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Bridgit demo: 6 things, about 5 minutes",
+        "html": "{{html}}",
+        "expires_in_seconds": 3600
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "start",
+          "step": 0
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": []
+    },
+    {
+      "id": "html-connection-test",
+      "kind": "html",
+      "title": "HTML card: connection test",
+      "summary": "A polished connection check using the shared action-card template. No device action; the owner confirms the answer path.",
+      "html_file": "action-card.html",
+      "card": {
+        "pill": "Connection check",
+        "icon": "✨",
+        "title": "We’re connected",
+        "text": "Your agent can reach Bridgit. Tap below to confirm your reply makes it back, too.",
+        "list": [],
+        "buttons": [
+          {
+            "id": "received",
+            "label": "Test received",
+            "style": "primary"
+          },
+          {
+            "id": "skip",
+            "label": "Skip"
+          }
+        ],
+        "data": {
+          "test": "connection"
+        },
+        "sending": "Sending your reply…",
+        "done_title": "Reply sent",
+        "done_text": "Your agent can now confirm that the round trip worked."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Bridgit connection check",
+        "html": "{{html}}",
+        "expires_in_seconds": 900
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "received",
+          "test": "connection"
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "Use this HTML template for pairing checks and user-visible connection tests. Change the wording as needed; preserve the styling and response bridge.",
+        "Wait for the answer and verify data.button is received before reporting that the answer path passed. Skip is not a passing result."
+      ]
+    },
+    {
+      "id": "html-step",
+      "kind": "html",
+      "title": "HTML card: step card",
+      "summary": "Step pill, icon medallion, info panel, gradient primary button, Skip and End demo, status line.",
+      "html_file": "action-card.html",
+      "card": {
+        "pill": "Step 1 of 6",
+        "icon": "🔦",
+        "title": "Flash the light",
+        "text": "I'll blink your phone's light three times. Look at it.",
+        "list": [],
+        "buttons": [
+          {
+            "id": "go",
+            "label": "Do it",
+            "style": "primary"
+          },
+          {
+            "id": "skip",
+            "label": "Skip"
+          },
+          {
+            "id": "end",
+            "label": "End demo",
+            "style": "quiet"
+          }
+        ],
+        "data": {
+          "step": 1
+        },
+        "sending": "Got it, one moment…",
+        "done_title": "Watch the light",
+        "done_text": "Look at your phone."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Step 1 of 6: Flash the light",
+        "html": "{{html}}",
+        "expires_in_seconds": 900
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "go",
+          "step": 1
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "For another step change pill, icon, title, text and data.step. For a game round, change the buttons too (e.g. shoot / stop)."
+      ]
+    },
+    {
+      "id": "html-photo-check",
+      "kind": "html",
+      "title": "HTML card: photo with a guess",
+      "summary": "A photo, your guess, optional choice chips and text box, and buttons. Values come back in data.values.",
+      "html_file": "photo-card.html",
+      "card": {
+        "pill": "Step 2 of 6",
+        "image": "data:image/jpeg;base64,{{sample-photo.jpg}}",
+        "title": "Did I see that right?",
+        "text": "I think this is a blue mug on a wooden desk.",
+        "choice": null,
+        "input": {
+          "id": "actually",
+          "label": "What is it really?",
+          "placeholder": "Optional"
+        },
+        "buttons": [
+          {
+            "id": "yes",
+            "label": "Spot on",
+            "style": "primary"
+          },
+          {
+            "id": "no",
+            "label": "Not quite"
+          }
+        ],
+        "data": {
+          "step": 2
+        },
+        "sending": "Sending…",
+        "done_text": "Your answer reached the agent.",
+        "done_title": "Thanks!"
+      },
+      "request": {
+        "kind": "html",
+        "title": "Did I see that right?",
+        "html": "{{html}}",
+        "expires_in_seconds": 900
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "no",
+          "values": {
+            "actually": "A teapot"
+          },
+          "step": 2
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "For a pick-one question set choice, e.g. {\"id\": \"feeling\", \"label\": \"How were you really feeling?\", \"options\": [\"Happy\", \"Surprised\", \"Sleepy\", \"Something else\"]}; the pick arrives as data.values.feeling."
+      ]
+    },
+    {
+      "id": "html-rps",
+      "kind": "html",
+      "title": "HTML card: rock paper scissors round",
+      "summary": "The demo's game page: Ready starts a 3, 2, 1, Shoot! countdown, the agent's hand appears as an icon at Shoot!, and the score and last round sit on top.",
+      "html_file": "rps-card.html",
+      "card": {
+        "me": "paper",
+        "history": [
+          {
+            "you": "scissors",
+            "me": "rock"
+          }
+        ],
+        "photo": "data:image/jpeg;base64,{{sample-photo.jpg}}",
+        "note": "",
+        "data": {
+          "step": 6
+        }
+      },
+      "request": {
+        "kind": "html",
+        "title": "Rock paper scissors: round 2 of 3",
+        "html": "{{html}}",
+        "expires_in_seconds": 300
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "ready",
+          "round": 2,
+          "step": 6
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "The card answers on Ready and keeps counting down; the agent speaks the countdown and takes the photo right after Shoot! (see the demo script, Item 6)."
+      ]
+    },
+    {
+      "id": "html-wrapup",
+      "kind": "html",
+      "title": "HTML card: wrap-up",
+      "summary": "The action card page as the demo's last card: what happened and what next.",
+      "html_file": "action-card.html",
+      "card": {
+        "pill": "That's the demo",
+        "icon": "🎉",
+        "title": "Want to see more?",
+        "text": "I flashed your light, saw your desk, read your face, came when you said Double, guessed your story and played a game with you.",
+        "list": [],
+        "buttons": [
+          {
+            "id": "more",
+            "label": "Show me more",
+            "style": "primary"
+          },
+          {
+            "id": "setup",
+            "label": "Set one idea up"
+          },
+          {
+            "id": "done",
+            "label": "That's enough",
+            "style": "quiet"
+          }
+        ],
+        "data": {
+          "step": "wrap-up"
+        },
+        "sending": "One moment…",
+        "done_title": "Thanks!",
+        "done_text": "Your answer reached the agent."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Want to see more?",
+        "html": "{{html}}"
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "more",
+          "step": "wrap-up"
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": []
+    },
+    {
+      "id": "html-checklist",
+      "kind": "html",
+      "title": "HTML card: checklist and slider mini app",
+      "summary": "Checkboxes, a 1-10 slider and a send button; the answer is structured data.",
+      "html_file": "checklist-card.html",
+      "card": {
+        "icon": "🧳",
+        "title": "Packing for Lisbon",
+        "subtitle": "Tick what's in the bag already.",
+        "items": [
+          "Passport",
+          "Phone charger",
+          "Sunglasses",
+          "Rain jacket",
+          "Train tickets"
+        ],
+        "slider": {
+          "id": "ready",
+          "label": "How ready do you feel?",
+          "value": 5
+        },
+        "button": "Send to the agent",
+        "done_text": "Sent. The agent has your list.",
+        "done_title": "Sent"
+      },
+      "request": {
+        "kind": "html",
+        "title": "Packing for Lisbon",
+        "html": "{{html}}"
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "send",
+          "checked": [
+            "Passport",
+            "Sunglasses"
+          ],
+          "unchecked": [
+            "Phone charger",
+            "Rain jacket",
+            "Train tickets"
+          ],
+          "ready": 7
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": []
+    },
+    {
+      "id": "text-panel",
+      "kind": "text",
+      "title": "Live text panel",
+      "summary": "A panel that scrolls on the phone as text is streamed into it. No controls, no answer.",
+      "request": {
+        "kind": "text",
+        "title": "Sorting your downloads folder"
+      },
+      "calls": [
+        {
+          "method": "POST",
+          "path": "/v1/text/stream",
+          "body": {
+            "interaction_id": "{interaction_id}",
+            "append": "Found 214 files.\n"
+          },
+          "reply": {
+            "interaction_id": 42,
+            "length": 17,
+            "status": "seen",
+            "done": false
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/v1/text/stream",
+          "body": {
+            "interaction_id": "{interaction_id}",
+            "append": "Moved 38 PDFs to Documents/Invoices.\n"
+          },
+          "reply": {
+            "interaction_id": 42,
+            "length": 54,
+            "status": "seen",
+            "done": false
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/v1/text/stream",
+          "body": {
+            "interaction_id": "{interaction_id}",
+            "append": "Done: 214 files sorted.\n",
+            "done": true
+          },
+          "reply": {
+            "interaction_id": 42,
+            "length": 78,
+            "status": "seen",
+            "done": true
+          }
+        }
+      ],
+      "answer": null,
+      "events": [
+        "interaction.seen",
+        "interaction.dismissed when the owner closes it"
+      ],
+      "notes": [
+        "Replies are shown for a panel whose interaction_id is 42; interaction_id may be sent as a string or a number. status is pending until the owner opens the panel, then seen.",
+        "Up to 16 KB per append; the panel keeps the last 200 KB.",
+        "After done: true another append gets 409 {\"error\":\"conflict\",\"message\":\"This text panel is finished (done was sent); create a new one.\"}."
+      ]
+    }
+  ]
+}

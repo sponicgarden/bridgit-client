@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your clipboard request: pending, copied, denied or expired",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "clipboard_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/clipboard/{id}",
+  "idempotent": false,
+  "path": "/v1/clipboard/{id}",
+  "capability": "clipboard",
+  "returns": "Your clipboard request: pending, copied, denied or expired",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/clipboard/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

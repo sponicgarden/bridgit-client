@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Check the software manifest now instead of waiting for the daily check; engines in use update to their newest version (on Wi-Fi)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "images_engines_check",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/images/engines/check",
+  "idempotent": false,
+  "path": "/v1/images/engines/check",
+  "capability": "find_crop",
+  "returns": "manifest {serial, published_at, source, checked_at, last_error}, engines as GET /v1/images/engines shows them",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": ["capability_disabled"],
+  "requires": null
+ }
+}

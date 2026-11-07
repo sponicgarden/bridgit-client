@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Deprecated alias of /v1/log?channel=audit (removed in v3)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "audit",
+  "query": [{
+   "name": "limit",
+   "description": "1-500, default 50",
+   "type": "integer",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/audit?limit=50",
+  "idempotent": false,
+  "path": "/v1/audit",
+  "capability": "log",
+  "returns": "entries[] (same shape as /v1/log)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"limit": {
+    "description": "1-500, default 50",
+    "type": "integer"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

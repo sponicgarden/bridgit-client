@@ -1,0 +1,684 @@
+{
+  "schema": "bridgit-services/1",
+  "model_preferences": "/v1/services/models",
+  "budgets": "/v1/services/budgets",
+  "scope": "Any installed applet or control agent may select these services through its granted APIs. Discovery grants no access and makes no paid call.",
+  "flow_authoring": {
+    "ask_model": {
+      "result": "answers.<question-id> holds the typed answer. See decisions.md for choice, score and probability representations.",
+      "max_questions": 10,
+      "apple_prerequisites": "Linked owner, network, monetary budget and consent to each submission. Use a paired Android host for sound watches.",
+      "failure": "An unavailable model, missing grant or exhausted budget stops a step under the default error policy. Inspect the run error and honor its retry policy. No implicit model substitution.",
+      "android": [
+        "clef",
+        "jev",
+        "glm"
+      ],
+      "request_schema": "workflow-step.schema.json",
+      "max_paid_steps_per_run": 4,
+      "max_paid_per_day": 500,
+      "macos_foreground": ["clef"],
+      "apple_question_types": [
+        "choice",
+        "score",
+        "noul"
+      ],
+      "privacy": "The hosted model receives the declared questions, state and referenced photo. Declare the transfer in permissions.remote and enable data_policy.device_only.remote_models.",
+      "ios_foreground": ["clef"]
+    },
+    "signed_editions": {
+      "reference": "workflow-steps.md describes host support, output fields, edition proof and the data sent for each operation.",
+      "appraise.signed-edition-budget.v2": ["appraise"],
+      "chef.signed-edition-budget.v2": [
+        "scan",
+        "observe"
+      ]
+    }
+  },
+  "availability_is_live": false,
+  "services": [
+    {
+      "provider_model": "z-ai/glm-5.3-flash",
+      "inputs": [
+        "text",
+        "json",
+        "images"
+      ],
+      "description": "General typed questions and decisions for any applet; not tied to a template.",
+      "applet_compatible": true,
+      "availability": "runtime_check_required",
+      "call": {
+        "path": "/v1/judgment",
+        "request": {
+          "questions": {"match": {
+            "instructions": "Does this state match the applet's condition?",
+            "type": "noul"
+          }},
+          "model": "glm",
+          "state": "The applet's text or JSON context"
+        },
+        "method": "POST",
+        "model": "glm",
+        "required_capability": "judgment"
+      },
+      "docs": "https://bridgit.cc/learn/decisions.md",
+      "provider": "OpenRouter",
+      "name": "GLM 5.3 Flash",
+      "paid": true,
+      "id": "glm",
+      "applet": {
+        "watch": {
+          "path": "/v1/watches",
+          "model": "glm",
+          "required_capability": "watches"
+        },
+        "flow_step": {
+          "questions": {"match": {
+            "instructions": "Does this state match the applet's condition?",
+            "type": "noul"
+          }},
+          "model": "glm",
+          "type": "ask_model"
+        },
+        "flow_scope": "decisions",
+        "media": "For photos use a camera watch or a flow photo step; retained audio uses Clef with its sound grant."
+      },
+      "budget": {
+        "configure_action": "service.budget.set",
+        "read": "/v1/services/budgets",
+        "configuration": "/v1/owner/configure",
+        "service": "glm",
+        "applet_limits_also_apply": true,
+        "owner_approval": true
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/judgment",
+        "request": {
+          "questions": {"match": {
+            "instructions": "Does this state match the applet's condition?",
+            "type": "noul"
+          }},
+          "model": "jev",
+          "state": "The applet's text or JSON context"
+        },
+        "method": "POST",
+        "model": "jev",
+        "required_capability": "judgment"
+      },
+      "docs": "https://bridgit.cc/learn/decisions.md",
+      "provider": "TypeSafe",
+      "inputs": [
+        "text",
+        "json",
+        "images"
+      ],
+      "name": "Jev",
+      "paid": true,
+      "description": "General typed questions and decisions for any applet; not tied to a template.",
+      "applet_compatible": true,
+      "id": "jev",
+      "availability": "runtime_check_required",
+      "applet": {
+        "watch": {
+          "path": "/v1/watches",
+          "model": "jev",
+          "required_capability": "watches"
+        },
+        "flow_step": {
+          "questions": {"match": {
+            "instructions": "Does this state match the applet's condition?",
+            "type": "noul"
+          }},
+          "model": "jev",
+          "type": "ask_model"
+        },
+        "flow_scope": "decisions",
+        "media": "For photos use a camera watch or a flow photo step; retained audio uses Clef with its sound grant."
+      },
+      "budget": {
+        "configure_action": "service.budget.set",
+        "read": "/v1/services/budgets",
+        "configuration": "/v1/owner/configure",
+        "service": "jev",
+        "applet_limits_also_apply": true,
+        "owner_approval": true
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/judgment",
+        "request": {
+          "questions": {"match": {
+            "instructions": "Does this state match the applet's condition?",
+            "type": "noul"
+          }},
+          "model": "clef",
+          "state": "The applet's text or JSON context"
+        },
+        "method": "POST",
+        "model": "clef",
+        "required_capability": "judgment"
+      },
+      "docs": "https://bridgit.cc/learn/decisions.md",
+      "provider": "Cloudflare",
+      "inputs": [
+        "text",
+        "json",
+        "images",
+        "audio",
+        "video"
+      ],
+      "name": "Clef",
+      "paid": true,
+      "description": "General typed questions and decisions for any applet; not tied to a template.",
+      "applet_compatible": true,
+      "id": "clef",
+      "availability": "runtime_check_required",
+      "applet": {
+        "watch": {
+          "path": "/v1/watches",
+          "model": "clef",
+          "required_capability": "watches"
+        },
+        "flow_step": {
+          "questions": {"match": {
+            "instructions": "Does this state match the applet's condition?",
+            "type": "noul"
+          }},
+          "model": "clef",
+          "type": "ask_model"
+        },
+        "flow_scope": "decisions",
+        "media": "For photos use a camera watch or a flow photo step; retained audio uses Clef with its sound grant."
+      },
+      "budget": {
+        "configure_action": "service.budget.set",
+        "read": "/v1/services/budgets",
+        "configuration": "/v1/owner/configure",
+        "service": "clef",
+        "applet_limits_also_apply": true,
+        "owner_approval": true
+      }
+    },
+    {
+      "outputs": ["images"],
+      "provider_model": "gpt-image-2.5-sunburst",
+      "inputs": ["text"],
+      "description": "Generate images through Azure; 40 images per account per calendar month UTC, shared by all devices and applet wordmarks.",
+      "applet_compatible": true,
+      "availability": "runtime_check_required",
+      "call": {
+        "path": "/v1/images/generations",
+        "request": {"prompt": "Describe the image"},
+        "method": "POST",
+        "idempotency_key_required": true,
+        "required_capability": "judgment"
+      },
+      "docs": "https://bridgit.cc/learn/images.md",
+      "provider": "Microsoft Azure",
+      "quota": {
+        "read": "/v1/images/usage",
+        "images_per_month": 40,
+        "timezone": "UTC",
+        "scope": "account"
+      },
+      "name": "GPT Image 2.5 Sunburst",
+      "paid": true,
+      "id": "images",
+      "budget": {
+        "configure_action": "service.budget.set",
+        "read": "/v1/services/budgets",
+        "configuration": "/v1/owner/configure",
+        "service": "images",
+        "applet_limits_also_apply": true
+      }
+    },
+    {
+      "outputs": ["images"],
+      "provider_model": "black-forest-labs/flux-3-image-klein",
+      "formats": [
+        "png",
+        "jpeg"
+      ],
+      "inputs": ["text"],
+      "description": "Generate images with FLUX through OpenRouter; shares the same 40-image account allowance with Azure and wordmarks. PNG/JPEG, standard quality, opaque backgrounds.",
+      "applet_compatible": true,
+      "availability": "runtime_check_required",
+      "call": {
+        "path": "/v1/images/generations",
+        "request": {
+          "task_key": "flux_image_generation",
+          "prompt": "Describe the image"
+        },
+        "method": "POST",
+        "idempotency_key_required": true,
+        "required_capability": "judgment"
+      },
+      "docs": "https://bridgit.cc/learn/images.md",
+      "provider": "OpenRouter",
+      "quota": {
+        "read": "/v1/images/usage",
+        "images_per_month": 40,
+        "timezone": "UTC",
+        "scope": "account"
+      },
+      "backgrounds": [
+        "auto",
+        "opaque"
+      ],
+      "name": "FLUX 3 Image Klein",
+      "paid": true,
+      "id": "flux_images",
+      "budget": {
+        "configure_action": "service.budget.set",
+        "read": "/v1/services/budgets",
+        "configuration": "/v1/owner/configure",
+        "service": "images",
+        "applet_limits_also_apply": true
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/services/context",
+        "request": {
+          "service": "places",
+          "latitude": 52.2297,
+          "longitude": 21.0122
+        },
+        "method": "POST",
+        "required_capability": "judgment"
+      },
+      "provider": "googlemaps",
+      "configuration": {
+        "read": "/v1/settings/ai-keys",
+        "shared_key_may_be_unconfigured": true,
+        "credential_provider": "googlemaps",
+        "write": "/v1/settings/ai-keys",
+        "write_only": true
+      },
+      "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+      "inputs": [
+        "latitude",
+        "longitude",
+        "radius_m",
+        "limit"
+      ],
+      "name": "Google Places Nearby Search",
+      "paid": true,
+      "description": "Nearby named places and types; map context, not proof of what is visible.",
+      "applet_compatible": true,
+      "id": "places",
+      "availability": "runtime_check_required",
+      "pricing": {
+        "budget_reserve_per_call": 0.032,
+        "automatic_provider_cutoff": false,
+        "free_monthly_events": 5000,
+        "shared_allowance_enforced": true,
+        "currency": "USD",
+        "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+        "free_allowance_scope": "provider_billing_account_not_per_user",
+        "checked_on": "2026-11-06"
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/services/context",
+        "request": {
+          "service": "airquality",
+          "latitude": 52.2297,
+          "longitude": 21.0122
+        },
+        "method": "POST",
+        "required_capability": "judgment"
+      },
+      "provider": "googlemaps",
+      "configuration": {
+        "read": "/v1/settings/ai-keys",
+        "shared_key_may_be_unconfigured": true,
+        "credential_provider": "googlemaps",
+        "write": "/v1/settings/ai-keys",
+        "write_only": true
+      },
+      "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+      "inputs": [
+        "latitude",
+        "longitude"
+      ],
+      "name": "Google Air Quality",
+      "paid": true,
+      "description": "Hourly air-quality indices; modeled area conditions, not a personal health assessment.",
+      "applet_compatible": true,
+      "id": "airquality",
+      "availability": "runtime_check_required",
+      "pricing": {
+        "budget_reserve_per_call": 0.005,
+        "automatic_provider_cutoff": false,
+        "free_monthly_events": 10000,
+        "shared_allowance_enforced": true,
+        "currency": "USD",
+        "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+        "free_allowance_scope": "provider_billing_account_not_per_user",
+        "checked_on": "2026-11-06"
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/services/context",
+        "request": {
+          "service": "pollen",
+          "latitude": 52.2297,
+          "longitude": 21.0122
+        },
+        "method": "POST",
+        "required_capability": "judgment"
+      },
+      "provider": "googlemaps",
+      "configuration": {
+        "read": "/v1/settings/ai-keys",
+        "shared_key_may_be_unconfigured": true,
+        "credential_provider": "googlemaps",
+        "write": "/v1/settings/ai-keys",
+        "write_only": true
+      },
+      "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+      "inputs": [
+        "latitude",
+        "longitude"
+      ],
+      "name": "Google Pollen",
+      "paid": true,
+      "description": "Daily pollen forecasts; availability varies by region.",
+      "applet_compatible": true,
+      "id": "pollen",
+      "availability": "runtime_check_required",
+      "pricing": {
+        "budget_reserve_per_call": 0.01,
+        "automatic_provider_cutoff": false,
+        "free_monthly_events": 5000,
+        "shared_allowance_enforced": true,
+        "currency": "USD",
+        "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+        "free_allowance_scope": "provider_billing_account_not_per_user",
+        "checked_on": "2026-11-06"
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/services/context",
+        "request": {
+          "service": "timezone",
+          "latitude": 52.2297,
+          "longitude": 21.0122
+        },
+        "method": "POST",
+        "required_capability": "judgment"
+      },
+      "provider": "googlemaps",
+      "configuration": {
+        "read": "/v1/settings/ai-keys",
+        "shared_key_may_be_unconfigured": true,
+        "credential_provider": "googlemaps",
+        "write": "/v1/settings/ai-keys",
+        "write_only": true
+      },
+      "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+      "inputs": [
+        "latitude",
+        "longitude",
+        "timestamp"
+      ],
+      "name": "Google Time Zone",
+      "paid": true,
+      "description": "Time-zone identifier and UTC/daylight-saving offsets at a coordinate and timestamp.",
+      "applet_compatible": true,
+      "id": "timezone",
+      "availability": "runtime_check_required",
+      "pricing": {
+        "budget_reserve_per_call": 0.005,
+        "automatic_provider_cutoff": false,
+        "free_monthly_events": 10000,
+        "shared_allowance_enforced": true,
+        "currency": "USD",
+        "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+        "free_allowance_scope": "provider_billing_account_not_per_user",
+        "checked_on": "2026-11-06"
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/services/context",
+        "request": {
+          "service": "maps",
+          "latitude": 52.2297,
+          "longitude": 21.0122
+        },
+        "method": "POST",
+        "required_capability": "judgment"
+      },
+      "provider": "googlemaps",
+      "configuration": {
+        "read": "/v1/settings/ai-keys",
+        "shared_key_may_be_unconfigured": true,
+        "credential_provider": "googlemaps",
+        "write": "/v1/settings/ai-keys",
+        "write_only": true
+      },
+      "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+      "inputs": [
+        "latitude",
+        "longitude"
+      ],
+      "name": "Google satellite map",
+      "paid": true,
+      "description": "Static satellite image of the surroundings; not live imagery.",
+      "applet_compatible": true,
+      "id": "maps",
+      "availability": "runtime_check_required",
+      "pricing": {
+        "budget_reserve_per_call": 0.002,
+        "automatic_provider_cutoff": false,
+        "free_monthly_events": 10000,
+        "shared_allowance_enforced": true,
+        "currency": "USD",
+        "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+        "free_allowance_scope": "provider_billing_account_not_per_user",
+        "checked_on": "2026-11-06"
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/services/context",
+        "request": {
+          "service": "streetview",
+          "latitude": 52.2297,
+          "longitude": 21.0122
+        },
+        "method": "POST",
+        "required_capability": "judgment"
+      },
+      "provider": "googlemaps",
+      "configuration": {
+        "read": "/v1/settings/ai-keys",
+        "shared_key_may_be_unconfigured": true,
+        "credential_provider": "googlemaps",
+        "write": "/v1/settings/ai-keys",
+        "write_only": true
+      },
+      "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+      "inputs": [
+        "latitude",
+        "longitude"
+      ],
+      "name": "Google Street View",
+      "paid": true,
+      "description": "Street-level image when coverage exists; metadata reports capture date when available.",
+      "applet_compatible": true,
+      "id": "streetview",
+      "availability": "runtime_check_required",
+      "pricing": {
+        "budget_reserve_per_call": 0.007,
+        "automatic_provider_cutoff": false,
+        "free_monthly_events": 10000,
+        "shared_allowance_enforced": true,
+        "currency": "USD",
+        "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+        "free_allowance_scope": "provider_billing_account_not_per_user",
+        "checked_on": "2026-11-06"
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/services/context",
+        "request": {
+          "service": "weathergoogle",
+          "latitude": 52.2297,
+          "longitude": 21.0122
+        },
+        "method": "POST",
+        "required_capability": "judgment"
+      },
+      "provider": "googlemaps",
+      "configuration": {
+        "read": "/v1/settings/ai-keys",
+        "shared_key_may_be_unconfigured": true,
+        "credential_provider": "googlemaps",
+        "write": "/v1/settings/ai-keys",
+        "write_only": true
+      },
+      "data_use": "Google Maps attribution, caching and content-use restrictions apply, including AI and synthesized speech; API access alone does not grant reuse rights.",
+      "inputs": [
+        "latitude",
+        "longitude"
+      ],
+      "name": "Google Weather",
+      "paid": true,
+      "description": "Current weather, temperature, wind and conditions.",
+      "applet_compatible": true,
+      "id": "weathergoogle",
+      "availability": "runtime_check_required",
+      "pricing": {
+        "budget_reserve_per_call": 0.00015,
+        "automatic_provider_cutoff": false,
+        "free_monthly_events": 10000,
+        "shared_allowance_enforced": true,
+        "currency": "USD",
+        "source": "https://developers.google.com/maps/billing-and-pricing/pricing",
+        "free_allowance_scope": "provider_billing_account_not_per_user",
+        "checked_on": "2026-11-06"
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/services/context",
+        "request": {
+          "service": "osm",
+          "latitude": 52.2297,
+          "longitude": 21.0122
+        },
+        "method": "POST",
+        "required_capability": "judgment"
+      },
+      "provider": "osm",
+      "configuration": null,
+      "data_use": "Attribute OpenStreetMap contributors; ODbL.",
+      "inputs": [
+        "latitude",
+        "longitude"
+      ],
+      "name": "OpenStreetMap surroundings",
+      "paid": false,
+      "description": "Nearby mapped parks, waterways, amenities and landmarks from Overpass.",
+      "applet_compatible": true,
+      "id": "osm",
+      "availability": "runtime_check_required",
+      "pricing": {
+        "budget_reserve_per_call": 0,
+        "automatic_provider_cutoff": false,
+        "free_monthly_events": null,
+        "shared_allowance_enforced": false,
+        "currency": "USD",
+        "source": null,
+        "free_allowance_scope": null,
+        "checked_on": "2026-11-06"
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/services/context",
+        "request": {
+          "service": "wikipedia",
+          "latitude": 52.2297,
+          "longitude": 21.0122
+        },
+        "method": "POST",
+        "required_capability": "judgment"
+      },
+      "provider": "wikipedia",
+      "configuration": null,
+      "data_use": "Follow article licensing and attribution; nearby does not mean visible.",
+      "inputs": [
+        "latitude",
+        "longitude"
+      ],
+      "name": "Wikipedia nearby places",
+      "paid": false,
+      "description": "Nearby geotagged articles for historical and cultural research.",
+      "applet_compatible": true,
+      "id": "wikipedia",
+      "availability": "runtime_check_required",
+      "pricing": {
+        "budget_reserve_per_call": 0,
+        "automatic_provider_cutoff": false,
+        "free_monthly_events": null,
+        "shared_allowance_enforced": false,
+        "currency": "USD",
+        "source": null,
+        "free_allowance_scope": null,
+        "checked_on": "2026-11-06"
+      }
+    },
+    {
+      "call": {
+        "path": "/v1/services/context",
+        "request": {
+          "service": "openmeteo",
+          "latitude": 52.2297,
+          "longitude": 21.0122
+        },
+        "method": "POST",
+        "required_capability": "judgment"
+      },
+      "provider": "openmeteo",
+      "configuration": {
+        "read": "/v1/settings/ai-keys",
+        "shared_key_may_be_unconfigured": true,
+        "credential_provider": "openmeteo",
+        "write": "/v1/settings/ai-keys",
+        "write_only": true
+      },
+      "data_use": "Attribute Open-Meteo; use the licensed customer API for commercial workloads.",
+      "inputs": [
+        "latitude",
+        "longitude"
+      ],
+      "name": "Open-Meteo weather",
+      "paid": true,
+      "description": "Weather and sunrise/sunset; commercial use requires a customer API subscription.",
+      "applet_compatible": true,
+      "id": "openmeteo",
+      "availability": "runtime_check_required",
+      "pricing": {
+        "budget_reserve_per_call": 0.001,
+        "automatic_provider_cutoff": false,
+        "free_monthly_events": null,
+        "shared_allowance_enforced": false,
+        "currency": "USD",
+        "source": "https://open-meteo.com/en/pricing",
+        "free_allowance_scope": null,
+        "checked_on": "2026-11-06"
+      }
+    }
+  ]
+}

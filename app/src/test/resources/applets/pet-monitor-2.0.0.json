@@ -1,0 +1,254 @@
+{
+  "format": "bridgit-template/1",
+  "id": "pet-monitor",
+  "version": "2.0.0",
+  "kind": "applet",
+  "name": "Pet activity monitor",
+  "summary": "A photo-based activity tally with explicit gaps, plus an offline card.",
+  "runtime": {
+    "adapter": "android.package.v1",
+    "applet_key": "pet-monitor",
+    "supports_dynamic_execution": false
+  },
+  "config_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "camera",
+      "interval_s",
+      "max_paid_per_hour"
+    ],
+    "properties": {
+      "camera": {
+        "type": "string",
+        "enum": [
+          "rear",
+          "front"
+        ]
+      },
+      "interval_s": {
+        "type": "integer",
+        "minimum": 30,
+        "maximum": 3600
+      },
+      "max_paid_per_hour": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 60
+      }
+    }
+  },
+  "defaults": {
+    "camera": "rear",
+    "interval_s": 30,
+    "max_paid_per_hour": 10
+  },
+  "processing": {
+    "watches": [
+      {
+        "id": "main",
+        "request": {
+          "label": "Pet activity samples",
+          "data": [
+            "camera"
+          ],
+          "camera": {
+            "$input": "camera"
+          },
+          "questions": {
+            "pet": {
+              "type": "noul",
+              "instructions": "Is an animal visible in this photo?"
+            },
+            "activity": {
+              "type": "choice",
+              "instructions": "Classify only the visible animal in this photo. If absent or ambiguous choose unclear. Do not infer identity or health.",
+              "criteria": {
+                "resting": "An animal is lying still.",
+                "eating": "An animal visibly eats at a bowl.",
+                "drinking": "An animal visibly drinks at a bowl.",
+                "other": "Visible activity fits none of those.",
+                "unclear": "Absent, occluded or uncertain."
+              }
+            }
+          },
+          "model": "clef",
+          "interval_s": {
+            "$input": "interval_s"
+          },
+          "window": 1,
+          "min_readings": 1,
+          "expires_in_s": 604800,
+          "repeat": true,
+          "local": {
+            "change_check": true,
+            "sensitivity": "high",
+            "learn_noise": true,
+            "max_reuse_s": 900
+          },
+          "max_paid_per_hour": {
+            "$input": "max_paid_per_hour"
+          },
+          "tally": {
+            "track": "activity",
+            "labels": [
+              "resting",
+              "eating",
+              "drinking",
+              "other"
+            ],
+            "min_confidence": 0.8,
+            "gap_s": 90,
+            "keep_days": 30,
+            "seen": {
+              "answer": "pet",
+              "min": 0.6
+            }
+          },
+          "rules": [
+            {
+              "id": "no-meal-by-6pm",
+              "when": {
+                "fewer_than": 1,
+                "of": "eating",
+                "by": "18:00"
+              },
+              "do": {
+                "method": "POST",
+                "path": "/v1/interactions",
+                "body": {
+                  "kind": "notice",
+                  "title": "No meal seen yet",
+                  "text": "{message}"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "permissions": {
+    "required": [
+      "camera",
+      "interactions",
+      "watches"
+    ],
+    "optional": [],
+    "remote": [],
+    "automatic_grants": false
+  },
+  "ui": {
+    "inputs": {
+      "camera": {
+        "label": "Camera",
+        "help": "The phone camera that faces the pet's spot."
+      },
+      "interval_s": {
+        "label": "Seconds between photos",
+        "help": "30 to 3600. Longer means fewer paid checks."
+      },
+      "max_paid_per_hour": {
+        "label": "Paid photo checks an hour, at most",
+        "help": "Unchanged pictures reuse the last answer for free."
+      }
+    },
+    "card": {
+      "title": "Pet activity monitor",
+      "sources": {
+        "activity": {
+          "watch": {
+            "$watch": "main"
+          },
+          "read": "tally"
+        }
+      },
+      "fresh_s": 120,
+      "states": {
+        "empty": "No visible activity samples yet. Gaps and absence are unknown."
+      },
+      "pieces": [
+        {
+          "type": "header",
+          "eyebrow": "Bridgit applet",
+          "text": "A little window into your pet's day."
+        },
+        {
+          "type": "metrics",
+          "items": [
+            {
+              "label": "Observed minutes",
+              "value": {
+                "$source": "activity.today.watched_minutes"
+              },
+              "format": "minutes"
+            },
+            {
+              "label": "Readings",
+              "value": {
+                "$source": "activity.today.checks"
+              },
+              "format": "number"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "rows": {
+            "$source": "activity.today.labels"
+          },
+          "columns": [
+            {
+              "key": "$key",
+              "label": "Activity"
+            },
+            {
+              "key": "episodes",
+              "label": "Episodes",
+              "format": "number"
+            },
+            {
+              "key": "minutes",
+              "label": "Minutes",
+              "format": "number"
+            }
+          ],
+          "empty": "Nothing counted yet today."
+        },
+        {
+          "type": "timeline",
+          "items": {
+            "$source": "activity.episodes"
+          },
+          "time": "start",
+          "label": "label",
+          "detail": "minutes",
+          "limit": 5,
+          "empty": "No episodes yet. Missing coverage is unknown."
+        },
+        {
+          "type": "note",
+          "text": "Sampled observations, not continuous coverage. Gaps and absence are unknown."
+        },
+        {
+          "type": "buttons",
+          "items": [
+            {
+              "label": "Refresh",
+              "style": "primary",
+              "do": {
+                "refresh": true
+              }
+            },
+            {
+              "label": "Pause",
+              "do": {
+                "pause_applet": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

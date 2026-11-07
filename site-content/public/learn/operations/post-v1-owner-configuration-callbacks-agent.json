@@ -1,0 +1,69 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set/change callback URL and receiver-provisioned signing key; apply native network policy; URL required; omitted secret preserves existing; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_callbacks_post",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "url",
+    "description": "Write-only destination URL; native tailnet/public HTTPS policy",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "secret",
+    "description": "Required when new; cbs_ + unpadded base64url of 32 random receiver-owned bytes; same format as native callback secrets",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/callbacks/{agent} {\"url\":\"https://example.com/callback\",\"secret\":\"<receiver-generated cbs key>\"}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/callbacks/{agent}",
+  "capability": "owner_features",
+  "returns": "agent_id,configured,write_only; no URL or signing secret",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "agent": {
+     "description": "The agent in /v1/owner/configuration/callbacks/{agent}",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "secret": {
+     "description": "Required when new; cbs_ + unpadded base64url of 32 random receiver-owned bytes; same format as native callback secrets",
+     "type": "string"
+    },
+    "url": {
+     "description": "Write-only destination URL; native tailnet/public HTTPS policy",
+     "type": "string"
+    }
+   },
+   "required": [
+    "agent",
+    "url",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

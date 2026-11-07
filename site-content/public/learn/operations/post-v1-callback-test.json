@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Send a signed test event to the callback URL the owner set for you",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "callback_test",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/callback/test",
+  "idempotent": false,
+  "path": "/v1/callback/test",
+  "capability": "interactions",
+  "returns": "delivered, http_status, host",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [
+   "not_found",
+   "callback_failed"
+  ],
+  "requires": null
+ }
+}

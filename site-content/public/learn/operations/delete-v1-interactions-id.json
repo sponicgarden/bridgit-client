@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Cancel one of your interactions",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "interactions_cancel",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/interactions/12",
+  "idempotent": false,
+  "path": "/v1/interactions/{id}",
+  "capability": "interactions",
+  "returns": "the interaction",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/interactions/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

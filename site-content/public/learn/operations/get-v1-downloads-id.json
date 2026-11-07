@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read your selected transfer bytes",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "downloads_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/downloads/{id}",
+  "idempotent": false,
+  "path": "/v1/downloads/{id}",
+  "capability": "downloads",
+  "returns": "Read your selected transfer bytes",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/downloads/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

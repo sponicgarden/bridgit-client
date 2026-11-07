@@ -1,0 +1,69 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0d2b45;color:#f2f6fa;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:22px 18px 28px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.p{width:46px;height:46px;border-radius:12px;background:#2b7fff;display:grid;place-content:center;font-weight:800;font-size:26px}
+.top b{display:block;font-size:18px}
+.top span{color:#9cb4c9;font-size:14px}
+.ring{position:relative;width:220px;height:220px;margin:6px auto 16px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .c b{font-size:46px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.ring .c span{color:#9cb4c9;font-size:14px}
+.ticket{background:#f7f3e8;color:#1d2733;border-radius:14px;padding:14px 16px;margin-bottom:16px;position:relative}
+.ticket:before,.ticket:after{content:"";position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:#0d2b45;transform:translateY(-50%)}
+.ticket:before{left:-9px}.ticket:after{right:-9px}
+.row{display:flex;justify-content:space-between;font-size:15px;padding:3px 0}
+.row span{color:#5d6976}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.opt{font:inherit;border:2px solid #2d4f6e;background:#123a5c;color:#f2f6fa;border-radius:12px;padding:10px 6px;min-height:64px;cursor:pointer}
+.opt b{display:block;font-size:18px}
+.opt small{color:#9cb4c9}
+.opt.on{border-color:#2b7fff;background:#1a4f80}
+button.main{width:100%;font:inherit;font-weight:700;border:0;border-radius:14px;padding:16px;min-height:52px;background:#2b7fff;color:#fff;cursor:pointer;margin-bottom:8px}
+button.alt{width:100%;font:inherit;border:0;border-radius:14px;padding:14px;background:transparent;color:#9cb4c9;cursor:pointer}
+</style>
+<div class="wrap">
+  <div class="top"><div class="p">P</div><div><b>Parking ends soon</b><span>Zone 2214 · Kazimierz, ul. Józefa</span></div></div>
+  <div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#1d4366" stroke-width="10"/><circle id="arc" cx="60" cy="60" r="52" fill="none" stroke="#ffb020" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="0"/></svg>
+    <div class="c"><b id="t">12:00</b><span id="u">left on the meter</span></div></div>
+  <div class="ticket">
+    <div class="row"><span>Car</span><b>KR 7H221 · blue Golf</b></div>
+    <div class="row"><span>Started</span><b>13:05</b></div>
+    <div class="row"><span>Ends</span><b>15:05</b></div>
+    <div class="row"><span>Paid so far</span><b>6.00 zł</b></div>
+    <div class="row"><span>Rate</span><b>3.00 zł / hour</b></div>
+  </div>
+  <div class="opts">
+    <button class="opt" data-m="30"><b>+30 min</b><small>1.50 zł</small></button>
+    <button class="opt on" data-m="60"><b>+1 h</b><small>3.00 zł</small></button>
+    <button class="opt" data-m="120"><b>+2 h</b><small>6.00 zł</small></button>
+  </div>
+  <button class="main" id="ext">Extend 1 h for 3.00 zł</button>
+  <button class="alt" id="end">I'm leaving, let it run out</button>
+</div>
+<script>
+// The meter's fixed end time, set by the agent when it sends the card (here 13:05 + 2 h paid). Time left is
+// always worked out from it, so the card stays right if it arrives late or is opened again.
+var ENDS_AT=Date.parse('2026-11-02T15:05:00+01:00'),TOTAL=12*60;
+if(window.BridgitGallery)ENDS_AT=Date.now()+TOTAL*1000; // the website's preview only
+var mins=60,sent=false;
+function left(){return Math.max(0,Math.round((ENDS_AT-Date.now())/1000))}
+function fmt(s){var m=Math.floor(s/60),x=s%60;return m+':'+(x<10?'0':'')+x}
+function tick(){
+  var l=left();
+  document.getElementById('t').textContent=fmt(l);
+  document.getElementById('arc').setAttribute('stroke-dashoffset',String(326.7*(1-Math.min(l,TOTAL)/TOTAL)));
+  if(l<=300)document.getElementById('arc').setAttribute('stroke','#ff5a4f');
+  if(l===0)document.getElementById('u').textContent='the meter has run out';
+}
+tick();setInterval(tick,1000);
+document.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){
+  document.querySelectorAll('.opt').forEach(function(x){x.classList.remove('on')});b.classList.add('on');mins=+b.dataset.m;
+  document.getElementById('ext').textContent='Extend '+b.querySelector('b').textContent.replace('+','')+' for '+b.querySelector('small').textContent;
+}});
+function send(o){if(sent)return;sent=true;o.seconds_left=left();(window.Bridgit||window.Bridget).respond(JSON.stringify(o))}
+document.getElementById('ext').onclick=function(){send({action:'extend',minutes:mins,price_pln:(mins/60*3).toFixed(2)})};
+document.getElementById('end').onclick=function(){send({action:'let_expire'})};
+</script>

@@ -1,0 +1,35 @@
+{
+ "detail_url": "/v1/discover?id=v1.location&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.location.json",
+ "title": "location",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.location.json",
+ "prerequisites": ["Check v1.location supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [{
+  "summary": "Where the phone is now, with altitude, speed, heading and the compass",
+  "path": "/v1/location",
+  "method": "GET",
+  "documentation": "https://bridgit.cc/learn/operations/get-v1-location.json",
+  "operation_url": "https://bridgit.cc/learn/operations/get-v1-location.json",
+  "control_scope": null,
+  "requires_power": null,
+  "tool": "location"
+ }],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.location",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "sense",
+ "capability_ids": ["v1.location"]
+}

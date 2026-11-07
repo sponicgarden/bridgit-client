@@ -1,0 +1,64 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Saved table rows, oldest first after since. Owner control agents can read every applet table without approval or share_with_installer; applet principals remain restricted. Discover tables at /applets/installed/{id}/data",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_installed_tables_rows_get",
+  "query": [
+   {
+    "name": "limit",
+    "description": "1-200, default 50",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "since",
+    "description": "A row id: only rows after it (the last page's next)",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/installed/ai0123456789abcd/tables/receipts/rows?limit=50",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/tables/{table}/rows",
+  "capability": "applet_install",
+  "returns": "items[{id, at, by, ...columns}], next (null at the end), count",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "limit": {
+     "description": "1-200, default 50",
+     "type": "integer"
+    },
+    "id": {
+     "description": "The id in /v1/applets/installed/{id}/tables/{table}/rows",
+     "type": "string"
+    },
+    "table": {
+     "description": "The table in /v1/applets/installed/{id}/tables/{table}/rows",
+     "type": "string"
+    },
+    "since": {
+     "description": "A row id: only rows after it (the last page's next)",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "table"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "not_shared"
+  ],
+  "requires": null
+ }
+}

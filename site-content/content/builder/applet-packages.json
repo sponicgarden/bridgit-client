@@ -1,0 +1,356 @@
+{
+  "about": "Per-recipe parts of each installable applet package. site-content/scripts/applet-packages.mjs turns every recipe into a bridgit-template/1 definition (runtime.adapter android.package.v1) at /recipes/<id>/applet.json. A blank's paths are JSON pointers into the recipe's start request; each is replaced by {\"$input\": blank}. A blank with optional:true has no default and is not required. card is the package's ui.card (title comes from the recipe); tables become processing.tables; flows become processing.flows; set lists {path, value} pairs that replace a value in the start request for the package only (a rule's do that starts a package flow); summary, when set, replaces the recipe's summary in the package.",
+  "packages": {
+    "pet-monitor": {
+      "version": "3.1.2",
+      "summary": "A photo-based activity tally with explicit gaps, a dinner check, and an offline card.",
+      "blanks": {
+        "camera": {
+          "schema": {"type": "string", "enum": ["rear", "front"]},
+          "default": "rear",
+          "label": "Camera",
+          "help": "The phone camera that faces the pet's spot and its bowl.",
+          "paths": ["/camera"]
+        },
+        "interval_s": {
+          "schema": {"type": "integer", "minimum": 30, "maximum": 3600},
+          "default": 30,
+          "label": "Seconds between photos",
+          "help": "30 to 3600. Longer means fewer paid checks.",
+          "paths": ["/interval_s"]
+        },
+        "max_paid_per_hour": {
+          "schema": {"type": "integer", "minimum": 1, "maximum": 60},
+          "default": 10,
+          "label": "Paid photo checks an hour, at most",
+          "help": "Unchanged pictures reuse the last answer for free.",
+          "paths": ["/max_paid_per_hour"]
+        }
+      },
+      "set": [{"path": "/rules/0/do", "value": {"flow": {"$flow": "dinner"}}}],
+      "flows": [
+        {
+          "id": "dinner",
+          "name": "Dinner check",
+          "trigger": {"type": "called"},
+          "max_paid_per_day": 10,
+          "steps": [
+            {"id": "shot", "type": "photo", "camera": {"$input": "camera"}},
+            {
+              "id": "look",
+              "type": "ask_model",
+              "model": "clef",
+              "photo": {"$step": "shot.photo"},
+              "questions": {
+                "bowl": {
+                  "type": "choice",
+                  "instructions": "Look only at the pet's food bowl.",
+                  "criteria": {
+                    "full": "The bowl is clearly full or nearly full.",
+                    "eaten": "The bowl is empty or clearly eaten from.",
+                    "not_visible": "No food bowl can be seen."
+                  }
+                }
+              }
+            },
+            {
+              "type": "notice",
+              "only_if": {"step": "look.answers.bowl", "is": "full"},
+              "title": "No meal yet",
+              "text": [{"$trigger": "message"}, " The bowl still looks full."]
+            },
+            {
+              "type": "notice",
+              "only_if": {"step": "look.answers.bowl", "is": "eaten"},
+              "title": "Bowl looks eaten from",
+              "text": "No meal was seen on camera, but the bowl looks eaten from. It may have eaten out of view."
+            },
+            {
+              "type": "notice",
+              "only_if": {"step": "look.answers.bowl", "is": "not_visible"},
+              "title": "Can't see the bowl",
+              "text": "No meal seen, and the bowl isn't in the picture. Point the camera at it to check."
+            }
+          ]
+        },
+        {
+          "id": "review",
+          "name": "Check pet activity",
+          "trigger": {"type": "called"},
+          "max_paid_per_day": 10,
+          "steps": [
+            {"id": "shot", "type": "photo", "camera": {"$input": "camera"}},
+            {
+              "id": "classify",
+              "type": "ask_model",
+              "model": "clef",
+              "photo": {"$step": "shot.photo"},
+              "questions": {
+                "activity": {
+                  "type": "choice",
+                  "instructions": "Classify the visible pet activity in this photo. Choose unclear when there is no visible animal or its activity is uncertain. Describe visible behavior only.",
+                  "criteria": {
+                    "resting": "An animal is lying still.",
+                    "eating": "An animal visibly eats at a bowl.",
+                    "drinking": "An animal visibly drinks at a bowl.",
+                    "other": "Visible activity fits none of those.",
+                    "unclear": "Absent, occluded or uncertain.",
+                    "playing": "Visible play with an object, person or another animal.",
+                    "moving": "Standing, walking or running."
+                  }
+                }
+              }
+            },
+            {
+              "id": "save",
+              "type": "record",
+              "table": "checks",
+              "row": {"activity": {"$step": "classify.answers.activity"}}
+            },
+            {
+              "type": "notice",
+              "title": "Pet activity",
+              "text": ["Observed activity: ", {"$step": "classify.answers.activity"}]
+            }
+          ]
+        }
+      ],
+      "card": {
+        "sources": {
+          "activity": {"watch": {"$watch": "main"}, "read": "tally"},
+          "last_check": {"runs": "workflow", "step": "look"},
+          "owner_checks": {"table": "checks", "limit": 10}
+        },
+        "fresh_s": 120,
+        "states": {"empty": "No visible activity samples yet. Gaps and absence are unknown."},
+        "pieces": [
+          {"type": "header", "eyebrow": "Bridgit applet", "text": "A little window into your pet's day."},
+          {
+            "type": "metrics",
+            "items": [
+              {
+                "label": "Observed minutes",
+                "value": {"$source": "activity.today.watched_minutes"},
+                "format": "minutes"
+              },
+              {"label": "Readings", "value": {"$source": "activity.today.checks"}, "format": "number"},
+              {
+                "label": "Bowl at last check",
+                "value": {"$source": "last_check.answers.bowl"},
+                "format": "words",
+                "words": {"full": "Full", "eaten": "Eaten from", "not_visible": "Not in view"},
+                "empty": "Not checked"
+              }
+            ]
+          },
+          {
+            "type": "table",
+            "rows": {"$source": "activity.today.labels"},
+            "columns": [
+              {"key": "$key", "label": "Activity"},
+              {"key": "episodes", "label": "Episodes", "format": "number"},
+              {"key": "minutes", "label": "Minutes", "format": "number"}
+            ],
+            "empty": "Nothing counted yet today."
+          },
+          {
+            "type": "timeline",
+            "items": {"$source": "activity.episodes"},
+            "time": "start",
+            "label": "label",
+            "detail": "minutes",
+            "limit": 5,
+            "empty": "No episodes yet. Missing coverage is unknown."
+          },
+          {
+            "type": "note",
+            "text": "Sampled observations, not continuous coverage. Gaps and absence are unknown."
+          },
+          {
+            "type": "timeline",
+            "items": {"$source": "owner_checks.items"},
+            "time": "at",
+            "label": "activity",
+            "label_words": {
+              "resting": "Resting",
+              "eating": "Eating",
+              "drinking": "Drinking",
+              "playing": "Playing",
+              "moving": "Moving",
+              "other": "Other activity",
+              "unclear": "Unclear"
+            },
+            "limit": 10,
+            "empty": "No owner checks yet."
+          },
+          {
+            "type": "buttons",
+            "items": [
+              {"label": "Check pet activity", "do": {"flow": {"$flow": "review"}}},
+              {"label": "Check bowl now", "style": "primary", "do": {"flow": {"$flow": "dinner"}}},
+              {"label": "Refresh", "do": {"refresh": true}},
+              {"label": "Pause", "do": {"pause_applet": true}}
+            ]
+          }
+        ]
+      },
+      "adapter": "bridgit.package.v1",
+      "tables": [
+        {
+          "id": "checks",
+          "label": "Owner checks",
+          "keep_days": 30,
+          "max_rows": 500,
+          "share_with_installer": false,
+          "columns": {
+            "activity": {
+              "type": "choice",
+              "options": ["resting", "eating", "drinking", "other", "unclear", "playing", "moving"]
+            }
+          }
+        }
+      ],
+      "remote": [
+        "The scheduled activity watch and owner-started checks send camera photos and package questions to Clef for paid classification."
+      ],
+      "migration": {
+        "strategy": "explicit_owner_opt_in",
+        "from": "3.1.1",
+        "rules": [],
+        "rollback": "Reinstall an earlier approved revision."
+      },
+      "budget": {"day_usd": 1, "month_usd": 10},
+      "data_policy": {
+        "backend_default": "device_only",
+        "scope": ["device_id", "applet_instance_id"],
+        "device_only": {
+          "server_registration": false,
+          "uploads": false,
+          "remote_models": true,
+          "derived_telemetry": false,
+          "queue": false
+        },
+        "enable": "Approve the camera and hosted decisions before starting the watch or a foreground check.",
+        "disable": "Pause the applet or revoke hosted decisions to stop checks.",
+        "sharing": {"role": "none"},
+        "retention": {
+          "local": "Foreground checks retain the activity label for up to 30 days and 500 rows. The review flow does not keep its photo. The scheduled tally covers observed samples and gaps.",
+          "server": "Clef receives the image and questions. Bridgit logs service usage and cost metadata."
+        },
+        "execution": "A scheduled watch tallies observations on supported hosts. The owner can also run one photo check from the card."
+      }
+    },
+    "receipt-scanner": {
+      "version": "2.0.1",
+      "migration": {"strategy":"explicit_owner_opt_in","from":"2.0.0","rules":[],"rollback":"Reinstall an earlier approved revision."},
+      "blanks": {
+        "gallery_id": {"schema": {"type": "integer", "minimum": 1}, "optional": true, "label": "Receipt photo", "help": "The gallery id of the receipt photo to read. Leave empty to choose one later.", "paths": []}
+      },
+      "tables": [{"id":"receipts","label":"Receipts","columns":{"text":{"type":"text","label":"Receipt text"},"gallery_id":{"type":"integer","label":"Gallery photo"}},"keep_days":365,"max_rows":2000,"share_with_installer":false}],
+      "card": {
+        "sources": {"scan":{"reply":"scan"},"receipts":{"table":"receipts","limit":20}},
+        "states": {"empty":"Select an authorized receipt image before reading."},
+        "pieces": [
+          {"type":"header","eyebrow":"Bridgit applet","text":"Turn a receipt into a draft you can check."},
+          {"type":"buttons","items":[{"label":"Read selected receipt","style":"primary","into":"scan","do":{"method":"POST","path":"/v1/ocr","body":{"gallery_id":{"$input":"gallery_id"}}}}]},
+          {"type":"draft","id":"receipt","label":"Receipt text","value":{"$source":"scan.text"},"max":1024},
+          {"type":"buttons","items":[{"label":"Save receipt","confirm":"Save this receipt on the phone?","do":{"record":"receipts","row":{"text":{"$draft":"receipt"},"gallery_id":{"$input":"gallery_id"}}}}]},
+          {"type":"table","rows":{"$source":"receipts.items"},"columns":[{"key":"at","label":"Saved","format":"time"},{"key":"text","label":"Receipt"}],"limit":20,"empty":"No saved receipts yet.","owner_delete":true},
+          {"type":"note","text":"Check the amount, date and currency before saving. Saved receipts stay on this phone."}
+        ]
+      }
+    },
+    "voice-notebook": {
+      "version": "2.0.0",
+      "blanks": {},
+      "tables": [{"id":"notes","label":"Notes","columns":{"text":{"type":"text","label":"Note"},"source_at":{"type":"time","label":"Recorded at"}},"keep_days":365,"max_rows":1000,"share_with_installer":false}],
+      "card": {
+        "sources": {"clip":{"reply":"clip"},"notes":{"table":"notes","limit":20}},
+        "states": {"empty":"No recording yet. Tap only when ready to speak."},
+        "pieces": [
+          {"type":"header","eyebrow":"Bridgit applet","text":"Catch a thought before it slips away."},
+          {"type":"buttons","items":[{"label":"Record 10 seconds","style":"primary","into":"clip","do":{"method":"POST","path":"/v1/mic/record","body":{"duration_seconds":10,"transcribe":true,"return_audio":false}}}]},
+          {"type":"draft","id":"note","label":"Note","value":{"$source":"clip.transcript"},"max":1024},
+          {"type":"buttons","items":[{"label":"Save note","confirm":"Save this note on the phone?","do":{"record":"notes","row":{"text":{"$draft":"note"},"source_at":{"$source":"clip.recorded_at"}}}}]},
+          {"type":"timeline","items":{"$source":"notes.items"},"time":"at","label":"text","limit":10,"empty":"No saved notes yet."},
+          {"type":"note","text":"Records ten seconds only when you tap. Review the words before saving. Saved notes stay on this phone."}
+        ]
+      }
+    },
+    "room-change-watcher": {
+      "version": "2.0.0",
+      "blanks": {
+        "camera": {"schema": {"type": "string", "enum": ["rear", "front"]}, "default": "rear", "label": "Camera", "help": "The phone camera that faces the room.", "paths": ["/camera"]},
+        "interval_s": {"schema": {"type": "integer", "minimum": 30, "maximum": 3600}, "default": 30, "label": "Seconds between checks", "help": "30 to 3600. Every check is free: it compares pictures on the phone.", "paths": ["/interval_s"]},
+        "sensitivity": {"schema": {"type": "string", "enum": ["low", "normal", "high"]}, "default": "normal", "label": "How big a change counts", "help": "Low ignores small changes like shadows; high notices more.", "paths": ["/local/sensitivity"]}
+      },
+      "card": {
+        "sources": {"status":{"watch":{"$watch":"main"},"read":"status"}},
+        "fresh_s": 120,
+        "states": {"empty":"No baseline or checks yet. Nothing observed is different from no change."},
+        "pieces": [
+          {"type":"header","eyebrow":"Bridgit applet","text":"See when the room's picture changes."},
+          {"type":"metrics","items":[{"label":"Checks","value":{"$source":"status.checks"},"format":"number"},{"label":"Change matches","value":{"$source":"status.matches"},"format":"number"}]},
+          {"type":"timeline","items":{"$source":"status.recent_checks"},"time":"at","label":"matched","label_format":"words","label_words":{"true":"Image changed","false":"No change"},"limit":10,"empty":"No checks yet."},
+          {"type":"note","text":"Image change is not person or danger detection. Changes can be light or shadows."},
+          {"type":"buttons","items":[{"label":"Pause","do":{"pause_applet":true}}]}
+        ]
+      }
+    },
+    "daily-briefing-panel": {
+      "version": "2.0.0",
+      "drop": ["/manifest/actions/0/when/count"],
+      "blanks": {
+        "time": {"schema": {"type": "string", "enum": ["06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00"]}, "default": "08:00", "label": "Reminder time", "help": "When the daily reminder appears.", "paths": ["/manifest/actions/0/when/daily/0"]},
+        "timezone": {"schema": {"type": "string", "maxLength": 64, "format": "timezone"}, "default": "Europe/Warsaw", "label": "Time zone", "help": "For example Europe/Warsaw or America/New_York.", "paths": ["/manifest/timezone"]}
+      },
+      "card": {
+        "sources": {"weather":{"call":{"method":"GET","path":"/v1/weather","query":{"hours":3}},"every_s":900}},
+        "fresh_s": 3600,
+        "states": {"empty":"No forecast fetched. Weather requires internet and owner permission."},
+        "pieces": [
+          {"type":"header","eyebrow":"Bridgit applet","text":"A quick look at the day ahead."},
+          {"type":"text","text":{"$source":"weather.now.summary"}},
+          {"type":"metrics","items":[{"label":"Temperature","value":{"$source":"weather.now.temperature_c"},"format":"celsius"},{"label":"Wind","value":{"$source":"weather.now.wind_speed_mps"},"format":"number","unit":"m/s"},{"label":"Low today","value":{"$source":"weather.next_24_hours.min_temperature_c"},"format":"celsius"},{"label":"High today","value":{"$source":"weather.next_24_hours.max_temperature_c"},"format":"celsius"},{"label":"Rain, next 24 h","value":{"$source":"weather.next_24_hours.precipitation_mm"},"format":"number","unit":"mm"}]},
+          {"type":"note","text":["Weather needs internet. The daily reminder is managed separately from this card. ",{"$source":"weather.attribution"}]},
+          {"type":"buttons","items":[{"label":"Refresh","style":"primary","do":{"refresh":true}}]}
+        ]
+      }
+    },
+    "external-device-dashboard": {
+      "version": "2.0.0",
+      "blanks": {},
+      "card": {
+        "sources": {"lan":{"call":{"method":"GET","path":"/v1/lan/devices"}}},
+        "states": {"empty":"No devices enrolled for this agent. Listing does not probe the network."},
+        "pieces": [
+          {"type":"header","eyebrow":"Bridgit applet","text":"Your shared devices at a glance."},
+          {"type":"devices","items":{"$source":"lan.devices"},"name":"name","kind":"adapter","availability":"availability","checked_at":"verified_at","empty":"No devices enrolled yet."},
+          {"type":"note","text":"Listing does not probe devices. No hardware is controlled here."},
+          {"type":"buttons","items":[{"label":"Refresh","style":"primary","do":{"refresh":true}}]}
+        ]
+      }
+    },
+    "situation-counter": {
+      "version": "2.0.0",
+      "blanks": {
+        "situation": {"schema": {"type": "string", "minLength": 1, "maxLength": 300}, "default": "pot_boiling_over", "label": "What to count", "help": "A library id: dog_licking_itself, dog_scratching, dog_on_couch, cat_on_counter, pot_boiling_over, smoke_in_room, water_on_floor, sunlight_in_room, lights_on, person_in_view. Or describe it in your own words, with spaces (\"the cat is on the kitchen counter\").", "paths": ["/situation"]},
+        "camera": {"schema": {"type": "string", "enum": ["rear", "front"]}, "default": "rear", "label": "Camera", "help": "The phone camera that faces what to watch.", "paths": ["/camera"]},
+        "interval_s": {"schema": {"type": "integer", "minimum": 10, "maximum": 3600}, "default": 20, "label": "Seconds between checks", "help": "10 to 3600. Unchanged pictures reuse the last answer for free; at most 30 paid checks an hour.", "paths": ["/interval_s"]}
+      },
+      "card": {
+        "sources": {"count":{"watch":{"$watch":"main"},"read":"tally"}},
+        "fresh_s": 120,
+        "states": {"empty":"No checks yet today. Not seen is not the same as didn't happen."},
+        "pieces": [
+          {"type":"header","eyebrow":"Bridgit applet","text":"Counts how often the camera sees one situation today."},
+          {"type":"metrics","items":[{"label":"Readings","value":{"$source":"count.today.checks"},"format":"number"},{"label":"Watched minutes","value":{"$source":"count.today.watched_minutes"},"format":"minutes"}]},
+          {"type":"table","rows":{"$source":"count.today.labels"},"columns":[{"key":"$key","label":"Situation"},{"key":"episodes","label":"Times seen today","format":"number"},{"key":"minutes","label":"Minutes","format":"number"}],"empty":"Not seen yet today."},
+          {"type":"timeline","items":{"$source":"count.episodes"},"time":"start","label":"label","detail":"minutes","limit":5,"empty":"No episodes yet."},
+          {"type":"note","text":"Sampled photos judged by a model. Gaps and things out of frame are unknown, and it is not a safety alarm."},
+          {"type":"buttons","items":[{"label":"Pause","do":{"pause_applet":true}}]}
+        ]
+      }
+    }
+  }
+}

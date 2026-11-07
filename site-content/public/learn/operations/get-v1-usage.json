@@ -1,0 +1,50 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "App foreground time from Android usage buckets (maximum seven days)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "usage",
+  "query": [
+   {
+    "name": "since",
+    "description": "ISO-8601 UTC",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "until",
+    "description": "ISO-8601 UTC",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/usage",
+  "idempotent": false,
+  "path": "/v1/usage",
+  "capability": "usage",
+  "returns": "App foreground time from Android usage buckets (maximum seven days)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "until": {
+     "description": "ISO-8601 UTC",
+     "type": "string"
+    },
+    "since": {
+     "description": "ISO-8601 UTC",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

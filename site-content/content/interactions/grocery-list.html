@@ -1,0 +1,77 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f7ef;color:#1d2a1a;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 120px}
+h1{font-size:24px;margin:0 0 2px}
+.sub{color:#5f6f5a;margin:0 0 14px}
+.sec{margin:16px 0 6px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4f7a3a;display:flex;gap:6px;align-items:center}
+ul{list-style:none;margin:0;padding:0;background:#fff;border-radius:14px;box-shadow:0 1px 0 #dbe4d3;overflow:hidden}
+li{border-top:1px solid #eef2ea}
+li:first-child{border-top:0}
+label{display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:52px;cursor:pointer}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:26px;height:26px;border:2px solid #9bb38c;border-radius:8px;margin:0;flex:none;display:grid;place-content:center;background:#fff}
+input[type=checkbox]:checked{background:#4f7a3a;border-color:#4f7a3a}
+input[type=checkbox]:checked::after{content:"";width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.t{flex:1}
+.t small{display:block;color:#7c8a77;font-size:13px}
+li.have .t{color:#9aa596;text-decoration:line-through}
+.qty{font-size:14px;color:#5f6f5a}
+.add{display:flex;gap:8px;margin-top:12px}
+.add input{flex:1;font:inherit;padding:12px 14px;border-radius:12px;border:1px solid #c9d6c0;background:#fff;min-width:0}
+.add button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:0 16px;background:#dfe9d6;color:#2f4a22}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fbfdf9;border-top:1px solid #dbe4d3;padding:12px 16px 12px}
+.bar .in{max-width:640px;margin:0 auto;display:flex;gap:12px;align-items:center}
+.bar p{flex:1;margin:0;font-size:14px;color:#5f6f5a}
+.bar b{color:#1d2a1a}
+.go{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px 18px;min-height:48px;background:#4f7a3a;color:#fff}
+</style>
+<div class="wrap">
+  <h1>Saturday shop</h1>
+  <p class="sub">For the 3 dinners you planned. Tick what you <b>already have</b>; I'll order the rest for 10:00–11:00.</p>
+  <div id="list"></div>
+  <div class="add"><input id="addi" maxlength="60" placeholder="Add something else" enterkeyhint="done"><button id="addb">Add</button></div>
+</div>
+<div class="bar"><div class="in"><p id="sum"></p><button class="go" id="go">Order the rest</button></div></div>
+<script>
+var data=[
+ ['🥬 Produce',[['spinach','Baby spinach','200 g'],['lemons','Lemons','3'],['garlic','Garlic','1 bulb'],['tomatoes','Cherry tomatoes','250 g'],['avocado','Avocados','2, ripe']]],
+ ['🧀 Dairy & eggs',[['eggs','Free-range eggs','6'],['feta','Feta','200 g'],['yogurt','Greek yogurt','500 g']]],
+ ['🍝 Pantry',[['orzo','Orzo','500 g'],['chickpeas','Chickpeas','2 tins'],['olive_oil','Olive oil','only if low']]],
+ ['🐟 Fish',[['salmon','Salmon fillets','2 × 140 g']]]
+],added=[],sent=false,list=document.getElementById('list');
+function render(){
+  list.innerHTML='';
+  data.forEach(function(sec){
+    var h=document.createElement('div');h.className='sec';h.textContent=sec[0];list.appendChild(h);
+    var ul=document.createElement('ul');
+    sec[1].forEach(function(it){
+      var li=document.createElement('li'),l=document.createElement('label'),c=document.createElement('input'),t=document.createElement('span'),q=document.createElement('span');
+      c.type='checkbox';c.value=it[0];c.onchange=function(){li.classList.toggle('have',c.checked);sum()};
+      t.className='t';t.textContent=it[1];q.className='qty';q.textContent=it[2];
+      l.append(c,t,q);li.appendChild(l);ul.appendChild(li);
+    });
+    list.appendChild(ul);
+  });
+  sum();
+}
+function sum(){
+  var all=document.querySelectorAll('input[type=checkbox]'),have=0;all.forEach(function(c){if(c.checked)have++});
+  document.getElementById('sum').innerHTML='<b>'+(all.length-have)+'</b> to order · '+have+' at home';
+}
+function addItem(){
+  var i=document.getElementById('addi'),v=i.value.trim();if(!v)return;
+  var id='extra_'+(added.length+1);added.push(v);
+  if(data[data.length-1][0]!=='➕ Added by you')data.push(['➕ Added by you',[]]);
+  data[data.length-1][1].push([id,v,'']);
+  var checked={};document.querySelectorAll('input:checked').forEach(function(c){checked[c.value]=1});
+  render();document.querySelectorAll('input[type=checkbox]').forEach(function(c){if(checked[c.value]){c.checked=true;c.closest('li').classList.add('have')}});sum();i.value='';
+}
+document.getElementById('addb').onclick=addItem;
+document.getElementById('addi').onkeydown=function(e){if(e.key==='Enter')addItem()};
+document.getElementById('go').onclick=function(){
+  if(sent)return;sent=true;var have=[],need=[];
+  document.querySelectorAll('input[type=checkbox]').forEach(function(c){if(c.value.indexOf('extra_')===0)return;(c.checked?have:need).push(c.value)});
+  (window.Bridgit||window.Bridget).respond(JSON.stringify({order:need,already_have:have,added:added,slot:'10:00-11:00'}));
+};
+render();
+</script>

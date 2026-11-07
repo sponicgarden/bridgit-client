@@ -1,0 +1,50 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Save a row in this applet principal's own declared table. Use typed columns or a json column with a description; no undeclared keys or blobs",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applet_tables_rows_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "row",
+   "description": "Declared column ids to values; json values are objects/arrays, never encoded strings",
+   "type": "object",
+   "required": true
+  }],
+  "example": "POST /v1/applet/tables/results/rows {\"row\":{\"payload\":{\"score\":3}}}",
+  "idempotent": false,
+  "path": "/v1/applet/tables/{table}/rows",
+  "capability": "applet_data",
+  "returns": "saved row with id, at, by and columns",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "row": {
+     "description": "Declared column ids to values; json values are objects/arrays, never encoded strings",
+     "type": "object"
+    },
+    "table": {
+     "description": "The table in /v1/applet/tables/{table}/rows",
+     "type": "string"
+    }
+   },
+   "required": [
+    "table",
+    "row"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "not_found",
+   "quota_exceeded",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

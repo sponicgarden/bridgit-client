@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your running City tour, if the owner started one with you",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "tour_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/tour",
+  "idempotent": false,
+  "path": "/v1/tour",
+  "capability": "tour",
+  "returns": "tour{tour_id, kinds, interval_s, started_at, ticks, last_tick_at, distance_m, photos_sent, brief} or null",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,97 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "One gallery image, sized for you",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "gallery_photo",
+  "query": [
+   {
+    "name": "size",
+    "description": "Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "agent",
+     "thumb",
+     "large",
+     "original"
+    ]
+   },
+   {
+    "name": "max_edge_px",
+    "description": "Long edge limit, 64-20000; overrides the preset",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "max_width_px",
+    "description": "Width limit, 64-20000",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "quality",
+    "description": "JPEG quality 40-100",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "raw",
+    "description": "1 = return the image bytes, details in X-Bridgit-* headers",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/gallery/photo/87567?size=agent",
+  "idempotent": false,
+  "path": "/v1/gallery/photo/{id}",
+  "capability": "gallery",
+  "returns": "taken_at, width_px, height_px, format, size_bytes, data_base64",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "max_edge_px": {
+     "description": "Long edge limit, 64-20000; overrides the preset",
+     "type": "integer"
+    },
+    "max_width_px": {
+     "description": "Width limit, 64-20000",
+     "type": "integer"
+    },
+    "size": {
+     "description": "Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original",
+     "type": "string",
+     "enum": [
+      "agent",
+      "thumb",
+      "large",
+      "original"
+     ]
+    },
+    "id": {
+     "description": "The id in /v1/gallery/photo/{id}",
+     "type": "string"
+    },
+    "quality": {
+     "description": "JPEG quality 40-100",
+     "type": "integer"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "capability_disabled",
+   "permission_denied",
+   "photo_not_found",
+   "payload_too_large"
+  ],
+  "requires": null
+ }
+}

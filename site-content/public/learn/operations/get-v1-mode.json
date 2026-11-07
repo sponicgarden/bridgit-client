@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The phone's mode (home, away, night, vacation or one the owner added), since when, who set it, every mode it can be, and the newest changes",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "mode_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/mode",
+  "idempotent": false,
+  "path": "/v1/mode",
+  "capability": "modes",
+  "returns": "mode, since, set_by {type, name}, modes [..], log [{at, from, to, by}] (newest 10)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings (UI-19, ui-spec 5.10): only the sections P1a has. -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="64dp"
+            app:navigationContentDescription="@string/cd_back"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="@string/settings_title" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="2dp"
+                android:paddingBottom="16dp">
+
+                <!-- Later phases add: the Screenshots section,
+                     Log precise locations / Address lookup (Privacy), Files/Feedback channels, the Feedback section and Licences (About). -->
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection" android:paddingTop="4dp">
+                    <include android:id="@+id/maxControl" layout="@layout/settings_switch_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_listener" />
+                    <include android:id="@+id/alwaysOn" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/port" layout="@layout/settings_row" />
+                    <include android:id="@+id/bind" layout="@layout/settings_row" />
+                    <include android:id="@+id/internetCallbacks" layout="@layout/settings_switch_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_privacy" />
+                    <include android:id="@+id/logVisibility" layout="@layout/settings_row" />
+                    <include android:id="@+id/lockscreenText" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/speakUrgent" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/outboundLog" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/remoteView" layout="@layout/settings_switch_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_team" />
+                    <include android:id="@+id/crashReports" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/usageTallies" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/usageWhat" layout="@layout/settings_row" />
+                    <include android:id="@+id/feedbackUpload" layout="@layout/settings_switch_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_security" />
+                    <include android:id="@+id/securityDeviceLock" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/securityAlerts" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/securityBiometric" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/securitySigned" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/securityLearn" layout="@layout/settings_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_captures" />
+                    <include android:id="@+id/capturesAgentFiles" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/capturesAgentUpload" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/capturesKeep" layout="@layout/settings_row" />
+                    <include android:id="@+id/capturesShareAll" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/capturesOwnerFiles" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/capturesOwnerUpload" layout="@layout/settings_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_log" />
+                    <include android:id="@+id/keep" layout="@layout/settings_row" />
+                    <include android:id="@+id/export" layout="@layout/settings_row" />
+                    <include android:id="@+id/clear" layout="@layout/settings_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_notifications" />
+                    <include android:id="@+id/notifListener" layout="@layout/settings_row" />
+                    <include android:id="@+id/notifCapture" layout="@layout/settings_row" />
+                    <include android:id="@+id/notifQuestions" layout="@layout/settings_row" />
+                    <include android:id="@+id/notifNotices" layout="@layout/settings_row" />
+                    <include android:id="@+id/openOnArrival" layout="@layout/settings_switch_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_alerts" />
+                    <include android:id="@+id/alertFrequency" layout="@layout/settings_row" />
+                    <include android:id="@+id/alertRecipient" layout="@layout/settings_row" />
+                    <include android:id="@+id/alertTest" layout="@layout/settings_row" />
+                    <include android:id="@+id/alertWhat" layout="@layout/settings_row" />
+                </LinearLayout>
+
+                <!-- Own AI keys: one row per OwnKeys.PROVIDERS entry, added in code. -->
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_own_keys" />
+                    <include android:id="@+id/ownKeysWhat" layout="@layout/settings_row" />
+                    <LinearLayout
+                        android:id="@+id/ownKeys"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_appearance" />
+                    <include android:id="@+id/theme" layout="@layout/settings_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_about" />
+                    <include android:id="@+id/version" layout="@layout/settings_row" />
+                    <include android:id="@+id/checkUpdates" layout="@layout/settings_row" />
+                    <include android:id="@+id/autoUpdateOffers" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/commit" layout="@layout/settings_row" />
+                    <include android:id="@+id/cert" layout="@layout/settings_row" />
+                    <include android:id="@+id/spec" layout="@layout/settings_row" />
+                    <include android:id="@+id/privacyPolicy" layout="@layout/settings_row" />
+                    <include android:id="@+id/terms" layout="@layout/settings_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/settings_reset" />
+                    <include android:id="@+id/deleteAll" layout="@layout/settings_row" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

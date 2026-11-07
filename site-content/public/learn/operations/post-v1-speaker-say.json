@@ -1,0 +1,109 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read text aloud on the phone (its own text-to-speech)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "speaker_say",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "text",
+    "description": "Up to 4,000 characters",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "language",
+    "description": "e.g. en-GB, de-DE",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "rate",
+    "description": "0.5-2, default 1",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "pitch",
+    "description": "0.5-2, default 1",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "replace",
+    "description": "after_current (default), now, or queue",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "tour_id",
+    "description": "Narration for your City tour",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "urgent",
+    "description": "Jump the queue",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/speaker/say {\"text\":\"On your left is the old town hall, built in 1360.\",\"tour_id\":\"t123\"}",
+  "idempotent": true,
+  "path": "/v1/speaker/say",
+  "capability": "speaker",
+  "returns": "play_id, position, status (playing, queued, or silenced: the phone is on silent, Do Not Disturb or in a call, so it won't be heard)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "tour_id": {
+     "description": "Narration for your City tour",
+     "type": "string"
+    },
+    "rate": {
+     "description": "0.5-2, default 1",
+     "type": "number"
+    },
+    "replace": {
+     "description": "after_current (default), now, or queue",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "language": {
+     "description": "e.g. en-GB, de-DE",
+     "type": "string"
+    },
+    "text": {
+     "description": "Up to 4,000 characters",
+     "type": "string"
+    },
+    "pitch": {
+     "description": "0.5-2, default 1",
+     "type": "number"
+    },
+    "urgent": {
+     "description": "Jump the queue",
+     "type": "boolean"
+    }
+   },
+   "required": ["text"]
+  },
+  "errors": [
+   "capability_disabled",
+   "invalid_parameter",
+   "rate_limited",
+   "not_found"
+  ],
+  "requires": null
+ }
+}

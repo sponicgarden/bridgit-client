@@ -1,0 +1,53 @@
+{
+  "application": "a-sorta-fairytale-about-me",
+  "observations": [
+    {
+      "practice": "visible-review",
+      "finding": "Native capture review combines these controls for both media types.",
+      "basis": "implementation",
+      "source": "app/src/main/java/cc/bridgit/app/ui/camera/CaptureReviewActivity.kt"
+    },
+    {
+      "practice": "capture-when-ready",
+      "finding": "Timed captures made the photographer wait even when ready. The voice option needs on-device recognition and microphone access.",
+      "basis": "implementation",
+      "source": "app/src/main/java/cc/bridgit/app/ui/camera/CaptureReviewActivity.kt"
+    },
+    {
+      "practice": "frame-guidance",
+      "finding": "Instructions travel with the capture request into the native viewfinder.",
+      "basis": "implementation",
+      "source": "app/src/main/java/cc/bridgit/app/capture/VisibleCapture.kt"
+    },
+    {
+      "practice": "choose-before-work",
+      "finding": "The capture flow uses the chosen style and accepted inputs to start one generation run.",
+      "basis": "flow-test",
+      "source": "applets/a-sorta-fairytale-about-me/flow.test.mjs"
+    },
+    {
+      "practice": "prepare-before-presenting",
+      "finding": "The flow test checks that speech and artwork requests both wait for reveal.",
+      "basis": "flow-test",
+      "source": "applets/a-sorta-fairytale-about-me/flow.test.mjs"
+    },
+    {
+      "practice": "stop-on-close",
+      "finding": "The portal teardown calls the same cancellation path as Stop.",
+      "basis": "implementation",
+      "source": "app/src/main/java/cc/bridgit/app/ui/applets/AppletPortalActivity.kt"
+    },
+    {
+      "practice": "recover-save-failures",
+      "finding": "A failed table write leaves the result readable and produces one generation call.",
+      "basis": "flow-test",
+      "source": "applets/a-sorta-fairytale-about-me/flow.test.mjs"
+    },
+    {
+      "practice": "one-primary-action",
+      "finding": "The four-step flow test checks that each completed capture gives way to the next action and an early reveal tap immediately shows progress while work continues.",
+      "basis": "flow-test",
+      "source": "applets/a-sorta-fairytale-about-me/flow.test.mjs"
+    }
+  ]
+}

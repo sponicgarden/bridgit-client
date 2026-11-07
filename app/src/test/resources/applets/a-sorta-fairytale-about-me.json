@@ -1,0 +1,110 @@
+{
+ "format": "bridgit-template/1",
+ "id": "a-sorta-fairytale-about-me",
+ "version": "1.1.0",
+ "kind": "applet",
+ "name": "A Sorta Fairytale About Me",
+ "summary": "Record and review a video of your surroundings and a portrait. Nearby places and air quality set the scene for a kind fairy tale or wild fictional life story, narrated by Aura 1 after a short musical intro.",
+ "runtime": {
+  "adapter": "android.package.v1",
+  "applet_key": "a-sorta-fairytale-about-me",
+  "supports_dynamic_execution": false
+ },
+ "budget": {
+  "limits": [
+   {
+    "id": "day",
+    "usd": 2,
+    "per": "day"
+   },
+   {
+    "id": "month",
+    "usd": 10,
+    "per": "month"
+   }
+  ]
+ },
+ "config_schema": {
+  "type": "object",
+  "properties": {},
+  "required": [],
+  "additionalProperties": false
+ },
+ "defaults": {},
+ "processing": {
+  "tables": [
+   {
+    "id": "stories",
+    "label": "My stories",
+    "keep_days": 365,
+    "max_rows": 200,
+    "columns": {
+     "result": {
+      "type": "json",
+      "label": "Story",
+      "description": "One completed story object: title, narration (spoken story text), and mode kind or wild. No coordinates, provider place data, photos or video."
+     },
+     "status": {
+      "type": "choice",
+      "label": "Status",
+      "options": [
+       "done",
+       "failed"
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "permissions": {
+  "required": [
+   "camera",
+   "video",
+   "location",
+   "judgment",
+   "speaker",
+   "interactions",
+   "applet_data",
+   "captures"
+  ],
+  "optional": [],
+  "remote": [],
+  "automatic_grants": false
+ },
+ "ui": {
+  "inputs": {},
+  "card": {
+   "title": "A Sorta Fairytale About Me",
+   "asset": "card.html",
+   "data": {}
+  }
+ },
+ "assets": {
+  "card.html": {
+   "media_type": "text/html",
+   "text": "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>A Sorta Fairytale About Me</title>\n<style>\n:root{color-scheme:light dark;--bg:#f8f2e7;--ink:#30293c;--muted:#73697d;--card:#fffdf7;--accent:#744b79;--line:#ded1d8;--ok:#397c61;--error:#b04454}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,sans-serif}main{max-width:700px;margin:auto;padding:20px 18px 70px}h1{font:normal clamp(31px,7vw,45px)/1.12 Georgia,serif;margin:18px 0 24px}h2{font:normal 24px Georgia;margin:0 0 10px}p{margin:8px 0 16px}.eyebrow,.hint{color:var(--muted);font-size:15px}.panel{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:20px;margin:16px 0}.step{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:white;font:16px system-ui;margin-right:8px}button,select{font:inherit;border:1px solid var(--line);border-radius:13px;padding:14px 18px;min-height:52px;background:var(--card);color:var(--ink)}button{cursor:pointer;touch-action:manipulation;transition:transform .1s,background .15s,box-shadow .15s}button:hover:not(:disabled){box-shadow:0 3px 12px #0002}button:active:not(:disabled){transform:scale(.97);filter:brightness(.88)}button:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:3px}button:disabled{opacity:.55;cursor:wait}.primary{background:var(--accent);border-color:var(--accent);color:#fff}.danger{color:var(--error)}.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1}.full{width:100%}.preview{width:100%;max-height:260px;object-fit:contain;border-radius:12px;background:#201b28;margin:12px 0}.review{margin-top:12px}.ready{color:var(--ok);font-weight:600}.progress{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 3px 15px #0001;padding:12px 18px}.progress-inner{max-width:664px;margin:auto;display:flex;gap:12px;align-items:center}.progress-copy{flex:1}.progress strong{display:block;font-size:16px}.progress small{color:var(--muted)}.spinner{display:inline-block;width:21px;height:21px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;flex:none;animation:spin .9s linear infinite}.spinner.idle{animation:none;border:0;width:12px;height:12px;background:var(--ok)}[hidden]{display:none!important}.error{color:var(--error)}.jobs{display:grid;gap:10px;margin:18px 0}.job{padding:12px;border:1px solid var(--line);border-radius:12px}.job strong{display:block}.job span{color:var(--muted);font-size:15px}#story{white-space:pre-wrap;font:21px/1.75 Georgia,serif}summary{cursor:pointer;padding:16px 0}#history button{display:block;width:100%;text-align:left;margin:8px 0}button[aria-busy=true]:before{content:'';display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;margin-right:8px;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}@media(prefers-color-scheme:dark){:root{--bg:#211d2b;--ink:#f7eddd;--muted:#c0b2ca;--card:#2e273b;--accent:#bd8bc3;--line:#594a64;--ok:#94d7b4;--error:#ffabb4}.primary{color:#231c2c}}@media(prefers-reduced-motion:reduce){*{animation-duration:2s!important;transition:none!important}}\n</style>\n<div class=\"progress\" role=\"status\" aria-live=\"polite\"><div class=\"progress-inner\"><span id=\"activity\" class=\"spinner idle\" aria-hidden=\"true\"></span><div class=\"progress-copy\"><strong id=\"status\">Start with a video of your surroundings</strong><small id=\"elapsed\" aria-hidden=\"true\">Ready</small></div><button id=\"stop\" class=\"danger\" hidden>Stop</button></div></div>\n<main><div class=\"eyebrow\">A little magic, starring you</div><h1>A Sorta Fairytale About Me</h1>\n<section class=\"panel\"><h2><span class=\"step\">1</span>Your surroundings</h2><p class=\"hint\">Record a slow full circle. You can flip the camera, then review or play the video.</p><button id=\"panorama\" class=\"primary full\">Open video camera</button><p id=\"sceneState\" class=\"ready\"></p><div id=\"videoReview\" class=\"review\" hidden><img id=\"scenePreview\" class=\"preview\" alt=\"Your surroundings video\"><div class=\"row\"><button id=\"playVideo\">▶ Play video</button><button id=\"deleteVideo\" class=\"danger\">Delete video</button></div></div></section>\n<section class=\"panel\"><h2><span class=\"step\">2</span>Your photo</h2><p class=\"hint\">Include as much of yourself as you like. The camera has a five-second timer.</p><button id=\"portrait\" class=\"primary full\">Open photo camera</button><p id=\"portraitState\" class=\"ready\"></p><div id=\"photoReview\" class=\"review\" hidden><img id=\"portraitPreview\" class=\"preview\" alt=\"Your chosen photo\"><button id=\"deletePhoto\" class=\"danger full\">Delete photo</button></div></section>\n<section class=\"panel\"><h2><span class=\"step\">3</span>Your story</h2><label for=\"flavor\" class=\"hint\">Story style</label><select id=\"flavor\" class=\"full\"><option value=\"kind\">Gentle fairytale</option><option value=\"wild\">Wild assumptions</option></select><p id=\"flavorHint\" class=\"hint\">A warm adventure with gentle humor.</p><p id=\"needed\" class=\"hint\">Record your video and take your photo first.</p><button id=\"create\" class=\"primary full\" disabled>Create my fairytale</button></section>\n<section id=\"result\" class=\"panel\" hidden><h2 id=\"storyTitle\"></h2><div class=\"jobs\"><div class=\"job\"><strong>Narration</strong><span id=\"voiceStatus\">Waiting</span></div><div class=\"job\"><strong>Illustration</strong><span id=\"imageStatus\">Waiting</span></div></div><div id=\"story\"></div><button id=\"listen\" class=\"full\">▶ Listen again</button></section><details><summary>My stories</summary><div id=\"history\"></div></details></main>\n<script>\nconst RECIPE=/*RECIPE*/{}/*END RECIPE*/;\n(()=>{'use strict';const $=id=>document.getElementById(id),bridge=window.Bridgit||window.Bridget;let frames=[],video=null,portrait=null,videoCamera='rear',portraitCamera='front',busy=false,generation=0,current=null,speechRun=0,phase='ready',phaseAt=Date.now(),activeButton=null;\nconst sleep=ms=>new Promise(r=>setTimeout(r,ms));\nasync function call(path,body,method,query){const r=await bridge.act({path,method:method||(body?'POST':'GET'),...(body?{body}:{}),...(query?{query}:{})});if(!r.ok){const e=Error(r.body?.message||r.error||'That step could not be completed.');e.code=r.body?.error||r.error;e.status=r.status;throw e;}return r.body;}\nfunction publish(){try{bridge.portal?.setState({phase,phase_started_at:phaseAt,busy,video_ready:frames.length>=2,photo_ready:!!portrait,title:current?.title||null,narration:$('voiceStatus').textContent,illustration:$('imageStatus').textContent});}catch(e){}}\nfunction status(text,error=false){$('status').textContent=text;$('status').className=error?'error':'';phase=text;phaseAt=Date.now();publish();}\nfunction lock(on,button){busy=on;['panorama','portrait','flavor','playVideo','deleteVideo','deletePhoto','listen'].forEach(id=>$(id).disabled=on);$('create').disabled=on||frames.length<2||!portrait;$('stop').hidden=!on;$('activity').className='spinner'+(on?'':' idle');if(activeButton){activeButton.setAttribute?.('aria-busy','false');}activeButton=on&&button?$(button):null;if(activeButton)activeButton.setAttribute?.('aria-busy','true');$('needed').hidden=frames.length>=2&&!!portrait;$('needed').textContent=portrait?'Record your surroundings to continue.':frames.length>=2?'Take your photo to continue.':'Record your video and take your photo first.';publish();}\nsetInterval(()=>{$('elapsed').textContent=busy?'Working · '+Math.floor((Date.now()-phaseAt)/1000)+'s':'Ready';},1000);\nfunction alive(run){if(run!==generation)throw Error('Stopped');}\nfunction failed(e,run){if(run===generation)status(/stopped|cancelled|deleted/i.test(e.message)?e.message:e.message+' Try again.',!/stopped|cancelled|deleted/i.test(e.message));}\nasync function thumbnail(id,target){try{const r=await call('/v1/captures/'+id,null,'GET',{max_edge_px:240});if(r.data_base64&&(target==='scenePreview'?frames[0]===id:portrait===id))$(target).src='data:image/jpeg;base64,'+r.data_base64;}catch(e){}}\n$('panorama').onclick=async()=>{if(busy)return;const run=++generation;lock(true,'panorama');status('Opening the video camera…');const previous=[...frames,...(video?[video]:[])];try{const r=await call('/v1/camera/video',{camera:videoCamera,duration_seconds:20,countdown_seconds:3,audio:false,resolution:'720p',extract_frames:6,viewfinder:true});alive(run);frames=r.frames.map(f=>f.capture_id);video=r.video_capture_id||null;videoCamera=r.camera||videoCamera;$('sceneState').textContent='✓ Video ready';$('panorama').textContent='Record a new video';$('videoReview').hidden=false;$('playVideo').hidden=!video;$('scenePreview').src='';const preview=thumbnail(frames[0],'scenePreview');for(const id of previous)await call('/v1/captures/'+id,null,'DELETE').catch(()=>{});await preview;alive(run);status(portrait?'Your captures are ready. Create your fairytale.':'Video ready. Take your photo next.');}catch(e){failed(e,run);}finally{if(run===generation)lock(false);}};\n$('portrait').onclick=async()=>{if(busy)return;const run=++generation;lock(true,'portrait');status('Opening the photo camera…');const previous=portrait;try{const r=await call('/v1/camera/snapshot',{camera:portraitCamera,countdown_seconds:5,viewfinder:true,store:['memory'],return_image:false,max_edge_px:960,quality:80});alive(run);portrait=r.capture.capture_id;portraitCamera=r.camera||portraitCamera;$('portraitState').textContent='✓ Photo ready';$('portrait').textContent='Take a new photo';$('photoReview').hidden=false;$('portraitPreview').src='';const preview=thumbnail(portrait,'portraitPreview');if(previous)await call('/v1/captures/'+previous,null,'DELETE').catch(()=>{});await preview;alive(run);status(frames.length>=2?'Your captures are ready. Create your fairytale.':'Photo ready. Record your surroundings next.');}catch(e){failed(e,run);}finally{if(run===generation)lock(false);}};\nasync function clearVideo(){for(const id of [...frames,...(video?[video]:[])])await call('/v1/captures/'+id,null,'DELETE').catch(e=>{if(e.code!=='not_found'&&e.status!==404)throw e;});frames=[];video=null;$('videoReview').hidden=true;$('sceneState').textContent='';$('scenePreview').src='';$('panorama').textContent='Open video camera';}\n$('deleteVideo').onclick=async()=>{if(busy)return;lock(true,'deleteVideo');status('Deleting video…');try{await clearVideo();status('Video deleted. Record a new one when ready.');}catch(e){status(e.message,true);}finally{lock(false);}};\n$('deletePhoto').onclick=async()=>{if(busy||!portrait)return;lock(true,'deletePhoto');status('Deleting photo…');try{await call('/v1/captures/'+portrait,null,'DELETE').catch(e=>{if(e.code!=='not_found'&&e.status!==404)throw e;});portrait=null;$('photoReview').hidden=true;$('portraitPreview').src='';$('portraitState').textContent='';$('portrait').textContent='Open photo camera';status('Photo deleted. Take another when ready.');}catch(e){status(e.message,true);}finally{lock(false);}};\n$('playVideo').onclick=async()=>{if(busy||!video)return;const run=++generation;lock(true,'playVideo');status('Opening your video…');try{const r=await call('/v1/camera/video/review',{capture_id:video});alive(run);if(r.deleted){await clearVideo();status('Video deleted.');}else status('Video ready.');}catch(e){failed(e,run);}finally{if(run===generation)lock(false);}};\n$('flavor').onchange=()=>{$('flavorHint').textContent=$('flavor').value==='wild'?'An entirely invented life, full of ridiculous possibilities.':'A warm adventure with gentle humor.';};\nfunction chunks(text){const sentences=text.match(/[^.!?]+[.!?]+(?:[”’\"']*)|[^.!?]+$/g)||[text];const out=[];let chunk='';for(let sentence of sentences){sentence=sentence.trim();while(sentence.length>550){if(chunk){out.push(chunk);chunk='';}let split=sentence.lastIndexOf(' ',550);if(split<1)split=550;out.push(sentence.slice(0,split));sentence=sentence.slice(split).trim();}if(chunk.length+sentence.length+1>550){out.push(chunk);chunk='';}chunk+=(chunk?' ':'')+sentence;}if(chunk)out.push(chunk);return out;}\nasync function narrate(text,run,token){token=token||(await call('/v1/story/presentation',{})).presentation_token;alive(run);const speaking=++speechRun;$('voiceStatus').textContent='Preparing narration…';publish();const selection=await call('/v1/speech/models');if(selection.speaking_model?.provider_model!=='@cf/deepgram/aura-1')throw Error('Aura 1 is not selected for this applet.');for(const part of chunks(text)){alive(run);if(speaking!==speechRun)return;while(true){alive(run);if(speaking!==speechRun)return;const q=await call('/v1/speaker');if((q.queued||[]).length<3)break;await sleep(500);}const r=await call('/v1/speech/speak',{text:part,presentation_token:token,expected_model:'speech-aura-1',allow_cloud:true,language:'en',replace:'queue'});alive(run);$('voiceStatus').textContent=r.status==='silenced'?'Sound is muted on this device.':'Reading your story…';publish();}while(true){alive(run);if(speaking!==speechRun)return;const q=await call('/v1/speaker');if(!q.playing&&!(q.queued||[]).length)break;await sleep(500);}$('voiceStatus').textContent='Finished';publish();}\nfunction show(r){current=r;$('result').hidden=false;$('storyTitle').textContent=r.title;$('story').textContent=r.narration;publish();}\n$('create').onclick=async()=>{if(busy||frames.length<2||!portrait)return;const run=++generation;lock(true,'create');try{status('Finding your location…');const loc=await call('/v1/location');alive(run);const context={};for(const service of ['places','airquality']){status(service==='places'?'Finding nearby places…':'Checking the air quality…');context[service]=await call('/v1/services/context',{service,latitude:loc.latitude,longitude:loc.longitude,radius_m:500,limit:5});alive(run);}await call('/v1/speaker/play',{url:'https://bridgit.cc/assets/audio/a-sorta-fairytale-about-me-intro.mp3'});alive(run);status('Creating your fairytale…');const r=await call('/v1/story',{mode:$('flavor').value,frame_capture_ids:frames,portrait_capture_id:portrait,context});alive(run);show(r);$('imageStatus').textContent='Creating your illustration…';$('voiceStatus').textContent='Preparing narration…';status('Your story is ready. Preparing narration and artwork…');const illustration=call('/v1/story/image',{title:r.title,narration:r.narration,presentation_token:r.presentation_token,request_id:'fairytale-'+Date.now()+'-'+Math.random().toString(36).slice(2)}).then(image=>{alive(run);$('imageStatus').textContent=image.display?.missing?.length?image.display.fix:'Illustration ready';publish();return image;}).catch(e=>{if(run===generation){$('imageStatus').textContent=e.message;publish();}return {error:e.message};});await narrate(r.narration,run,r.presentation_token);alive(run);if($('imageStatus').textContent==='Creating your illustration…')status('Narration finished. Finishing your illustration…');const image=await illustration;alive(run);status(image.error?'Story finished. Illustration: '+image.error:'The end.');await history();}catch(e){failed(e,run);}finally{if(run===generation)lock(false);}};\n$('stop').onclick=async()=>{const run=++generation;++speechRun;lock(true);$('stop').disabled=true;status('Stopping…');await call('/v1/story/stop',{}).catch(()=>{});if(run===generation){$('voiceStatus').textContent='Stopped';$('imageStatus').textContent='Stopped';$('stop').disabled=false;status('Stopped.');lock(false);}};\n$('listen').onclick=async()=>{if(!current||busy)return;const run=++generation;lock(true,'listen');try{status('Preparing narration…');await narrate(current.narration,run);alive(run);status('The end.');}catch(e){failed(e,run);}finally{if(run===generation)lock(false);}};\nasync function history(){const list=$('history');list.replaceChildren();list.textContent='Loading stories…';try{let since;const rows=[];do{const r=await bridge.act({path:'/v1/applet/tables/stories/rows',query:{limit:50,...(since?{since}:{})}});if(!r.ok)throw Error(r.body?.message||'Stories unavailable');rows.push(...(r.body.items||[]));since=r.body.next;}while(since);list.textContent='';for(const row of rows.reverse()){if(!row.result)continue;const b=document.createElement('button');b.textContent=row.result.title;b.onclick=()=>show(row.result);list.append(b);}if(!rows.length)list.textContent='Your stories will appear here.';}catch(e){list.textContent=e.message;}}\nhistory();publish();\n})();\n</script></html>\n",
+   "sha256": "692cce42cf284537407cb0d6ba722b6b5fe680d92f42b1ea00fbc3ad37331d3f"
+  }
+ },
+ "data_policy": {
+  "backend_default": "device_only",
+  "scope": [
+   "device_id",
+   "applet_instance_id"
+  ],
+  "device_only": {
+   "server_registration": false,
+   "uploads": false,
+   "remote_models": true,
+   "derived_telemetry": false,
+   "queue": false
+  },
+  "enable": "Owner-approved installation permits deliberate video/photo captures, location context and hosted generation when Tell my story is tapped.",
+  "disable": "Stop cancels presentation and discards late story results. Pause or remove revokes applet execution.",
+  "retention": {
+   "local": "Your accepted video, pictures selected from it, and your portrait stay in owner-configured capture memory until deleted or expired; completed story text stays in the declared stories table for 365 days.",
+   "server": "Frames and portrait are sent to GLM 5.3 Flash through OpenRouter. Nearby Places and Air Quality receive coordinates. Story text is sent to Cloudflare Aura 1 and to Azure GPT Image 2.5 Sunburst for an illustration. Image results are retained privately by the backend for up to 24 hours and shown in a device interaction card. Content is not stored in backend call logs."
+  },
+  "execution": "Native capture and frame extraction; signed and budgeted GLM, Google Maps Platform and Aura 1 requests. No microphone capture."
+ }
+}

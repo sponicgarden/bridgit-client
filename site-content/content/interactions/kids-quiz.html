@@ -1,0 +1,49 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fff4d6;color:#2b2140;font:18px/1.4 "Comic Sans MS","Chalkboard SE",system-ui,-apple-system,Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:620px;margin:0 auto;padding:20px 16px 30px;text-align:center}
+.dots{display:flex;justify-content:center;gap:8px;margin-bottom:14px}
+.dots i{width:14px;height:14px;border-radius:50%;background:#f1d79a}
+.dots i.ok{background:#3bb273}.dots i.no{background:#ff7a59}.dots i.now{outline:3px solid #7b5cff;outline-offset:2px}
+.big{font-size:84px;line-height:1;margin:10px 0}
+h1{font-size:26px;margin:6px 0 16px}
+.ans{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans button{font:inherit;font-size:22px;font-weight:700;border:0;border-radius:20px;padding:18px 10px;min-height:80px;cursor:pointer;color:#fff;box-shadow:0 5px 0 rgba(0,0,0,.18);transition:transform .1s}
+.ans button:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.ans button:nth-child(1){background:#7b5cff}.ans button:nth-child(2){background:#ff8a3d}.ans button:nth-child(3){background:#1fb5c9}.ans button:nth-child(4){background:#e8478b}
+.ans button.right{background:#3bb273!important}.ans button.wrong{opacity:.35}
+.msg{min-height:30px;margin:14px 0 0;font-weight:700}
+.end .stars{font-size:56px;letter-spacing:6px}
+.end button{font:inherit;font-weight:700;border:0;border-radius:20px;padding:16px 28px;background:#7b5cff;color:#fff;font-size:20px;margin-top:16px;cursor:pointer}
+</style>
+<div class="wrap" id="app"></div>
+<script>
+var Q=[
+ {e:'🐙',q:'How many arms does an octopus have?',a:['6','8','10','12'],r:1},
+ {e:'🌍',q:'Which planet do we live on?',a:['Mars','Venus','Earth','Jupiter'],r:2},
+ {e:'🦒',q:'Which animal has the longest neck?',a:['Giraffe','Horse','Camel','Ostrich'],r:0},
+ {e:'🌈',q:'How many colours are in a rainbow?',a:['5','6','7','9'],r:2},
+ {e:'🐝',q:'What do bees make?',a:['Milk','Honey','Jam','Butter'],r:1}
+],i=0,score=0,picks=[],start=Date.now(),sent=false,app=document.getElementById('app');
+var cheers=['Brilliant!','You got it!','Super smart!','Yes!!','Amazing!'];
+function dots(){return '<div class="dots">'+Q.map(function(_,k){return '<i class="'+(k<picks.length?(picks[k].ok?'ok':'no'):(k===i?'now':''))+'"></i>'}).join('')+'</div>'}
+function show(){
+  if(i>=Q.length)return done();
+  var q=Q[i];
+  app.innerHTML=dots()+'<div class="big">'+q.e+'</div><h1>'+q.q+'</h1><div class="ans">'+q.a.map(function(t,k){return '<button data-k="'+k+'">'+t+'</button>'}).join('')+'</div><p class="msg" id="m"></p>';
+  app.querySelectorAll('.ans button').forEach(function(b){b.onclick=function(){pick(+b.dataset.k)}});
+}
+function pick(k){
+  var q=Q[i],ok=k===q.r;if(picks.length>i)return;
+  picks.push({question:i+1,picked:q.a[k],ok:ok});if(ok)score++;
+  app.querySelectorAll('.ans button').forEach(function(b,n){b.disabled=true;b.classList.add(n===q.r?'right':'wrong')});
+  document.getElementById('m').textContent=ok?cheers[i%cheers.length]+' 🎉':'Nice try! It’s '+q.a[q.r]+'.';
+  setTimeout(function(){i++;show()},1300);
+}
+function done(){
+  var stars='⭐'.repeat(score)+'☆'.repeat(Q.length-score);
+  app.innerHTML=dots()+'<div class="end"><div class="big">'+(score>=4?'🏆':score>=2?'🎈':'🌟')+'</div><h1>You got '+score+' out of '+Q.length+'!</h1><div class="stars">'+stars+'</div><button id="fin">Tell Dad my score</button></div>';
+  document.getElementById('fin').onclick=function(){if(sent)return;sent=true;(window.Bridgit||window.Bridget).respond(JSON.stringify({score:score,out_of:Q.length,seconds:Math.round((Date.now()-start)/1000),answers:picks}))};
+}
+show();
+</script>

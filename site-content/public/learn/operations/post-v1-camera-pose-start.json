@@ -1,0 +1,86 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Track a person's body for up to 2 minutes: the phone finds 33 body points in every camera frame (ML Kit, offline and free; no picture leaves the phone). Read the frames as they come with GET /v1/camera/pose/{id}",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "camera_pose_start",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "camera",
+    "description": "front (default, the person can see the screen) or rear",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "front",
+     "rear"
+    ]
+   },
+   {
+    "name": "seconds",
+    "description": "How long to track, 5-120 (default 60). It also stops when nobody has read it for 10 s",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "preview_every_ms",
+    "description": "How often to refresh the small preview picture, 150-2000 (default 400)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "preview_edge_px",
+    "description": "Longest side of the preview picture, 120-480 (default 320)",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/camera/pose/start {\"camera\":\"front\",\"seconds\":45}",
+  "idempotent": false,
+  "path": "/v1/camera/pose/start",
+  "capability": "camera",
+  "returns": "session_id, state starting|running, camera, mirror (true for front: draw it mirrored), max_ms, started_at",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "seconds": {
+     "description": "How long to track, 5-120 (default 60). It also stops when nobody has read it for 10 s",
+     "type": "integer"
+    },
+    "preview_edge_px": {
+     "description": "Longest side of the preview picture, 120-480 (default 320)",
+     "type": "integer"
+    },
+    "preview_every_ms": {
+     "description": "How often to refresh the small preview picture, 150-2000 (default 400)",
+     "type": "integer"
+    },
+    "camera": {
+     "description": "front (default, the person can see the screen) or rear",
+     "type": "string",
+     "enum": [
+      "front",
+      "rear"
+     ]
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "permission_denied",
+   "notifications_required",
+   "device_locked",
+   "sensor_busy",
+   "service_start_blocked",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

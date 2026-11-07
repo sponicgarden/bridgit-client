@@ -1,0 +1,14 @@
+{
+  "kind": "notice",
+  "title": "Leave in 10 minutes for the airport",
+  "text": "Traffic on the A4 is building. Leaving at 14:20 gets you to KRK by 15:05, 1 h 35 min before your flight.",
+  "speak": true,
+  "controls": [
+    {
+      "type": "link",
+      "id": "directions",
+      "label": "Open directions",
+      "url": "geo:0,0?q=Krak%C3%B3w+Airport"
+    }
+  ]
+}

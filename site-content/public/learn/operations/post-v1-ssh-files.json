@@ -1,0 +1,199 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Granular SFTP operations; files_read or files_write permission; can be scheduled",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "ssh_files",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "connection",
+    "description": "This agent's saved SSH connection id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "action",
+    "description": "Operation",
+    "type": "string",
+    "required": true,
+    "enum": [
+     "stat",
+     "list",
+     "read",
+     "write",
+     "mkdir",
+     "rename",
+     "remove",
+     "rmdir",
+     "chmod"
+    ]
+   },
+   {
+    "name": "path",
+    "description": "Literal remote path; relative to SFTP home or absolute. Wildcards are escaped.",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "timeout_seconds",
+    "description": "Total connect + operation deadline, 1..120 seconds; default 30. Disconnect does not guarantee remote termination.",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "offset",
+    "description": "Read byte offset, or list entry offset; write requires 0; 0..1000000000000, default 0",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "max_bytes",
+    "description": "Read chunk 1..524288; default 524288",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "List entry count 1..1000; default 200. Pagination is not a snapshot.",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "data_base64",
+    "description": "write: base64 bytes, at most 512 KiB decoded",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "write_mode",
+    "description": "write: replace (default, truncates) or append. Upload larger files in sequential chunks: replace first, append subsequent chunks. Do not use concurrent writers.",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "replace",
+     "append"
+    ]
+   },
+   {
+    "name": "destination",
+    "description": "rename: literal destination path; may replace existing destination",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "mode",
+    "description": "chmod: octal permissions, e.g. 600 or 0755",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "follow_symlinks",
+    "description": "stat: follow link; default false",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "confirm",
+    "description": "Must be true for write, rename, remove, rmdir and chmod. Writes may replace data; failed writes may be partial.",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/ssh/files {\"connection\":\"ssh:example\",\"action\":\"list\",\"path\":\".\",\"limit\":100}",
+  "idempotent": true,
+  "path": "/v1/ssh/files",
+  "capability": "ssh",
+  "returns": "action,path; stat attributes; list entries,next_offset; read data_base64,bytes,offset,eof,next_offset; write bytes_written,write_mode,size. Remote filesystem ACLs apply; directory deletion is nonrecursive.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "offset": {
+     "description": "Read byte offset, or list entry offset; write requires 0; 0..1000000000000, default 0",
+     "type": "integer"
+    },
+    "destination": {
+     "description": "rename: literal destination path; may replace existing destination",
+     "type": "string"
+    },
+    "max_bytes": {
+     "description": "Read chunk 1..524288; default 524288",
+     "type": "integer"
+    },
+    "mode": {
+     "description": "chmod: octal permissions, e.g. 600 or 0755",
+     "type": "string"
+    },
+    "confirm": {
+     "description": "Must be true for write, rename, remove, rmdir and chmod. Writes may replace data; failed writes may be partial.",
+     "type": "boolean"
+    },
+    "path": {
+     "description": "Literal remote path; relative to SFTP home or absolute. Wildcards are escaped.",
+     "type": "string"
+    },
+    "data_base64": {
+     "description": "write: base64 bytes, at most 512 KiB decoded",
+     "type": "string"
+    },
+    "write_mode": {
+     "description": "write: replace (default, truncates) or append. Upload larger files in sequential chunks: replace first, append subsequent chunks. Do not use concurrent writers.",
+     "type": "string",
+     "enum": [
+      "replace",
+      "append"
+     ]
+    },
+    "limit": {
+     "description": "List entry count 1..1000; default 200. Pagination is not a snapshot.",
+     "type": "integer"
+    },
+    "action": {
+     "description": "Operation",
+     "type": "string",
+     "enum": [
+      "stat",
+      "list",
+      "read",
+      "write",
+      "mkdir",
+      "rename",
+      "remove",
+      "rmdir",
+      "chmod"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "connection": {
+     "description": "This agent's saved SSH connection id",
+     "type": "string"
+    },
+    "timeout_seconds": {
+     "description": "Total connect + operation deadline, 1..120 seconds; default 30. Disconnect does not guarantee remote termination.",
+     "type": "integer"
+    },
+    "follow_symlinks": {
+     "description": "stat: follow link; default false",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "connection",
+    "action",
+    "path",
+    "idempotency_key"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

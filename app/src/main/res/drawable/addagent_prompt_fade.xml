@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fade at the bottom edge of the prompt card (ui-spec 5.4 step 4). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient android:angle="270" android:startColor="@android:color/transparent"
+        android:endColor="?attr/colorSurfaceContainer" />
+</shape>

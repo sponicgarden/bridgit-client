@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The library of common picture situations a watch can count (dog licking itself, pot boiling over, sunlight in the room, ...): send one as situation in POST /v1/watches, or describe your own in words",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "situations",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/situations",
+  "idempotent": false,
+  "path": "/v1/situations",
+  "capability": "watches",
+  "returns": "about, situations [{id, title, question, min, interval_s, gap_s, alert, counts_only_while}], custom {example, defaults}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Remove (x) on a 24dp round backing; the ImageButton around it is 48dp (UI-29). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:width="24dp" android:height="24dp" android:gravity="center" android:drawable="@drawable/feedback_bg_remove" />
+    <item android:width="16dp" android:height="16dp" android:gravity="center" android:drawable="@drawable/ic_close" />
+</layer-list>

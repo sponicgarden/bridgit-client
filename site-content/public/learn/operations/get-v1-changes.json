@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "What's new in the API since a revision you know",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "changes",
+  "query": [{
+   "name": "since",
+   "description": "The API revision you last read about; 0 or absent = everything",
+   "type": "integer",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/changes?since=2",
+  "idempotent": false,
+  "path": "/v1/changes",
+  "capability": "status",
+  "returns": "api_revision, app_version, changes[revision, app_version, date, items[what, endpoint]], links",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"since": {
+    "description": "The API revision you last read about; 0 or absent = everything",
+    "type": "integer"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

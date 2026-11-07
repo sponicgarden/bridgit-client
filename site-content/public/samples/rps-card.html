@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bridgit rock paper scissors</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #f4f1ff;
+    background: radial-gradient(120% 80% at 50% 0%, #3b2a7a 0%, #1a1440 55%, #0c1a2a 100%);
+    min-height: 100vh;
+  }
+  .card { max-width: 440px; margin: 0 auto; padding: 24px 18px 22px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+  .pill { margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(255, 196, 92, .16); color: #ffc45c;
+    font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  h1 { margin: 0; font-size: 24px; line-height: 1.2; font-weight: 750; }
+  .score { margin: 0; color: #b9b0dc; font-size: 15px; }
+  .panel { width: 100%; padding: 12px 14px; border-radius: 18px; text-align: left;
+    background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); }
+  #last { display: flex; gap: 12px; align-items: center; }
+  #last[hidden], .panel[hidden] { display: none; }
+  #last img { width: 72px; height: 96px; object-fit: cover; border-radius: 12px; flex: none; }
+  .line { margin: 3px 0; color: #e4defa; font-size: 15px; }
+  .hands { display: flex; justify-content: space-around; align-items: center; text-align: center; }
+  .hand { font-size: 64px; line-height: 1.15; }
+  .who { font-size: 13px; color: #b9b0dc; }
+  #big { margin: 0; font-size: 56px; font-weight: 800; line-height: 1.1; }
+  #big:empty { display: none; }
+  #msg { margin: 0; min-height: 1.4em; font-size: 17px; color: #e4defa; }
+  .actions { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  button { font: inherit; font-weight: 650; border-radius: 16px; min-height: 52px; padding: 12px 16px; cursor: pointer;
+    border: 0; color: #fff; background: linear-gradient(135deg, #ff8a3d, #ff3d77); box-shadow: 0 8px 22px rgba(255, 61, 119, .35); }
+  button.quiet { background: none; box-shadow: none; min-height: 40px; color: #b9b0dc; font-weight: 500; }
+  button:disabled { opacity: .5; }
+  button[hidden] { display: none; }
+</style>
+</head>
+<body>
+<main class="card">
+  <p class="pill" id="pill"></p>
+  <h1 id="title"></h1>
+  <p class="score" id="score"></p>
+  <section class="panel" id="last" hidden><div id="lines"></div></section>
+  <section class="panel hands" id="arena">
+    <div><div class="hand" id="you">❔</div><div class="who">You</div></div>
+    <div class="who">vs</div>
+    <div><div class="hand" id="me">❔</div><div class="who">Me</div></div>
+  </section>
+  <p id="big" aria-live="assertive"></p>
+  <p id="msg" role="status" aria-live="polite"></p>
+  <div class="actions">
+    <button type="button" id="go"></button>
+    <button type="button" class="quiet" id="stop">Stop the game</button>
+  </div>
+</main>
+<script>
+// The round's content. Change only this object; the script below draws it.
+// me: the agent's logged move this round. history: rounds played so far, oldest first.
+// Three rounds in history makes this the final score. Answers: {"button": "ready"|"stop"|"done", ...data, "round": n}.
+var CARD = /*CARD*/{
+  "me": "rock",
+  "history": [],
+  "photo": "",
+  "note": "",
+  "data": {"step": 6}
+}/*END CARD*/;
+
+(function () {
+  var ICON = {rock: '✊', paper: '✋', scissors: '✌️'};
+  var BEATS = {rock: 'scissors', paper: 'rock', scissors: 'paper'};
+  var $ = function (id) { return document.getElementById(id); };
+  function add(text) { var p = document.createElement('p'); p.className = 'line'; p.textContent = text; $('lines').appendChild(p); }
+  function win(r) { return r.you === r.me ? 'draw' : BEATS[r.you] === r.me ? 'you' : 'me'; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function said(r, n) {
+    var w = win(r);
+    return 'Round ' + n + ': you ' + ICON[r.you] + ' ' + r.you + ', me ' + ICON[r.me] + ' ' + r.me + '. ' +
+      (w === 'draw' ? 'A draw.' : cap(w === 'you' ? r.you : r.me) + ' wins, point to ' + (w === 'you' ? 'you.' : 'me.'));
+  }
+
+  var H = CARD.history || [], s = {you: 0, me: 0, draw: 0}, round = H.length + 1, done = H.length >= 3;
+  H.forEach(function (r) { s[win(r)]++; });
+  $('score').textContent = 'You ' + s.you + ' · Me ' + s.me + (s.draw ? ' · Draws ' + s.draw : '');
+  var box = $('last');
+  if (done) H.forEach(function (r, i) { add(said(r, i + 1)); });
+  else if (H.length) add(said(H[H.length - 1], H.length));
+  if (CARD.note) add(CARD.note);
+  if (CARD.photo && CARD.photo.indexOf('data:image/') === 0) {
+    var im = document.createElement('img');
+    im.src = CARD.photo; im.alt = 'Your last throw';
+    box.insertBefore(im, $('lines'));
+  }
+  box.hidden = !$('lines').childNodes.length;
+
+  // Bridgit's bridge object; Bridgit 1.6.269 and older only name it window.Bridget.
+  var bridge = window.Bridgit || window.Bridget;
+  var sent = '';
+  function send(id) {
+    if (!bridge || typeof bridge.respond !== 'function') { $('msg').textContent = 'Preview only: open this card in Bridgit to play.'; return false; }
+    var answer = {button: id, round: Math.min(round, 3)};
+    var extra = CARD.data || {};
+    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) answer[k] = extra[k];
+    sent = id;
+    // A JSON string works on every Bridgit build.
+    bridge.respond(JSON.stringify(answer));
+    return true;
+  }
+  // Keep the card's own view; Bridgit's confirmation panel would cover the countdown.
+  document.addEventListener('bridgit:answered', function (event) {
+    event.preventDefault();
+    if (sent !== 'ready') $('msg').textContent = 'Thanks for playing!';
+  });
+
+  if (done) {
+    $('pill').textContent = 'Final score';
+    $('title').textContent = 'Game over';
+    $('arena').hidden = true; $('stop').hidden = true;
+    $('big').textContent = s.you > s.me ? 'You win!' : s.me > s.you ? 'I win!' : 'A draw!';
+    $('go').textContent = 'Done';
+    $('go').onclick = function () { if (send('done')) $('go').disabled = true; };
+    return;
+  }
+
+  $('pill').textContent = 'Round ' + round + ' of 3';
+  $('title').textContent = 'Rock paper scissors';
+  $('msg').textContent = 'Tap Ready, then throw on Shoot!';
+  $('go').textContent = 'Ready';
+  $('stop').onclick = function () { if (send('stop')) $('go').disabled = $('stop').disabled = true; };
+  $('go').onclick = function () {
+    if (!send('ready')) return;
+    $('go').hidden = $('stop').hidden = true;
+    $('msg').textContent = 'Get your hand ready…';
+    // The phone starts speaking about 0.4 s after Ready, so the count starts then; then one beat a second.
+    var steps = ['3', '2', '1'], i = 0;
+    function tick() {
+      if (i < steps.length) { $('big').textContent = steps[i++]; setTimeout(tick, 1000); return; }
+      $('big').textContent = 'Shoot!';
+      $('me').textContent = ICON[CARD.me] || '❔';
+      $('you').textContent = '📷';
+      $('msg').textContent = 'I threw ' + CARD.me + '! Hold your hand up until I say Got it.';
+    }
+    setTimeout(tick, 400);
+    // Bridgit shrinks the card a moment after the answer; keep the countdown in view.
+    setTimeout(function () { $('arena').scrollIntoView({block: 'start'}); }, 450);
+  };
+})();
+</script>
+</body>
+</html>

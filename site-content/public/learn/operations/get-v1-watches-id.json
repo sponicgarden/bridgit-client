@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "One running watch: its spec, the last 10 checks with the model's answers, and the last state sent",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "watches_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/watches/w0123456789ab",
+  "idempotent": false,
+  "path": "/v1/watches/{id}",
+  "capability": "watches",
+  "returns": "watch_id, label, ..., usage, people? (a people watch: {state: on|battery_low|cap_reached|off, battery_floor, last_burst_at, faces_today, queued, embedder: ready|downloading|not_ready}), spec, recent_checks [{at, readings, model, paid, answers, matched, cost_usd (paid) or answered_locally (free)} or {at, skipped: max_paid_per_hour} or {at, error, message}], last_state",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/watches/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

@@ -1,0 +1,54 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set torch with mandatory auto-off",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "flashlight_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "on",
+    "description": "true or false",
+    "type": "boolean",
+    "required": true
+   },
+   {
+    "name": "auto_off_seconds",
+    "description": "1\u2013600, default 60",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/flashlight",
+  "idempotent": true,
+  "path": "/v1/flashlight",
+  "capability": "flashlight",
+  "returns": "Set torch with mandatory auto-off",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "auto_off_seconds": {
+     "description": "1\u2013600, default 60",
+     "type": "integer"
+    },
+    "on": {
+     "description": "true or false",
+     "type": "boolean"
+    }
+   },
+   "required": ["on"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

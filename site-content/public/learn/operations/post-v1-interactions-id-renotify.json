@@ -1,0 +1,42 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Notify the owner again about one of your pending or seen cards. Opening a card clears its alert; only this explicit request restores it. Preserves seen status, answers and expiry; does not open the screen or speak. Closed or expired cards are refused",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "interactions_renotify",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/interactions/12/renotify {}",
+  "idempotent": true,
+  "path": "/v1/interactions/{id}/renotify",
+  "capability": "interactions",
+  "returns": "the interaction, notification_requested",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/interactions/{id}/renotify",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "conflict",
+   "capability_disabled",
+   "notifications_required"
+  ],
+  "requires": null
+ }
+}

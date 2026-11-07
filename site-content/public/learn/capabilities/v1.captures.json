@@ -1,0 +1,77 @@
+{
+ "detail_url": "/v1/discover?id=v1.captures&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.captures.json",
+ "title": "captures",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.captures.json",
+ "prerequisites": ["Check v1.captures supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Where your captures go: your choice and what the owner allows",
+   "path": "/v1/captures/storage",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-captures-storage.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-captures-storage.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "captures_storage_get"
+  },
+  {
+   "summary": "Choose where your captures go, in any combination: memory, phone files, upload; and how long memory keeps them (within the owner's limits)",
+   "path": "/v1/captures/storage",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-captures-storage.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-captures-storage.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "captures_storage_set"
+  },
+  {
+   "summary": "Your kept captures (photos, screenshots, recordings, clips), newest first: where each is and until when",
+   "path": "/v1/captures",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-captures.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-captures.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "captures_list"
+  },
+  {
+   "summary": "One kept capture: from memory, or from its phone file after memory let it go; optional max_edge_px returns a bounded image preview",
+   "path": "/v1/captures/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-captures-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-captures-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "captures_get"
+  },
+  {
+   "summary": "Forget a capture: drops the memory copy and deletes its phone file (uploads can't be recalled)",
+   "path": "/v1/captures/{id}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-captures-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-captures-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "captures_delete"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.captures",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "remember",
+ "capability_ids": ["v1.captures"]
+}

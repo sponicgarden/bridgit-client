@@ -1,0 +1,8 @@
+<resources>
+<string name="own_key_googlemaps">Google Maps</string>
+<string name="own_key_googlemaps_desc">Places, maps and environment</string>
+<string name="own_key_openmeteo">Open-Meteo</string>
+<string name="own_key_openmeteo_desc">Commercial weather API</string>
+<string name="applets_bundled_fairytale_title">A Sorta Fairytale About Me</string>
+<string name="applets_bundled_fairytale_desc">Your surroundings become a spoken story.</string>
+</resources>

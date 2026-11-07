@@ -1,0 +1,25 @@
+package cc.bridgit.app.api
+
+/** Shared by the phone guide, published instructions and API HTML. */
+object LogGuide {
+    val markdown = """
+## Complete activity history and device diagnostics
+
+Bridgit's audit, agent-note and diagnostic history is kept in SQLite across restarts. New default retention is unlimited: no automatic entry-count or age deletion. Existing explicit owner limits remain in force. Check GET /v1/settings for log.retention_entries and log.retention_days; 0 disables that limit. To remove both limits use POST /v1/settings {"changes":{"log.retention_entries":0,"log.retention_days":0}} with the App settings grant, its owner switch and Agent Super Powers. The owner can also enter 0 in both fields under Settings → Keep. Diagnostic history has no automatic cap. History still uses device storage; clearing the activity log deletes audit/agent entries and records the clear, while clearing app data or uninstalling removes everything. Previously deleted entries cannot be recovered.
+
+Read all retained activity with GET /v1/log?order=asc&limit=500. Pass next_cursor back as cursor, keeping the same filters and order, until next_cursor is null (a final empty page is valid). For a fixed snapshot, use the first response's latest_id plus 1 as until on subsequent pages. Channel can be audit, agent or diagnostic; omit it for all channels. agent=me restricts to your entries. Owner log visibility and agent grants apply to queries, exports and stats; these calls never grant access by themselves. GET /v1/audit remains the deprecated audit-only alias; use /v1/log for pagination.
+
+Export the whole matching history with GET /v1/log/export?format=jsonl or format=csv. Direct authenticated HTTP streams oldest first in bounded-memory pages, with no total-size cap; save the response to a file. Exports use a fixed newest-entry watermark so new calls cannot make an export run forever. The phone's Activity export uses the same paged store. MCP and relay wrap bodies in an envelope and retain an 8 MiB response cap: use /v1/log pages for large histories through those transports. Exports may end early if access is revoked or the connection fails; restart the export or resume using log IDs. Normal query/export responses do not include media or full message bodies.
+
+Follow new activity with GET /v1/log?order=asc&since=<last_id>&wait=55; use a client timeout above 55 seconds. Drain next_cursor pages before waiting again. GET /v1/log/stats?since=0 counts the complete retained request history; the default is the last 24 hours. POST /v1/log writes an agent note; GET /v1/log/{id} reads one entry.
+
+Device diagnostics are separate from activity history and require explicit powers:
+
+- GET /v1/log/device?buffer=main&lines=1000: Android logcat visible to Bridgit's app UID, requires the log grant and Bridgit Fixer Mode. Buffers: main, system, crash, events, all. A system buffer name does not grant system-wide access.
+- GET /v1/adb/logcat?buffer=all&lines=1000: system-wide logcat, requires the adb grant, Agent Super Powers, the private build, the owner's ADB switch and working ADB. GET /v1/adb/status and /v1/adb/setup describe readiness and setup. It never silently falls back to app-only logs.
+- Both logcat endpoints accept 1–10000 lines (default 1000), cap each output at 2 MiB and stop after 10 seconds. Check scope, exit_code (0 means success), truncated and timed_out before treating a response as complete. Android buffers rotate and are not a lifetime device-log archive. Callers can poll and archive snapshots externally; repeated snapshots may overlap. Known Bridgit keys, bearer credentials and common password/token fields are scrubbed, but arbitrary Android/vendor diagnostics can still contain sensitive content.
+- GET /v1/log/exits?limit=20&trace=true: Bridgit's recent Android process exits, crashes and ANRs, requires the log grant, Fixer Mode and Android 11+. Follow next_before as before for older pages; timestamp ties stay together. reason is Android ApplicationExitInfo's numeric reason, with status, description, process, timestamp_ms and memory measurements. Optional traces can be unavailable, unreadable, omitted when the page byte budget is exhausted, or truncated (trace_available, trace_error, trace_omitted, trace_truncated); UTF-8 traces are scrubbed, native tombstones are base64 protobuf and must be handled as sensitive binary diagnostics. Android controls this recent history and trace availability. At each app start Bridgit archives newly seen exit summaries to persistent /v1/log?channel=diagnostic&kind=crash; these summaries outlive Android's exit cache, but full traces remain Android-managed. Devices below Android 11 return not_supported.
+
+All endpoints use the paired agent's Authorization bearer key over the existing direct/relay transport. Missing powers return forbidden; disabled ADB returns capability_disabled; unavailable ADB returns service_start_blocked; invalid filters return invalid_parameter. No endpoint clears logs or enables Android access.
+""".trimIndent()
+}

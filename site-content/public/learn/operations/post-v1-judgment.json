@@ -1,0 +1,108 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Ask Jev typed questions about text/JSON, or Clef about one retained sound/wake-word clip (audio is sent to the decision backend); run matching conditional actions",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "judgment",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "model",
+    "description": "jev (default), clef (retained audio), or glm (GLM 5.3 Flash through OpenRouter)",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "jev",
+     "clef",
+     "glm"
+    ]
+   },
+   {
+    "name": "audio_clip_id",
+    "description": "With model clef: one retained clip id from sound.heard or listen.heard; needs its enabled sound/wake-word grant. Sends the clip to Clef; no new recording or local sound-model download.",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "state",
+    "description": "What the questions are about: text or JSON, up to about 512 KB. Text/JSON context; use model clef plus audio_clip_id to classify a retained audio clip",
+    "type": [
+     "string",
+     "object",
+     "array"
+    ],
+    "required": true
+   },
+   {
+    "name": "questions",
+    "description": "1-50 typed questions, {id: {type: choice|noul|..., instructions, criteria?}}, as https://docs.typesafe.ai/primitives",
+    "type": "object",
+    "required": true
+   },
+   {
+    "name": "actions",
+    "description": "Up to 10 rules, bridgit-actions/1: {id, when: condition or 1-5 conditions (all must hold), do: action}. Condition: {answer, choice, min_confidence?} or {answer, min?, max?} for a probability. Action: {type: notice, title, text?} (a card from you), {type: speak, text} or {type: log, message}; plain text only, no links",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/judgment {\"state\":{\"battery_percent\":12,\"charging\":false},\"questions\":{\"charge\":{\"type\":\"choice\",\"instructions\":\"Should the owner plug in before a two-hour call?\",\"criteria\":{\"yes\":\"Plug in first\",\"no\":\"Fine as it is\"}}},\"actions\":[{\"id\":\"plug_in\",\"when\":{\"answer\":\"charge\",\"choice\":\"yes\",\"min_confidence\":0.8},\"do\":{\"type\":\"notice\",\"title\":\"Plug in before your call\",\"text\":\"Battery is at 12%.\"}}]}",
+  "idempotent": false,
+  "path": "/v1/judgment",
+  "capability": "judgment",
+  "returns": "model, answers {id: {type, choice+confidence | noul}}, usage, cost_usd, elapsed_ms, actions_schema (bridgit-actions/1), actions [{id, type, reason, ran, error?}] (only rules whose conditions held), skipped [{id, reason}]. When Jev fails you get an error and no action runs",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "audio_clip_id": {
+     "description": "With model clef: one retained clip id from sound.heard or listen.heard; needs its enabled sound/wake-word grant. Sends the clip to Clef; no new recording or local sound-model download.",
+     "type": "string"
+    },
+    "questions": {
+     "description": "1-50 typed questions, {id: {type: choice|noul|..., instructions, criteria?}}, as https://docs.typesafe.ai/primitives",
+     "type": "object"
+    },
+    "model": {
+     "description": "jev (default), clef (retained audio), or glm (GLM 5.3 Flash through OpenRouter)",
+     "type": "string",
+     "enum": [
+      "jev",
+      "clef",
+      "glm"
+     ]
+    },
+    "state": {
+     "description": "What the questions are about: text or JSON, up to about 512 KB. Text/JSON context; use model clef plus audio_clip_id to classify a retained audio clip",
+     "type": [
+      "string",
+      "object",
+      "array"
+     ]
+    },
+    "actions": {
+     "description": "Up to 10 rules, bridgit-actions/1: {id, when: condition or 1-5 conditions (all must hold), do: action}. Condition: {answer, choice, min_confidence?} or {answer, min?, max?} for a probability. Action: {type: notice, title, text?} (a card from you), {type: speak, text} or {type: log, message}; plain text only, no links",
+     "type": "array",
+     "items": {"type": "object"}
+    }
+   },
+   "required": [
+    "state",
+    "questions"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "rate_limited",
+   "upstream_failed",
+   "team_unavailable",
+   "payload_too_large"
+  ],
+  "requires": null
+ }
+}

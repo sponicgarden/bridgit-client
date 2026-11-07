@@ -1,0 +1,13 @@
+{
+  "kind": "notice",
+  "title": "Your parcel was delivered",
+  "text": "Left at the front door at 11:42. The courier took a photo.",
+  "controls": [
+    {
+      "type": "link",
+      "id": "photo",
+      "label": "See the photo",
+      "url": "https://example.com/track/DPD-0459-2291/photo"
+    }
+  ]
+}

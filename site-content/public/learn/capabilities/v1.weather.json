@@ -1,0 +1,35 @@
+{
+ "detail_url": "/v1/discover?id=v1.weather&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.weather.json",
+ "title": "weather",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.weather.json",
+ "prerequisites": ["Check v1.weather supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": ["daily-briefing-panel"],
+ "operations": [{
+  "summary": "Weather where the phone is (or at a lat/lon you give): conditions now, the next hours and the next 24 hours, from MET Norway. Schedule it like any call: {\"do\":{\"call\":\"GET /v1/weather\"}}",
+  "path": "/v1/weather",
+  "method": "GET",
+  "documentation": "https://bridgit.cc/learn/operations/get-v1-weather.json",
+  "operation_url": "https://bridgit.cc/learn/operations/get-v1-weather.json",
+  "control_scope": null,
+  "requires_power": null,
+  "tool": "weather"
+ }],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.weather",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "sense",
+ "capability_ids": ["v1.weather"]
+}

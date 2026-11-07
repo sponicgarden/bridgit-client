@@ -1,0 +1,50 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Forget the saved position",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "lan_cameras_applet_views_delete",
+  "query": [{
+   "name": "revision",
+   "description": "Current saved position revision",
+   "type": "string",
+   "required": true
+  }],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/lan-cameras/applet-views/{instance}/{view}?revision=...",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/applet-views/{instance}/{view}",
+  "capability": "lan_camera",
+  "returns": "Cleared view",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "view": {
+     "description": "The view in /v1/lan-cameras/applet-views/{instance}/{view}",
+     "type": "string"
+    },
+    "instance": {
+     "description": "The instance in /v1/lan-cameras/applet-views/{instance}/{view}",
+     "type": "string"
+    },
+    "revision": {
+     "description": "Current saved position revision",
+     "type": "string"
+    }
+   },
+   "required": [
+    "instance",
+    "view",
+    "revision"
+   ]
+  },
+  "errors": [],
+  "requires": "fixer_mode"
+ }
+}

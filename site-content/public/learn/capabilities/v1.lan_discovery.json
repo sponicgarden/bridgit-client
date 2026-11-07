@@ -1,0 +1,67 @@
+{
+ "detail_url": "/v1/discover?id=v1.lan_discovery&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.lan_discovery.json",
+ "title": "lan discovery",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.lan_discovery.json",
+ "prerequisites": ["Check v1.lan_discovery supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Remembered devices on the current LAN; no scan",
+   "path": "/v1/lan/discovered",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-discovered.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-discovered.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_discovered"
+  },
+  {
+   "summary": "Bundled discovery coverage, brand logos and control-agent instructions; no network scan",
+   "path": "/v1/lan/catalog",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-catalog.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-catalog.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_catalog"
+  },
+  {
+   "summary": "A passive bundled manufacturer logo; never a remote lookup",
+   "path": "/v1/lan/brands/{id}/logo",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-brands-id-logo.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-brands-id-logo.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_brands_logo"
+  },
+  {
+   "summary": "Bounded discovery on the Android host's direct local network",
+   "path": "/v1/lan/discover",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-discover.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-discover.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_discover"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.lan_discovery",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v1.lan_discovery"]
+}

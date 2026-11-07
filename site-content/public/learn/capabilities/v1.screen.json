@@ -1,0 +1,35 @@
+{
+ "detail_url": "/v1/discover?id=v1.screen&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.screen.json",
+ "title": "screen",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.screen.json",
+ "prerequisites": ["Check v1.screen supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [{
+  "summary": "What's on the owner's screen right now (no prompt once they've turned it on)",
+  "path": "/v1/screen/capture",
+  "method": "POST",
+  "documentation": "https://bridgit.cc/learn/operations/post-v1-screen-capture.json",
+  "operation_url": "https://bridgit.cc/learn/operations/post-v1-screen-capture.json",
+  "control_scope": null,
+  "requires_power": null,
+  "tool": "screen_capture"
+ }],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.screen",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "sense",
+ "capability_ids": ["v1.screen"]
+}

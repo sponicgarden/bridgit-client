@@ -1,0 +1,67 @@
+{
+ "detail_url": "/v1/discover?id=v1.app_device_access&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.app_device_access.json",
+ "title": "app device access",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.app_device_access.json",
+ "prerequisites": ["Check v1.app_device_access supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Read selectively assigned external devices for installed applets",
+   "path": "/v1/applet-devices",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applet-devices.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applet-devices.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_devices_get"
+  },
+  {
+   "summary": "Replace one visible device's applet assignments; separate from enrollment",
+   "path": "/v1/applet-devices",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applet-devices.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applet-devices.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_devices_post"
+  },
+  {
+   "summary": "Legacy alias of GET /v1/applet-devices",
+   "path": "/v1/app-devices",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-app-devices.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-app-devices.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "app_devices_get"
+  },
+  {
+   "summary": "Legacy alias of POST /v1/applet-devices",
+   "path": "/v1/app-devices",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-app-devices.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-app-devices.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "app_devices_post"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.app_device_access",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v1.app_device_access"]
+}

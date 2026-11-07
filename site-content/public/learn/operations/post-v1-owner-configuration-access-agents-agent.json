@@ -1,0 +1,119 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "An already authorized Super agent replaces grants or changes roles for an existing paired control agent, including its own configuration bootstrap; applets, portals and device peers excluded",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_access_agents",
+  "query": [],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [
+   {
+    "name": "expected_generation",
+    "description": "Exact opaque generation from access discovery; changes on key rotation",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "capabilities",
+    "description": "Replace legacy capability ids; null allows all (relay stores explicit ids)",
+    "type": [
+     "array",
+     "null"
+    ],
+    "required": false
+   },
+   {
+    "name": "control_scopes",
+    "description": "Replace control grants with these known scopes, durable until revoked; [] clears; native capture revocation also narrows corresponding legacy permissions",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "paused",
+    "description": "Pause/resume this paired control agent",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "super_powers",
+    "description": "Delegate/revoke Super Powers; caller must already have them",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "fixer_mode",
+    "description": "Delegate/revoke Fixer Mode",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "maximum_control",
+    "description": "Preserves the separate Superpowers role. true alone grants native maximum capabilities/roles/scopes; false stops future maximum inheritance",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/access/agents/example {\"expected_generation\":\"<generation from discovery>\",\"control_scopes\":[\"owner.configuration\"]}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/access/agents/{agent}",
+  "capability": "settings",
+  "returns": "sanitized control-agent access,approval_required=false; no key creation or Android consent bypass",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "expected_generation": {
+     "description": "Exact opaque generation from access discovery; changes on key rotation",
+     "type": "string"
+    },
+    "agent": {
+     "description": "The agent in /v1/owner/configuration/access/agents/{agent}",
+     "type": "string"
+    },
+    "paused": {
+     "description": "Pause/resume this paired control agent",
+     "type": "boolean"
+    },
+    "capabilities": {
+     "description": "Replace legacy capability ids; null allows all (relay stores explicit ids)",
+     "type": [
+      "array",
+      "null"
+     ]
+    },
+    "maximum_control": {
+     "description": "Preserves the separate Superpowers role. true alone grants native maximum capabilities/roles/scopes; false stops future maximum inheritance",
+     "type": "boolean"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "fixer_mode": {
+     "description": "Delegate/revoke Fixer Mode",
+     "type": "boolean"
+    },
+    "super_powers": {
+     "description": "Delegate/revoke Super Powers; caller must already have them",
+     "type": "boolean"
+    },
+    "control_scopes": {
+     "description": "Replace control grants with these known scopes, durable until revoked; [] clears; native capture revocation also narrows corresponding legacy permissions",
+     "type": "array",
+     "items": {"type": "object"}
+    }
+   },
+   "required": [
+    "agent",
+    "expected_generation",
+    "idempotency_key"
+   ]
+  },
+  "errors": [],
+  "requires": "super_powers"
+ }
+}

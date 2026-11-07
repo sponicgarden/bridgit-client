@@ -1,0 +1,153 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Generate one image through Azure Sunburst or OpenRouter FLUX 3 Image Klein; 40 per linked account per calendar month UTC, shared across devices and applet wordmarks",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "images_generations",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "prompt",
+    "description": "Image description, 1-32000 characters",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "task_key",
+    "description": "Registered applet image task; image_generation by default. Resolves live applet/account model preferences; Azure Sunburst by default; flux_image_generation selects FLUX 3 Image Klein",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "image_generation",
+     "make_fairytale_image",
+     "flux_image_generation"
+    ]
+   },
+   {
+    "name": "size",
+    "description": "Image dimensions",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "1024x1024",
+     "1536x1024",
+     "1024x1536"
+    ]
+   },
+   {
+    "name": "quality",
+    "description": "Quality; medium by default, and the only supported FLUX quality",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "low",
+     "medium",
+     "high"
+    ]
+   },
+   {
+    "name": "output_format",
+    "description": "Image format; png by default",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "png",
+     "jpeg"
+    ]
+   },
+   {
+    "name": "background",
+    "description": "Transparent requires png and the Azure service",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "auto",
+     "opaque",
+     "transparent"
+    ]
+   }
+  ],
+  "example": "POST /v1/images/generations {\"prompt\":\"An otter in a purple scarf\"}",
+  "idempotent": true,
+  "path": "/v1/images/generations",
+  "capability": "judgment",
+  "returns": "provider, model, request_id, data[{b64_json}], size, quality, output_format, usage, cost_usd, quota{limit,used,remaining,resets_at}. Idempotency-Key required; retry unknown outcomes only with the same key; results kept privately 24 hours",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "size": {
+     "description": "Image dimensions",
+     "type": "string",
+     "enum": [
+      "1024x1024",
+      "1536x1024",
+      "1024x1536"
+     ]
+    },
+    "output_format": {
+     "description": "Image format; png by default",
+     "type": "string",
+     "enum": [
+      "png",
+      "jpeg"
+     ]
+    },
+    "background": {
+     "description": "Transparent requires png and the Azure service",
+     "type": "string",
+     "enum": [
+      "auto",
+      "opaque",
+      "transparent"
+     ]
+    },
+    "task_key": {
+     "description": "Registered applet image task; image_generation by default. Resolves live applet/account model preferences; Azure Sunburst by default; flux_image_generation selects FLUX 3 Image Klein",
+     "type": "string",
+     "enum": [
+      "image_generation",
+      "make_fairytale_image",
+      "flux_image_generation"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "prompt": {
+     "description": "Image description, 1-32000 characters",
+     "type": "string"
+    },
+    "quality": {
+     "description": "Quality; medium by default, and the only supported FLUX quality",
+     "type": "string",
+     "enum": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "required": [
+    "prompt",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "account_required",
+   "image_quota_exceeded",
+   "image_in_progress",
+   "image_provider_failed",
+   "image_outcome_unknown",
+   "images_unavailable"
+  ],
+  "requires": null
+ }
+}

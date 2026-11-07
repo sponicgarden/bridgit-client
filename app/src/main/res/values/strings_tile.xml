@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UI-23: Quick Settings tile. -->
+<resources>
+    <string name="tile_label">Bridgit</string>
+    <string name="tile_listening">Listening</string>
+    <string name="tile_paused">Paused</string>
+</resources>

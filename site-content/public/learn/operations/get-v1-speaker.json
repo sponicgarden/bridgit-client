@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "What's playing, and your queued sounds",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "speaker_status",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/speaker",
+  "idempotent": false,
+  "path": "/v1/speaker",
+  "capability": "speaker",
+  "returns": "playing{play_id, agent, text} (yours only, else null), busy (someone else's sound is playing), paused, queued[], quiet",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

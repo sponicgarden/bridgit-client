@@ -1,0 +1,112 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_stream_start",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-stream.start.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-stream.start.json",
+  "required_arguments": ["idempotency_key"],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "duration_seconds": {
+      "maximum": 1800,
+      "type": "integer",
+      "minimum": 10
+     },
+     "interval_seconds": {
+      "maximum": 30,
+      "type": "integer",
+      "minimum": 2
+     },
+     "camera": {
+      "description": "rear (default), front, or an enrolled lan:<id>; local cameras also need lan_camera permission",
+      "type": "string",
+      "maxLength": 80
+     }
+    },
+    "required": []
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": ["tool"],
+    "properties": {
+     "arguments": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "duration_seconds": {
+        "maximum": 1800,
+        "type": "integer",
+        "minimum": 10
+       },
+       "interval_seconds": {
+        "maximum": 30,
+        "type": "integer",
+        "minimum": 2
+       },
+       "camera": {
+        "description": "rear (default), front, or an enrolled lan:<id>; local cameras also need lan_camera permission",
+        "type": "string",
+        "maxLength": 80
+       }
+      },
+      "required": []
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["stream.start"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "duration_seconds": {
+     "maximum": 1800,
+     "type": "integer",
+     "minimum": 10
+    },
+    "interval_seconds": {
+     "maximum": 30,
+     "type": "integer",
+     "minimum": 2
+    },
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    },
+    "camera": {
+     "description": "rear (default), front, or an enrolled lan:<id>; local cameras also need lan_camera permission",
+     "type": "string",
+     "maxLength": 80
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_stream_start"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "stream.start"
+ }
+}

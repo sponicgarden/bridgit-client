@@ -1,0 +1,70 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Follow up on a report you filed: a note (\"still happens on 1.7.2\"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "feedback_followup",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "note",
+    "description": "What you see now (500 chars); needed when there's no outcome",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "outcome",
+    "description": "works or still_broken: the owner's Confirm / Still broken, allowed once the report is fixed, wont_fix or duplicate",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "works",
+     "still_broken"
+    ]
+   }
+  ],
+  "example": "POST /v1/feedback/7/followup {\"outcome\":\"still_broken\",\"note\":\"Still returns 500 on 1.7.2\"}",
+  "idempotent": true,
+  "path": "/v1/feedback/{id}/followup",
+  "capability": "feedback",
+  "returns": "the report summary",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "note": {
+     "description": "What you see now (500 chars); needed when there's no outcome",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/feedback/{id}/followup",
+     "type": "string"
+    },
+    "outcome": {
+     "description": "works or still_broken: the owner's Confirm / Still broken, allowed once the report is fixed, wont_fix or duplicate",
+     "type": "string",
+     "enum": [
+      "works",
+      "still_broken"
+     ]
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

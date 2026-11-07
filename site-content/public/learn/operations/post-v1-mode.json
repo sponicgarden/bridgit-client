@@ -1,0 +1,39 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set the phone's mode. Setting the mode it already is changes nothing; flows with a mode trigger start on a change",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "mode_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "mode",
+   "description": "One of the phone's modes (GET /v1/mode lists them)",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/mode {\"mode\":\"away\"}",
+  "idempotent": false,
+  "path": "/v1/mode",
+  "capability": "modes",
+  "returns": "mode, from, changed (false when it already was that mode)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"mode": {
+    "description": "One of the phone's modes (GET /v1/mode lists them)",
+    "type": "string"
+   }},
+   "required": ["mode"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

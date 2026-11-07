@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Paid external services, account spending and limits; set or clear with owner/configure service.budget.set",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "services_budgets",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/services/budgets",
+  "idempotent": false,
+  "path": "/v1/services/budgets",
+  "capability": "owner_features",
+  "returns": "services[{service,name,limits[{id,usd,per,spent_usd,resets_at}],timezone,state}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,70 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "System-wide Android logcat snapshot; requires Agent Super Powers, adb grant, private build and the owner's ADB switch",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "adb_logcat",
+  "query": [
+   {
+    "name": "buffer",
+    "description": "all (default), main, system, crash or events",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "all",
+     "main",
+     "system",
+     "crash",
+     "events"
+    ]
+   },
+   {
+    "name": "lines",
+    "description": "1-10000, default 1000; output capped at 2 MiB, timeout 10 seconds",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/adb/logcat?buffer=all&lines=1000",
+  "idempotent": false,
+  "path": "/v1/adb/logcat",
+  "capability": "adb",
+  "returns": "scope, buffer, output, exit_code, truncated, timed_out, retention",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "buffer": {
+     "description": "all (default), main, system, crash or events",
+     "type": "string",
+     "enum": [
+      "all",
+      "main",
+      "system",
+      "crash",
+      "events"
+     ]
+    },
+    "lines": {
+     "description": "1-10000, default 1000; output capped at 2 MiB, timeout 10 seconds",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "forbidden",
+   "agent_not_allowed",
+   "capability_disabled",
+   "service_start_blocked",
+   "invalid_parameter"
+  ],
+  "requires": "super_powers"
+ }
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- First-run native pages, matched to page 1 (assets/firstrun/intro.html). Dark values in values-night. -->
+<resources>
+    <color name="firstrun_glow_top">@color/b_surface_container</color>
+    <color name="firstrun_head">@color/b_on_surface</color>
+    <color name="firstrun_card_bg">@color/b_surface_container_low</color>
+    <color name="firstrun_warn_edge">#80F59E42</color>
+    <color name="firstrun_amber">#C46A12</color>
+    <color name="firstrun_amber_soft">#26F59E42</color>
+    <color name="firstrun_line">@color/b_outline_variant</color>
+</resources>

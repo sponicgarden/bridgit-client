@@ -1,0 +1,34 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Run one approved action now, outside its timetable (its 'after' chain doesn't follow)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "schedule_run",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/schedule/run/pics",
+  "idempotent": false,
+  "path": "/v1/schedule/run/{id}",
+  "capability": "schedule",
+  "returns": "action_id, status (ok or failed), result{runs, last_status, last_error}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/schedule/run/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "capability_disabled"
+  ],
+  "requires": null
+ }
+}

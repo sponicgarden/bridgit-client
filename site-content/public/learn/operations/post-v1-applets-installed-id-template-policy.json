@@ -1,0 +1,73 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Track, pause template updates, or detach and repurpose your applet; never pauses execution or deletes data. Detached copies cannot silently reattach",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applets_installed_template_policy",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "state",
+    "description": "tracking, paused or detached; tracking resumes a paused relationship only",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "expected_revision",
+    "description": "revision from development snapshot",
+    "type": "integer",
+    "required": true
+   },
+   {
+    "name": "reason",
+    "description": "Owner's requested reason, 1-1000 characters",
+    "type": "string",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/applets/installed/ai0123456789abcd/template-policy {\"state\":\"detached\",\"expected_revision\":1,\"reason\":\"Repurpose as inventory\"}",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/template-policy",
+  "capability": "applet_install",
+  "returns": "the instance with template_state and revision",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "expected_revision": {
+     "description": "revision from development snapshot",
+     "type": "integer"
+    },
+    "reason": {
+     "description": "Owner's requested reason, 1-1000 characters",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/applets/installed/{id}/template-policy",
+     "type": "string"
+    },
+    "state": {
+     "description": "tracking, paused or detached; tracking resumes a paused relationship only",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "state",
+    "expected_revision",
+    "reason"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "conflict",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

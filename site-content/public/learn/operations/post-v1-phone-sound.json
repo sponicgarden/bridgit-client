@@ -1,0 +1,64 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Change ringer or volume",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "phone_sound",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "ringer_mode",
+    "description": "normal, vibrate or silent",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "volume",
+    "description": "media/ring/alarm percentages, 0\u2013100",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "duration_minutes",
+    "description": "Optional timed restoration, 1\u20131440 minutes; null leaves the change in place",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/phone/sound",
+  "idempotent": true,
+  "path": "/v1/phone/sound",
+  "capability": "controls",
+  "returns": "Change ringer or volume",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "volume": {
+     "description": "media/ring/alarm percentages, 0\u2013100",
+     "type": "object"
+    },
+    "duration_minutes": {
+     "description": "Optional timed restoration, 1\u20131440 minutes; null leaves the change in place",
+     "type": "integer"
+    },
+    "ringer_mode": {
+     "description": "normal, vibrate or silent",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

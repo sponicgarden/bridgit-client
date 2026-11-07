@@ -1,0 +1,171 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_owner_configure",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-owner.configure.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-owner.configure.json",
+  "required_arguments": [
+   "idempotency_key",
+   "action",
+   "options"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "options": {
+      "description": "Exact action options from GET /v1/owner/features",
+      "type": "object"
+     },
+     "action": {
+      "type": "string",
+      "enum": [
+       "service.model.set",
+       "service.budget.set",
+       "resource.download",
+       "resource.delete",
+       "resource.check",
+       "dog.configure",
+       "applet.configure",
+       "dog.start",
+       "dog.stop",
+       "dog.find_camera",
+       "dog.clear_history",
+       "tour.start",
+       "wake.configure",
+       "sounds.configure",
+       "remote.configure",
+       "callback.configure",
+       "delivery.subscribe",
+       "updates.offers",
+       "updates.install",
+       "android.setup"
+      ]
+     }
+    },
+    "required": [
+     "action",
+     "options"
+    ]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "options": {
+        "description": "Exact action options from GET /v1/owner/features",
+        "type": "object"
+       },
+       "action": {
+        "type": "string",
+        "enum": [
+         "service.model.set",
+         "service.budget.set",
+         "resource.download",
+         "resource.delete",
+         "resource.check",
+         "dog.configure",
+         "applet.configure",
+         "dog.start",
+         "dog.stop",
+         "dog.find_camera",
+         "dog.clear_history",
+         "tour.start",
+         "wake.configure",
+         "sounds.configure",
+         "remote.configure",
+         "callback.configure",
+         "delivery.subscribe",
+         "updates.offers",
+         "updates.install",
+         "android.setup"
+        ]
+       }
+      },
+      "required": [
+       "action",
+       "options"
+      ]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["owner.configure"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "options": {
+     "description": "Exact action options from GET /v1/owner/features",
+     "type": "object"
+    },
+    "action": {
+     "type": "string",
+     "enum": [
+      "service.model.set",
+      "service.budget.set",
+      "resource.download",
+      "resource.delete",
+      "resource.check",
+      "dog.configure",
+      "applet.configure",
+      "dog.start",
+      "dog.stop",
+      "dog.find_camera",
+      "dog.clear_history",
+      "tour.start",
+      "wake.configure",
+      "sounds.configure",
+      "remote.configure",
+      "callback.configure",
+      "delivery.subscribe",
+      "updates.offers",
+      "updates.install",
+      "android.setup"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "idempotency_key",
+    "action",
+    "options"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_owner_configure"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "owner.configure"
+ }
+}

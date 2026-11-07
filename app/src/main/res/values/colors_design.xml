@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared design tokens, matched to the welcome page (assets/firstrun/intro.html). Dark values in values-night.
+     design_info_*: gradient behind purely informational panels (never behind switches or lists).
+     design_rule_*: the short lavender-to-amber accent line under a screen's lead text. -->
+<resources>
+    <color name="design_info_start">@color/b_surface_container</color>
+    <color name="design_info_end">@color/b_surface_container</color>
+    <color name="design_info_edge">@color/b_outline_variant</color>
+    <color name="design_rule_start">@color/b_primary</color>
+    <color name="design_rule_end">@color/b_primary</color>
+    <color name="design_screen_glow">@color/b_surface_container_low</color>
+</resources>

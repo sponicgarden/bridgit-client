@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Discover general decision and location-context services for any applet: Azure image generation, models, nearby places, air quality, pollen, time zones, maps and weather; call formats, grants and budgets; no paid call",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "services",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/services",
+  "idempotent": false,
+  "path": "/v1/services",
+  "capability": "status",
+  "returns": "bridgit-services/1: services[id,name,provider,provider_model?,applet_compatible,paid,inputs,availability,call,applet,budget,docs]; catalog availability is configuration only; check grants and live call results",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,43 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Delete one row in this applet principal's own declared table using the same table-store cleanup as the owner UI",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "applet_tables_rows_delete",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/applet/tables/results/rows/abc",
+  "idempotent": false,
+  "path": "/v1/applet/tables/{table}/rows/{row}",
+  "capability": "applet_data",
+  "returns": "deleted, existed",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "row": {
+     "description": "The row in /v1/applet/tables/{table}/rows/{row}",
+     "type": "string"
+    },
+    "table": {
+     "description": "The table in /v1/applet/tables/{table}/rows/{row}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "table",
+    "row"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "not_found"
+  ],
+  "requires": null
+ }
+}

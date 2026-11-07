@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your manifest: what's approved, what's waiting for the owner, each action's next run and last result, and your saved files",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "schedule_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/schedule",
+  "idempotent": false,
+  "path": "/v1/schedule",
+  "capability": "schedule",
+  "returns": "status (none, awaiting_owner, active, paused), timezone, source{url, poll_minutes, last_poll, last_error}, active{digest, actions[{id, summary, next_at, runs, last_status, last_error}]}, pending{digest, actions}, assets[]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

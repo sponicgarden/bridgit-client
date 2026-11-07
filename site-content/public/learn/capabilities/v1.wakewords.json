@@ -1,0 +1,47 @@
+{
+ "detail_url": "/v1/discover?id=v1.wakewords&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.wakewords.json",
+ "title": "wakewords",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.wakewords.json",
+ "prerequisites": ["Check v1.wakewords supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Wake words: whether the phone is listening, and the wake words the owner gave you",
+   "path": "/v1/listen",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-listen.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-listen.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "listen"
+  },
+  {
+   "summary": "The audio after a wake word, when the owner set that wake word to send it (kept in memory 10 minutes unless you chose longer with POST /v1/captures/storage; also GET /v1/captures/{id})",
+   "path": "/v1/listen/clip/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-listen-clip-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-listen-clip-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "listen_clip"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.wakewords",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "sense",
+ "capability_ids": ["v1.wakewords"]
+}

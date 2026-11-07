@@ -1,0 +1,83 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Newest gallery images (metadata only)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "gallery_recent",
+  "query": [
+   {
+    "name": "type",
+    "description": "any, photo or screenshot",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "album",
+    "description": "Exact album name",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "since",
+    "description": "ISO-8601 UTC added-at lower bound",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "until",
+    "description": "ISO-8601 UTC upper bound",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "1-100, default 20",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/gallery/recent?limit=10",
+  "idempotent": false,
+  "path": "/v1/gallery/recent",
+  "capability": "gallery",
+  "returns": "access_mode, photos[id, taken_at, width_px, height_px, size_bytes, mime, album]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "album": {
+     "description": "Exact album name",
+     "type": "string"
+    },
+    "limit": {
+     "description": "1-100, default 20",
+     "type": "integer"
+    },
+    "until": {
+     "description": "ISO-8601 UTC upper bound",
+     "type": "string"
+    },
+    "type": {
+     "description": "any, photo or screenshot",
+     "type": "string"
+    },
+    "since": {
+     "description": "ISO-8601 UTC added-at lower bound",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "permission_denied"
+  ],
+  "requires": null
+ }
+}

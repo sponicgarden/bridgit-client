@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ADB setup (8.27): developer options → Wireless debugging → pair → full access → let agents use ADB. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="64dp"
+        app:navigationContentDescription="@string/access_back"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="@string/more_adb_setup"
+        app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <!-- What ADB setup does: read-only, so the welcome page's gradient panel and accent line. -->
+            <LinearLayout
+                style="@style/Widget.Bridgit.InfoPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/intro"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <View
+                    style="@style/Widget.Bridgit.Rule"
+                    android:layout_marginTop="12dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/Widget.Bridgit.Panel"
+                android:paddingBottom="12dp">
+
+            <TextView
+                style="@style/Widget.Bridgit.SectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="14dp"
+                android:text="Turn on ADB" />
+
+            <LinearLayout
+                android:id="@+id/steps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:id="@+id/code_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Code, and port if asked (split screen)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:digits="0123456789 .:"
+                        android:inputType="text"
+                        android:maxLength="40" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/use_code"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Pair" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/pair_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="4dp"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorSecondary"
+                android:visibility="gone" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/Widget.Bridgit.Panel"
+                android:paddingBottom="12dp">
+
+            <TextView
+                style="@style/Widget.Bridgit.SectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="14dp"
+                android:text="Or use a laptop and a USB cable" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="4dp"
+                android:text="If pairing over Wi-Fi doesn't work, an AI control agent on your laptop (Claude Code, Codex or Cursor) can give Bridgit its access through a cable instead."
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <LinearLayout
+                android:id="@+id/usb_steps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/share_prompt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Share prompt" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/copy_prompt"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Copy prompt" />
+            </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/Widget.Bridgit.Panel"
+                android:paddingBottom="12dp">
+
+            <TextView
+                style="@style/Widget.Bridgit.SectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="14dp"
+                android:text="Give Bridgit full access" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/grant_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Give Bridgit full access" />
+
+            <LinearLayout
+                android:id="@+id/grants"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/grant_output"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:fontFamily="monospace"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textIsSelectable="true"
+                android:visibility="gone" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/Widget.Bridgit.Panel"
+                android:paddingBottom="12dp">
+
+            <TextView
+                style="@style/Widget.Bridgit.SectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="14dp"
+                android:text="Control agents" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/agents_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:text="Let control agents use ADB"
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="4dp"
+                android:text="Each control agent also needs Agent Super Powers turned on in its page under Control agents. Every command a control agent runs is logged in Activity."
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/forget"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="12dp"
+                android:text="Forget pairing" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/revokeSuper"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/revoke_super_button"
+                android:textColor="?attr/colorError" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="4dp"
+                android:text="Turns off Super Powers for every control agent, removes special ADB access, forgets the pairing and turns off Wireless debugging. Ordinary permissions such as camera and microphone remain; you can remove them in Bridgit’s App info."
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

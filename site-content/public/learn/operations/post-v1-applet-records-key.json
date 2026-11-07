@@ -1,0 +1,49 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Save a control agent record (replaces it). Applet execution principals must use declared processing.tables, including described json columns; this legacy store refuses applet writes",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applet_records_save",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "value",
+   "description": "Any JSON object, 40,000 characters at most",
+   "type": "object",
+   "required": true
+  }],
+  "example": "POST /v1/applet/records/item.k3j9 {\"value\":{\"label\":\"stand mixer\"}}",
+  "idempotent": false,
+  "path": "/v1/applet/records/{key}",
+  "capability": "applet_data",
+  "returns": "key, updated_at, chars, count, total_chars",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "value": {
+     "description": "Any JSON object, 40,000 characters at most",
+     "type": "object"
+    },
+    "key": {
+     "description": "The key in /v1/applet/records/{key}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "key",
+    "value"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "payload_too_large",
+   "quota_exceeded"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Manage connection lifecycle; discover preset names and safe metadata, including revoked connections",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_connections_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/connections",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/connections",
+  "capability": "owner_features",
+  "returns": "connections with id,name,preset,enabled and configured flags only; presets with header support and extra field names; no URLs or secrets",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "How to help the owner turn on ADB for Bridgit, and what to do once it's on (Markdown)",
+  "method": "GET",
+  "auth": false,
+  "mcp_tool": "adb_setup",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/adb/setup",
+  "idempotent": false,
+  "path": "/v1/adb/setup",
+  "capability": "adb",
+  "returns": "text/markdown",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

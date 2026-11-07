@@ -1,0 +1,102 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_workflow_simulate",
+  "idempotency_required": false,
+  "documentation": "https://bridgit.cc/learn/operations/v2-workflow.simulate.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-workflow.simulate.json",
+  "required_arguments": ["flow"],
+  "http": {
+   "path": "/v2/call",
+   "headers": {"Authorization": "Bearer <your key>"},
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "description": "Preview a flow with fixtures. Returns simulated, status, steps and would. No device actions or paid calls.",
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "trigger": {
+      "description": "Example event values available to trigger references",
+      "type": "object"
+     },
+     "flow": {
+      "description": "An inline workflow.validate definition with name, trigger and steps",
+      "type": "object"
+     },
+     "fixtures": {
+      "description": "Synthetic results keyed by group and step id, e.g. photos.shot, ask_model.look and ask_owner.check. Omit fixtures for skipped steps",
+      "type": "object"
+     }
+    },
+    "required": ["flow"]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "description": "Preview a flow with fixtures. Returns simulated, status, steps and would. No device actions or paid calls.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "trigger": {
+        "description": "Example event values available to trigger references",
+        "type": "object"
+       },
+       "flow": {
+        "description": "An inline workflow.validate definition with name, trigger and steps",
+        "type": "object"
+       },
+       "fixtures": {
+        "description": "Synthetic results keyed by group and step id, e.g. photos.shot, ask_model.look and ask_owner.check. Omit fixtures for skipped steps",
+        "type": "object"
+       }
+      },
+      "required": ["flow"]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["workflow.simulate"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "description": "Preview a flow with fixtures. Returns simulated, status, steps and would. No device actions or paid calls.",
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "trigger": {
+     "description": "Example event values available to trigger references",
+     "type": "object"
+    },
+    "flow": {
+     "description": "An inline workflow.validate definition with name, trigger and steps",
+     "type": "object"
+    },
+    "fixtures": {
+     "description": "Synthetic results keyed by group and step id, e.g. photos.shot, ask_model.look and ask_owner.check. Omit fixtures for skipped steps",
+     "type": "object"
+    }
+   },
+   "required": ["flow"]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_workflow_simulate"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "workflow.simulate"
+ }
+}

@@ -1,0 +1,18 @@
+{
+  "kind": "question",
+  "title": "Pay €184.20 to Fraulini Plumbing?",
+  "text": "Invoice #2291 for the boiler repair on 28 Oct. Due 7 Nov. It matches the quote you approved (€180 + €4.20 parts).\n\nI’ll pay from your current account ending 0932.",
+  "controls": [
+    {
+      "type": "button",
+      "id": "pay",
+      "label": "Pay €184.20",
+      "style": "primary"
+    },
+    {
+      "type": "button",
+      "id": "not_now",
+      "label": "Not now"
+    }
+  ]
+}

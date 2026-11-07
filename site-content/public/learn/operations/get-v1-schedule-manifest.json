@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your exact approved and pending action manifests for inspection or resubmission",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "schedule_manifest",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/schedule/manifest",
+  "idempotent": false,
+  "path": "/v1/schedule/manifest",
+  "capability": "schedule",
+  "returns": "active and pending manifest (your submissions only), digests; reading does not approve or change anything",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

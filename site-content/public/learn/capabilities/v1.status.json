@@ -1,0 +1,367 @@
+{
+ "detail_url": "/v1/discover?id=v1.status&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.status.json",
+ "title": "status",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.status.json",
+ "prerequisites": ["Check v1.status supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Your display name and artwork",
+   "path": "/v1/agent/profile",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-agent-profile.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-agent-profile.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "agent_profile_get"
+  },
+  {
+   "summary": "Update your self-supplied name and artwork",
+   "path": "/v1/agent/profile",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-agent-profile.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-agent-profile.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "agent_profile_post"
+  },
+  {
+   "summary": "Speech selection and local readiness",
+   "path": "/v1/speech/models",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-speech-models.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-speech-models.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "speech_models"
+  },
+  {
+   "summary": "Discover general decision and location-context services for any applet: Azure image generation, models, nearby places, air quality, pollen, time zones, maps and weather; call formats, grants and budgets; no paid call",
+   "path": "/v1/services",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-services.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-services.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "services"
+  },
+  {
+   "summary": "Is Bridgit up, and which agent you are",
+   "path": "/v1/health",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-health.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-health.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "health"
+  },
+  {
+   "summary": "Host and owner-configured external devices, supported actions and access status",
+   "path": "/v1/devices",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-devices.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-devices.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "devices"
+  },
+  {
+   "summary": "What's switched on and ready, and why not",
+   "path": "/v1/capabilities",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-capabilities.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-capabilities.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "capabilities"
+  },
+  {
+   "summary": "Your account's limits right now, and what is used: Jev and Clef calls an hour, the monthly model budget, paid watch checks, and the limits this phone enforces itself. Limits differ per account and can change: read them here, never assume documented numbers",
+   "path": "/v1/limits",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-limits.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-limits.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "limits"
+  },
+  {
+   "summary": "Find capabilities and recipes for an intent without executing them",
+   "path": "/v1/discover",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-discover.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-discover.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "discover"
+  },
+  {
+   "summary": "Report an explicit catalog selection or bounded self-reported feedback; never verified evidence",
+   "path": "/v1/discover/report",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-discover-report.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-discover-report.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "discover_report"
+  },
+  {
+   "summary": "This guide, generated live (Markdown)",
+   "path": "/v1/guide",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-guide.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-guide.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "guide"
+  },
+  {
+   "summary": "The starter (https://bridgit.cc/learn/start.md) served from the phone, so an agent without web access reads it too: the four stages of building an applet (Markdown, no key needed)",
+   "path": "/v1/start",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-start.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-start.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "start"
+  },
+  {
+   "summary": "The demo to offer right after pairing: a five-minute first-run tour run from cards on the phone, then a menu of more demos picked by a few questions (Markdown)",
+   "path": "/v1/demo",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-demo.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-demo.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "demo"
+  },
+  {
+   "summary": "Complete interaction samples for every kind (notice, question, html, text): the POST /v1/interactions body, the reply and the answer it produces (JSON). For cards that decide or watch (Jev, Clef, the free camera change check), read https://bridgit.cc/learn/decisions.md",
+   "path": "/v1/samples",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-samples.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-samples.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "samples"
+  },
+  {
+   "summary": "OpenAPI 3.1 description of every endpoint",
+   "path": "/v1/openapi.json",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-openapi-json.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-openapi-json.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": null
+  },
+  {
+   "summary": "What's new in the API since a revision you know",
+   "path": "/v1/changes",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-changes.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-changes.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "changes"
+  },
+  {
+   "summary": "The `bridgit` command-line helper (Python, no secrets inside)",
+   "path": "/v1/tools/bridgit",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-tools-bridgit.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-tools-bridgit.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": null
+  },
+  {
+   "summary": "Deprecated: the old address of GET /v1/tools/bridgit, same helper",
+   "path": "/v1/tools/bridget",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-tools-bridget.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-tools-bridget.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": null
+  },
+  {
+   "summary": "Fetch your key with a 6-digit code shown on the phone (alternative to the setup prompt)",
+   "path": "/v1/pair",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-pair.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-pair.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": null
+  },
+  {
+   "summary": "Model Context Protocol (Streamable HTTP, JSON replies): every endpoint you can use is an MCP tool",
+   "path": "/v1/mcp",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-mcp.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-mcp.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": null
+  },
+  {
+   "summary": "Tell the owner which model you are and what runs you; shown on your agent card",
+   "path": "/v1/me",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-me.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-me.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "me"
+  },
+  {
+   "summary": "Whether the owner has verified their email. Bridgit works for 24 hours from the first agent call; after that, until they do, only the status endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes) and feedback keep working, plus the control tools capabilities, events, operation.get and feedback.create; every other call answers email_required",
+   "path": "/v1/owner/email",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-email.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-email.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "owner_email_get"
+  },
+  {
+   "summary": "Give the owner's email address: bridgit.cc emails them a link, and tapping it verifies the address (the same address gets email alerts). Works during and after the 24 hours; not once an address is verified (the owner changes it on the phone)",
+   "path": "/v1/owner/email",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-email.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-email.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "owner_email_post"
+  },
+  {
+   "summary": "The satellites (other Bridgit phones linked to this one) you may use, with what each offers. Any call takes header X-Bridgit-Target: <satellite id> (or query target=<id>) to run on that satellite instead of this phone; leave it out to use this phone.",
+   "path": "/v1/satellites",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-satellites.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-satellites.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "satellites"
+  },
+  {
+   "summary": "Phone to phone: a hub trades a satellite pairing link's one-time code for its key. Not for agents.",
+   "path": "/v1/satellite/claim",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-satellite-claim.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-satellite-claim.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": null
+  },
+  {
+   "summary": "Phone to phone: what this satellite offers its hub (only for a hub link's key). Agents use GET /v1/satellites on the hub.",
+   "path": "/v1/satellite/manifest",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-satellite-manifest.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-satellite-manifest.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": null
+  },
+  {
+   "summary": "Phone to phone: a hub tells its satellite which photo applets and portals it has, and how to call back (only for a hub link's key). Not for agents.",
+   "path": "/v1/satellite/hub-info",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-satellite-hub-info.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-satellite-hub-info.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "satellite_hub_info"
+  },
+  {
+   "summary": "Phone to phone: a satellite reads its hub's photo applets and portals (only for a satellite's return key). Not for agents.",
+   "path": "/v1/satellite/hub",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-satellite-hub.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-satellite-hub.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "satellite_hub"
+  },
+  {
+   "summary": "Phone to phone: a photo the owner took on a satellite's Camera tab, checked by this hub's photo applets (only for a satellite's return key). Not for agents.",
+   "path": "/v1/satellite/hub/photo",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-satellite-hub-photo.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-satellite-hub-photo.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "satellite_hub_photo"
+  },
+  {
+   "summary": "Phone to phone: a one-use bridgit.cc sign-in code for the hub's account, so a satellite's Portals tab opens the hub's portals signed in (only for a satellite's return key). Not for agents.",
+   "path": "/v1/satellite/hub/portal-login",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-satellite-hub-portal-login.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-satellite-hub-portal-login.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "satellite_hub_portal_login"
+  },
+  {
+   "summary": "Phone to phone: the hub removed this satellite, so the satellite drops its hub link too (only for a hub link's key). Not for agents.",
+   "path": "/v1/satellite/unlink",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-satellite-unlink.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-satellite-unlink.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "satellite_unlink"
+  },
+  {
+   "summary": "Phone to phone: a satellite unlinked this hub, so the hub removes it too (only for a satellite's return key). Not for agents.",
+   "path": "/v1/satellite/hub/unlink",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-satellite-hub-unlink.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-satellite-hub-unlink.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "satellite_hub_unlink"
+  },
+  {
+   "summary": "Phone to phone: the hub's control agents, so a satellite switched to its hub can see and pause them (only for a satellite's return key, while the hub hasn't paused that satellite). Not for agents.",
+   "path": "/v1/satellite/hub/agents",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-satellite-hub-agents.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-satellite-hub-agents.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "satellite_hub_agents"
+  },
+  {
+   "summary": "Phone to phone: a satellite pauses or resumes one of its hub's control agents (only for a satellite's return key). Not for agents.",
+   "path": "/v1/satellite/hub/agents/{id}/pause",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-satellite-hub-agents-id-pause.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-satellite-hub-agents-id-pause.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "satellite_hub_agents_pause"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.status",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v1.status"]
+}

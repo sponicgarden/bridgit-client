@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Interaction detail (UI-16): Play aloud, Close. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/interactions_play" android:icon="@drawable/interactions_ic_play"
+        android:title="@string/interactions_play" app:showAsAction="ifRoom" />
+    <item android:id="@+id/interactions_close" android:title="@string/interactions_close" app:showAsAction="never" />
+</menu>

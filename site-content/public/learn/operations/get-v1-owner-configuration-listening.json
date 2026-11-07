@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read complete wake-word definitions and sound-event recipient configuration",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_listening_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/listening",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/listening",
+  "capability": "owner_features",
+  "returns": "wake_words[{phrase,agent_id,send_clip}],sounds{agent_id,sensitivity,send_clip} or null",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

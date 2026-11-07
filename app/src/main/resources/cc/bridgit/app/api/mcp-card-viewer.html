@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bridgit card</title>
+<style>
+body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1f1b16;background:#f5f2eb}
+.bw{padding:22px 20px;text-align:center;color:#6b6257}
+.bp{padding:20px;max-width:420px;margin:0 auto}
+.bp h2{margin:0 0 8px;font-size:19px}.bp p{margin:0 0 12px}
+.bp .row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.bp button{font:inherit;padding:9px 14px;border-radius:10px;border:1px solid #cfc6b8;background:#fff;color:#1f1b16}
+.bp small{color:#6b6257}
+.be{color:#8a2d1c}
+</style>
+<script>
+/*
+ * Bridgit card viewer for MCP Apps hosts (Claude, ChatGPT, VS Code, Goose, basic-host...).
+ * Served by Bridgit's MCP server as ui://bridgit/card.html. It runs an unchanged Bridgit card on the phone's own
+ * bridge: the card page is built like CardRules.prepare on the phone (CSP meta, viewport, the phone's GUARD and
+ * RESPOND_SHIM scripts, then the card), with a small native object under the shim in place of the phone's Kotlin one.
+ * PHONE_HEAD below is filled in by the phone when it serves this page (McpApps.viewer), from CardRules.kt itself.
+ * The native object has the phone's two methods:
+ *   act(json) -> ref: MCP tools/call "card_act" through the host, which runs the endpoint on the phone as the
+ *     connected agent (its grants and the owner's switches apply); the result {ok, status, body, error?} comes back
+ *     through window.__bridgitActed({...result, ref}) and a bridgit:acted event, as CardActions.deliverScript does.
+ *   respond(json): once per card, the answer goes to the chat (ui/update-model-context and ui/message), then a
+ *     bridgit:answered event fires on document.
+ * The card itself arrives in the tool's input (html) or result (structuredContent.html) and replaces this page.
+ * No keys are in this page; the host holds the connection.
+ */
+(function(){
+  var w = window, host = w.parent, nextId = 1, pending = {}, ready = false, queue = [];
+  var input = null, rendered = false, answered = false, inFlight = 0, refs = 0, title = '', interactionId = null;
+  var MAX_IN_FLIGHT = 8, RESPOND_MAX = 16384;
+  /* The phone's card page head, CardRules.prepare(""): CSP meta, viewport, GUARD, RESPOND_SHIM. */
+  var PHONE_HEAD = /*BRIDGIT_PHONE_HEAD*/'';
+  /* Hands the native object to the card page; the page's first script takes it (see render). */
+  var NATIVE = '(function(){var w=window,n=w.__bridgitNative;try{delete w.__bridgitNative}catch(e){}w.Bridgit=n;w.Bridget=n})();';
+
+  function post(m){ try{ host.postMessage(m, '*'); }catch(e){} }
+  function request(method, params){
+    var id = 'bridgit-' + (nextId++);
+    return new Promise(function(res, rej){ pending[id] = {res: res, rej: rej}; post({jsonrpc: '2.0', id: id, method: method, params: params || {}}); });
+  }
+  function notify(method, params){ post({jsonrpc: '2.0', method: method, params: params || {}}); }
+  function whenReady(fn){ if (ready) fn(); else queue.push(fn); }
+  function fire(target, name, detail, cancelable){
+    try{ return target.dispatchEvent(new CustomEvent(name, {cancelable: !!cancelable, detail: detail})); }catch(e){ return true; }
+  }
+
+  function onMessage(e){
+    if (e.source !== host) return;
+    var m = e.data;
+    if (!m || m.jsonrpc !== '2.0') return;
+    if (m.id != null && !m.method){
+      var p = pending[m.id]; if (!p) return; delete pending[m.id];
+      if (m.error) p.rej(m.error); else p.res(m.result);
+      return;
+    }
+    if (m.method === 'ui/notifications/tool-input'){ input = (m.params && m.params.arguments) || {}; return; }
+    if (m.method === 'ui/notifications/tool-result'){ onResult(m.params || {}); return; }
+    if (m.method === 'ui/notifications/tool-cancelled'){ if (!rendered) status('The card was not shown: the call was cancelled.', true); return; }
+    if (m.id != null && (m.method === 'ui/resource-teardown' || m.method === 'ping')){ post({jsonrpc: '2.0', id: m.id, result: {}}); }
+  }
+  w.addEventListener('message', onMessage);
+
+  function text(result){
+    var c = result && result.content;
+    if (c && c.length && c[0] && typeof c[0].text === 'string') return c[0].text;
+    return '';
+  }
+  function status(msg, bad){
+    if (rendered) return;
+    var b = document.body; if (!b) return;
+    b.innerHTML = '';
+    var d = document.createElement('div'); d.className = 'bw' + (bad ? ' be' : ''); d.textContent = msg; b.appendChild(d);
+    size();
+  }
+
+  function onResult(r){
+    if (rendered) return;
+    var sc = r.structuredContent || {}, args = input || {};
+    if (r.isError){
+      var msg = text(r); try{ var j = JSON.parse(msg); msg = j.message || j.error || msg; }catch(e){}
+      status('Bridgit did not show this card: ' + (msg || 'the call failed.'), true);
+      return;
+    }
+    title = sc.title || args.title || '';
+    interactionId = sc.interaction_id != null ? sc.interaction_id : (sc.id != null ? sc.id : null);
+    var html = typeof sc.html === 'string' ? sc.html : (typeof args.html === 'string' && (!args.kind || args.kind === 'html') ? args.html : null);
+    if (html){ render(html); return; }
+    if (args.kind){ preview(args); return; }
+    status('This call has no card to show.', false);
+  }
+
+  /* A card that isn't HTML (question, notice, text) was sent to the phone; show what the owner sees, read-only. */
+  function preview(args){
+    var b = document.body; b.innerHTML = '';
+    var box = document.createElement('div'); box.className = 'bp';
+    var h = document.createElement('h2'); h.textContent = args.title || 'Card sent to the phone'; box.appendChild(h);
+    if (args.body){ var p = document.createElement('p'); p.textContent = String(args.body); box.appendChild(p); }
+    var controls = Array.isArray(args.controls) ? args.controls : [];
+    var row = document.createElement('div'); row.className = 'row';
+    controls.forEach(function(c){ if (c && c.type === 'button'){ var bt = document.createElement('button'); bt.disabled = true; bt.textContent = c.label || c.id; row.appendChild(bt); } });
+    if (row.childNodes.length) box.appendChild(row);
+    var s = document.createElement('small'); s.textContent = 'Sent to the phone. The owner answers there.'; box.appendChild(s);
+    b.appendChild(box); size();
+  }
+
+  /*
+   * Replaces this page with the card, keeping this window (and so the native object and the pending calls).
+   * The page is the phone's: its head (CSP, viewport), the native object, GUARD, RESPOND_SHIM, then the card with
+   * every http-equiv renamed so the card can't set a policy, refresh or redirect.
+   */
+  function render(html){
+    rendered = true;
+    var neutral = String(html).replace(/http-equiv/gi, 'data-blocked-equiv');
+    var cut = PHONE_HEAD.indexOf('<script>');
+    var page = PHONE_HEAD.slice(0, cut) + '<script>' + NATIVE + '<\/script>' + PHONE_HEAD.slice(cut) + neutral;
+    try{ Object.defineProperty(w, '__bridgitNative', {value: native, writable: true, configurable: true}); }catch(e){ w.__bridgitNative = native; }
+    var d = document;
+    d.open(); d.write(page); d.close();
+    // document.open drops the window's event listeners; take the host's messages again.
+    w.addEventListener('message', onMessage);
+    watchSize();
+  }
+
+  var lastW = 0, lastH = 0, sizeTimer = 0;
+  function size(){
+    clearTimeout(sizeTimer);
+    sizeTimer = setTimeout(function(){
+      var el = document.documentElement; if (!el) return;
+      var h = Math.ceil(Math.max(el.scrollHeight, document.body ? document.body.scrollHeight : 0));
+      var wd = Math.ceil(el.scrollWidth);
+      if (h === lastH && wd === lastW) return;
+      lastH = h; lastW = wd;
+      whenReady(function(){ notify('ui/notifications/size-changed', {width: wd, height: h}); });
+    }, 30);
+  }
+  function watchSize(){
+    size();
+    try{ new ResizeObserver(size).observe(document.documentElement); if (document.body) new ResizeObserver(size).observe(document.body); }catch(e){}
+    w.addEventListener('load', size);
+  }
+
+  function refused(code, message, st){ return {ok: false, status: st || 400, error: code, body: {error: code, message: message}}; }
+
+  /* Hands a result to the card like CardActions.deliverScript: window.__bridgitActed (the shim's), then bridgit:acted.
+     Always later than the act call, because the shim waits on the ref only after act returns it. */
+  function deliver(ref, result){
+    setTimeout(function(){
+      var r; try{ r = JSON.parse(JSON.stringify(result)); }catch(e){ r = refused('internal_error', 'The result could not be read.', 500); }
+      r.ref = ref;
+      try{ w.__bridgitActed && w.__bridgitActed(r); }catch(e){}
+      try{ w.dispatchEvent(new CustomEvent('bridgit:acted', {detail: r})); }catch(e){}
+    }, 0);
+  }
+
+  /* The native act: takes the JSON string from the shim, returns a ref at once, delivers the result later. */
+  function act(s){
+    var ref = ++refs;
+    var o = null; try{ o = typeof s === 'string' ? JSON.parse(s) : null; }catch(e){}
+    if (!o || typeof o !== 'object' || Array.isArray(o)){ deliver(ref, refused('invalid_parameter', 'Bridgit.act needs an object like {method, path, body}.')); return ref; }
+    if (inFlight >= MAX_IN_FLIGHT){ deliver(ref, refused('rate_limited', 'At most ' + MAX_IN_FLIGHT + ' actions can run at once on a card.', 429)); return ref; }
+    inFlight++;
+    var args = {path: o.path};
+    if (o.method != null) args.method = o.method;
+    if (o.query != null) args.query = o.query;
+    if (o.body != null) args.body = o.body;
+    if (interactionId != null) args.interaction_id = interactionId;
+    whenReady(function(){
+      request('tools/call', {name: 'card_act', arguments: args}).then(function(r){
+        var sc = r && r.structuredContent;
+        if (!sc || typeof sc.ok !== 'boolean'){ try{ sc = JSON.parse(text(r)); }catch(e){ sc = null; } }
+        if (!sc || typeof sc.ok !== 'boolean') sc = refused('bad_reply', (r && r.isError && text(r)) || 'The chat app returned no result.', 502);
+        inFlight--; deliver(ref, sc);
+      }, function(err){
+        inFlight--; deliver(ref, refused('host_refused', (err && err.message) || 'The chat app refused the call.', 502));
+      });
+    });
+    return ref;
+  }
+
+  function confirmAnswer(answer){
+    if (!fire(document, 'bridgit:answered', {answer: answer, close_after_ms: null}, true)) return;
+    var b = document.body; if (!b) return;
+    var cs = getComputedStyle(b), clear = cs.backgroundColor === 'rgba(0, 0, 0, 0)';
+    var panel = document.createElement('section');
+    panel.setAttribute('role', 'status');
+    panel.style.cssText = 'position:fixed;inset:0;z-index:2147483647;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;';
+    panel.style.background = clear ? '#f5f2eb' : cs.backgroundColor; panel.style.color = clear ? '#1f1b16' : cs.color; panel.style.fontFamily = cs.fontFamily;
+    var icon = document.createElement('div'); icon.textContent = '✓'; icon.style.cssText = 'font-size:44px;margin-bottom:16px;';
+    var h = document.createElement('h2'); h.textContent = 'Answer sent';
+    var p = document.createElement('p'); p.textContent = 'Your answer went to the chat.';
+    panel.appendChild(icon); panel.appendChild(h); panel.appendChild(p); b.appendChild(panel);
+    document.querySelectorAll('button,input,select,textarea').forEach(function(e){ e.disabled = true; });
+  }
+
+  /* The native respond: the shim hands it a JSON string; the first valid one (up to 16 KB) is the answer. */
+  function respond(s){
+    if (answered || typeof s !== 'string' || s.length > RESPOND_MAX) return;
+    var parsed; try{ parsed = JSON.parse(s); }catch(e){ return; }
+    answered = true;
+    var line = 'Bridgit card answer' + (title ? ' (' + title + ')' : '') + ': ' + s;
+    whenReady(function(){
+      var ctx = {bridgit_card_answer: parsed};
+      if (interactionId != null) ctx.interaction_id = interactionId;
+      request('ui/update-model-context', {content: [{type: 'text', text: line}], structuredContent: ctx}).catch(function(){});
+      // The SDK's hosts take content as a list of blocks; the spec text shows one block, so that is the fallback.
+      var block = {type: 'text', text: line}, done = function(){ confirmAnswer(parsed); };
+      request('ui/message', {role: 'user', content: [block]}).then(done, function(){
+        request('ui/message', {role: 'user', content: block}).then(done, done);
+      });
+    });
+  }
+
+  /* The phone's native bridge has these two methods only; RESPOND_SHIM turns them into the public Bridgit. */
+  var native = {respond: respond, act: act};
+
+  request('ui/initialize', {
+    protocolVersion: '2026-01-26',
+    appInfo: {name: 'bridgit-card', version: '1'},
+    appCapabilities: {availableDisplayModes: ['inline']}
+  }).then(function(){
+    notify('ui/notifications/initialized', {});
+    ready = true;
+    queue.splice(0).forEach(function(f){ try{ f(); }catch(e){} });
+    size();
+  }, function(){ status('This chat app could not start the card.', true); });
+})();
+</script>
+</head>
+<body><div class="bw">Loading the Bridgit card…</div></body>
+</html>

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Pet monitor status, models, camera, today's totals and recent readings",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_dog_monitor",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/dog-monitor",
+  "idempotent": false,
+  "path": "/v1/applets/dog-monitor",
+  "capability": "owner_features",
+  "returns": "running, models, camera, cameras, camera_search_delays (effective seconds per camera), camera_search_delay_default_s=20, sampling {all_s, default_s=20, min_s, max_s, cameras (effective seconds), overrides (cameras with their own value), photo_interval_s}, feeding (saved food-view and sampled eating-sound response; setup on device), pan_search, searching, scanning, error code, today totals, recent verdicts; does not take a photo",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

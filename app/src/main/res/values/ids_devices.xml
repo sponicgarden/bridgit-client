@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Devices tab: holds the network device list (the List view). Fixed so the child fragment restores. -->
+    <item name="devices_list_container" type="id" />
+</resources>

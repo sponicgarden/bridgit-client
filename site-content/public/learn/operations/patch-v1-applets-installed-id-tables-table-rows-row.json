@@ -1,0 +1,60 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Change table columns while preserving the row id and other values. Owner control agents can act on any applet; applet principals need installer sharing; values are validated",
+  "method": "PATCH",
+  "auth": true,
+  "mcp_tool": "applets_installed_tables_rows_patch",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "set",
+   "description": "column → new value; null empties a column",
+   "type": "object",
+   "required": true
+  }],
+  "example": "PATCH /v1/applets/installed/ai0123456789abcd/tables/receipts/rows/0f3k2m9x1a2b {\"set\":{\"total\":12.5}}",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/tables/{table}/rows/{row}",
+  "capability": "applet_install",
+  "returns": "the stored row {id, at, by, ...columns}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "set": {
+     "description": "column → new value; null empties a column",
+     "type": "object"
+    },
+    "id": {
+     "description": "The id in /v1/applets/installed/{id}/tables/{table}/rows/{row}",
+     "type": "string"
+    },
+    "row": {
+     "description": "The row in /v1/applets/installed/{id}/tables/{table}/rows/{row}",
+     "type": "string"
+    },
+    "table": {
+     "description": "The table in /v1/applets/installed/{id}/tables/{table}/rows/{row}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "table",
+    "row",
+    "set"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "not_shared",
+   "row_not_found",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Apps agents built from watches that remember (tally watches, 3 Nov 2026), on Applets → Applets. -->
+<resources>
+    <string name="agent_apps_header">Made by your control agents</string>
+    <string name="agent_apps_intro">These run on this phone and keep counting while your control agent is offline.</string>
+    <string name="agent_apps_by">By %1$s · every %2$d s · until %3$s</string>
+    <string name="agent_apps_rules">Rules: %1$d · times fired: %2$d</string>
+    <string name="agent_apps_stop">Stop</string>
+    <string name="agent_apps_stop_title">Stop %1$s?</string>
+    <string name="agent_apps_stop_body">It stops watching and its counts are deleted. %1$s is told it was stopped.</string>
+    <string name="agent_apps_stop_cancel">Keep running</string>
+    <string name="installed_applet_running">Running</string>
+    <string name="installed_applet_paused">Paused</string>
+    <string name="installed_applet_meta">Version %1$s</string>
+    <string name="installed_applet_manage">Manage</string>
+    <string name="library_home">Home: %1$s</string>
+    <string name="library_last_activity">Last activity: %1$s</string>
+    <string name="library_no_activity">No activity yet</string>
+    <string name="library_paused_activity">Paused · %1$s</string>
+</resources>

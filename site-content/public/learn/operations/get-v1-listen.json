@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Wake words: whether the phone is listening, and the wake words the owner gave you",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "listen",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/listen",
+  "idempotent": false,
+  "path": "/v1/listen",
+  "capability": "wakewords",
+  "returns": "enabled, state (off|listening|hearing|paused), reason, muted_until, model (ready|not_downloaded|downloading|failed), model_name, max_seconds, wake_words[{phrase, send_clip}]. Each hit arrives as a listen.heard event: wake_word, transcript, heard_at, ended_by (pause|max_seconds|no_speech|interrupted), duration_seconds, recogniser, clip_id, capture {capture_id, stored, url, memory_until, file}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

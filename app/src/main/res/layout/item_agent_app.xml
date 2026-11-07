@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.Bridgit.AppletRow"
+    android:orientation="vertical">
+    <LinearLayout android:id="@+id/agent_app_content" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+        <ImageView android:id="@+id/agent_app_icon" style="@style/Widget.Bridgit.AppletIcon"
+            android:src="@drawable/ic_nav_applets" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:orientation="vertical">
+            <TextView android:id="@+id/agent_app_title" style="@style/Widget.Bridgit.AppletTitle" />
+            <TextView android:id="@+id/agent_app_today" style="@style/Widget.Bridgit.AppletSecondary"
+                android:accessibilityLiveRegion="polite" />
+            <TextView android:id="@+id/agent_app_home" style="@style/Widget.Bridgit.AppletSecondary"
+                android:textSize="14sp" android:layout_marginTop="4dp" />
+            <TextView android:id="@+id/agent_app_meta" style="@style/Widget.Bridgit.AppletSecondary"
+                android:textSize="14sp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/agent_app_update"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_gravity="start" android:minHeight="48dp"
+                android:text="@string/applets_update_available" android:visibility="gone" />
+        </LinearLayout>
+        <ImageButton android:id="@+id/agent_app_action" android:layout_width="48dp"
+            android:layout_height="48dp" android:layout_marginStart="8dp"
+            android:padding="12dp" android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_overflow" app:tint="?attr/colorOnSurfaceVariant" />
+    </LinearLayout>
+</LinearLayout>

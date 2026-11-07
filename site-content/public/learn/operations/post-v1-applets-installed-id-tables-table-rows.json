@@ -1,0 +1,56 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Add a table row, checked against its columns. Owner control agents can act on any applet; applet principals need installer sharing",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applets_installed_tables_rows_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "row",
+   "description": "column → value; missing columns are empty",
+   "type": "object",
+   "required": true
+  }],
+  "example": "POST /v1/applets/installed/ai0123456789abcd/tables/receipts/rows {\"row\":{\"text\":\"Coffee 3.20\"}}",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/tables/{table}/rows",
+  "capability": "applet_install",
+  "returns": "the stored row {id, at, by, ...columns}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "id": {
+     "description": "The id in /v1/applets/installed/{id}/tables/{table}/rows",
+     "type": "string"
+    },
+    "row": {
+     "description": "column → value; missing columns are empty",
+     "type": "object"
+    },
+    "table": {
+     "description": "The table in /v1/applets/installed/{id}/tables/{table}/rows",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "table",
+    "row"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "not_shared",
+   "invalid_parameter",
+   "quota_exceeded",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Phone to phone: the hub removed this satellite, so the satellite drops its hub link too (only for a hub link's key). Not for agents.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "satellite_unlink",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/satellite/unlink",
+  "idempotent": false,
+  "path": "/v1/satellite/unlink",
+  "capability": "status",
+  "returns": "ok",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

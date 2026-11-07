@@ -1,0 +1,42 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Ring and vibrate within Android sound restrictions",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "phone_ring_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [{
+   "name": "duration_seconds",
+   "description": "1\u201360, default 15",
+   "type": "integer",
+   "required": false
+  }],
+  "example": "POST /v1/phone/ring",
+  "idempotent": true,
+  "path": "/v1/phone/ring",
+  "capability": "ring",
+  "returns": "Ring and vibrate within Android sound restrictions",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "duration_seconds": {
+     "description": "1\u201360, default 15",
+     "type": "integer"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

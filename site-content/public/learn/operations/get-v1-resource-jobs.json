@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your resource download/check/delete jobs",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "resource_jobs_list",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/resource-jobs",
+  "idempotent": false,
+  "path": "/v1/resource-jobs",
+  "capability": "owner_features",
+  "returns": "jobs[id,resource,operation,status,percent,result,error]; completed download means verified where supported",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

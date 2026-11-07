@@ -1,0 +1,89 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f1ea;color:#1f1d19;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:680px;margin:0 auto;padding:20px 18px 170px}
+.tag{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7a5b2e;background:#efe2c9;border-radius:99px;padding:3px 10px}
+h1{font-size:24px;line-height:1.2;margin:10px 0 4px}
+.sub{color:#6b665c;margin:0 0 16px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 18px}
+.facts div{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:0 1px 0 #e4ded2}
+.facts b{display:block;font-size:18px}
+.facts span{font-size:13px;color:#6b665c}
+.doc{background:#fff;border-radius:16px;padding:18px 18px 8px;box-shadow:0 1px 0 #e4ded2}
+.doc h2{font-size:15px;margin:16px 0 4px;color:#3a352c}
+.doc h2:first-child{margin-top:0}
+.doc p{margin:0 0 10px;font-size:15px;color:#3a352c}
+.flag{background:#fff6dc;border-left:4px solid #e0a82e;padding:8px 10px;border-radius:8px}
+.end{text-align:center;color:#8a8478;font-size:13px;padding:10px 0 4px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fffdf8;border-top:1px solid #e4ded2;padding:12px 18px 12px}
+.bar .in{max-width:680px;margin:0 auto}
+.prog{height:4px;background:#ece6da;border-radius:4px;overflow:hidden;margin-bottom:10px}
+.prog i{display:block;height:100%;width:0;background:#2f7d5b;transition:width .2s}
+label.name{display:flex;gap:8px;align-items:center;font-size:14px;color:#6b665c;margin-bottom:10px}
+label.name input{flex:1;font:inherit;font-size:20px;font-family:"Snell Roundhand","Segoe Script","Brush Script MT",cursive;border:0;border-bottom:2px solid #c9c1b1;background:transparent;padding:4px 2px;color:#1f1d19;min-width:0}
+.row{display:flex;gap:10px}
+button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:14px 16px;min-height:48px;cursor:pointer}
+.sign{flex:1;background:#2f7d5b;color:#fff}
+.sign:disabled{background:#b9c9bf;color:#f4f7f5}
+.later{background:#ece6da;color:#3a352c}
+.hint{font-size:13px;color:#8a8478;margin:6px 0 0;text-align:center}
+</style>
+<div class="wrap">
+  <span class="tag">Lease · needs your approval</span>
+  <h1>12-month lease, Flat 4B, 18 Orchard Street</h1>
+  <p class="sub">From Maple &amp; Lane Lettings. I read it and flagged two clauses. Scroll to the end to approve signing.</p>
+  <div class="facts">
+    <div><b>€1,450</b><span>per month, due the 1st</span></div>
+    <div><b>€2,900</b><span>deposit, held in escrow</span></div>
+    <div><b>1 Dec 2026</b><span>move-in date</span></div>
+    <div><b>2 months</b><span>notice to leave</span></div>
+  </div>
+  <div class="doc" id="doc">
+    <h2>1. Parties</h2>
+    <p>This agreement is between Maple &amp; Lane Lettings on behalf of the owner ("Landlord") and you ("Tenant") for Flat 4B, 18 Orchard Street, including the storage cage in the basement.</p>
+    <h2>2. Term</h2>
+    <p>The tenancy runs for 12 months from 1 December 2026. After that it continues month to month until either side gives notice.</p>
+    <h2>3. Rent</h2>
+    <p>Rent is €1,450 per month, paid by bank transfer on or before the 1st. Rent can rise once a year by no more than the published inflation index.</p>
+    <h2>4. Deposit</h2>
+    <p>The deposit of €2,900 is held by an approved deposit scheme and returned within 14 days of the end of the tenancy, less agreed deductions.</p>
+    <p class="flag"><b>Flagged:</b> deductions include "professional cleaning" at a fixed €250 whatever the condition. You can ask to strike this.</p>
+    <h2>5. Repairs</h2>
+    <p>The Landlord repairs the structure, heating, hot water and appliances supplied. The Tenant reports problems promptly and allows access with 24 hours' notice.</p>
+    <h2>6. Pets</h2>
+    <p>One cat or small dog is allowed with written consent, which will not be unreasonably refused.</p>
+    <h2>7. Subletting</h2>
+    <p>The Tenant may not sublet the whole flat. Short stays by guests of up to 14 nights a year are fine.</p>
+    <p class="flag"><b>Flagged:</b> a €95 "admin fee" applies to every renewal. Most agents in the city no longer charge this.</p>
+    <h2>8. Ending the tenancy</h2>
+    <p>After the first 6 months either side may end the tenancy with 2 months' written notice. The flat is returned clean, with the keys and fobs.</p>
+    <h2>9. Signatures</h2>
+    <p>By signing, the Tenant confirms they have read and agree to all clauses above.</p>
+    <div class="end">End of document</div>
+  </div>
+</div>
+<div class="bar"><div class="in">
+  <div class="prog"><i id="p"></i></div>
+  <label class="name">Type your name <input id="n" maxlength="80" autocomplete="name" placeholder="Your full name"></label>
+  <div class="row">
+    <button class="later" id="later">Not yet</button>
+    <button class="sign" id="sign" disabled>Approve signing</button>
+  </div>
+  <p class="hint" id="h">Scroll to the end to unlock approval</p>
+  <p class="hint">This sends your approval to the agent. The lease has not been submitted yet.</p>
+</div></div>
+<script>
+var start=Date.now(),reached=false,sent=false,sign=document.getElementById('sign'),nm=document.getElementById('n'),hint=document.getElementById('h');
+function update(){
+  var el=document.scrollingElement||document.documentElement,max=el.scrollHeight-el.clientHeight;
+  var f=max<=0?1:Math.min(1,el.scrollTop/max);
+  document.getElementById('p').style.width=(f*100)+'%';
+  if(f>0.97)reached=true;
+  sign.disabled=!(reached&&nm.value.trim().length>1);
+  hint.textContent=reached?(nm.value.trim().length>1?'Ready to approve':'Type your name to approve'):'Scroll to the end to unlock approval';
+}
+window.addEventListener('scroll',update,{passive:true});nm.addEventListener('input',update);update();
+function send(o){if(sent)return;sent=true;o.read_seconds=Math.round((Date.now()-start)/1000);(window.Bridgit||window.Bridget).respond(JSON.stringify(o));}
+sign.onclick=function(){send({decision:'approve_signing',typed_name:nm.value.trim(),scrolled_to_end:reached})};
+document.getElementById('later').onclick=function(){send({decision:'not_yet',scrolled_to_end:reached})};
+</script>

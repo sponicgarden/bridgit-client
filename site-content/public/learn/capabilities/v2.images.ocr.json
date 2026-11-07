@@ -1,0 +1,34 @@
+{
+ "detail_url": "/v1/discover?id=v2.images.ocr&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v2.images.ocr.json",
+ "title": "Local text recognition",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v2.images.ocr.json",
+ "prerequisites": ["Check v2.images.ocr supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [{
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_images_ocr",
+  "documentation": "https://bridgit.cc/learn/operations/v2-images.ocr.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-images.ocr.json",
+  "required_arguments": [],
+  "tool": "images.ocr"
+ }],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
+ "examples_url": null,
+ "id": "v2.images.ocr",
+ "state": {
+  "ready": null,
+  "blockers": ["check_v2_capabilities"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "process",
+ "capability_ids": ["v2.images.ocr"]
+}

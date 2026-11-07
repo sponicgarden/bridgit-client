@@ -1,0 +1,141 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_configuration_get",
+  "idempotency_required": false,
+  "documentation": "https://bridgit.cc/learn/operations/v2-configuration.get.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-configuration.get.json",
+  "required_arguments": [],
+  "http": {
+   "path": "/v2/call",
+   "headers": {"Authorization": "Bearer <your key>"},
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "description": "Configuration delegation required; access operations also accept existing Agent Super Powers with App settings for bootstrap. Returns the result directly, never a durable operation or per-change GUI approval",
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "body": {
+      "description": "Exact native configuration payload; omit on reads/deletes. Credentials are write-only and never saved in operation history",
+      "type": "object"
+     },
+     "operation": {
+      "description": "Exact method and path template from configuration discovery; GET defaults to its index",
+      "type": "string",
+      "enum": [
+       "GET /v1/owner/configuration/access",
+       "GET /v1/owner/configuration/approvals",
+       "GET /v1/owner/configuration/approvals/{kind}/{id}",
+       "GET /v1/owner/configuration",
+       "GET /v1/owner/configuration/keys",
+       "GET /v1/owner/configuration/connections",
+       "GET /v1/owner/configuration/callbacks",
+       "GET /v1/owner/configuration/notifications/{agent}",
+       "GET /v1/owner/configuration/email",
+       "GET /v1/owner/configuration/feeding",
+       "GET /v1/owner/configuration/modes",
+       "GET /v1/owner/configuration/listening"
+      ]
+     },
+     "parameters": {
+      "description": "Path parameter values, e.g. {provider:openrouter}; omit when none",
+      "type": "object"
+     }
+    },
+    "required": []
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": ["tool"],
+    "properties": {
+     "arguments": {
+      "description": "Configuration delegation required; access operations also accept existing Agent Super Powers with App settings for bootstrap. Returns the result directly, never a durable operation or per-change GUI approval",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "body": {
+        "description": "Exact native configuration payload; omit on reads/deletes. Credentials are write-only and never saved in operation history",
+        "type": "object"
+       },
+       "operation": {
+        "description": "Exact method and path template from configuration discovery; GET defaults to its index",
+        "type": "string",
+        "enum": [
+         "GET /v1/owner/configuration/access",
+         "GET /v1/owner/configuration/approvals",
+         "GET /v1/owner/configuration/approvals/{kind}/{id}",
+         "GET /v1/owner/configuration",
+         "GET /v1/owner/configuration/keys",
+         "GET /v1/owner/configuration/connections",
+         "GET /v1/owner/configuration/callbacks",
+         "GET /v1/owner/configuration/notifications/{agent}",
+         "GET /v1/owner/configuration/email",
+         "GET /v1/owner/configuration/feeding",
+         "GET /v1/owner/configuration/modes",
+         "GET /v1/owner/configuration/listening"
+        ]
+       },
+       "parameters": {
+        "description": "Path parameter values, e.g. {provider:openrouter}; omit when none",
+        "type": "object"
+       }
+      },
+      "required": []
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["configuration.get"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "description": "Configuration delegation required; access operations also accept existing Agent Super Powers with App settings for bootstrap. Returns the result directly, never a durable operation or per-change GUI approval",
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "body": {
+     "description": "Exact native configuration payload; omit on reads/deletes. Credentials are write-only and never saved in operation history",
+     "type": "object"
+    },
+    "operation": {
+     "description": "Exact method and path template from configuration discovery; GET defaults to its index",
+     "type": "string",
+     "enum": [
+      "GET /v1/owner/configuration/access",
+      "GET /v1/owner/configuration/approvals",
+      "GET /v1/owner/configuration/approvals/{kind}/{id}",
+      "GET /v1/owner/configuration",
+      "GET /v1/owner/configuration/keys",
+      "GET /v1/owner/configuration/connections",
+      "GET /v1/owner/configuration/callbacks",
+      "GET /v1/owner/configuration/notifications/{agent}",
+      "GET /v1/owner/configuration/email",
+      "GET /v1/owner/configuration/feeding",
+      "GET /v1/owner/configuration/modes",
+      "GET /v1/owner/configuration/listening"
+     ]
+    },
+    "parameters": {
+     "description": "Path parameter values, e.g. {provider:openrouter}; omit when none",
+     "type": "object"
+    }
+   },
+   "required": []
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_configuration_get"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "configuration.get"
+ }
+}

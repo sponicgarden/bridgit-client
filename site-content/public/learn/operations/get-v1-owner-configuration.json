@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Discover unattended app-owned configuration for owner-authorized control agents",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration",
+  "idempotent": false,
+  "path": "/v1/owner/configuration",
+  "capability": "owner_features",
+  "returns": "scope, approval_required=false, settings, actions, keys, connections, callbacks, notifications, feeding, email; remaining OS/security/account authority",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

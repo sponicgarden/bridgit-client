@@ -1,0 +1,153 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Verify authentication and save or fully replace this agent's SSH connection",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "ssh_connections_save",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "connection",
+    "description": "Existing owned id to replace; omit to create. Replacement requires all fields, including credentials.",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "name",
+    "description": "Label, 1..80 characters",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "host",
+    "description": "DNS name, IPv4 or unbracketed IPv6",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "port",
+    "description": "1..65535; default 22",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "username",
+    "description": "Authorized remote account, 1..128 characters",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "fingerprint",
+    "description": "Independently verified SHA256 host-key fingerprint",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "confirm_host_key",
+    "description": "Must be true after comparing with a trusted host-key source, not merely the probe",
+    "type": "boolean",
+    "required": true
+   },
+   {
+    "name": "password",
+    "description": "Password authentication; mutually exclusive with private_key",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "private_key",
+    "description": "PEM/OpenSSH private key, at most 32768 characters",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "passphrase",
+    "description": "Optional private-key passphrase",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "permissions",
+    "description": "Nonempty selection of exec, files_read, files_write. exec provides the remote account's full shell authority, including file operations.",
+    "type": "array",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/ssh/connections/save (see guide; credentials must not be pasted into chat)",
+  "idempotent": true,
+  "path": "/v1/ssh/connections/save",
+  "capability": "ssh",
+  "returns": "Safe saved connection and authenticated=true; credentials encrypted on phone, never returned",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "confirm_host_key": {
+     "description": "Must be true after comparing with a trusted host-key source, not merely the probe",
+     "type": "boolean"
+    },
+    "password": {
+     "description": "Password authentication; mutually exclusive with private_key",
+     "type": "string"
+    },
+    "port": {
+     "description": "1..65535; default 22",
+     "type": "integer"
+    },
+    "permissions": {
+     "description": "Nonempty selection of exec, files_read, files_write. exec provides the remote account's full shell authority, including file operations.",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "name": {
+     "description": "Label, 1..80 characters",
+     "type": "string"
+    },
+    "host": {
+     "description": "DNS name, IPv4 or unbracketed IPv6",
+     "type": "string"
+    },
+    "fingerprint": {
+     "description": "Independently verified SHA256 host-key fingerprint",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "connection": {
+     "description": "Existing owned id to replace; omit to create. Replacement requires all fields, including credentials.",
+     "type": "string"
+    },
+    "private_key": {
+     "description": "PEM/OpenSSH private key, at most 32768 characters",
+     "type": "string"
+    },
+    "passphrase": {
+     "description": "Optional private-key passphrase",
+     "type": "string"
+    },
+    "username": {
+     "description": "Authorized remote account, 1..128 characters",
+     "type": "string"
+    }
+   },
+   "required": [
+    "name",
+    "host",
+    "username",
+    "fingerprint",
+    "confirm_host_key",
+    "permissions",
+    "idempotency_key"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,81 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Find capabilities and recipes for an intent without executing them",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "discover",
+  "query": [
+   {
+    "name": "q",
+    "description": "Task intent, at most 256 characters",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "id",
+    "description": "Exact stable capability or recipe ID",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "Maximum results, 1\u201320 (default 5)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "detail",
+    "description": "Response detail",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "summary",
+     "full"
+    ]
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/discover?q=scan%20receipt&limit=5",
+  "idempotent": false,
+  "path": "/v1/discover",
+  "capability": "status",
+  "returns": "start (with q: the closest recipe, why, you_decide, capabilities with this phone's ready and blockers, owner_must, first_calls, adapt, done_when, recipe_url; null when nothing matches), documentation_revision, api_revision, installed_api_revision, provenance, results[id,kind,score,reason,state,prerequisites,operations,boundaries]; unknown state is null. Full detail supplies exact operation references. No device actions.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "q": {
+     "description": "Task intent, at most 256 characters",
+     "type": "string"
+    },
+    "limit": {
+     "description": "Maximum results, 1\u201320 (default 5)",
+     "type": "integer"
+    },
+    "id": {
+     "description": "Exact stable capability or recipe ID",
+     "type": "string"
+    },
+    "detail": {
+     "description": "Response detail",
+     "type": "string",
+     "enum": [
+      "summary",
+      "full"
+     ]
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "invalid_parameter",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

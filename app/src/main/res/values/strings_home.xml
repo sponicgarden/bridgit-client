@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings for Home, First run, More, Features and Settings (UI-08 … UI-11, UI-18, UI-19). -->
+<resources>
+    <!-- Home: hero card (UI-09) -->
+    <string name="home_menu_settings">Settings</string>
+    <string name="home_menu_run_diagnostics">Run Level 1 Diagnostics</string>
+    <string name="home_scene_cd">Level 1 Diagnostics: every part of the phone Bridgit can use. Tap a part to open Feature enablement.</string>
+    <string name="home_state_listening">Listening</string>
+    <string name="home_state_paused">Paused</string>
+    <string name="home_state_starting">Starting…</string>
+    <string name="home_state_tailscale_down">Tailscale is down</string>
+    <string name="home_state_capturing">Capturing</string>
+    <string name="home_state_bind_error">Bridgit can\'t listen on port %1$d</string>
+    <string name="home_pause">Pause</string>
+    <string name="home_resume">Resume</string>
+    <string name="home_address">%1$s:%2$d</string>
+    <string name="home_no_address">No Tailscale address</string>
+    <string name="home_address_copied">Address copied</string>
+    <string name="home_copy_address">Copy address</string>
+    <string name="home_chip_tailscale">Tailscale</string>
+    <string name="home_chip_tailscale_off">Tailscale off</string>
+    <string name="home_cd_hero">Bridgit is %1$s.</string>
+    <string name="home_cd_address">Address %1$s.</string>
+    <string name="home_cd_tailscale_on">Tailscale connected.</string>
+    <string name="home_cd_tailscale_off">Tailscale not connected.</string>
+
+    <!-- Home: banners (UI-10, ui-spec 5.2) -->
+    <string name="home_banner_open_once">Open the app once for camera and mic</string>
+    <string name="home_banner_fix_now">Fix now</string>
+    <string name="home_banner_notifications">Notifications are off</string>
+    <!-- %1$s: the features notifications being off stops, e.g. "camera, microphone, screenshots". -->
+    <string name="home_banner_notifications_list">Notifications, %1$s are off</string>
+    <string name="home_banner_turn_on">Turn on</string>
+    <string name="home_banner_tailscale">Tailscale isn\'t connected</string>
+    <!-- Short one-line Home banner; the full sentence below stays for first run. -->
+    <string name="home_banner_tailscale_missing_short">Tailscale isn\'t installed</string>
+    <string name="home_banner_open_tailscale">Open Tailscale</string>
+    <string name="home_banner_tailscale_missing">Tailscale isn\'t installed. Control agents reach Bridgit through Tailscale, so install it and sign in.</string>
+    <string name="home_banner_battery">Allow actions with screen off</string>
+    <string name="home_banner_fix">Fix</string>
+    <string name="home_banner_permission">%1$s permission removed</string>
+    <string name="home_banner_grant">Grant</string>
+    <!-- Questions from agents the owner hasn't answered yet, including expired ones (they can still be answered). -->
+    <string name="home_banner_question_one">%1$s: %2$s</string>
+    <plurals name="home_banner_questions">
+        <item quantity="one">%1$d question waiting</item>
+        <item quantity="other">%1$d questions waiting</item>
+    </plurals>
+    <string name="home_banner_answer">Answer</string>
+    <string name="home_banner_see_questions">See them</string>
+
+    <!-- Home: agents, today, quick switches (UI-11) -->
+    <string name="home_agents">Control agents</string>
+    <string name="home_see_all">See all</string>
+    <string name="home_agent_ago">·\u00A0%1$s</string>
+    <string name="home_agent_not_used">· not used yet</string>
+    <string name="home_agent_active">Active</string>
+    <string name="home_agent_idle">Idle</string>
+    <string name="home_agents_label">Control agents:</string>
+    <string name="home_no_agents">None Connected</string>
+    <string name="home_add_agent">Add control agent</string>
+    <string name="home_today">24h</string>
+    <string name="activity_today">Last 24 hours</string>
+    <plurals name="home_requests"><item quantity="one">%d request</item><item quantity="other">%d requests</item></plurals>
+    <plurals name="home_photos"><item quantity="one">%d photo</item><item quantity="other">%d photos</item></plurals>
+    <plurals name="home_clips"><item quantity="one">%d clip</item><item quantity="other">%d clips</item></plurals>
+    <plurals name="home_errors"><item quantity="one">%d error</item><item quantity="other">%d errors</item></plurals>
+    <string name="home_quick_switches">Quick switches</string>
+    <string name="home_turned">You turned %1$s %2$s</string>
+    <string name="home_on">on</string>
+    <string name="home_off">off</string>
+
+    <!-- Shared permission follow-up -->
+    <string name="perm_denied">Allow it in Android settings.</string>
+    <string name="perm_open_settings">Open settings</string>
+    <string name="perm_camera">Camera</string>
+    <string name="perm_mic">Microphone</string>
+    <string name="perm_photos">Photos</string>
+    <string name="perm_location">Location</string>
+
+    <!-- First run (UI-08) -->
+    <string name="firstrun_p1_headline">Designed for your favorite agent.</string>
+    <string name="firstrun_p1_tagline">Build distributed applications with real-world senses and networked intelligence.</string>
+    <string name="firstrun_agent_logos">Control agents and providers</string>
+    <string name="firstrun_p1_body">Your AI control agents get a device to work with. They reach it over your private Tailscale network, through a simple API or MCP, and you see every request.</string>
+    <string name="firstrun_caps_heading">What Bridgit can do</string>
+    <string name="firstrun_caps_body">With these capabilities, your control agent can build amazing applets for you.</string>
+    <string name="firstrun_cap_see_title">See</string>
+    <string name="firstrun_cap_see_body">Take a photo, a short video or a screenshot.</string>
+    <string name="firstrun_cap_hear_title">Hear and speak</string>
+    <string name="firstrun_cap_hear_body">Record audio, listen for wake words, and speak out loud.</string>
+    <string name="firstrun_cap_files_title">Photos and files</string>
+    <string name="firstrun_cap_files_body">Find gallery photos, send files, and receive what you share.</string>
+    <string name="firstrun_cap_identify_title">Identify images and sounds</string>
+    <string name="firstrun_cap_identify_body">Use AI to understand photos, audio and video.</string>
+    <string name="firstrun_cap_context_title">Know where and what</string>
+    <string name="firstrun_cap_context_body">Check the weather, location, battery and sensors. Use the flashlight or Find my phone.</string>
+    <string name="firstrun_cap_network_title">Connect to devices on your network</string>
+    <string name="firstrun_cap_network_body">Reach computers, printers and TVs on your Wi-Fi.</string>
+    <string name="firstrun_cap_ask_title">Ask you</string>
+    <string name="firstrun_cap_ask_body">Questions, notices and cards you answer with a tap.</string>
+    <string name="firstrun_ideas_heading">Things to try</string>
+    <string-array name="firstrun_ideas">
+        <item>Snap the whiteboard and turn it into notes.</item>
+        <item>Tell me if the baby cries.</item>
+        <item>Walk me through this neighbourhood.</item>
+        <item>Ring my phone, I can\'t find it.</item>
+    </string-array>
+    <string name="firstrun_p2_title">Private by design.</string>
+    <string name="firstrun_p2_body">Keep activity on your device and private network, or set up a backend web portal to view and monitor Bridgit’s activity. Just ask your control agent.</string>
+    <string name="firstrun_p3_title">Before you add a control agent</string>
+    <string name="firstrun_p3_warning">Each control agent gets a setup text that holds its own key. That text contains a key that gives super-control of your device. Do not give it to any human or silicon intelligence agent you do not trust to have your best interests at heart, and the ability to defend themselves against malicious actors.</string>
+    <string name="firstrun_p3_risk">Pasting it into a hosted AI service is your call; you can rotate the key any time from the control agent\'s page.</string>
+    <string name="firstrun_p3_body">Every feature starts off. Turn on what you want, and switch anything off in one tap.</string>
+    <string name="firstrun_ts_checking">Checking Tailscale…</string>
+    <string name="firstrun_ts_connected">Tailscale: connected (%1$s)</string>
+    <string name="firstrun_ts_missing">Tailscale isn\'t connected</string>
+    <string name="firstrun_notif_line">Bridgit uses notifications to show you every time a control agent uses your phone. Without them, camera, mic and screenshots stay off.</string>
+    <string name="firstrun_allow_notifications">Allow notifications</string>
+    <string name="firstrun_notif_on">Notifications are on.</string>
+    <string name="firstrun_add_first">Add Control Agent</string>
+    <string name="firstrun_warning_label">Warning</string>
+    <string name="firstrun_run_diagnostic">Run diagnostic</string>
+    <string name="firstrun_skip">Skip</string>
+    <string name="firstrun_next">Next</string>
+    <string name="firstrun_page">Page %1$d of %2$d</string>
+
+    <!-- More (ui-spec 5.13) -->
+    <string name="more_title">More</string>
+    <string name="more_features">Feature enablement</string>
+    <string name="more_access">Hardware access</string>
+    <string name="more_software_access">Software access</string>
+    <string name="more_adb_setup">ADB setup</string>
+    <string name="more_settings">Settings</string>
+    <string name="more_about">About</string>
+    <string name="more_report_bug">Report a bug</string>
+    <string name="more_request_feature">Request a feature</string>
+    <string name="more_my_reports">My reports</string>
+    <string name="more_check_updates">Check for updates</string>
+    <string name="more_about_title">Bridgit: Agentic Android Device Bridge</string>
+    <string name="more_about_body">Version %1$s (%2$s)\nCommit %3$s\n\nSource code: github.com/sponicgarden/bridgit-client</string>
+    <string name="more_dirty">%1$s (dirty)</string>
+
+    <!-- Features (UI-18) -->
+    <string name="features_title">Feature enablement</string>
+    <string name="features_group_capture">Capture</string>
+    <string name="features_group_photos">Photos &amp; files</string>
+    <string name="features_group_talk">Talk to you</string>
+    <string name="features_group_where">Where and what</string>
+    <string name="features_needs_permission">Needs %1$s permission.</string>
+    <string name="features_open_once">Needs the app opened once</string>
+    <string name="features_notifications_off">Notifications are off.</string>
+    <string name="features_listener_off">Listener is paused</string>
+    <string name="features_needs_newer_android">Needs a newer Android version</string>
+    <string name="features_grant">Grant</string>
+    <string name="features_turn_on">Turn on</string>
+    <string name="perm_word_camera">camera</string>
+    <string name="perm_word_mic">microphone</string>
+    <string name="perm_word_photos">photos</string>
+    <string name="perm_word_location">location</string>
+
+    <!-- Settings (UI-19) -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_listener">Listener</string>
+    <string name="settings_always_on">Always on</string>
+    <string name="settings_always_on_desc">Listen for your control agents, also after a restart</string>
+    <string name="settings_port">Port</string>
+    <string name="settings_port_hint">Port (1024 to 65535)</string>
+    <string name="settings_port_invalid">Use a number from 1024 to 65535.</string>
+    <string name="settings_port_warning">Every control agent\'s setup prompt has the old port. Control agents will need new prompts (Rotate key).</string>
+    <string name="settings_change_port">Change port</string>
+    <string name="settings_bind">Bind address</string>
+    <string name="settings_not_listening">Not listening</string>
+    <string name="settings_privacy">Privacy</string>
+    <string name="settings_log_visibility">Control agents can read the log</string>
+    <string name="settings_log_all">All entries</string>
+    <string name="settings_log_own">Only their own</string>
+    <string name="settings_log">Log</string>
+    <string name="settings_keep">Keep</string>
+    <string name="settings_keep_forever">Until you clear it · no automatic deletion</string>
+    <string name="settings_keep_value">%1$s entries / %2$d days · 0 = unlimited</string>
+    <string name="settings_keep_entries">Entries (0 = unlimited, up to 100,000)</string>
+    <string name="settings_keep_days">Days (0 = unlimited, up to 365)</string>
+    <string name="settings_keep_entries_invalid">Use a number from 0 to 100,000; 0 means unlimited.</string>
+    <string name="settings_keep_days_invalid">Use a number from 0 to 365; 0 means unlimited.</string>
+    <string name="settings_export">Export</string>
+    <string name="settings_export_desc">On the Activity screen</string>
+    <string name="settings_clear">Clear log</string>
+    <string name="settings_clear_desc">Diagnostics are kept</string>
+    <string name="settings_clear_confirm">Clear the activity log? This deletes %1$d entries. Diagnostics are kept.</string>
+    <string name="settings_clear_action">Clear</string>
+    <string name="settings_cleared">Log cleared</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_version_value">%1$s (%2$s)</string>
+    <string name="settings_commit">Commit</string>
+    <string name="settings_cert">Signing certificate SHA-256</string>
+    <string name="settings_cert_copied">Certificate fingerprint copied</string>
+    <string name="settings_spec">Spec</string>
+    <string name="settings_spec_value">docs/bridgit-spec-v2.md</string>
+    <string name="settings_privacy_policy">Privacy policy</string>
+    <string name="settings_terms">Terms of use</string>
+    <string name="settings_privacy_url" translatable="false">https://bridgit.cc/privacy/</string>
+    <string name="settings_terms_url" translatable="false">https://bridgit.cc/terms/</string>
+    <string name="health_rationale">Health access in Bridgit\n\nBridgit reads only the steps, sleep and heart-rate source records you grant. It never writes health data. Reads require the Health Connect feature switch and the calling control agent\'s grant. Data is returned to that control agent on request; its provider may retain a copy. No health records are retained by Bridgit. Revoke permissions in Health Connect at any time.\n\nPrivacy policy: %1$s</string>
+    <string name="settings_no_browser">No browser to open %1$s</string>
+    <string name="settings_reset">Reset</string>
+    <string name="settings_delete_all">Delete all Bridgit data</string>
+    <string name="settings_delete_all_desc">Control agents, keys, log, inbox, reports, files and settings</string>
+    <string name="settings_delete_all_title">Delete all Bridgit data?</string>
+    <string name="settings_delete_all_confirm">Every control agent is removed and its key stops working at once. The log, inbox, bug reports, received files, wake words and every setting are deleted, and any phone setting a control agent changed for a while is put back. Email alerts are cancelled.\n\nBridgit then closes. Next time you open it, it starts like a fresh install. This can\'t be undone.\n\nAndroid also resets Bridgit\'s permissions (camera, microphone, notifications) and turns off its notification access. Usage access and Accessibility may stay on; turn them off in Android settings if you want.</string>
+    <string name="settings_delete_all_action">Delete everything</string>
+    <string name="settings_delete_all_failed">Android didn\'t delete the data. Try again, or use Android Settings > Apps > Bridgit > Storage > Clear storage.</string>
+    <string name="settings_save">Save</string>
+    <string name="settings_changed_port">You changed the port to %1$d</string>
+    <string name="settings_changed_listener">You turned Always on %1$s</string>
+    <string name="settings_changed_visibility">You set control agents to read %1$s</string>
+    <string name="settings_visibility_all">all log entries</string>
+    <string name="settings_visibility_own">only their own log entries</string>
+    <string name="settings_changed_keep">You set the log to keep %1$d entries / %2$d days</string>
+    <string name="cd_back">Back</string>
+
+    <dimen name="home_chip_icon">14dp</dimen>
+    <dimen name="firstrun_banner_pad">12dp</dimen>
+    <item name="home_action_copy_address" type="id" />
+
+    <style name="SettingsHeader" parent="Widget.Bridgit.SectionHeader">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
+
+    <!-- Hero card chip (outlined, ui-spec 5.2). Kept here so this slice touches no shared theme file. -->
+    <style name="HomeHeroChip" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/home_bg_chip_outline</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelMedium</item>
+        <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
+    </style>
+    <string name="home_banner_dismiss">Dismiss alert: %1$s</string>
+    <string name="video_setup_access">Start camera access to enable video recording.</string>
+    <string name="video_enable_access">Enable access</string>
+    <string name="home_status_no_applets">No applets running</string>
+    <string name="home_status_waiting">Waiting for connection</string>
+    <string name="home_status_running">Running</string>
+    <string name="home_status_listening_from">Listening for Instructions from %1$s</string>
+    <string name="home_status_named">%1$s · %2$s</string>
+    <string name="home_status_position">%1$s of %2$s</string>
+    <string name="more_linked_metrics">Linked devices · %1$d enabled · %2$d disabled</string>
+    <string name="more_report_metrics">%1$d filed · %2$d fixed</string>
+    <string name="more_report_metrics_cd">%1$s: %2$d filed, %3$d fixed. View reports.</string>
+</resources>

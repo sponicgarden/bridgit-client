@@ -1,0 +1,49 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Pause or resume your watch without losing its tally; expiry is unchanged",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "watches_pause",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "paused",
+   "description": "true pauses, false resumes",
+   "type": "boolean",
+   "required": true
+  }],
+  "example": "POST /v1/watches/w123/pause {\"paused\":true}",
+  "idempotent": true,
+  "path": "/v1/watches/{id}/pause",
+  "capability": "watches",
+  "returns": "watch metadata including user_paused; watch.paused/watch.resumed events",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "paused": {
+     "description": "true pauses, false resumes",
+     "type": "boolean"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/watches/{id}/pause",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "paused"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

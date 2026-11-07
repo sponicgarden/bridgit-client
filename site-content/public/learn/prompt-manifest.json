@@ -1,0 +1,18 @@
+{
+ "outputs": {
+  "learn/introduction.txt": "795e380168a112f950766653cba151a7ad7fc1d94b235c395e5f4f9c11017a96",
+  "learn/evaluate.md": "45a20cd76100bac0da3777b6e294545e0943a74b784a813679ff243daa307276",
+  "learn/pairing-direct.txt": "c9b4cfea120a1d52eb266ae67888b8a76a7d3feba620180fc43f19acc6234e38",
+  "learn/pairing-userspace.txt": "70ad0faab481cc10e61dbc670f2ba027022faba762fcddacbe3dcdf541c3ab0a"
+ },
+ "inputs": {
+  "app/build.gradle.kts": "5048388a817ac17fbae199a824b684ed3b26659079f909e6bf9117b7cad7e005",
+  "tools/bridgit": "51cdb509b66428a147926f5d1a92aa6498d2a7514b45cdc04e7331243640333a",
+  "app/src/main/java/cc/bridgit/app/api/SelfDescription.kt": "095315d352678bdc4a71897f5d1cd914ddb9d36ace1820c9060495a95deb5fa1",
+  "app/src/main/java/cc/bridgit/app/adb/AdbSetupHelp.kt": "abc90047e9d71b9cc918a16de6790eae11558b91e4cd475174b4600749557a7e",
+  "app/src/test/java/cc/bridgit/app/api/LearnTest.kt": "7847cbc7828da97c9c150354bddbd56109f68839bb6f8ed81ef7dc2e56a579d5",
+  "app/src/main/java/cc/bridgit/app/api/Playbook.kt": "373d9ded305ff29de19ce856d7d6ef60e4332f7c2afba9bbecc98efdb8fafed9",
+  "app/src/main/java/cc/bridgit/app/api/Learn.kt": "342f5977035a3d9b83ceaee964fb317803fd9b323d0710c6abd30703b5e21d84"
+ },
+ "generator": "SetupPrompt.build (private distribution)"
+}

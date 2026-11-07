@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Discover model-key providers, write-only field formats and configured flags",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_keys_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/keys",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/keys",
+  "capability": "owner_features",
+  "returns": "providers[{id,name,configured,write_only,fields[{label,pattern,secret}],write_url}]; no saved suffixes/values",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

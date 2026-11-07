@@ -1,0 +1,47 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Remove an agent callback URL and signing key; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "owner_configuration_callbacks_delete",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/owner/configuration/callbacks/{agent} ",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/callbacks/{agent}",
+  "capability": "owner_features",
+  "returns": "agent_id,configured=false",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "agent": {
+     "description": "The agent in /v1/owner/configuration/callbacks/{agent}",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": [
+    "agent",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

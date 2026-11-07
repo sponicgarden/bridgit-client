@@ -1,0 +1,101 @@
+{
+ "detail_url": "/v1/discover?id=v1.watches&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.watches.json",
+ "title": "watches",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.watches.json",
+ "prerequisites": ["Check v1.watches supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [
+  "pet-monitor",
+  "room-change-watcher",
+  "situation-counter"
+ ],
+ "operations": [
+  {
+   "summary": "Call me back when ...: the phone reads the data you pick (location, motion, a camera photo, ...) on an interval, asks Clef or Jev (paid) your question about the last few readings, and calls you back when the answer matches. With a photo, a free change check on the phone skips the paid call while the picture stays the same; model none is local only. Designing one (which model, the change check, a worked door-camera example, cost): https://bridgit.cc/learn/decisions.md",
+   "path": "/v1/watches",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-watches.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-watches.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "watches_start"
+  },
+  {
+   "summary": "Your running watches, with their last check",
+   "path": "/v1/watches",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-watches.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-watches.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "watches_list"
+  },
+  {
+   "summary": "One running watch: its spec, the last 10 checks with the model's answers, and the last state sent",
+   "path": "/v1/watches/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-watches-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-watches-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "watches_get"
+  },
+  {
+   "summary": "Stop a watch (you get a watch.ended event with reason deleted)",
+   "path": "/v1/watches/{id}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-watches-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-watches-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "watches_stop"
+  },
+  {
+   "summary": "A tally watch's counts: today, the last 7 days, what's going on now, typical gaps, rules, and the episodes",
+   "path": "/v1/watches/{id}/tally",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-watches-id-tally.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-watches-id-tally.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "watches_tally"
+  },
+  {
+   "summary": "Pause or resume your watch without losing its tally; expiry is unchanged",
+   "path": "/v1/watches/{id}/pause",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-watches-id-pause.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-watches-id-pause.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "watches_pause"
+  },
+  {
+   "summary": "The library of common picture situations a watch can count (dog licking itself, pot boiling over, sunlight in the room, ...): send one as situation in POST /v1/watches, or describe your own in words",
+   "path": "/v1/situations",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-situations.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-situations.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "situations"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.watches",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "decide",
+ "capability_ids": ["v1.watches"]
+}

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Camera tab (owner, 5 Nov 2026): take photos by hand; the applets that check photos check them too. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <View
+        android:id="@+id/flash"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="#FFFFFF" />
+
+    <LinearLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/send_to"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/camera_scrim_chip"
+            android:drawablePadding="6dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="3"
+            android:minHeight="40dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/camera_scrim_chip"
+            android:gravity="center"
+            android:padding="12dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="#FFFFFF"
+            android:visibility="gone" />
+
+        <!-- Which applets the camera feeds, shown each time the tab opens and faded out after 10 s (owner, 5 Nov 2026). -->
+        <TextView
+            android:id="@+id/connected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/camera_scrim_chip"
+            android:padding="12dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="#FFFFFF"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:id="@+id/result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/camera_scrim_chip"
+            android:gravity="center"
+            android:paddingStart="14dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="8dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="#FFFFFF"
+            android:visibility="gone" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="84dp">
+
+            <TextView
+                android:id="@+id/count"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center_vertical|start"
+                android:layout_marginStart="32dp"
+                android:background="@drawable/camera_scrim_chip"
+                android:gravity="center"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="#FFFFFF"
+                android:visibility="invisible" />
+
+            <ImageButton
+                android:id="@+id/shutter"
+                android:layout_width="76dp"
+                android:layout_height="76dp"
+                android:layout_gravity="center"
+                android:background="@drawable/camera_shutter"
+                android:contentDescription="@string/camera_take" />
+
+            <ImageButton
+                android:id="@+id/flip"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/camera_scrim_chip"
+                android:contentDescription="@string/camera_flip"
+                android:src="@drawable/ic_camera_flip" />
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,93 @@
+{
+ "detail_url": "/v1/discover?id=v2.diagnostics&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v2.diagnostics.json",
+ "title": "Device diagnostics",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v2.diagnostics.json",
+ "prerequisites": ["Check v2.diagnostics supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_capabilities",
+   "documentation": "https://bridgit.cc/learn/operations/v2-capabilities.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-capabilities.json",
+   "required_arguments": [],
+   "tool": "capabilities"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_diagnostics",
+   "documentation": "https://bridgit.cc/learn/operations/v2-diagnostics.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-diagnostics.json",
+   "required_arguments": [],
+   "tool": "diagnostics"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_operation_cancel",
+   "documentation": "https://bridgit.cc/learn/operations/v2-operation.cancel.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-operation.cancel.json",
+   "required_arguments": [
+    "idempotency_key",
+    "id"
+   ],
+   "tool": "operation.cancel"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_operation_get",
+   "documentation": "https://bridgit.cc/learn/operations/v2-operation.get.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-operation.get.json",
+   "required_arguments": ["id"],
+   "tool": "operation.get"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_operation_list",
+   "documentation": "https://bridgit.cc/learn/operations/v2-operation.list.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-operation.list.json",
+   "required_arguments": [],
+   "tool": "operation.list"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_phone_context",
+   "documentation": "https://bridgit.cc/learn/operations/v2-phone.context.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-phone.context.json",
+   "required_arguments": [],
+   "tool": "phone.context"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_phone_status",
+   "documentation": "https://bridgit.cc/learn/operations/v2-phone.status.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-phone.status.json",
+   "required_arguments": [],
+   "tool": "phone.status"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
+ "examples_url": null,
+ "id": "v2.diagnostics",
+ "state": {
+  "ready": null,
+  "blockers": ["check_v2_capabilities"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v2.diagnostics"]
+}

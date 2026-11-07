@@ -1,0 +1,621 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bridgit workflow trigger",
+  "description": "Authoring shape after configuration inputs have been filled. The offline compiler checks referenced watches, cross-field equality and scopes. Event delivery requires a host implementing that trigger.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "button"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "button"
+        }
+      ],
+      "description": "Owner-started. Apple supports foreground button flows."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "called"
+        },
+        "with": {
+          "type": "object",
+          "maxProperties": 8,
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,31}$"
+          },
+          "additionalProperties": {
+            "enum": [
+              "text",
+              "number",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "called",
+          "with": {
+            "room": "text"
+          }
+        }
+      ],
+      "description": "A card, rule or schedule supplies typed arguments. A missing argument resolves to null."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "charging"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "charging"
+        }
+      ],
+      "description": "Android power connection transition, equivalent to power on plugged."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "power"
+        },
+        "on": {
+          "enum": [
+            "unplugged",
+            "plugged",
+            "restored"
+          ]
+        },
+        "for_s": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3600,
+          "default": 0
+        }
+      },
+      "required": [
+        "type",
+        "on"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "power",
+          "on": "unplugged",
+          "for_s": 60
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "battery"
+        },
+        "on": {
+          "enum": [
+            "low",
+            "critical",
+            "okay",
+            "full",
+            "saver_on",
+            "saver_off",
+            "hot",
+            "cooled"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "on"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "battery",
+          "on": "low"
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "sun"
+        },
+        "on": {
+          "enum": [
+            "sunrise",
+            "sunset"
+          ]
+        },
+        "offset_min": {
+          "type": "integer",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        }
+      },
+      "required": [
+        "type",
+        "on"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "sun",
+          "on": "sunrise",
+          "offset_min": 15
+        }
+      ],
+      "description": "Supply both coordinates or grant location for the host to save a rough position.",
+      "dependentRequired": {
+        "latitude": [
+          "longitude"
+        ],
+        "longitude": [
+          "latitude"
+        ]
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "interval"
+        },
+        "seconds": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 86400,
+          "default": 900
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "interval",
+          "seconds": 600
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "geofence"
+        },
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "radius_m": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 10000,
+          "default": 200
+        }
+      },
+      "required": [
+        "type",
+        "latitude",
+        "longitude"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "geofence",
+          "latitude": 48.5,
+          "longitude": 2.2,
+          "radius_m": 200
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "watch"
+        },
+        "watch": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$watch": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_-]{0,31}$"
+                }
+              },
+              "required": [
+                "$watch"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "on": {
+          "enum": [
+            "match",
+            "rule"
+          ],
+          "default": "match"
+        },
+        "rule": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,40}$"
+        }
+      },
+      "required": [
+        "type",
+        "watch"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "watch",
+          "watch": {
+            "$watch": "main"
+          },
+          "on": "match"
+        }
+      ],
+      "description": "Use a package watch reference to bind the watch created for this installation. A resolved ID must belong to its agent.",
+      "if": {
+        "properties": {
+          "on": {
+            "const": "rule"
+          }
+        },
+        "required": [
+          "on"
+        ]
+      },
+      "then": {
+        "required": [
+          "rule"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "rule"
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "mode"
+        },
+        "from": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,23}$"
+        },
+        "to": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,23}$"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "mode",
+          "to": "away"
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "applet.event"
+        },
+        "applet_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,79}$"
+        },
+        "application_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,79}$"
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,79}$"
+        },
+        "transport": {
+          "enum": [
+            "webhook",
+            "notification"
+          ]
+        },
+        "package": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "adapter": {
+          "enum": [
+            "generic",
+            "tapo"
+          ],
+          "default": "generic"
+        },
+        "mapping": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            },
+            "device_id": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            },
+            "device_name": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            },
+            "occurred_at": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "event_type": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "cooldown_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 86400,
+          "default": 30
+        }
+      },
+      "required": [
+        "type",
+        "source_id",
+        "transport"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "applet.event",
+          "applet_id": "door-alert",
+          "source_id": "front-door",
+          "transport": "webhook"
+        }
+      ],
+      "description": "Requires events.read. Notifications also require notifications.read. If both applet ID aliases appear, their values must agree.",
+      "anyOf": [
+        {
+          "required": [
+            "applet_id"
+          ]
+        },
+        {
+          "required": [
+            "application_id"
+          ]
+        }
+      ],
+      "if": {
+        "properties": {
+          "transport": {
+            "const": "notification"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "package"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "package"
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "application.event"
+        },
+        "applet_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,79}$"
+        },
+        "application_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,79}$"
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,79}$"
+        },
+        "transport": {
+          "enum": [
+            "webhook",
+            "notification"
+          ]
+        },
+        "package": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "adapter": {
+          "enum": [
+            "generic",
+            "tapo"
+          ],
+          "default": "generic"
+        },
+        "mapping": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            },
+            "device_id": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            },
+            "device_name": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            },
+            "occurred_at": {
+              "type": "string",
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+){0,7}$"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "event_type": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "cooldown_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 86400,
+          "default": 30
+        }
+      },
+      "required": [
+        "type",
+        "source_id",
+        "transport"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "application.event",
+          "applet_id": "door-alert",
+          "source_id": "front-door",
+          "transport": "webhook"
+        }
+      ],
+      "description": "Requires events.read. Notifications also require notifications.read. If both applet ID aliases appear, their values must agree.",
+      "anyOf": [
+        {
+          "required": [
+            "applet_id"
+          ]
+        },
+        {
+          "required": [
+            "application_id"
+          ]
+        }
+      ],
+      "if": {
+        "properties": {
+          "transport": {
+            "const": "notification"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "package"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "package"
+          ]
+        }
+      }
+    }
+  ]
+}

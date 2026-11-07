@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "A passive bundled manufacturer logo; never a remote lookup",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_brands_logo",
+  "query": [{
+   "name": "raw",
+   "description": "Return image bytes instead of JSON/base64; default false",
+   "type": "boolean",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan/brands/tapo/logo",
+  "idempotent": false,
+  "path": "/v1/lan/brands/{id}/logo",
+  "capability": "lan_discovery",
+  "returns": "id,name,mime,source,sha256,data_base64; raw=1 returns passive SVG or PNG bytes; same discovery grant",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/lan/brands/{id}/logo",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

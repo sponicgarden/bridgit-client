@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Discover installed applets and their data_url. Owner control agents see all applets, including owner-installed ones; no installer ownership or new approval required",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_installed_list",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/installed",
+  "idempotent": false,
+  "path": "/v1/applets/installed",
+  "capability": "applet_install",
+  "returns": "installed[{id, package_id, name, version, status, run_mode, lifecycle{task_id,generation,state,participants,pending}, lifecycle_errors, config, template_update{status, version, id}|null, watches{part: watch_id}, card_id, workflow_id, flows{name: workflow_id}, budget{day_usd, month_usd, spent_today_usd, spent_month_usd, set_by: owner|package|default}, installed_at, updated_at}], pending[]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

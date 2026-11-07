@@ -1,0 +1,69 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Weather where the phone is (or at a lat/lon you give): conditions now, the next hours and the next 24 hours, from MET Norway. Schedule it like any call: {\"do\":{\"call\":\"GET /v1/weather\"}}",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "weather",
+  "query": [
+   {
+    "name": "lat",
+    "description": "Latitude. With lon: weather there, and no location access is needed",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "lon",
+    "description": "Longitude, with lat",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "hours",
+    "description": "Hourly forecast points after now, 0-48 (default 6)",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/weather?hours=3",
+  "idempotent": false,
+  "path": "/v1/weather",
+  "capability": "weather",
+  "returns": "location{latitude, longitude, from (phone or request), rounded_to_decimals}, now{time, temperature_c, symbol, summary, precipitation_mm, precipitation_period, wind_speed_mps, wind_from_deg, wind_from, humidity_pct, cloud_pct, pressure_hpa}, next_hours[{time, temperature_c, symbol, summary, precipitation_mm, wind_speed_mps}], next_12_hours{symbol, summary}, next_24_hours{min_temperature_c, max_temperature_c, precipitation_mm}, forecast_updated_at, fetched_at, expires_at, cached, stale, source, attribution",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "hours": {
+     "description": "Hourly forecast points after now, 0-48 (default 6)",
+     "type": "integer"
+    },
+    "lon": {
+     "description": "Longitude, with lat",
+     "type": "number"
+    },
+    "lat": {
+     "description": "Latitude. With lon: weather there, and no location access is needed",
+     "type": "number"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "invalid_parameter",
+   "agent_not_allowed",
+   "permission_denied",
+   "access_needed",
+   "notifications_required",
+   "capture_timeout",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

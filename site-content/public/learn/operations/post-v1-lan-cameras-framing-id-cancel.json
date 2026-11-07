@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Cancel your framing operation and request camera Stop",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_cameras_framing_cancel",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/lan-cameras/framing/{id}/cancel {}",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/framing/{id}/cancel",
+  "capability": "lan_camera",
+  "returns": "cancel_requested and current state. Poll status for Stop confirmation; a failure is not a confirmed stop.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/lan-cameras/framing/{id}/cancel",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,48 @@
+{
+ "detail_url": "/v1/discover?id=v2.peripherals&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v2.peripherals.json",
+ "title": "Bluetooth, USB and NFC",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v2.peripherals.json",
+ "prerequisites": ["Check v2.peripherals supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_peripheral_action",
+   "documentation": "https://bridgit.cc/learn/operations/v2-peripheral.action.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-peripheral.action.json",
+   "required_arguments": [
+    "idempotency_key",
+    "type"
+   ],
+   "tool": "peripheral.action"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_peripheral_list",
+   "documentation": "https://bridgit.cc/learn/operations/v2-peripheral.list.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-peripheral.list.json",
+   "required_arguments": [],
+   "tool": "peripheral.list"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Private build only; owner grants and session/transport requirements apply. See control guide.",
+ "examples_url": null,
+ "id": "v2.peripherals",
+ "state": {
+  "ready": null,
+  "blockers": ["check_v2_capabilities"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v2.peripherals"]
+}

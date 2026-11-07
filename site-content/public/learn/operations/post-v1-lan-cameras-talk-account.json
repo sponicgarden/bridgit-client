@@ -1,0 +1,57 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Verify and privately store or clear this camera's separate Tapo cloud-password credential",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_cameras_talk_account",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "camera",
+    "description": "Enrolled camera id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "cloud_password",
+    "description": "Authorized cloud account password, not RTSP password; empty clears",
+    "type": "string",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/lan-cameras/talk-account {\"camera\":\"lan:example\",\"cloud_password\":\"<private authorized password>\"}",
+  "idempotent": true,
+  "path": "/v1/lan-cameras/talk-account",
+  "capability": "lan_camera_speaker",
+  "returns": "camera, talk_credentials_configured, authentication_verified, audibly_verified=false; also requires lan_enrollment permission. No speaker playback during authentication.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "cloud_password": {
+     "description": "Authorized cloud account password, not RTSP password; empty clears",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "camera": {
+     "description": "Enrolled camera id",
+     "type": "string"
+    }
+   },
+   "required": [
+    "camera",
+    "cloud_password"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

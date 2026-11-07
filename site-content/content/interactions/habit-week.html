@@ -1,0 +1,146 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1020;color:#eef1fb;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 28px}
+.head{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.ring{flex:none;position:relative;width:96px;height:96px}
+.ring svg{width:96px;height:96px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}
+.ring .bg{stroke:#1f2740}
+.ring .fg{stroke:url(#rg);stroke-linecap:round;transition:stroke-dashoffset .3s ease}
+.ring b{position:absolute;inset:0;display:grid;place-content:center;font-size:22px;font-weight:750;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.eyebrow{font-size:13px;font-weight:600;color:#9aa3c2;margin:0 0 4px}
+h1{font-size:21px;line-height:1.25;margin:0;letter-spacing:-.01em}
+.list{display:grid;gap:12px}
+.habit{background:#141a2e;border:1px solid #1f2740;border-radius:18px;padding:14px}
+.hrow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
+.hname{font-weight:650;margin:0}
+.streak{font-size:13px;color:#c3c9de;white-space:nowrap;font-variant-numeric:tabular-nums}
+.streak svg{width:13px;height:13px;vertical-align:-1px;margin-right:3px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{font:inherit;font-size:12px;font-weight:650;min-height:48px;border-radius:12px;border:1.5px solid #2b3452;background:transparent;color:#8d96b5;cursor:pointer;padding:0;transition:background .18s,border-color .18s,color .18s,transform .15s}
+.day.on{border-color:transparent;background:linear-gradient(140deg,var(--a),var(--b));color:#0b1020}
+.day:active,.step:active,.go:active{transform:scale(.96)}
+.goal{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #1f2740;font-size:14px;color:#c3c9de}
+.stepper{display:flex;align-items:center;gap:4px}
+.step{font:inherit;font-size:22px;width:48px;height:48px;border-radius:14px;border:0;background:#1f2740;color:#eef1fb;cursor:pointer;transition:transform .15s,opacity .15s}
+.step:disabled{opacity:.35}
+.gval{min-width:68px;text-align:center;font-weight:650;color:#eef1fb;font-variant-numeric:tabular-nums}
+.go{display:block;width:100%;margin-top:20px;font:inherit;font-weight:700;font-size:17px;min-height:54px;border:0;border-radius:16px;background:linear-gradient(120deg,#2dd4bf,#8b5cf6 55%,#f472b6);color:#0b1020;cursor:pointer;transition:opacity .18s,transform .15s}
+.go:disabled{opacity:.45}
+.hint{font-size:13px;color:#9aa3c2;text-align:center;margin:12px 0 0}
+.status{text-align:center;font-size:14px;color:#9aa3c2;min-height:20px;margin:10px 0 0}
+button:disabled{cursor:default}
+</style>
+<div class="wrap">
+  <div class="head">
+    <div class="ring">
+      <svg viewBox="0 0 96 96" aria-hidden="true">
+        <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset=".55" stop-color="#8b5cf6"/><stop offset="1" stop-color="#f472b6"/></linearGradient></defs>
+        <circle class="bg" cx="48" cy="48" r="40"/><circle class="fg" id="arc" cx="48" cy="48" r="40"/>
+      </svg>
+      <b id="score"></b>
+    </div>
+    <div><p class="eyebrow" id="eyebrow"></p><h1 id="title"></h1></div>
+  </div>
+  <div class="list" id="list"></div>
+  <p class="hint" id="hint"></p>
+  <button class="go" id="go"></button>
+  <p class="status" id="status"></p>
+</div>
+<script>
+// answer.data: {"days":{habit_id:[Mon..Sun as 1/0]},"goals":{habit_id:days per week}}
+// The card's content. Change only this object.
+var CARD = {
+  eyebrow: "Week of 27 Oct – 2 Nov",
+  title: "Your week: 3 habits, 16 of 21 days",
+  days: ["M", "T", "W", "T", "F", "S", "S"],
+  dayNames: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+  streak: "day streak",
+  noStreak: "Start again tonight",
+  goal: "Next week's goal",
+  unit: "days",
+  hint: "Tap a day to fix it.",
+  save: "Save the week",
+  confirm: "✓ Week saved. New goals start Monday",
+  habits: [
+    { id: "walk", name: "Walk 8k steps", colors: ["#2dd4bf", "#22d3ee"], done: [1, 1, 1, 0, 1, 1, 1], goal: 6 },
+    { id: "read", name: "Read 20 min", colors: ["#a78bfa", "#f472b6"], done: [1, 0, 1, 1, 0, 0, 1], goal: 5 },
+    { id: "phone", name: "No phone after 23:00", colors: ["#fbbf24", "#fb7185"], done: [1, 1, 0, 1, 1, 1, 1], goal: 4 }
+  ]
+};
+
+var $ = function (id) { return document.getElementById(id); };
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+var sent = false, C = 2 * Math.PI * 40;
+var flame = '<svg viewBox="0 0 24 24"><path fill="#fb923c" d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-3-1-6 1-9z"/></svg>';
+$("eyebrow").textContent = CARD.eyebrow;
+$("title").textContent = CARD.title;
+$("hint").textContent = CARD.hint;
+$("arc").style.strokeDasharray = C;
+
+var habits = CARD.habits.map(function (h) {
+  var x = { id: h.id, done: h.done.slice(), goal: h.goal };
+  var card = el("div", "habit"), row = el("div", "hrow");
+  row.appendChild(el("p", "hname", h.name));
+  var st = el("span", "streak"); row.appendChild(st); card.appendChild(row);
+  card.style.setProperty("--a", h.colors[0]); card.style.setProperty("--b", h.colors[1]);
+  var days = el("div", "days");
+  x.btns = CARD.days.map(function (d, i) {
+    var b = el("button", "day", d);
+    b.onclick = function () { if (!sent) { x.done[i] = x.done[i] ? 0 : 1; paint(); } };
+    days.appendChild(b); return b;
+  });
+  card.appendChild(days);
+  var goal = el("div", "goal"); goal.appendChild(el("span", "", CARD.goal));
+  var sp = el("div", "stepper"), minus = el("button", "step", "−"), val = el("span", "gval"), plus = el("button", "step", "+");
+  minus.setAttribute("aria-label", "Fewer days"); plus.setAttribute("aria-label", "More days");
+  minus.onclick = function () { if (!sent && x.goal > 1) { x.goal--; paint(); } };
+  plus.onclick = function () { if (!sent && x.goal < 7) { x.goal++; paint(); } };
+  sp.appendChild(minus); sp.appendChild(val); sp.appendChild(plus); goal.appendChild(sp); card.appendChild(goal);
+  $("list").appendChild(card);
+  x.ui = { st: st, val: val, minus: minus, plus: plus, name: h.name };
+  return x;
+});
+
+function paint() {
+  var total = 0, max = 0;
+  habits.forEach(function (x) {
+    x.btns.forEach(function (b, i) {
+      b.classList.toggle("on", !!x.done[i]);
+      b.setAttribute("aria-label", x.ui.name + ", " + CARD.dayNames[i] + (x.done[i] ? ", done" : ", missed"));
+    });
+    var s = 0; for (var i = x.done.length - 1; i >= 0 && x.done[i]; i--) s++;
+    x.ui.st.innerHTML = s ? flame : "";
+    x.ui.st.appendChild(document.createTextNode(s ? s + " " + CARD.streak : CARD.noStreak));
+    x.ui.val.textContent = x.goal + " " + CARD.unit;
+    if (!sent) { x.ui.minus.disabled = x.goal <= 1; x.ui.plus.disabled = x.goal >= 7; }
+    total += x.done.reduce(function (a, b) { return a + b; }, 0); max += x.done.length;
+  });
+  $("score").textContent = total + "/" + max;
+  $("arc").style.strokeDashoffset = C * (1 - total / max);
+  $("go").textContent = CARD.save + " · " + total + " of " + max;
+}
+paint();
+
+$("go").onclick = function () {
+  if (sent) return;
+  var bridge = window.Bridgit || window.Bridget;
+  if (!bridge) { $("status").textContent = "Preview only: open this card in Bridgit to answer."; return; }
+  sent = true;
+  var answer = { days: {}, goals: {} };
+  habits.forEach(function (x) { answer.days[x.id] = x.done.slice(); answer.goals[x.id] = x.goal; });
+  document.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+  $("status").textContent = "Sending…";
+  (window.Bridgit || window.Bridget).respond(JSON.stringify(answer));
+};
+
+document.addEventListener("bridgit:answered", function (e) {
+  e.preventDefault();
+  sent = true;
+  document.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+  $("title").textContent = CARD.confirm;
+  $("status").textContent = "";
+  setTimeout(function () { $("title").scrollIntoView({ block: "center", behavior: "smooth" }); }, 400);
+});
+</script>

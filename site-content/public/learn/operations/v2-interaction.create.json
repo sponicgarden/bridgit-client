@@ -1,0 +1,166 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_interaction_create",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-interaction.create.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-interaction.create.json",
+  "required_arguments": [
+   "idempotency_key",
+   "title"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "kind": {
+      "description": "question waits for the owner's answer; notice just shows (default question)",
+      "type": "string",
+      "enum": [
+       "question",
+       "notice"
+      ]
+     },
+     "expires_seconds": {
+      "maximum": 86400,
+      "type": "integer",
+      "minimum": 30
+     },
+     "text": {
+      "type": "string",
+      "maxLength": 4096
+     },
+     "title": {
+      "type": "string",
+      "maxLength": 120
+     },
+     "choices": {
+      "maxItems": 6,
+      "description": "Answers the owner can tap",
+      "type": "array",
+      "items": {
+       "type": "string",
+       "maxLength": 256
+      }
+     }
+    },
+    "required": ["title"]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "kind": {
+        "description": "question waits for the owner's answer; notice just shows (default question)",
+        "type": "string",
+        "enum": [
+         "question",
+         "notice"
+        ]
+       },
+       "expires_seconds": {
+        "maximum": 86400,
+        "type": "integer",
+        "minimum": 30
+       },
+       "text": {
+        "type": "string",
+        "maxLength": 4096
+       },
+       "title": {
+        "type": "string",
+        "maxLength": 120
+       },
+       "choices": {
+        "maxItems": 6,
+        "description": "Answers the owner can tap",
+        "type": "array",
+        "items": {
+         "type": "string",
+         "maxLength": 256
+        }
+       }
+      },
+      "required": ["title"]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["interaction.create"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "kind": {
+     "description": "question waits for the owner's answer; notice just shows (default question)",
+     "type": "string",
+     "enum": [
+      "question",
+      "notice"
+     ]
+    },
+    "expires_seconds": {
+     "maximum": 86400,
+     "type": "integer",
+     "minimum": 30
+    },
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    },
+    "text": {
+     "type": "string",
+     "maxLength": 4096
+    },
+    "title": {
+     "type": "string",
+     "maxLength": 120
+    },
+    "choices": {
+     "maxItems": 6,
+     "description": "Answers the owner can tap",
+     "type": "array",
+     "items": {
+      "type": "string",
+      "maxLength": 256
+     }
+    }
+   },
+   "required": [
+    "idempotency_key",
+    "title"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_interaction_create"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "interaction.create"
+ }
+}

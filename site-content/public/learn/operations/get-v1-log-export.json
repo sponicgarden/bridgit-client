@@ -1,0 +1,138 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Every matching entry as JSONL or CSV; direct HTTP streams without a total size cap; MCP/relay envelopes capped at 8 MiB",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "log_export",
+  "query": [
+   {
+    "name": "format",
+    "description": "jsonl (default) or csv",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "jsonl",
+     "csv"
+    ]
+   },
+   {
+    "name": "channel",
+    "description": "Comma list of audit, diagnostic, agent",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "agent",
+    "description": "Agent name or id; `me` for you; `bridgit` for Bridgit's own entries",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "kind",
+    "description": "request, setting, agent, pairing, service, note, \u2026",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "endpoint",
+    "description": "Endpoint prefix, e.g. /v1/camera",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "result",
+    "description": "ok, error, or an error code",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "level",
+    "description": "Minimum level: debug, info, warn, error",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "since",
+    "description": "Log id or ISO time (exclusive id)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "until",
+    "description": "Log id or ISO time",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "q",
+    "description": "Text in message or endpoint",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/log/export?format=csv&agent=me",
+  "idempotent": false,
+  "path": "/v1/log/export",
+  "capability": "log",
+  "returns": "application/x-ndjson or text/csv",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "result": {
+     "description": "ok, error, or an error code",
+     "type": "string"
+    },
+    "q": {
+     "description": "Text in message or endpoint",
+     "type": "string"
+    },
+    "agent": {
+     "description": "Agent name or id; `me` for you; `bridgit` for Bridgit's own entries",
+     "type": "string"
+    },
+    "endpoint": {
+     "description": "Endpoint prefix, e.g. /v1/camera",
+     "type": "string"
+    },
+    "level": {
+     "description": "Minimum level: debug, info, warn, error",
+     "type": "string"
+    },
+    "kind": {
+     "description": "request, setting, agent, pairing, service, note, \u2026",
+     "type": "string"
+    },
+    "format": {
+     "description": "jsonl (default) or csv",
+     "type": "string",
+     "enum": [
+      "jsonl",
+      "csv"
+     ]
+    },
+    "channel": {
+     "description": "Comma list of audit, diagnostic, agent",
+     "type": "string"
+    },
+    "until": {
+     "description": "Log id or ISO time",
+     "type": "string"
+    },
+    "since": {
+     "description": "Log id or ISO time (exclusive id)",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

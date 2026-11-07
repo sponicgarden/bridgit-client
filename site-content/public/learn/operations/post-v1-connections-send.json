@@ -1,0 +1,85 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Send a message, data and optionally a kept photo to one of the owner's connections. Queued and retried by default; wait_reply waits up to 15 s and returns the reply",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "connections_send",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "to",
+    "description": "A connection id from GET /v1/connections",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "data",
+    "description": "Up to 32 keys of text, numbers or true/false (16 KiB). Bridgit adds applet, flow, run_id, sent_at and phone",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "text",
+    "description": "A short line, up to 1000 characters. Needed for Discord, Slack, Telegram, ntfy and Pushover",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "photo",
+    "description": "A kept photo of your applet (kept:\u2026), for connections that take photos",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "wait_reply",
+    "description": "true sends now and waits up to 15 s for the reply",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/connections/send {\"to\":\"<connection id>\",\"text\":\"A package is at the front door\",\"data\":{\"where\":\"front door\"}}",
+  "idempotent": false,
+  "path": "/v1/connections/send",
+  "capability": "connections",
+  "returns": "queued true and delivery_id; or with wait_reply: status (HTTP), reply (JSON) or reply_text, queued false",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "wait_reply": {
+     "description": "true sends now and waits up to 15 s for the reply",
+     "type": "boolean"
+    },
+    "data": {
+     "description": "Up to 32 keys of text, numbers or true/false (16 KiB). Bridgit adds applet, flow, run_id, sent_at and phone",
+     "type": "object"
+    },
+    "photo": {
+     "description": "A kept photo of your applet (kept:\u2026), for connections that take photos",
+     "type": "string"
+    },
+    "to": {
+     "description": "A connection id from GET /v1/connections",
+     "type": "string"
+    },
+    "text": {
+     "description": "A short line, up to 1000 characters. Needed for Discord, Slack, Telegram, ntfy and Pushover",
+     "type": "string"
+    }
+   },
+   "required": ["to"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "not_found",
+   "rate_limited",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

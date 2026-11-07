@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The satellites (other Bridgit phones linked to this one) you may use, with what each offers. Any call takes header X-Bridgit-Target: <satellite id> (or query target=<id>) to run on that satellite instead of this phone; leave it out to use this phone.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "satellites",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/satellites",
+  "idempotent": false,
+  "path": "/v1/satellites",
+  "capability": "status",
+  "returns": "satellites[{id (sat:\u2026), name, status (online|offline|unlinked|not_checked), last_seen (ms, 0 = never), battery{percent, charging}, model, device_type (phone, tablet, computer, tv, watch or camera; null from an older satellite), app_version, cameras[{id, target_camera}], capabilities[{id, enabled, ready, blocked_reason}], endpoints[{method, path}], how_to_call}], how_to_call. Only satellites the owner lets you use are listed.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

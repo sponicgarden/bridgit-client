@@ -1,0 +1,58 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Legacy alias of POST /v1/applet-devices",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "app_devices_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "device",
+    "description": "Visible enrolled external device id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "applets",
+    "description": "Installed applet ids, dog_monitor or city_tour. [] revokes all; no automatic assignments.",
+    "type": "array",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/applet-devices {\"device\":\"lan:example\",\"applets\":[\"dog_monitor\"]}",
+  "idempotent": true,
+  "path": "/v1/app-devices",
+  "capability": "app_device_access",
+  "returns": "device, applets; revocation immediately stops Pet Monitor when its active cameras lose access. Unrelated devices' assignments stay unchanged.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "applets": {
+     "description": "Installed applet ids, dog_monitor or city_tour. [] revokes all; no automatic assignments.",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "device": {
+     "description": "Visible enrolled external device id",
+     "type": "string"
+    }
+   },
+   "required": [
+    "device",
+    "applets"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

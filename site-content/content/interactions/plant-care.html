@@ -1,0 +1,163 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef3ea;color:#1f2a20;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 28px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.04em;color:#5b6b58;margin:0 0 4px}
+h1{font-size:24px;line-height:1.2;margin:0 0 14px;letter-spacing:-.01em}
+.sum{display:flex;align-items:center;gap:12px;background:#fffdf7;border-radius:16px;padding:12px 14px;box-shadow:0 1px 2px rgba(47,93,58,.08),0 6px 18px -10px rgba(47,93,58,.25);margin-bottom:16px}
+.sum b{font-variant-numeric:tabular-nums;font-size:15px;white-space:nowrap}
+.track{flex:1;height:8px;border-radius:99px;background:#e2eadc;overflow:hidden}
+.track i{display:block;height:100%;width:0;background:#2f5d3a;border-radius:99px;transition:width .2s ease}
+.list{display:grid;gap:12px}
+.plant{background:#fffdf7;border-radius:18px;padding:14px;box-shadow:0 1px 2px rgba(47,93,58,.08),0 8px 20px -14px rgba(47,93,58,.35);transition:background .18s,box-shadow .18s}
+.plant.done{background:#f3f8ef;box-shadow:0 0 0 1.5px #b9d2b4 inset}
+.row{display:flex;gap:12px;align-items:center}
+.pic{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-content:center;padding-bottom:9px;font-size:24px;background:radial-gradient(circle at 50% 35%,#f1f6ec 0,#dfe9d7 70%);position:relative}
+.pic::after{content:"";position:absolute;left:14px;right:14px;bottom:6px;height:9px;border-radius:2px 2px 6px 6px;background:#c46a4a;opacity:.9;z-index:0}
+.info{flex:1;min-width:0}
+.name{font-weight:650;font-size:16px;margin:0}
+.name span{font-weight:450;color:#5b6b58}
+.light{font-size:13px;color:#5b6b58;margin:1px 0 0}
+.tick{flex:none;width:52px;height:52px;border-radius:50%;border:2px solid #b9d2b4;background:#fff;color:#2f5d3a;display:grid;place-content:center;cursor:pointer;transition:background .18s,border-color .18s,transform .15s}
+.tick svg{width:24px;height:24px;opacity:.35;transition:opacity .18s}
+.tick.on{background:#2f5d3a;border-color:#2f5d3a;color:#fff}
+.tick.on svg{opacity:1}
+.tick:active,.chip:active,.go:active{transform:scale(.98)}
+.meter{margin:12px 0 0}
+.mtrack{height:6px;border-radius:99px;background:#efe6dc;overflow:hidden}
+.mtrack i{display:block;height:100%;border-radius:99px;transition:width .2s}
+.mlab{display:flex;justify-content:space-between;font-size:12px;color:#6c7a69;margin-top:4px}
+.mlab .now{color:#9a4a2e;font-weight:650}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;font-size:13px;color:#5b6b58}
+.chip{font:inherit;font-size:14px;font-weight:600;min-height:48px;padding:0 16px;border-radius:99px;border:1.5px solid #e3cbbd;background:#fbf3ec;color:#8a3f24;cursor:pointer;transition:background .18s,color .18s,border-color .18s,transform .15s}
+.chip.on{background:#c46a4a;border-color:#c46a4a;color:#fff}
+.badge{font-size:12px;font-weight:700;color:#9a4a2e;background:#f8e7dc;border-radius:99px;padding:3px 9px}
+.go{display:block;width:100%;margin-top:20px;font:inherit;font-weight:700;font-size:17px;min-height:54px;border:0;border-radius:16px;background:#2f5d3a;color:#fff;cursor:pointer;box-shadow:0 8px 20px -10px #2f5d3a;transition:opacity .18s,transform .15s}
+.go:disabled{opacity:.45}
+.status{text-align:center;font-size:14px;color:#5b6b58;min-height:20px;margin:10px 0 0}
+button:disabled{cursor:default}
+</style>
+<div class="wrap">
+  <p class="eyebrow" id="eyebrow"></p>
+  <h1 id="title"></h1>
+  <div class="sum"><b id="count"></b><div class="track"><i id="fill"></i></div></div>
+  <div class="list" id="list"></div>
+  <button class="go" id="go"></button>
+  <p class="status" id="status"></p>
+</div>
+<script>
+// answer.data: {"watered":[ids],"remind_tonight":[ids],"skipped":[thirsty ids left alone]}
+// The card's content. Change only this object.
+var CARD = {
+  eyebrow: "Sunday 2 Nov · Flat on Długa",
+  title: "4 plants are thirsty today",
+  done: "Done for today",
+  remind: "Remind me tonight",
+  remindOn: "Tonight 20:00",
+  fine: "Fine until",
+  thirsty: "Thirsty",
+  levels: ["Dry", "OK", "Moist"],
+  confirm: "✓ Logged. Your jungle thanks you",
+  plants: [
+    { id: "monty", icon: "🌿", name: "Monstera", nick: "Monty", moisture: 12, light: "☀️ Bright, indirect", thirsty: true },
+    { id: "fern", icon: "🌱", name: "Boston fern", nick: "Fern", moisture: 18, light: "⛅ Shade, humid", thirsty: true },
+    { id: "olive", icon: "🫒", name: "Olive tree", nick: "Olive", moisture: 22, light: "☀️ Full sun", thirsty: true },
+    { id: "calathea", icon: "🍃", name: "Calathea", nick: "Cleo", moisture: 26, light: "⛅ Medium light", thirsty: true },
+    { id: "pothos", icon: "🪴", name: "Pothos", nick: "Pip", moisture: 58, light: "⛅ Any light", thirsty: false, next: "Wed" },
+    { id: "cactus", icon: "🌵", name: "Cactus", nick: "Spike", moisture: 74, light: "☀️ Full sun", thirsty: false, next: "Sun 16 Nov" }
+  ]
+};
+
+var $ = function (id) { return document.getElementById(id); };
+var state = {}, sent = false;
+var plants = CARD.plants.slice().sort(function (a, b) { return (b.thirsty - a.thirsty) || (a.moisture - b.moisture); });
+var thirsty = plants.filter(function (p) { return p.thirsty; });
+$("eyebrow").textContent = CARD.eyebrow;
+$("title").textContent = CARD.title;
+var check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+plants.forEach(function (p) {
+  state[p.id] = { watered: false, remind: false };
+  var card = el("div", "plant"), row = el("div", "row");
+  var pic = el("div", "pic", p.icon);
+  var info = el("div", "info"), name = el("p", "name", p.name + " ");
+  name.appendChild(el("span", "", "· " + p.nick));
+  info.appendChild(name); info.appendChild(el("p", "light", p.light));
+  var tick = el("button", "tick"); tick.innerHTML = check;
+  tick.setAttribute("aria-label", "Watered " + p.name);
+  row.appendChild(pic); row.appendChild(info); row.appendChild(tick); card.appendChild(row);
+
+  var meter = el("div", "meter"), mt = el("div", "mtrack"), mi = el("i");
+  var lvl = p.moisture < 33 ? 0 : p.moisture < 66 ? 1 : 2;
+  mi.style.width = p.moisture + "%";
+  mi.style.background = ["#c46a4a", "#8fb486", "#2f5d3a"][lvl];
+  mt.appendChild(mi); meter.appendChild(mt);
+  var lab = el("div", "mlab");
+  CARD.levels.forEach(function (l, i) { lab.appendChild(el("span", i === lvl ? "now" : "", l)); });
+  meter.appendChild(lab); card.appendChild(meter);
+
+  var foot = el("div", "foot"), chip = null;
+  if (p.thirsty) {
+    foot.appendChild(el("span", "badge", CARD.thirsty + " · " + p.moisture + "%"));
+    chip = el("button", "chip", CARD.remind);
+    chip.onclick = function () {
+      if (sent) return;
+      var s = state[p.id]; s.remind = !s.remind; if (s.remind) s.watered = false; paint();
+    };
+    foot.appendChild(chip);
+  } else {
+    foot.appendChild(el("span", "", CARD.fine + " " + p.next + " · " + p.moisture + "%"));
+  }
+  card.appendChild(foot); $("list").appendChild(card);
+
+  tick.onclick = function () {
+    if (sent) return;
+    var s = state[p.id]; s.watered = !s.watered; if (s.watered) s.remind = false; paint();
+  };
+  p.ui = { card: card, tick: tick, chip: chip };
+});
+
+function pick(key) { return plants.filter(function (p) { return state[p.id][key]; }).map(function (p) { return p.id; }); }
+
+function paint() {
+  plants.forEach(function (p) {
+    var s = state[p.id];
+    p.ui.card.classList.toggle("done", s.watered);
+    p.ui.tick.classList.toggle("on", s.watered);
+    p.ui.tick.setAttribute("aria-pressed", s.watered);
+    if (p.ui.chip) { p.ui.chip.classList.toggle("on", s.remind); p.ui.chip.textContent = s.remind ? "⏰ " + CARD.remindOn : CARD.remind; }
+  });
+  var n = thirsty.filter(function (p) { return state[p.id].watered; }).length;
+  $("count").textContent = n + " of " + thirsty.length + " watered";
+  $("fill").style.width = (n / thirsty.length * 100) + "%";
+  var w = pick("watered").length, r = pick("remind").length;
+  $("go").textContent = CARD.done + (w || r ? " · " + [w ? w + " watered" : "", r ? r + " tonight" : ""].filter(Boolean).join(", ") : "");
+}
+paint();
+
+$("go").onclick = function () {
+  if (sent) return;
+  var bridge = window.Bridgit || window.Bridget;
+  if (!bridge) { $("status").textContent = "Preview only: open this card in Bridgit to answer."; return; }
+  sent = true;
+  var answer = {
+    watered: pick("watered"),
+    remind_tonight: pick("remind"),
+    skipped: thirsty.filter(function (p) { var s = state[p.id]; return !s.watered && !s.remind; }).map(function (p) { return p.id; })
+  };
+  document.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+  $("status").textContent = "Sending…";
+  (window.Bridgit || window.Bridget).respond(JSON.stringify(answer));
+};
+
+document.addEventListener("bridgit:answered", function (e) {
+  e.preventDefault();
+  sent = true;
+  document.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+  $("title").textContent = CARD.confirm;
+  $("status").textContent = "";
+  setTimeout(function () { $("title").scrollIntoView({ block: "center", behavior: "smooth" }); }, 400);
+});
+</script>

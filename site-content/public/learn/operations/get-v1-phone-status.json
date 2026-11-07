@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Battery, network, screen and sound status, with as_of",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "phone_status",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/phone/status",
+  "idempotent": false,
+  "path": "/v1/phone/status",
+  "capability": "phone",
+  "returns": "Battery, network, screen and sound status, with as_of",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

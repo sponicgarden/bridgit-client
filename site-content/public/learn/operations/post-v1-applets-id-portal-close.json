@@ -1,0 +1,34 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Close an applet's portal screen",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applets_portal_close",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/applets/ai0123456789abcd/portal/close",
+  "idempotent": false,
+  "path": "/v1/applets/{id}/portal/close",
+  "capability": "applet_portals",
+  "returns": "id, closed (false when it wasn't open)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/applets/{id}/portal/close",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "not_supported"
+  ],
+  "requires": null
+ }
+}

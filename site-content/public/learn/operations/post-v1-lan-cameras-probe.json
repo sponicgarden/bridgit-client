@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Refresh enrolled camera capabilities without recording audio, playing a sound or moving motors",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_cameras_probe",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [{
+   "name": "camera",
+   "description": "Enrolled camera id",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/lan-cameras/probe {\"camera\":\"lan:example\"}",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/probe",
+  "capability": "lan_camera",
+  "returns": "Safe per-device capabilities: advertised vs implemented vs tested, timestamp, audio codecs/directions, ONVIF feature inventory and Tapo talk credential state. Legacy cameras remain not_checked until probed.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"camera": {
+    "description": "Enrolled camera id",
+    "type": "string"
+   }},
+   "required": ["camera"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

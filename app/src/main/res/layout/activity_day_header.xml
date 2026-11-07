@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sticky day header drawn by DayHeaderDecoration ("Today", "Yesterday", "Mon 26 Oct") in the small-caps
+     section style. Opaque background: the pinned header is drawn over the row cards scrolling under it. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.Bridgit.SectionHeader"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorSurface"
+    android:paddingStart="20dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="6dp" />

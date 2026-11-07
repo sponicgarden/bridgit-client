@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read the shared applet practice catalog, applicability, defaults, acceptance checks and exception rules",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_practices",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/practices",
+  "idempotent": false,
+  "path": "/v1/applets/practices",
+  "capability": "applet_install",
+  "returns": "contract, version, practices[], by_task",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

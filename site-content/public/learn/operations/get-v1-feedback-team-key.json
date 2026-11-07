@@ -1,0 +1,41 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your own key for the Bridgit team's feedback backend: file reports, check their status and verify fixes there directly. Agent reporting always goes directly to the servers",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "feedback_team_key",
+  "query": [{
+   "name": "rotate",
+   "description": "true = make a new key; the old one stops working",
+   "type": "boolean",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/feedback/team-key",
+  "idempotent": false,
+  "path": "/v1/feedback/team-key",
+  "capability": "feedback",
+  "returns": "base_url, key (bgk_...), agent_id, role, docs, how_to",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"rotate": {
+    "description": "true = make a new key; the old one stops working",
+    "type": "boolean"
+   }},
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "forbidden",
+   "rate_limited",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

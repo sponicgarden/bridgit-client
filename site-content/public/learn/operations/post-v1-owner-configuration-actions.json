@@ -1,0 +1,87 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Apply an allowlisted app-owned configuration action with existing feature/capture grants; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_actions",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "action",
+    "description": "Configuration action",
+    "type": "string",
+    "required": true,
+    "enum": [
+     "applet.configure",
+     "delivery.subscribe",
+     "dog.configure",
+     "remote.configure",
+     "service.budget.set",
+     "service.model.set",
+     "sounds.configure",
+     "updates.offers",
+     "wake.configure"
+    ]
+   },
+   {
+    "name": "options",
+    "description": "Same exact options as GET /v1/owner/features; credential fields refused here, use dedicated write-only routes",
+    "type": "object",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/owner/configuration/actions {\"action\":\"updates.offers\",\"options\":{\"enabled\":true}}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/actions",
+  "capability": "owner_features",
+  "returns": "native configuration result, approval_required=false; account linking may still require sign-in",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "options": {
+     "description": "Same exact options as GET /v1/owner/features; credential fields refused here, use dedicated write-only routes",
+     "type": "object"
+    },
+    "action": {
+     "description": "Configuration action",
+     "type": "string",
+     "enum": [
+      "applet.configure",
+      "delivery.subscribe",
+      "dog.configure",
+      "remote.configure",
+      "service.budget.set",
+      "service.model.set",
+      "sounds.configure",
+      "updates.offers",
+      "wake.configure"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": [
+    "action",
+    "options",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

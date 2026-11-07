@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- Android 10–12 read photos and videos through storage access (Perms.platform). -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <!-- libadb declares no targetSdk, so the merger adds these two for it. Bridgit uses neither, and on
+         Android 13+ storage can't be granted at all: Max Agentic Control showed dead "Try again" rows. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
+    <!-- Lets the app detect and serve Android 14's "Select photos" partial grant. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <!-- Keeps the listener alive when camera/mic permissions are not granted yet. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- CAP-56: lets a new interaction bring Bridgit to the front (Android blocks background starts otherwise). -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- In-app updates (12.14, UPD-04): hands a verified APK to Android's installer, which always asks to confirm. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Android 12+: Bridgit installs its own verified update without Android's extra "Update this app?" box. -->
+    <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
+
+    <!-- Videos and downloads (8.5): gallery reads include videos. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <!-- Battery saver control. Android never grants it from the phone: the owner runs
+         adb shell pm grant <package> android.permission.WRITE_SECURE_SETTINGS once. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <!-- ADB setup (8.27): granted only over ADB (pm grant / appops). Secure settings lets Bridgit turn Wireless
+         debugging back on after a reboot; the overlay lets it open apps from the background. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.health.READ_STEPS" />
+    <uses-permission android:name="android.permission.health.READ_SLEEP" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+
+    <queries>
+        <!-- Lets Bridgit open the Tailscale app from Home and first run. -->
+        <package android:name="com.tailscale.ipn" />
+        <!-- CAP-31/41: interaction link controls may open an app by package (its launch intent). -->
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <!-- City tour Ask (8.25): the default SpeechRecognizer can't find its service on API 30+ without this. -->
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <application
+        android:name="cc.bridgit.app.BridgeApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Bridgit">
+        <!-- Ask Play services to fetch the face model at install, so the first find works offline. -->
+        <meta-data android:name="com.google.mlkit.vision.DEPENDENCIES" android:value="face" />
+        <activity android:name=".ui.applets.AppletSettingsActivity" android:exported="true">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="bridgit.cc" android:path="/applet-settings/" />
+                <data android:scheme="https" android:host="bridgit.cc" android:path="/applet-settings" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="bridgit" android:host="settings" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".context.ContextActivity" android:exported="false" />
+        <activity android:name=".ownerapi.OwnerSetupActivity" android:exported="false" />
+        <activity android:name=".relay.RelayActivity" android:exported="false" />
+        <activity android:name=".portal.PortalActivity" android:exported="false" />
+        <activity android:name=".portal.PairDeviceActivity" android:exported="false" />
+        <activity android:name=".portal.PortalScanActivity" android:exported="false" />
+        <!-- Bridgit Satellites: the hub's screen; a tapped bridgit://satellite#… pairing link opens it (the owner confirms before anything is claimed). -->
+        <activity android:name=".satellite.SatelliteActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="bridgit" android:host="satellite" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".remoteview.LinkWebViewActivity" android:exported="false" />
+
+        <!-- D32: CrashReports.start() initialises Sentry itself, after checking the Settings switch. -->
+        <meta-data android:name="io.sentry.auto-init" android:value="false" />
+
+        <activity
+            android:name="cc.bridgit.app.ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- UI-23: long-press on the Quick Settings tile opens Home. -->
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name="cc.bridgit.app.planned.ControlsReceiver" android:exported="false" />
+        <receiver android:name="cc.bridgit.app.planned.RestoreControlsReceiver" android:exported="false" />
+        <service android:name="cc.bridgit.app.planned.ProjectionService" android:exported="false" android:foregroundServiceType="mediaProjection" />
+        <activity android:name="cc.bridgit.app.planned.HealthPrivacyActivity" android:exported="true">
+            <intent-filter><action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" /></intent-filter>
+        </activity>
+        <activity-alias android:name="cc.bridgit.app.planned.HealthPermissionsUsage" android:targetActivity="cc.bridgit.app.planned.HealthPrivacyActivity"
+            android:exported="true" android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter><action android:name="android.intent.action.VIEW_PERMISSION_USAGE" /><category android:name="android.intent.category.HEALTH_PERMISSIONS" /></intent-filter>
+        </activity-alias>
+        <activity android:name=".planned.OwnerToolsActivity" android:exported="false" />
+        <activity android:name=".listen.WakeWordsActivity" android:exported="false" android:label="Wake words" />
+        <activity android:name=".planned.ShareActivity" android:exported="true" android:label="Share to Bridgit">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+        <service android:name="cc.bridgit.app.planned.NotificationReaderService" android:exported="true"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" android:label="Bridgit notification access">
+            <intent-filter><action android:name="android.service.notification.NotificationListenerService" /></intent-filter>
+        </service>
+        <!-- UI-23: Quick Settings tile "Bridgit": tap pauses or resumes the listener. -->
+        <service
+            android:name="cc.bridgit.app.ui.home.ListenerTile"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_bridgit"
+            android:label="@string/tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data android:name="android.service.quicksettings.ACTIVE_TILE" android:value="true" />
+            <meta-data android:name="android.service.quicksettings.TOGGLEABLE_TILE" android:value="true" />
+        </service>
+
+        <service
+            android:name="cc.bridgit.app.BridgeService"
+            android:exported="false"
+            android:foregroundServiceType="camera|microphone|location|mediaPlayback|specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Private API listener on the owner's Tailscale network; answers camera, microphone and gallery requests from the owner's control agents." />
+        </service>
+
+        <!-- Relay wake-ups: a content-free FCM data message tells the relay socket to reconnect now. -->
+        <service android:name="cc.bridgit.app.relay.RelayPushService" android:exported="false">
+            <intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT" /></intent-filter>
+        </service>
+
+        <!-- 8.10 (D17, CAP-26): takes screenshots only; no events, no window content, no gestures, no keys. -->
+        <service
+            android:name="cc.bridgit.app.capability.ScreenshotService"
+            android:exported="false"
+            android:label="@string/screenshot_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/accessibility_screenshot" />
+        </service>
+
+        <receiver android:name="cc.bridgit.app.feedback.FeedbackActionReceiver" android:exported="false" />
+
+        <!-- 8.27: the Wireless debugging pairing code, typed into Bridgit's notification. -->
+        <receiver android:name=".adb.AdbPairReceiver" android:exported="false" />
+
+        <!-- CAP-33: answers questions from notification buttons and inline reply. -->
+        <receiver android:name="cc.bridgit.app.interact.InteractionActionReceiver" android:exported="false" />
+
+        <!-- 8.25: Ask, Pause/Resume and End from the City tour notification. -->
+        <receiver android:name="cc.bridgit.app.tour.TourActionReceiver" android:exported="false" />
+        <receiver android:name="cc.bridgit.app.security.SecurityActionReceiver" android:exported="false" />
+        <!-- Pet monitor applet: Stop from its notification. -->
+        <receiver android:name="cc.bridgit.app.dog.DogStopReceiver" android:exported="false" />
+
+        <!-- CAP-41: opens an interaction link from a notification action (no trampolines). -->
+        <activity
+            android:name="cc.bridgit.app.interact.LinkActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Bridgit.Invisible" />
+
+        <!-- UPD-04: shares only cacheDir/updates/ with the package installer. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <receiver android:name="cc.bridgit.app.BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <activity android:name="cc.bridgit.app.platform.ControlCenterActivity" android:exported="false" />
+        <activity android:name="cc.bridgit.app.platform.ConnectionsActivity" android:exported="false" android:label="Connections" />
+        <!-- Installable applets: Import links (bridgit://install?…, https://bridgit.cc/install/?…) and applet files open the one owner review screen. -->
+        <activity android:name="cc.bridgit.app.applets.AppletDataActivity" android:exported="false" android:label="Applet data" />
+        <activity android:name="cc.bridgit.app.ui.applets.BuildInstructionsActivity" android:exported="false" android:label="@string/build_instructions_title" />
+        <activity android:name="cc.bridgit.app.ui.applets.AppletPortalActivity" android:exported="false" android:label="Applet portal" android:launchMode="singleTop" android:windowSoftInputMode="adjustResize" />
+        <activity android:name="cc.bridgit.app.applets.BudgetEditorActivity" android:exported="false" android:label="Spending limit" android:windowSoftInputMode="adjustResize" />
+        <activity android:name="cc.bridgit.app.ui.camera.CaptureReviewActivity" android:exported="false" android:label="Capture and review" android:screenOrientation="portrait" />
+        <activity android:name="cc.bridgit.app.ui.camera.AppletCameraActivity" android:exported="false" android:label="Camera" android:screenOrientation="portrait" />
+        <activity android:name="cc.bridgit.app.applets.AppletInstallActivity" android:exported="true" android:label="Install applet" android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="bridgit" android:host="install" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="bridgit.cc" android:pathPrefix="/install" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/json" />
+            </intent-filter>
+        </activity>
+        <activity android:name="cc.bridgit.app.platform.ShareReceiveActivity" android:exported="true" android:label="Share to a control agent"><intent-filter><action android:name="android.intent.action.SEND" /><category android:name="android.intent.category.DEFAULT" /><data android:mimeType="text/plain" /><data android:mimeType="image/*" /><data android:mimeType="application/pdf" /><data android:mimeType="audio/*" /></intent-filter></activity>
+        <service android:name="cc.bridgit.app.platform.ProjectionService" android:exported="false" android:foregroundServiceType="mediaProjection" />
+        <activity android:name="cc.bridgit.app.schedule.ScheduleActivity" android:exported="false" />
+        <receiver android:name="cc.bridgit.app.schedule.ScheduleAlarmReceiver" android:exported="false" />
+        <service android:name="cc.bridgit.app.platform.WorkflowJobService" android:exported="true" android:permission="android.permission.BIND_JOB_SERVICE" />
+        <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.files" android:exported="false" android:grantUriPermissions="true"><meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/agent_files" /></provider>
+    </application>
+</manifest>

@@ -1,0 +1,75 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Send a bounded supplied audio clip to a supported enrolled camera speaker",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_cameras_audio_play",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "camera",
+    "description": "Enrolled camera id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "pcm_s16le_base64",
+    "description": "Raw signed 16-bit little-endian mono PCM, 8000Hz, 0.02..30 seconds; no WAV header",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "transport",
+    "description": "Explicit adapter; no automatic credential fallback",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "onvif_backchannel",
+     "tapo"
+    ]
+   }
+  ],
+  "example": "POST /v1/lan-cameras/audio/play {\"camera\":\"lan:example\",\"pcm_s16le_base64\":\"...\",\"transport\":\"tapo\"}",
+  "idempotent": true,
+  "path": "/v1/lan-cameras/audio/play",
+  "capability": "lan_camera_speaker",
+  "returns": "status=audio_sent, duration_seconds, audibly_verified=false. Requires separate owner-enabled lan_camera_speaker and existing lan_camera grants. Use Idempotency-Key; no automatic retries.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "pcm_s16le_base64": {
+     "description": "Raw signed 16-bit little-endian mono PCM, 8000Hz, 0.02..30 seconds; no WAV header",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "transport": {
+     "description": "Explicit adapter; no automatic credential fallback",
+     "type": "string",
+     "enum": [
+      "onvif_backchannel",
+      "tapo"
+     ]
+    },
+    "camera": {
+     "description": "Enrolled camera id",
+     "type": "string"
+    }
+   },
+   "required": [
+    "camera",
+    "pcm_s16le_base64"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,64 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Android 11+ Bridgit process exits, crashes and ANRs; Fixer Mode; Android-managed history",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "log_exits",
+  "query": [
+   {
+    "name": "before",
+    "description": "Exclusive timestamp_ms cursor from next_before",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "1-100, default 20; timestamp ties kept together",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "trace",
+    "description": "Include available traces (default false), up to 2 MiB total per page; native tombstones are base64 protobuf",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/log/exits?limit=20&trace=true",
+  "idempotent": false,
+  "path": "/v1/log/exits",
+  "capability": "log",
+  "returns": "entries[id, timestamp_ms, process, pid, reason, status, description, importance, pss_kib, rss_kib, trace?], next_before, retention",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "trace": {
+     "description": "Include available traces (default false), up to 2 MiB total per page; native tombstones are base64 protobuf",
+     "type": "boolean"
+    },
+    "before": {
+     "description": "Exclusive timestamp_ms cursor from next_before",
+     "type": "integer"
+    },
+    "limit": {
+     "description": "1-100, default 20; timestamp ties kept together",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "forbidden",
+   "invalid_parameter",
+   "not_supported"
+  ],
+  "requires": "fixer_mode"
+ }
+}

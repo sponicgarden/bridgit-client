@@ -1,0 +1,36 @@
+{
+  "kind": "question",
+  "title": "How was your Wolt delivery?",
+  "text": "Thai Garden, delivered 19:42 (8 min early) by Kamil.",
+  "controls": [
+    {
+      "type": "choice",
+      "id": "stars",
+      "label": "Rating",
+      "options": [
+        "★★★★★",
+        "★★★★☆",
+        "★★★☆☆",
+        "★★☆☆☆",
+        "★☆☆☆☆"
+      ]
+    },
+    {
+      "type": "text",
+      "id": "comment",
+      "label": "Comment (optional)",
+      "placeholder": "Anything to pass on?"
+    },
+    {
+      "type": "button",
+      "id": "send",
+      "label": "Send rating",
+      "style": "primary"
+    },
+    {
+      "type": "button",
+      "id": "skip",
+      "label": "Skip"
+    }
+  ]
+}

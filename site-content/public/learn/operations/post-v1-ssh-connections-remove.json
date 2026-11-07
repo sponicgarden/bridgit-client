@@ -1,0 +1,45 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Forget this agent's connection and credentials; active operations disconnect",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "ssh_connections_remove",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "connection",
+   "description": "This agent's saved SSH connection id",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/ssh/connections/remove {\"connection\":\"ssh:example\"}",
+  "idempotent": true,
+  "path": "/v1/ssh/connections/remove",
+  "capability": "ssh",
+  "returns": "removed",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "connection": {
+     "description": "This agent's saved SSH connection id",
+     "type": "string"
+    }
+   },
+   "required": [
+    "connection",
+    "idempotency_key"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

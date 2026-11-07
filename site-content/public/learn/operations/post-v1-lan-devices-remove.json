@@ -1,0 +1,42 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Forget this agent's enrollment and stored credentials",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_devices_remove",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "device",
+   "description": "Enrolled device id",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/lan/devices/remove {\"device\":\"net:example\"}",
+  "idempotent": true,
+  "path": "/v1/lan/devices/remove",
+  "capability": "lan_enrollment",
+  "returns": "removed; Devices-tab entries remain owner-managed",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "device": {
+     "description": "Enrolled device id",
+     "type": "string"
+    }
+   },
+   "required": ["device"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

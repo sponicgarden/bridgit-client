@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Callback presence per agent; receiver secret and destination remain write-only",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_callbacks_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/callbacks",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/callbacks",
+  "capability": "owner_features",
+  "returns": "callbacks[{agent_id,configured,write_only}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

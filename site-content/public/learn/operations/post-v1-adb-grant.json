@@ -1,0 +1,41 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Give Bridgit every useful permission and access through ADB (agents with Agent Super Powers)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "adb_grant",
+  "query": [],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [{
+   "name": "only",
+   "description": "Grant keys to run (default all); see grants in /v1/adb/status",
+   "type": "array",
+   "required": false
+  }],
+  "example": "POST /v1/adb/grant {}",
+  "idempotent": false,
+  "path": "/v1/adb/grant",
+  "capability": "adb",
+  "returns": "results[], grants[key, title, granted]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"only": {
+    "description": "Grant keys to run (default all); see grants in /v1/adb/status",
+    "type": "array",
+    "items": {"type": "string"}
+   }},
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "service_start_blocked",
+   "forbidden"
+  ],
+  "requires": "super_powers"
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Latest uncropped frame of your operation, subject to current camera/app access",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_cameras_framing_photo",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan-cameras/framing/{id}/photo",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/framing/{id}/photo",
+  "capability": "lan_camera",
+  "returns": "JPEG bytes; sensor timestamp is unverified. Unclear/limited results are not confirmed centered.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/lan-cameras/framing/{id}/photo",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

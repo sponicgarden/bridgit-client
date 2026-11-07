@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home: Level 1 Diagnostics (2 Nov 2026). Banners that need the owner on top, the live scene below.
+     The old Home moved: listener card to Agents, last 24 hours to Activity, quick switches and
+     Max Agentic Control to Feature enablement. -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="44dp">
+
+            <!-- Shared by every APK variant: icon and wordmark at the same height, without a tagline. -->
+            <LinearLayout
+                android:id="@+id/brand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|start"
+                android:gravity="bottom"
+                android:orientation="horizontal"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp">
+
+                <!-- The app icon as a rounded square, the same shape as the Bridgit Portal iOS icon (not the launcher's mask). -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/brand_icon"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="8dp"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/brand_logo_square"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Bridgit.AppIcon" />
+
+                <ImageView
+                    android:id="@+id/brand_wordmark"
+                    android:layout_width="@dimen/brand_wordmark_width_compact"
+                    android:layout_height="36dp"
+                    android:contentDescription="@string/app_name"
+                    android:accessibilityHeading="true"
+                    android:src="@drawable/brand_wordmark"
+                    app:tint="?attr/colorOnSurface" />
+            </LinearLayout>
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+        <!-- Tour card (inserted in code) and banners, most urgent first (UI-10). -->
+        <LinearLayout
+            android:id="@+id/top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <LinearLayout
+                android:id="@+id/banners"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="4dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- The scene (assets/diagnostics/scene.html) is added here in code. -->
+        <FrameLayout
+            android:id="@+id/sceneFrame"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/b_surface" />
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

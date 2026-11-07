@@ -1,0 +1,190 @@
+{
+  "format": "bridgit-template/1",
+  "id": "situation-counter",
+  "version": "2.0.0",
+  "kind": "applet",
+  "name": "Situation counter",
+  "summary": "Spot and count one camera situation, like a pot boiling over or a dog licking itself.",
+  "runtime": {
+    "adapter": "android.package.v1",
+    "applet_key": "situation-counter",
+    "supports_dynamic_execution": false
+  },
+  "config_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "situation",
+      "camera",
+      "interval_s"
+    ],
+    "properties": {
+      "situation": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      },
+      "camera": {
+        "type": "string",
+        "enum": [
+          "rear",
+          "front"
+        ]
+      },
+      "interval_s": {
+        "type": "integer",
+        "minimum": 10,
+        "maximum": 3600
+      }
+    }
+  },
+  "defaults": {
+    "situation": "pot_boiling_over",
+    "camera": "rear",
+    "interval_s": 20
+  },
+  "processing": {
+    "watches": [
+      {
+        "id": "main",
+        "request": {
+          "situation": {
+            "$input": "situation"
+          },
+          "data": [
+            "camera"
+          ],
+          "camera": {
+            "$input": "camera"
+          },
+          "interval_s": {
+            "$input": "interval_s"
+          },
+          "expires_in_s": 7776000,
+          "max_paid_per_hour": 30,
+          "local": {
+            "change_check": true,
+            "sensitivity": "normal",
+            "max_reuse_s": 300
+          }
+        }
+      }
+    ]
+  },
+  "permissions": {
+    "required": [
+      "camera",
+      "interactions",
+      "watches"
+    ],
+    "optional": [],
+    "remote": [],
+    "automatic_grants": false
+  },
+  "ui": {
+    "inputs": {
+      "situation": {
+        "label": "What to count",
+        "help": "A library id: dog_licking_itself, dog_scratching, dog_on_couch, cat_on_counter, pot_boiling_over, smoke_in_room, water_on_floor, sunlight_in_room, lights_on, person_in_view. Or describe it in your own words, with spaces (\"the cat is on the kitchen counter\")."
+      },
+      "camera": {
+        "label": "Camera",
+        "help": "The phone camera that faces what to watch."
+      },
+      "interval_s": {
+        "label": "Seconds between checks",
+        "help": "10 to 3600. Unchanged pictures reuse the last answer for free; at most 30 paid checks an hour."
+      }
+    },
+    "card": {
+      "title": "Situation counter",
+      "sources": {
+        "count": {
+          "watch": {
+            "$watch": "main"
+          },
+          "read": "tally"
+        }
+      },
+      "fresh_s": 120,
+      "states": {
+        "empty": "No checks yet today. Not seen is not the same as didn't happen."
+      },
+      "pieces": [
+        {
+          "type": "header",
+          "eyebrow": "Bridgit applet",
+          "text": "Counts how often the camera sees one situation today."
+        },
+        {
+          "type": "metrics",
+          "items": [
+            {
+              "label": "Readings",
+              "value": {
+                "$source": "count.today.checks"
+              },
+              "format": "number"
+            },
+            {
+              "label": "Watched minutes",
+              "value": {
+                "$source": "count.today.watched_minutes"
+              },
+              "format": "minutes"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "rows": {
+            "$source": "count.today.labels"
+          },
+          "columns": [
+            {
+              "key": "$key",
+              "label": "Situation"
+            },
+            {
+              "key": "episodes",
+              "label": "Times seen today",
+              "format": "number"
+            },
+            {
+              "key": "minutes",
+              "label": "Minutes",
+              "format": "number"
+            }
+          ],
+          "empty": "Not seen yet today."
+        },
+        {
+          "type": "timeline",
+          "items": {
+            "$source": "count.episodes"
+          },
+          "time": "start",
+          "label": "label",
+          "detail": "minutes",
+          "limit": 5,
+          "empty": "No episodes yet."
+        },
+        {
+          "type": "note",
+          "text": "Sampled photos judged by a model. Gaps and things out of frame are unknown, and it is not a safety alarm."
+        },
+        {
+          "type": "buttons",
+          "items": [
+            {
+              "label": "Pause",
+              "do": {
+                "pause_applet": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

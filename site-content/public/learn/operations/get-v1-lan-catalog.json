@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Bundled discovery coverage, brand logos and control-agent instructions; no network scan",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_catalog",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan/catalog",
+  "idempotent": false,
+  "path": "/v1/lan/catalog",
+  "capability": "lan_discovery",
+  "returns": "version, methods, services, brands, agent_guidance, scope, updates; requires owner-enabled discovery and this agent's discovery grant",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,49 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Pause or resume an applet monitoring task and its device work; manual actions remain available once paused",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applets_installed_pause",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "paused",
+   "description": "true pauses, false resumes",
+   "type": "boolean",
+   "required": true
+  }],
+  "example": "POST /v1/applets/installed/ai0123456789abcd/pause {\"paused\":true}",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/pause",
+  "capability": "applet_install",
+  "returns": "the instance with lifecycle.state starting, running, pausing or paused, pending participants and lifecycle_errors; repeat pause to retry unconfirmed stops",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "paused": {
+     "description": "true pauses, false resumes",
+     "type": "boolean"
+    },
+    "id": {
+     "description": "The id in /v1/applets/installed/{id}/pause",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "paused"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter",
+   "capability_disabled"
+  ],
+  "requires": null
+ }
+}

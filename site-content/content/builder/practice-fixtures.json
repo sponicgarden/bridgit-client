@@ -1,0 +1,736 @@
+{
+  "contract": "bridgit-practices/1",
+  "cases": [
+    {
+      "name": "legacy definitions remain readable but cannot bypass authoring review",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": []
+          }
+        }
+      },
+      "valid": false,
+      "statuses": {
+        "GOV-001": "fail"
+      }
+    },
+    {
+      "name": "a reviewed table receives defaults, not a fabricated device pass",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ]
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        }
+      },
+      "valid": true,
+      "statuses": {
+        "TABLE-001": "runtime-default",
+        "GOV-001": "structural-pass",
+        "LAYOUT-001": "unverified"
+      }
+    },
+    {
+      "name": "an unreviewed sort opt-out is rejected",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ],
+                "sort": false
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        }
+      },
+      "valid": false,
+      "statuses": {
+        "TABLE-001": "fail"
+      }
+    },
+    {
+      "name": "a justified exception is proposed for normal owner approval",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ],
+                "sort": false
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            },
+            "exceptions": [
+              {
+                "id": "sequence-only",
+                "practice": "TABLE-001",
+                "target": "/ui/card/pieces/0",
+                "reason": "These are procedure steps in execution order.",
+                "alternative": "Use step number to find each step.",
+                "acceptance": [
+                  "Step order survives refresh."
+                ],
+                "review_on": "next target change"
+              }
+            ]
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        }
+      },
+      "valid": true,
+      "statuses": {
+        "TABLE-001": "proposed-exception"
+      }
+    },
+    {
+      "name": "an exception cannot silently cover changed target content",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  },
+                  {
+                    "key": "other"
+                  }
+                ],
+                "sort": false
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            },
+            "exceptions": [
+              {
+                "id": "sequence-only",
+                "practice": "TABLE-001",
+                "target": "/ui/card/pieces/0",
+                "reason": "These are procedure steps in execution order.",
+                "alternative": "Use step number to find each step.",
+                "acceptance": [
+                  "Step order survives refresh."
+                ],
+                "review_on": "next target change"
+              }
+            ]
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        }
+      },
+      "previous": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ],
+                "sort": false
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            },
+            "exceptions": [
+              {
+                "id": "sequence-only",
+                "practice": "TABLE-001",
+                "target": "/ui/card/pieces/0",
+                "reason": "These are procedure steps in execution order.",
+                "alternative": "Use step number to find each step.",
+                "acceptance": [
+                  "Step order survives refresh."
+                ],
+                "review_on": "next target change"
+              }
+            ]
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        }
+      },
+      "error": "needs a new id"
+    },
+    {
+      "name": "invented practice ids fail closed",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ]
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "UNKNOWN"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        }
+      },
+      "error": "known practice_ids"
+    },
+    {
+      "name": "a catalog addition needs its proposal",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ]
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "add",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        }
+      },
+      "error": "proposal"
+    },
+    {
+      "name": "a new HTML failure is not legacy debt",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ]
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        },
+        "assets": {
+          "card.html": {
+            "media_type": "text/html",
+            "text": "<table data-bridgit-sort=\"off\"><thead><tr><th>Name</th></tr></thead></table>"
+          }
+        }
+      },
+      "previous": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ]
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        }
+      },
+      "valid": false,
+      "statuses": {
+        "TABLE-001": "fail"
+      }
+    },
+    {
+      "name": "an unrelated exception cannot waive another target",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ]
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            },
+            "exceptions": [
+              {
+                "id": "wrong-target",
+                "practice": "TABLE-001",
+                "target": "/name",
+                "reason": "Ordered steps",
+                "alternative": "Use search",
+                "acceptance": [
+                  "Steps stay ordered"
+                ],
+                "review_on": "next change"
+              }
+            ]
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        },
+        "assets": {
+          "card.html": {
+            "media_type": "text/html",
+            "text": "<table data-bridgit-sort=\"off\"><thead><tr><th>Name</th></tr></thead></table>"
+          }
+        },
+        "name": "Procedure"
+      },
+      "valid": false,
+      "statuses": {
+        "TABLE-001": "fail"
+      }
+    },
+    {
+      "name": "null is not an exception list",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ]
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            },
+            "exceptions": null
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        }
+      },
+      "error": "At most 32"
+    },
+    {
+      "name": "HTML opt-out cannot hide as data-bridgit-sort = off",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ]
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        },
+        "assets": {
+          "card.html": {
+            "media_type": "text/html",
+            "text": "<table data-bridgit-sort = off></table>"
+          }
+        }
+      },
+      "valid": false,
+      "statuses": {
+        "TABLE-001": "fail"
+      }
+    },
+    {
+      "name": "HTML opt-out cannot hide as DATA-BRIDGIT-SORT = \"o&#102;f\"",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ]
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        },
+        "assets": {
+          "card.html": {
+            "media_type": "text/html",
+            "text": "<table DATA-BRIDGIT-SORT = \"o&#102;f\"></table>"
+          }
+        }
+      },
+      "valid": false,
+      "statuses": {
+        "TABLE-001": "fail"
+      }
+    },
+    {
+      "name": "HTML opt-out cannot hide as data-bridgit-sort = 'off'",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": [
+              {
+                "type": "table",
+                "columns": [
+                  {
+                    "key": "amount"
+                  }
+                ]
+              }
+            ]
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        },
+        "assets": {
+          "card.html": {
+            "media_type": "text/html",
+            "text": "<table data-bridgit-sort = 'off'></table>"
+          }
+        }
+      },
+      "valid": false,
+      "statuses": {
+        "TABLE-001": "fail"
+      }
+    },
+    {
+      "name": "a config boolean is not a table opt-out",
+      "candidate": {
+        "ui": {
+          "card": {
+            "pieces": []
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        },
+        "defaults": {
+          "sort": false
+        }
+      },
+      "valid": true,
+      "statuses": {
+        "TABLE-001": "not-applicable"
+      }
+    },
+    {
+      "name": "new custom HTML must adopt managed defaults or justify its own controls",
+      "candidate": {
+        "ui": {
+          "card": {
+            "asset": "card.html"
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        },
+        "assets": {
+          "card.html": {
+            "media_type": "text/html",
+            "text": "<body><img alt=\"Photo\"></body>"
+          }
+        }
+      },
+      "valid": false,
+      "statuses": {
+        "UI-001": "fail"
+      }
+    },
+    {
+      "name": "managed HTML receives shared defaults",
+      "candidate": {
+        "ui": {
+          "card": {
+            "asset": "card.html"
+          },
+          "practices": {
+            "contract": "bridgit-practices/1",
+            "catalog": "1.0.0",
+            "review": {
+              "decision": "no-new-practice",
+              "reason": "The shared table contract covers these columns.",
+              "practice_ids": [
+                "TABLE-001",
+                "GOV-001"
+              ]
+            }
+          }
+        },
+        "processing": {},
+        "config_schema": {
+          "properties": {}
+        },
+        "assets": {
+          "card.html": {
+            "media_type": "text/html",
+            "text": "<body data-bridgit-ui><img alt=\"Photo\"></body>"
+          }
+        }
+      },
+      "valid": true,
+      "statuses": {
+        "UI-001": "runtime-default"
+      }
+    }
+  ]
+}

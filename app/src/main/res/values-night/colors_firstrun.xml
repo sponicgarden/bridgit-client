@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="firstrun_glow_top">@color/b_surface_container</color>
+    <color name="firstrun_head">@color/b_on_surface</color>
+    <color name="firstrun_card_bg">@color/b_surface_container_low</color>
+    <color name="firstrun_warn_edge">#66F59E42</color>
+    <color name="firstrun_amber">#F59E42</color>
+    <color name="firstrun_amber_soft">#26F59E42</color>
+    <color name="firstrun_line">@color/b_outline_variant</color>
+</resources>

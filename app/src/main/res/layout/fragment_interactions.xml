@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Interactions tab (D26, UI-15): filter chips and the list of questions and notices.
+     Owner, 4 Nov 2026: three tabs, Portals and Config (child fragments in tab_host) and Cards (the inbox of
+     agents' cards, plus the card library). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:orientation="vertical">
+
+    <!-- Tabs and account/menu share one centered row, below the status-bar inset. -->
+    <LinearLayout
+        android:id="@+id/header_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingEnd="8dp">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorHeight="3dp"
+            app:tabMinWidth="0dp"
+            app:tabPaddingTop="0dp"
+            app:tabPaddingBottom="0dp"
+            app:tabPaddingStart="8dp"
+            app:tabPaddingEnd="8dp"
+            app:tabTextAppearance="@style/TextAppearance.Bridgit.Tab">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/applets_tab_portals" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/applets_tab_config" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/applets_tab_cards" />
+        </com.google.android.material.tabs.TabLayout>
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:minHeight="48dp"
+            app:buttonGravity="center_vertical"
+            app:contentInsetStart="0dp"
+            app:contentInsetEnd="0dp"
+            app:contentInsetStartWithNavigation="0dp"
+            app:contentInsetEndWithActions="0dp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    <!-- Cards tab (design pass, Sol 6.1 spec, 4 Nov 2026): an Inbox / Library switch (Library is a place, not a
+         filter), then, in the inbox only, a labelled filter row. Files and Shared are in the ⋮ menu. -->
+    <LinearLayout
+        android:id="@+id/inbox"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingTop="4dp">
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/cards_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cards_mode_inbox"
+            style="@style/Widget.Bridgit.Segment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="36dp"
+            android:text="@string/interactions_tab_inbox" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cards_mode_library"
+            style="@style/Widget.Bridgit.Segment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="36dp"
+            android:text="@string/applets_cards_library" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <LinearLayout
+        android:id="@+id/filter_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:importantForAccessibility="no"
+            android:text="@string/interactions_filter_label"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="14sp" />
+
+    <HorizontalScrollView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingEnd="16dp"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:chipSpacingHorizontal="8dp"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_all"
+                style="@style/Widget.Bridgit.FilterChip.Labelled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/interactions_chip_all" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_questions"
+                style="@style/Widget.Bridgit.FilterChip.Labelled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/interactions_chip_questions" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_notices"
+                style="@style/Widget.Bridgit.FilterChip.Labelled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/interactions_chip_notices" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_open"
+                style="@style/Widget.Bridgit.FilterChip.Labelled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/interactions_chip_open" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/library"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/inbox_body"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="0dp"
+            android:paddingBottom="24dp" />
+
+        <LinearLayout
+            android:id="@+id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="16dp"
+            android:accessibilityLiveRegion="polite"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/empty_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="16dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_nav_interactions"
+                app:tint="?attr/colorOnSurfaceVariant" />
+
+            <TextView
+                android:id="@+id/empty_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/interactions_empty_title"
+                android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+            <TextView
+                android:id="@+id/empty_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/interactions_empty_body"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/empty_action"
+                style="@style/Widget.Bridgit.Pill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/interactions_browse_library" />
+        </LinearLayout>
+    </FrameLayout>
+    </LinearLayout>
+    </LinearLayout>
+
+    <!-- Portals and Config tabs: child fragments, hidden rather than removed so an open portal keeps its page. -->
+    <FrameLayout
+        android:id="@+id/tab_host"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+    </FrameLayout>
+</LinearLayout>

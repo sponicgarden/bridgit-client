@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "One log entry",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "log_entry",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/log/48213",
+  "idempotent": false,
+  "path": "/v1/log/{id}",
+  "capability": "log",
+  "returns": "the entry",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/log/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

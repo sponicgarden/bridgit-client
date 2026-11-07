@@ -1,0 +1,150 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Update connection fields; omitted fields preserve existing values; null headers/extra clear them; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "PATCH",
+  "auth": true,
+  "mcp_tool": "owner_configuration_connections_patch",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "name",
+    "description": "1-80 character name",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "url",
+    "description": "Write-only preset URL, up to 2048 characters; required on create",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "preset",
+    "description": "Discovered preset; otherwise recognised from URL",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "allow_private",
+    "description": "Native private-network HTTP/port policy, default false",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "headers",
+    "description": "Write-only native headers; null clears; omitted preserves on update",
+    "type": [
+     "object",
+     "null"
+    ],
+    "required": false
+   },
+   {
+    "name": "extra",
+    "description": "Write-only preset fields; null clears; omitted preserves on update",
+    "type": [
+     "object",
+     "null"
+    ],
+    "required": false
+   },
+   {
+    "name": "enabled",
+    "description": "Disable cancels pending deliveries; true re-enables subject to limits",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "signing_secret",
+    "description": "Write-only Standard Webhooks whsec_ + base64 of 32 receiver-generated random bytes; replacement rotates with 24-hour overlap",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "alert_secret",
+    "description": "Write-only alerts/event-delivery HMAC key: 64 lowercase hex characters encoding 32 receiver-generated random bytes; replacement has no overlap",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "PATCH /v1/owner/configuration/connections/{id} {\"name\":\"Kitchen hook\"}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/connections/{id}",
+  "capability": "owner_features",
+  "returns": "safe connection metadata; no credentials",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "headers": {
+     "description": "Write-only native headers; null clears; omitted preserves on update",
+     "type": [
+      "object",
+      "null"
+     ]
+    },
+    "alert_secret": {
+     "description": "Write-only alerts/event-delivery HMAC key: 64 lowercase hex characters encoding 32 receiver-generated random bytes; replacement has no overlap",
+     "type": "string"
+    },
+    "signing_secret": {
+     "description": "Write-only Standard Webhooks whsec_ + base64 of 32 receiver-generated random bytes; replacement rotates with 24-hour overlap",
+     "type": "string"
+    },
+    "allow_private": {
+     "description": "Native private-network HTTP/port policy, default false",
+     "type": "boolean"
+    },
+    "extra": {
+     "description": "Write-only preset fields; null clears; omitted preserves on update",
+     "type": [
+      "object",
+      "null"
+     ]
+    },
+    "name": {
+     "description": "1-80 character name",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/connections/{id}",
+     "type": "string"
+    },
+    "preset": {
+     "description": "Discovered preset; otherwise recognised from URL",
+     "type": "string"
+    },
+    "url": {
+     "description": "Write-only preset URL, up to 2048 characters; required on create",
+     "type": "string"
+    },
+    "enabled": {
+     "description": "Disable cancels pending deliveries; true re-enables subject to limits",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "id",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

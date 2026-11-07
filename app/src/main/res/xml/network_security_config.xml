@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ARC-12a: Bridgit makes no outgoing plain-HTTP calls in 1.3.0 (the Add-agent
+     self-check opens a raw TCP socket, which this config does not cover), so
+     cleartext stays off. This setting never affects requests coming in to
+     Bridgit's own listener. P2 callbacks will need a decision here: the config
+     can't express IP ranges like 100.64.0.0/10, only domains such as ts.net. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <!-- Bridgit Satellites (docs/spec-satellites.md): a hub calls its satellites over Tailscale, which already
+         encrypts phone to phone. Only SatelliteClient uses this made-up name, and its own resolver maps it to a
+         Tailscale address and nothing else (100.64.0.0/10 or fd7a:115c:a1e0::/48); no real DNS name matches. -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">tailnet.bridgit.invalid</domain>
+    </domain-config>
+</network-security-config>

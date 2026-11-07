@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Activity (UI-17, ui-spec 5.7) and Access (UI-25 … UI-27, ui-spec 5.9). -->
+<resources>
+    <!-- Activity -->
+    <string name="activity_title">Activity</string>
+    <string name="activity_subtitle_diagnostics">Diagnostics</string>
+    <string name="activity_menu_export">Export…</string>
+    <string name="activity_menu_clear">Clear log</string>
+    <string name="activity_menu_diagnostics">Diagnostics</string>
+    <string name="activity_menu_back">Back to activity</string>
+    <string name="activity_search_hint">Search activity</string>
+    <string name="activity_chip_agent">Agent</string>
+    <string name="activity_chip_type">Type</string>
+    <string name="activity_chip_types">Types (%1$d)</string>
+    <string name="activity_chip_errors">Errors only</string>
+    <string name="activity_chip_live">Live</string>
+    <string name="activity_chip_level">Level</string>
+    <string name="activity_choose_agent">Choose agent</string>
+    <string name="activity_choose_type">Choose types</string>
+    <string name="activity_choose_level">Choose level</string>
+    <string name="activity_all_agents">All agents</string>
+    <string name="activity_bridgit_system">Bridgit (system)</string>
+    <string name="activity_type_requests">Requests</string>
+    <string name="activity_type_settings">Settings</string>
+    <string name="activity_type_agents">Agents</string>
+    <string name="activity_type_diagnostics">Diagnostics</string>
+    <string name="activity_type_notes">Notes</string>
+    <string name="activity_type_done">Done</string>
+    <string name="activity_type_clear">Clear</string>
+    <string name="activity_level_all">All levels</string>
+    <string name="activity_level_info">Info and above</string>
+    <string name="activity_level_warn">Warnings and errors</string>
+    <string name="activity_level_error">Errors only</string>
+    <string name="activity_empty_title">Nothing yet.</string>
+    <string name="activity_empty_body">When a control agent uses Bridgit, it shows up here.</string>
+    <string name="activity_nomatch_title">No entries match</string>
+    <string name="activity_clear_filters">Clear filters</string>
+    <plurals name="activity_new_entries">
+        <item quantity="one">%1$d new entry</item>
+        <item quantity="other">%1$d new entries</item>
+    </plurals>
+    <string name="activity_loading_more">Loading more entries</string>
+    <string name="activity_live_on">Live: following new entries</string>
+    <string name="activity_live_off">Live off</string>
+
+    <string name="activity_clear_title">Clear the activity log?</string>
+    <string name="activity_clear_body">This deletes %1$s entries. Diagnostics are kept.</string>
+    <string name="activity_clear_confirm">Clear</string>
+    <string name="activity_cleared">Log cleared</string>
+
+    <string name="activity_sheet_copy">Copy as JSON</string>
+    <string name="activity_sheet_agent">%1$s\'s activity</string>
+    <string name="activity_sheet_copied">Copied</string>
+    <string name="activity_sheet_clip_label">Bridgit log entry</string>
+    <string name="activity_sheet_missing">This entry is no longer in the log.</string>
+
+    <string name="activity_export_title">Export activity</string>
+    <string name="activity_export_jsonl">JSONL</string>
+    <string name="activity_export_csv">CSV</string>
+    <string name="activity_export_count">Uses the current filters (%1$s entries)</string>
+    <string name="activity_export_counting">Uses the current filters</string>
+    <string name="activity_export_go">Export</string>
+    <string name="activity_export_done">Exported %1$s entries</string>
+    <string name="activity_export_failed">Couldn\'t write the file</string>
+
+    <!-- Access -->
+    <string name="access_title">Hardware access</string>
+    <string name="access_title_software">Software access</string>
+    <string name="access_back">Back</string>
+    <string name="access_intro">Android settings Bridgit can use. Each button opens the exact page.</string>
+    <string name="access_needs_you">Needs you</string>
+    <string name="access_all_set">All set</string>
+    <string name="access_show_me_how">Show me how</string>
+    <string name="access_open_app_info">Open App info</string>
+    <string name="access_status_on">On</string>
+    <string name="access_status_off">Off</string>
+    <string name="access_status_partly">Partly</string>
+    <string name="access_status_blocked">Blocked</string>
+    <string name="access_btn_turn_on">Turn on</string>
+    <string name="access_btn_grant">Grant</string>
+    <string name="access_btn_change">Change</string>
+    <string name="access_row_cd">%1$s, %2$s. %3$s</string>
+    <string name="access_row_cd_button">%1$s, %2$s. %3$s Button: %4$s</string>
+    <string name="access_now">%1$s is now %2$s</string>
+
+    <string name="access_notifications">Notifications</string>
+    <string name="access_notifications_unlocks">Shows you every time a control agent uses the phone. Without it, captures stay off.</string>
+    <string name="access_camera">Camera</string>
+    <string name="access_camera_unlocks">Lets control agents take photos when the Camera switch is on.</string>
+    <string name="access_mic">Microphone</string>
+    <string name="access_mic_unlocks">Lets control agents record audio clips when the Microphone switch is on.</string>
+    <string name="access_photos">Photos</string>
+    <string name="access_photos_unlocks">Lets control agents find and fetch photos from your gallery.</string>
+    <string name="access_photos_partly">Only the photos you picked. New photos and screenshots stay hidden until you choose \"Allow all\"</string>
+    <string name="access_screenshots">Screenshots</string>
+    <string name="access_screenshots_unlocks">Lets control agents see your screen when they ask. Bridgit\'s screenshot service can\'t read or tap anything.</string>
+    <string name="access_battery">Battery: unrestricted</string>
+    <string name="access_battery_unlocks">Keeps the listener running when the screen is off.</string>
+
+    <string name="access_notifications_partly">Capture notifications are turned off</string>
+
+    <string-array name="access_how_notifications">
+        <item>Tap Turn on.</item>
+        <item>If Android asks, choose \"Allow\".</item>
+        <item>If a settings page opens, turn on \"All Bridgit notifications\" and \"Captures\".</item>
+        <item>Come back here.</item>
+    </string-array>
+    <string-array name="access_how_camera">
+        <item>Tap Grant.</item>
+        <item>Choose \"While using the app\".</item>
+        <item>Come back here.</item>
+        <item>If App info opens instead, tap Permissions, then Camera, then \"Allow only while using the app\".</item>
+    </string-array>
+    <string-array name="access_how_mic">
+        <item>Tap Grant.</item>
+        <item>Choose \"While using the app\".</item>
+        <item>Come back here.</item>
+        <item>If App info opens instead, tap Permissions, then Microphone, then \"Allow only while using the app\".</item>
+    </string-array>
+    <string-array name="access_how_photos">
+        <item>Tap Grant.</item>
+        <item>Choose \"Allow all\", or \"Select photos\" to share only some.</item>
+        <item>Come back here.</item>
+        <item>To change it later, tap Change, then Permissions, then \"Photos and videos\".</item>
+    </string-array>
+    <string-array name="access_how_screenshots">
+        <item>Tap Turn on. Android opens \"Bridgit screenshots\".</item>
+        <item>Turn on \"Use Bridgit screenshots\" and tap Allow.</item>
+        <item>If Android says \"Restricted setting\": open Bridgit\'s App info, tap the three dots (top right), tap \"Allow restricted settings\", confirm, then try again.</item>
+        <item>Come back here, and turn on Screenshots in Feature enablement.</item>
+    </string-array>
+    <string-array name="access_how_battery">
+        <item>Tap Turn on.</item>
+        <item>Choose \"Allow\" in the pop-up.</item>
+        <item>Come back here.</item>
+    </string-array>
+
+    <string name="access_how_title">Show me how</string>
+    <string name="access_how_note">If a button lands somewhere unexpected, follow these steps.</string>
+    <string name="access_how_step">%1$d. %2$s</string>
+    <string name="access_how_step_cd">Step %1$d of %2$d: %3$s</string>
+</resources>

@@ -1,0 +1,139 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_file_put",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-file.put.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-file.put.json",
+  "required_arguments": [
+   "idempotency_key",
+   "name",
+   "mime",
+   "data_base64"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "data_base64": {
+      "description": "File bytes, base64, up to about 520 KB",
+      "type": "string",
+      "maxLength": 720000
+     },
+     "note": {
+      "type": "string",
+      "maxLength": 1024
+     },
+     "mime": {
+      "type": "string",
+      "maxLength": 120
+     },
+     "name": {
+      "type": "string",
+      "maxLength": 120
+     }
+    },
+    "required": [
+     "name",
+     "mime",
+     "data_base64"
+    ]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "data_base64": {
+        "description": "File bytes, base64, up to about 520 KB",
+        "type": "string",
+        "maxLength": 720000
+       },
+       "note": {
+        "type": "string",
+        "maxLength": 1024
+       },
+       "mime": {
+        "type": "string",
+        "maxLength": 120
+       },
+       "name": {
+        "type": "string",
+        "maxLength": 120
+       }
+      },
+      "required": [
+       "name",
+       "mime",
+       "data_base64"
+      ]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["file.put"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "data_base64": {
+     "description": "File bytes, base64, up to about 520 KB",
+     "type": "string",
+     "maxLength": 720000
+    },
+    "note": {
+     "type": "string",
+     "maxLength": 1024
+    },
+    "mime": {
+     "type": "string",
+     "maxLength": 120
+    },
+    "name": {
+     "type": "string",
+     "maxLength": 120
+    },
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "idempotency_key",
+    "name",
+    "mime",
+    "data_base64"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_file_put"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "file.put"
+ }
+}

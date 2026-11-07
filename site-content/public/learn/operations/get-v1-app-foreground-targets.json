@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Discover available Bridgit screens, your cards, installed applet pages and consumer portals",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "app_foreground_targets",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/app/foreground/targets",
+  "idempotent": false,
+  "path": "/v1/app/foreground/targets",
+  "capability": "owner_features",
+  "returns": "screens,cards,applets,portals with type and id; app.foreground grant required; portal targets also need applet_portals; min_interval_ms,max_per_minute",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

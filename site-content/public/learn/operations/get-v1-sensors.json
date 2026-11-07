@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Supported fresh sensor values or explicit unavailable status",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "sensors",
+  "query": [{
+   "name": "which",
+   "description": "Comma separated: light,pressure,proximity,steps,orientation,motion",
+   "type": "string",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/sensors",
+  "idempotent": false,
+  "path": "/v1/sensors",
+  "capability": "sensors",
+  "returns": "Supported fresh sensor values or explicit unavailable status",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"which": {
+    "description": "Comma separated: light,pressure,proximity,steps,orientation,motion",
+    "type": "string"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

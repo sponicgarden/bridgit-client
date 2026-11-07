@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Listen for any sounds: whether the phone tells you when the room gets loud (8.23)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "sounds",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/sounds",
+  "idempotent": false,
+  "path": "/v1/sounds",
+  "capability": "sounds",
+  "returns": "enabled, for_you, state (off|listening|paused), reason, sensitivity (quiet|normal|loud), send_clip, cooldown_seconds, max_seconds. Each sound arrives as a sound.heard event: heard_at, duration_seconds, peak_dbfs, mean_dbfs, sensitivity, clip_id, capture {capture_id, stored, url, memory_until, file}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

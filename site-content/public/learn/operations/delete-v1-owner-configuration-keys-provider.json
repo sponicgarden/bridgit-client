@@ -1,0 +1,47 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Remove a provider's saved model credentials; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "owner_configuration_keys_delete",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/owner/configuration/keys/{provider} ",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/keys/{provider}",
+  "capability": "owner_features",
+  "returns": "provider,configured=false,write_only",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "provider": {
+     "description": "The provider in /v1/owner/configuration/keys/{provider}",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": [
+    "provider",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

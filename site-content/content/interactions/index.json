@@ -1,0 +1,961 @@
+{
+  "about": "Bridgit interaction library source. Each <slug>.json is the exact POST /v1/interactions body; html cards also keep their HTML in <slug>.html (run npm run interactions:sync after editing). Published at https://bridgit.cc/interactions/index.json.",
+  "interactions": [
+    {
+      "slug": "approve-payment",
+      "title": "Pay €184.20 to Fraulini Plumbing?",
+      "kind": "question",
+      "category": "Money",
+      "description": "Ask before paying a bill. The simplest useful card: two buttons and the facts.",
+      "owner_sees": "The invoice details and Pay / Not now buttons.",
+      "status": "answered",
+      "answer": {
+        "button": "pay",
+        "values": {}
+      },
+      "next": "pay: make the payment and send a notice with the confirmation number. not_now: stop. Ask again only when the owner asked you to or brings it up.",
+      "tags": [
+        "buttons",
+        "approval"
+      ]
+    },
+    {
+      "slug": "card-declined",
+      "title": "Card declined: 412.00 zł at MediaExpert",
+      "kind": "question",
+      "category": "Money",
+      "description": "Urgent, read aloud, with a one-tap call to the bank. For things that cannot wait.",
+      "owner_sees": "An urgent card that is spoken aloud: Retry / Freeze card buttons and a Call the bank link.",
+      "status": "answered",
+      "answer": {
+        "button": "freeze",
+        "values": {}
+      },
+      "next": "retry: retry the payment once. freeze: freeze the card through the bank’s API and confirm with a notice. The Call link only opens the dialer; it is not an answer.",
+      "tags": [
+        "urgent",
+        "speak",
+        "link",
+        "tel"
+      ]
+    },
+    {
+      "slug": "split-the-bill",
+      "title": "Split dinner at Trattoria Sole",
+      "kind": "html",
+      "category": "Money",
+      "description": "A mini app: tip chips and a slider per person, starting from what each one ordered.",
+      "owner_sees": "The bill total, tip buttons, and a slider and amount for each diner.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "total_eur": 233.64,
+          "tip_percent": 10,
+          "shares_eur": {
+            "you": 68.75,
+            "maya": 63.8,
+            "tom": 54.89,
+            "jo": 46.2
+          },
+          "request_from": [
+            "maya",
+            "tom",
+            "jo"
+          ]
+        }
+      },
+      "next": "Send each person a payment request for their share.",
+      "tags": [
+        "html",
+        "slider",
+        "money"
+      ]
+    },
+    {
+      "slug": "expense-receipt",
+      "title": "File this receipt as an expense?",
+      "kind": "html",
+      "category": "Money",
+      "description": "A receipt next to a short form: category chips, client dropdown and a note. Two columns on a tablet.",
+      "owner_sees": "The receipt, a warning about the policy limit, category chips, a client dropdown and a note field.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "action": "submit",
+          "category": "client_meal",
+          "client": "Fern & Pine Studio",
+          "note": "Kick-off for the Q1 redesign",
+          "amount_pln": 110
+        }
+      },
+      "next": "submit: file it in the expense system with the receipt photo. personal: archive it and don’t ask again.",
+      "tags": [
+        "html",
+        "form",
+        "select",
+        "textarea"
+      ]
+    },
+    {
+      "slug": "parking-ending",
+      "title": "Parking ends in 12 minutes",
+      "kind": "html",
+      "category": "Money",
+      "description": "A live countdown ring and three extend options. Time left is worked out from the meter's fixed end time, so it stays right if the card arrives late or is opened again. Before sending, set ENDS_AT in the script, the Ends row and the title to the meter's real end time.",
+      "owner_sees": "Time left on the meter counting down, the ticket, +30 min / +1 h / +2 h and Extend.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "action": "extend",
+          "minutes": 60,
+          "price_pln": "3.00",
+          "seconds_left": 622
+        }
+      },
+      "next": "extend: pay through the parking app’s API and confirm. let_expire: do nothing.",
+      "tags": [
+        "html",
+        "timer",
+        "live"
+      ]
+    },
+    {
+      "slug": "budget-month",
+      "title": "October spending: €2,184 of €2,400",
+      "kind": "html",
+      "category": "Money",
+      "description": "A monthly budget review: a donut chart, a meter per category and three fix-it choices, so the owner sees the whole month before agreeing to a change.",
+      "owner_sees": "A donut of October spending with the total in the middle, six category rows with Groceries flagged €46 over, and three choices with the agent's pick selected.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "action": "move",
+          "from": "eating_out",
+          "to": "groceries",
+          "amount_eur": 50
+        }
+      },
+      "next": "move: shift €50 from Eating out to Groceries for this month. raise: set the Groceries budget to €470. leave: change nothing and mention it again in the end-of-month summary.",
+      "tags": [
+        "html",
+        "chart",
+        "budget",
+        "money"
+      ]
+    },
+    {
+      "slug": "subscriptions-review",
+      "title": "7 subscriptions, €94.93 a month. Keep them all?",
+      "kind": "html",
+      "category": "Money",
+      "description": "A list of subscriptions with Keep/Cancel switches and a live savings counter, with the unused ones switched off for the owner already.",
+      "owner_sees": "A big \"You'd save €312 a year\" counter, seven subscriptions with price, when each was last used and a switch, and a Cancel button that counts them.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "cancel": [
+            "streambox",
+            "fitplus",
+            "lingualeap"
+          ],
+          "keep": [
+            "cloudvault",
+            "courier",
+            "musichub",
+            "pixelstudio"
+          ],
+          "saves_eur_month": 26,
+          "saves_eur_year": 312
+        }
+      },
+      "next": "Cancel each listed subscription (or open its cancel page if it can't be done for the owner) and confirm the end dates. If cancel is empty, keep them all and don't ask again for three months.",
+      "tags": [
+        "html",
+        "switch",
+        "subscriptions",
+        "money"
+      ]
+    },
+    {
+      "slug": "restaurant-time",
+      "title": "Book Osteria Lupa for Saturday?",
+      "kind": "question",
+      "category": "Plans",
+      "description": "Choice plus an optional note, and a link to the menu. One card replaces a back-and-forth.",
+      "owner_sees": "A time choice, a party size choice, a notes field, Book it, and a View the menu link.",
+      "status": "answered",
+      "answer": {
+        "button": "book",
+        "values": {
+          "time": "19:30",
+          "party": "4",
+          "notes": "One vegetarian, a high chair please"
+        }
+      },
+      "next": "Book that slot and send a notice with the confirmation.",
+      "tags": [
+        "choice",
+        "text",
+        "link"
+      ]
+    },
+    {
+      "slug": "calendar-slot",
+      "title": "Dentist check-up: which slot?",
+      "kind": "question",
+      "category": "Plans",
+      "description": "Three buttons, one per slot, plus a way out. The fastest scheduling there is.",
+      "owner_sees": "Three time buttons and None of these.",
+      "status": "answered",
+      "answer": {
+        "button": "thu_1000",
+        "values": {}
+      },
+      "next": "Send the invite for that slot. none: ask what works instead with a text card.",
+      "tags": [
+        "buttons",
+        "calendar"
+      ]
+    },
+    {
+      "slug": "cinema-seats",
+      "title": "Pick seats for Orbit Hearts, Fri 19:40",
+      "kind": "html",
+      "category": "Plans",
+      "description": "A tappable seat map with taken seats, best-view hints and a running total.",
+      "owner_sees": "The screen, rows A to H, taken seats crossed out, and Book 2 seats.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "seats": [
+            "E7",
+            "E8"
+          ],
+          "total_pln": 64,
+          "showing": "2026-11-07T19:40"
+        }
+      },
+      "next": "Buy those seats and send the tickets as a notice with a link.",
+      "tags": [
+        "html",
+        "grid",
+        "picker"
+      ]
+    },
+    {
+      "slug": "leave-now",
+      "title": "Leave in 10 minutes for the airport",
+      "kind": "notice",
+      "category": "Plans",
+      "description": "A spoken heads-up with a map link. No answer needed.",
+      "owner_sees": "A notice, read aloud, with an Open directions link.",
+      "status": "seen",
+      "answer": null,
+      "next": "Nothing to wait for. Check traffic again in 5 minutes if they haven’t moved.",
+      "tags": [
+        "notice",
+        "speak",
+        "geo"
+      ]
+    },
+    {
+      "slug": "flight-gate-change",
+      "title": "Gate change: FR 2417 now leaves from B14",
+      "kind": "notice",
+      "category": "Plans",
+      "description": "An urgent notice with the boarding pass a tap away.",
+      "owner_sees": "An urgent notice, read aloud, with a Boarding pass link.",
+      "status": "seen",
+      "answer": null,
+      "next": "Nothing to wait for. Watch for further changes.",
+      "tags": [
+        "notice",
+        "urgent",
+        "speak",
+        "link"
+      ]
+    },
+    {
+      "slug": "trip-day-plan",
+      "title": "Your Saturday in Porto: keep or skip?",
+      "kind": "html",
+      "category": "Plans",
+      "description": "A day timeline with a Keep/Skip toggle per stop; the times, end time and walking re-calculate live. Good for any itinerary the owner should trim before you book.",
+      "owner_sees": "Six Porto stops on a timeline with walking times, start-time chips, a live “back by” summary and Lock in 5 stops.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "start": "09:30",
+          "keep": [
+            "livraria",
+            "clerigos",
+            "bolhao",
+            "ribeira",
+            "gaia"
+          ],
+          "skip": [
+            "serralves"
+          ],
+          "ends_at": "16:54",
+          "walk_minutes": 59
+        }
+      },
+      "next": "start/keep/skip: book the timed tickets, add the stops to the calendar with walking directions. replan: ask what kind of day they want instead.",
+      "tags": [
+        "html",
+        "timeline",
+        "travel"
+      ]
+    },
+    {
+      "slug": "team-dinner-date",
+      "title": "Team dinner: which evening works?",
+      "kind": "html",
+      "category": "Plans",
+      "description": "A month calendar tinted by how many people are free each evening, with time chips and who can't make it. Good for any group date where the owner makes the final call.",
+      "owner_sees": "December 2026 with candidate evenings shaded by availability, four start times, the names that miss out, and Propose Thu 10 Dec, 19:30.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "date": "2026-12-10",
+          "time": "19:30",
+          "free": 7,
+          "missing": [
+            "Ola"
+          ]
+        }
+      },
+      "next": "date/time: send the calendar invite to the team and book a table for the free count. none_work: poll the team for January dates.",
+      "tags": [
+        "html",
+        "calendar",
+        "group"
+      ]
+    },
+    {
+      "slug": "compare-flights",
+      "title": "Kraków → Lisbon: pick a flight",
+      "kind": "html",
+      "category": "Plans",
+      "description": "Three flight cards side by side with times, route line, stops, price and CO₂, the agent's pick highlighted, and a bag toggle that updates the price. Good for any compare-and-buy choice.",
+      "owner_sees": "Ryanair (best balance, my pick), Wizz Air (cheapest) and TAP (fastest), a checked-bag switch and Book Ryanair · €148.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "flight": "FR 2417",
+          "airline": "Ryanair",
+          "bag": true,
+          "price_eur": 183,
+          "agent_pick": true
+        }
+      },
+      "next": "flight: book it (with the bag if asked) and send the confirmation. more_options: search again with later or cheaper flights.",
+      "tags": [
+        "html",
+        "compare",
+        "travel"
+      ]
+    },
+    {
+      "slug": "grocery-list",
+      "title": "Saturday shop: what do you already have?",
+      "kind": "html",
+      "category": "Home",
+      "description": "A checklist with sections, big tick boxes and an Add field. Ticked items are skipped.",
+      "owner_sees": "The shopping list in aisles, tick boxes, a field to add more, and Order the rest.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "order": [
+            "spinach",
+            "lemons",
+            "tomatoes",
+            "avocado",
+            "feta",
+            "orzo",
+            "chickpeas",
+            "salmon"
+          ],
+          "already_have": [
+            "garlic",
+            "eggs",
+            "yogurt",
+            "olive_oil"
+          ],
+          "added": [
+            "Coffee beans"
+          ],
+          "slot": "10:00-11:00"
+        }
+      },
+      "next": "Fill the online basket with the order list plus anything added, then send the total as an approve-payment card.",
+      "tags": [
+        "html",
+        "checkbox",
+        "list"
+      ]
+    },
+    {
+      "slug": "daily-check-in",
+      "title": "Evening check-in",
+      "kind": "question",
+      "category": "Home",
+      "description": "Two choices and a free-text line. Same card each evening builds a journal.",
+      "owner_sees": "Mood and sleep choices, an optional text field and Save.",
+      "status": "answered",
+      "answer": {
+        "button": "save",
+        "values": {
+          "mood": "🙂 Good",
+          "sleep": "6-7 h",
+          "note": "Long day, but the run helped"
+        }
+      },
+      "next": "Store it. Once a week send a notice with the trend.",
+      "tags": [
+        "choice",
+        "text",
+        "habit"
+      ]
+    },
+    {
+      "slug": "delivery-rating",
+      "title": "How was your Wolt delivery?",
+      "kind": "question",
+      "category": "Home",
+      "description": "Star rating as a choice, plus a comment. Works for any service.",
+      "owner_sees": "A star choice, a comment field and Send rating / Skip.",
+      "status": "answered",
+      "answer": {
+        "button": "send",
+        "values": {
+          "stars": "★★★★☆",
+          "comment": "Fast, but the bag was torn"
+        }
+      },
+      "next": "Submit the rating. Under 3 stars: offer to ask for a refund.",
+      "tags": [
+        "choice",
+        "text",
+        "rating"
+      ]
+    },
+    {
+      "slug": "courier-at-door",
+      "title": "The courier is downstairs with your parcel",
+      "kind": "question",
+      "category": "Home",
+      "description": "Urgent and spoken, three clear options. The courier is waiting.",
+      "owner_sees": "An urgent card read aloud with three buttons.",
+      "status": "answered",
+      "answer": {
+        "button": "door",
+        "values": {}
+      },
+      "next": "Relay the choice to the courier through the delivery app.",
+      "tags": [
+        "urgent",
+        "speak",
+        "buttons"
+      ]
+    },
+    {
+      "slug": "parcel-delivered",
+      "title": "Your parcel was delivered",
+      "kind": "notice",
+      "category": "Home",
+      "description": "A plain notice with a photo link. The default for good news.",
+      "owner_sees": "A notice with a See the photo link.",
+      "status": "seen",
+      "answer": null,
+      "next": "Nothing to wait for.",
+      "tags": [
+        "notice",
+        "link"
+      ]
+    },
+    {
+      "slug": "leaving-home",
+      "title": "You've left home. Tidy up the house?",
+      "kind": "html",
+      "category": "Home",
+      "description": "A smart-home control screen of device tiles that start on the agent's suggestions, so one tap applies them and any tile can be flipped first.",
+      "owner_sees": "A tile grid: two lights on, the heating at 17° with − / + and an Away button, the front door to lock, the garage, and the washing machine finishing in 12 min.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "lights_off": [
+            "living",
+            "kitchen"
+          ],
+          "lights_on": [],
+          "heating_c": 17,
+          "lock_door": true,
+          "close_garage": false
+        }
+      },
+      "next": "Switch off the listed lights, set the heating (null means leave it), lock the door, and warm the house back up when the owner is 20 minutes away. leave_as_is: change nothing.",
+      "tags": [
+        "html",
+        "smart-home",
+        "tiles",
+        "stepper"
+      ]
+    },
+    {
+      "slug": "plant-care",
+      "title": "4 plants are thirsty today",
+      "kind": "html",
+      "category": "Home",
+      "description": "A checklist of rich item cards with live meters, a running count and a per-item snooze chip: the pattern for any daily routine with a few things to tick off.",
+      "owner_sees": "Six plants with soil-moisture meters, thirsty ones first, each with a round Watered tick and a Remind me tonight chip.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "watered": [
+            "monty",
+            "fern",
+            "calathea"
+          ],
+          "remind_tonight": [
+            "olive"
+          ],
+          "skipped": []
+        }
+      },
+      "next": "Mark watered plants with today's date and reset their moisture estimate. remind_tonight: send a notice at 20:00 for those plants. skipped: ask again tomorrow morning.",
+      "tags": [
+        "html",
+        "checklist",
+        "home",
+        "reminder"
+      ]
+    },
+    {
+      "slug": "evening-meds",
+      "title": "Evening medicines, 21:00",
+      "kind": "html",
+      "category": "Health",
+      "description": "A per-item Taken / Skip choice with reason chips and a week of history dots: a calm, clear way to log doses or any repeating to-do.",
+      "owner_sees": "Three medicines with pill pictures, doses and notes, Taken / Skip buttons, and dots showing which evenings this week were taken.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "taken": [
+            "atorvastatin",
+            "vitamin_d"
+          ],
+          "skipped": [
+            {
+              "id": "magnesium",
+              "reason": "ran_out"
+            }
+          ],
+          "at": "21:04"
+        }
+      },
+      "next": "Log taken doses with the time. skipped with ran_out: add it to the shopping list or offer to reorder. side_effects: suggest noting it for the doctor. forgot_earlier or none: just log it and remind again tomorrow at 21:00.",
+      "tags": [
+        "html",
+        "health",
+        "reminder",
+        "history"
+      ]
+    },
+    {
+      "slug": "habit-week",
+      "title": "Your week: 3 habits, 16 of 21 days",
+      "kind": "html",
+      "category": "Health",
+      "description": "A weekly review with a score ring, tappable day grids the owner can correct and a goal stepper per row: good for any streak or tracker check-in.",
+      "owner_sees": "A dark weekly summary with a 16/21 ring, each habit's Mon–Sun squares and streak, and a stepper to set next week's goal.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "days": {
+            "walk": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              1,
+              1
+            ],
+            "read": [
+              1,
+              0,
+              1,
+              1,
+              1,
+              0,
+              1
+            ],
+            "phone": [
+              1,
+              1,
+              0,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          "goals": {
+            "walk": 6,
+            "read": 5,
+            "phone": 5
+          }
+        }
+      },
+      "next": "Save the corrected days as the week's record and set the new goals for Monday. Mention any habit whose goal went up or that dropped below its goal, once, without nagging.",
+      "tags": [
+        "html",
+        "habits",
+        "stepper",
+        "weekly"
+      ]
+    },
+    {
+      "slug": "sign-lease",
+      "title": "Sign the lease for Flat 4B?",
+      "kind": "html",
+      "category": "Work & paperwork",
+      "description": "A long document with key facts on top and flagged clauses. Approval unlocks only after scrolling to the end. The tap records approval; the agent does the actual signing.",
+      "owner_sees": "Rent, deposit and dates as tiles, the full lease with two flagged clauses, a progress bar, a name field, Approve signing and a note that the lease has not been submitted yet.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "decision": "approve_signing",
+          "typed_name": "Alex Morgan",
+          "scrolled_to_end": true,
+          "read_seconds": 94
+        }
+      },
+      "next": "approve_signing: submit the signature to the agency with the two flagged clauses as questions, then send one notice saying whether it went through. not_yet: ask what is holding them back.",
+      "tags": [
+        "html",
+        "scroll",
+        "signature"
+      ]
+    },
+    {
+      "slug": "pick-listing-photo",
+      "title": "Which photo should lead the listing?",
+      "kind": "html",
+      "category": "Work & paperwork",
+      "description": "A photo grid with the agent’s own pick marked. Drawn with inline SVG, so it runs offline.",
+      "owner_sees": "Six photos in a grid (three across on a tablet), My pick on one, and Use as cover.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "cover": "balcony",
+          "agreed_with_suggestion": false,
+          "order": [
+            "balcony",
+            "living_room",
+            "kitchen",
+            "bedroom",
+            "bathroom",
+            "street"
+          ]
+        }
+      },
+      "next": "Reorder the listing photos and publish.",
+      "tags": [
+        "html",
+        "images",
+        "picker"
+      ]
+    },
+    {
+      "slug": "reply-draft",
+      "title": "Reply to Anna about the venue?",
+      "kind": "question",
+      "category": "Work & paperwork",
+      "description": "Show a draft, let them send it, or type changes. Text replies come back in values.",
+      "owner_sees": "The draft reply, a Changes field, Send as is and Send with my changes.",
+      "status": "answered",
+      "answer": {
+        "button": "revise",
+        "values": {
+          "changes": "Say Thursday works too, and drop the last line"
+        }
+      },
+      "next": "send: send the draft. revise: rewrite with the changes and ask again.",
+      "tags": [
+        "text",
+        "buttons",
+        "email"
+      ]
+    },
+    {
+      "slug": "sign-in-approval",
+      "title": "Is this you signing in to GitHub?",
+      "kind": "question",
+      "category": "Work & paperwork",
+      "description": "Confirm a sign-in from a new device. Short expiry; no answer means no.",
+      "owner_sees": "An urgent card with the device and place, and Yes, that’s me / No, block it.",
+      "status": "answered",
+      "answer": {
+        "button": "block",
+        "values": {}
+      },
+      "next": "allow: let the sign-in through. block or expired: deny it and suggest changing the password.",
+      "tags": [
+        "urgent",
+        "security",
+        "buttons"
+      ]
+    },
+    {
+      "slug": "build-log",
+      "title": "Release 1.7.0: build and upload",
+      "kind": "text",
+      "category": "Work & paperwork",
+      "description": "A live text panel the agent streams into while it works. The owner watches progress from across the room.",
+      "owner_sees": "A scrolling panel that fills in line by line until the agent marks it done.",
+      "status": "seen",
+      "answer": null,
+      "stream": [
+        "Release 1.7.0 build started 14:02\n",
+        "✓ Fetched main @ 33a2de9\n",
+        "✓ Unit tests: 1,284 passed (2 min 11 s)\n",
+        "… Building release APK\n",
+        "✓ APK signed, 18.4 MB\n",
+        "✓ Uploaded to the beta channel\n",
+        "\nDone at 14:09. Your 3 testers get it within the hour.\n"
+      ],
+      "done": true,
+      "next": "POST /v1/text/stream {\"interaction_id\",\"append\"} for each line, then {\"interaction_id\",\"done\":true}.",
+      "tags": [
+        "text",
+        "live",
+        "stream"
+      ]
+    },
+    {
+      "slug": "meeting-actions",
+      "title": "5 action items from the Q1 planning call",
+      "kind": "html",
+      "category": "Work & paperwork",
+      "description": "Turn a meeting into a checked, assigned to-do list: accept each item, cycle its owner and due date with one tap, then send it to the team.",
+      "owner_sees": "The meeting header with attendee avatars and five action items, each with an accept tick, an owner pill and a due-date chip, plus a live \"for you / for others\" count.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "action": "send",
+          "items": [
+            {
+              "id": "a1",
+              "task": "Draft the Q1 budget for the Kraków office",
+              "accepted": true,
+              "owner": "you",
+              "due": "2026-11-06"
+            },
+            {
+              "id": "a2",
+              "task": "Book the venue for the January offsite",
+              "accepted": true,
+              "owner": "maja",
+              "due": "2026-11-13"
+            },
+            {
+              "id": "a3",
+              "task": "Share the hiring plan with finance",
+              "accepted": true,
+              "owner": "ines",
+              "due": "2026-11-09"
+            },
+            {
+              "id": "a4",
+              "task": "Update the product roadmap slides",
+              "accepted": false,
+              "owner": "tomasz",
+              "due": "2026-11-13"
+            },
+            {
+              "id": "a5",
+              "task": "Send meeting notes to the Lisbon team",
+              "accepted": true,
+              "owner": "you",
+              "due": "2026-11-06"
+            }
+          ]
+        }
+      },
+      "next": "send: post the accepted items to the team chat with owners and dates, add the owner's own items to their task list and calendar, and drop the ones left unticked. later: keep the draft and remind them tomorrow morning.",
+      "tags": [
+        "html",
+        "tasks",
+        "meetings",
+        "assign"
+      ]
+    },
+    {
+      "slug": "logo-pick",
+      "title": "Which logo for Fern & Pine Studio?",
+      "kind": "html",
+      "category": "Work & paperwork",
+      "description": "A design review in one card: compare three logo concepts side by side, flip them onto a dark background, pick one and say why, so the designer gets clear feedback.",
+      "owner_sees": "Three large logo tiles drawn in the card, a \"Show on dark\" switch, reason chips and a short note box.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "pick": "A",
+          "reasons": [
+            "simple",
+            "works_small"
+          ],
+          "note": "Make the leaf a touch thicker",
+          "checked_dark": true
+        }
+      },
+      "next": "A, B or C: send the pick, the reasons and the note to the designer and ask for final files. pick null (None of these): ask the designer for a new round, passing on the note.",
+      "tags": [
+        "html",
+        "design",
+        "choice",
+        "feedback"
+      ]
+    },
+    {
+      "slug": "kids-quiz",
+      "title": "Animal & planet quiz for Zosia",
+      "kind": "html",
+      "category": "Family",
+      "description": "A five-question picture quiz with big colourful buttons, cheers and a star score.",
+      "owner_sees": "One emoji question at a time, four big answer buttons, a celebration and the score.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "score": 4,
+          "out_of": 5,
+          "seconds": 48,
+          "answers": [
+            {
+              "question": 1,
+              "picked": "8",
+              "ok": true
+            },
+            {
+              "question": 2,
+              "picked": "Earth",
+              "ok": true
+            },
+            {
+              "question": 3,
+              "picked": "Giraffe",
+              "ok": true
+            },
+            {
+              "question": 4,
+              "picked": "6",
+              "ok": false
+            },
+            {
+              "question": 5,
+              "picked": "Honey",
+              "ok": true
+            }
+          ]
+        }
+      },
+      "next": "Say well done out loud (POST /v1/speaker/say) and offer a harder round.",
+      "tags": [
+        "html",
+        "game",
+        "kids"
+      ]
+    },
+    {
+      "slug": "recipe-steps",
+      "title": "Pancakes for 4",
+      "kind": "text",
+      "category": "Family",
+      "description": "A hands-free recipe on a propped-up tablet: the agent streams the next step when asked.",
+      "owner_sees": "A big text panel with the ingredients, then each step as the agent adds it.",
+      "status": "seen",
+      "answer": null,
+      "stream": [
+        "Pancakes for 4 (12 pancakes)\n\n",
+        "You need: 250 g flour, 2 eggs, 500 ml milk, 1 tbsp sugar, pinch of salt, butter for the pan.\n\n",
+        "Step 1. Whisk flour, sugar and salt in a big bowl.\n",
+        "Step 2. Make a well, crack in the eggs, add half the milk. Whisk smooth.\n",
+        "Step 3. Whisk in the rest of the milk. Rest 10 minutes. (I’ll set a timer.)\n"
+      ],
+      "done": false,
+      "next": "Stream the next step when the owner says \"next\" (wake word event), done:true after the last step.",
+      "tags": [
+        "text",
+        "live",
+        "hands-free"
+      ]
+    },
+    {
+      "slug": "bedtime-story",
+      "title": "Bedtime story for Zosia: you choose!",
+      "kind": "html",
+      "category": "Family",
+      "description": "A playful picker for a child: big emoji tiles to choose a hero, a place and a twist, with a live sentence that builds the story as they tap.",
+      "owner_sees": "A night-sky card with three rows of big emoji tiles, a Short / Medium / Long switch, a live story sentence and a yellow \"Tell my story ✨\" button.",
+      "status": "answered",
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "hero": "fox",
+          "place": "volcano",
+          "twist": "key",
+          "minutes": 6,
+          "surprise": false
+        }
+      },
+      "next": "Write and read aloud a story of about that many minutes using the chosen hero, place and twist, then send a goodnight notice. surprise true: mention that the story was picked by chance.",
+      "tags": [
+        "html",
+        "kids",
+        "emoji",
+        "choice"
+      ]
+    }
+  ]
+}

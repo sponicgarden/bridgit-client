@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Security: device lock, new-place alerts, fingerprint check, relay signed-only (bridgit.cc/security). -->
+    <string name="channel_security">Security alerts</string>
+    <string name="channel_security_desc">A control agent\'s key was used from a new device or network</string>
+
+    <string name="settings_security">Security</string>
+    <string name="settings_security_device_lock">Lock control agents to their device</string>
+    <string name="settings_security_device_lock_desc">Each control agent\'s key works only from the Tailscale device that first used it. Another device is refused and you\'re asked.</string>
+    <string name="settings_security_alerts">Alert on new devices and networks</string>
+    <string name="settings_security_alerts_desc">A notification when a control agent shows up from somewhere new, with one tap to block it</string>
+    <string name="settings_security_biometric">Confirm with fingerprint</string>
+    <string name="settings_security_biometric_desc">Turning on Super Powers, approving control agent requests and allowing a new device need your fingerprint, face or screen lock</string>
+    <string name="settings_security_signed">Relay: signed requests only</string>
+    <string name="settings_security_signed_desc">Relay control agents that can control the phone must use sealed mode, signed with their own key. Portals still work; sign-in connectors (like claude.ai) stop.</string>
+    <string name="settings_security_learn">How Bridgit keeps control agents in check</string>
+    <string name="settings_security_learn_desc">bridgit.cc/security</string>
+
+    <string name="security_alert_refused_title">%1$s was refused on a new device</string>
+    <string name="security_alert_refused_text">Someone used %1$s\'s key from %2$s, which isn\'t its device. If that was you, tap Allow. If not, tap Block and rotate the key.</string>
+    <string name="security_alert_device_title">%1$s connected from a new device</string>
+    <string name="security_alert_device_text">%1$s\'s key was used from %2$s. If that wasn\'t you, tap Block.</string>
+    <string name="security_alert_network_title">%1$s used from a new network</string>
+    <string name="security_alert_network_text">%1$s reached this phone through the relay from %2$s. If that wasn\'t expected, tap Block.</string>
+    <string name="security_action_allow">Allow</string>
+    <string name="security_action_block">Block</string>
+
+    <string name="security_log_refused">Refused %1$s from %2$s: the key is locked to another device</string>
+    <string name="security_log_new_device">%1$s connected from a new device, %2$s</string>
+    <string name="security_log_new_network">%1$s used through the relay from a new network, %2$s</string>
+    <string name="security_log_blocked">You paused %1$s from a security alert</string>
+    <string name="security_log_allowed">You allowed %1$s on %2$s</string>
+    <string name="security_log_unlocked">You unlocked %1$s: the next device that uses its key becomes its device</string>
+
+    <string name="agents_device_locked">Locked to %1$s</string>
+    <string name="agents_device_unbound">Not locked yet: its next device becomes its device</string>
+    <string name="agents_device_unlock">Unlock</string>
+    <string name="agents_device_unlock_title">Unlock %1$s?</string>
+    <string name="agents_device_unlock_text">The next device that uses this key becomes its device. Do this only when you\'re moving the control agent to a new machine.</string>
+
+    <string name="biometric_title">Confirm it\'s you</string>
+    <string name="biometric_super">Turn on Super Powers for %1$s</string>
+    <string name="biometric_approve">Approve %1$s\'s request</string>
+    <string name="biometric_unlock">Unlock %1$s\'s device lock</string>
+    <string name="biometric_unavailable">Set a screen lock first: this phone has no fingerprint, face or PIN set up.</string>
+
+    <string name="portal_link_single_use">Works once, on one iPhone, iPad or Android phone. Expires in 24 hours if nobody uses it.</string>
+</resources>

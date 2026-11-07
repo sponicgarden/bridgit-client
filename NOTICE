@@ -1,0 +1,31 @@
+Bridgit
+Copyright 2026 Sponic Garden, Inc.
+
+Required Notice: Copyright 2026 Sponic Garden, Inc. (https://bridgit.cc)
+
+Licensed under the PolyForm Noncommercial License 1.0.0 (see LICENSE, or
+https://polyformproject.org/licenses/noncommercial/1.0.0). You may use, build and
+modify this software for any noncommercial purpose. Commercial use needs a
+separate licence from Sponic Garden, Inc.: support@bridgit.cc.
+
+Versions published before 7 November 2026 were offered under the Apache License,
+Version 2.0, and copies of those versions keep that licence.
+
+The licence grants no rights to the Bridgit name or logo. Modified versions must
+use a different name and icon.
+Bridgit's hosted services (relay, AI checks, applet backends) are not part of
+this repository.
+
+Weather forecasts (GET /v1/weather) come from MET Norway's Locationforecast API
+(https://api.met.no), licensed under CC BY 4.0. Weather data from MET Norway.
+
+SSH uses mwiede/JSch, distributed under the Revised BSD license.
+The JSch license is bundled at app/src/main/assets/licenses/jsch.txt.
+
+The "portal" in the Bridgit Portal wordmark uses Bricolage Grotesque Bold, under the SIL Open Font
+License 1.1, bundled at app/src/main/assets/licenses/bricolage-grotesque-ofl.txt.
+
+The kitchen applet's People feature runs the AuraFace-v1 face embedding model by fal.ai
+(https://huggingface.co/fal/AuraFace-v1), converted to TFLite by eungsang/auraface-v1-tflite, both under the
+Apache License 2.0. The model is not bundled: the phone downloads it on demand. Notice at
+app/src/main/assets/third-party-notices/auraface-v1.txt.

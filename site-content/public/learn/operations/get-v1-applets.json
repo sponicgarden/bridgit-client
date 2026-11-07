@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Native and agent-built applets visible to this agent",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets",
+  "idempotent": false,
+  "path": "/v1/applets",
+  "capability": "owner_features",
+  "returns": "native applet ids, state URLs, your tally-watch applets; no other agent's tour",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,77 @@
+{
+ "detail_url": "/v1/discover?id=v1.speaker&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.speaker.json",
+ "title": "speaker",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.speaker.json",
+ "prerequisites": ["Check v1.speaker supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Speak one turn through the model registry and guarded speaker queue",
+   "path": "/v1/speech/speak",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-speech-speak.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-speech-speak.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "speech_speak"
+  },
+  {
+   "summary": "Play audio on the phone's speaker: send audio/* bytes as the body, or {\"url\"} (public https)",
+   "path": "/v1/speaker/play",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-speaker-play.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-speaker-play.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "speaker_play"
+  },
+  {
+   "summary": "Read text aloud on the phone (its own text-to-speech)",
+   "path": "/v1/speaker/say",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-speaker-say.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-speaker-say.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "speaker_say"
+  },
+  {
+   "summary": "What's playing, and your queued sounds",
+   "path": "/v1/speaker",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-speaker.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-speaker.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "speaker_status"
+  },
+  {
+   "summary": "Stop your audio and clear your queue",
+   "path": "/v1/speaker",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-speaker.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-speaker.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "speaker_stop"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.speaker",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "interact",
+ "capability_ids": ["v1.speaker"]
+}

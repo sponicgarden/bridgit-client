@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- More (UI-07, ui-spec 5.13). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="64dp"
+        app:title="@string/more_title" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <!-- UPD-02: first row, so updates are easy to find (2 Nov 2026), in its own section. -->
+            <LinearLayout style="@style/Widget.Bridgit.SettingsSection"
+                android:layout_marginTop="0dp"
+                android:paddingBottom="0dp">
+                <include android:id="@+id/check_updates" layout="@layout/more_row" />
+                <!-- Bridgit Portals (iOS) and Satellites right under updates: one screen since 5 Nov 2026. -->
+                <include android:id="@+id/portal" layout="@layout/more_row" />
+            </LinearLayout>
+
+            <!-- Flat sections use the same headings and row separators as Settings.
+                 Feedback sits above Device and setup (4 Nov 2026). -->
+            <LinearLayout style="@style/Widget.Bridgit.SettingsSection" android:layout_marginTop="0dp">
+                <TextView style="@style/SettingsHeader" android:text="@string/more_group_feedback" />
+                <!-- FBK-01, FBK-09 -->
+                <include android:id="@+id/report_bug" layout="@layout/more_row" />
+                <include android:id="@+id/request_feature" layout="@layout/more_row" />
+            </LinearLayout>
+
+            <cc.bridgit.app.ui.more.CompactSearchHeader
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:paddingHorizontal="16dp"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:orientation="horizontal">
+                <TextView
+                    style="@style/SettingsHeader"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="12dp"
+                    android:text="@string/more_group_device" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/search_container"
+                    android:layout_width="187dp"
+                    android:layout_height="wrap_content"
+                    app:hintEnabled="false"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusTopStart="24dp"
+                    app:boxCornerRadiusTopEnd="24dp"
+                    app:boxCornerRadiusBottomStart="24dp"
+                    app:boxCornerRadiusBottomEnd="24dp"
+                    app:startIconDrawable="@drawable/ic_search"
+                    app:startIconContentDescription="@string/more_search"
+                    app:startIconMinSize="32dp"
+                    app:endIconMinSize="32dp"
+                    app:endIconMode="clear_text">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/search"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="38dp"
+                        android:paddingVertical="4dp"
+                        android:textSize="14sp"
+                        android:contentDescription="@string/more_search"
+                        android:inputType="text"
+                        android:imeOptions="actionSearch"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </cc.bridgit.app.ui.more.CompactSearchHeader>
+
+            <LinearLayout
+                android:id="@+id/search_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/search_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp"
+                android:text="@string/more_search_empty"
+                android:accessibilityLiveRegion="polite"
+                android:visibility="gone" />
+            <LinearLayout
+                android:id="@+id/menu_sections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="0dp"
+                android:paddingBottom="16dp">
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection" android:layout_marginTop="0dp">
+                    <!-- Settings first in the section (owner, 5 Nov 2026). -->
+                    <include android:id="@+id/settings" layout="@layout/more_row" />
+                    <!-- Owner, 5 Nov 2026: the Devices tab moved here, first in the section, as Network device monitor. -->
+                    <include android:id="@+id/device_monitor" layout="@layout/more_row" />
+                    <!-- D26: Activity moved here from the bottom bar. -->
+                    <include android:id="@+id/open_activity" layout="@layout/more_row" />
+                    <include android:id="@+id/features" layout="@layout/more_row" />
+                    <include android:id="@+id/access" layout="@layout/more_row" />
+                    <include android:id="@+id/software_access" layout="@layout/more_row" />
+                    <include android:id="@+id/ssh_connections" layout="@layout/more_row" />
+                    <include android:id="@+id/network_devices" layout="@layout/more_row" />
+                    <include android:id="@+id/tailscale_setup" layout="@layout/more_row" />
+                    <include android:id="@+id/adb_setup" layout="@layout/more_row" />
+                    <include android:id="@+id/relay" layout="@layout/more_row" />
+                    <include android:id="@+id/control_center" layout="@layout/more_row" />
+                    <include android:id="@+id/link_web_view" layout="@layout/more_row" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+                    <TextView style="@style/SettingsHeader" android:text="@string/more_group_app" />
+                    <include android:id="@+id/automated_context" layout="@layout/more_row" />
+                    <include android:id="@+id/about" layout="@layout/more_row" />
+                    <include android:id="@+id/what_can" layout="@layout/more_row" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

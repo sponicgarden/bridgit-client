@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Linked devices' device dialog (LinkedDeviceSheet): Close as a text button, the one main action as a filled pill. -->
+    <style name="ThemeOverlay.Bridgit.DeviceDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Bridgit.DeviceDialog.Primary</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Material3.Button.TextButton.Dialog</item>
+    </style>
+    <style name="Widget.Bridgit.DeviceDialog.Primary" parent="Widget.Bridgit.Pill">
+        <item name="android:layout_marginStart">8dp</item>
+    </style>
+</resources>

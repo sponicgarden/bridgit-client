@@ -1,0 +1,61 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set, replace or remove a saved AI key with App settings and Super Powers; write-only",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "settings_ai_keys_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "provider",
+    "description": "Provider id from GET /v1/settings/ai-keys",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "fields",
+    "description": "Provider fields in displayed order; mutually exclusive with remove",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "remove",
+    "description": "true clears this provider",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/settings/ai-keys {\"provider\":\"openrouter\",\"remove\":true}",
+  "idempotent": false,
+  "path": "/v1/settings/ai-keys",
+  "capability": "settings",
+  "returns": "provider,configured,readable:false; no secrets in logs or operation history",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "provider": {
+     "description": "Provider id from GET /v1/settings/ai-keys",
+     "type": "string"
+    },
+    "fields": {
+     "description": "Provider fields in displayed order; mutually exclusive with remove",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "remove": {
+     "description": "true clears this provider",
+     "type": "boolean"
+    }
+   },
+   "required": ["provider"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

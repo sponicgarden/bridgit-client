@@ -1,0 +1,2128 @@
+{
+ "api_revision": 127,
+ "changes": [
+  {
+   "date": "2026-10-27",
+   "app_version": "1.3.0",
+   "items": [
+    {
+     "endpoint": "/v1/health",
+     "what": "Health, capabilities (enabled / ready / blocked_reason), this guide and OpenAPI"
+    },
+    {
+     "endpoint": "/v1/camera/snapshot",
+     "what": "Camera photo with size presets and raw=1"
+    },
+    {
+     "endpoint": "/v1/mic/record",
+     "what": "Microphone clip, 1-120 s"
+    },
+    {
+     "endpoint": "/v1/gallery/recent",
+     "what": "Gallery list"
+    },
+    {
+     "endpoint": "/v1/gallery/photo/{id}",
+     "what": "One gallery photo, any size, raw=1"
+    },
+    {
+     "endpoint": "/v1/image/last",
+     "what": "Newest screenshot or photo; since + wait for the next one"
+    },
+    {
+     "endpoint": "/v1/log",
+     "what": "Log: query, follow live, stats, export, notes; /v1/audit alias"
+    },
+    {
+     "endpoint": null,
+     "what": "Idempotency-Key on POSTs; pending (202) schema"
+    },
+    {
+     "endpoint": "/v1/tools/bridget",
+     "what": "The bridget helper download"
+    }
+   ],
+   "revision": 1
+  },
+  {
+   "date": "2026-10-27",
+   "app_version": "1.4.0",
+   "items": [
+    {
+     "endpoint": "/v1/feedback",
+     "what": "File a bug report or feature request (any agent)"
+    },
+    {
+     "endpoint": "/v1/feedback/{id}/status",
+     "what": "Developer agents: list and read reports, move their status"
+    }
+   ],
+   "revision": 2
+  },
+  {
+   "date": "2026-10-27",
+   "app_version": "1.4.4",
+   "items": [
+    {
+     "endpoint": "/v1/camera/snapshot",
+     "what": "Camera zoom: \"zoom\": 0.5 (ultra-wide) to the phone's maximum; range in /v1/capabilities"
+    },
+    {
+     "endpoint": "/v1/changes",
+     "what": "API revisions: X-Bridget-API-Revision on every reply, X-Bridget-Whats-New until you've caught up, and this list"
+    }
+   ],
+   "revision": 3
+  },
+  {
+   "date": "2026-10-27",
+   "app_version": "1.5.0",
+   "items": [
+    {
+     "endpoint": "/v1/interactions",
+     "what": "Interactions: send the owner a notice or a question with buttons, a text reply, a choice or links; read aloud if you ask"
+    },
+    {
+     "endpoint": "/v1/interactions/{id}",
+     "what": "Wait for their answer (wait=55), list or cancel your interactions"
+    },
+    {
+     "endpoint": "/v1/events",
+     "what": "Events: answers, closes and expiries for you, oldest first, with long-poll"
+    }
+   ],
+   "revision": 4
+  },
+  {
+   "date": "2026-10-27",
+   "app_version": "1.5.0",
+   "items": [
+    {
+     "endpoint": "/v1/location",
+     "what": "Location with altitude, speed, heading and the compass"
+    },
+    {
+     "endpoint": "/v1/speaker/play",
+     "what": "Play audio or read text aloud on the phone; newer narration replaces what's queued"
+    },
+    {
+     "endpoint": "/v1/speaker/say",
+     "what": "Speak text with the phone's own voice"
+    },
+    {
+     "endpoint": "/v1/speaker",
+     "what": "What's playing; stop your audio"
+    },
+    {
+     "endpoint": "/v1/tour",
+     "what": "City tour: your running tour (tour.started / tour.tick / tour.question / tour.ended events)"
+    }
+   ],
+   "revision": 5
+  },
+  {
+   "date": "2026-10-27",
+   "app_version": "1.5.2",
+   "items": [
+    {
+     "endpoint": "/v1/me",
+     "what": "Report your model and harness; the owner sees it on your agent card"
+    },
+    {
+     "endpoint": "/v1/tour",
+     "what": "City tour brief in tour.started and GET /v1/tour: directions relative to them, nearest interesting places when nothing is left here"
+    },
+    {
+     "endpoint": "/v1/tour/photo/{n}",
+     "what": "tour.photo: the owner took a photo for you on the tour; fetch it"
+    }
+   ],
+   "revision": 6
+  },
+  {
+   "date": "2026-10-27",
+   "app_version": "1.5.2",
+   "items": [
+    {
+     "endpoint": "/v1/interactions",
+     "what": "HTML cards: kind=html draws your own card (offline, Bridget.respond(json) answers)"
+    },
+    {
+     "endpoint": "/v1/text/stream",
+     "what": "Live text panel: kind=text, then stream text into it"
+    },
+    {
+     "endpoint": "/v1/callback/test",
+     "what": "Callbacks: the owner can set a callback URL for you; events are POSTed signed with HMAC-SHA256; send a test"
+    },
+    {
+     "endpoint": "/v1/mcp",
+     "what": "MCP: use Bridgit as an MCP server (Streamable HTTP) with your key"
+    },
+    {
+     "endpoint": "/v1/speaker",
+     "what": "Speaker status: playing shows only your own sound; busy and paused added"
+    },
+    {
+     "endpoint": "/v1/tour",
+     "what": "End tour: optional tour_id so you only end the tour you mean"
+    },
+    {
+     "endpoint": "/v1/screen/capture",
+     "what": "Screenshot on request: what's on the owner's screen now, nothing saved (once they turn on Screenshots)"
+    },
+    {
+     "endpoint": "/v1/gallery/recent",
+     "what": "Gallery with \"Select photos\" access: photo_not_found and /v1/gallery/recent say how the owner allows all"
+    }
+   ],
+   "revision": 7
+  },
+  {
+   "date": "2026-10-29",
+   "app_version": "1.6.0",
+   "items": [
+    {
+     "endpoint": "/v1/phone/status",
+     "what": "Device context, sensors, flashlight, timed sound/display controls and find-phone ring"
+    },
+    {
+     "endpoint": "/v1/files",
+     "what": "Private file transfers, owner-selected Downloads, Android sharing and clipboard approval"
+    },
+    {
+     "endpoint": "/v1/ocr",
+     "what": "On-device OCR and transcription; short video and accessible gallery videos"
+    },
+    {
+     "endpoint": "/v1/health/records",
+     "what": "Read-only Health Connect, app usage and opt-in notification text"
+    },
+    {
+     "endpoint": "/v1/screen/grant",
+     "what": "Owner-approved, per-agent MediaProjection screen-sharing grants"
+    },
+    {
+     "endpoint": "/v1/sensors",
+     "what": "Sensors"
+    },
+    {
+     "endpoint": "/v1/flashlight",
+     "what": "Flashlight"
+    },
+    {
+     "endpoint": "/v1/phone/context",
+     "what": "Phone context"
+    },
+    {
+     "endpoint": "/v1/phone/dnd",
+     "what": "DND"
+    },
+    {
+     "endpoint": "/v1/phone/sound",
+     "what": "Sound"
+    },
+    {
+     "endpoint": "/v1/phone/brightness",
+     "what": "Brightness"
+    },
+    {
+     "endpoint": "/v1/phone/undo",
+     "what": "Undo timed changes"
+    },
+    {
+     "endpoint": "/v1/phone/ring",
+     "what": "Ring"
+    },
+    {
+     "endpoint": "/v1/shares",
+     "what": "Shares"
+    },
+    {
+     "endpoint": "/v1/downloads",
+     "what": "Downloads"
+    },
+    {
+     "endpoint": "/v1/clipboard",
+     "what": "Clipboard"
+    },
+    {
+     "endpoint": "/v1/camera/video",
+     "what": "Video recording"
+    },
+    {
+     "endpoint": "/v1/gallery/videos/recent",
+     "what": "Gallery videos"
+    },
+    {
+     "endpoint": "/v1/gallery/video/{id}",
+     "what": "Gallery video bytes"
+    },
+    {
+     "endpoint": "/v1/notifications",
+     "what": "Notification reads"
+    },
+    {
+     "endpoint": "/v1/usage",
+     "what": "Usage summaries"
+    },
+    {
+     "endpoint": "/v1/screen/share/capture",
+     "what": "Shared-screen capture"
+    },
+    {
+     "endpoint": "/v1/capabilities",
+     "what": "Per-agent capability grants, enforced for HTTP and MCP"
+    }
+   ],
+   "revision": 8
+  },
+  {
+   "date": "2026-10-30",
+   "app_version": "1.6.0",
+   "items": [{
+    "endpoint": "/v1/demo",
+    "what": "A demo script: offer the owner a hands-on tour of what you can do, tailored by a few questions"
+   }],
+   "revision": 9
+  },
+  {
+   "date": "2026-10-30",
+   "app_version": "1.6.0",
+   "items": [
+    {
+     "endpoint": "/v1/listen",
+     "what": "Wake words: the owner maps words like \"hey bridget\" to you; what they say next arrives as a listen.heard event. Your wake words and whether the phone is listening"
+    },
+    {
+     "endpoint": "/v1/listen/clip/{id}",
+     "what": "The audio after a wake word, when the owner chose to send it"
+    }
+   ],
+   "revision": 10
+  },
+  {
+   "date": "2026-10-30",
+   "app_version": "1.6.0",
+   "items": [
+    {
+     "endpoint": "/v1/sounds",
+     "what": "Listen for any sounds: the owner can have the phone tell you when the room gets loud (sound.heard events), and how it's set"
+    },
+    {
+     "endpoint": "/v1/sounds/clip/{id}",
+     "what": "The audio of a sound, when the owner lets sounds send audio"
+    }
+   ],
+   "revision": 11
+  },
+  {
+   "date": "2026-10-30",
+   "app_version": "1.6.0",
+   "items": [{
+    "endpoint": "/v1/events",
+    "what": "Late answers: the owner can still answer a question after it expires; you get interaction.answered with late=true after interaction.expired"
+   }],
+   "revision": 12
+  },
+  {
+   "date": "2026-10-31",
+   "app_version": "1.6.0",
+   "items": [
+    {
+     "endpoint": null,
+     "what": "A five-minute first-run demo to offer right after pairing: https://bridgit.cc/demo/SKILL.md"
+    },
+    {
+     "endpoint": "/v1/speaker/say",
+     "what": "speaker/say and speaker/play reply status \"silenced\" when the phone is on silent, Do Not Disturb or in a call"
+    },
+    {
+     "endpoint": "/v1/flashlight",
+     "what": "Flashlight on a device without one: capabilities shows blocked_reason no_hardware and the call fails with not_supported"
+    }
+   ],
+   "revision": 13
+  },
+  {
+   "date": "2026-11-01",
+   "app_version": "1.6.0",
+   "items": [{
+    "endpoint": "/v1/demo",
+    "what": "The demo has one entry point: GET /v1/demo (MCP tool demo) now starts with the first-run tour, run from cards on the phone, then the menu. The menu asks its questions on a card and every demo ends with a card"
+   }],
+   "revision": 14
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.6.0",
+   "items": [{
+    "endpoint": "/v1/feedback",
+    "what": "Reports go to the Bridgit team too (unless the owner turns it off), with the phone's details and yours: add agent_info {harness, harness_version, model} when you file one; replies say sent_to_team. Up to 50 reports an hour per agent"
+   }],
+   "revision": 15
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.6.0",
+   "items": [
+    {
+     "endpoint": "/v1/settings",
+     "what": "App settings: every Bridgit setting and the phone's sound and display settings, with type, allowed values and whether you may change each one (locked_reason, why)"
+    },
+    {
+     "endpoint": "/v1/settings",
+     "what": "Developer agents change settings in one call once the owner turns on App settings; locked ones fail with setting_locked"
+    }
+   ],
+   "revision": 16
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.6.0",
+   "items": [
+    {
+     "endpoint": null,
+     "what": "Spelled Bridgit everywhere. Headers are now X-Bridgit-* (API revision, what's new, image and audio details, callback signatures); every one is still also sent as X-Bridget-*, so read either"
+    },
+    {
+     "endpoint": "/v1/tools/bridgit",
+     "what": "The helper is GET /v1/tools/bridgit (save it as ~/bin/bridgit; it reads BRIDGIT_* and ~/.config/bridgit/env, and still BRIDGET_* and ~/.config/bridget/env). /v1/tools/bridget still works"
+    },
+    {
+     "endpoint": "/v1/interactions",
+     "what": "HTML cards: call Bridgit.respond(json)"
+    },
+    {
+     "endpoint": "/v1/health",
+     "what": "health says \"app\": \"Bridgit\"; the MCP server name is bridgit; log filter agent=bridgit (agent=bridget still works); the pairing QR carries \"bridgit\": 1 as well as \"bridget\": 1"
+    }
+   ],
+   "revision": 17
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.6.0",
+   "items": [
+    {
+     "endpoint": "/v1/interactions",
+     "what": "HTML cards act on the phone: Bridgit.act({method, path, body}) runs one of your endpoints at once, as you (your grants and the owner's switches apply), and resolves to {ok, status, body}"
+    },
+    {
+     "endpoint": "/v1/events",
+     "what": "action.executed event for every Bridgit.act call, so a card's action is reported even while you're offline"
+    }
+   ],
+   "revision": 18
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.6.0",
+   "items": [
+    {
+     "endpoint": "/v1/samples",
+     "what": "Interaction samples: GET /v1/samples has a complete, tested POST body for every kind, styled html cards included, and the exact answer each one produces"
+    },
+    {
+     "endpoint": "/v1/demo",
+     "what": "The demo's cards are styled html cards (step pill, icon, Do it / Skip / End demo); their pages are in GET /v1/samples"
+    }
+   ],
+   "revision": 19
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.6.0",
+   "items": [{
+    "endpoint": "/v1/interactions",
+    "what": "Card stacks: post kind=html cards with the same \"stack\" id (optional stack_index) and the owner swipes through them, n of m with a peek of the next card. swipe_answer {left, right} lets a swipe answer a card (answer.data.swipe). Interactions and interaction.answered events carry stack, stack_index (and stack_size)"
+   }],
+   "revision": 20
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.6.0",
+   "items": [{
+    "endpoint": "/v1/camera/arm",
+    "what": "Arm the camera ahead of a photo: it opens and settles exposure for up to 10 s, so your next snapshot fires in about 0.3 s instead of 1.4-2 s; snapshot replies say warm"
+   }],
+   "revision": 21
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.6.0",
+   "items": [{
+    "endpoint": "/v1/schedule",
+    "what": "Scheduled actions: hand the phone an action manifest once (inline or a URL it polls) \u2014 any call you may make plus download, play, show, send and delete, each with its own schedule (at, times, every_minutes with count/until, daily, after). The owner approves it once; results arrive as schedule.* events, saved files at /v1/schedule/assets"
+   }],
+   "revision": 22
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.6.0",
+   "items": [{
+    "endpoint": "/v1/feedback",
+    "what": "Please report bugs and ask for features: the setup prompt, the guide (Report bugs, ask for features), the MCP instructions and health's links.feedback now point you to POST /v1/feedback. health's links also lists samples"
+   }],
+   "revision": 23
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.6.0",
+   "items": [
+    {
+     "endpoint": "/v1/feedback/{id}",
+     "what": "Check on your own reports: every agent can list (GET /v1/feedback) and read the reports it filed, with status, history and the Bridgit team's note; the team's latest status is pulled first. Developer agents still see every report; mine=true narrows to yours"
+    },
+    {
+     "endpoint": "/v1/feedback/{id}/followup",
+     "what": "Follow up on a report you filed: a note, and once it's fixed, won't fix or duplicate, outcome works or still_broken. Follow-ups reach the Bridgit team"
+    },
+    {
+     "endpoint": "/v1/feedback",
+     "what": "Filing a report replies with url and followup_url so you can check back"
+    }
+   ],
+   "revision": 24
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.7.0",
+   "items": [
+    {
+     "endpoint": "/v1/phone/battery",
+     "what": "Full battery report: status, plug type, health, temperature, voltage, cycles, current, time to full, battery saver, screen timeout and which power settings you may change. /v1/phone/status carries the same fields under battery"
+    },
+    {
+     "endpoint": "/v1/phone/power",
+     "what": "Battery saver on or off (after the owner's one-time USB grant) and screen timeout, with optional restoration"
+    },
+    {
+     "endpoint": "/v1/events",
+     "what": "Battery events on /v1/events for agents with the phone grant: battery.low (15%), battery.critical (5%), battery.okay (20%), battery.charging_started/stopped, battery.full, battery.saver_on/off, battery.hot (45 °C) and battery.cooled"
+    }
+   ],
+   "revision": 25
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.7.0",
+   "items": [
+    {
+     "endpoint": "/v1/feedback/team-key",
+     "what": "Your own key for the Bridgit team's feedback backend: file reports, check their status and verify fixes there directly, so a broken phone doesn't stop you. rotate=true makes a new one"
+    },
+    {
+     "endpoint": "/v1/feedback/team-key",
+     "what": "The verify loop: follow your reports on the backend (GET /v1/agent/reports?waiting=true); when one is waiting_for_retest, install fixed_in or later, re-run the repro and POST /v1/agent/reports/{id}/verify works, still_broken or unverified. Never call something fixed until a re-test says works"
+    },
+    {
+     "endpoint": "/v1/feedback",
+     "what": "Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one. POST /v1/feedback replies carry team_api {base_url, key_endpoint, docs}; uploads now carry your agent id"
+    }
+   ],
+   "revision": 26
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.7.0",
+   "items": [
+    {
+     "endpoint": "/v1/weather",
+     "what": "Weather where the phone is, or at a lat/lon you give: conditions now, the next hours and the next 24 hours, from MET Norway (free, CC BY 4.0). Coordinates are rounded to about 1 km before they leave the phone. Schedule it like any call: {\"do\":{\"call\":\"GET /v1/weather\"}}"
+    },
+    {
+     "endpoint": null,
+     "what": "New error upstream_failed (502): a service Bridgit asks for you, such as MET Norway, failed and nothing was cached"
+    }
+   ],
+   "revision": 27
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.7.0",
+   "items": [
+    {
+     "endpoint": "/v1/adb/setup",
+     "what": "ADB control: how to help the owner set it up (on the phone, or with a USB cable and a laptop agent), and what to run once it's on (no key needed)"
+    },
+    {
+     "endpoint": "/v1/adb/status",
+     "what": "ADB setup progress and which grants took effect"
+    },
+    {
+     "endpoint": "/v1/adb/shell",
+     "what": "Run a shell command as Android's shell user (developer agents, owner switch)"
+    },
+    {
+     "endpoint": "/v1/adb/grant",
+     "what": "Give Bridgit every useful permission and access through ADB"
+    }
+   ],
+   "revision": 28
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/feedback",
+     "what": "Every agent can file and follow bug reports and feature requests, whatever permissions the owner gave it"
+    },
+    {
+     "endpoint": null,
+     "what": "Every error reply carries report_problems: where to report, including the team server's no-phone route for when the phone itself is the problem"
+    }
+   ],
+   "revision": 29
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": null,
+    "what": "Learn Bridgit without the phone: https://bridgit.cc/learn/index.json lists the guide, OpenAPI, endpoint list, change log, samples, demo, errors and how to file bugs, always current with the latest code, no key. Also https://bridgit.cc/llms.txt. health's links.learn and /v1/changes links.learn point there"
+   }],
+   "revision": 30
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/guide",
+     "what": "The guide starts with a short Start here (capabilities first, one call, how to wait, retry and limits) and Good phone manners for cards and notices"
+    },
+    {
+     "endpoint": "/v1/capabilities",
+     "what": "The guide's capability table and endpoint list show what you are allowed to use (agent_allowed), not only what is switched on"
+    },
+    {
+     "endpoint": "/v1/tools/bridgit",
+     "what": "The bridgit helper's wait-interaction keeps waiting while a question is only seen, holds 55 s at a time, and takes --idempotency-key"
+    }
+   ],
+   "revision": 31
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/judgment",
+     "what": "Decisions with Jev (TypeSafe): send a state and typed questions, get typed answers with calibrated probabilities, on the Bridgit team's account. Add conditional actions (bridgit-actions/1): a card, speech or a log line that runs only when an answer clears your threshold; a Jev failure runs nothing"
+    },
+    {
+     "endpoint": "/v1/feedback/team-key",
+     "what": "Agents with a phone-minted team key can also call the team backend directly: POST {base_url}/v1/jev, same body and reply (actions come back, not run)"
+    }
+   ],
+   "revision": 32
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/captures/storage",
+     "what": "Keep your captures where you want, in any combination: memory (for as long as you choose, up to the owner's limit), the phone's Downloads/Bridgit folder, or an upload to your URL. Set it once for all your captures or per kind"
+    },
+    {
+     "endpoint": "/v1/camera/snapshot",
+     "what": "store on photos, screenshots and recordings: [\"memory\",\"files\",\"upload\"] for this one capture; the reply's capture says where it went"
+    },
+    {
+     "endpoint": "/v1/captures",
+     "what": "List, fetch and delete your kept captures; wake-word and sound clips are there too, and their events carry capture"
+    },
+    {
+     "endpoint": null,
+     "what": "Each agent still sees only its own captures, and only while it has the capability, unless the owner lets agents share them"
+    }
+   ],
+   "revision": 33
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/outbound",
+     "what": "Outbound log: every call the phone made to a server off the device (team backend, Jev, weather, relay, updates, Sentry, your callbacks), with destination, purpose, the agent that caused it, data categories, bytes, status and a redacted preview of what was sent. Filter by since, destination, agent, category; every agent may read the calls it caused"
+    },
+    {
+     "endpoint": "/v1/outbound/summary",
+     "what": "Totals of what left the phone by destination, category, agent, purpose and day"
+    },
+    {
+     "endpoint": "/v1/outbound/{id}",
+     "what": "One outbound entry with its previews"
+    }
+   ],
+   "revision": 34
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/owner/email",
+     "what": "The owner's email: Bridgit works for 24 hours from the first agent call, then needs a verified address. See where it stands; health has the same as owner_email"
+    },
+    {
+     "endpoint": "/v1/owner/email",
+     "what": "Send the owner's address yourself: bridgit.cc emails them a link to tap (the same address gets email alerts)"
+    },
+    {
+     "endpoint": null,
+     "what": "New error email_required (403): after the 24 hours only status, feedback and /v1/owner/email work until the owner verifies"
+    }
+   ],
+   "revision": 35
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/outbound/summary",
+     "what": "The outbound summary is now an analysis in one call: a plain-language headline (what left the phone and to whom), period=today|24h|7d|30d, trends by hour or day, the biggest destinations, agents and calls, destinations first seen in the window, failures by destination and error, and for each destination the data categories, purposes and agents"
+    },
+    {
+     "endpoint": "/v1/settings",
+     "what": "privacy.outbound_log turns the outbound log on or off (default on); the owner in Settings or an agent here, audited. While it is off nothing new is recorded, and /v1/outbound's recording says since when and who turned it off"
+    },
+    {
+     "endpoint": "/v1/outbound",
+     "what": "period=today|24h|7d|30d on the outbound list too, and a recording block in every reply"
+    }
+   ],
+   "revision": 36
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": null,
+     "what": "The Developer switch is now two: Bridgit Fixer Mode (every bug report with screenshots, moving reports, attaching images) and Agent Super Powers (ADB shell and grants, changing settings, every agent's log). Agents that had Developer keep both"
+    },
+    {
+     "endpoint": "/v1/settings",
+     "what": "Refusals say which one you need: forbidden with reason fixer_mode_off or super_powers_off (was developer_only). settings has agent.fixer_mode and agent.super_powers instead of agent.developer"
+    },
+    {
+     "endpoint": "/v1/adb/status",
+     "what": "The owner can tap Revoke Super Powers: Super Powers off for every agent, ADB control off, what ADB gave Bridgit taken back, the pairing forgotten and Wireless debugging off"
+    }
+   ],
+   "revision": 37
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/feedback",
+     "what": "Reports have one team-wide number, ref: a letter for the source and the Bridgit team's id, e.g. M0042 (the owner, from the app), A0042 (an agent), C0042 (caught automatically, like crashes). The phone shows it everywhere instead of its own #0001"
+    },
+    {
+     "endpoint": "/v1/feedback/{id}",
+     "what": "number is now that same ref, and null until the phone has sent the report to the Bridgit team (it was the phone's own #0001). team_id is the plain id. Keep using id in /v1/feedback/{id} URLs"
+    }
+   ],
+   "revision": 38
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/watches",
+     "what": "Watches: \"call me back when ...\". Pick data (location with speed, motion, steps, battery, ...) and an interval; the phone asks Jev (or Clef, model: clef) your question about the last few readings and calls you back (watch.matched) when the answer matches"
+    },
+    {
+     "endpoint": "/v1/watches/{id}",
+     "what": "Read one watch's last checks and the state Jev saw, or stop it"
+    }
+   ],
+   "revision": 39
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/watches",
+     "what": "Watches can read the camera (data: [\"camera\"], a 640 px photo each reading) and you choose what is paid and what stays on the phone: model clef (default with a photo), jev, or none (local only: called back when the picture changes, free)"
+    },
+    {
+     "endpoint": "/v1/watches",
+     "what": "local: a free change check before every paid call (on by default with camera): reuse the last answer while the picture stays the same, with sensitivity low/normal/high, learn_noise and max_reuse_s. max_paid_per_hour caps paid calls per watch"
+    },
+    {
+     "endpoint": "/v1/watches/{id}",
+     "what": "Each watch reports usage: answered_locally (free) vs paid_calls, paid_cost_usd and paid calls in the last hour; checks and watch.matched say paid or answered_locally with cost_usd. Defaults, presets and limits are in /v1/capabilities under watches"
+    }
+   ],
+   "revision": 40
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/me",
+    "what": "Send X-Bridgit-Model: <model id> (and optionally X-Bridgit-Harness: <harness>) on any call and the owner's agent card follows it, so it stays right when you switch models. Easiest: add the line to the header file you send with every call. POST /v1/me still works"
+   }],
+   "revision": 41
+  },
+  {
+   "date": "2026-11-02",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/interactions",
+    "what": "Interactions open automatically by default, subject to the owner's setting and Android overlay permission. Send no_takeover: true to keep a call in the Inbox and notifications without navigating, even while Bridgit is open; it is also excluded from automatic follow-up cards"
+   }],
+   "revision": 42
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/devices",
+     "what": "Device inventory: the Android host plus owner-configured external devices, their action endpoints and permission state. Passive inventory distinguishes configured from confirmed online"
+    },
+    {
+     "endpoint": "/v1/lan-cameras",
+     "what": "Owner-enrolled LAN cameras: direct RTSP snapshots and ONVIF pan / tilt, separate lan_camera switch and agent grant. Add cameras and view video on the Devices tab"
+    }
+   ],
+   "revision": 43
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/watches",
+     "what": "Watches that remember: tally on POST /v1/watches counts answers on the phone (episodes, day totals, typical gaps) for up to 90 days, with no agent online; rules fire on the counts (none_for_s, fewer_than by a time, at_least within) and can call one of your endpoints on the phone; watch.rule event; 10 s readings with the camera change check"
+    },
+    {
+     "endpoint": "/v1/watches/{id}/tally",
+     "what": "A tally watch's counts, days and episodes"
+    }
+   ],
+   "revision": 44
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/app-devices",
+     "what": "Read and configure selective applet device assignments with a separate owner-controlled switch and agent grant; revocation stops active Dog Monitor use"
+    },
+    {
+     "endpoint": "/v1/lan/discover",
+     "what": "Bounded mDNS (Android 13+), SSDP, ONVIF and optional TCP discovery on the host network"
+    },
+    {
+     "endpoint": "/v1/lan/devices/enroll",
+     "what": "Verify and enroll supported local devices with authorized credentials"
+    },
+    {
+     "endpoint": "/v1/lan/devices/remove",
+     "what": "Forget this agent\u2019s local device enrollment"
+    },
+    {
+     "endpoint": "/v1/lan/devices/action",
+     "what": "Fixed supported device actions, never arbitrary RPC"
+    },
+    {
+     "endpoint": "/v1/lan/devices",
+     "what": "Direct-LAN discovery, supported-device enrollment and per-agent device actions. Separate owner-only switches and agent grants; Shelly Gen1 relays, read-only OpenWrt ubus, and existing Tapo ONVIF enrollment"
+    }
+   ],
+   "revision": 45
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/owner/features",
+     "what": "Owner features and required downloads: resources inventory (Vosk voice model, translation, Android speech/TTS, bundled recognition and official APK updates), agent-scoped jobs with progress, errors and cancellation. All configuration/download/deletion requests need owner.configuration enabled/granted plus an immutable on-phone approval"
+    },
+    {
+     "endpoint": "/v1/resources",
+     "what": "Resource inventory, language readiness and your download/check/delete jobs"
+    },
+    {
+     "endpoint": "/v1/resource-jobs",
+     "what": "Follow and cancel one of your resource jobs"
+    },
+    {
+     "endpoint": "/v1/applets",
+     "what": "Native and agent-built applet catalog with Dog monitor status, history and existing frame"
+    },
+    {
+     "endpoint": "/v1/remote-view",
+     "what": "Remote viewing link and photo-sharing status"
+    },
+    {
+     "endpoint": "/v1/delivery",
+     "what": "Own callback/alert delivery queue, retries and approved destination IDs without signing secrets"
+    },
+    {
+     "endpoint": "/v1/owner/settings",
+     "what": "Supplemental owner settings and model-key presence"
+    },
+    {
+     "endpoint": "/v1/owner/configure",
+     "what": "Native Dog monitor reads (state, totals/history and existing latest frame), applet catalog, device-to-app membership, remote sharing settings, callback/delivery diagnostics and model-key presence without secrets. Approved requests configure models/cameras, start/stop applets, set listening, open owner/Android setup"
+    },
+    {
+     "endpoint": "/v1/agent/profile",
+     "what": "Self-supplied profile now has main-MCP parity. Control MCP adds owner.configure and operation.cancel. Enrolled LAN cameras work in generic watches and bounded-JPEG control monitoring; each rechecks source grants"
+    },
+    {
+     "endpoint": "/v1/watches/{id}/pause",
+     "what": "Pause/resume your watch without losing its tally (expiry unchanged); read your exact approved/pending schedule manifest. Sound classification: judgment model clef with audio_clip_id sends an existing permitted clip to the decision backend, without starting a recording"
+    }
+   ],
+   "revision": 46
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/lan-cameras/framing",
+     "what": "Reference-image search, bounded direction calibration and centering, then hold aim; operation status, cancel, private final photo and Fixer defaults. Requires camera and judgment access; no patrol, tracking or zoom simulation"
+    },
+    {
+     "endpoint": "/v1/lan-cameras/{id}/controls",
+     "what": "Active-profile ONVIF control evidence. Absolute PTZ and zoom advertisement stay separate from implemented and verified controls"
+    }
+   ],
+   "revision": 47
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/phone/battery",
+    "what": "Passive battery time-to-empty estimate while unplugged: battery_runtime on health; estimated_runtime in phone battery/status, diagnostics and watch battery samples. Includes approximate range, drain rate and learning/plugged_in/unavailable states; no extra wakeups"
+   }],
+   "revision": 48
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/owner/configure",
+     "what": "Dog monitor personal backend is optional per applet per device. Owner-approved dog.configure accepts personal_backend, photo_sharing, backend_email and user_alias; enabling requires the requested email and alias and returns a verified-account linking code"
+    },
+    {
+     "endpoint": "/v1/applets/dog-monitor",
+     "what": "Dog monitor status includes backend consent, pending deletion, portal identity and estimated eating/drinking time"
+    }
+   ],
+   "revision": 49
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/applets/dog-monitor",
+     "what": "Pet monitor is the current display name across applets, device assignments and owner controls. Existing dog-monitor paths, dog actions and stored identifiers remain compatible; monitoring still uses the current dog classifier"
+    },
+    {
+     "endpoint": null,
+     "what": "Public homepage applet library and Pet monitor capabilities are generated from published template 1.1.0, revision 2. Full template and instance configuration APIs remain authenticated; template saves do not start an applet. See https://bridgit.cc/applets/pet-monitor/"
+    }
+   ],
+   "revision": 50
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/lan-cameras/probe",
+     "what": "Passive per-camera capability checks at enrollment and explicit refresh: advertised features, implementation, codec/direction, verification state; no automatic recording, playback or movement"
+    },
+    {
+     "endpoint": "/v1/lan-cameras/audio/record",
+     "what": "Explicit 1\u201330 second external camera microphone WAV clips, separate owner switch and agent permission; decodable silence is not proof of room pickup"
+    },
+    {
+     "endpoint": "/v1/lan-cameras/audio/play",
+     "what": "Bounded camera speaker audio through advertised ONVIF PCMA backchannel or authenticated Tapo adapter; separate owner speaker permission and private supplied PCM"
+    },
+    {
+     "endpoint": "/v1/lan-cameras/talk-account",
+     "what": "Separately verify/store or clear authorized Tapo cloud-password talk credentials; local camera passwords remain separate"
+    }
+   ],
+   "revision": 51
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/owner/configure",
+     "what": "Pet monitor manual camera arrays take turns; Auto stays exclusive. Optional built-in and assigned camera microphone selections sample five-second clips with at least 60 seconds between rounds; Clef estimates barking/growling and reports unavailable captures separately"
+    },
+    {
+     "endpoint": "/v1/applets/dog-monitor",
+     "what": "Pet monitor status includes selected microphones, sample status and bounded audio observations; microphone permissions are required to read audio observations"
+    }
+   ],
+   "revision": 52
+  },
+  {
+   "date": "2026-11-03",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/applets/dog-monitor",
+     "what": "Pet monitor readings carry unchanged_since, a per-camera visual continuity marker. The private gallery groups consecutive matching samples into first/latest pictures and elapsed sampled time; changed scenes, camera/model changes and gaps stay separate"
+    },
+    {
+     "endpoint": "/v1/owner/configure",
+     "what": "Per-application, per-camera search delays on this device default to 60 seconds. Pet monitor Auto searches after every active view reaches its delay and retries without the former 5/10/20-minute backoff. Owner-approved dog.configure accepts camera_search_delays (10\u20133600 whole seconds; null resets); status exposes effective values"
+    }
+   ],
+   "revision": 53
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/log/export",
+     "what": "Unlimited history by default; zero disables each retention limit. Direct HTTP JSONL/CSV exports stream without a total-size cap"
+    },
+    {
+     "endpoint": "/v1/log/device",
+     "what": "Fixer Mode: app-UID logcat snapshots and Android exit/crash/ANR history; persistent exit summaries"
+    },
+    {
+     "endpoint": "/v1/log/exits",
+     "what": "Android 11+ exit metadata and optional ANR/native traces"
+    },
+    {
+     "endpoint": "/v1/adb/logcat",
+     "what": "Super Powers and enabled ADB: system-wide logcat snapshots"
+    }
+   ],
+   "revision": 54
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/discover",
+     "what": "Bounded intent discovery for source-derived capabilities and recipes, with caller-scoped v1 readiness and explicit unknown v2 state; compact public starter and generated catalog, independently versioned documentation"
+    },
+    {
+     "endpoint": "/v1/discover/report",
+     "what": "Strict authenticated selection/relevance/self-reported attempt/outcome counters through existing opt-out-aware anonymous usage tallies; no query, content or verified-success events"
+    }
+   ],
+   "revision": 55
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/lan/discovered",
+     "what": "Remembered current-network discovery inventory with last-seen timestamps and connected/category totals; no scan"
+    },
+    {
+     "endpoint": "/v1/lan/catalog",
+     "what": "Versioned discovery and brand/logo catalog with control-agent instructions"
+    },
+    {
+     "endpoint": "/v1/lan/brands/{id}/logo",
+     "what": "Authenticated passive manufacturer logos, raw image or JSON/base64"
+    },
+    {
+     "endpoint": "/v1/lan/discover",
+     "what": "Grouped human-readable device discovery, totals, suggested types/brands and useful categories first; broader mDNS, Tapo/TP-Link and WiiM coverage"
+    }
+   ],
+   "revision": 56
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/watches",
+    "what": "Correct the watch data array's MCP/OpenAPI item type to string, matching documented examples and the existing runtime parser; no watch behavior change"
+   }],
+   "revision": 57
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v2/applets/events",
+     "what": "Applet terminology across UI, guides and schemas. Canonical applet.event command/trigger, applet_id and /v2/applets/events; legacy application names retain approval, event formats and idempotency compatibility"
+    },
+    {
+     "endpoint": "/v1/applet-devices",
+     "what": "Canonical applet device assignment routes; /v1/app-devices and the existing grant remain compatible"
+    }
+   ],
+   "revision": 58
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/ssh/connections",
+     "what": "SSH connections: pinned hosts, encrypted password/key login, granular commands and SFTP, owner management and scheduled remote work"
+    },
+    {
+     "endpoint": "/v1/ssh/exec",
+     "what": "Scheduled SSH commands treat nonzero/unknown exit status as failure; required idempotency keys supplied per run"
+    },
+    {
+     "endpoint": "/v1/ssh/probe",
+     "what": "Observe host fingerprints without credentials"
+    },
+    {
+     "endpoint": "/v1/ssh/test",
+     "what": "Test saved SSH authentication without executing commands"
+    },
+    {
+     "endpoint": "/v1/ssh/files",
+     "what": "SFTP stat/list/read/write/mkdir/rename/remove/rmdir/chmod"
+    }
+   ],
+   "revision": 59
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/portal/home",
+     "what": "Bridgit Portal (iPhone & iPad): read-only owner views over the relay, paired on More \u203a Bridgit Portal. Home with feature states, connections and navigation"
+    },
+    {
+     "endpoint": "/v1/portal/snapshot",
+     "what": "Portal snapshot: home, agents, applets and the newest log entries in one call"
+    },
+    {
+     "endpoint": "/v1/portal/devices",
+     "what": "Portal network devices: the remembered-devices payload, no scan"
+    },
+    {
+     "endpoint": "/v1/portal/brands/{id}/logo",
+     "what": "Portal brand logos, as the LAN logo route"
+    },
+    {
+     "endpoint": "/v1/portal/logs",
+     "what": "Portal activity with remote-view redaction, oldest first after since"
+    },
+    {
+     "endpoint": "/v1/portal/agents",
+     "what": "Portal agents with transport, mode and grants"
+    },
+    {
+     "endpoint": "/v1/portal/applets",
+     "what": "Portal applets"
+    },
+    {
+     "endpoint": "/v1/portal/theme",
+     "what": "Portal design tokens: light/dark colours, Home scene colours, corner radii, fonts, motion and signature animations"
+    }
+   ],
+   "revision": 60
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/portal/home",
+    "what": "Portal endpoints take client=iPhone|iPad|Android: the phone's Home shows the device viewing it; relay calls now update an agent's last_used_at"
+   }],
+   "revision": 61
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/portal/home",
+     "what": "Portal home carries scene{options, paused, listening, home_status}: what the phone's Home feeds its scene; agents_count counts control agents only"
+    },
+    {
+     "endpoint": "/v1/portal/logs",
+     "what": "Portal logs: until/has_older/oldest_id/latest_id paging and the Home scene's entry keys, still redacted"
+    },
+    {
+     "endpoint": "/v1/portal/agents",
+     "what": "Portal agents: portal flag on Bridgit Portal pairings"
+    }
+   ],
+   "revision": 62
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/portal/snapshot",
+    "what": "Portal snapshot: relay_daily_jobs, the pairing's relay allowance per day (20000 for Bridgit Portal pairings)"
+   }],
+   "revision": 63
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/limits",
+    "what": "Limits are per account and can change: GET /v1/limits gives this phone's Jev and Clef calls an hour, monthly model budget and paid watch checks, with what is used, plus the limits the phone enforces itself. Watches use the account's value"
+   }],
+   "revision": 64
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/settings",
+     "what": "Device lock (on by default): your key works only from the Tailscale device(s) it is locked to; another device gets 403 wrong_device and the owner is asked. Settings security.* show the owner's security choices (read-only)"
+    },
+    {
+     "endpoint": "/v1/portal/home",
+     "what": "Bridgit Portal pairing links are single-use: the portal claims with a token it made (POST /v1/portal/claim through the relay); unclaimed links expire in 24 h (claim_required). With security.relay_signed_only on, connector relay agents other than portals get signed_requests_required"
+    }
+   ],
+   "revision": 65
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/watches",
+     "what": "Sound watches: data [\"sound\"] wakes a watch on each loud sound the phone hears (free loudness check on the phone, no interval) and asks Clef your question about that clip. sound {sensitivity, reuse_s}: a loud sound within reuse_s (default 300) that sounds like the last one checked (fingerprint compared on the phone) reuses that answer for free; a different sound is checked. listening shows whether the phone hears for it. Paid checks default to 6 an hour (max_paid_per_hour). Tally, rules and callbacks work as for any watch; needs the Sounds grant"
+    },
+    {
+     "endpoint": "/v1/owner/configure",
+     "what": "Pet monitor barking is automatic, on the same sound core: the built-in microphone listens for loud sounds and Clef checks only those; barking episodes are counted today (owner status barking, portal tile)"
+    }
+   ],
+   "revision": 66
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/satellites",
+     "what": "Bridgit Satellites: other Bridgit phones linked to this one. GET /v1/satellites lists the ones the owner lets you use; they also appear in GET /v1/devices (kind satellite)"
+    },
+    {
+     "endpoint": "/v1/camera/snapshot",
+     "what": "Run a call on a satellite: add header X-Bridgit-Target: sat:<id> (or query target=sat:<id>) to camera, mic, speaker, interactions, location, gallery, sounds, /v1/health and /v1/capabilities calls. Replies carry X-Bridgit-Ran-On. New errors: unknown_target, target_not_granted, not_on_satellite, satellite_offline"
+    },
+    {
+     "endpoint": "/v1/satellite/claim",
+     "what": "Phone to phone only (not for agents): a hub claims a satellite's one-time pairing code"
+    },
+    {
+     "endpoint": "/v1/satellite/manifest",
+     "what": "Phone to phone only (not for agents): what a satellite offers its hub"
+    }
+   ],
+   "revision": 67
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/applets/dog-monitor",
+    "what": "Pet monitor readings carry dark: a near-black photo (lights off, camera covered) is not sent to a model and never reuses an earlier answer; it reads dog false, dog_p 0, dark true, and today's views count it as \"dark\". The first lit photo after it is checked fresh"
+   }],
+   "revision": 68
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/applets/install",
+     "what": "Installable applets: POST /v1/applets/install takes one applet package (a bridgit-template/1 definition with runtime.adapter android.package.v1: typed blanks, watches, schedule, workflow, card and declared permissions), inline or by https://bridgit.cc URL or template registry key. The owner reviews it once on the phone; on Approve the phone creates every part under the applet's own agent and keeps it running with no agent (watches and card are renewed). POST /v1/applets/validate is the dry run with the owner's plain-words review"
+    },
+    {
+     "endpoint": "/v1/applets/installed",
+     "what": "Installed applets you asked for: GET /v1/applets/installed, pause/resume, DELETE (removes every part and its permissions), and POST /v1/applets/installed/{id}/update, which recompiles and swaps a new revision in at once when it adds no permission (unchanged watches keep their history) and otherwise waits for the owner. Events applet.installed and applet.declined"
+    }
+   ],
+   "revision": 69
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/applets/dog-monitor",
+    "what": "Pet monitor sampling interval: one value for all cameras and microphones (default 20 s, was 60), 10-3600 s, with per-camera overrides. Auto checks the other cameras after this long without seeing the pet, and the food-view microphone samples this often. Read it as sampling {all_s, default_s, min_s, max_s, cameras, overrides, photo_interval_s}; the owner sets it with dog.configure sampling_all_s (camera_search_delays null now follows it) or from the web portal"
+   }],
+   "revision": 70
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/situations",
+    "what": "Situations: POST /v1/watches takes situation instead of question, a common picture situation from the library (dog_licking_itself, dog_scratching, dog_on_couch, cat_on_counter, pot_boiling_over, smoke_in_room, water_on_floor, sunlight_in_room, lights_on, person_in_view) or your own words. The phone makes a camera watch with a tuned yes/no question that counts each episode on the phone (GET /v1/watches/{id}/tally) and, for alert situations, sends the owner an urgent notice when one starts. The model stays your pick (clef by default, or jev). GET /v1/situations lists the library"
+   }],
+   "revision": 71
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/images/find",
+     "what": "Find things in a photo: POST /v1/images/find {query: \"the dog\" | \"each dirty dish\" | \"the face of each person\", capture_id | gallery_id | data_base64} returns boxes (x0, y0, x1, y1 fractions plus pixels). Faces are found on the phone, offline and free; anything else by a cheap cloud vision model on the Jev/Clef budget (mode auto, on_device or cloud)"
+    },
+    {
+     "endpoint": "/v1/images/crop",
+     "what": "Zoom in: POST /v1/images/crop crops to what query finds (or a box you give) with a margin; which=first, all (one crop around every match) or each (one per match); pad, aspect, max_edge_px, raw=1"
+    }
+   ],
+   "revision": 72
+  },
+  {
+   "date": "2026-11-04",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/owner/configure",
+    "what": "Installed applets on the web portal: owner_configure action applet.configure {applet: package id, personal_backend, photo_sharing, backend_email, user_alias} shows an installed package applet with a counting (tally) watch as its own tab at bridgit.cc/<alias>/myapps: today's counts, the latest answer, the notices it sent, its pause state and (photo_sharing, default on) the photo of its latest check. The owner can pause it, rename it and share it from the portal. GET /v1/applets/installed reports web_portal"
+   }],
+   "revision": 73
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/portal/photo",
+    "what": "Owner photos: the phone's Camera tab and the Bridgit Portal's camera hand each photo the owner takes to the watches that check photos, as if the watch had taken it (no change-check training, the hourly paid cap still applies). The check shows in GET /v1/watches/{id} recent with source owner and counts in the tally. The Portal sends them with POST /v1/portal/photo {data_base64, camera, targets} after GET /v1/portal/photo/targets"
+   }],
+   "revision": 74
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/satellite/hub-info",
+     "what": "Phone to phone only (not for agents): a hub tells its satellite its photo applets and portals and gives it a return key that can call only GET /v1/satellite/hub, POST /v1/satellite/hub/photo and POST /v1/satellite/hub/portal-login, so the satellite's Camera tab checks photos with the hub's applets and its Portals tab shows the hub's portals"
+    },
+    {
+     "endpoint": "/v1/satellite/hub",
+     "what": "Phone to phone only (not for agents): a satellite reads its hub's photo applets and portals with its return key"
+    },
+    {
+     "endpoint": "/v1/satellite/hub/photo",
+     "what": "Phone to phone only (not for agents): a photo taken on a satellite's Camera tab, checked by the hub's photo applets"
+    },
+    {
+     "endpoint": "/v1/satellite/hub/portal-login",
+     "what": "Phone to phone only (not for agents): a one-use bridgit.cc sign-in code so a satellite opens its hub's portals signed in"
+    }
+   ],
+   "revision": 75
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/portal/home",
+    "what": "A satellite's return key may also read its hub's GET /v1/portal/home and GET /v1/portal/logs, so the satellite's Home can switch to the hub's Home (read-only, as a Bridgit Portal does)"
+   }],
+   "revision": 76
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/images/find",
+     "what": "Opt-in on-phone vision engines, free and offline, used only when you name them (the default routing is unchanged: faces on the phone, the rest in the cloud). POST /v1/images/find and /v1/images/crop take engine on_device_detector (Florence-2 base finds anything named in words; 7-16 s a photo on a mid-range phone, never falls back to the cloud) and outline true (MobileSAM: each item gets outline [[x, y], ...] fractions; crop returns a PNG cut out along it). Until a model is downloaded (Wi-Fi only) they answer 503 model_not_ready {engine, state, size_mb, retry_after_s} and start the download"
+    },
+    {
+     "endpoint": "/v1/images/engines",
+     "what": "GET /v1/images/engines lists the engines: what each is good at, speed, memory, size, licence and whether its model is downloaded (installed, state); POST /v1/images/engines/download {engine} fetches one ahead of time"
+    },
+    {
+     "endpoint": "/v1/applets/install",
+     "what": "Applet packages can ask for engines by name: runtime.engines [\"on_device_detector\", \"on_device_outline\"] (needs find_crop in permissions.required). The owner's review says what downloads; approving starts the download, and the applet's card calls find/crop with engine or outline"
+    }
+   ],
+   "revision": 77
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/interactions",
+    "what": "Card flows: send follow_up: true on a question, notice or html card when you will post another card once the owner answers or closes it. The card screen then shows \"Waiting for the next card\u2026\" and stays up to 30 s; your next card replaces it in place (a card in the same stack comes up next), and Bridgit steps back to what the owner was doing only after the last card. interaction.answered and interaction.dismissed for such a card carry follow_up_seconds. Closing an html card now shows a \"Closed\" panel in the card, like an answer (no bridgit:answered event)"
+   }],
+   "revision": 78
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/images/engines",
+    "what": "The on-phone engines' runtime (ONNX Runtime, 18 MB) is no longer in the app: it downloads once with the first engine, on Wi-Fi. GET /v1/images/engines shows it as runtime {model, size_mb, state}; an engine is installed only when its runtime is too, and model_not_ready says which part is still downloading"
+   }],
+   "revision": 79
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/camera/pose/start",
+     "what": "Body tracking on the phone, offline and free: POST /v1/camera/pose/start {camera front|rear, seconds 5-120} streams the camera through ML Kit's pose detector and keeps 33 body points per frame (about 8-25 frames a second); no picture leaves the phone. Uses the camera grant"
+    },
+    {
+     "endpoint": "/v1/camera/pose/{id}",
+     "what": "GET /v1/camera/pose/{id}?since=&preview_after=&wait_ms= reads the frames as they come ([x, y, v] per point, fractions of the upright picture) with a small live preview picture; GET /v1/camera/pose/{id}/picture?t= gives the replay picture nearest a time (one every half second); POST /v1/camera/pose/{id}/stop ends it early"
+    }
+   ],
+   "revision": 80
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/images/engines",
+     "what": "On-phone engines now come from the Bridgit team's signed software manifest, checked once a day while an engine is in use (and on request with POST /v1/images/engines/check), so new engines and new versions can appear without an app update. GET /v1/images/engines adds manifest {serial, published_at, source, checked_at, signed_by, last_error}, each engine's version and kept_up_to_date, items this app can't run (state unsupported with the reason), and update {model, version, state} while a newer version downloads; the old version keeps answering until the new one checks out"
+    },
+    {
+     "endpoint": "/v1/images/engines/check",
+     "what": "POST /v1/images/engines/check: read the software manifest now; engines in use update to their newest version (on Wi-Fi)"
+    },
+    {
+     "endpoint": "/v1/images/find",
+     "what": "engine on find/crop and runtime.engines in applet packages accept any engine the manifest lists; one this phone can't run answers not_supported (and blocks an applet install) with the reason"
+    }
+   ],
+   "revision": 81
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/images/appraise",
+     "what": "Home inventory from a photo: POST /v1/images/appraise {capture_id | data_base64, room?} lists each belonging with a box, category, brand and model where readable, condition, estimated price new and used (USD), insurable or not with a reason, and confidence. One cloud vision call, about half a cent, on the Jev/Clef budget (find_crop permission)"
+    },
+    {
+     "endpoint": "/v1/applet/records",
+     "what": "Your own records on the phone (applet_data permission): POST /v1/applet/records/{key} {value} saves a JSON object (40,000 characters, 1000 records), GET /v1/applet/records?prefix=&after= pages through them with values (about 48 KB a page), GET and DELETE one. Never uploaded; removing an applet deletes its records"
+    },
+    {
+     "endpoint": "/v1/applets/install",
+     "what": "Applet packages may be 128 KB, with assets up to 48 KB each (were 64 and 16 KB)"
+    }
+   ],
+   "revision": 82
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v2/call",
+     "what": "Workflows are flows: new steps photo, ask_model (Jev/Clef, scope decisions), ask_owner (waits for an answer), wait and stop; later steps use earlier results with {\"$step\":\"id.path\"} (text fields also take a list of texts and references); only_if conditions; on_error stop/skip/retry; a watch trigger {type: watch, watch, on: match|rule}. A failed run no longer blocks the workflow. workflow.validate returns summary, the flow as one plain sentence"
+    },
+    {
+     "endpoint": "/v2/call",
+     "what": "workflow.runs {id, limit}: the newest runs step by step (status, results, errors, cost); new event workflow.failed"
+    },
+    {
+     "endpoint": "/v1/applets/install",
+     "what": "Applet packages: processing.workflow can name a package watch with {\"$watch\":\"main\"}"
+    }
+   ],
+   "revision": 83
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/satellite/unlink",
+    "what": "Phone to phone only (not for agents): a hub and its satellite keep their link in step. POST /v1/satellite/unlink (hub link key) and POST /v1/satellite/hub/unlink (return key) tell the other phone a link was removed; a phone whose key the other no longer knows (401) drops the link too. A test build adds its name to the phone name it shows, e.g. \"Pixel 2 XL (test applets)\""
+   }],
+   "revision": 84
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/applet/portal/record",
+    "what": "Applet results on the web portal: an applet whose package declares ui.portal.records {kind, title} (e.g. workout) sends one record per result from its card with POST /v1/applet/portal/record {label?, metrics {up to 16 numbers}, items [{label, count?, seconds?}], answers?}. Words and numbers only, never free text or pictures; sent only while the owner has that applet's web portal on (portal on | not_linked | off in the reply). Needs the applet_data permission"
+   }],
+   "revision": 85
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/watches",
+     "what": "One action vocabulary (reference: https://bridgit.cc/learn/builder/applet-packages.md): a watch tally rule's do and a schedule action's do may start a flow, {\"flow\": \"<workflow id>\", \"with\"?: {\u2026}}, or run one step from the workflow menu, {\"step\": {\"type\": \"notice\" | \"speak\", \u2026}} (text may use {\"$trigger\":\"message\"}). The raw endpoint call keeps working; POST /v1/watches returns hints with the step that does the same"
+    },
+    {
+     "endpoint": "/v1/schedule",
+     "what": "Schedule actions also accept the call as {method, path, query?, body?}, the same spelling as watch rules and cards; call \"POST /v1/\u2026\" keeps working"
+    },
+    {
+     "endpoint": "/v2/call",
+     "what": "Workflows: a called trigger {type: called, with?: {name: text|number|boolean}} for a flow that only a watch rule, a schedule or workflow.run starts; steps read the values as {\"$trigger\":\"with.<name>\"} and the caller as trigger caller (rule, schedule, button, agent). workflow.run takes with. The notice step takes priority normal|urgent. A rule's trigger data now also has of and today"
+    },
+    {
+     "endpoint": "/v1/applets/install",
+     "what": "Applet packages: processing.flows (1-4 flows, each a workflow body plus id); rules and schedule actions start one with {\"flow\": {\"$flow\": \"<id>\"}}, bound to the applet's own flow by name, so an update that changes a flow keeps the watches and their counts. GET /v1/applets/installed shows flows {name: workflow_id}"
+    }
+   ],
+   "revision": 86
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/interactions",
+     "what": "Applet cards from pieces (reference: https://bridgit.cc/learn/builder/applet-packages.md): ui.card {title, sources, pieces} draws header, status, metrics, table, timeline, gallery, video, people, devices, draft and buttons in Bridgit's own style, with the card state (loading, empty, stale, paused, error) set by the phone; no HTML or CSS. Also POST /v1/interactions kind pieces"
+    },
+    {
+     "endpoint": "/v1/applets/installed/{id}/tables/{table}/rows",
+     "what": "On-phone tables: processing.tables, the workflow step record and photo keep: true, card buttons that save a row; the owner sees and deletes rows under Installed applets \u203a Data. The installing agent reads and adds rows of a shared table (share_with_installer)"
+    },
+    {
+     "endpoint": "/v1/applets/validate",
+     "what": "Validate returns package: the complete file with observation_schema, metrics, lifecycle, migration and data_policy filled in (and a missing permissions.required and asset sha256), so agents stop copying them"
+    }
+   ],
+   "revision": 87
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/applets/install",
+     "what": "Applet spending cap : a package may set budget {day_usd, month_usd} (0.01-100; default $1 a day, $10 a month). Every paid cloud call the applet makes (watch Jev/Clef checks, ask_model, find, locate, appraise, judgment) counts; over the cap they fail with the new error budget_reached (on_error decides in flows). The review states the cap, GET /v1/applets/installed shows budget {day_usd, month_usd, spent_today_usd, spent_month_usd, set_by}, and the owner can change it in Installed applets"
+    },
+    {
+     "endpoint": "/v1/applets/validate",
+     "what": "POST /v1/applets/validate (and the install review) return warnings [{code, where, says, fix}] that never block an install: card_request_too_big, card_reply_too_big, card_form_submit, card_storage, permission_unused, data_policy_contradicts, paid_without_cap. workflow.validate warns paid_without_cap"
+    },
+    {
+     "endpoint": "/v1/interactions",
+     "what": "Bridgit.act: a request over 16 KB is refused with request_too_big, and a JSON reply over 64 KB comes back ok: false with error reply_too_big and a fix (it used to come back ok with only its size)"
+    }
+   ],
+   "revision": 88
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v2/call",
+     "what": "Workflow steps appraise (a kept photo → items[] with prices and boxes, scope decisions, paid like ask_model) and update (change columns of one row of the applet's table, row_not_found). record takes for_each (one row per element, at most 50 in one write) with {\"$item\":\"<field>\"}"
+    },
+    {
+     "endpoint": "/v1/applets/install",
+     "what": "Applet card buttons: do.flow starts one of the package's flows; with for_each (an array source or a table), only_if {item, \u2026}, max 1-200 and progress it runs a batch, one run per element, that survives a restart. New card source {\"batch\": \"<button id or label>\"}. A run cut off by a restart no longer blocks its workflow"
+    },
+    {
+     "endpoint": "/v1/applets/installed/{id}/tables/{table}/rows/{row}",
+     "what": "PATCH /v1/applets/installed/{id}/tables/{table}/rows/{row} {set} changes one row of a shared table; new error row_not_found"
+    }
+   ],
+   "revision": 89
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v2/call",
+    "what": "Workflow step share (only in a flow with a button trigger) and card button do.step {share}: the phone builds a PDF report or a CSV file of one of the applet's tables (columns, group_by, totals, photos thumbs, where) and opens Android's share sheet; the owner picks where it goes. At most 10,000 rows, 200 photos, 20 MB; new errors export_too_large and share_unavailable"
+   }],
+   "revision": 90
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/connections",
+     "what": "Connections (webhooks out): the owner approves where applets may send in Applets \u203a Connections (Home Assistant, n8n, Discord, Slack, Telegram, ntfy, Pushover, Zapier, Make, IFTTT or any JSON webhook). GET /v1/connections lists id, name, service and whether it takes photos, never the address or secrets"
+    },
+    {
+     "endpoint": "/v2/call",
+     "what": "Workflow step send {to, data, text, photo, wait_reply} (scope connections.send) and do.step send: data (32 keys, 16 KiB) plus applet, flow, run_id, sent_at and phone; a photo step's result goes as a file (Discord, Telegram, ntfy, Pushover, Home Assistant, JSON); wait_reply waits up to 15 s and returns status and reply (JSON) or reply_text for only_if. Queued sends retry, keep their sent_at and go the moment the network is back"
+    },
+    {
+     "endpoint": "/v1/connections/send",
+     "what": "POST /v1/connections/send: the same send from an agent or a single step, with a kept photo"
+    },
+    {
+     "endpoint": null,
+     "what": "New connections sign with Standard Webhooks (webhook-id, webhook-timestamp, webhook-signature v1 with a whsec_ secret); older destinations keep their X-Bridgit-Signature. On my private network allows plain http and any port, only to private addresses"
+    }
+   ],
+   "revision": 91
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/satellite/hub/agents",
+     "what": "Phone to phone only (not for agents): a satellite switched to its hub lists the hub's control agents, while the hub hasn't paused that satellite"
+    },
+    {
+     "endpoint": "/v1/satellite/hub/agents/{id}/pause",
+     "what": "Phone to phone only (not for agents): a satellite pauses or resumes one of its hub's control agents"
+    }
+   ],
+   "revision": 92
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/start",
+     "what": "The starter page (learn/start.md) is also served from the phone, with no key, for agents that can't reach the web; health links it as start"
+    },
+    {
+     "endpoint": "/v1/events",
+     "what": "GET /v1/events takes limit (1 to 100): the newest N without since, the first N after the cursor with it"
+    }
+   ],
+   "revision": 93
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v2/call",
+     "what": "Workflow trigger power {on: unplugged | plugged | restored, for_s 0-3600}: unplugged with for_s 600 fires once after 10 minutes off charge (a power cut); restored fires when charging comes back after at least for_s off, with off_at, on_at and off_minutes. Plugs and unplugs are saved as they happen, so an outage across a reboot is still reported. charging stays as the old name of power plugged, and no longer fires at once for a flow activated while the phone is charging"
+    },
+    {
+     "endpoint": "/v2/call",
+     "what": "Workflow triggers battery {on: low, critical, okay, full, hot, cooled, saver_on, saver_off} with percent, charging, battery_saver and temperature_c, and sun {on: sunrise | sunset, offset_min -180..180, optional latitude and longitude, else scope location and a rough position saved once}"
+    },
+    {
+     "endpoint": "/v2/call",
+     "what": "Workflow fields cooldown_s (0-86400) and max_runs_per_day (1-1000): starts too soon are skipped, counted in skipped_runs, refused with workflow_skipped and reported as skipped to rules and schedules; the review sentence says \"at most once an hour, at most 10 times a day\". An applet.event trigger's cooldown_seconds is now the old name of the flow's cooldown_s; on such a flow it still counts per device and event type (default 30)"
+    }
+   ],
+   "revision": 94
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/events",
+     "what": "Applet budgets are shared by all the owner's devices working on the applet and enforced by Bridgit's servers: every paid call an installed applet makes names it (package id; dog for the Pet monitor). Over a limit calls fail with the new error applet_budget (applet, limit, resets_at) and the applet's watches pause until resets_at (status paused: applet_budget, a watch.paused event with reason applet_budget, watch.resumed when it lifts). budget_forecast and budget_out events reach the agent that installed it"
+    },
+    {
+     "endpoint": "/v1/applets/{id}/budget",
+     "what": "GET /v1/applets/{id}/budget: limits with used, forecast and reset (all phones), state ok|warning|out, ceiling, agents_may_change, actions with every_s, min_s, max_s, places, paid share and projection, and the last changes"
+    },
+    {
+     "endpoint": "/v1/applets/{id}/budget",
+     "what": "New Budgets permission (master switch on by default; on for the agent that installed an applet): PUT /v1/applets/{id}/budget {limits}, POST /v1/applets/{id}/budget/top-up {limit_id, usd} and PUT /v1/applets/{id}/actions/{action} {every_s, dry_run}. New errors agents_may_not_change, over_ceiling and out_of_range; at most 10 changes a day per agent and applet (rate_limited)"
+    },
+    {
+     "endpoint": "/v1/applets/install",
+     "what": "Packages: budget takes limits [{id, usd, per hour|day|week|month, check_at}] (day_usd and month_usd become l1 and l2), and actions {id: {every, min, max, per, priority}} that watches name with action. A watch's interval_s can now change in place (interval_s shows the current one, package_interval_s the package's) and keeps its tally"
+    }
+   ],
+   "revision": 95
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v2/call",
+     "what": "Workflow only_if gains sources time {between [HH:MM, HH:MM] (may cross midnight; the early hours belong to the day it began), days}, sun {after | before: sunrise | sunset, offset_min} (today's, on the phone), phone (charging, battery at_least/below, network wifi/mobile/none), zone {latitude, longitude, radius_m} with is, mode {\"mode\": true, is | is_not | in}, and count / sum over the applet's own table {table, since today | this_week | all or hours N, where {column, is}, column} with at_least / below; all and any take 2-8 tests, one level. The review sentence says them: \"only between 22:00 and 07:00 and when the mode is away\""
+    },
+    {
+     "endpoint": "/v2/call",
+     "what": "A flow-level only_if, checked before the first step: a start that doesn't hold is skipped, counted in skipped_runs and refused with workflow_skipped (also for the owner's own Run tap: a condition isn't a rate limit)"
+    },
+    {
+     "endpoint": "/v2/mode",
+     "what": "Modes: one per phone (home, away, night, vacation; the owner can add). Step set_mode {mode} (new scope modes.set, risk action) and do.step set_mode; trigger {type: mode, to?, from?} with from, to and by; card source {\"mode\": true} (mode, since, set_by, modes, label); GET /v2/mode, GET /v1/mode and POST /v1/mode. Setting the mode it already is starts nothing; a flow or agent may change it at most 20 times in 10 minutes (mode_busy)"
+    },
+    {
+     "endpoint": "/v1/mode",
+     "what": "GET /v1/mode and POST /v1/mode {mode}: the phone's mode, since, set_by, modes and the newest changes, and setting it (what do.step set_mode calls); returns mode, from and changed"
+    },
+    {
+     "endpoint": "/v2/call",
+     "what": "Workflow step lookup {table, where?, since? | hours?, limit 1-10}: the newest matching rows of the applet's own table, newest first, as rows, row (the newest) and count (all matching rows)"
+    }
+   ],
+   "revision": 96
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/satellites",
+     "what": "Satellites carry device_type (phone, tablet, computer, tv, watch or camera; null from an older satellite)"
+    },
+    {
+     "endpoint": "/v1/satellite/manifest",
+     "what": "Phone to phone: the satellite manifest, hub info and GET /v1/satellite/hub say what kind of device sent them (device_type)"
+    },
+    {
+     "endpoint": "/v1/portal/home",
+     "what": "Portal home device gains device_type (phone, tablet, computer, tv, watch or camera) next to type; a portal may send client_type with snapshot and home"
+    }
+   ],
+   "revision": 97
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/applets/install",
+     "what": "Packages: ui.portal.include \"optional\" (default: the owner turns the applet's web portal on in Installed applets) or \"always\" (the portal comes with the applet: the install review says what it sends, it starts on Approve and stops only when the applet is removed). \"always\" needs something to send (ui.portal.records or a watch with a tally). GET /v1/applets/installed reports web_portal.include"
+    },
+    {
+     "endpoint": "/v1/applets/installed",
+     "what": "An applet with no watches, no schedule and only flows a button or another flow starts is user-driven: it has no scheduled actions (actions is empty in its budget), and Installed applets shows Open for its card"
+    }
+   ],
+   "revision": 98
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/applets/install",
+    "what": "Packages: ui.portal.tables [1-3 of the applet's table ids] makes the web portal the applet's interface: the phone copies those tables' rows and photos to the portal while it is on, the card stays off the Cards inbox, and the portal page presses the card buttons listed in ui.portal.actions [button ids] on the phone (in Applets \u203a Portals) and edits or deletes rows."
+   }],
+   "revision": 99
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/applets/portals",
+     "what": "Applet portals (permission applet_portals): GET /v1/applets/portals lists every applet with a portal; POST /v1/applets/{id}/portal/open brings any applet's portal to the front of the screen; GET /v1/applets/{id}/portal returns its functions, published state, visible text and last input (owner or agent); POST \u2026/portal/call runs a function the page exposes; POST \u2026/portal/close closes it. Events portal.opened, portal.functions, portal.state and portal.closed"
+    },
+    {
+     "endpoint": "/v1/applets/{id}/portal",
+     "what": "Applet pages get Bridgit.portal: expose(name, {description, params}), setState(json) and on(\"call\", handler) inside a portal; Bridgit.portal.available is false in an Inbox card. Installed applets' Open shows the applet's portal"
+    }
+   ],
+   "revision": 100
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/applets/installed/{id}/development",
+     "what": "Personal applet development snapshots, durable template ancestry and tracking/paused/detached policy. Template upgrade preparation creates a local special task; conflicts and verification stay with the control agent. Agent updates now require change.expected_revision, intent, acceptance and evidence and wait for owner review"
+    },
+    {
+     "endpoint": "/v1/applets/context",
+     "what": "Discover typed device context metadata without collecting readings"
+    }
+   ],
+   "revision": 101
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/applets/installed/{id}/development",
+    "what": "Modify applet shares only the control-agent instructions link and installed instance ID. The owner-selected editor can read the development snapshot and propose updates to this applet; existing revision and owner-approval checks apply. It receives applet.modify_requested {instance_id, instructions}. Table rows, pause, removal and template-policy access remain with the assigned developer"
+   }],
+   "revision": 102
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/speech/hear",
+     "what": "Registry-selected bounded speech turns: hear (1-30 seconds), speak (1-600 characters), explicit cloud permission, offline defaults and no automatic cloud fallback"
+    },
+    {
+     "endpoint": "/v1/speech/models",
+     "what": "Speech model selection and on-device readiness"
+    },
+    {
+     "endpoint": "/v1/speech/speak",
+     "what": "Speak through the existing permission-checked speaker queue, volume ceiling and Stop"
+    }
+   ],
+   "revision": 103
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/context",
+    "what": "Automated Context: GET /v1/context, GET /v2/context and context.status read durable and temporary facts with source, confidence and expiry (context.read). A context flow step returns the same snapshot; reads never acquire GPS or call a model. Unknown/expired/deleted values are null; deleted automatic items stay deleted until restored. Exact positions stay internal. The owner can inspect, tag added facts Durable/Temporary with expiry, correct, delete or pause in More > Automated Context. Place and night are independent; no automatic mode changes."
+   }],
+   "revision": 104
+  },
+  {
+   "date": "2026-11-05",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/applet/tables",
+     "what": "Custom applet cards discover their own declared table schemas with GET /applet/tables and read/add/edit rows through /applet/tables/{table}/rows, bound to their own principal without an installed-instance id"
+    },
+    {
+     "endpoint": "/v1/applets/validate",
+     "what": "Applet persistence is restricted to declared processing.tables. New json columns require a description and hold bounded objects/arrays. Legacy free-form applet writes are refused; existing blobs remain readable for migration. Portal records declare a table/json column and save locally before queueing"
+    },
+    {
+     "endpoint": "/v1/applets/installed",
+     "what": "Owner control keys with applet_install can discover every installed applet and read/edit its tables without installer ownership, share_with_installer or another approval. Applet principals remain isolated; existing capability and key checks still apply"
+    },
+    {
+     "endpoint": "/v1/applets/installed/{id}/data",
+     "what": "Uniform runtime-generated bridgit-applet-data/2 discovery for existing and future templates: schemas, row and status counts, batch outcomes, paginated rows and saved-photo links"
+    },
+    {
+     "endpoint": "/v1/applets/installed/{id}/data/export",
+     "what": "Read-only JSON export or ZIP with manifest.json and original saved photos (20 MB); larger data uses paginated rows and authenticated individual photos. No capture, recognition or share sheet"
+    }
+   ],
+   "revision": 105
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/applets/installed/{id}/template-upgrade",
+    "what": "Template upgrades for unchanged applets return an owner review (awaiting_owner) directly; customized copies retain three-way tasks. bundled selects a built-in template without a network fetch. Installed applets expose computed template_update availability; source, revision and approval checks still apply"
+   }],
+   "revision": 106
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/services",
+    "what": "General external service discovery for any applet: GLM 5.3 Flash via OpenRouter, Jev and Clef; call formats, required grants, applet watch/flow usage and per-service budget configuration. Reading the catalog makes no paid call"
+   }],
+   "revision": 107
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/settings",
+     "what": "Device name read/write/reset through settings device.name; existing App settings and Agent Super Powers required"
+    },
+    {
+     "endpoint": "/v1/settings/modes",
+     "what": "Custom mode definitions: read and atomically replace, add, rename or clear unused custom modes; built-in and current modes are protected. Uses existing App settings and Agent Super Powers without a per-change dialog"
+    }
+   ],
+   "revision": 108
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v2/call",
+    "what": "workflow.simulate validates an inline flow and previews its steps with fixtures. Returns the run log and intended effects without capturing, calling a model or contacting the owner"
+   }],
+   "revision": 109
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v2/capabilities",
+     "what": "Owner-paired control agents default to durable maximum grants; relay maximum retains explicit permissions. New scopes inherit maximum authority; narrowing or revoking it stops inheritance"
+    },
+    {
+     "endpoint": "/v1/owner/configure",
+     "what": "App-owned owner.configure changes run under the existing configuration grant without repeated approval; OS consent and sign-in stay on device"
+    },
+    {
+     "endpoint": "/v1/settings",
+     "what": "Super-powered settings writers can change listener and capture policy; security and initial-authority gates remain owner-only"
+    },
+    {
+     "endpoint": "/v1/settings/ai-keys",
+     "what": "Write-only saved AI key provisioning and removal; reads expose only presence"
+    },
+    {
+     "endpoint": "/v1/connections/configure",
+     "what": "Create, replace, revoke and rotate connection configuration with owner.configuration plus App settings and Super Powers; existing credentials remain write-only"
+    },
+    {
+     "endpoint": "/v1/settings/capture-upload",
+     "what": "Write-only owner capture upload configuration; null clears it"
+    }
+   ],
+   "revision": 110
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/owner/configuration",
+    "what": "Unattended app-owned configuration for explicitly owner-granted control agents: discover settings, captures/listener policy, native configuration actions, model keys, connection lifecycle, callback provisioning, notification selections, listening recipients, custom modes, alert enrollment and saved food view. Secrets are write-only; OS/account/biometric/security authority remains human"
+   }],
+   "revision": 111
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/images/usage",
+     "what": "Read the account image-generation allowance and usage before requesting a new applet illustration."
+    },
+    {
+     "endpoint": "/v1/images/generations",
+     "what": "Azure GPT Image 2.5 Sunburst generation and usage discovery; shared 40 images per linked account per month, server-enforced idempotency and existing judgment authority"
+    }
+   ],
+   "revision": 112
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/services/models",
+     "what": "Applet model preferences inherit live from account override, applet default, then shared task default. Account overrides apply to every instance of the package; clearing restores inheritance. Read choices and effective source; use existing owner.configuration for service.model.set"
+    },
+    {
+     "endpoint": "/v1/services/context",
+     "what": "General location-context adapters with discoverable requests, write-only Google Maps/Open-Meteo keys and service budgets"
+    },
+    {
+     "endpoint": "/v1/story",
+     "what": "GLM fairytales from kept panorama frames and a portrait, Aura narration and parallel Azure illustrations in HTML cards; presentation tokens prevent late speech and images after Stop"
+    },
+    {
+     "endpoint": "/v1/camera/video",
+     "what": "Video frame extraction returns caller-owned capture ids; snapshot return_image:false returns compact metadata"
+    }
+   ],
+   "revision": 113
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/camera/snapshot",
+     "what": "Person-started card/portal photos and videos require visible capture, camera flip, review and deletion; automatic monitoring is unchanged"
+    },
+    {
+     "endpoint": "/v1/camera/video/review",
+     "what": "Replay or delete a kept video through its caller-owned capture id; image capture reads support bounded previews"
+    }
+   ],
+   "revision": 114
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/applets/catalog",
+     "what": "Search and page through the independent applet library. Each entry identifies an immutable registry key and revision to install."
+    },
+    {
+     "endpoint": "/v1/applets/install",
+     "what": "Installing a catalog selection verifies its registry key and revision. Historical starter ids resolve to a pinned registry release."
+    }
+   ],
+   "revision": 115
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/story/generate",
+    "what": "Generate a story from reviewed captures. Applets choose which results to save in their own tables."
+   }],
+   "revision": 116
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/portal/applets/inventory",
+    "what": "Read the enrolled devices for an approved applet edition from a paired portal."
+   }],
+   "revision": 117
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/portal/applets/watches",
+    "what": "Read watch state, counts and last check outcome for one paired applet edition."
+   }],
+   "revision": 118
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/portal/applets/watches",
+    "what": "Watch cards may read scoped recent checks, today's tally and bounded episodes from the paired monitor."
+   }],
+   "revision": 119
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/lan-cameras/applet-views/{instance}/{view}",
+    "what": "Read, save and clear owner-reviewed applet camera positions using a revision check."
+   }],
+   "revision": 120
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/owner/configuration/approvals",
+    "what": "Delegated control agents can inspect and approve or decline exact pending applet installs/updates, schedules, workflows, actions and control sessions with their existing configuration and action authority. Changed requests conflict; native validation and OS consent remain in force"
+   }],
+   "revision": 121
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/images/generations",
+    "what": "FLUX 3 Image Klein is available through the image service with task_key flux_image_generation, sharing the existing 40-image account allowance and spending limits"
+   }],
+   "revision": 122
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/owner/configuration/access",
+    "what": "Existing Agent Super Powers authority can configure app-owned feature switches and paired control-agent capabilities, roles and durable scope grants, including configuration bootstrap, without another owner tap. Initial Super authority, key pairing and real Android/account consent remain protected"
+   }],
+   "revision": 123
+  },
+  {
+   "date": "2026-11-06",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/interactions/{id}/renotify",
+     "what": "Viewed card notifications stay cleared; the sending control agent can explicitly request another alert for its open card without changing its read status, expiry or answers"
+    },
+    {
+     "endpoint": "/v1/story/reveal",
+     "what": "Guided camera capture, a group voice shutter and explicit reveal for prepared story media"
+    }
+   ],
+   "revision": 124
+  },
+  {
+   "date": "2026-11-07",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/applets/practices",
+    "what": "Applet practice catalog, creation/change review gates, scoped exceptions and structural compliance reports; shared photo viewer and truthful progress defaults"
+   }],
+   "revision": 125
+  },
+  {
+   "date": "2026-11-07",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/applets/installed",
+     "what": "Applet run modes Autonomous and Passive; durable starting, running, pausing and paused task states with stop acknowledgments"
+    },
+    {
+     "endpoint": "/v1/applets/installed/{id}/pause",
+     "what": "Pause waits for task-owned work and device Stop confirmation; explicit manual actions remain available after pause"
+    }
+   ],
+   "revision": 126
+  },
+  {
+   "date": "2026-11-07",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/app/foreground",
+    "what": "Owner-authorized agents can bring Bridgit itself forward with an audit reason and a device-wide cooldown; the result confirms visibility or an Open Bridgit notification fallback"
+   }],
+   "revision": 127
+  }
+ ],
+ "links": {
+  "discover": "/v1/discover",
+  "catalog_bulk_export": "https://bridgit.cc/learn/catalog.json",
+  "owner_features": "/v1/owner/features",
+  "capabilities": "/v1/capabilities",
+  "control_capabilities": "/v2/capabilities",
+  "starter": "https://bridgit.cc/learn/start.md",
+  "openapi": "/v1/openapi.json",
+  "learn": "https://bridgit.cc/learn/index.json",
+  "catalog": "https://bridgit.cc/learn/catalog-index.json",
+  "start": "/v1/start",
+  "changes": "/v1/changes",
+  "resources": "/v1/resources",
+  "services": "/v1/services",
+  "demo": "/v1/demo",
+  "samples": "/v1/samples",
+  "feedback": "/v1/feedback",
+  "applet_practices": "/v1/applets/practices",
+  "llms_txt": "https://bridgit.cc/llms.txt",
+  "guide": "/v1/guide"
+ },
+ "how_to_use": "Your phone's api_revision is in GET /v1/health. Everything after it is new to that phone's Bridgit; everything up to it works there."
+}

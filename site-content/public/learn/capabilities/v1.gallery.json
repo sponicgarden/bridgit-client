@@ -1,0 +1,57 @@
+{
+ "detail_url": "/v1/discover?id=v1.gallery&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.gallery.json",
+ "title": "gallery",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.gallery.json",
+ "prerequisites": ["Check v1.gallery supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": ["receipt-scanner"],
+ "operations": [
+  {
+   "summary": "Newest gallery images (metadata only)",
+   "path": "/v1/gallery/recent",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-gallery-recent.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-gallery-recent.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "gallery_recent"
+  },
+  {
+   "summary": "One gallery image, sized for you",
+   "path": "/v1/gallery/photo/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-gallery-photo-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-gallery-photo-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "gallery_photo"
+  },
+  {
+   "summary": "The newest image of a type; with since and wait, waits for the next one",
+   "path": "/v1/image/last",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-image-last.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-image-last.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "image_last"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.gallery",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "remember",
+ "capability_ids": ["v1.gallery"]
+}

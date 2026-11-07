@@ -1,0 +1,34 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "What an applet's portal shows now: the functions its page exposes, the state it published, its visible words, and who used it last (the owner by touch, or an agent)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_portal",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/ai0123456789abcd/portal",
+  "idempotent": false,
+  "path": "/v1/applets/{id}/portal",
+  "capability": "applet_portals",
+  "returns": "id, name, kind, open, on_screen, loaded, functions[{name, description, params}], state (the page's own JSON or null), state_at, text (visible words, ≤ 8 KB, null when closed), last_input{by: owner|agent, agent?, function?, at}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/applets/{id}/portal",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "not_supported"
+  ],
+  "requires": null
+ }
+}

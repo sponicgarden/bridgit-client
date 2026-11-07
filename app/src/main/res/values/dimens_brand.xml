@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Wordmark widths. Home matches the icon height. -->
+    <dimen name="brand_wordmark_width">124dp</dimen>
+    <!-- Home wordmark: preserve its intrinsic 124:39 ratio at 36dp tall. -->
+    <dimen name="brand_wordmark_width_compact">114.46dp</dimen>
+    <!-- Update branding shares one width, with a proportional wordmark height. -->
+    <dimen name="brand_tagline_width">160dp</dimen>
+    <dimen name="update_wordmark_height">50.32dp</dimen>
+</resources>

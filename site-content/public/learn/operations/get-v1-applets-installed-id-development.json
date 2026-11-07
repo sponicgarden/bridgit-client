@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read the exact personal package, template baseline, customization journal, revision and pending upgrade task. Owner control agents can inspect any installed applet; private, keep local unless the owner consents to model upload",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_installed_development",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/installed/ai0123456789abcd/development",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/development",
+  "capability": "applet_install",
+  "returns": "instance_id, revision, package, config, evolution{state, origin, baseline_known, baseline?, journal[], policy_generation, task?}, guide",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/applets/installed/{id}/development",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

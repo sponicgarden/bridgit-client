@@ -1,0 +1,58 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set/replace/clear alert address using native enrollment; this never fabricates confirmation; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_email_post",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "email",
+   "description": "Valid email; null removes after server confirmation",
+   "type": [
+    "string",
+    "null"
+   ],
+   "required": true
+  }],
+  "example": "POST /v1/owner/configuration/email {\"email\":\"owner@example.com\"}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/email",
+  "capability": "owner_features",
+  "returns": "email,state,human_verification_required,delivery; pending/failed delivery does not imply verification",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "email": {
+     "description": "Valid email; null removes after server confirmation",
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": [
+    "email",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

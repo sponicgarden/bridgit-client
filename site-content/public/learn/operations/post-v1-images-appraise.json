@@ -1,0 +1,92 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Home inventory from a photo: every belonging in it with a box, category, brand and model where they can be read, visible condition, estimated price new and used (US dollars), whether a home or renters policy would normally cover it, and how sure the model is. One cloud vision call (about half a cent; shares the Jev/Clef budget)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "images_appraise",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "capture_id",
+    "description": "A photo this agent captured and kept (POST /v1/camera/snapshot with store), or one shared with it",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "gallery_id",
+    "description": "An accessible gallery photo (also needs the gallery grant)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "data_base64",
+    "description": "The image bytes instead (JPEG, PNG or WebP; about 1.5 MB of image at most, so use capture_id or gallery_id for big photos)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "room",
+    "description": "Optional: the room the photo is in, e.g. Kitchen (60 characters at most); otherwise the model guesses",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "max_items",
+    "description": "1-30, default 20",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/images/appraise {\"capture_id\":\"cap_...\",\"room\":\"Living room\"}",
+  "idempotent": true,
+  "path": "/v1/images/appraise",
+  "capability": "find_crop",
+  "returns": "room, items [{label, category, brand, model, quantity, condition new|like new|good|fair|poor, new_usd, used_usd, insurable, insurable_note, confidence 0-1, box {x0,y0,x1,y1 fractions, px}}], count, currency USD, estimate_basis, model, cost_usd, width_px, height_px. Prices are model estimates, not quotes; brand/model/condition/prices may be null",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "data_base64": {
+     "description": "The image bytes instead (JPEG, PNG or WebP; about 1.5 MB of image at most, so use capture_id or gallery_id for big photos)",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "gallery_id": {
+     "description": "An accessible gallery photo (also needs the gallery grant)",
+     "type": "integer"
+    },
+    "capture_id": {
+     "description": "A photo this agent captured and kept (POST /v1/camera/snapshot with store), or one shared with it",
+     "type": "string"
+    },
+    "room": {
+     "description": "Optional: the room the photo is in, e.g. Kitchen (60 characters at most); otherwise the model guesses",
+     "type": "string"
+    },
+    "max_items": {
+     "description": "1-30, default 20",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "invalid_parameter",
+   "capability_disabled",
+   "photo_not_found",
+   "not_supported",
+   "rate_limited",
+   "team_unavailable",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

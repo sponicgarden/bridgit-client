@@ -1,0 +1,178 @@
+{
+  "max_steps": 32,
+  "max_paid_steps": 4,
+  "conformance": "field_inventory_not_complete_schema",
+  "common_fields": [
+    "type",
+    "id",
+    "only_if",
+    "on_error",
+    "retries"
+  ],
+  "max_paid_per_day": 500,
+  "format": "bridgit-flow-authoring/1",
+  "steps": {
+    "lookup": {
+      "scope": null,
+      "fields": [
+        "hours",
+        "limit",
+        "since",
+        "table",
+        "where"
+      ]
+    },
+    "wait": {
+      "scope": null,
+      "fields": ["seconds"]
+    },
+    "ask_model": {
+      "scope": "decisions",
+      "fields": [
+        "model",
+        "photo",
+        "questions"
+      ]
+    },
+    "ring": {
+      "scope": "phone.control",
+      "fields": ["seconds"]
+    },
+    "photo": {
+      "scope": "camera.snapshot",
+      "fields": [
+        "camera",
+        "keep",
+        "view"
+      ]
+    },
+    "update": {
+      "scope": null,
+      "fields": [
+        "row",
+        "set",
+        "table"
+      ]
+    },
+    "ask_owner": {
+      "scope": "interactions",
+      "fields": [
+        "choices",
+        "text",
+        "title",
+        "wait_s"
+      ]
+    },
+    "stop": {
+      "scope": null,
+      "fields": []
+    },
+    "alert": {
+      "scope": "alerts",
+      "fields": [
+        "destinations",
+        "text"
+      ]
+    },
+    "appraise": {
+      "scope": "decisions",
+      "fields": [
+        "max_items",
+        "photo"
+      ]
+    },
+    "service": {
+      "scope": "decisions",
+      "fields": [
+        "area",
+        "max_items",
+        "operation",
+        "photo",
+        "service",
+        "session_s",
+        "tip_gap_s"
+      ]
+    },
+    "record": {
+      "scope": null,
+      "fields": [
+        "for_each",
+        "row",
+        "table"
+      ]
+    },
+    "context": {
+      "scope": "context.read",
+      "fields": []
+    },
+    "speak": {
+      "scope": "audio.speak",
+      "fields": [
+        "allow_cloud",
+        "text"
+      ]
+    },
+    "share": {
+      "scope": null,
+      "fields": [
+        "as",
+        "columns",
+        "group_by",
+        "photos",
+        "table",
+        "title",
+        "totals",
+        "where"
+      ]
+    },
+    "event": {
+      "scope": null,
+      "fields": ["text"]
+    },
+    "kitchen": {
+      "scope": "decisions",
+      "fields": [
+        "area",
+        "mode",
+        "photo",
+        "session_s",
+        "tip_gap_s"
+      ]
+    },
+    "set_mode": {
+      "scope": "modes.set",
+      "fields": ["mode"]
+    },
+    "send": {
+      "scope": "connections.send",
+      "fields": [
+        "data",
+        "photo",
+        "text",
+        "to",
+        "wait_reply"
+      ]
+    },
+    "hear": {
+      "scope": "microphone.clip",
+      "fields": [
+        "allow_cloud",
+        "duration_seconds",
+        "language"
+      ]
+    },
+    "notice": {
+      "scope": "interactions",
+      "fields": [
+        "priority",
+        "text",
+        "title"
+      ]
+    }
+  },
+  "retry_delays_ms": [
+    2000,
+    5000,
+    10000
+  ]
+}

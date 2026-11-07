@@ -1,0 +1,68 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your kept captures (photos, screenshots, recordings, clips), newest first: where each is and until when",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "captures_list",
+  "query": [
+   {
+    "name": "kind",
+    "description": "Only this kind",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "camera",
+     "screen",
+     "mic",
+     "wakewords",
+     "sounds",
+     "lan_camera",
+     "lan_camera_audio"
+    ]
+   },
+   {
+    "name": "limit",
+    "description": "1-200, default 50",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/captures?kind=camera",
+  "idempotent": false,
+  "path": "/v1/captures",
+  "capability": "captures",
+  "returns": "captures[id, kind, agent_id, mime, size_bytes, captured_at, in_memory, memory_until, file, upload {agent|owner: pending|sent|failed: why}, url, meta]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "description": "Only this kind",
+     "type": "string",
+     "enum": [
+      "camera",
+      "screen",
+      "mic",
+      "wakewords",
+      "sounds",
+      "lan_camera",
+      "lan_camera_audio"
+     ]
+    },
+    "limit": {
+     "description": "1-200, default 50",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

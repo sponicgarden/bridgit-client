@@ -1,0 +1,67 @@
+{
+ "detail_url": "/v1/discover?id=v1.files&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.files.json",
+ "title": "files",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.files.json",
+ "prerequisites": ["Check v1.files supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Your files transfers, retained 30 days on the phone",
+   "path": "/v1/files",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-files.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-files.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "files_list"
+  },
+  {
+   "summary": "Read your selected transfer bytes",
+   "path": "/v1/files/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-files-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-files-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "files_get"
+  },
+  {
+   "summary": "Delete your transfer",
+   "path": "/v1/files/{id}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-files-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-files-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "files_delete"
+  },
+  {
+   "summary": "Receive a file on the phone (25 MB maximum)",
+   "path": "/v1/files",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-files.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-files.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "files_receive"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.files",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "remember",
+ "capability_ids": ["v1.files"]
+}

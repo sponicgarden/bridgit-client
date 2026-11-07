@@ -1,0 +1,57 @@
+{
+ "detail_url": "/v1/discover?id=v1.downloads&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.downloads.json",
+ "title": "downloads",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.downloads.json",
+ "prerequisites": ["Check v1.downloads supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Your downloads transfers, retained 30 days on the phone",
+   "path": "/v1/downloads",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-downloads.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-downloads.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "downloads_list"
+  },
+  {
+   "summary": "Read your selected transfer bytes",
+   "path": "/v1/downloads/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-downloads-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-downloads-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "downloads_get"
+  },
+  {
+   "summary": "Delete your transfer",
+   "path": "/v1/downloads/{id}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-downloads-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-downloads-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "downloads_delete"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.downloads",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "remember",
+ "capability_ids": ["v1.downloads"]
+}

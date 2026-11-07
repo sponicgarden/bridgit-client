@@ -1,0 +1,20 @@
+{
+  "kind": "question",
+  "title": "Is this you signing in to GitHub?",
+  "text": "Chrome on Windows, Warsaw, Poland. Just now (21:03).\n\nIf you don’t answer in 5 minutes I’ll block it.",
+  "priority": "urgent",
+  "expires_in_seconds": 300,
+  "controls": [
+    {
+      "type": "button",
+      "id": "allow",
+      "label": "Yes, that’s me",
+      "style": "primary"
+    },
+    {
+      "type": "button",
+      "id": "block",
+      "label": "No, block it"
+    }
+  ]
+}

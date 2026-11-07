@@ -1,0 +1,60 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_app_foreground_targets",
+  "idempotency_required": false,
+  "documentation": "https://bridgit.cc/learn/operations/v2-app.foreground.targets.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-app.foreground.targets.json",
+  "required_arguments": [],
+  "http": {
+   "path": "/v2/call",
+   "headers": {"Authorization": "Bearer <your key>"},
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "description": "Discover Bridgit screens, your cards, installed applet pages and consumer portals available to this control agent. No navigation or capture.",
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {},
+    "required": []
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": ["tool"],
+    "properties": {
+     "arguments": {
+      "description": "Discover Bridgit screens, your cards, installed applet pages and consumer portals available to this control agent. No navigation or capture.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {},
+      "required": []
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["app.foreground.targets"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "description": "Discover Bridgit screens, your cards, installed applet pages and consumer portals available to this control agent. No navigation or capture.",
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_app_foreground_targets"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "app.foreground.targets"
+ }
+}

@@ -1,0 +1,47 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Revoke a connection and cancel queued sends/callback delivery; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "owner_configuration_connections_delete",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/owner/configuration/connections/{id} ",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/connections/{id}",
+  "capability": "owner_features",
+  "returns": "safe metadata,enabled=false; historical record retained as in native UI",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/connections/{id}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

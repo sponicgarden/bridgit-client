@@ -1,0 +1,60 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Decode a fresh frame directly from a local camera",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_cameras_snapshot",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "camera",
+    "description": "Configured camera id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "raw",
+    "description": "1 returns JPEG bytes",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "store",
+    "description": "memory, files, upload; subject to owner policy",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/lan-cameras/snapshot {\"camera\":\"lan:example\",\"raw\":1}",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/snapshot",
+  "capability": "lan_camera",
+  "returns": "640×360 JPEG; raw bytes or data_base64, mime, width_px, height_px, captured_at",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "store": {
+     "description": "memory, files, upload; subject to owner policy",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "camera": {
+     "description": "Configured camera id",
+     "type": "string"
+    }
+   },
+   "required": ["camera"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

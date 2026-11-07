@@ -1,0 +1,117 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_alert_trigger",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-alert.trigger.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-alert.trigger.json",
+  "required_arguments": [
+   "idempotency_key",
+   "destinations",
+   "text"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "destinations": {
+      "minItems": 1,
+      "maxItems": 3,
+      "description": "1-3 owner-approved destination ids",
+      "type": "array",
+      "items": {"type": "string"}
+     },
+     "text": {
+      "type": "string",
+      "maxLength": 1024
+     }
+    },
+    "required": [
+     "destinations",
+     "text"
+    ]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "destinations": {
+        "minItems": 1,
+        "maxItems": 3,
+        "description": "1-3 owner-approved destination ids",
+        "type": "array",
+        "items": {"type": "string"}
+       },
+       "text": {
+        "type": "string",
+        "maxLength": 1024
+       }
+      },
+      "required": [
+       "destinations",
+       "text"
+      ]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["alert.trigger"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "destinations": {
+     "minItems": 1,
+     "maxItems": 3,
+     "description": "1-3 owner-approved destination ids",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    },
+    "text": {
+     "type": "string",
+     "maxLength": 1024
+    }
+   },
+   "required": [
+    "idempotency_key",
+    "destinations",
+    "text"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_alert_trigger"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "alert.trigger"
+ }
+}

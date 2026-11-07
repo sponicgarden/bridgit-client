@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Max Agentic Control on/off confirm (PowersFragment.confirmMaximum / confirmAllOff), in the welcome page's look:
+     badge, title, short lead, accent line, a shaded panel of short points (rows added in code), then the amber
+     Warning card. The dialog's own buttons sit under it. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fadingEdgeLength="16dp"
+    android:requiresFadingEdge="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="4dp">
+
+        <!-- Bolt badge beside the title, centred, so the heading takes one line. -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/design_bg_icon_bolt">
+
+                <ImageView
+                    android:id="@+id/badge"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_bolt"
+                    app:tint="@color/firstrun_amber" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:accessibilityHeading="true"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="-0.01"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center_horizontal"
+            android:textSize="14sp"
+            android:lineSpacingMultiplier="1.05"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <View
+            style="@style/Widget.Bridgit.Rule"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp" />
+
+        <LinearLayout
+            android:id="@+id/points"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/design_bg_panel"
+            android:orientation="vertical"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp" />
+
+        <LinearLayout
+            android:id="@+id/notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="vertical" />
+
+        <!-- Amber Warning card, as on the welcome pages; the bold "Warning" leads the text (set in code). -->
+        <LinearLayout
+            android:id="@+id/warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/firstrun_bg_warn"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="8dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_warning"
+                app:tint="@color/firstrun_amber" />
+
+            <TextView
+                android:id="@+id/warningText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:lineSpacingMultiplier="1.05"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

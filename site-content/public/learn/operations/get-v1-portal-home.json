@@ -1,0 +1,60 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "portal_home",
+  "query": [
+   {
+    "name": "client",
+    "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "client_device",
+    "description": "Optional: the viewing device's model, system and app version, e.g. iPhone 16 Pro · iOS 26.1 · Portal 1.4 (1-80 characters). Shown on the phone's Linked devices",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "client_type",
+    "description": "Optional: the viewing device's kind: phone, tablet, computer, tv, watch or camera. Shown on the phone's Linked devices",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/portal/home",
+  "idempotent": false,
+  "path": "/v1/portal/home",
+  "capability": "portal",
+  "returns": "device{name, manufacturer, model, android, api_level, app_version, type (phone or tablet), device_type (phone, tablet, computer, tv, watch or camera)}, battery{percent, charging}, connections{tailscale, adb, relay, wifi: connected|disconnected}, paused, features[{id, name, title, group, icon, state: on|off|blocked, summary}], listening[ids], agents_count (control agents, not portal viewers), nav[{id, title, icon, section: tab|more}], scene{options, paused, listening, home_status} (what the phone's Home feeds assets/diagnostics/scene.html)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "client_device": {
+     "description": "Optional: the viewing device's model, system and app version, e.g. iPhone 16 Pro · iOS 26.1 · Portal 1.4 (1-80 characters). Shown on the phone's Linked devices",
+     "type": "string"
+    },
+    "client": {
+     "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+     "type": "string"
+    },
+    "client_type": {
+     "description": "Optional: the viewing device's kind: phone, tablet, computer, tv, watch or camera. Shown on the phone's Linked devices",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

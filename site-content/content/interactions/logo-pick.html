@@ -1,0 +1,146 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f6f4f0;color:#151515;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 28px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#6b6358;margin:0 0 6px}
+h1{font-size:24px;line-height:1.2;margin:0 0 6px;letter-spacing:-.02em;font-weight:700}
+.sub{color:#5c554c;font-size:15px;margin:0 0 16px}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.bar span{font-size:14px;color:#5c554c}
+.sw{font:inherit;font-size:14px;font-weight:600;border:1px solid #e3ddd2;background:#fff;color:#151515;border-radius:999px;min-height:48px;padding:0 14px 0 8px;display:inline-flex;align-items:center;gap:10px;cursor:pointer}
+.sw i{width:40px;height:24px;border-radius:999px;background:#d9d2c5;position:relative;transition:background .18s}
+.sw i:after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .18s}
+.sw.on i{background:#151515}.sw.on i:after{transform:translateX(16px)}
+.tiles{display:flex;flex-direction:column;gap:12px;margin-bottom:22px}
+.tile{position:relative;font:inherit;width:100%;border:2px solid #e8e2d7;background:#fff;border-radius:18px;padding:22px 16px 14px;cursor:pointer;text-align:left;color:#151515;box-shadow:0 2px 10px rgba(60,45,20,.05);transition:border-color .18s,background .18s,transform .1s,box-shadow .18s}
+.tile:active,.chip:active,.main:active{transform:scale(.98)}
+.tile.on{border-color:#151515;box-shadow:0 8px 24px rgba(21,21,21,.12)}
+.tile svg{display:block;width:100%;height:96px}
+.tile .lab{display:block;margin-top:10px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6b6358}
+.tile .ok{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:#151515;color:#fff;display:grid;place-content:center;font-size:15px;font-weight:800;opacity:0;transform:scale(.6);transition:all .18s}
+.tile.on .ok{opacity:1;transform:none}
+.dark .tile{background:#1b1b1b;border-color:#2e2e2e}
+.dark .tile.on{border-color:#f6f4f0}
+.dark .tile .lab{color:#b8b0a3}
+.dark .tile .ok{background:#f6f4f0;color:#151515}
+.ink{fill:#151515}.dark .ink{fill:#f6f4f0}
+.fern{fill:#1f5c3a}.dark .fern{fill:#7fc79a}
+.terra{fill:#b4532a}.dark .terra{fill:#e08a5f}
+.wordc{fill:#fff}
+h2{font-size:15px;margin:0 0 10px}
+h2 small{font-weight:400;color:#6b6358}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{font:inherit;font-size:14.5px;font-weight:600;border:1px solid #e3ddd2;background:#fff;color:#151515;border-radius:999px;min-height:48px;padding:0 16px;cursor:pointer;transition:background .15s,color .15s,border-color .15s,transform .1s}
+.chip.on{background:#151515;border-color:#151515;color:#fff}
+textarea{width:100%;font:inherit;font-size:15px;border:1px solid #e3ddd2;background:#fff;color:#151515;border-radius:14px;padding:12px 14px;min-height:84px;resize:vertical;margin-bottom:20px}
+textarea:focus{outline:2px solid #151515;outline-offset:1px}
+.main{width:100%;font:inherit;font-weight:700;border:0;border-radius:14px;min-height:54px;background:#151515;color:#fff;cursor:pointer;transition:background .15s,transform .1s}
+.main:disabled{background:#cfc8bb;color:#5c554c;cursor:default}
+.alt{width:100%;font:inherit;font-weight:600;border:0;background:none;color:#5c554c;min-height:48px;margin-top:6px;cursor:pointer}
+.status{text-align:center;color:#5c554c;font-size:14px;min-height:20px;margin-top:8px}
+</style>
+<div class="wrap">
+  <p class="eyebrow" id="eyebrow"></p>
+  <h1 id="title"></h1>
+  <p class="sub" id="sub"></p>
+  <div class="bar"><span id="hint"></span><button class="sw" id="dark"><i></i><span id="darkLabel"></span></button></div>
+  <div class="tiles" id="tiles">
+    <button class="tile" data-id="A"><span class="ok">✓</span>
+      <svg viewBox="0 0 300 96" aria-hidden="true"><circle cx="48" cy="48" r="38" class="fern"/><path d="M48 80 V22" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M48 30 q-14 0 -20 8 q12 2 20 -2zM48 30 q14 0 20 8 q-12 2 -20 -2zM48 44 q-17 0 -24 10 q15 2 24 -3zM48 44 q17 0 24 10 q-15 2 -24 -3zM48 58 q-14 0 -20 9 q12 1 20 -3zM48 58 q14 0 20 9 q-12 1 -20 -3z" fill="#fff"/><text data-k="name" x="102" y="45" class="fern" font-family="Georgia,serif" font-size="26" font-weight="700"></text><text data-k="tag" x="103" y="68" class="fern" font-family="system-ui,sans-serif" font-size="12" letter-spacing="4"></text></svg>
+      <span class="lab"></span></button>
+    <button class="tile" data-id="B"><span class="ok">✓</span>
+      <svg viewBox="0 0 300 96" aria-hidden="true"><path d="M48 8 L70 40 H26Z M48 26 L76 62 H20Z M48 46 L82 84 H14Z" class="ink"/><text data-k="caps" x="102" y="52" class="ink" font-family="system-ui,sans-serif" font-size="24" font-weight="800" letter-spacing="2"></text><text data-k="tag" x="103" y="72" class="ink" font-family="system-ui,sans-serif" font-size="11" letter-spacing="6"></text></svg>
+      <span class="lab"></span></button>
+    <button class="tile" data-id="C"><span class="ok">✓</span>
+      <svg viewBox="0 0 300 96" aria-hidden="true"><rect x="10" y="10" width="76" height="76" rx="20" class="terra"/><text data-k="mono" x="48" y="59" text-anchor="middle" class="wordc" font-family="Georgia,serif" font-size="28" font-style="italic" font-weight="700"></text><text data-k="lower" x="102" y="47" class="terra" font-family="system-ui,sans-serif" font-size="23" font-weight="600"></text><text data-k="tagC" x="103" y="68" class="terra" font-family="Georgia,serif" font-size="14" font-style="italic"></text></svg>
+      <span class="lab"></span></button>
+  </div>
+  <h2 id="whyTitle"></h2>
+  <div class="chips" id="chips"></div>
+  <textarea id="note" maxlength="300" rows="3"></textarea>
+  <button class="main" id="send" disabled></button>
+  <button class="alt" id="none"></button>
+  <div class="status" id="status"></div>
+</div>
+<script>
+// answer.data: {pick:"A"|"B"|"C"|null, reasons:["simple",…], note:"…", checked_dark:true|false}
+// The card's content. Change only this object.
+var CARD = {
+  eyebrow: 'Fern & Pine Studio · Logo round 2',
+  title: 'Which logo should we go with?',
+  sub: 'Three concepts from Ola. Tap the one you like best.',
+  wordmark: {name:'Fern & Pine', caps:'FERN+PINE', lower:'fern & pine', mono:'F&P', tag:'STUDIO', tagC:'design studio'},
+  hint: 'Tap to choose',
+  darkLabel: 'Show on dark',
+  logos: [
+    {id:'A', label:'A · Leaf'},
+    {id:'B', label:'B · Pines'},
+    {id:'C', label:'C · Monogram'}
+  ],
+  whyTitle: 'Why this one?',
+  whyNote: 'pick any',
+  reasons: [
+    {id:'simple', label:'Simple'},
+    {id:'warm', label:'Feels warm'},
+    {id:'works_small', label:'Works small'},
+    {id:'memorable', label:'Memorable'}
+  ],
+  notePlaceholder: 'Anything to change? (optional)',
+  pickFirst: 'Tap a logo first',
+  choose: 'Choose ',
+  noneLabel: 'None of these, try again',
+  sending: 'Sending…',
+  doneText: {pick:'Sent: you picked ', none:'Sent: asking for new ideas'},
+  preview: 'Preview only: open this card in Bridgit to answer.'
+};
+var $ = function(id){return document.getElementById(id)};
+var pick = null, reasons = {}, dark = false, checkedDark = false, sent = false;
+['eyebrow','title','sub','hint','darkLabel','whyTitle'].forEach(function(k){$(k).textContent = CARD[k]});
+var sm = document.createElement('small'); sm.textContent = ' · ' + CARD.whyNote; $('whyTitle').appendChild(sm);
+document.querySelectorAll('text[data-k]').forEach(function(t){ t.textContent = CARD.wordmark[t.getAttribute('data-k')] });
+$('note').placeholder = CARD.notePlaceholder;
+$('none').textContent = CARD.noneLabel;
+var tiles = document.querySelectorAll('.tile');
+tiles.forEach(function(t, i){
+  t.querySelector('.lab').textContent = CARD.logos[i].label;
+  t.onclick = function(){ if (sent) return; pick = t.dataset.id; draw(); };
+});
+CARD.reasons.forEach(function(r){
+  var b = document.createElement('button'); b.className = 'chip'; b.textContent = r.label;
+  b.onclick = function(){ if (sent) return; reasons[r.id] = !reasons[r.id]; b.classList.toggle('on', reasons[r.id]); };
+  $('chips').appendChild(b);
+});
+$('dark').onclick = function(){
+  if (sent) return; dark = !dark; if (dark) checkedDark = true;
+  $('dark').classList.toggle('on', dark); $('tiles').classList.toggle('dark', dark);
+};
+function draw(){
+  tiles.forEach(function(t){ t.classList.toggle('on', t.dataset.id === pick) });
+  $('send').disabled = !pick;
+  $('send').textContent = pick ? CARD.choose + pick : CARD.pickFirst;
+}
+draw();
+var last = 'pick';
+function answer(kind){
+  if (sent) return;
+  var b = window.Bridgit || window.Bridget;
+  if (!b) { $('status').textContent = CARD.preview; return; }
+  sent = true; last = kind;
+  document.querySelectorAll('button,textarea').forEach(function(x){ x.disabled = true });
+  $('status').textContent = CARD.sending;
+  b.respond(JSON.stringify({
+    pick: kind === 'pick' ? pick : null,
+    reasons: CARD.reasons.filter(function(r){ return reasons[r.id] }).map(function(r){ return r.id }),
+    note: $('note').value.trim(),
+    checked_dark: checkedDark
+  }));
+}
+$('send').onclick = function(){ answer('pick') };
+$('none').onclick = function(){ answer('none') };
+document.addEventListener('bridgit:answered', function(e){
+  e.preventDefault();
+  $('title').textContent = '✓ ' + CARD.doneText[last] + (last === 'pick' ? pick : '');
+  $('status').textContent = '';
+  setTimeout(function(){ $('title').scrollIntoView({block:'center'}) }, 400);
+});
+</script>

@@ -1,0 +1,45 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Super agent changes app-owned enabled device features; actual Android consent remains required",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_access_features",
+  "query": [],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [{
+   "name": "changes",
+   "description": "Feature id to boolean from access discovery; validated together before changes",
+   "type": "object",
+   "required": true
+  }],
+  "example": "POST /v1/owner/configuration/access/features {\"changes\":{\"owner.configuration\":true}}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/access/features",
+  "capability": "settings",
+  "returns": "changed,approval_required=false",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "changes": {
+     "description": "Feature id to boolean from access discovery; validated together before changes",
+     "type": "object"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": [
+    "changes",
+    "idempotency_key"
+   ]
+  },
+  "errors": [],
+  "requires": "super_powers"
+ }
+}

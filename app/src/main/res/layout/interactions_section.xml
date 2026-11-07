@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Section label in the Interactions list: "Needs you · 3" above the waiting rows, "Earlier" above the rest.
+     Small-caps section style, the first line inside the section's panel; InteractionsAdapter sets the colour. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/label"
+    style="@style/Widget.Bridgit.SectionHeader"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:accessibilityHeading="true"
+    android:paddingStart="16dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="4dp" />

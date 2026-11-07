@@ -1,0 +1,47 @@
+{
+ "detail_url": "/v1/discover?id=v1.clipboard&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.clipboard.json",
+ "title": "clipboard",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.clipboard.json",
+ "prerequisites": ["Check v1.clipboard supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Queue a five-minute owner approval; never copies until owner taps Copy",
+   "path": "/v1/clipboard",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-clipboard.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-clipboard.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "clipboard_post"
+  },
+  {
+   "summary": "Your clipboard request: pending, copied, denied or expired",
+   "path": "/v1/clipboard/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-clipboard-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-clipboard-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "clipboard_get"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.clipboard",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "act",
+ "capability_ids": ["v1.clipboard"]
+}

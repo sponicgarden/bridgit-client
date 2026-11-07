@@ -1,0 +1,110 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set bounded reference-framing defaults (Fixer Mode)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_cameras_framing_config_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [
+   {
+    "name": "max_moves",
+    "description": "0..24; default 6",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "max_checks",
+    "description": "2..48; default 12",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "timeout_s",
+    "description": "15..300; default 90",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "settle_ms",
+    "description": "1000..5000; default 1500",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "max_step",
+    "description": ".005.. .05",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "max_travel",
+    "description": ".01.. .60",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "min_confidence",
+    "description": ".6.. .99; default .8",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "min_similarity",
+    "description": ".6.. .99; default .75",
+    "type": "number",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/lan-cameras/framing/config {\"max_moves\":6}",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/framing/config",
+  "capability": "lan_camera",
+  "returns": "Updated defaults within immutable hard limits",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "settle_ms": {
+     "description": "1000..5000; default 1500",
+     "type": "integer"
+    },
+    "max_travel": {
+     "description": ".01.. .60",
+     "type": "number"
+    },
+    "timeout_s": {
+     "description": "15..300; default 90",
+     "type": "integer"
+    },
+    "max_step": {
+     "description": ".005.. .05",
+     "type": "number"
+    },
+    "min_similarity": {
+     "description": ".6.. .99; default .75",
+     "type": "number"
+    },
+    "max_moves": {
+     "description": "0..24; default 6",
+     "type": "integer"
+    },
+    "min_confidence": {
+     "description": ".6.. .99; default .8",
+     "type": "number"
+    },
+    "max_checks": {
+     "description": "2..48; default 12",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": "fixer_mode"
+ }
+}

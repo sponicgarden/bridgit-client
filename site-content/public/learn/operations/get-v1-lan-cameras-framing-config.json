@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Reference framing defaults, hard limits and retention",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_cameras_framing_config_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan-cameras/framing/config",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/framing/config",
+  "capability": "lan_camera",
+  "returns": "limits, framing, calibration, hold, retention; no credentials",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

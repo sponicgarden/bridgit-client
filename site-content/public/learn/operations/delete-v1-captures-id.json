@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Forget a capture: drops the memory copy and deletes its phone file (uploads can't be recalled)",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "captures_delete",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/captures/c0123abcd",
+  "idempotent": false,
+  "path": "/v1/captures/{id}",
+  "capability": "captures",
+  "returns": "deleted",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/captures/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

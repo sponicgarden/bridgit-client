@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Applets ⋮ on the Cards tab: Files and Shared used to be extra chips beside the filters (redesign, 4 Nov 2026).
+     Shown and hidden by InteractionsFragment.portalMenuChanged. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/cards_menu_files" android:orderInCategory="90" android:visible="false"
+        android:title="@string/applets_cards_files" app:showAsAction="never" />
+    <item android:id="@+id/cards_menu_shared" android:orderInCategory="91" android:visible="false"
+        android:title="@string/applets_cards_shared" app:showAsAction="never" />
+</menu>

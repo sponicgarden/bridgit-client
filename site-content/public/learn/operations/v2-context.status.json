@@ -1,0 +1,60 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_context_status",
+  "idempotency_required": false,
+  "documentation": "https://bridgit.cc/learn/operations/v2-context.status.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-context.status.json",
+  "required_arguments": [],
+  "http": {
+   "path": "/v2/call",
+   "headers": {"Authorization": "Bearer <your key>"},
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "description": "Read the context vault: durable facts and temporary context with source, confidence and expiry. Unknown and expired values are null. Needs context.read; never acquires location or calls a model.",
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {},
+    "required": []
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": ["tool"],
+    "properties": {
+     "arguments": {
+      "description": "Read the context vault: durable facts and temporary context with source, confidence and expiry. Unknown and expired values are null. Needs context.read; never acquires location or calls a model.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {},
+      "required": []
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["context.status"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "description": "Read the context vault: durable facts and temporary context with source, confidence and expiry. Unknown and expired values are null. Needs context.read; never acquires location or calls a model.",
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_context_status"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "context.status"
+ }
+}

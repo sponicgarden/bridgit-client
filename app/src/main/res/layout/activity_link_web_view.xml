@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Account connection first; manual pairing and privacy details are secondary. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="64dp"
+        app:navigationContentDescription="@string/cd_back"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="@string/link_web_view_title"
+        app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="24dp">
+
+            <!-- How to link: read-only, so the welcome page's gradient panel and accent line. -->
+            <LinearLayout
+                style="@style/Widget.Bridgit.InfoPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="32dp" android:layout_height="32dp"
+                    android:layout_marginBottom="12dp" android:src="@mipmap/ic_launcher"
+                    android:importantForAccessibility="no" />
+                <TextView android:id="@+id/deviceName"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp" android:textAppearance="?attr/textAppearanceTitleMedium" />
+                <TextView
+                    android:id="@+id/steps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/link_web_view_steps"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <TextView android:id="@+id/status"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp" android:textAppearance="?attr/textAppearanceBodyMedium" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/openPortal"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp" android:minHeight="56dp"
+                    android:text="@string/link_web_view_open" />
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/manualSetup"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/link_web_view_manual" />
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/codePanel"
+                android:visibility="gone"
+                style="@style/Widget.Material3.CardView.Filled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                app:cardCornerRadius="24dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/code"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.08"
+                        android:textColor="?attr/colorOnPrimaryContainer"
+                        android:textIsSelectable="true"
+                        android:textSize="40sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/codeNote"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/copy"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/link_web_view_copy"
+                            app:icon="@drawable/ic_copy" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/share"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/link_web_view_share"
+                            app:icon="@drawable/ic_share" />
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/newCode"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/link_web_view_new_code" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="@string/link_web_view_sharing_hint"
+                android:textAppearance="?attr/textAppearanceBodyMedium" android:textColor="?attr/colorOnSurfaceVariant" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/privacyToggle"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/link_web_view_privacy" />
+            <TextView android:id="@+id/privacyDetails"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:visibility="gone" android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/turnOff"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/link_web_view_turn_off" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

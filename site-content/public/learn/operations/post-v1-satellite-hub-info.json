@@ -1,0 +1,95 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Phone to phone: a hub tells its satellite which photo applets and portals it has, and how to call back (only for a hub link's key). Not for agents.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "satellite_hub_info",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "name",
+    "description": "The hub's name",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "device_type",
+    "description": "The hub's kind: phone, tablet, computer, tv, watch or camera",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "port",
+    "description": "The hub's API port",
+    "type": "integer",
+    "required": true
+   },
+   {
+    "name": "key",
+    "description": "The satellite's return key on the hub",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "targets",
+    "description": "The hub's photo applets [{id, name}]",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "portals",
+    "description": "The hub's portals [{id, name, url}]",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/satellite/hub-info {\"name\":\"Kitchen tablet\",\"port\":18471,\"key\":\"<return key>\",\"targets\":[],\"portals\":[]}",
+  "idempotent": false,
+  "path": "/v1/satellite/hub-info",
+  "capability": "status",
+  "returns": "ok",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "port": {
+     "description": "The hub's API port",
+     "type": "integer"
+    },
+    "portals": {
+     "description": "The hub's portals [{id, name, url}]",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "name": {
+     "description": "The hub's name",
+     "type": "string"
+    },
+    "device_type": {
+     "description": "The hub's kind: phone, tablet, computer, tv, watch or camera",
+     "type": "string"
+    },
+    "targets": {
+     "description": "The hub's photo applets [{id, name}]",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "key": {
+     "description": "The satellite's return key on the hub",
+     "type": "string"
+    }
+   },
+   "required": [
+    "port",
+    "key"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

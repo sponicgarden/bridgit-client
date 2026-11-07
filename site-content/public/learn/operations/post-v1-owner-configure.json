@@ -1,0 +1,106 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Apply an app-owned configuration change with the separate owner.configuration grant; Android consent and sign-in still require the owner",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configure",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "action",
+    "description": "Action from GET /v1/owner/features",
+    "type": "string",
+    "required": true,
+    "enum": [
+     "service.model.set",
+     "service.budget.set",
+     "resource.download",
+     "resource.delete",
+     "resource.check",
+     "dog.configure",
+     "applet.configure",
+     "dog.start",
+     "dog.stop",
+     "dog.find_camera",
+     "dog.clear_history",
+     "tour.start",
+     "wake.configure",
+     "sounds.configure",
+     "remote.configure",
+     "callback.configure",
+     "delivery.subscribe",
+     "updates.offers",
+     "updates.install",
+     "android.setup"
+    ]
+   },
+   {
+    "name": "options",
+    "description": "Exact action options from GET /v1/owner/features; unknown fields and all credential fields refused",
+    "type": "object",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/owner/configure {\"action\":\"resource.download\",\"options\":{\"resource\":\"wake-english\"}}",
+  "idempotent": true,
+  "path": "/v1/owner/configure",
+  "capability": "owner_features",
+  "returns": "durable v2 operation: accepted/completed/failed; inspect /v2/operations/{id} or MCP bridgit_operation_get; resource operations return a resource job id",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "options": {
+     "description": "Exact action options from GET /v1/owner/features; unknown fields and all credential fields refused",
+     "type": "object"
+    },
+    "action": {
+     "description": "Action from GET /v1/owner/features",
+     "type": "string",
+     "enum": [
+      "service.model.set",
+      "service.budget.set",
+      "resource.download",
+      "resource.delete",
+      "resource.check",
+      "dog.configure",
+      "applet.configure",
+      "dog.start",
+      "dog.stop",
+      "dog.find_camera",
+      "dog.clear_history",
+      "tour.start",
+      "wake.configure",
+      "sounds.configure",
+      "remote.configure",
+      "callback.configure",
+      "delivery.subscribe",
+      "updates.offers",
+      "updates.install",
+      "android.setup"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": [
+    "action",
+    "options",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "agent_not_allowed",
+   "forbidden"
+  ],
+  "requires": null
+ }
+}

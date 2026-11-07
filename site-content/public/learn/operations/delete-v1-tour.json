@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "End your City tour",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "tour_end",
+  "query": [{
+   "name": "tour_id",
+   "description": "Only end this tour (it must be yours and still running)",
+   "type": "string",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/tour",
+  "idempotent": false,
+  "path": "/v1/tour",
+  "capability": "tour",
+  "returns": "ended",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"tour_id": {
+    "description": "Only end this tour (it must be yours and still running)",
+    "type": "string"
+   }},
+   "required": []
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

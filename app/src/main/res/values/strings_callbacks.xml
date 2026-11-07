@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Callbacks (EVT-05, EVT-06). Kept apart from strings.xml so parallel work doesn't collide. -->
+<resources>
+    <string name="callback_section">Callback URL</string>
+    <string name="callback_not_set">Not set. %1$s reads events with GET /v1/events.</string>
+    <string name="callback_set_to">Sends events to %1$s</string>
+    <string name="callback_hint">Bridgit POSTs this control agent\'s events to the URL, signed with a secret. Only tailnet addresses, unless Allow internet callbacks is on in Settings.</string>
+    <string name="callback_set">Set</string>
+    <string name="callback_change">Change</string>
+    <string name="callback_remove">Remove</string>
+    <string name="callback_dialog_title">Callback URL for %1$s</string>
+    <string name="callback_dialog_hint">http://100.x.y.z:8080/bridgit</string>
+    <string name="callback_dialog_label">URL</string>
+    <string name="callback_next">Next</string>
+    <string name="callback_confirm_title">Send %1$s\'s events here?</string>
+    <string name="callback_confirm_body">Bridgit will POST every event for %1$s to:\n\n%2$s\n\nA new secret is made for it. Any old secret stops working.</string>
+    <string name="callback_save">Save</string>
+    <string name="callback_secret_title">Callback secret for %1$s</string>
+    <string name="callback_secret_body">Give this to %1$s so it can check that events really come from Bridgit. It\'s shown only once. Adding the control agent again or a new key also puts it in the setup prompt.</string>
+    <string name="callback_copy">Copy</string>
+    <string name="callback_done">Done</string>
+    <string name="callback_copied">Secret copied. Bridgit clears the clipboard when you come back.</string>
+    <string name="callback_remove_confirm">Stop sending %1$s\'s events to %2$s? The secret is deleted.</string>
+    <string name="callback_set_log">You set a callback URL for %1$s (%2$s)</string>
+    <string name="callback_removed_log">You removed %1$s\'s callback URL (%2$s)</string>
+
+    <string name="settings_internet_callbacks">Allow internet callbacks</string>
+    <string name="settings_internet_callbacks_desc">Lets a control agent\'s callback URL be a public https:// address. Off: tailnet addresses only.</string>
+    <string name="settings_changed_internet_callbacks">Allow internet callbacks turned %1$s</string>
+</resources>

@@ -1,0 +1,530 @@
+{
+ "about": "Bridgit interaction samples: complete request bodies for POST /v1/interactions, one or more per kind, with the reply and the answer each one produces. Source: site-content/content/samples.json plus the card pages in site-content/public/samples/. scripts/samples.mjs builds site-content/public/samples/samples.json, which the app serves at GET /v1/samples.",
+ "api_revision": 122,
+ "conventions": {
+  "create": "POST /v1/interactions with the sample's request as the JSON body. Reply 201: {\"interaction_id\": <number>, \"status\": \"pending\", \"expires_at\": \"<ISO-8601>\"}.",
+  "wait": "GET /v1/interactions/{interaction_id}?wait=55 returns when the owner answers, closes it, or after 55 s (status still pending). The same answer arrives as an interaction.answered event on GET /v1/events.",
+  "answer_question": "kind=question: answer = {\"button\": <button id or null>, \"values\": {<text or choice control id>: <string>}}.",
+  "answer_html": "kind=html: answer = {\"button\": null, \"values\": {}, \"data\": <the value the page passed to Bridget.respond>}.",
+  "resubmission": "The owner can reopen an answered card and answer again: a new interaction.answered event with \"resubmission\": true and \"previous_answer\".",
+  "html_cards": "An html card runs offline: inline CSS and JS only, pictures as data:image/* URLs, no forms, no network. Bridgit.respond(JSON string) answers once (window.Bridget on 1.6.269 and older) (16 KB max). Bridgit then fires bridgit:answered on document (cancelable; detail = {answer, close_after_ms}); calling preventDefault() lets the card show its own confirmation. The card closes about 5 s later. The CARD object at the top of each sample page holds all its text, so a new card is the same page with a different CARD object.",
+  "progress": "A single card can't be swiped. Progress through a series is the text \"Step n of m\" (the pill in these samples), not Stories-style segment bars, which suggest a swipe that does nothing.",
+  "user_visible_tests": "Always present user-visible tests and connection checks as rich, attractive kind=html cards adapted from the supplied templates; start with html-connection-test for pairing checks. Keep native question samples for API compatibility testing only."
+ },
+ "samples": [
+  {
+   "id": "pieces-status",
+   "kind": "pieces",
+   "title": "Pieces card: live phone status, no HTML",
+   "summary": "A card made of pieces that Bridgit draws in its own style: a header, metric tiles read from one GET call every 5 minutes, a note and a Refresh button. You write no HTML, CSS or script; loading, stale and error states are automatic. Prefer pieces for status panels, lists, photos and tables; use an html card only when pieces can't draw it.",
+   "request": {
+    "kind": "pieces",
+    "title": "Phone status",
+    "fresh_s": 900,
+    "sources": {
+     "battery": {
+      "call": {
+       "method": "GET",
+       "path": "/v1/phone/battery"
+      },
+      "every_s": 300
+     }
+    },
+    "pieces": [
+     {
+      "type": "header",
+      "text": "Your agent keeps this up to date."
+     },
+     {
+      "type": "metrics",
+      "items": [
+       {
+        "label": "Battery",
+        "value": {
+         "$source": "battery.percent"
+        },
+        "format": "number",
+        "unit": "%"
+       },
+       {
+        "label": "Charging",
+        "value": {
+         "$source": "battery.charging"
+        },
+        "format": "yes_no"
+       },
+       {
+        "label": "Temperature",
+        "value": {
+         "$source": "battery.temperature_c"
+        },
+        "format": "celsius"
+       }
+      ]
+     },
+     {
+      "type": "note",
+      "text": "Read from the phone every 5 minutes while the card is open."
+     },
+     {
+      "type": "buttons",
+      "items": [
+       {
+        "label": "Refresh",
+        "style": "primary",
+        "do": {
+         "refresh": true
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "answer": null,
+   "events": [
+    "interaction.seen",
+    "interaction.dismissed"
+   ],
+   "notes": [
+    "Sources may name only your own watches and GET calls you are allowed to make (here: the phone module).",
+    "The same pieces, sources and buttons are what an applet package's ui.card uses; see https://bridgit.cc/learn/builder/applet-packages.md."
+   ]
+  },
+  {
+   "id": "notice",
+   "kind": "notice",
+   "title": "Notice with links, read aloud",
+   "summary": "One-way message. Only link controls (https:, geo:, tel:, mailto: or an app package). No answer.",
+   "request": {
+    "kind": "notice",
+    "title": "Your train leaves in 40 minutes",
+    "text": "Platform 4, coach C, seat 21. It's a 12-minute walk from where you are.",
+    "priority": "urgent",
+    "speak": true,
+    "controls": [
+     {
+      "type": "link",
+      "id": "ticket",
+      "label": "Open the ticket",
+      "url": "https://bridgit.cc/demo/"
+     },
+     {
+      "type": "link",
+      "id": "map",
+      "label": "Walk to the station",
+      "url": "geo:0,0?q=Lisboa+Santa+Apolonia"
+     }
+    ]
+   },
+   "answer": null,
+   "events": [
+    "interaction.seen when the owner opens it (GET then shows status seen and seen_at)",
+    "interaction.dismissed when they close it"
+   ],
+   "notes": [
+    "priority urgent shows a heads-up; speak reads the title and text aloud (silent when the phone is on silent).",
+    "At most 30 notices per hour per agent."
+   ]
+  },
+  {
+   "id": "question-buttons",
+   "kind": "question",
+   "title": "Yes / no question",
+   "summary": "One tap answers it. Up to 6 controls; style primary marks the main button.",
+   "request": {
+    "kind": "question",
+    "title": "Pay the electricity bill?",
+    "text": "EDP, 48.20 EUR, due Friday. Paid from the usual account.",
+    "controls": [
+     {
+      "type": "button",
+      "id": "pay",
+      "label": "Pay it",
+      "style": "primary"
+     },
+     {
+      "type": "button",
+      "id": "later",
+      "label": "Not now"
+     }
+    ],
+    "expires_in_seconds": 3600
+   },
+   "answer": {
+    "button": "pay",
+    "values": {}
+   },
+   "events": [
+    "interaction.answered {\"interaction_id\", \"answer\"}"
+   ],
+   "notes": [
+    "After expires_in_seconds a wait returns status expired, but the owner can still answer late (interaction.answered with \"late\": true)."
+   ]
+  },
+  {
+   "id": "question-form",
+   "kind": "question",
+   "title": "Choice, text box, link and buttons",
+   "summary": "Every control type in one question: choice (2-8 options), text, link and button.",
+   "request": {
+    "kind": "question",
+    "title": "Where should we eat tonight?",
+    "text": "Three places near you with a table at 8.",
+    "controls": [
+     {
+      "type": "choice",
+      "id": "place",
+      "label": "Pick one",
+      "options": [
+       "Taberna da Rua",
+       "Sushi Bar 7",
+       "Pizzeria Luzia"
+      ]
+     },
+     {
+      "type": "text",
+      "id": "note",
+      "label": "Anything to tell them?",
+      "placeholder": "Allergies, a birthday"
+     },
+     {
+      "type": "link",
+      "id": "menu",
+      "label": "See the menus",
+      "url": "https://bridgit.cc/demo/"
+     },
+     {
+      "type": "button",
+      "id": "book",
+      "label": "Book it",
+      "style": "primary"
+     },
+     {
+      "type": "button",
+      "id": "skip",
+      "label": "Cook at home"
+     }
+    ]
+   },
+   "answer": {
+    "button": "book",
+    "values": {
+     "place": "Sushi Bar 7",
+     "note": "One vegetarian"
+    }
+   },
+   "events": [
+    "interaction.answered"
+   ],
+   "notes": [
+    "values only holds the fields the owner filled in. Text answers are up to 2,000 characters."
+   ]
+  },
+  {
+   "id": "question-photo",
+   "kind": "question",
+   "title": "Question with a photo",
+   "summary": "image.data_base64 (a JPEG or PNG, up to 2 MB) or image.gallery_id (from GET /v1/image/last).",
+   "request": {
+    "kind": "question",
+    "title": "Did I see that right?",
+    "text": "I think this is a blue mug on a wooden desk.",
+    "image": {
+     "data_base64": "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"
+    },
+    "speak": true,
+    "controls": [
+     {
+      "type": "button",
+      "id": "yes",
+      "label": "Spot on",
+      "style": "primary"
+     },
+     {
+      "type": "button",
+      "id": "no",
+      "label": "Not quite"
+     },
+     {
+      "type": "text",
+      "id": "actually",
+      "label": "What is it really?",
+      "placeholder": "Optional"
+     }
+    ]
+   },
+   "answer": {
+    "button": "no",
+    "values": {
+     "actually": "A teapot"
+    }
+   },
+   "events": [
+    "interaction.answered"
+   ],
+   "notes": [
+    "Images are for notices and questions; an html card puts its picture in the page as a data:image URL."
+   ]
+  },
+  {
+   "id": "html-agenda",
+   "kind": "html",
+   "title": "HTML card: demo agenda",
+   "summary": "The action card page with a numbered list: the demo's opening card.",
+   "request": {
+    "kind": "html",
+    "title": "Bridgit demo: 6 things, about 5 minutes",
+    "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>Bridgit action card</title>\n<style>\n  * { box-sizing: border-box; }\n  html, body { margin: 0; min-height: 100%; }\n  body {\n    font: 16px/1.45 system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif;\n    color: #f4f1ff;\n    background: radial-gradient(120% 80% at 50% 0%, #3b2a7a 0%, #1a1440 55%, #0c1a2a 100%);\n    min-height: 100vh;\n  }\n  .card { max-width: 440px; margin: 0 auto; padding: 28px 20px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }\n  .pill { margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(255, 196, 92, .16); color: #ffc45c;\n    font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }\n  .medal { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; font-size: 44px;\n    background: radial-gradient(circle at 35% 30%, #ffd27a, #ff7a45 60%, #c2366b);\n    box-shadow: 0 10px 30px rgba(255, 122, 69, .35), inset 0 2px 6px rgba(255, 255, 255, .35); }\n  h1 { margin: 4px 0 0; font-size: 26px; line-height: 1.2; font-weight: 750; }\n  .panel { width: 100%; padding: 14px 16px; border-radius: 18px; text-align: left;\n    background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); }\n  .panel p { margin: 0; color: #e4defa; }\n  .panel ol { margin: 10px 0 0; padding-left: 22px; color: #e4defa; }\n  .panel ol:empty { display: none; }\n  .panel li { margin: 3px 0; }\n  .actions { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }\n  button { font: inherit; font-weight: 650; border-radius: 16px; min-height: 52px; padding: 12px 16px; cursor: pointer;\n    border: 1px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .06); color: #f4f1ff; }\n  button.primary { border: 0; color: #fff; background: linear-gradient(135deg, #ff8a3d, #ff3d77);\n    box-shadow: 0 8px 22px rgba(255, 61, 119, .35); }\n  button.quiet { border: 0; background: none; min-height: 40px; color: #b9b0dc; font-weight: 500; }\n  button:disabled { opacity: .5; }\n  button:active:not(:disabled) { transform: scale(.98); }\n  .status { margin: 2px 0 0; min-height: 1.4em; font-size: 14px; color: #b9b0dc; }\n  .status.error { color: #ff9a9a; }\n</style>\n</head>\n<body>\n<main class=\"card\">\n  <p class=\"pill\" id=\"pill\"></p>\n  <div class=\"medal\" id=\"icon\" aria-hidden=\"true\"></div>\n  <h1 id=\"title\"></h1>\n  <section class=\"panel\"><p id=\"text\"></p><ol id=\"list\"></ol></section>\n  <div class=\"actions\" id=\"actions\"></div>\n  <p class=\"status\" id=\"status\" role=\"status\" aria-live=\"polite\"></p>\n</main>\n<script>\n// The card's content. Change only this object; the script below draws it.\n// Tapping a button answers the card once. The agent reads answer.data = {\"button\": <id>, ...data}.\nvar CARD = /*CARD*/{\n  \"pill\": \"Bridgit demo\",\n  \"icon\": \"✨\",\n  \"title\": \"6 things, about 5 minutes\",\n  \"text\": \"A quick show of what I can do through your phone. Before each one you can tap Do it or Skip.\",\n  \"list\": [\n    \"Flash the light\",\n    \"Back photo: what I see\",\n    \"Front photo: how am I feeling?\",\n    \"Say \\\"Double\\\"\",\n    \"Game: Guess My Story\",\n    \"Rock paper scissors\"\n  ],\n  \"buttons\": [\n    {\n      \"id\": \"start\",\n      \"label\": \"Start\",\n      \"style\": \"primary\"\n    },\n    {\n      \"id\": \"later\",\n      \"label\": \"Not now\",\n      \"style\": \"quiet\"\n    }\n  ],\n  \"data\": {\n    \"step\": 0\n  },\n  \"sending\": \"Starting…\",\n  \"done_title\": \"Here we go\",\n  \"done_text\": \"The first step is on its way.\"\n}/*END CARD*/;\n\n(function () {\n  var $ = function (id) { return document.getElementById(id); };\n  var status = $('status');\n  var buttons = [];\n  $('pill').textContent = CARD.pill || '';\n  $('pill').hidden = !CARD.pill;\n  $('icon').textContent = CARD.icon || '';\n  $('title').textContent = CARD.title || '';\n  $('text').textContent = CARD.text || '';\n  (CARD.list || []).forEach(function (item) {\n    var li = document.createElement('li');\n    li.textContent = item;\n    $('list').appendChild(li);\n  });\n\n  function say(text, isError) {\n    status.textContent = text;\n    status.className = isError ? 'status error' : 'status';\n  }\n  function lock(on) { buttons.forEach(function (b) { b.disabled = on; }); }\n\n  // Bridgit's bridge object; Bridgit 1.6.269 and older only name it window.Bridget.\n  var bridge = window.Bridgit || window.Bridget;\n  var waiting = null;\n\n  function send(id) {\n    if (!bridge || typeof bridge.respond !== 'function') {\n      say('Preview only: open this card in Bridgit to answer.', true);\n      return;\n    }\n    var answer = { button: id };\n    var extra = CARD.data || {};\n    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) answer[k] = extra[k];\n    lock(true);\n    say(CARD.sending || 'Sending…');\n    // A JSON string works on every Bridgit build; Bridgit 1.6.269 and older drop plain objects.\n    bridge.respond(JSON.stringify(answer));\n    // No confirmation after 8 s: let the owner try again.\n    waiting = setTimeout(function () {\n      lock(false);\n      say('Not confirmed yet. Tap again, or close the card.', true);\n    }, 8000);\n  }\n\n  (CARD.buttons || []).forEach(function (spec) {\n    var b = document.createElement('button');\n    b.type = 'button';\n    b.textContent = spec.label;\n    if (spec.style === 'primary' || spec.style === 'quiet') b.className = spec.style;\n    b.addEventListener('click', function () { send(spec.id); });\n    $('actions').appendChild(b);\n    buttons.push(b);\n  });\n\n  // Bridgit fires bridgit:answered on document once the answer is saved. preventDefault() keeps\n  // Bridgit's own confirmation panel away so this card can show its own.\n  document.addEventListener('bridgit:answered', function (event) {\n    event.preventDefault();\n    clearTimeout(waiting);\n    lock(true);\n    $('icon').textContent = '✓';\n    $('title').textContent = CARD.done_title || 'Sent';\n    var ms = event.detail && event.detail.close_after_ms;\n    say((CARD.done_text || '') + (ms ? ' Closing in ' + Math.round(ms / 1000) + ' s.' : ''));\n    // Bridgit shrinks the card a moment after the answer; bring the confirmation back into view then.\n    setTimeout(function () { $('title').scrollIntoView({ block: 'center' }); }, 400);\n  });\n})();\n</script>\n</body>\n</html>\n",
+    "expires_in_seconds": 3600
+   },
+   "answer": {
+    "button": null,
+    "values": {},
+    "data": {
+     "button": "start",
+     "step": 0
+    }
+   },
+   "events": [
+    "interaction.answered"
+   ],
+   "notes": [],
+   "page": "https://bridgit.cc/samples/action-card.html"
+  },
+  {
+   "id": "html-connection-test",
+   "kind": "html",
+   "title": "HTML card: connection test",
+   "summary": "A polished connection check using the shared action-card template. No device action; the owner confirms the answer path.",
+   "request": {
+    "kind": "html",
+    "title": "Bridgit connection check",
+    "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>Bridgit action card</title>\n<style>\n  * { box-sizing: border-box; }\n  html, body { margin: 0; min-height: 100%; }\n  body {\n    font: 16px/1.45 system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif;\n    color: #f4f1ff;\n    background: radial-gradient(120% 80% at 50% 0%, #3b2a7a 0%, #1a1440 55%, #0c1a2a 100%);\n    min-height: 100vh;\n  }\n  .card { max-width: 440px; margin: 0 auto; padding: 28px 20px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }\n  .pill { margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(255, 196, 92, .16); color: #ffc45c;\n    font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }\n  .medal { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; font-size: 44px;\n    background: radial-gradient(circle at 35% 30%, #ffd27a, #ff7a45 60%, #c2366b);\n    box-shadow: 0 10px 30px rgba(255, 122, 69, .35), inset 0 2px 6px rgba(255, 255, 255, .35); }\n  h1 { margin: 4px 0 0; font-size: 26px; line-height: 1.2; font-weight: 750; }\n  .panel { width: 100%; padding: 14px 16px; border-radius: 18px; text-align: left;\n    background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); }\n  .panel p { margin: 0; color: #e4defa; }\n  .panel ol { margin: 10px 0 0; padding-left: 22px; color: #e4defa; }\n  .panel ol:empty { display: none; }\n  .panel li { margin: 3px 0; }\n  .actions { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }\n  button { font: inherit; font-weight: 650; border-radius: 16px; min-height: 52px; padding: 12px 16px; cursor: pointer;\n    border: 1px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .06); color: #f4f1ff; }\n  button.primary { border: 0; color: #fff; background: linear-gradient(135deg, #ff8a3d, #ff3d77);\n    box-shadow: 0 8px 22px rgba(255, 61, 119, .35); }\n  button.quiet { border: 0; background: none; min-height: 40px; color: #b9b0dc; font-weight: 500; }\n  button:disabled { opacity: .5; }\n  button:active:not(:disabled) { transform: scale(.98); }\n  .status { margin: 2px 0 0; min-height: 1.4em; font-size: 14px; color: #b9b0dc; }\n  .status.error { color: #ff9a9a; }\n</style>\n</head>\n<body>\n<main class=\"card\">\n  <p class=\"pill\" id=\"pill\"></p>\n  <div class=\"medal\" id=\"icon\" aria-hidden=\"true\"></div>\n  <h1 id=\"title\"></h1>\n  <section class=\"panel\"><p id=\"text\"></p><ol id=\"list\"></ol></section>\n  <div class=\"actions\" id=\"actions\"></div>\n  <p class=\"status\" id=\"status\" role=\"status\" aria-live=\"polite\"></p>\n</main>\n<script>\n// The card's content. Change only this object; the script below draws it.\n// Tapping a button answers the card once. The agent reads answer.data = {\"button\": <id>, ...data}.\nvar CARD = /*CARD*/{\n  \"pill\": \"Connection check\",\n  \"icon\": \"✨\",\n  \"title\": \"We’re connected\",\n  \"text\": \"Your agent can reach Bridgit. Tap below to confirm your reply makes it back, too.\",\n  \"list\": [],\n  \"buttons\": [\n    {\n      \"id\": \"received\",\n      \"label\": \"Test received\",\n      \"style\": \"primary\"\n    },\n    {\n      \"id\": \"skip\",\n      \"label\": \"Skip\"\n    }\n  ],\n  \"data\": {\n    \"test\": \"connection\"\n  },\n  \"sending\": \"Sending your reply…\",\n  \"done_title\": \"Reply sent\",\n  \"done_text\": \"Your agent can now confirm that the round trip worked.\"\n}/*END CARD*/;\n\n(function () {\n  var $ = function (id) { return document.getElementById(id); };\n  var status = $('status');\n  var buttons = [];\n  $('pill').textContent = CARD.pill || '';\n  $('pill').hidden = !CARD.pill;\n  $('icon').textContent = CARD.icon || '';\n  $('title').textContent = CARD.title || '';\n  $('text').textContent = CARD.text || '';\n  (CARD.list || []).forEach(function (item) {\n    var li = document.createElement('li');\n    li.textContent = item;\n    $('list').appendChild(li);\n  });\n\n  function say(text, isError) {\n    status.textContent = text;\n    status.className = isError ? 'status error' : 'status';\n  }\n  function lock(on) { buttons.forEach(function (b) { b.disabled = on; }); }\n\n  // Bridgit's bridge object; Bridgit 1.6.269 and older only name it window.Bridget.\n  var bridge = window.Bridgit || window.Bridget;\n  var waiting = null;\n\n  function send(id) {\n    if (!bridge || typeof bridge.respond !== 'function') {\n      say('Preview only: open this card in Bridgit to answer.', true);\n      return;\n    }\n    var answer = { button: id };\n    var extra = CARD.data || {};\n    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) answer[k] = extra[k];\n    lock(true);\n    say(CARD.sending || 'Sending…');\n    // A JSON string works on every Bridgit build; Bridgit 1.6.269 and older drop plain objects.\n    bridge.respond(JSON.stringify(answer));\n    // No confirmation after 8 s: let the owner try again.\n    waiting = setTimeout(function () {\n      lock(false);\n      say('Not confirmed yet. Tap again, or close the card.', true);\n    }, 8000);\n  }\n\n  (CARD.buttons || []).forEach(function (spec) {\n    var b = document.createElement('button');\n    b.type = 'button';\n    b.textContent = spec.label;\n    if (spec.style === 'primary' || spec.style === 'quiet') b.className = spec.style;\n    b.addEventListener('click', function () { send(spec.id); });\n    $('actions').appendChild(b);\n    buttons.push(b);\n  });\n\n  // Bridgit fires bridgit:answered on document once the answer is saved. preventDefault() keeps\n  // Bridgit's own confirmation panel away so this card can show its own.\n  document.addEventListener('bridgit:answered', function (event) {\n    event.preventDefault();\n    clearTimeout(waiting);\n    lock(true);\n    $('icon').textContent = '✓';\n    $('title').textContent = CARD.done_title || 'Sent';\n    var ms = event.detail && event.detail.close_after_ms;\n    say((CARD.done_text || '') + (ms ? ' Closing in ' + Math.round(ms / 1000) + ' s.' : ''));\n    // Bridgit shrinks the card a moment after the answer; bring the confirmation back into view then.\n    setTimeout(function () { $('title').scrollIntoView({ block: 'center' }); }, 400);\n  });\n})();\n</script>\n</body>\n</html>\n",
+    "expires_in_seconds": 900
+   },
+   "answer": {
+    "button": null,
+    "values": {},
+    "data": {
+     "button": "received",
+     "test": "connection"
+    }
+   },
+   "events": [
+    "interaction.answered"
+   ],
+   "notes": [
+    "Use this HTML template for pairing checks and user-visible connection tests. Change the wording as needed; preserve the styling and response bridge.",
+    "Wait for the answer and verify data.button is received before reporting that the answer path passed. Skip is not a passing result."
+   ],
+   "page": "https://bridgit.cc/samples/action-card.html"
+  },
+  {
+   "id": "html-step",
+   "kind": "html",
+   "title": "HTML card: step card",
+   "summary": "Step pill, icon medallion, info panel, gradient primary button, Skip and End demo, status line.",
+   "request": {
+    "kind": "html",
+    "title": "Step 1 of 6: Flash the light",
+    "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>Bridgit action card</title>\n<style>\n  * { box-sizing: border-box; }\n  html, body { margin: 0; min-height: 100%; }\n  body {\n    font: 16px/1.45 system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif;\n    color: #f4f1ff;\n    background: radial-gradient(120% 80% at 50% 0%, #3b2a7a 0%, #1a1440 55%, #0c1a2a 100%);\n    min-height: 100vh;\n  }\n  .card { max-width: 440px; margin: 0 auto; padding: 28px 20px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }\n  .pill { margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(255, 196, 92, .16); color: #ffc45c;\n    font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }\n  .medal { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; font-size: 44px;\n    background: radial-gradient(circle at 35% 30%, #ffd27a, #ff7a45 60%, #c2366b);\n    box-shadow: 0 10px 30px rgba(255, 122, 69, .35), inset 0 2px 6px rgba(255, 255, 255, .35); }\n  h1 { margin: 4px 0 0; font-size: 26px; line-height: 1.2; font-weight: 750; }\n  .panel { width: 100%; padding: 14px 16px; border-radius: 18px; text-align: left;\n    background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); }\n  .panel p { margin: 0; color: #e4defa; }\n  .panel ol { margin: 10px 0 0; padding-left: 22px; color: #e4defa; }\n  .panel ol:empty { display: none; }\n  .panel li { margin: 3px 0; }\n  .actions { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }\n  button { font: inherit; font-weight: 650; border-radius: 16px; min-height: 52px; padding: 12px 16px; cursor: pointer;\n    border: 1px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .06); color: #f4f1ff; }\n  button.primary { border: 0; color: #fff; background: linear-gradient(135deg, #ff8a3d, #ff3d77);\n    box-shadow: 0 8px 22px rgba(255, 61, 119, .35); }\n  button.quiet { border: 0; background: none; min-height: 40px; color: #b9b0dc; font-weight: 500; }\n  button:disabled { opacity: .5; }\n  button:active:not(:disabled) { transform: scale(.98); }\n  .status { margin: 2px 0 0; min-height: 1.4em; font-size: 14px; color: #b9b0dc; }\n  .status.error { color: #ff9a9a; }\n</style>\n</head>\n<body>\n<main class=\"card\">\n  <p class=\"pill\" id=\"pill\"></p>\n  <div class=\"medal\" id=\"icon\" aria-hidden=\"true\"></div>\n  <h1 id=\"title\"></h1>\n  <section class=\"panel\"><p id=\"text\"></p><ol id=\"list\"></ol></section>\n  <div class=\"actions\" id=\"actions\"></div>\n  <p class=\"status\" id=\"status\" role=\"status\" aria-live=\"polite\"></p>\n</main>\n<script>\n// The card's content. Change only this object; the script below draws it.\n// Tapping a button answers the card once. The agent reads answer.data = {\"button\": <id>, ...data}.\nvar CARD = /*CARD*/{\n  \"pill\": \"Step 1 of 6\",\n  \"icon\": \"🔦\",\n  \"title\": \"Flash the light\",\n  \"text\": \"I'll blink your phone's light three times. Look at it.\",\n  \"list\": [],\n  \"buttons\": [\n    {\n      \"id\": \"go\",\n      \"label\": \"Do it\",\n      \"style\": \"primary\"\n    },\n    {\n      \"id\": \"skip\",\n      \"label\": \"Skip\"\n    },\n    {\n      \"id\": \"end\",\n      \"label\": \"End demo\",\n      \"style\": \"quiet\"\n    }\n  ],\n  \"data\": {\n    \"step\": 1\n  },\n  \"sending\": \"Got it, one moment…\",\n  \"done_title\": \"Watch the light\",\n  \"done_text\": \"Look at your phone.\"\n}/*END CARD*/;\n\n(function () {\n  var $ = function (id) { return document.getElementById(id); };\n  var status = $('status');\n  var buttons = [];\n  $('pill').textContent = CARD.pill || '';\n  $('pill').hidden = !CARD.pill;\n  $('icon').textContent = CARD.icon || '';\n  $('title').textContent = CARD.title || '';\n  $('text').textContent = CARD.text || '';\n  (CARD.list || []).forEach(function (item) {\n    var li = document.createElement('li');\n    li.textContent = item;\n    $('list').appendChild(li);\n  });\n\n  function say(text, isError) {\n    status.textContent = text;\n    status.className = isError ? 'status error' : 'status';\n  }\n  function lock(on) { buttons.forEach(function (b) { b.disabled = on; }); }\n\n  // Bridgit's bridge object; Bridgit 1.6.269 and older only name it window.Bridget.\n  var bridge = window.Bridgit || window.Bridget;\n  var waiting = null;\n\n  function send(id) {\n    if (!bridge || typeof bridge.respond !== 'function') {\n      say('Preview only: open this card in Bridgit to answer.', true);\n      return;\n    }\n    var answer = { button: id };\n    var extra = CARD.data || {};\n    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) answer[k] = extra[k];\n    lock(true);\n    say(CARD.sending || 'Sending…');\n    // A JSON string works on every Bridgit build; Bridgit 1.6.269 and older drop plain objects.\n    bridge.respond(JSON.stringify(answer));\n    // No confirmation after 8 s: let the owner try again.\n    waiting = setTimeout(function () {\n      lock(false);\n      say('Not confirmed yet. Tap again, or close the card.', true);\n    }, 8000);\n  }\n\n  (CARD.buttons || []).forEach(function (spec) {\n    var b = document.createElement('button');\n    b.type = 'button';\n    b.textContent = spec.label;\n    if (spec.style === 'primary' || spec.style === 'quiet') b.className = spec.style;\n    b.addEventListener('click', function () { send(spec.id); });\n    $('actions').appendChild(b);\n    buttons.push(b);\n  });\n\n  // Bridgit fires bridgit:answered on document once the answer is saved. preventDefault() keeps\n  // Bridgit's own confirmation panel away so this card can show its own.\n  document.addEventListener('bridgit:answered', function (event) {\n    event.preventDefault();\n    clearTimeout(waiting);\n    lock(true);\n    $('icon').textContent = '✓';\n    $('title').textContent = CARD.done_title || 'Sent';\n    var ms = event.detail && event.detail.close_after_ms;\n    say((CARD.done_text || '') + (ms ? ' Closing in ' + Math.round(ms / 1000) + ' s.' : ''));\n    // Bridgit shrinks the card a moment after the answer; bring the confirmation back into view then.\n    setTimeout(function () { $('title').scrollIntoView({ block: 'center' }); }, 400);\n  });\n})();\n</script>\n</body>\n</html>\n",
+    "expires_in_seconds": 900
+   },
+   "answer": {
+    "button": null,
+    "values": {},
+    "data": {
+     "button": "go",
+     "step": 1
+    }
+   },
+   "events": [
+    "interaction.answered"
+   ],
+   "notes": [
+    "For another step change pill, icon, title, text and data.step. For a game round, change the buttons too (e.g. shoot / stop)."
+   ],
+   "page": "https://bridgit.cc/samples/action-card.html"
+  },
+  {
+   "id": "html-photo-check",
+   "kind": "html",
+   "title": "HTML card: photo with a guess",
+   "summary": "A photo, your guess, optional choice chips and text box, and buttons. Values come back in data.values.",
+   "request": {
+    "kind": "html",
+    "title": "Did I see that right?",
+    "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>Bridgit photo card</title>\n<style>\n  * { box-sizing: border-box; }\n  html, body { margin: 0; min-height: 100%; }\n  body {\n    font: 16px/1.45 system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif;\n    color: #f2f7f6;\n    background: radial-gradient(120% 80% at 50% 0%, #11545a 0%, #0f2b3a 55%, #0b1520 100%);\n    min-height: 100vh;\n  }\n  .card { max-width: 440px; margin: 0 auto; padding: 24px 18px; display: flex; flex-direction: column; gap: 14px; }\n  .pill { align-self: center; margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(120, 240, 200, .14);\n    color: #7ff0c8; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }\n  .photo { position: relative; border-radius: 20px; overflow: hidden; background: #0a1a22;\n    box-shadow: 0 12px 30px rgba(0, 0, 0, .35); }\n  .photo img { display: block; width: 100%; max-height: 46vh; object-fit: cover; }\n  .photo:empty { display: none; }\n  h1 { margin: 0; font-size: 24px; line-height: 1.25; text-align: center; }\n  .text { margin: 0; color: #d6e7e4; text-align: center; }\n  .panel { padding: 14px; border-radius: 18px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .13);\n    display: flex; flex-direction: column; gap: 10px; }\n  .panel:empty { display: none; }\n  .label { margin: 0; font-size: 14px; color: #b4cdc9; }\n  .chips { display: flex; flex-wrap: wrap; gap: 8px; }\n  .chip { min-height: 40px; padding: 8px 14px; border-radius: 999px; font: inherit; font-size: 15px;\n    border: 1px solid rgba(255, 255, 255, .25); background: transparent; color: inherit; }\n  .chip[aria-pressed=\"true\"] { background: #7ff0c8; color: #0b1520; border-color: #7ff0c8; font-weight: 650; }\n  input[type=text] { width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 14px; font: inherit;\n    border: 1px solid rgba(255, 255, 255, .25); background: rgba(0, 0, 0, .25); color: inherit; }\n  .actions { display: flex; flex-direction: column; gap: 10px; }\n  button.act { font: inherit; font-weight: 650; border-radius: 16px; min-height: 52px; padding: 12px 16px;\n    border: 1px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .06); color: inherit; }\n  button.act.primary { border: 0; color: #06231d; background: linear-gradient(135deg, #7ff0c8, #3cc7ff);\n    box-shadow: 0 8px 22px rgba(60, 199, 255, .3); }\n  button:disabled { opacity: .5; }\n  .status { margin: 0; min-height: 1.4em; font-size: 14px; color: #b4cdc9; text-align: center; }\n  .status.error { color: #ff9a9a; }\n</style>\n</head>\n<body>\n<main class=\"card\">\n  <p class=\"pill\" id=\"pill\"></p>\n  <div class=\"photo\" id=\"photo\"></div>\n  <h1 id=\"title\"></h1>\n  <p class=\"text\" id=\"text\"></p>\n  <section class=\"panel\" id=\"panel\"></section>\n  <div class=\"actions\" id=\"actions\"></div>\n  <p class=\"status\" id=\"status\" role=\"status\" aria-live=\"polite\"></p>\n</main>\n<script>\n// The card's content. Change only this object; the script below draws it.\n// image: a data:image/jpeg;base64,... URL (cards load nothing from the network).\n// choice / input: optional; their values arrive in answer.data.values by id.\n// Tapping a button answers once: answer.data = {\"button\": <id>, \"values\": {...}, ...data}.\nvar CARD = /*CARD*/{\n  \"pill\": \"Step 2 of 6\",\n  \"image\": \"data:image/jpeg;base64,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\",\n  \"title\": \"Did I see that right?\",\n  \"text\": \"I think this is a blue mug on a wooden desk.\",\n  \"choice\": null,\n  \"input\": {\n    \"id\": \"actually\",\n    \"label\": \"What is it really?\",\n    \"placeholder\": \"Optional\"\n  },\n  \"buttons\": [\n    {\n      \"id\": \"yes\",\n      \"label\": \"Spot on\",\n      \"style\": \"primary\"\n    },\n    {\n      \"id\": \"no\",\n      \"label\": \"Not quite\"\n    }\n  ],\n  \"data\": {\n    \"step\": 2\n  },\n  \"sending\": \"Sending…\",\n  \"done_text\": \"Your answer reached the agent.\",\n  \"done_title\": \"Thanks!\"\n}/*END CARD*/;\n\n(function () {\n  var $ = function (id) { return document.getElementById(id); };\n  var status = $('status');\n  var controls = [];\n  var picked = null;\n  var field = null;\n\n  $('pill').textContent = CARD.pill || '';\n  $('pill').hidden = !CARD.pill;\n  $('title').textContent = CARD.title || '';\n  $('text').textContent = CARD.text || '';\n  if (CARD.image) {\n    var img = document.createElement('img');\n    img.alt = CARD.title || 'Photo';\n    img.src = CARD.image;\n    $('photo').appendChild(img);\n  }\n\n  if (CARD.choice) {\n    var label = document.createElement('p');\n    label.className = 'label';\n    label.textContent = CARD.choice.label;\n    var chips = document.createElement('div');\n    chips.className = 'chips';\n    chips.setAttribute('role', 'group');\n    CARD.choice.options.forEach(function (option) {\n      var chip = document.createElement('button');\n      chip.type = 'button';\n      chip.className = 'chip';\n      chip.textContent = option;\n      chip.setAttribute('aria-pressed', 'false');\n      chip.addEventListener('click', function () {\n        picked = option;\n        chips.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c === chip)); });\n      });\n      chips.appendChild(chip);\n      controls.push(chip);\n    });\n    $('panel').append(label, chips);\n  }\n  if (CARD.input) {\n    var inLabel = document.createElement('label');\n    inLabel.className = 'label';\n    inLabel.textContent = CARD.input.label;\n    field = document.createElement('input');\n    field.type = 'text';\n    field.maxLength = 500;\n    field.placeholder = CARD.input.placeholder || '';\n    inLabel.htmlFor = field.id = 'field';\n    $('panel').append(inLabel, field);\n    controls.push(field);\n  }\n\n  function say(text, isError) { status.textContent = text; status.className = isError ? 'status error' : 'status'; }\n  function lock(on) { controls.forEach(function (c) { c.disabled = on; }); }\n\n  var bridge = window.Bridgit || window.Bridget;\n  var waiting = null;\n\n  function send(id) {\n    if (!bridge || typeof bridge.respond !== 'function') { say('Preview only: open this card in Bridgit to answer.', true); return; }\n    var values = {};\n    if (CARD.choice && picked) values[CARD.choice.id] = picked;\n    if (CARD.input && field.value.trim()) values[CARD.input.id] = field.value.trim();\n    var answer = { button: id, values: values };\n    var extra = CARD.data || {};\n    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) answer[k] = extra[k];\n    lock(true);\n    say(CARD.sending || 'Sending…');\n    bridge.respond(JSON.stringify(answer)); // a JSON string works on every Bridgit build\n    waiting = setTimeout(function () { lock(false); say('Not confirmed yet. Tap again, or close the card.', true); }, 8000);\n  }\n\n  (CARD.buttons || []).forEach(function (spec) {\n    var b = document.createElement('button');\n    b.type = 'button';\n    b.className = spec.style === 'primary' ? 'act primary' : 'act';\n    b.textContent = spec.label;\n    b.addEventListener('click', function () { send(spec.id); });\n    $('actions').appendChild(b);\n    controls.push(b);\n  });\n\n  document.addEventListener('bridgit:answered', function (event) {\n    event.preventDefault(); // this card shows its own confirmation instead of Bridgit's panel\n    clearTimeout(waiting);\n    lock(true);\n    var ms = event.detail && event.detail.close_after_ms;\n    say('✓ ' + (CARD.done_text || 'Sent.') + (ms ? ' Closing in ' + Math.round(ms / 1000) + ' s.' : ''));\n    $('title').textContent = '\\u2713 ' + (CARD.done_title || 'Sent');\n    // Bridgit shrinks the card a moment after the answer; bring the confirmation back into view then.\n    setTimeout(function () { $('title').scrollIntoView({ block: 'center' }); }, 400);\n  });\n})();\n</script>\n</body>\n</html>\n",
+    "expires_in_seconds": 900
+   },
+   "answer": {
+    "button": null,
+    "values": {},
+    "data": {
+     "button": "no",
+     "values": {
+      "actually": "A teapot"
+     },
+     "step": 2
+    }
+   },
+   "events": [
+    "interaction.answered"
+   ],
+   "notes": [
+    "For a pick-one question set choice, e.g. {\"id\": \"feeling\", \"label\": \"How were you really feeling?\", \"options\": [\"Happy\", \"Surprised\", \"Sleepy\", \"Something else\"]}; the pick arrives as data.values.feeling."
+   ],
+   "page": "https://bridgit.cc/samples/photo-card.html"
+  },
+  {
+   "id": "html-rps",
+   "kind": "html",
+   "title": "HTML card: rock paper scissors round",
+   "summary": "The demo's game page: Ready starts a 3, 2, 1, Shoot! countdown, the agent's hand appears as an icon at Shoot!, and the score and last round sit on top.",
+   "request": {
+    "kind": "html",
+    "title": "Rock paper scissors: round 2 of 3",
+    "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>Bridgit rock paper scissors</title>\n<style>\n  * { box-sizing: border-box; }\n  html, body { margin: 0; min-height: 100%; }\n  body {\n    font: 16px/1.45 system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif;\n    color: #f4f1ff;\n    background: radial-gradient(120% 80% at 50% 0%, #3b2a7a 0%, #1a1440 55%, #0c1a2a 100%);\n    min-height: 100vh;\n  }\n  .card { max-width: 440px; margin: 0 auto; padding: 24px 18px 22px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }\n  .pill { margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(255, 196, 92, .16); color: #ffc45c;\n    font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }\n  h1 { margin: 0; font-size: 24px; line-height: 1.2; font-weight: 750; }\n  .score { margin: 0; color: #b9b0dc; font-size: 15px; }\n  .panel { width: 100%; padding: 12px 14px; border-radius: 18px; text-align: left;\n    background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); }\n  #last { display: flex; gap: 12px; align-items: center; }\n  #last[hidden], .panel[hidden] { display: none; }\n  #last img { width: 72px; height: 96px; object-fit: cover; border-radius: 12px; flex: none; }\n  .line { margin: 3px 0; color: #e4defa; font-size: 15px; }\n  .hands { display: flex; justify-content: space-around; align-items: center; text-align: center; }\n  .hand { font-size: 64px; line-height: 1.15; }\n  .who { font-size: 13px; color: #b9b0dc; }\n  #big { margin: 0; font-size: 56px; font-weight: 800; line-height: 1.1; }\n  #big:empty { display: none; }\n  #msg { margin: 0; min-height: 1.4em; font-size: 17px; color: #e4defa; }\n  .actions { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }\n  button { font: inherit; font-weight: 650; border-radius: 16px; min-height: 52px; padding: 12px 16px; cursor: pointer;\n    border: 0; color: #fff; background: linear-gradient(135deg, #ff8a3d, #ff3d77); box-shadow: 0 8px 22px rgba(255, 61, 119, .35); }\n  button.quiet { background: none; box-shadow: none; min-height: 40px; color: #b9b0dc; font-weight: 500; }\n  button:disabled { opacity: .5; }\n  button[hidden] { display: none; }\n</style>\n</head>\n<body>\n<main class=\"card\">\n  <p class=\"pill\" id=\"pill\"></p>\n  <h1 id=\"title\"></h1>\n  <p class=\"score\" id=\"score\"></p>\n  <section class=\"panel\" id=\"last\" hidden><div id=\"lines\"></div></section>\n  <section class=\"panel hands\" id=\"arena\">\n    <div><div class=\"hand\" id=\"you\">❔</div><div class=\"who\">You</div></div>\n    <div class=\"who\">vs</div>\n    <div><div class=\"hand\" id=\"me\">❔</div><div class=\"who\">Me</div></div>\n  </section>\n  <p id=\"big\" aria-live=\"assertive\"></p>\n  <p id=\"msg\" role=\"status\" aria-live=\"polite\"></p>\n  <div class=\"actions\">\n    <button type=\"button\" id=\"go\"></button>\n    <button type=\"button\" class=\"quiet\" id=\"stop\">Stop the game</button>\n  </div>\n</main>\n<script>\n// The round's content. Change only this object; the script below draws it.\n// me: the agent's logged move this round. history: rounds played so far, oldest first.\n// Three rounds in history makes this the final score. Answers: {\"button\": \"ready\"|\"stop\"|\"done\", ...data, \"round\": n}.\nvar CARD = /*CARD*/{\n  \"me\": \"paper\",\n  \"history\": [\n    {\n      \"you\": \"scissors\",\n      \"me\": \"rock\"\n    }\n  ],\n  \"photo\": \"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QCARXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAIdpAAQAAAABAAAATgAAAAAAAABIAAAAAQAAAEgAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAAUCgAwAEAAAAAQAAAMgAAAAA/+0AOFBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAAAAOEJJTQQlAAAAAAAQ1B2M2Y8AsgTpgAmY7PhCfv/AABEIAMgBQAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2wBDAAICAgICAgQCAgQGBAQEBggGBgYGCAoICAgICAoMCgoKCgoKDAwMDAwMDAwODg4ODg4QEBAQEBISEhISEhISEhL/2wBDAQMDAwUEBQgEBAgTDQsNExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExP/3QAEABT/2gAMAwEAAhEDEQA/AP1N30b6q7zRvNeqeRctb6N9Vd5o3mgLlrfRvqrvNG80Bctb6N9Vd5o3mgLlrfRvqrvNG80Bctb6N9Vd5o3mgLlrfRvqrvNG80Bctb6N9Vd5o3mgLlrfRvqrvNG80Bctb6N9Vd5o3mgLlrfRvqrvNG80Bctb6N9Vd5o3mgLlrfRvqrvNG80Bctb6N9Vd5o3mgLlrfRvqrvNG80Bctb6N9Vd5o3mgLlrfRvqrvNG80Bctb6N9Vd5o3mgLlrfRvqrvNG80Bctb6N9Vd5o3mgLn/9D9Ot1G6q+6jdXr2PHLG6jdVfdRuosBY3Ubqr7qN1FgLG6jdVfdRuosBY3Ubqr7qN1FgLG6jdVfdRuosBY3Ubqr7qN1FgLG6jdVfdRuosBY3Ubqr7qN1FgLG6jdVfdRuosBY3Ubqr7qN1FgLG6jdVfdRuosBY3Ubqr7qN1FgLG6jdVfdRuosBY3Ubqr7qN1FgLG6jdVfdRuosBY3Ubqr7qN1FgLG6jdVfdRuosBY3Ubqr7qN1FgLG6jdVfdRuosB//R/SrdRuqvuo3V7B4pY3Ubqr7qN1AFjdRuqvuo3UAWN1G6q+6jdQBY3Ubqr7qN1AFjdRuqvuo3UAWN1G6q+6jdQBY3Ubqr7qN1AFjdRuqvuo3UAWN1G6q+6jdQBY3Ubqr7qN1AFjdRuqvuo3UAWN1G6q+6jdQBY3Ubqr7qN1AFjdRuqvuo3UAWN1G6q+6jdQBY3Ubqr7qN1AFjdRuqvuo3UAWN1G6q+6jdQBY3Ubqr7qN1AH//0v0Z3Ubqg3ijeK9o8In3Ubqg3ijeKAJ91G6oN4o3igCfdRuqDeKN4oAn3Ubqg3ijeKAJ91G6oN4o3igCfdRuqDeKN4oAn3Ubqg3ijeKAJ91G6oN4o3igCfdRuqDeKN4oAn3Ubqg3ijeKAJ91G6oN4o3igCfdRuqDeKN4oAn3Ubqg3ijeKAJ91G6oN4o3igCfdRuqDeKN4oAn3Ubqg3ijeKAJ91G6oN4o3igCfdRuqDeKN4oAn3Ubqg3ijeKAP//T/QjfRvqruo3V7ljwLlrfRvqruo3UWC5a30b6q7qN1FguWt9G+qu6jdRYLlrfRvqruo3UWC5a30b6q7qN1FguWt9G+qu6jdRYLlrfWQP2iv2Um6ax/wCS99/8aq7ur8YIq+m4dyOjmXtfbya5bWtbrfun2ODG4+eF5eSKd+5+yo/aF/ZVPTV//Je+/wDjdSD9oH9lg9NX/wDJe+/+N1+Okfar0de7Pg3CR2nP71/8icDz6t/JH7n/AJn7AD4+fsuHpq3/AJAvf/jdSD48fsvnpqv/AJAvf/jdfkTF1q9H0rknwpho7Tl96/yF/b9b+SP3P/M/WsfHP9mI9NU/8gXv/wAbqQfG79mY9NT/APIF7/8AG6/J6Or0XWuOfDmHjtOX3r/IP7frfyR+5/5n6rD41fs0npqf/kG8/wDjdB1zw14gP9r+D5fO06b/AFL7XXO35W4kAb7wPUfTivy3jr7w+Dhx8ONO/wC23/o568nMMsp4aCnBt621OvBZpUxU3TnFLS+i/wCCer76N9Vd1G6vJsepctb6N9Vd1G6iwXLW+jfVXdRuosFy1vo31V3UbqLBctb6N9Vd1G6iwXLW+jfVXdRuosFy1vo31V3UbqLBctb6N9Vd1G6iwXP/1PvbdRuqvuo3V7p89csbqN1V91G6gLljdRuqvuo3UBcsbqN1V91G6gLljdRuqvuo3UBcsbqN1V91G6gLljdRuqvuo3UBcsbq/GiKv2P3V+OEVffcD/8AMR/27/7ceJnP2Pn+hej7VejqjH2q9HX2NU8Jl6LrV6PpVGLrV6PpXnVSS9HV6LrVGOr0XWvMqgXo6+6vg+cfDrTv+2v/AKOevhWOqlz8Z/iV4TmPh/w/qX2e0t8eXH5ML43jeeXQscsSeTXk4rL6mOXsqTSa11/p9zvy2vGjUcpdv8j9QN1G6vy40z9of4t6b9nT+1PtEVvsGyaKJ96pjh32iQ5AwW3bj1znmvsH4QfHjSviQ50TVIlsNWRQVjDZScBcu0eRkEHJMZyQvILYYr4uNyDE4WDqys0u3Q+go46nUfKtGfQ26jdVfdRurxDruWN1G6q+6jdQFyxuo3VX3UbqAuWN1G6q+6jdQFyxuo3VX3UbqAuWN1G6q+6jdQFyxuo3VX3UbqAuf//V+5t1G6q+8UbxXv2PnCxuo3VX3ijeKLAWN1G6q+8UbxRYCxuo3VX3ijeKLAWN1G6q+8UbxRYCxuo3VX3ijeKLAWN1G6q+8UbxRYCxur8eIq/X/eK/ICKvveCP+X//AG7/AO3Hi5x9j5/oXo+1Xo6ox9qvR19hVPDZei61ej6VRi61ej6V51UkvR1ei61Rjq9F1rzKoF6OvoL4f/BH4feJdCTxR4jtpLy4vc5VpXRI/LZk+QRlD8wAzuLcjjFfPsdfbHwnYD4f6eP+uv8A6NevBzSvUow5qMmm300PSymEZ1WpK+n+RxOv/s0/DHVNOa20e3k0y45KTRyySc4IAZZWYFckEgbWOMBhzXwP4h0LXfAPimbRb5vIvtPkUiSF+hwHR0YYIyCGHQjuAeK/XPeK/P8A/arOfiHZ/wDYOj/9HTVpw7mVepWeHrSck111PTx2HhGHPFWZ9dfCDx3/AMLA8C2usztuu4v9Huu376MDLcKq/OpV8KMDdt7V6dur5X/ZSe4HgW/R1URC/YqwY7ixij3ArtwABtwdxzk8DAJ+oN4r5/M6EaOKqU4bJnbh5udOMmWN1G6q+8UbxXBY2LG6jdVfeKN4osBY3Ubqr7xRvFFgLG6jdVfeKN4osBY3Ubqr7xRvFFgLG6jdVfeKN4osB//W+1N9G+vgFVLHitGCBzXjvjO3/Ln/AMm/+1PWXBd/+X//AJL/APbH3bvo318YW8DAc1qKu0c1m+N7f8uP/Jv/ALUtcD/9P/8AyX/7Y+u99G+vj+WVVFYtzcJQuNr/APLj/wAm/wDtQfBFv+X/AP5L/wDbH21vo318FTSgniqwUseK0XGX/Tj/AMm/+1M3wX/0/wD/ACX/AO2Pv7fRvr4Qggcmt62t2A5qXxrb/lx/5N/9qUuCb/8AL/8A8l/+2PtHfRvr5DRdo5pkkigc1H+u/wD04/8AJv8A7Uv/AFH/AOn/AP5L/wDbH1/vo318T3NwnIrDmlUnArRcaX/5cf8Ak3/2pD4Kt/y//wDJf/tj7031+RUVe7gFjxXhEVfrXhfnP9o/W/c5eXk6335/Jdj4bjHJf7O9j7/Nzc3S23L5vuXo+1Xo6ox9qvR1+l1T4hl6LrV6PpVGLrV6PpXnVSS9HV6LrVGOr0XWvMqgXo6+n/hn8RPBFh4Yh0HUdUt7W7s93mpO4ix5jsy7S+0NxydpOMjOK+YI6838RaJrN5rM1xaWk0sbbcMkbMDhQOCBjrXmV8NQxHuYmpyLvdLX5/M7stdRVX7GPM7f5H6Ia78YvhxoGntqE+rW9zjIWO1kWeRmwSAFQnGcYy2FBxkjNfnZ4+8a6j4/8UXHiTUF8vzMLFEGLLFGowqgn8zgAFiTgZxWRbeGvEN55ZtrKdllxtbYwUhuh3EYx75xXsHg74fro8o1XXdrzrgxxg5VDjOT2LA8DGQOoJOCPPxma5Vw1SniJVVOpayimrvystl3b/4D+nwGT47N6kaUYOMeradl/n5Jf8E+t/gf4PuPBPw/t7O+DLdXjG7mRsjY0gUBMFVIKoqhgc4bdzjFevb6+LLm4TpWDPMp6V+TV+O5YipKtOhq3f4v/tT7uPA6pxUVX2/u/wD2x9476N9fAPLHircMLms/9c/+nP8A5N/9qC4Lv/y//wDJf/tj7z30b6+KLa3fqa2I0Kjms3xtb/lx/wCTf/ami4Iv/wAv/wDyX/7Y+v8AfRvr5Dd1Uc1k3NwgoXG1/wDlx/5N/wDag+CLf8v/APyX/wC2PtLfRvr4QnmU1QPzHitFxl/04/8AJv8A7UzfBf8A0/8A/Jf/ALY+/t9G+vgqGFia27a3ek+NLf8ALj/yb/7UpcFN/wDL/wD8l/8Atj7a30b6+P4oyoqR3VRzWf8Arv8A9OP/ACb/AO1L/wBR/wDp/wD+S/8A2x//10g0wD71aaW8UQ5p8km0cVkXN0wyK/J9ZH6tojTe5iiFZc+pgcCsSe4cmqeS55rWNNdTN1Oxfmv3k6VV/eymrEMANbltaoKbaiJJvcxYbCSTrWxBpgGCa2Y4lUcUPJtHFZuo2aKCRFHbRRCle4ii6Vm3N0w4FYc9y5oUG9wcrG3PqYHC1jzag7nis7LOeatwwAnmtVFIzcmyHMspqzFYyP1rZtrRO9bEcKqOKiVS2xSh3MaDSwPvV8xRV9cO+wcV8jxV+6+CTb+v3/6d/wDt5+V+J6S+q2/v/wDtpej7VejqjH2q9HX7XVPydl6LrV6PpVGLrV6PpXnVSS9HV6LrVGOr0XWvMqgXo67/AEmaOLTY89ef5muAjrcinZbZUHv/ADr8v8S43y+mv76/9JkfoPhq7ZjUf/Tt/wDpUTpZ9TVchax5tRd+lZhZnPNTxQhjzX4qoJH7W5tjS8sp4qaKykkPNa9taJwTWzFAijpSlUtsNQvuYsGl/wB4VrRWccY5q0zBBxWbcXJA4rK7kaWSLzSxRCs+fUkXpWJcXLk9azWdmPNaRp9yJVOxqT6kzcA1QaWWU0sUO481tW1qverbUSNZGTHZySHmtaDSz/FW1DAijpVhiEHFZOo3saKCRTiso4+TU5eKIVTnuWUcVgz3TnvSUW9xuSRuTaki8CsafUmbpWU0jMakiiDda1UEjNzb2P/Q13jDjisu4syeRVODVD3Na8V7HIOa/KLOJ+rXTOYntHB6VQKOhrvDHFKKoz6cjcirVTuQ6fY5iK429a27a9XuapT6aynis5opYjxVNKRN3E7aK4Rx1qVkDjiuIju5IzzWrBqh7ms3Ta2LVRM0LizLDisKezcdq6SK+jk61YKxSikpOO43FM4NkdDU0U+0811M2nI/QVjT6aV5ArVTTM3BrYs296o61tRXKOOtcU0MkZ4p8d1LGaTp32Gp23OovdW0eykEN9dQwORuCyOqnHrgkcV8pxyxDqw/OvR/GHhrVfEuqx31nJEqpEIyJCwOQzHsp45rBi+GWvyf8t7b/vp//iK+74N4tlw3Gt7KCl7TlvdtW5ebt/iPkuJcg/tp01NuPJe1ut7f5GAl1bL96RR+Iq0moWA6zxj/AIEP8a3x8JPEEn/Le2/76f8A+IqGT4N+IjyJrb/vp/8A4ivsZeLtWW9GP3s+XfhxH/n5L7kUo9U00Hm4i/77X/Grkeq6Xj/j5i/77X/Gs6b4OeI16TW//fT/APxFUH+FHiOM/wCtt/8Avp//AIisn4p1Jf8ALqP3sh+HUV/y8l9yOvj1XTP+fmL/AL7X/Gr0eqaZn/j5i/77X/GvP1+GviJD/rrf/vp//iKuxfDrxB3mt/8Avp//AIiuefiVUf8Ay6j97BeHdP8A5+S+5HoCavpQ63UX/fa/41sR6xoX2dS17bg88GVPX615zF8M9ek/5b23/fT/APxFWx8JfEEn/Le2/wC+n/8AiK+a4h4r/tehHD1YqKTvp6Nfqe9w/wAJ/wBkV5YmlJybjy2du6f6HZNruhKf+P63/wC/qf41s210jossbBkYAqwOQQehBry+T4N+IWGfOtv++n/+Ir1mx0KWw0u2spcF4YkRivTKqAcdOK+Nq+zSXLK59lS9o2+aNjRt71RjNbcN0jDrXHvbyRnikS4ljPNc7gnsdCm1ud2drjiqM9ruHFYsGpsOCa2IdQR8ZrNxcS+ZMxbiycHpWW8Loeld3mKUVVmsI5ORVRqdyXT7HHxylDzWvb3gHBNLPphHIrLktpIzxV6SI1iddBdow61b+VxxXBrPLEa0oNSZeCaiVLsaKoupvT2u4cVh3Fk47VrQ6ir8GrwaKUVKbjuNpM4V4XQ0JKUPNdnLYxyDisefTO4FaKonuQ4NbH//0eUBIPFX4JHHSkhs5H5xWzb6cR1r8ulJH6hGLJraRzitZCSOahjt0jHNOeeOMda53rsbrQdKqkc1jXMSVJcaggGAaxZ73eeKuMWRKSIZkXPFU84PFSEvIeKsxWcjnpW+25la+wsEjg1u20r1Db6cerVrx2yxjmsZyRrGLJo2JHNEiqRzTWljjHWs2fUEHANZpN7Ft2I7mJOawp0UVPPfFjxWeWeQ8VvFNGMmmR9DxVyB2FJFaSP2rYt9ObvTlJIUYsmtpHrYjYkc1DFarGOamaWOMVzyd9jZaDpFBHNZFzEnNST6gijg1iT327gVcYsUpIhnRR0qgeDxUrO8h4qWK1kc9K3Wm5jvsELtW7bSvUVvpzdTWxFaqnWsZyRpGLJomJHNSOoI5phkjjFZ89+i8A1mk3saXsMuYkNYM6KKnnv9x4rNaR5DxW8YtGMpIiPB4qzC7DpRHayOela9vpzdxTlJLcUYsltpX6VtRMSOahhtFjHNWC8cYrCTvsbJWHuARzWXcRpinz38ajg1i3GobulOMWKUkQTxoKzmGDxUryvIcCnR20jnpW603MXrsELsDW1bSvxUdvpznqK2YbMIMms5yRpGLJ4nYjmp2AI5pm6OMVRnvo16GsrX2NL2P//S1VijjFRS3SRjinTBscVh3KvX5PFX3P1Zuw+41I9FrHlvJHPBqKYNmoVxnmt1FIxcmyQLJIeavwWBY5NJAyd637dkxSlJocYpkUGnIvWtJYY4xUykY4qGUNisHJs2tYZJcpGOKybjUjzimXSvWJMG71pGCM5SaJZb2R+M1XAkkNRDAPNaMBWtdtjPfcWGxL9a2oNOQckVJbMnatRCMcVjKbNoxREkEcYpslwkY4p8obHFYt0r1KV9xt2FuNSI4Wsea+kc8Gopg1VR15reMUjGUmS/vJDVuGxL9aSApW9bMmBSlJrYcY33GW+mqOTWolvHGOlSoRjimyBscVg5NmyVhjzxxjisqfUcdKS5V8VhTK1aRiiJSaJZr6Rz1qpmSU1F0PNXoCta7bGV77iw2TP1rZg01R1FPtmTitiMjFYymzWMUQx20cY6UrzJGOKkkBI4rHuVkqEr7lPQWfUccLWLNfyPwDUcwbNUu/NdEYoxlJku6SU1Zhs2c802ArW7bMlEpW2CMbjLfTV6mtaO1ijHSpoyuOKVwccVzuTZskkRtKkY4rNn1EL0pLlXwawZ1arjFMmUmiWe/kY9aol5JDUR681bhK1ta2xlds//09GO6ikHWnPDHKKxratuLpX5O1bY/V07mXPpoP3axptPdOgrsm6Vl3HSqhJkyijlCksRqxFevGeakuOtZp61va+5jtsdLb6mOjVrR3cUg61xkPUVtWtYzijSMmzdaKKUVnT6aGGRWhD0FTt0rNNrY0aucfPpzr0FUDHLEa6y471gT963jJsxlFEEV28Z5rXt9THeudbrU0VOUUxRkzs4ryOQVK0cUorBtq3IulYNW2Nk7lGfTlb7tY0+nOvIFdg3Ss246VUZsUoo5FopYjUsd28Z5q3cday3+9Wy13MXo9Dfg1Psa2Ir2OQYJrjIutbNr96s5QRpGTOgKRSiqM+nK2SKtQdKtnpWV2tjS1zkZ9NdegrOaGWI8V189YE/U1vGTZlKKRSjupIzzWtBqeODWC/WnRdapxTIUmdnFfRyDmrJWKUVzltW9B0rnkrbG6dytPp6vyKxp9NdeQK60/dqjcdKcZMUoo454JYzTo7mSM81oXNZMnWt1ruYvTY27fU8cNWxDfxuOTXGR9a17frWcoo0hJs6b91KKpzWCvyKlgq72rK9tjS1zlJ9NYcgVmPbyxmuyn6Vg3P3jW0JNmUoo//Z\",\n  \"note\": \"\",\n  \"data\": {\n    \"step\": 6\n  }\n}/*END CARD*/;\n\n(function () {\n  var ICON = {rock: '✊', paper: '✋', scissors: '✌️'};\n  var BEATS = {rock: 'scissors', paper: 'rock', scissors: 'paper'};\n  var $ = function (id) { return document.getElementById(id); };\n  function add(text) { var p = document.createElement('p'); p.className = 'line'; p.textContent = text; $('lines').appendChild(p); }\n  function win(r) { return r.you === r.me ? 'draw' : BEATS[r.you] === r.me ? 'you' : 'me'; }\n  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }\n  function said(r, n) {\n    var w = win(r);\n    return 'Round ' + n + ': you ' + ICON[r.you] + ' ' + r.you + ', me ' + ICON[r.me] + ' ' + r.me + '. ' +\n      (w === 'draw' ? 'A draw.' : cap(w === 'you' ? r.you : r.me) + ' wins, point to ' + (w === 'you' ? 'you.' : 'me.'));\n  }\n\n  var H = CARD.history || [], s = {you: 0, me: 0, draw: 0}, round = H.length + 1, done = H.length >= 3;\n  H.forEach(function (r) { s[win(r)]++; });\n  $('score').textContent = 'You ' + s.you + ' · Me ' + s.me + (s.draw ? ' · Draws ' + s.draw : '');\n  var box = $('last');\n  if (done) H.forEach(function (r, i) { add(said(r, i + 1)); });\n  else if (H.length) add(said(H[H.length - 1], H.length));\n  if (CARD.note) add(CARD.note);\n  if (CARD.photo && CARD.photo.indexOf('data:image/') === 0) {\n    var im = document.createElement('img');\n    im.src = CARD.photo; im.alt = 'Your last throw';\n    box.insertBefore(im, $('lines'));\n  }\n  box.hidden = !$('lines').childNodes.length;\n\n  // Bridgit's bridge object; Bridgit 1.6.269 and older only name it window.Bridget.\n  var bridge = window.Bridgit || window.Bridget;\n  var sent = '';\n  function send(id) {\n    if (!bridge || typeof bridge.respond !== 'function') { $('msg').textContent = 'Preview only: open this card in Bridgit to play.'; return false; }\n    var answer = {button: id, round: Math.min(round, 3)};\n    var extra = CARD.data || {};\n    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) answer[k] = extra[k];\n    sent = id;\n    // A JSON string works on every Bridgit build.\n    bridge.respond(JSON.stringify(answer));\n    return true;\n  }\n  // Keep the card's own view; Bridgit's confirmation panel would cover the countdown.\n  document.addEventListener('bridgit:answered', function (event) {\n    event.preventDefault();\n    if (sent !== 'ready') $('msg').textContent = 'Thanks for playing!';\n  });\n\n  if (done) {\n    $('pill').textContent = 'Final score';\n    $('title').textContent = 'Game over';\n    $('arena').hidden = true; $('stop').hidden = true;\n    $('big').textContent = s.you > s.me ? 'You win!' : s.me > s.you ? 'I win!' : 'A draw!';\n    $('go').textContent = 'Done';\n    $('go').onclick = function () { if (send('done')) $('go').disabled = true; };\n    return;\n  }\n\n  $('pill').textContent = 'Round ' + round + ' of 3';\n  $('title').textContent = 'Rock paper scissors';\n  $('msg').textContent = 'Tap Ready, then throw on Shoot!';\n  $('go').textContent = 'Ready';\n  $('stop').onclick = function () { if (send('stop')) $('go').disabled = $('stop').disabled = true; };\n  $('go').onclick = function () {\n    if (!send('ready')) return;\n    $('go').hidden = $('stop').hidden = true;\n    $('msg').textContent = 'Get your hand ready…';\n    // The phone starts speaking about 0.4 s after Ready, so the count starts then; then one beat a second.\n    var steps = ['3', '2', '1'], i = 0;\n    function tick() {\n      if (i < steps.length) { $('big').textContent = steps[i++]; setTimeout(tick, 1000); return; }\n      $('big').textContent = 'Shoot!';\n      $('me').textContent = ICON[CARD.me] || '❔';\n      $('you').textContent = '📷';\n      $('msg').textContent = 'I threw ' + CARD.me + '! Hold your hand up until I say Got it.';\n    }\n    setTimeout(tick, 400);\n    // Bridgit shrinks the card a moment after the answer; keep the countdown in view.\n    setTimeout(function () { $('arena').scrollIntoView({block: 'start'}); }, 450);\n  };\n})();\n</script>\n</body>\n</html>\n",
+    "expires_in_seconds": 300
+   },
+   "answer": {
+    "button": null,
+    "values": {},
+    "data": {
+     "button": "ready",
+     "round": 2,
+     "step": 6
+    }
+   },
+   "events": [
+    "interaction.answered"
+   ],
+   "notes": [
+    "The card answers on Ready and keeps counting down; the agent speaks the countdown and takes the photo right after Shoot! (see the demo script, Item 6)."
+   ],
+   "page": "https://bridgit.cc/samples/rps-card.html"
+  },
+  {
+   "id": "html-wrapup",
+   "kind": "html",
+   "title": "HTML card: wrap-up",
+   "summary": "The action card page as the demo's last card: what happened and what next.",
+   "request": {
+    "kind": "html",
+    "title": "Want to see more?",
+    "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>Bridgit action card</title>\n<style>\n  * { box-sizing: border-box; }\n  html, body { margin: 0; min-height: 100%; }\n  body {\n    font: 16px/1.45 system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif;\n    color: #f4f1ff;\n    background: radial-gradient(120% 80% at 50% 0%, #3b2a7a 0%, #1a1440 55%, #0c1a2a 100%);\n    min-height: 100vh;\n  }\n  .card { max-width: 440px; margin: 0 auto; padding: 28px 20px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }\n  .pill { margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(255, 196, 92, .16); color: #ffc45c;\n    font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }\n  .medal { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; font-size: 44px;\n    background: radial-gradient(circle at 35% 30%, #ffd27a, #ff7a45 60%, #c2366b);\n    box-shadow: 0 10px 30px rgba(255, 122, 69, .35), inset 0 2px 6px rgba(255, 255, 255, .35); }\n  h1 { margin: 4px 0 0; font-size: 26px; line-height: 1.2; font-weight: 750; }\n  .panel { width: 100%; padding: 14px 16px; border-radius: 18px; text-align: left;\n    background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); }\n  .panel p { margin: 0; color: #e4defa; }\n  .panel ol { margin: 10px 0 0; padding-left: 22px; color: #e4defa; }\n  .panel ol:empty { display: none; }\n  .panel li { margin: 3px 0; }\n  .actions { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }\n  button { font: inherit; font-weight: 650; border-radius: 16px; min-height: 52px; padding: 12px 16px; cursor: pointer;\n    border: 1px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .06); color: #f4f1ff; }\n  button.primary { border: 0; color: #fff; background: linear-gradient(135deg, #ff8a3d, #ff3d77);\n    box-shadow: 0 8px 22px rgba(255, 61, 119, .35); }\n  button.quiet { border: 0; background: none; min-height: 40px; color: #b9b0dc; font-weight: 500; }\n  button:disabled { opacity: .5; }\n  button:active:not(:disabled) { transform: scale(.98); }\n  .status { margin: 2px 0 0; min-height: 1.4em; font-size: 14px; color: #b9b0dc; }\n  .status.error { color: #ff9a9a; }\n</style>\n</head>\n<body>\n<main class=\"card\">\n  <p class=\"pill\" id=\"pill\"></p>\n  <div class=\"medal\" id=\"icon\" aria-hidden=\"true\"></div>\n  <h1 id=\"title\"></h1>\n  <section class=\"panel\"><p id=\"text\"></p><ol id=\"list\"></ol></section>\n  <div class=\"actions\" id=\"actions\"></div>\n  <p class=\"status\" id=\"status\" role=\"status\" aria-live=\"polite\"></p>\n</main>\n<script>\n// The card's content. Change only this object; the script below draws it.\n// Tapping a button answers the card once. The agent reads answer.data = {\"button\": <id>, ...data}.\nvar CARD = /*CARD*/{\n  \"pill\": \"That's the demo\",\n  \"icon\": \"🎉\",\n  \"title\": \"Want to see more?\",\n  \"text\": \"I flashed your light, saw your desk, read your face, came when you said Double, guessed your story and played a game with you.\",\n  \"list\": [],\n  \"buttons\": [\n    {\n      \"id\": \"more\",\n      \"label\": \"Show me more\",\n      \"style\": \"primary\"\n    },\n    {\n      \"id\": \"setup\",\n      \"label\": \"Set one idea up\"\n    },\n    {\n      \"id\": \"done\",\n      \"label\": \"That's enough\",\n      \"style\": \"quiet\"\n    }\n  ],\n  \"data\": {\n    \"step\": \"wrap-up\"\n  },\n  \"sending\": \"One moment…\",\n  \"done_title\": \"Thanks!\",\n  \"done_text\": \"Your answer reached the agent.\"\n}/*END CARD*/;\n\n(function () {\n  var $ = function (id) { return document.getElementById(id); };\n  var status = $('status');\n  var buttons = [];\n  $('pill').textContent = CARD.pill || '';\n  $('pill').hidden = !CARD.pill;\n  $('icon').textContent = CARD.icon || '';\n  $('title').textContent = CARD.title || '';\n  $('text').textContent = CARD.text || '';\n  (CARD.list || []).forEach(function (item) {\n    var li = document.createElement('li');\n    li.textContent = item;\n    $('list').appendChild(li);\n  });\n\n  function say(text, isError) {\n    status.textContent = text;\n    status.className = isError ? 'status error' : 'status';\n  }\n  function lock(on) { buttons.forEach(function (b) { b.disabled = on; }); }\n\n  // Bridgit's bridge object; Bridgit 1.6.269 and older only name it window.Bridget.\n  var bridge = window.Bridgit || window.Bridget;\n  var waiting = null;\n\n  function send(id) {\n    if (!bridge || typeof bridge.respond !== 'function') {\n      say('Preview only: open this card in Bridgit to answer.', true);\n      return;\n    }\n    var answer = { button: id };\n    var extra = CARD.data || {};\n    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) answer[k] = extra[k];\n    lock(true);\n    say(CARD.sending || 'Sending…');\n    // A JSON string works on every Bridgit build; Bridgit 1.6.269 and older drop plain objects.\n    bridge.respond(JSON.stringify(answer));\n    // No confirmation after 8 s: let the owner try again.\n    waiting = setTimeout(function () {\n      lock(false);\n      say('Not confirmed yet. Tap again, or close the card.', true);\n    }, 8000);\n  }\n\n  (CARD.buttons || []).forEach(function (spec) {\n    var b = document.createElement('button');\n    b.type = 'button';\n    b.textContent = spec.label;\n    if (spec.style === 'primary' || spec.style === 'quiet') b.className = spec.style;\n    b.addEventListener('click', function () { send(spec.id); });\n    $('actions').appendChild(b);\n    buttons.push(b);\n  });\n\n  // Bridgit fires bridgit:answered on document once the answer is saved. preventDefault() keeps\n  // Bridgit's own confirmation panel away so this card can show its own.\n  document.addEventListener('bridgit:answered', function (event) {\n    event.preventDefault();\n    clearTimeout(waiting);\n    lock(true);\n    $('icon').textContent = '✓';\n    $('title').textContent = CARD.done_title || 'Sent';\n    var ms = event.detail && event.detail.close_after_ms;\n    say((CARD.done_text || '') + (ms ? ' Closing in ' + Math.round(ms / 1000) + ' s.' : ''));\n    // Bridgit shrinks the card a moment after the answer; bring the confirmation back into view then.\n    setTimeout(function () { $('title').scrollIntoView({ block: 'center' }); }, 400);\n  });\n})();\n</script>\n</body>\n</html>\n"
+   },
+   "answer": {
+    "button": null,
+    "values": {},
+    "data": {
+     "button": "more",
+     "step": "wrap-up"
+    }
+   },
+   "events": [
+    "interaction.answered"
+   ],
+   "notes": [],
+   "page": "https://bridgit.cc/samples/action-card.html"
+  },
+  {
+   "id": "html-checklist",
+   "kind": "html",
+   "title": "HTML card: checklist and slider mini app",
+   "summary": "Checkboxes, a 1-10 slider and a send button; the answer is structured data.",
+   "request": {
+    "kind": "html",
+    "title": "Packing for Lisbon",
+    "html": "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>Bridgit checklist card</title>\n<style>\n  * { box-sizing: border-box; }\n  html, body { margin: 0; min-height: 100%; }\n  body { font: 16px/1.45 system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif; color: #2a2118;\n    background: linear-gradient(180deg, #fff6e8 0%, #ffe9d2 100%); min-height: 100vh; }\n  .card { max-width: 440px; margin: 0 auto; padding: 24px 18px; display: flex; flex-direction: column; gap: 14px; }\n  header { display: flex; align-items: center; gap: 12px; }\n  .icon { width: 52px; height: 52px; flex: none; border-radius: 16px; display: grid; place-items: center; font-size: 28px;\n    background: linear-gradient(135deg, #ffb057, #ff6b4a); box-shadow: 0 6px 16px rgba(255, 107, 74, .3); }\n  h1 { margin: 0; font-size: 22px; line-height: 1.2; }\n  .sub { margin: 2px 0 0; font-size: 14px; color: #7a6656; }\n  .list { margin: 0; padding: 6px; list-style: none; border-radius: 18px; background: #fff; box-shadow: 0 4px 18px rgba(120, 70, 20, .08); }\n  .list label { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 10px; border-radius: 12px; }\n  .list input { width: 22px; height: 22px; accent-color: #ff6b4a; }\n  .list input:checked + span { text-decoration: line-through; color: #a8968a; }\n  .meter { padding: 14px; border-radius: 18px; background: #fff; box-shadow: 0 4px 18px rgba(120, 70, 20, .08); }\n  .meter p { margin: 0 0 8px; display: flex; justify-content: space-between; font-size: 15px; }\n  .meter b { color: #ff6b4a; }\n  input[type=range] { width: 100%; accent-color: #ff6b4a; }\n  .progress { margin: 0; font-size: 14px; color: #7a6656; text-align: center; }\n  button { font: inherit; font-weight: 650; min-height: 52px; border-radius: 16px; border: 0; color: #fff;\n    background: linear-gradient(135deg, #ff9a3d, #ff4f6d); box-shadow: 0 8px 20px rgba(255, 79, 109, .3); }\n  button:disabled { opacity: .5; }\n  .status { margin: 0; min-height: 1.4em; font-size: 14px; color: #7a6656; text-align: center; }\n  .status.error { color: #c0392b; }\n</style>\n</head>\n<body>\n<main class=\"card\">\n  <header>\n    <div class=\"icon\" id=\"icon\" aria-hidden=\"true\"></div>\n    <div><h1 id=\"title\"></h1><p class=\"sub\" id=\"sub\"></p></div>\n  </header>\n  <ul class=\"list\" id=\"items\"></ul>\n  <section class=\"meter\">\n    <p><span id=\"slider-label\"></span><b id=\"slider-value\"></b></p>\n    <input type=\"range\" id=\"slider\" min=\"1\" max=\"10\" step=\"1\">\n  </section>\n  <p class=\"progress\" id=\"progress\"></p>\n  <button type=\"button\" id=\"send\"></button>\n  <p class=\"status\" id=\"status\" role=\"status\" aria-live=\"polite\"></p>\n</main>\n<script>\n// The card's content. Change only this object.\n// answer.data = {\"button\": \"send\", \"checked\": [...], \"unchecked\": [...], \"<slider.id>\": <1-10>}\nvar CARD = /*CARD*/{\n  \"icon\": \"🧳\",\n  \"title\": \"Packing for Lisbon\",\n  \"subtitle\": \"Tick what's in the bag already.\",\n  \"items\": [\n    \"Passport\",\n    \"Phone charger\",\n    \"Sunglasses\",\n    \"Rain jacket\",\n    \"Train tickets\"\n  ],\n  \"slider\": {\n    \"id\": \"ready\",\n    \"label\": \"How ready do you feel?\",\n    \"value\": 5\n  },\n  \"button\": \"Send to the agent\",\n  \"done_text\": \"Sent. The agent has your list.\",\n  \"done_title\": \"Sent\"\n}/*END CARD*/;\n\n(function () {\n  var $ = function (id) { return document.getElementById(id); };\n  var boxes = [];\n  $('icon').textContent = CARD.icon || '';\n  $('title').textContent = CARD.title || '';\n  $('sub').textContent = CARD.subtitle || '';\n  CARD.items.forEach(function (name) {\n    var li = document.createElement('li');\n    var label = document.createElement('label');\n    var box = document.createElement('input');\n    box.type = 'checkbox';\n    var span = document.createElement('span');\n    span.textContent = name;\n    label.append(box, span);\n    li.appendChild(label);\n    $('items').appendChild(li);\n    boxes.push({ name: name, box: box });\n    box.addEventListener('change', progress);\n  });\n  var slider = $('slider');\n  $('slider-label').textContent = CARD.slider.label;\n  slider.value = CARD.slider.value;\n  function showValue() { $('slider-value').textContent = slider.value + ' / 10'; }\n  slider.addEventListener('input', showValue);\n  showValue();\n  function progress() {\n    var n = boxes.filter(function (b) { return b.box.checked; }).length;\n    $('progress').textContent = n + ' of ' + boxes.length + ' packed';\n  }\n  progress();\n\n  var send = $('send');\n  send.textContent = CARD.button;\n  var status = $('status');\n  function say(text, isError) { status.textContent = text; status.className = isError ? 'status error' : 'status'; }\n  function lock(on) { send.disabled = on; slider.disabled = on; boxes.forEach(function (b) { b.box.disabled = on; }); }\n\n  var bridge = window.Bridgit || window.Bridget;\n  var waiting = null;\n  send.addEventListener('click', function () {\n    if (!bridge || typeof bridge.respond !== 'function') { say('Preview only: open this card in Bridgit to answer.', true); return; }\n    var answer = {\n      button: 'send',\n      checked: boxes.filter(function (b) { return b.box.checked; }).map(function (b) { return b.name; }),\n      unchecked: boxes.filter(function (b) { return !b.box.checked; }).map(function (b) { return b.name; })\n    };\n    answer[CARD.slider.id] = Number(slider.value);\n    lock(true);\n    say('Sending…');\n    // Bridget.respond takes a JSON string on every build. Answer at most 16 KB, once per card.\n    bridge.respond(JSON.stringify(answer));\n    waiting = setTimeout(function () { lock(false); say('Not confirmed yet. Tap again, or close the card.', true); }, 8000);\n  });\n\n  document.addEventListener('bridgit:answered', function (event) {\n    event.preventDefault();\n    clearTimeout(waiting);\n    lock(true);\n    say('✓ ' + CARD.done_text);\n    $('title').textContent = '\\u2713 ' + (CARD.done_title || 'Sent');\n    setTimeout(function () { $('title').scrollIntoView({ block: 'center' }); }, 400);\n  });\n})();\n</script>\n</body>\n</html>\n"
+   },
+   "answer": {
+    "button": null,
+    "values": {},
+    "data": {
+     "button": "send",
+     "checked": [
+      "Passport",
+      "Sunglasses"
+     ],
+     "unchecked": [
+      "Phone charger",
+      "Rain jacket",
+      "Train tickets"
+     ],
+     "ready": 7
+    }
+   },
+   "events": [
+    "interaction.answered"
+   ],
+   "notes": [],
+   "page": "https://bridgit.cc/samples/checklist-card.html"
+  },
+  {
+   "id": "text-panel",
+   "kind": "text",
+   "title": "Live text panel",
+   "summary": "A panel that scrolls on the phone as text is streamed into it. No controls, no answer.",
+   "request": {
+    "kind": "text",
+    "title": "Sorting your downloads folder"
+   },
+   "calls": [
+    {
+     "method": "POST",
+     "path": "/v1/text/stream",
+     "body": {
+      "interaction_id": "{interaction_id}",
+      "append": "Found 214 files.\n"
+     },
+     "reply": {
+      "interaction_id": 42,
+      "length": 17,
+      "status": "seen",
+      "done": false
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/v1/text/stream",
+     "body": {
+      "interaction_id": "{interaction_id}",
+      "append": "Moved 38 PDFs to Documents/Invoices.\n"
+     },
+     "reply": {
+      "interaction_id": 42,
+      "length": 54,
+      "status": "seen",
+      "done": false
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/v1/text/stream",
+     "body": {
+      "interaction_id": "{interaction_id}",
+      "append": "Done: 214 files sorted.\n",
+      "done": true
+     },
+     "reply": {
+      "interaction_id": 42,
+      "length": 78,
+      "status": "seen",
+      "done": true
+     }
+    }
+   ],
+   "answer": null,
+   "events": [
+    "interaction.seen",
+    "interaction.dismissed when the owner closes it"
+   ],
+   "notes": [
+    "Replies are shown for a panel whose interaction_id is 42; interaction_id may be sent as a string or a number. status is pending until the owner opens the panel, then seen.",
+    "Up to 16 KB per append; the panel keeps the last 200 KB.",
+    "After done: true another append gets 409 {\"error\":\"conflict\",\"message\":\"This text panel is finished (done was sent); create a new one.\"}."
+   ]
+  }
+ ]
+}

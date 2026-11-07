@@ -1,0 +1,57 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Watch activity on the selected monitoring phone for one approved registry edition. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "portal_applets_watches",
+  "query": [
+   {
+    "name": "template",
+    "description": "Exact registry key",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "revision",
+    "description": "Approved registry revision",
+    "type": "integer",
+    "required": true
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/portal/applets/watches?template=room-change-watcher&revision=1",
+  "idempotent": false,
+  "path": "/v1/portal/applets/watches",
+  "capability": "portal",
+  "returns": "template, revision, watches[{key,state:scheduled|paused|budget_paused|blocked|ended,checks?,matches?,last_check_at?,last_outcome?:error|skipped|match|no_match|checked}]. Declared status sources add recent_checks[{at,matched?|outcome?}]; tally sources add tally{today{checks,watched_minutes,labels},episodes[{start,label,minutes}]}, newest 20 from the last day.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "template": {
+     "description": "Exact registry key",
+     "type": "string"
+    },
+    "revision": {
+     "description": "Approved registry revision",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "template",
+    "revision"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "not_found",
+   "agent_not_allowed"
+  ],
+  "requires": null
+ }
+}

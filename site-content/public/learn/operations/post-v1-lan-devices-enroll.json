@@ -1,0 +1,118 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Verify a supported device with authorized credentials and enroll it for this agent",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_devices_enroll",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "host",
+    "description": "Direct LAN literal IPv4",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "adapter",
+    "description": "Supported adapter",
+    "type": "string",
+    "required": true,
+    "enum": [
+     "shelly_gen1",
+     "openwrt_ubus",
+     "tapo_onvif"
+    ]
+   },
+   {
+    "name": "name",
+    "description": "Owner's device label, 1..60 chars",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "username",
+    "description": "Authorized local device/router account",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "password",
+    "description": "Authorized local password, never returned",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "talk_cloud_password",
+    "description": "Optional separate authorized Tapo cloud password, encrypted privately; passive authentication only, no speaker playback",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "allow_http",
+    "description": "Explicitly permit unencrypted LAN HTTP, including supplied credentials. Default false (HTTPS with normal certificate validation). Required for Tapo ONVIF.",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/lan/devices/enroll {\"host\":\"192.168.1.20\",\"adapter\":\"shelly_gen1\",\"name\":\"Desk lamp\",\"allow_http\":true}",
+  "idempotent": true,
+  "path": "/v1/lan/devices/enroll",
+  "capability": "lan_enrollment",
+  "returns": "Verified enrolled device and safe verification; saved only after successful protocol check. Tapo camera also appears in Devices tab, requiring existing lan_camera permission.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "password": {
+     "description": "Authorized local password, never returned",
+     "type": "string"
+    },
+    "adapter": {
+     "description": "Supported adapter",
+     "type": "string",
+     "enum": [
+      "shelly_gen1",
+      "openwrt_ubus",
+      "tapo_onvif"
+     ]
+    },
+    "host": {
+     "description": "Direct LAN literal IPv4",
+     "type": "string"
+    },
+    "name": {
+     "description": "Owner's device label, 1..60 chars",
+     "type": "string"
+    },
+    "talk_cloud_password": {
+     "description": "Optional separate authorized Tapo cloud password, encrypted privately; passive authentication only, no speaker playback",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "username": {
+     "description": "Authorized local device/router account",
+     "type": "string"
+    },
+    "allow_http": {
+     "description": "Explicitly permit unencrypted LAN HTTP, including supplied credentials. Default false (HTTPS with normal certificate validation). Required for Tapo ONVIF.",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "host",
+    "adapter",
+    "name"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

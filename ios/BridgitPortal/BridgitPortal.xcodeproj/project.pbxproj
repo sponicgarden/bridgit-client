@@ -1,0 +1,767 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		01875F13391D596C35234C40 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE922C061CFB74991543C05 /* AppModel.swift */; };
+		1345229FC302BEE19605B268 /* OwnerPhotos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 132284A34C828037736EF5D7 /* OwnerPhotos.swift */; };
+		1A4149FB629E08DDA86FAC14 /* RelayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89646CBB90CEC1823EB4D2D5 /* RelayClient.swift */; };
+		21FCE6012D1B79FF0B2C6714 /* DevicesViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51DECC4FC96E0B0089EBF67 /* DevicesViews.swift */; };
+		2445CF40C54807EF83DA205D /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = B36C44E044A1CD7C2022CB1D /* OFL.txt */; };
+		31754C5E051ECC29E33AC52F /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CBBD8DDF119C7D47BEB999F /* HomeView.swift */; };
+		34DC7341160D3BD84C929BB5 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6250A3CB4DCA87A7B7AF68 /* SampleData.swift */; };
+		4AAC4EB7B36EA08AC90DF682 /* AppletCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824B6F96B0E630D8E4553148 /* AppletCatalogView.swift */; };
+		4BD795FCD8A415E37C559B68 /* OwnerPhotosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12A0FBD8790DBEAEB1B89D9 /* OwnerPhotosTests.swift */; };
+		4DE6F0BB966B7BE7BF2E73A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F090896BB4BC10B07E10EA7B /* Assets.xcassets */; };
+		53DD45D8E38A95C0BF67B2C2 /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E204ED1DD1F090963DB103 /* ParsingTests.swift */; };
+		6B2E569FF6F879954319AC9B /* PhoneLive.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B36523A8F24C3B710BBAAA /* PhoneLive.swift */; };
+		6B6467A3763C2E1CC5F3792C /* DecisionInstall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A29808EE6C74191C1B4EAA3 /* DecisionInstall.swift */; };
+		714808891549F8D5C09E2558 /* DeviceBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99ADC915FAD87E6DFE062CE7 /* DeviceBar.swift */; };
+		760C0BD829A0C8E1CA319318 /* BridgitAppletRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = E67DEABC9C509CF726EEDD07 /* BridgitAppletRuntime */; };
+		7A577FC925A3DC959CA08350 /* HomeSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE693E8E912929E963FC61B6 /* HomeSceneView.swift */; };
+		7E76D728AE0946AE93FE9059 /* BridgitPortalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1DE18EAE8A3857F195F284 /* BridgitPortalApp.swift */; };
+		8D29479E611A6D11A63AF919 /* PairingClaim.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7456A3BFD3D1386202019B5 /* PairingClaim.swift */; };
+		905ACEB2064CA0CB6FA83070 /* WatchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4CE36A0DE9D586FDC87377 /* WatchModels.swift */; };
+		9398960187A254FAE091910E /* SignInPairViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493F1EF009D9BBCFEB6B1D39 /* SignInPairViews.swift */; };
+		96149A4156C9141E3C68A758 /* AgentsDevicesViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5927F7A45B552A32A98B52F /* AgentsDevicesViews.swift */; };
+		A11CD7CF806E070A463605BB /* AppletCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5FD65D671DE820B87C2E3E /* AppletCardsView.swift */; };
+		A6553405EA17EE59E8B2A10E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E91425A628AF5F9BBDB02B /* Theme.swift */; };
+		B07C3A7F3528CE33C4B27357 /* AppletLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B30F2AC4E9B0492C24096E /* AppletLists.swift */; };
+		B2FBB736FABA1A3347D0E362 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F40C2CFFF50AD759E478A6 /* Keychain.swift */; };
+		B728B9E7E3D951E13DF25FF2 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2726DDC84E8FBF08347A4D3F /* MoreView.swift */; };
+		B8E529562C170F8BEDB8C47E /* AppletPortalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6512D42CC5DD3D70B4F2E387 /* AppletPortalsView.swift */; };
+		BC1F2F1616AA4577D8C9EFED /* CrashReports.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC7DE3FB1100C3CFB68486E /* CrashReports.swift */; };
+		BDC03611F396480D48A10211 /* SignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BBB5BC85681E5435202AF16 /* SignIn.swift */; };
+		D55D65F0B830E9C78DC33A73 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 509E525A16712ED1FD5E96FC /* Sentry */; };
+		D63E2D8B565B618890615A3F /* AppletListsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14787813826F4E880B4216AC /* AppletListsTests.swift */; };
+		E49EC820A6335906F9E6F04E /* Pairing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1C1A974AAA4D8972093FA8 /* Pairing.swift */; };
+		F0CF90F1A05227FF4651FD4E /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 976A65CB1B748876EF4B3087 /* CameraView.swift */; };
+		F48E8CA675CB0CF48FD7023C /* PortalDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FD5FB990663945CAD66D114 /* PortalDevice.swift */; };
+		F7B855844EAF3C643CE68D5C /* WatchClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2DD251E004440CCE4932E /* WatchClient.swift */; };
+		FBFA07AEA3D4D467B658FD5E /* BricolageGrotesque-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 28204902046D40F951B77E0E /* BricolageGrotesque-Bold.ttf */; };
+		FF0FED97EBB05F86644652E8 /* AppletsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D95C0E4FA4F7C304B3F1D0 /* AppletsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1B9119DE9917D4DB58C5BB5D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D44DF11463B6E223DD495E65 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E0F10F7D925A0D6107A0C73D;
+			remoteInfo = BridgitPortal;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		10B2DD251E004440CCE4932E /* WatchClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchClient.swift; sourceTree = "<group>"; };
+		132284A34C828037736EF5D7 /* OwnerPhotos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerPhotos.swift; sourceTree = "<group>"; };
+		14787813826F4E880B4216AC /* AppletListsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletListsTests.swift; sourceTree = "<group>"; };
+		1BBB5BC85681E5435202AF16 /* SignIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignIn.swift; sourceTree = "<group>"; };
+		24F40C2CFFF50AD759E478A6 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
+		2726DDC84E8FBF08347A4D3F /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
+		28204902046D40F951B77E0E /* BricolageGrotesque-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BricolageGrotesque-Bold.ttf"; sourceTree = "<group>"; };
+		3D6250A3CB4DCA87A7B7AF68 /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		3E5FD65D671DE820B87C2E3E /* AppletCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletCardsView.swift; sourceTree = "<group>"; };
+		493F1EF009D9BBCFEB6B1D39 /* SignInPairViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInPairViews.swift; sourceTree = "<group>"; };
+		4A1B0CB527F9EC59565BEE0D /* BridgitPortalTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BridgitPortalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4A29808EE6C74191C1B4EAA3 /* DecisionInstall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionInstall.swift; sourceTree = "<group>"; };
+		4BC7DE3FB1100C3CFB68486E /* CrashReports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReports.swift; sourceTree = "<group>"; };
+		4FD5FB990663945CAD66D114 /* PortalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortalDevice.swift; sourceTree = "<group>"; };
+		588C0AF1519A41A9F212CB8A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		59E91425A628AF5F9BBDB02B /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		64B30F2AC4E9B0492C24096E /* AppletLists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletLists.swift; sourceTree = "<group>"; };
+		6512D42CC5DD3D70B4F2E387 /* AppletPortalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletPortalsView.swift; sourceTree = "<group>"; };
+		75D95C0E4FA4F7C304B3F1D0 /* AppletsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletsView.swift; sourceTree = "<group>"; };
+		7CBBD8DDF119C7D47BEB999F /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		824B6F96B0E630D8E4553148 /* AppletCatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletCatalogView.swift; sourceTree = "<group>"; };
+		89646CBB90CEC1823EB4D2D5 /* RelayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayClient.swift; sourceTree = "<group>"; };
+		89A3CE2F2C4D5EA8745BEF99 /* BridgitPortal.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BridgitPortal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		976A65CB1B748876EF4B3087 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		99ADC915FAD87E6DFE062CE7 /* DeviceBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBar.swift; sourceTree = "<group>"; };
+		A7B36523A8F24C3B710BBAAA /* PhoneLive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLive.swift; sourceTree = "<group>"; };
+		B12A0FBD8790DBEAEB1B89D9 /* OwnerPhotosTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerPhotosTests.swift; sourceTree = "<group>"; };
+		B36C44E044A1CD7C2022CB1D /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
+		B51DECC4FC96E0B0089EBF67 /* DevicesViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesViews.swift; sourceTree = "<group>"; };
+		B5E204ED1DD1F090963DB103 /* ParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsingTests.swift; sourceTree = "<group>"; };
+		B7456A3BFD3D1386202019B5 /* PairingClaim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingClaim.swift; sourceTree = "<group>"; };
+		B8A1E455669DBEF4E11E3DE2 /* BridgitAppletRuntime */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BridgitAppletRuntime; path = ../../apple/BridgitAppletRuntime; sourceTree = SOURCE_ROOT; };
+		BF1DE18EAE8A3857F195F284 /* BridgitPortalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgitPortalApp.swift; sourceTree = "<group>"; };
+		CE4CE36A0DE9D586FDC87377 /* WatchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchModels.swift; sourceTree = "<group>"; };
+		EBE922C061CFB74991543C05 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		F090896BB4BC10B07E10EA7B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F5927F7A45B552A32A98B52F /* AgentsDevicesViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentsDevicesViews.swift; sourceTree = "<group>"; };
+		FB1C1A974AAA4D8972093FA8 /* Pairing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pairing.swift; sourceTree = "<group>"; };
+		FE693E8E912929E963FC61B6 /* HomeSceneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSceneView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		433ED78E79C5E1B427913665 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				760C0BD829A0C8E1CA319318 /* BridgitAppletRuntime in Frameworks */,
+				D55D65F0B830E9C78DC33A73 /* Sentry in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0F519333768B9884520FFF1C /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				64B30F2AC4E9B0492C24096E /* AppletLists.swift */,
+				4BC7DE3FB1100C3CFB68486E /* CrashReports.swift */,
+				24F40C2CFFF50AD759E478A6 /* Keychain.swift */,
+				3D6250A3CB4DCA87A7B7AF68 /* SampleData.swift */,
+				59E91425A628AF5F9BBDB02B /* Theme.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		1639C3CBAE732790EBCF7BE4 /* BridgitPortal */ = {
+			isa = PBXGroup;
+			children = (
+				F090896BB4BC10B07E10EA7B /* Assets.xcassets */,
+				588C0AF1519A41A9F212CB8A /* Info.plist */,
+				B13626D9666A734F3BF153D9 /* App */,
+				A02BFA1C9C1C96B9B6E71AB5 /* Cloud */,
+				5E0518C9825DB4F689C8E58D /* Fonts */,
+				7BF9B9BB27902B37D46A40B4 /* Live */,
+				43668D6565E69CC3D0CA776A /* Relay */,
+				0F519333768B9884520FFF1C /* Support */,
+				2AC2B0843CAA191E52F469F8 /* Views */,
+			);
+			path = BridgitPortal;
+			sourceTree = "<group>";
+		};
+		2AC2B0843CAA191E52F469F8 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F5927F7A45B552A32A98B52F /* AgentsDevicesViews.swift */,
+				3E5FD65D671DE820B87C2E3E /* AppletCardsView.swift */,
+				824B6F96B0E630D8E4553148 /* AppletCatalogView.swift */,
+				6512D42CC5DD3D70B4F2E387 /* AppletPortalsView.swift */,
+				75D95C0E4FA4F7C304B3F1D0 /* AppletsView.swift */,
+				976A65CB1B748876EF4B3087 /* CameraView.swift */,
+				99ADC915FAD87E6DFE062CE7 /* DeviceBar.swift */,
+				B51DECC4FC96E0B0089EBF67 /* DevicesViews.swift */,
+				FE693E8E912929E963FC61B6 /* HomeSceneView.swift */,
+				7CBBD8DDF119C7D47BEB999F /* HomeView.swift */,
+				2726DDC84E8FBF08347A4D3F /* MoreView.swift */,
+				493F1EF009D9BBCFEB6B1D39 /* SignInPairViews.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		2B09E7A8DC836F8D7BDF822C /* BridgitPortalTests */ = {
+			isa = PBXGroup;
+			children = (
+				14787813826F4E880B4216AC /* AppletListsTests.swift */,
+				B12A0FBD8790DBEAEB1B89D9 /* OwnerPhotosTests.swift */,
+				B5E204ED1DD1F090963DB103 /* ParsingTests.swift */,
+			);
+			path = BridgitPortalTests;
+			sourceTree = "<group>";
+		};
+		3E2F158F3E6E80ECB68154F8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				89A3CE2F2C4D5EA8745BEF99 /* BridgitPortal.app */,
+				4A1B0CB527F9EC59565BEE0D /* BridgitPortalTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		43668D6565E69CC3D0CA776A /* Relay */ = {
+			isa = PBXGroup;
+			children = (
+				FB1C1A974AAA4D8972093FA8 /* Pairing.swift */,
+				B7456A3BFD3D1386202019B5 /* PairingClaim.swift */,
+				89646CBB90CEC1823EB4D2D5 /* RelayClient.swift */,
+			);
+			path = Relay;
+			sourceTree = "<group>";
+		};
+		5E0518C9825DB4F689C8E58D /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				28204902046D40F951B77E0E /* BricolageGrotesque-Bold.ttf */,
+				B36C44E044A1CD7C2022CB1D /* OFL.txt */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		7BF9B9BB27902B37D46A40B4 /* Live */ = {
+			isa = PBXGroup;
+			children = (
+				132284A34C828037736EF5D7 /* OwnerPhotos.swift */,
+				A7B36523A8F24C3B710BBAAA /* PhoneLive.swift */,
+				4FD5FB990663945CAD66D114 /* PortalDevice.swift */,
+			);
+			path = Live;
+			sourceTree = "<group>";
+		};
+		8F9C56AA24BAB62B755BBB66 = {
+			isa = PBXGroup;
+			children = (
+				1639C3CBAE732790EBCF7BE4 /* BridgitPortal */,
+				2B09E7A8DC836F8D7BDF822C /* BridgitPortalTests */,
+				AAB01A3A82D97871DC3144B9 /* Packages */,
+				3E2F158F3E6E80ECB68154F8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A02BFA1C9C1C96B9B6E71AB5 /* Cloud */ = {
+			isa = PBXGroup;
+			children = (
+				4A29808EE6C74191C1B4EAA3 /* DecisionInstall.swift */,
+				1BBB5BC85681E5435202AF16 /* SignIn.swift */,
+				10B2DD251E004440CCE4932E /* WatchClient.swift */,
+				CE4CE36A0DE9D586FDC87377 /* WatchModels.swift */,
+			);
+			path = Cloud;
+			sourceTree = "<group>";
+		};
+		AAB01A3A82D97871DC3144B9 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				B8A1E455669DBEF4E11E3DE2 /* BridgitAppletRuntime */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		B13626D9666A734F3BF153D9 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				EBE922C061CFB74991543C05 /* AppModel.swift */,
+				BF1DE18EAE8A3857F195F284 /* BridgitPortalApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AED153E6CCF233871A4BD791 /* BridgitPortalTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 639007A1F4C80DE9746DAE84 /* Build configuration list for PBXNativeTarget "BridgitPortalTests" */;
+			buildPhases = (
+				E40D4241187DF73AD09DBCEC /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FE0A7E5FE0CEC450BF549B4E /* PBXTargetDependency */,
+			);
+			name = BridgitPortalTests;
+			packageProductDependencies = (
+			);
+			productName = BridgitPortalTests;
+			productReference = 4A1B0CB527F9EC59565BEE0D /* BridgitPortalTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E0F10F7D925A0D6107A0C73D /* BridgitPortal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4637B53150E42AF8E6AC9C98 /* Build configuration list for PBXNativeTarget "BridgitPortal" */;
+			buildPhases = (
+				4A086B9DBC336B0A3E4B9055 /* Sources */,
+				A2F70644DB3D2E231BC487F0 /* Copy the APK Home scene */,
+				EEF8B6248D0DEFAF88E6C5C2 /* Copy the APK card library */,
+				BD6420752B2AB283CC408CE9 /* Copy the APK device brand logos */,
+				40CA9E6E26CAC959815E9C6A /* Resources */,
+				433ED78E79C5E1B427913665 /* Frameworks */,
+				F30F5F0BB316FBBF487F3DBD /* Crash reporting address (Sentry DSN) */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BridgitPortal;
+			packageProductDependencies = (
+				E67DEABC9C509CF726EEDD07 /* BridgitAppletRuntime */,
+				509E525A16712ED1FD5E96FC /* Sentry */,
+			);
+			productName = BridgitPortal;
+			productReference = 89A3CE2F2C4D5EA8745BEF99 /* BridgitPortal.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D44DF11463B6E223DD495E65 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					AED153E6CCF233871A4BD791 = {
+						DevelopmentTeam = 9QHUBZYQ86;
+						ProvisioningStyle = Automatic;
+					};
+					E0F10F7D925A0D6107A0C73D = {
+						DevelopmentTeam = 9QHUBZYQ86;
+					};
+				};
+			};
+			buildConfigurationList = 1FE9EFDC50B00A4B808AB014 /* Build configuration list for PBXProject "BridgitPortal" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 8F9C56AA24BAB62B755BBB66;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				26FC1EB53AE829C76322D939 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				EB625449F9922E9F6E8164D8 /* XCLocalSwiftPackageReference "../../apple/BridgitAppletRuntime" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 3E2F158F3E6E80ECB68154F8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E0F10F7D925A0D6107A0C73D /* BridgitPortal */,
+				AED153E6CCF233871A4BD791 /* BridgitPortalTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		40CA9E6E26CAC959815E9C6A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4DE6F0BB966B7BE7BF2E73A6 /* Assets.xcassets in Resources */,
+				FBFA07AEA3D4D467B658FD5E /* BricolageGrotesque-Bold.ttf in Resources */,
+				2445CF40C54807EF83DA205D /* OFL.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A2F70644DB3D2E231BC487F0 /* Copy the APK Home scene */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../../app/src/main/assets/diagnostics/scene.html",
+				"$(SRCROOT)/../../app/src/main/assets/diagnostics/home-status.js",
+				"$(SRCROOT)/../../app/src/main/assets/diagnostics/symbols.woff2",
+				"$(SRCROOT)/../../app/src/main/assets/diagnostics/portal-overlay.js",
+				"$(SRCROOT)/../../app/src/main/assets/diagnostics/devices.html",
+			);
+			name = "Copy the APK Home scene";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/scene.html",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/home-status.js",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/symbols.woff2",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/portal-overlay.js",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/devices.html",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# One source of truth: the same scene files the APK ships (app/src/main/assets/diagnostics):\n# Home's scene and the Devices tab's map.\nset -e\ndest=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/diagnostics\"\nmkdir -p \"$dest\"\ncp \"$SRCROOT/../../app/src/main/assets/diagnostics/scene.html\" \"$SRCROOT/../../app/src/main/assets/diagnostics/home-status.js\" \"$SRCROOT/../../app/src/main/assets/diagnostics/symbols.woff2\" \"$SRCROOT/../../app/src/main/assets/diagnostics/portal-overlay.js\" \"$SRCROOT/../../app/src/main/assets/diagnostics/devices.html\" \"$dest/\"\n";
+		};
+		BD6420752B2AB283CC408CE9 /* Copy the APK device brand logos */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy the APK device brand logos";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The APK's bundled brand logos and catalog (app/src/main/assets/device-brands), next to diagnostics/\n# so the map page's ../device-brands/ paths resolve. Always re-synced; it is a handful of small files.\n# The List draws logos natively, and UIImage can't read SVG, so each SVG is also rendered to PNG\n# (brand-logos/<asset>.png) with macOS Quick Look. Without a render, the app shows the brand's name instead.\nset -e\nsrc=\"$SRCROOT/../../app/src/main/assets/device-brands\"\nres=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nmkdir -p \"$res/device-brands\" \"$res/brand-logos\"\nrsync -a --delete \"$src/\" \"$res/device-brands/\"\n# Each SVG is drawn on a mid-grey backdrop (#808080) first, so white logos survive Quick Look's white page;\n# the app turns that grey back into transparency (BrandImages.trim).\ncache=\"$DERIVED_FILE_DIR/brand-logos\"\nwork=\"$DERIVED_FILE_DIR/brand-logos-src\"\nmkdir -p \"$cache\" \"$work\"\nfor f in \"$src\"/*.svg; do\n  name=\"$(basename \"$f\")\"\n  out=\"$cache/$name.png\"\n  if [ ! -f \"$out\" ] || [ \"$f\" -nt \"$out\" ]; then\n    perl -0pe 's/(<svg\\b[^>]*>)/$1<rect x=\"-100000\" y=\"-100000\" width=\"200000\" height=\"200000\" fill=\"#808080\"\\/>/s' \"$f\" > \"$work/$name\"\n    qlmanage -t -s 256 -o \"$cache\" \"$work/$name\" >/dev/null 2>&1 || echo \"warning: no PNG render for $name\"\n  fi\ndone\nrsync -a --delete \"$cache/\" \"$res/brand-logos/\"\n";
+		};
+		EEF8B6248D0DEFAF88E6C5C2 /* Copy the APK card library */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../../site-content/public/samples/samples.json",
+			);
+			name = "Copy the APK card library";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/samples.json",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Applets › Cards › Library: the same samples file the APK bundles (app/build.gradle.kts copies it too).\nset -e\ncp \"$SRCROOT/../../site-content/public/samples/samples.json\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/samples.json\"\n";
+		};
+		F30F5F0BB316FBBF487F3DBD /* Crash reporting address (Sentry DSN) */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Crash reporting address (Sentry DSN)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Crash reports go only where the builder points them, like the APK (app/build.gradle.kts):\n# BRIDGIT_SENTRY_DSN, or iosSentryDsn in keystore.properties (this checkout or the main one).\n# Empty means no crash reports. The address is never committed.\ndsn=\"${BRIDGIT_SENTRY_DSN:-}\"\nif [ -z \"$dsn\" ]; then\n  common=\"$(git -C \"$SRCROOT\" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)\"\n  for f in \"$SRCROOT/../../keystore.properties\" \"${common%/.git}/keystore.properties\"; do\n    [ -f \"$f\" ] && dsn=\"$(sed -n 's/^iosSentryDsn=//p' \"$f\" | head -1)\" && [ -n \"$dsn\" ] && break\n  done\nfi\n/usr/libexec/PlistBuddy -c \"Set :SentryDSN ${dsn}\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n[ -n \"$dsn\" ] && echo \"Sentry crash reports on\" || echo \"Sentry crash reports off (no DSN)\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4A086B9DBC336B0A3E4B9055 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96149A4156C9141E3C68A758 /* AgentsDevicesViews.swift in Sources */,
+				01875F13391D596C35234C40 /* AppModel.swift in Sources */,
+				A11CD7CF806E070A463605BB /* AppletCardsView.swift in Sources */,
+				4AAC4EB7B36EA08AC90DF682 /* AppletCatalogView.swift in Sources */,
+				B07C3A7F3528CE33C4B27357 /* AppletLists.swift in Sources */,
+				B8E529562C170F8BEDB8C47E /* AppletPortalsView.swift in Sources */,
+				FF0FED97EBB05F86644652E8 /* AppletsView.swift in Sources */,
+				7E76D728AE0946AE93FE9059 /* BridgitPortalApp.swift in Sources */,
+				F0CF90F1A05227FF4651FD4E /* CameraView.swift in Sources */,
+				BC1F2F1616AA4577D8C9EFED /* CrashReports.swift in Sources */,
+				6B6467A3763C2E1CC5F3792C /* DecisionInstall.swift in Sources */,
+				714808891549F8D5C09E2558 /* DeviceBar.swift in Sources */,
+				21FCE6012D1B79FF0B2C6714 /* DevicesViews.swift in Sources */,
+				7A577FC925A3DC959CA08350 /* HomeSceneView.swift in Sources */,
+				31754C5E051ECC29E33AC52F /* HomeView.swift in Sources */,
+				B2FBB736FABA1A3347D0E362 /* Keychain.swift in Sources */,
+				B728B9E7E3D951E13DF25FF2 /* MoreView.swift in Sources */,
+				1345229FC302BEE19605B268 /* OwnerPhotos.swift in Sources */,
+				E49EC820A6335906F9E6F04E /* Pairing.swift in Sources */,
+				8D29479E611A6D11A63AF919 /* PairingClaim.swift in Sources */,
+				6B2E569FF6F879954319AC9B /* PhoneLive.swift in Sources */,
+				F48E8CA675CB0CF48FD7023C /* PortalDevice.swift in Sources */,
+				1A4149FB629E08DDA86FAC14 /* RelayClient.swift in Sources */,
+				34DC7341160D3BD84C929BB5 /* SampleData.swift in Sources */,
+				BDC03611F396480D48A10211 /* SignIn.swift in Sources */,
+				9398960187A254FAE091910E /* SignInPairViews.swift in Sources */,
+				A6553405EA17EE59E8B2A10E /* Theme.swift in Sources */,
+				F7B855844EAF3C643CE68D5C /* WatchClient.swift in Sources */,
+				905ACEB2064CA0CB6FA83070 /* WatchModels.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E40D4241187DF73AD09DBCEC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D63E2D8B565B618890615A3F /* AppletListsTests.swift in Sources */,
+				4BD795FCD8A415E37C559B68 /* OwnerPhotosTests.swift in Sources */,
+				53DD45D8E38A95C0BF67B2C2 /* ParsingTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FE0A7E5FE0CEC450BF549B4E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E0F10F7D925A0D6107A0C73D /* BridgitPortal */;
+			targetProxy = 1B9119DE9917D4DB58C5BB5D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		194BF1016424DCF8F7FC1C47 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 9QHUBZYQ86;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		9568B4795FAD3419D84F1526 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 9QHUBZYQ86;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A43066C2721B7F6E6FC86061 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cc.bridgit.BridgitPortalTests;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bridgit Portal.app/Bridgit Portal";
+				"TEST_HOST[sdk=macosx*]" = "$(BUILT_PRODUCTS_DIR)/Bridgit Portal.app/Contents/MacOS/Bridgit Portal";
+			};
+			name = Release;
+		};
+		A613AA4FFFE87DAC5C708E19 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cc.bridgit.BridgitPortalTests;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bridgit Portal.app/Bridgit Portal";
+				"TEST_HOST[sdk=macosx*]" = "$(BUILT_PRODUCTS_DIR)/Bridgit Portal.app/Contents/MacOS/Bridgit Portal";
+			};
+			name = Debug;
+		};
+		B8325394512D2E169F745AA5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Settings.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = Catalyst.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = BridgitPortal/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cc.bridgit.portal;
+				PRODUCT_NAME = "Bridgit Portal";
+				PROVISIONING_PROFILE_SPECIFIER = "Bridgit Portal App Store";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CE4BC42F950C44B3D6C6CA05 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Settings.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = Catalyst.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = BridgitPortal/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cc.bridgit.portal;
+				PRODUCT_NAME = "Bridgit Portal";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1FE9EFDC50B00A4B808AB014 /* Build configuration list for PBXProject "BridgitPortal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9568B4795FAD3419D84F1526 /* Debug */,
+				194BF1016424DCF8F7FC1C47 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4637B53150E42AF8E6AC9C98 /* Build configuration list for PBXNativeTarget "BridgitPortal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE4BC42F950C44B3D6C6CA05 /* Debug */,
+				B8325394512D2E169F745AA5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		639007A1F4C80DE9746DAE84 /* Build configuration list for PBXNativeTarget "BridgitPortalTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A613AA4FFFE87DAC5C708E19 /* Debug */,
+				A43066C2721B7F6E6FC86061 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		EB625449F9922E9F6E8164D8 /* XCLocalSwiftPackageReference "../../apple/BridgitAppletRuntime" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../apple/BridgitAppletRuntime;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		26FC1EB53AE829C76322D939 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa";
+			requirement = {
+				kind = exactVersion;
+				version = 9.31.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		509E525A16712ED1FD5E96FC /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26FC1EB53AE829C76322D939 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		E67DEABC9C509CF726EEDD07 /* BridgitAppletRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BridgitAppletRuntime;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = D44DF11463B6E223DD495E65 /* Project object */;
+}

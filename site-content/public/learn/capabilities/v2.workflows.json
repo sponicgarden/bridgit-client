@@ -1,0 +1,133 @@
+{
+ "detail_url": "/v1/discover?id=v2.workflows&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v2.workflows.json",
+ "title": "Local workflows",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v2.workflows.json",
+ "prerequisites": ["Check v2.workflows supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_applet_event",
+   "documentation": "https://bridgit.cc/learn/operations/v2-applet.event.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-applet.event.json",
+   "required_arguments": [
+    "idempotency_key",
+    "workflow_id",
+    "event_id",
+    "payload"
+   ],
+   "tool": "applet.event"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_application_event",
+   "documentation": "https://bridgit.cc/learn/operations/v2-application.event.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-application.event.json",
+   "required_arguments": [
+    "idempotency_key",
+    "workflow_id",
+    "event_id",
+    "payload"
+   ],
+   "tool": "application.event"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_workflow_list",
+   "documentation": "https://bridgit.cc/learn/operations/v2-workflow.list.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-workflow.list.json",
+   "required_arguments": [],
+   "tool": "workflow.list"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_workflow_pause",
+   "documentation": "https://bridgit.cc/learn/operations/v2-workflow.pause.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-workflow.pause.json",
+   "required_arguments": [
+    "idempotency_key",
+    "id"
+   ],
+   "tool": "workflow.pause"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_workflow_propose",
+   "documentation": "https://bridgit.cc/learn/operations/v2-workflow.propose.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-workflow.propose.json",
+   "required_arguments": [
+    "idempotency_key",
+    "name",
+    "trigger",
+    "steps"
+   ],
+   "tool": "workflow.propose"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_workflow_run",
+   "documentation": "https://bridgit.cc/learn/operations/v2-workflow.run.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-workflow.run.json",
+   "required_arguments": [
+    "idempotency_key",
+    "id"
+   ],
+   "tool": "workflow.run"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_workflow_runs",
+   "documentation": "https://bridgit.cc/learn/operations/v2-workflow.runs.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-workflow.runs.json",
+   "required_arguments": ["id"],
+   "tool": "workflow.runs"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_workflow_simulate",
+   "documentation": "https://bridgit.cc/learn/operations/v2-workflow.simulate.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-workflow.simulate.json",
+   "required_arguments": ["flow"],
+   "tool": "workflow.simulate"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_workflow_validate",
+   "documentation": "https://bridgit.cc/learn/operations/v2-workflow.validate.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-workflow.validate.json",
+   "required_arguments": [
+    "name",
+    "trigger",
+    "steps"
+   ],
+   "tool": "workflow.validate"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
+ "examples_url": null,
+ "id": "v2.workflows",
+ "state": {
+  "ready": null,
+  "blockers": ["check_v2_capabilities"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "run",
+ "capability_ids": ["v2.workflows"]
+}

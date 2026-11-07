@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Maximum powers: every switch on, then one guided pass through Android's own prompts and pages. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="64dp"
+        app:navigationContentDescription="@string/cd_back"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="@string/power_title"
+        app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
+
+            <!-- Read-only explanation (set in code): the gradient info panel. -->
+            <TextView
+                android:id="@+id/intro"
+                style="@style/Widget.Bridgit.InfoPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="12dp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/summary_card"
+                style="@style/Widget.Material3.CardView.Filled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="10dp"
+                android:accessibilityLiveRegion="polite"
+                android:visibility="gone"
+                app:cardBackgroundColor="?attr/colorSuccessContainer"
+                app:cardCornerRadius="12dp">
+
+                <TextView
+                    android:id="@+id/summary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSuccessContainer" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Each section is a shaded panel with a small-caps heading. Step rows are added to steps in code. -->
+            <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+
+                <TextView
+                    style="@style/SettingsHeader"
+                    android:text="@string/power_android_header" />
+
+                <LinearLayout
+                    android:id="@+id/steps"
+                    android:divider="@drawable/settings_divider"
+                    android:showDividers="middle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Widget.Bridgit.SettingsSection">
+
+                <TextView
+                    android:id="@+id/features_header"
+                    style="@style/SettingsHeader"
+                    android:text="@string/power_features_header" />
+
+                <TextView
+                    android:id="@+id/features"
+                    android:divider="@drawable/settings_divider"
+                    android:showDividers="middle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="4dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/open_features"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/power_open_features" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/next"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="56dp" />
+    </LinearLayout>
+</LinearLayout>

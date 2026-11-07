@@ -1,0 +1,73 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Small relative pan / tilt, only if advertised by the camera",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_cameras_move",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "camera",
+    "description": "Configured camera id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "pan",
+    "description": "-0.1 to 0.1, camera-native sign; verify with fresh frames",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "tilt",
+    "description": "-0.1 to 0.1, camera-native sign; verify with fresh frames",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "stop",
+    "description": "true sends ONVIF Stop",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/lan-cameras/move {\"camera\":\"lan:example\",\"pan\":0.03}",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/move",
+  "capability": "lan_camera",
+  "returns": "camera, status",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "stop": {
+     "description": "true sends ONVIF Stop",
+     "type": "boolean"
+    },
+    "tilt": {
+     "description": "-0.1 to 0.1, camera-native sign; verify with fresh frames",
+     "type": "number"
+    },
+    "camera": {
+     "description": "Configured camera id",
+     "type": "string"
+    },
+    "pan": {
+     "description": "-0.1 to 0.1, camera-native sign; verify with fresh frames",
+     "type": "number"
+    }
+   },
+   "required": ["camera"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "An installed applet's budget on all the owner's phones: limits with used, forecast and reset, state (ok, warning, out), the owner's ceiling, whether agents may change it, its actions with intervals and projections, and the last changes. For the applet you asked for, or any applet when you have Budgets",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_budget_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/ai0123456789abcd/budget",
+  "idempotent": false,
+  "path": "/v1/applets/{id}/budget",
+  "capability": "applet_install",
+  "returns": "applet, instance_id, name, state (ok|warning|out|unknown), limits[{id, usd, per, check_at, top_up_usd, used_usd, resets_at, forecast_usd, forecast_runs_out_at, estimate}], source (package|owner|agent), ceiling, agents_may_change, actions[{action, every_s, min_s, max_s, per, priority, places, paid_share, usd_per_run, projected_usd, set_by}], revision, this_phone{spent_today_usd, spent_month_usd}, synced_at, changes[]. budget_forecast and budget_out events follow in /v1/events",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/applets/{id}/budget",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

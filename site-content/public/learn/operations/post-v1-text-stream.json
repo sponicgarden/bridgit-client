@@ -1,0 +1,65 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Add text to your live text panel (an interaction of kind text); it scrolls on the phone as it arrives",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "text_stream",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "interaction_id",
+    "description": "The panel's interaction_id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "append",
+    "description": "Text to add, up to 16 KB per call (the panel keeps the last 200 KB)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "done",
+    "description": "true: the stream is finished; the panel stays until the owner closes it",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/text/stream {\"interaction_id\":\"42\",\"append\":\"Claude: running the tests now...\\n\"}",
+  "idempotent": false,
+  "path": "/v1/text/stream",
+  "capability": "interactions",
+  "returns": "interaction_id, length, status",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "interaction_id": {
+     "description": "The panel's interaction_id",
+     "type": "string"
+    },
+    "done": {
+     "description": "true: the stream is finished; the panel stays until the owner closes it",
+     "type": "boolean"
+    },
+    "append": {
+     "description": "Text to add, up to 16 KB per call (the panel keeps the last 200 KB)",
+     "type": "string"
+    }
+   },
+   "required": ["interaction_id"]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter",
+   "conflict",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

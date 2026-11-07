@@ -1,0 +1,92 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Hear one bounded turn through the model registry",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "speech_hear",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "duration_seconds",
+    "description": "Whole seconds, 1-30",
+    "type": "integer",
+    "required": true
+   },
+   {
+    "name": "allow_cloud",
+    "description": "Explicit permission to send audio to the registry-selected cloud model; default false",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "language",
+    "description": "BCP 47 language",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "return_audio",
+    "description": "Default false; original clip if true for cloud hearing only; device hearing does not record a clip",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "store",
+    "description": "Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or \"none\" = only return it. Default: your POST /v1/captures/storage choice, else only returned",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/speech/hear {\"duration_seconds\":5}",
+  "idempotent": true,
+  "path": "/v1/speech/hear",
+  "capability": "mic",
+  "returns": "transcript, on_device, speech{model, processing, cost_usd, elapsed_ms}; normal clip metadata; no audio by default",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "duration_seconds": {
+     "description": "Whole seconds, 1-30",
+     "type": "integer"
+    },
+    "allow_cloud": {
+     "description": "Explicit permission to send audio to the registry-selected cloud model; default false",
+     "type": "boolean"
+    },
+    "return_audio": {
+     "description": "Default false; original clip if true for cloud hearing only; device hearing does not record a clip",
+     "type": "boolean"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "language": {
+     "description": "BCP 47 language",
+     "type": "string"
+    },
+    "store": {
+     "description": "Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or \"none\" = only return it. Default: your POST /v1/captures/storage choice, else only returned",
+     "type": "array",
+     "items": {"type": "string"}
+    }
+   },
+   "required": ["duration_seconds"]
+  },
+  "errors": [
+   "capability_disabled",
+   "permission_denied",
+   "notifications_required",
+   "sensor_busy",
+   "capture_timeout",
+   "service_start_blocked"
+  ],
+  "requires": null
+ }
+}

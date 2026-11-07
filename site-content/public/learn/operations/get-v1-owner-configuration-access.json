@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Existing Super agents can inspect and delegate app-owned feature switches, capabilities, roles and control grants without a separate configuration grant",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_access",
+  "query": [],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/access",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/access",
+  "capability": "settings",
+  "returns": "authority,approval_required=false,agents[{id,name,generation,key_created_at,capabilities,control_scopes,effective_control_scopes,paused,super_powers,fixer_mode,maximum_control}],features[{id,name,enabled,blockers}],capabilities; no keys or hashes",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": "super_powers"
+ }
+}

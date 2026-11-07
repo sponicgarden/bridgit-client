@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Notes on top of agent prompts sent through the share sheet or a mail app (ShareText.prompt). -->
+<resources>
+    <string name="share_agent_heading">Bridgit setup for %1$s on %2$s</string>
+    <string name="share_agent_note">This connects the control agent %1$s to my Android device %2$s through Bridgit. The key inside gives %1$s control of %2$s: paste it into %1$s only, and don\'t pass it on.</string>
+    <string name="share_usb_heading">Set up Bridgit over USB</string>
+    <string name="share_usb_note">Plug the phone into the computer with a USB cable, then give this to the AI control agent on that computer (Claude Code, Codex or similar).</string>
+    <string name="share_ts_heading">Put this computer on my Tailscale network</string>
+    <string name="share_ts_note">Give this to the AI control agent on the computer (Claude Code, Codex or similar). It walks the control agent through joining the same private network as my phone.</string>
+    <string name="share_relay_heading">Bridgit Relay setup</string>
+    <string name="share_relay_subject">Bridgit Relay setup</string>
+    <string name="share_relay_note">This connects a control agent to my phone through Bridgit Relay. It contains a private key, so don\'t forward it.</string>
+    <string name="share_relay_keys_heading">Bridgit Relay public keys</string>
+    <string name="share_relay_keys_note">These identify my phone to a relay I run myself. They hold no secrets.</string>
+    <string name="share_relay_keys_target">your relay\'s enrolment page</string>
+</resources>

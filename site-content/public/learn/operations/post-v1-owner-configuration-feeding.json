@@ -1,0 +1,71 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Save current enrolled Pet monitor camera position, enable/disable eating-sound response or clear saved view; existing camera/audio grants and motion lease checks apply; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_feeding_post",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "save_current_camera",
+    "description": "Enrolled lan:<id> in Pet monitor; reads its current ONVIF position, never moves it",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "enabled",
+    "description": "Needs a saved food view",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "clear",
+    "description": "true clears position and disables response; incompatible with save/enable",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/feeding {\"enabled\":false}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/feeding",
+  "capability": "owner_features",
+  "returns": "food-view status and saved position; camera failure does not claim a saved view",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "clear": {
+     "description": "true clears position and disables response; incompatible with save/enable",
+     "type": "boolean"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "save_current_camera": {
+     "description": "Enrolled lan:<id> in Pet monitor; reads its current ONVIF position, never moves it",
+     "type": "string"
+    },
+    "enabled": {
+     "description": "Needs a saved food view",
+     "type": "boolean"
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

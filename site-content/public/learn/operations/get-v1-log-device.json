@@ -1,0 +1,67 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Snapshot of Android logcat visible to Bridgit's app UID; requires Fixer Mode",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "log_device",
+  "query": [
+   {
+    "name": "buffer",
+    "description": "main (default), system, crash, events or all",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "main",
+     "system",
+     "crash",
+     "events",
+     "all"
+    ]
+   },
+   {
+    "name": "lines",
+    "description": "1-10000, default 1000; snapshot capped at 2 MiB",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/log/device?buffer=crash&lines=1000",
+  "idempotent": false,
+  "path": "/v1/log/device",
+  "capability": "log",
+  "returns": "scope, buffer, output, exit_code, truncated, timed_out, retention",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "buffer": {
+     "description": "main (default), system, crash, events or all",
+     "type": "string",
+     "enum": [
+      "main",
+      "system",
+      "crash",
+      "events",
+      "all"
+     ]
+    },
+    "lines": {
+     "description": "1-10000, default 1000; snapshot capped at 2 MiB",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "forbidden",
+   "invalid_parameter"
+  ],
+  "requires": "fixer_mode"
+ }
+}

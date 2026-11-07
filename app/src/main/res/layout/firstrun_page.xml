@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One first-run page. Each page must fit on one phone screen without scrolling; the ScrollView only
+     catches very small screens or very large text. Page 1 is HTML (assets/firstrun/intro.html) in the
+     WebView; page 2: what Bridgit can do; page 3: Tailscale and notifications; page 4: the key warning
+     and the two buttons. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <WebView
+        android:id="@+id/introWeb"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+<ScrollView
+    android:id="@+id/nativePage"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/firstrun_bg_glow"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:id="@+id/pageContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="16dp">
+
+        <!-- Icon + "bridgit" wordmark above each native page's title, as on page 1 and the Home header
+             (owner rule, 2 Nov 2026: the icon never shows without the wordmark). -->
+        <LinearLayout
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginEnd="12dp"
+                android:elevation="12dp"
+                android:importantForAccessibility="no"
+                android:src="@mipmap/ic_launcher" />
+
+            <ImageView
+                android:layout_width="146dp"
+                android:layout_height="45dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/brand_wordmark"
+                app:tint="@color/firstrun_head" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:accessibilityHeading="true"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_horizontal"
+            android:letterSpacing="-0.01"
+            android:textColor="@color/firstrun_head"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_horizontal"
+            android:lineSpacingMultiplier="1.3"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <!-- Page 2: what Bridgit can do (rows added in code; the page title is the heading). -->
+        <LinearLayout
+            android:id="@+id/capRows"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="vertical"
+            android:visibility="gone" />
+
+        <!-- Page 3: Tailscale check (live region) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tsCard"
+            style="@style/Widget.Bridgit.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityLiveRegion="polite"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/tsProgress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:indeterminate="true"
+                        app:indicatorSize="20dp" />
+
+                    <ImageView
+                        android:id="@+id/tsIcon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="12dp"
+                        android:importantForAccessibility="no"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tsText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAppearance="?attr/textAppearanceBodyMedium" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/openTailscale"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/home_banner_open_tailscale"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Page 3: notifications (PRD-05) -->
+        <LinearLayout
+            android:id="@+id/notifBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/notifCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:id="@+id/notifInner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityLiveRegion="polite"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/notifLine"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/firstrun_notif_line"
+                        android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/notifSettings"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/perm_open_settings"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/allowNotif"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/firstrun_allow_notifications" />
+
+            <TextView
+                android:id="@+id/notifOn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="@string/firstrun_notif_on"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Page 4: the same key warning the Add agent screen shows beside the setup prompt. -->
+        <LinearLayout
+            android:id="@+id/finishBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Glass card with an amber edge: a "Warning" heading, then the text at full width. -->
+            <LinearLayout
+                android:id="@+id/keyWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/firstrun_bg_warn"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:accessibilityHeading="true"
+                    android:drawablePadding="8dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center_vertical"
+                    android:text="@string/firstrun_warning_label"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    android:textColor="@color/firstrun_amber"
+                    app:drawableStartCompat="@drawable/ic_warning"
+                    app:drawableTint="@color/firstrun_amber" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingMultiplier="1.35"
+                    android:text="@string/firstrun_p3_warning"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@color/firstrun_line" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:lineSpacingMultiplier="1.3"
+                    android:text="@string/firstrun_p3_risk"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/finishNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center_horizontal"
+                android:lineSpacingMultiplier="1.3"
+                android:text="@string/firstrun_p3_body"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/runDiagnostic"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="56dp"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                app:icon="@drawable/ic_check"
+                app:iconGravity="textStart"
+                android:text="@string/firstrun_run_diagnostic" />
+
+            <!-- Add agent and Privacy policy: outlined buttons sharing one row, so the page fits above the page dots. -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/addFirst"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="11sp"
+                    app:autoSizeMaxTextSize="14sp"
+                    android:text="@string/firstrun_add_first" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/privacy"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:text="@string/settings_privacy_policy" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+</FrameLayout>

@@ -1,0 +1,167 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f1ff;color:#231d3d;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 28px}
+.eyebrow{font-size:13px;font-weight:600;color:#5d5580;margin:0 0 4px;letter-spacing:.02em}
+h1{font-size:24px;line-height:1.2;margin:0 0 16px;letter-spacing:-.01em}
+.box{background:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 1px 2px rgba(60,40,140,.06),0 10px 24px -16px rgba(60,40,140,.35)}
+.week{margin-bottom:14px}
+.whead{display:flex;justify-content:space-between;font-size:14px;margin-bottom:10px}
+.whead b{font-weight:650}
+.whead span{color:#5d5580;font-variant-numeric:tabular-nums}
+.days{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:12px;color:#5d5580}
+.dot{width:22px;height:22px;border-radius:50%;margin:0 auto 4px;border:2px solid #c9bff5;background:transparent}
+.dot.t{background:#7c5cff;border-color:#7c5cff}
+.dot.now{border:2px dashed #7c5cff}
+.days .today{color:#5536e0;font-weight:700}
+.list{display:grid;gap:12px}
+.med{transition:box-shadow .18s}
+.top{display:flex;gap:14px;align-items:center}
+.pillbox{flex:none;width:56px;height:56px;border-radius:16px;background:#f6f3ff;display:grid;place-content:center}
+.pill{display:block}
+.cap{width:40px;height:16px;border-radius:99px;transform:rotate(-35deg);box-shadow:inset 0 -2px 0 rgba(0,0,0,.08),0 0 0 1px rgba(40,60,140,.18)}
+.tab{width:30px;height:30px;border-radius:50%;position:relative;box-shadow:inset 0 -2px 0 rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.06)}
+.tab::after{content:"";position:absolute;left:6px;right:6px;top:14px;height:2px;border-radius:2px;background:rgba(0,0,0,.12)}
+.gel{width:34px;height:22px;border-radius:50%;position:relative;transform:rotate(-20deg)}
+.gel::after{content:"";position:absolute;left:6px;top:4px;width:9px;height:5px;border-radius:50%;background:rgba(255,255,255,.7)}
+.name{font-weight:650;margin:0}
+.dose{font-size:14px;color:#3f3763;margin:1px 0 0}
+.note{font-size:13px;color:#6b6390;margin:2px 0 0}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.btn{font:inherit;font-weight:650;min-height:48px;border-radius:14px;border:1.5px solid #e2dcfa;background:#fff;color:#3f3763;cursor:pointer;transition:background .18s,border-color .18s,color .18s,transform .15s}
+.btn.taken.on{background:#dff7ec;border-color:#5fcf9f;color:#0f6b45}
+.btn.skip.on{background:#f1edff;border-color:#7c5cff;color:#4a2fd1}
+.btn:active,.chip:active,.go:active{transform:scale(.98)}
+.why{display:none;flex-wrap:wrap;gap:8px;margin-top:12px}
+.why.open{display:flex}
+.why p{width:100%;margin:0;font-size:13px;color:#6b6390}
+.chip{font:inherit;font-size:14px;min-height:48px;padding:0 14px;border-radius:99px;border:1.5px solid #e2dcfa;background:#faf9ff;color:#3f3763;cursor:pointer;transition:background .18s,color .18s,border-color .18s,transform .15s}
+.chip.on{background:#7c5cff;border-color:#7c5cff;color:#fff}
+.go{display:block;width:100%;margin-top:20px;font:inherit;font-weight:700;font-size:17px;min-height:54px;border:0;border-radius:16px;background:#6a48f5;color:#fff;cursor:pointer;box-shadow:0 10px 22px -12px #6a48f5;transition:opacity .18s,transform .15s}
+.go:disabled{opacity:.45;box-shadow:none}
+.status{text-align:center;font-size:14px;color:#5d5580;min-height:20px;margin:10px 0 0}
+button:disabled{cursor:default}
+</style>
+<div class="wrap">
+  <p class="eyebrow" id="eyebrow"></p>
+  <h1 id="title"></h1>
+  <div class="box week">
+    <div class="whead"><b id="weekLabel"></b><span id="weekCount"></span></div>
+    <div class="days" id="days"></div>
+  </div>
+  <div class="list" id="list"></div>
+  <button class="go" id="go" disabled></button>
+  <p class="status" id="status"></p>
+</div>
+<script>
+// answer.data: {"taken":[ids],"skipped":[{"id","reason"}],"at":"HH:MM"}; reason is null if none was picked
+// The card's content. Change only this object.
+var CARD = {
+  eyebrow: "Sunday 2 Nov · 21:00 reminder",
+  title: "Evening medicines, 21:00",
+  weekLabel: "This week",
+  days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  history: [1, 1, 0, 1, 1, 1],
+  taken: "Taken",
+  skip: "Skip",
+  whyLabel: "Why skip it?",
+  reasons: [
+    { id: "forgot_earlier", label: "Forgot earlier" },
+    { id: "side_effects", label: "Side effects" },
+    { id: "ran_out", label: "Ran out" }
+  ],
+  save: "Save evening dose",
+  confirm: "✓ Evening dose saved. Sleep well",
+  meds: [
+    { id: "atorvastatin", name: "Atorvastatin", dose: "20 mg · 1 tablet", note: "With water, after food", shape: "tab", colors: ["#ffd9e4"] },
+    { id: "vitamin_d", name: "Vitamin D3", dose: "2000 IU · 1 softgel", note: "With your evening meal", shape: "gel", colors: ["#ffc93d"] },
+    { id: "magnesium", name: "Magnesium", dose: "250 mg · 1 capsule", note: "An hour before bed", shape: "cap", colors: ["#6aa8ff", "#f2f5ff"] }
+  ]
+};
+
+var $ = function (id) { return document.getElementById(id); };
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+var choice = {}, sent = false;
+$("eyebrow").textContent = CARD.eyebrow;
+$("title").textContent = CARD.title;
+$("weekLabel").textContent = CARD.weekLabel;
+var done = CARD.history.filter(Boolean).length;
+$("weekCount").textContent = done + " of " + CARD.history.length + " evenings";
+
+CARD.days.forEach(function (d, i) {
+  var col = el("div", i === CARD.history.length ? "today" : ""), dot = el("div", "dot");
+  if (i < CARD.history.length) dot.classList.add(CARD.history[i] ? "t" : "m");
+  else if (i === CARD.history.length) dot.classList.add("now");
+  col.appendChild(dot); col.appendChild(document.createTextNode(d)); $("days").appendChild(col);
+});
+
+CARD.meds.forEach(function (m) {
+  var card = el("div", "box med"), top = el("div", "top");
+  var box = el("div", "pillbox"), pill = el("i", "pill " + m.shape);
+  pill.style.background = m.colors.length > 1 ? "linear-gradient(90deg," + m.colors[0] + " 50%," + m.colors[1] + " 50%)" : m.colors[0];
+  box.appendChild(pill); top.appendChild(box);
+  var info = el("div", "");
+  info.appendChild(el("p", "name", m.name));
+  info.appendChild(el("p", "dose", m.dose));
+  info.appendChild(el("p", "note", m.note));
+  top.appendChild(info); card.appendChild(top);
+
+  var acts = el("div", "acts"), bt = el("button", "btn taken", "✓ " + CARD.taken), bs = el("button", "btn skip", CARD.skip);
+  acts.appendChild(bt); acts.appendChild(bs); card.appendChild(acts);
+  var why = el("div", "why"); why.appendChild(el("p", "", CARD.whyLabel));
+  var chips = CARD.reasons.map(function (r) {
+    var c = el("button", "chip", r.label);
+    c.onclick = function () {
+      if (sent) return;
+      choice[m.id].reason = choice[m.id].reason === r.id ? null : r.id; paint();
+    };
+    why.appendChild(c); return c;
+  });
+  card.appendChild(why); $("list").appendChild(card);
+
+  bt.onclick = function () { if (!sent) { choice[m.id] = { v: "taken" }; paint(); } };
+  bs.onclick = function () { if (!sent) { choice[m.id] = { v: "skip", reason: (choice[m.id] || {}).reason || null }; paint(); } };
+  m.ui = { bt: bt, bs: bs, why: why, chips: chips };
+});
+
+function paint() {
+  var t = 0, s = 0;
+  CARD.meds.forEach(function (m) {
+    var c = choice[m.id] || {};
+    m.ui.bt.classList.toggle("on", c.v === "taken");
+    m.ui.bs.classList.toggle("on", c.v === "skip");
+    m.ui.why.classList.toggle("open", c.v === "skip");
+    m.ui.chips.forEach(function (ch, i) { ch.classList.toggle("on", c.reason === CARD.reasons[i].id); });
+    if (c.v === "taken") t++; if (c.v === "skip") s++;
+  });
+  var left = CARD.meds.length - t - s;
+  $("go").disabled = left > 0;
+  $("go").textContent = left > 0 ? CARD.save + " · " + left + " to go" : CARD.save + " · " + t + " taken" + (s ? ", " + s + " skipped" : "");
+}
+paint();
+
+$("go").onclick = function () {
+  if (sent) return;
+  var bridge = window.Bridgit || window.Bridget;
+  if (!bridge) { $("status").textContent = "Preview only: open this card in Bridgit to answer."; return; }
+  sent = true;
+  var now = new Date(), pad = function (n) { return (n < 10 ? "0" : "") + n; };
+  var answer = { taken: [], skipped: [], at: pad(now.getHours()) + ":" + pad(now.getMinutes()) };
+  CARD.meds.forEach(function (m) {
+    var c = choice[m.id];
+    if (c.v === "taken") answer.taken.push(m.id); else answer.skipped.push({ id: m.id, reason: c.reason || null });
+  });
+  document.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+  $("status").textContent = "Sending…";
+  (window.Bridgit || window.Bridget).respond(JSON.stringify(answer));
+};
+
+document.addEventListener("bridgit:answered", function (e) {
+  e.preventDefault();
+  sent = true;
+  document.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+  $("title").textContent = CARD.confirm;
+  $("status").textContent = "";
+  setTimeout(function () { $("title").scrollIntoView({ block: "center", behavior: "smooth" }); }, 400);
+});
+</script>

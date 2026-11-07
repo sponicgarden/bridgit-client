@@ -1,0 +1,47 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Bring an installed applet's portal to the front of the screen (any applet), as if the owner tapped Open. Waits for its page to load and expose its functions",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applets_portal_open",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "wait_s",
+   "description": "0-15 seconds to wait for the page (default 5)",
+   "type": "integer",
+   "required": false
+  }],
+  "example": "POST /v1/applets/ai0123456789abcd/portal/open {\"wait_s\":5}",
+  "idempotent": false,
+  "path": "/v1/applets/{id}/portal/open",
+  "capability": "applet_portals",
+  "returns": "as GET \u2026/portal, plus note when the portal didn't come to the front. portal.opened, portal.functions, portal.state and portal.closed follow in /v1/events",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "wait_s": {
+     "description": "0-15 seconds to wait for the page (default 5)",
+     "type": "integer"
+    },
+    "id": {
+     "description": "The id in /v1/applets/{id}/portal/open",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "not_supported",
+   "invalid_parameter",
+   "service_start_blocked"
+  ],
+  "requires": null
+ }
+}

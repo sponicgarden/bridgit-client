@@ -1,0 +1,47 @@
+{
+ "detail_url": "/v1/discover?id=v1.mic&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.mic.json",
+ "title": "mic",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.mic.json",
+ "prerequisites": ["Check v1.mic supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": ["voice-notebook"],
+ "operations": [
+  {
+   "summary": "Hear one bounded turn through the model registry",
+   "path": "/v1/speech/hear",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-speech-hear.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-speech-hear.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "speech_hear"
+  },
+  {
+   "summary": "Record an audio clip",
+   "path": "/v1/mic/record",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-mic-record.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-mic-record.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "mic_record"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.mic",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "sense",
+ "capability_ids": ["v1.mic"]
+}

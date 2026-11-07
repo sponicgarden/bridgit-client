@@ -1,0 +1,70 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Agent activity from the phone's log, with the same redaction as remote view: no messages, parameters or results. Oldest first after since; the newest page without it. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "portal_logs",
+  "query": [
+   {
+    "name": "client",
+    "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "since",
+    "description": "Log id: only entries after it (use next_since from the last page)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "until",
+    "description": "Log id: an older page, entries before it (use oldest_id); not with since",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "1-200, default 50",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/portal/logs?since=48210&limit=50",
+  "idempotent": false,
+  "path": "/v1/portal/logs",
+  "capability": "portal",
+  "returns": "entries[{id, ts, agent, kind, method, path, status, caption, plus the Home scene keys channel, level, result, endpoint, http, message, params, data}], next_since (pass back as since; it moves past skipped entries too), has_more, has_older, oldest_id (pass as until for the next older page), latest_id",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "limit": {
+     "description": "1-200, default 50",
+     "type": "integer"
+    },
+    "client": {
+     "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+     "type": "string"
+    },
+    "until": {
+     "description": "Log id: an older page, entries before it (use oldest_id); not with since",
+     "type": "integer"
+    },
+    "since": {
+     "description": "Log id: only entries after it (use next_since from the last page)",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

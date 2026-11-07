@@ -1,0 +1,61 @@
+{
+ "detail_url": "/v1/discover?id=v2.alerts&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v2.alerts.json",
+ "title": "Approved recipient alerts",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v2.alerts.json",
+ "prerequisites": ["Check v2.alerts supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_alert_cancel",
+   "documentation": "https://bridgit.cc/learn/operations/v2-alert.cancel.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-alert.cancel.json",
+   "required_arguments": [
+    "idempotency_key",
+    "id"
+   ],
+   "tool": "alert.cancel"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_alert_list",
+   "documentation": "https://bridgit.cc/learn/operations/v2-alert.list.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-alert.list.json",
+   "required_arguments": [],
+   "tool": "alert.list"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_alert_trigger",
+   "documentation": "https://bridgit.cc/learn/operations/v2-alert.trigger.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-alert.trigger.json",
+   "required_arguments": [
+    "idempotency_key",
+    "destinations",
+    "text"
+   ],
+   "tool": "alert.trigger"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
+ "examples_url": null,
+ "id": "v2.alerts",
+ "state": {
+  "ready": null,
+  "blockers": ["check_v2_capabilities"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "interact",
+ "capability_ids": ["v2.alerts"]
+}

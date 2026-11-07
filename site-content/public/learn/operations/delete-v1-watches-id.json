@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Stop a watch (you get a watch.ended event with reason deleted)",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "watches_stop",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/watches/w0123456789ab",
+  "idempotent": false,
+  "path": "/v1/watches/{id}",
+  "capability": "watches",
+  "returns": "deleted: the watch_id",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/watches/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

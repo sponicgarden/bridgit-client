@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Remove an installed applet you asked for and everything it created (watches, schedule, workflow, card, its grants)",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "applets_installed_remove",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/applets/installed/ai0123456789abcd",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}",
+  "capability": "applet_install",
+  "returns": "removed, left_behind[] (empty when nothing is left)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/applets/installed/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

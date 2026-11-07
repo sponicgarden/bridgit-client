@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Beacon gold dot: waiting for the first call (ui-spec 1.3). Gold in both themes. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/beacon_gold" />
+    <size android:width="14dp" android:height="14dp" />
+</shape>

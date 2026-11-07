@@ -1,0 +1,112 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Play audio on the phone's speaker: send audio/* bytes as the body, or {\"url\"} (public https)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "speaker_play",
+  "query": [
+   {
+    "name": "replace",
+    "description": "after_current (default: replace what's queued from you), now, or queue",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "after_current",
+     "now",
+     "queue"
+    ]
+   },
+   {
+    "name": "tour_id",
+    "description": "Narration for your running City tour",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "urgent",
+    "description": "Jump the queue (answers to questions)",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "text",
+    "description": "Caption shown on the phone while it plays",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "loop",
+    "description": "Repeat until stopped or replaced",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "url",
+    "description": "https:// audio file (MP3, M4A, OGG, WAV, FLAC), up to 25 MB",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/speaker/play (Content-Type: audio/mpeg, body = the MP3)",
+  "idempotent": true,
+  "path": "/v1/speaker/play",
+  "capability": "speaker",
+  "returns": "play_id, position, status (playing, queued or silenced)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "tour_id": {
+     "description": "Narration for your running City tour",
+     "type": "string"
+    },
+    "loop": {
+     "description": "Repeat until stopped or replaced",
+     "type": "boolean"
+    },
+    "replace": {
+     "description": "after_current (default: replace what's queued from you), now, or queue",
+     "type": "string",
+     "enum": [
+      "after_current",
+      "now",
+      "queue"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "text": {
+     "description": "Caption shown on the phone while it plays",
+     "type": "string"
+    },
+    "urgent": {
+     "description": "Jump the queue (answers to questions)",
+     "type": "boolean"
+    },
+    "url": {
+     "description": "https:// audio file (MP3, M4A, OGG, WAV, FLAC), up to 25 MB",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "notifications_required",
+   "invalid_parameter",
+   "payload_too_large",
+   "rate_limited",
+   "not_found"
+  ],
+  "requires": null
+ }
+}

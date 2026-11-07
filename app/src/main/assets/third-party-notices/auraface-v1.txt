@@ -1,0 +1,13 @@
+Face embedding model: AuraFace-v1
+https://huggingface.co/fal/AuraFace-v1
+Copyright fal.ai. Licensed under the Apache License, Version 2.0.
+
+TFLite conversion: eungsang/auraface-v1-tflite
+Licensed under the Apache License, Version 2.0.
+
+You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software distributed under the License is
+distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+Bridgit does not ship the model in its APK. The phone downloads it on demand (only while an installed
+applet has a watch with the people option) and checks its SHA-256 before use.

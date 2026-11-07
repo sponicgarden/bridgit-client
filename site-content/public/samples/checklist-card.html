@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bridgit checklist card</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #2a2118;
+    background: linear-gradient(180deg, #fff6e8 0%, #ffe9d2 100%); min-height: 100vh; }
+  .card { max-width: 440px; margin: 0 auto; padding: 24px 18px; display: flex; flex-direction: column; gap: 14px; }
+  header { display: flex; align-items: center; gap: 12px; }
+  .icon { width: 52px; height: 52px; flex: none; border-radius: 16px; display: grid; place-items: center; font-size: 28px;
+    background: linear-gradient(135deg, #ffb057, #ff6b4a); box-shadow: 0 6px 16px rgba(255, 107, 74, .3); }
+  h1 { margin: 0; font-size: 22px; line-height: 1.2; }
+  .sub { margin: 2px 0 0; font-size: 14px; color: #7a6656; }
+  .list { margin: 0; padding: 6px; list-style: none; border-radius: 18px; background: #fff; box-shadow: 0 4px 18px rgba(120, 70, 20, .08); }
+  .list label { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 10px; border-radius: 12px; }
+  .list input { width: 22px; height: 22px; accent-color: #ff6b4a; }
+  .list input:checked + span { text-decoration: line-through; color: #a8968a; }
+  .meter { padding: 14px; border-radius: 18px; background: #fff; box-shadow: 0 4px 18px rgba(120, 70, 20, .08); }
+  .meter p { margin: 0 0 8px; display: flex; justify-content: space-between; font-size: 15px; }
+  .meter b { color: #ff6b4a; }
+  input[type=range] { width: 100%; accent-color: #ff6b4a; }
+  .progress { margin: 0; font-size: 14px; color: #7a6656; text-align: center; }
+  button { font: inherit; font-weight: 650; min-height: 52px; border-radius: 16px; border: 0; color: #fff;
+    background: linear-gradient(135deg, #ff9a3d, #ff4f6d); box-shadow: 0 8px 20px rgba(255, 79, 109, .3); }
+  button:disabled { opacity: .5; }
+  .status { margin: 0; min-height: 1.4em; font-size: 14px; color: #7a6656; text-align: center; }
+  .status.error { color: #c0392b; }
+</style>
+</head>
+<body>
+<main class="card">
+  <header>
+    <div class="icon" id="icon" aria-hidden="true"></div>
+    <div><h1 id="title"></h1><p class="sub" id="sub"></p></div>
+  </header>
+  <ul class="list" id="items"></ul>
+  <section class="meter">
+    <p><span id="slider-label"></span><b id="slider-value"></b></p>
+    <input type="range" id="slider" min="1" max="10" step="1">
+  </section>
+  <p class="progress" id="progress"></p>
+  <button type="button" id="send"></button>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+</main>
+<script>
+// The card's content. Change only this object.
+// answer.data = {"button": "send", "checked": [...], "unchecked": [...], "<slider.id>": <1-10>}
+var CARD = /*CARD*/{
+  "icon": "🧳",
+  "title": "Packing for Lisbon",
+  "subtitle": "Tick what's in the bag already.",
+  "items": ["Passport", "Phone charger", "Sunglasses", "Rain jacket", "Train tickets"],
+  "slider": {"id": "ready", "label": "How ready do you feel?", "value": 5},
+  "button": "Send to the agent",
+  "done_title": "Sent",
+  "done_text": "Sent. The agent has your list."
+}/*END CARD*/;
+
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var boxes = [];
+  $('icon').textContent = CARD.icon || '';
+  $('title').textContent = CARD.title || '';
+  $('sub').textContent = CARD.subtitle || '';
+  CARD.items.forEach(function (name) {
+    var li = document.createElement('li');
+    var label = document.createElement('label');
+    var box = document.createElement('input');
+    box.type = 'checkbox';
+    var span = document.createElement('span');
+    span.textContent = name;
+    label.append(box, span);
+    li.appendChild(label);
+    $('items').appendChild(li);
+    boxes.push({ name: name, box: box });
+    box.addEventListener('change', progress);
+  });
+  var slider = $('slider');
+  $('slider-label').textContent = CARD.slider.label;
+  slider.value = CARD.slider.value;
+  function showValue() { $('slider-value').textContent = slider.value + ' / 10'; }
+  slider.addEventListener('input', showValue);
+  showValue();
+  function progress() {
+    var n = boxes.filter(function (b) { return b.box.checked; }).length;
+    $('progress').textContent = n + ' of ' + boxes.length + ' packed';
+  }
+  progress();
+
+  var send = $('send');
+  send.textContent = CARD.button;
+  var status = $('status');
+  function say(text, isError) { status.textContent = text; status.className = isError ? 'status error' : 'status'; }
+  function lock(on) { send.disabled = on; slider.disabled = on; boxes.forEach(function (b) { b.box.disabled = on; }); }
+
+  var bridge = window.Bridgit || window.Bridget;
+  var waiting = null;
+  send.addEventListener('click', function () {
+    if (!bridge || typeof bridge.respond !== 'function') { say('Preview only: open this card in Bridgit to answer.', true); return; }
+    var answer = {
+      button: 'send',
+      checked: boxes.filter(function (b) { return b.box.checked; }).map(function (b) { return b.name; }),
+      unchecked: boxes.filter(function (b) { return !b.box.checked; }).map(function (b) { return b.name; })
+    };
+    answer[CARD.slider.id] = Number(slider.value);
+    lock(true);
+    say('Sending…');
+    // Bridget.respond takes a JSON string on every build. Answer at most 16 KB, once per card.
+    bridge.respond(JSON.stringify(answer));
+    waiting = setTimeout(function () { lock(false); say('Not confirmed yet. Tap again, or close the card.', true); }, 8000);
+  });
+
+  document.addEventListener('bridgit:answered', function (event) {
+    event.preventDefault();
+    clearTimeout(waiting);
+    lock(true);
+    say('✓ ' + CARD.done_text);
+    $('title').textContent = '\u2713 ' + (CARD.done_title || 'Sent');
+    setTimeout(function () { $('title').scrollIntoView({ block: 'center' }); }, 400);
+  });
+})();
+</script>
+</body>
+</html>

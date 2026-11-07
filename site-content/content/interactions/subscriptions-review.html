@@ -1,0 +1,156 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#111318;color:#f1f3f6;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 28px}
+h1{font-size:21px;line-height:1.3;margin:0 0 4px;letter-spacing:-.01em}
+h1.done{color:#c6f432}
+.sub{color:#9aa1ad;font-size:15px;margin:0 0 16px}
+.save{position:relative;overflow:hidden;background:linear-gradient(140deg,#1d2210,#171a20 70%);border:1px solid rgba(198,244,50,.25);border-radius:20px;padding:18px 18px 16px;margin-bottom:18px}
+.save span{display:block;font-size:14px;color:#b7bdc7}
+.save b{display:block;font-size:40px;font-weight:800;letter-spacing:-.03em;color:#c6f432;font-variant-numeric:tabular-nums;line-height:1.15;transition:color .2s}
+.save b.zero{color:#6b7280}
+.save small{font-size:14px;color:#9aa1ad;font-variant-numeric:tabular-nums}
+.list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.sub-row{display:flex;align-items:center;gap:10px;background:#1b1e25;border:1px solid #252a33;border-radius:16px;padding:12px 12px 12px 12px;min-height:68px;cursor:pointer;transition:background-color .18s,border-color .18s,transform .15s}
+.sub-row:active{transform:scale(.98)}
+.sub-row.cut{background:#15171c;border-color:rgba(198,244,50,.35)}
+.av{width:42px;height:42px;border-radius:12px;display:grid;place-content:center;font-weight:800;font-size:18px;color:#fff;flex:none;transition:opacity .18s}
+.cut .av{opacity:.45}
+.info{flex:1;min-width:0}
+.nm{display:block;font-weight:600;font-size:15px;line-height:1.3}
+.hint{display:block;font-size:13px;color:#9aa1ad}
+.hint.idle{color:#f5b85a}
+.pr{font-weight:600;font-size:15px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.pr small{display:block;font-size:12px;font-weight:500;color:#8b929e}
+.cut .pr{color:#7d8491}
+.cut .pr span{text-decoration:line-through}
+.sw{position:relative;width:52px;height:32px;border-radius:16px;background:#3a3f4a;flex:none;transition:background-color .2s}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35);transition:transform .2s}
+.sw.on{background:#c6f432}
+.sw.on:after{transform:translateX(20px)}
+.sl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-align:center;margin-top:3px;color:#9aa1ad}
+.cut .sl{color:#c6f432}
+.main{width:100%;min-height:54px;font:inherit;font-weight:700;font-size:16px;border:0;border-radius:16px;background:#c6f432;color:#14170c;cursor:pointer;box-shadow:0 8px 24px rgba(198,244,50,.18);transition:transform .15s,opacity .2s}
+.main:active,.alt:active{transform:scale(.98)}
+.main:disabled{opacity:.4;cursor:default;box-shadow:none}
+.alt{width:100%;min-height:48px;font:inherit;font-size:15px;border:0;background:none;color:#b7bdc7;cursor:pointer;margin-top:6px;border-radius:12px}
+.alt:disabled{opacity:.5}
+.status{text-align:center;font-size:14px;color:#9aa1ad;min-height:20px;margin:6px 0 0}
+</style>
+<div class="wrap">
+  <h1 id="title"></h1>
+  <p class="sub" id="sub"></p>
+  <div class="save"><span id="saveLead"></span><b id="year"></b><small id="month"></small></div>
+  <div class="list" id="list"></div>
+  <button class="main" id="go"></button>
+  <button class="alt" id="keep"></button>
+  <p class="status" id="status" role="status"></p>
+</div>
+<script>
+// The card's content. Change only this object.
+// answer.data: {"cancel":["streambox",…],"keep":["cloudvault",…],"saves_eur_month":26.0,"saves_eur_year":312}
+var CARD = {
+  title: '7 subscriptions, €94.93 a month. Keep them all?',
+  sub: 'I checked your card statement. Three of these haven’t been opened in over a month.',
+  currency: '€',
+  save_lead: 'You’d save',
+  idle_after_days: 30,
+  subs: [
+    {id: 'streambox', name: 'StreamBox', price: 13.50, last: 'Unused for 63 days', days: 63, color: '#e5484d'},
+    {id: 'cloudvault', name: 'CloudVault 2 TB', price: 9.96, last: 'Synced today', days: 0, color: '#3e7bfa'},
+    {id: 'fitplus', name: 'Fit+ Gym app', price: 4.50, last: 'Unused for 41 days', days: 41, color: '#f76b15'},
+    {id: 'courier', name: 'Daily Courier news', price: 14.99, last: 'Read yesterday', days: 1, color: '#5b5bd6'},
+    {id: 'musichub', name: 'MusicHub Family', price: 19.99, last: 'Used today', days: 0, color: '#12a594'},
+    {id: 'pixelstudio', name: 'Pixel Studio', price: 23.99, last: 'Used 3 days ago', days: 3, color: '#d6409f'},
+    {id: 'lingualeap', name: 'LinguaLeap', price: 8.00, last: 'Unused for 108 days', days: 108, color: '#30a46c'}
+  ],
+  per_month: '/mo',
+  keep_word: 'Keep', cancel_word: 'Cancel',
+  keep_all: 'Keep them all',
+  none_selected: 'Switch off any you want to cancel',
+  sending: 'Sending…',
+  preview: 'Preview only: open this card in Bridgit to answer.',
+  done: 'Got it. I’ll cancel those for you',
+  done_keep: 'Got it. Keeping all seven'
+};
+
+var sent = false, state = {}, doneText = CARD.done;
+function $(id) { return document.getElementById(id); }
+function money(v) { return CARD.currency + v.toFixed(2); }
+$('title').textContent = CARD.title;
+$('sub').textContent = CARD.sub;
+$('saveLead').textContent = CARD.save_lead;
+$('keep').textContent = CARD.keep_all;
+
+CARD.subs.forEach(function (s) {
+  state[s.id] = s.days < CARD.idle_after_days; // true = keep
+  var r = document.createElement('div'); r.className = 'sub-row'; r.setAttribute('role', 'switch'); r.tabIndex = 0;
+  var av = document.createElement('div'); av.className = 'av'; av.style.background = s.color; av.textContent = s.name.charAt(0);
+  var info = document.createElement('div'); info.className = 'info';
+  var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = s.name;
+  var h = document.createElement('span'); h.className = 'hint' + (s.days >= CARD.idle_after_days ? ' idle' : ''); h.textContent = s.last;
+  info.appendChild(nm); info.appendChild(h);
+  var pr = document.createElement('div'); pr.className = 'pr'; var pv = document.createElement('span'); pv.textContent = money(s.price); pr.appendChild(pv);
+  var pm = document.createElement('small'); pm.textContent = CARD.per_month; pr.appendChild(pm);
+  var wrap = document.createElement('div');
+  var sw = document.createElement('div'); sw.className = 'sw';
+  var sl = document.createElement('span'); sl.className = 'sl';
+  wrap.appendChild(sw); wrap.appendChild(sl);
+  r.appendChild(av); r.appendChild(info); r.appendChild(pr); r.appendChild(wrap);
+  r.onclick = function () { if (sent) return; state[s.id] = !state[s.id]; update(); };
+  r.onkeydown = function (e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); r.onclick(); } };
+  s.el = {row: r, sw: sw, sl: sl};
+  $('list').appendChild(r);
+});
+
+function totals() {
+  var cut = CARD.subs.filter(function (s) { return !state[s.id]; });
+  var m = Math.round(cut.reduce(function (a, s) { return a + s.price; }, 0) * 100) / 100;
+  return {cut: cut, month: m, year: Math.round(m * 12)};
+}
+function update() {
+  CARD.subs.forEach(function (s) {
+    var keep = state[s.id];
+    s.el.row.classList.toggle('cut', !keep);
+    s.el.sw.classList.toggle('on', keep);
+    s.el.sl.textContent = keep ? CARD.keep_word : CARD.cancel_word;
+    s.el.row.setAttribute('aria-checked', String(keep));
+    s.el.row.setAttribute('aria-label', s.name + ', ' + (keep ? CARD.keep_word : CARD.cancel_word));
+  });
+  var t = totals(), n = t.cut.length;
+  $('year').textContent = CARD.currency + t.year + ' a year';
+  $('year').classList.toggle('zero', n === 0);
+  $('month').textContent = money(t.month) + ' a month · ' + n + ' to cancel';
+  $('go').textContent = n ? 'Cancel ' + n + ' subscription' + (n > 1 ? 's' : '') : CARD.none_selected;
+  $('go').disabled = n === 0;
+}
+
+function send(data) {
+  if (sent) return;
+  var B = window.Bridgit || window.Bridget;
+  if (!B) { $('status').textContent = CARD.preview; return; }
+  sent = true;
+  $('go').disabled = true; $('keep').disabled = true;
+  $('status').textContent = CARD.sending;
+  B.respond(JSON.stringify(data));
+}
+$('go').onclick = function () {
+  var t = totals();
+  send({
+    cancel: t.cut.map(function (s) { return s.id; }),
+    keep: CARD.subs.filter(function (s) { return state[s.id]; }).map(function (s) { return s.id; }),
+    saves_eur_month: t.month, saves_eur_year: t.year
+  });
+};
+$('keep').onclick = function () {
+  doneText = CARD.done_keep;
+  send({cancel: [], keep: CARD.subs.map(function (s) { return s.id; }), saves_eur_month: 0, saves_eur_year: 0});
+};
+document.addEventListener('bridgit:answered', function (e) {
+  e.preventDefault();
+  $('title').textContent = '✓ ' + doneText; $('title').classList.add('done');
+  $('status').textContent = '';
+  setTimeout(function () { $('title').scrollIntoView({block: 'center', behavior: 'smooth'}); }, 400);
+});
+update();
+</script>

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read this linked account's shared monthly image allowance without generating an image",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "images_usage",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/images/usage",
+  "idempotent": false,
+  "path": "/v1/images/usage",
+  "capability": "judgment",
+  "returns": "limit (40), used, remaining, period, timezone (UTC), resets_at",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,48 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "A small picture from a body tracking session (one is kept every half second), the one nearest a time, for a replay",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "camera_pose_picture",
+  "query": [{
+   "name": "t",
+   "description": "Milliseconds into the session",
+   "type": "integer",
+   "required": true
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/camera/pose/pose_abc/picture?t=12000",
+  "idempotent": false,
+  "path": "/v1/camera/pose/{id}/picture",
+  "capability": "camera",
+  "returns": "t, width_px, height_px, format jpeg, data_base64",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "t": {
+     "description": "Milliseconds into the session",
+     "type": "integer"
+    },
+    "id": {
+     "description": "The id in /v1/camera/pose/{id}/picture",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "t"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

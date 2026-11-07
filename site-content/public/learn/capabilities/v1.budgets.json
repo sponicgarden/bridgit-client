@@ -1,0 +1,57 @@
+{
+ "detail_url": "/v1/discover?id=v1.budgets&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.budgets.json",
+ "title": "budgets",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.budgets.json",
+ "prerequisites": ["Check v1.budgets supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Set an installed applet's money limits (all the owner's phones share them): each {id?, usd 0.01-100, per hour|day|week|month, check_at?}; within the owner's ceiling",
+   "path": "/v1/applets/{id}/budget",
+   "method": "PUT",
+   "documentation": "https://bridgit.cc/learn/operations/put-v1-applets-id-budget.json",
+   "operation_url": "https://bridgit.cc/learn/operations/put-v1-applets-id-budget.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_budget_set"
+  },
+  {
+   "summary": "Add money to one limit of an installed applet for the current period only (it ends at the reset); stopped checks resume at once",
+   "path": "/v1/applets/{id}/budget/top-up",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-id-budget-top-up.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-id-budget-top-up.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_budget_top_up"
+  },
+  {
+   "summary": "Change how often one action of an installed applet runs (every_s within the action's min_s..max_s), on every phone; the running watches change in place and keep their counts. dry_run returns the new projection without saving",
+   "path": "/v1/applets/{id}/actions/{action}",
+   "method": "PUT",
+   "documentation": "https://bridgit.cc/learn/operations/put-v1-applets-id-actions-action.json",
+   "operation_url": "https://bridgit.cc/learn/operations/put-v1-applets-id-actions-action.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_action_set"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.budgets",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v1.budgets"]
+}

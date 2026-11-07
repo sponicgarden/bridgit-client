@@ -1,0 +1,158 @@
+name: BridgitPortal
+options:
+  bundleIdPrefix: cc.bridgit
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: 9QHUBZYQ86 # Sponic Gardens, Inc (TestFlight team)
+    CODE_SIGN_STYLE: Automatic
+packages:
+  BridgitAppletRuntime:
+    path: ../../apple/BridgitAppletRuntime
+  Sentry:
+    url: https://github.com/getsentry/sentry-cocoa
+    exactVersion: 9.31.0
+targets:
+  BridgitPortal:
+    type: application
+    platform: iOS
+    sources: [BridgitPortal]
+    dependencies:
+      - package: BridgitAppletRuntime
+      - package: Sentry
+        product: Sentry
+    info:
+      path: BridgitPortal/Info.plist
+      properties:
+        CFBundleDisplayName: Bridgit Portal
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UILaunchScreen: {}
+        NSLocationWhenInUseUsageDescription: Share one foreground location reading with an applet you approve.
+        NSMicrophoneUsageDescription: Record a short clip when you tap an applet recording button.
+        NSSpeechRecognitionUsageDescription: Transcribe your applet recording on this device for you to review.
+        NSCameraUsageDescription: Take and review photos for local applets, send photos to selected applets on your paired phone, or scan a pairing code.
+        ITSAppUsesNonExemptEncryption: false
+        UIAppFonts: [BricolageGrotesque-Bold.ttf]
+        SentryDSN: ""
+        CFBundleURLTypes:
+          - CFBundleURLName: cc.bridgit.portal
+            CFBundleURLSchemes: [bridgitportal]
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+    postCompileScripts:
+      - name: Copy the APK Home scene
+        basedOnDependencyAnalysis: true
+        inputFiles:
+          - $(SRCROOT)/../../app/src/main/assets/diagnostics/scene.html
+          - $(SRCROOT)/../../app/src/main/assets/diagnostics/home-status.js
+          - $(SRCROOT)/../../app/src/main/assets/diagnostics/symbols.woff2
+          - $(SRCROOT)/../../app/src/main/assets/diagnostics/portal-overlay.js
+          - $(SRCROOT)/../../app/src/main/assets/diagnostics/devices.html
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/scene.html
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/home-status.js
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/symbols.woff2
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/portal-overlay.js
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/devices.html
+        script: |
+          # One source of truth: the same scene files the APK ships (app/src/main/assets/diagnostics):
+          # Home's scene and the Devices tab's map.
+          set -e
+          dest="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/diagnostics"
+          mkdir -p "$dest"
+          cp "$SRCROOT/../../app/src/main/assets/diagnostics/scene.html" "$SRCROOT/../../app/src/main/assets/diagnostics/home-status.js" "$SRCROOT/../../app/src/main/assets/diagnostics/symbols.woff2" "$SRCROOT/../../app/src/main/assets/diagnostics/portal-overlay.js" "$SRCROOT/../../app/src/main/assets/diagnostics/devices.html" "$dest/"
+      - name: Copy the APK card library
+        basedOnDependencyAnalysis: true
+        inputFiles:
+          - $(SRCROOT)/../../site-content/public/samples/samples.json
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/samples.json
+        script: |
+          # Applets › Cards › Library: the same samples file the APK bundles (app/build.gradle.kts copies it too).
+          set -e
+          cp "$SRCROOT/../../site-content/public/samples/samples.json" "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/samples.json"
+      - name: Copy the APK device brand logos
+        basedOnDependencyAnalysis: false
+        script: |
+          # The APK's bundled brand logos and catalog (app/src/main/assets/device-brands), next to diagnostics/
+          # so the map page's ../device-brands/ paths resolve. Always re-synced; it is a handful of small files.
+          # The List draws logos natively, and UIImage can't read SVG, so each SVG is also rendered to PNG
+          # (brand-logos/<asset>.png) with macOS Quick Look. Without a render, the app shows the brand's name instead.
+          set -e
+          src="$SRCROOT/../../app/src/main/assets/device-brands"
+          res="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH"
+          mkdir -p "$res/device-brands" "$res/brand-logos"
+          rsync -a --delete "$src/" "$res/device-brands/"
+          # Each SVG is drawn on a mid-grey backdrop (#808080) first, so white logos survive Quick Look's white page;
+          # the app turns that grey back into transparency (BrandImages.trim).
+          cache="$DERIVED_FILE_DIR/brand-logos"
+          work="$DERIVED_FILE_DIR/brand-logos-src"
+          mkdir -p "$cache" "$work"
+          for f in "$src"/*.svg; do
+            name="$(basename "$f")"
+            out="$cache/$name.png"
+            if [ ! -f "$out" ] || [ "$f" -nt "$out" ]; then
+              perl -0pe 's/(<svg\b[^>]*>)/$1<rect x="-100000" y="-100000" width="200000" height="200000" fill="#808080"\/>/s' "$f" > "$work/$name"
+              qlmanage -t -s 256 -o "$cache" "$work/$name" >/dev/null 2>&1 || echo "warning: no PNG render for $name"
+            fi
+          done
+          rsync -a --delete "$cache/" "$res/brand-logos/"
+    postBuildScripts:
+      - name: Crash reporting address (Sentry DSN)
+        basedOnDependencyAnalysis: false
+        script: |
+          # Crash reports go only where the builder points them, like the APK (app/build.gradle.kts):
+          # BRIDGIT_SENTRY_DSN, or iosSentryDsn in keystore.properties (this checkout or the main one).
+          # Empty means no crash reports. The address is never committed.
+          dsn="${BRIDGIT_SENTRY_DSN:-}"
+          if [ -z "$dsn" ]; then
+            common="$(git -C "$SRCROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"
+            for f in "$SRCROOT/../../keystore.properties" "${common%/.git}/keystore.properties"; do
+              [ -f "$f" ] && dsn="$(sed -n 's/^iosSentryDsn=//p' "$f" | head -1)" && [ -n "$dsn" ] && break
+            done
+          fi
+          /usr/libexec/PlistBuddy -c "Set :SentryDSN ${dsn}" "$TARGET_BUILD_DIR/$INFOPLIST_PATH"
+          [ -n "$dsn" ] && echo "Sentry crash reports on" || echo "Sentry crash reports off (no DSN)"
+    settings:
+      base:
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        PRODUCT_BUNDLE_IDENTIFIER: cc.bridgit.portal
+        "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": Catalyst.entitlements
+        PRODUCT_NAME: Bridgit Portal
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: YES
+      configs:
+        # TestFlight builds are signed by publish-testflight.sh with the team's distribution
+        # certificate and the "Bridgit Portal App Store" profile; Debug stays automatic.
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: Bridgit Portal App Store
+  BridgitPortalTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [BridgitPortalTests]
+    dependencies:
+      - target: BridgitPortal
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        SUPPORTS_MACCATALYST: YES
+        "TEST_HOST[sdk=macosx*]": "$(BUILT_PRODUCTS_DIR)/Bridgit Portal.app/Contents/MacOS/Bridgit Portal"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Bridgit Portal.app/Bridgit Portal"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+schemes:
+  BridgitPortal:
+    build:
+      targets:
+        BridgitPortal: all
+        BridgitPortalTests: [test]
+    test:
+      targets: [BridgitPortalTests]

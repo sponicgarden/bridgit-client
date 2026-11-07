@@ -1,0 +1,177 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#f6f5ff 0%,#ffffff 60%);color:#1e1b3a;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 28px}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#4646b8;background:#ebebfd;border-radius:999px;padding:5px 10px}
+h1{font-size:24px;line-height:1.2;margin:10px 0 4px;letter-spacing:-.01em}
+.sub{color:#5d5a7a;font-size:15px;margin:0 0 16px}
+.cal{background:#fff;border-radius:20px;padding:14px 12px 12px;box-shadow:0 4px 18px rgba(60,55,140,.09)}
+.mon{display:flex;justify-content:space-between;align-items:baseline;margin:0 4px 10px}
+.mon b{font-size:17px}
+.mon span{font-size:12px;color:#5d5a7a}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dow{text-align:center;font-size:12px;font-weight:700;color:#7a77a0;padding-bottom:2px}
+.day{font:inherit;border:0;border-radius:12px;min-height:50px;padding:4px 0;background:transparent;color:#bdbbd0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-variant-numeric:tabular-nums;transition:transform .15s,box-shadow .18s}
+.day b{font-size:15px;font-weight:600;line-height:1.1}
+.day small{font-size:11px;font-weight:700;line-height:1}
+.day.c{cursor:pointer}
+.day.on{box-shadow:0 0 0 2.5px #fff,0 0 0 5px #2f2d8c;transform:scale(1.04)}
+.day.c:active{transform:scale(.96)}
+.key{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-size:12px;color:#5d5a7a;margin:10px 4px 0}
+.key i{display:block;width:90px;height:8px;border-radius:4px;background:linear-gradient(90deg,#efeefd,#403ec4)}
+.lbl{font-size:13px;font-weight:700;color:#5d5a7a;margin:18px 0 8px}
+.times{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tm{font:inherit;min-height:56px;border-radius:14px;border:1.5px solid #dcdaf5;background:#fff;color:#1e1b3a;cursor:pointer;font-variant-numeric:tabular-nums;transition:all .18s}
+.tm b{display:block;font-size:16px}
+.tm small{font-size:12px;color:#5d5a7a}
+.tm.on{background:#5b5bd6;border-color:#5b5bd6;color:#fff;box-shadow:0 6px 14px rgba(91,91,214,.3)}
+.tm.on small{color:#e4e4ff}
+.who{background:#fff;border-radius:16px;padding:12px 14px;margin-top:12px;box-shadow:0 2px 10px rgba(60,55,140,.06);min-height:58px}
+.who p{margin:0 0 8px;font-size:14px;color:#5d5a7a}
+.ppl{display:flex;flex-wrap:wrap;gap:8px}
+.pp{display:flex;align-items:center;gap:6px;background:#f4f3ff;border-radius:999px;padding:4px 10px 4px 4px;font-size:14px;font-weight:600}
+.pp i{width:24px;height:24px;border-radius:50%;background:#c9c8f3;color:#2f2d8c;display:grid;place-content:center;font-style:normal;font-size:12px;font-weight:800}
+.all{font-weight:700;color:#2f8a5a}
+.foot{margin-top:20px}
+button.main{width:100%;font:inherit;font-weight:700;font-size:17px;border:0;border-radius:16px;padding:16px;min-height:56px;background:#5b5bd6;color:#fff;cursor:pointer;box-shadow:0 8px 18px rgba(91,91,214,.32);transition:transform .15s,opacity .2s}
+button.alt{width:100%;font:inherit;font-weight:600;border:0;border-radius:14px;padding:14px;min-height:48px;background:transparent;color:#4646b8;cursor:pointer;margin-top:6px}
+button:active{transform:scale(.98)}
+button:disabled{opacity:.5;cursor:default;transform:none}
+.status{text-align:center;color:#5d5a7a;font-size:14px;min-height:20px;margin-top:6px}
+.done{color:#4646b8}
+</style>
+<div class="wrap">
+  <span class="eyebrow" id="eyebrow"></span>
+  <h1 id="title"></h1>
+  <p class="sub" id="sub"></p>
+  <div class="cal">
+    <div class="mon"><b id="month"></b><span id="hint"></span></div>
+    <div class="grid" id="grid"></div>
+    <div class="key"><span id="kLo"></span><i></i><span id="kHi"></span></div>
+  </div>
+  <p class="lbl" id="timeLbl"></p>
+  <div class="times" id="times"></div>
+  <div class="who"><p id="whoLbl"></p><div class="ppl" id="ppl"></div></div>
+  <div class="foot"><button class="main" id="go"></button><button class="alt" id="alt"></button><div class="status" id="status"></div></div>
+</div>
+<script>
+// The card's content. Change only this object.
+// answer.data: {date:"2026-12-10", time:"19:30", free:7, missing:["Ola"]} or {action:"none_work"}
+var CARD = {
+  eyebrow: "👥 Design team · 8 people",
+  title: "Team dinner: which evening works?",
+  sub: "I checked everyone's calendars. Darker evenings have more people free.",
+  year: 2026, month: 12, monthName: "December 2026",
+  hint: "Tap an evening",
+  weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  dayNames: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  shortMonth: "Dec",
+  keyLow: "fewer", keyHigh: "more free",
+  people: [
+    { name: "Ania" }, { name: "Bartek", earliest: "19:00" }, { name: "Kasia" }, { name: "Marek" },
+    { name: "Ola" }, { name: "Piotr" }, { name: "Zosia", earliest: "19:30" }, { name: "Tomek", latest: "19:30" }
+  ],
+  // candidate evenings: day of month -> who is busy all evening
+  days: {
+    1: ["Ania", "Piotr", "Tomek"], 2: ["Marek", "Kasia"], 3: ["Ola", "Ania", "Piotr", "Kasia"],
+    4: ["Tomek", "Marek"], 8: ["Kasia", "Zosia", "Ola", "Bartek", "Piotr"], 9: ["Piotr", "Ania"],
+    10: ["Ola"], 11: ["Marek", "Tomek", "Ania"], 15: ["Bartek", "Kasia"],
+    16: ["Ania", "Marek", "Ola", "Tomek", "Kasia", "Piotr"], 17: ["Zosia", "Ola"]
+  },
+  times: ["18:30", "19:00", "19:30", "20:00"],
+  pick: { day: 10, time: "19:30" },
+  timeLabel: "Start time",
+  whoLabel: "Can't make it",
+  everyone: "Everyone's in 🎉",
+  primary: "Propose {day}, {time}",
+  secondary: "None of these work",
+  sending: "Sending…",
+  doneTitle: "Proposed to the team",
+  doneSub: "I'll send the invite and book a table for {n}.",
+  preview: "Preview only: open this card in Bridgit to answer."
+};
+
+var sent = false, day = CARD.pick.day, time = CARD.pick.time, cells = {}, chips = [];
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function m(t){ var p = t.split(":"); return +p[0] * 60 + +p[1]; }
+function missing(d, t){
+  var busy = CARD.days[d] || [];
+  return CARD.people.filter(function(p){
+    return busy.indexOf(p.name) >= 0 || (p.earliest && m(t) < m(p.earliest)) || (p.latest && m(t) > m(p.latest));
+  }).map(function(p){ return p.name; });
+}
+function best(d){ return Math.max.apply(null, CARD.times.map(function(t){ return CARD.people.length - missing(d, t).length; })); }
+function tint(n){
+  var a = [239, 238, 253], b = [64, 62, 196], k = Math.max(0, (n - 1) / (CARD.people.length - 1));
+  return a.map(function(v, i){ return Math.round(v + (b[i] - v) * k); });
+}
+function label(d){ var w = new Date(CARD.year, CARD.month - 1, d).getDay(); return CARD.dayNames[w] + " " + d + " " + CARD.shortMonth; }
+
+["eyebrow", "title", "sub"].forEach(function(k){ $(k).textContent = CARD[k]; });
+$("month").textContent = CARD.monthName; $("hint").textContent = CARD.hint;
+$("kLo").textContent = CARD.keyLow; $("kHi").textContent = CARD.keyHigh;
+$("timeLbl").textContent = CARD.timeLabel; $("whoLbl").textContent = CARD.whoLabel; $("alt").textContent = CARD.secondary;
+
+CARD.weekdays.forEach(function(w){ $("grid").appendChild(el("div", "dow", w)); });
+var lead = (new Date(CARD.year, CARD.month - 1, 1).getDay() + 6) % 7, total = new Date(CARD.year, CARD.month, 0).getDate();
+for (var i = 0; i < lead; i++) $("grid").appendChild(el("div"));
+for (var d = 1; d <= total; d++) (function(d){
+  var cand = !!CARD.days[d], c = el(cand ? "button" : "div", "day" + (cand ? " c" : ""));
+  c.appendChild(el("b", null, String(d)));
+  if (cand) {
+    var n = best(d);
+    c.appendChild(el("small", null, n + "/" + CARD.people.length));
+    var rgb = tint(n), L = rgb.map(function(v){ v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); });
+    L = .2126 * L[0] + .7152 * L[1] + .0722 * L[2];
+    c.style.background = "rgb(" + rgb.join(",") + ")"; c.style.color = 1.05 / (L + .05) > (L + .05) / .0644 ? "#fff" : "#1c1a4a";
+    c.setAttribute("aria-label", label(d) + ": " + n + " free");
+    c.onclick = function(){ if (sent) return; day = d; render(); };
+    cells[d] = c;
+  }
+  $("grid").appendChild(c);
+})(d);
+
+CARD.times.forEach(function(t){
+  var b = el("button", "tm"); b.appendChild(el("b", null, t)); b.appendChild(el("small"));
+  b.onclick = function(){ if (sent) return; time = t; render(); };
+  chips.push({ t: t, b: b }); $("times").appendChild(b);
+});
+
+function render(){
+  Object.keys(cells).forEach(function(k){ cells[k].classList.toggle("on", +k === day); });
+  chips.forEach(function(c){
+    c.b.classList.toggle("on", c.t === time);
+    c.b.lastChild.textContent = (CARD.people.length - missing(day, c.t).length) + " free";
+  });
+  var miss = missing(day, time), box = $("ppl");
+  box.textContent = "";
+  if (!miss.length) box.appendChild(el("span", "all", CARD.everyone));
+  miss.forEach(function(n){ var p = el("span", "pp"); p.appendChild(el("i", null, n.charAt(0))); p.appendChild(document.createTextNode(n)); box.appendChild(p); });
+  $("go").textContent = CARD.primary.replace("{day}", label(day)).replace("{time}", time);
+  return miss;
+}
+
+function send(answer){
+  if (sent) return;
+  var B = window.Bridgit || window.Bridget;
+  if (!B || !B.respond) { $("status").textContent = CARD.preview; return; }
+  sent = true;
+  document.querySelectorAll("button").forEach(function(b){ b.disabled = true; });
+  $("status").textContent = CARD.sending;
+  B.respond(JSON.stringify(answer));
+}
+$("go").onclick = function(){
+  var miss = render(), mm = CARD.month < 10 ? "0" + CARD.month : CARD.month, dd = day < 10 ? "0" + day : day;
+  send({ date: CARD.year + "-" + mm + "-" + dd, time: time, free: CARD.people.length - miss.length, missing: miss });
+};
+$("alt").onclick = function(){ send({ action: "none_work" }); };
+document.addEventListener("bridgit:answered", function(e){
+  e.preventDefault();
+  $("title").textContent = "✓ " + CARD.doneTitle; $("title").className = "done";
+  $("sub").textContent = CARD.doneSub.replace("{n}", CARD.people.length - missing(day, time).length);
+  $("status").textContent = "";
+  setTimeout(function(){ $("title").scrollIntoView({ block: "center" }); }, 400);
+});
+render();
+</script>

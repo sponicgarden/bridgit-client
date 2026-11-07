@@ -1,0 +1,48 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Delete a declared table row using owner-UI table-store cleanup. Owner control agents can act on every applet; applet principals need installer sharing",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "applets_installed_tables_rows_delete",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/applets/installed/ai0123456789abcd/tables/receipts/rows/abc",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/tables/{table}/rows/{row}",
+  "capability": "applet_install",
+  "returns": "deleted, existed",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "id": {
+     "description": "The id in /v1/applets/installed/{id}/tables/{table}/rows/{row}",
+     "type": "string"
+    },
+    "row": {
+     "description": "The row in /v1/applets/installed/{id}/tables/{table}/rows/{row}",
+     "type": "string"
+    },
+    "table": {
+     "description": "The table in /v1/applets/installed/{id}/tables/{table}/rows/{row}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "table",
+    "row"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "not_shared"
+  ],
+  "requires": null
+ }
+}

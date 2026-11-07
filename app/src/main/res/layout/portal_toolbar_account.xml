@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:contentDescription="@string/applets_portal_account"
+    android:focusable="true"
+    android:clickable="true"
+    android:foreground="?attr/selectableItemBackgroundBorderless">
+    <TextView
+        android:id="@+id/portal_account"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:background="@drawable/portal_avatar_bg"
+        android:importantForAccessibility="no"
+        android:gravity="center"
+        android:textAllCaps="true"
+        android:textColor="@color/portal_avatar_ink"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+</FrameLayout>

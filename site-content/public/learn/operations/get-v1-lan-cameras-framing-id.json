@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your operation's camera, confidence, progress, stop result and framing limits",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_cameras_framing_status",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan-cameras/framing/{id}",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/framing/{id}",
+  "capability": "lan_camera",
+  "returns": "state, reason, camera, observation, limits, moves, checks, travel, frame retrieval time (not sensor time), photo_url, stop, framing_limited; no reference bytes",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/lan-cameras/framing/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

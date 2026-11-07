@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your retained reference-framing operations",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_cameras_framing_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan-cameras/framing",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/framing",
+  "capability": "lan_camera",
+  "returns": "operations; records and private frames expire 15 minutes after completion",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

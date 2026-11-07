@@ -1,0 +1,57 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read this applet principal's own declared table, oldest first. No instance id or installer sharing needed; other applets are inaccessible",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applet_tables_rows_get",
+  "query": [
+   {
+    "name": "limit",
+    "description": "1-200, default 50; page also bounded to about 40 KB",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "since",
+    "description": "Previous next row id; stop at next:null",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applet/tables/results/rows?limit=10",
+  "idempotent": false,
+  "path": "/v1/applet/tables/{table}/rows",
+  "capability": "applet_data",
+  "returns": "items[], count, next (pass as since)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "limit": {
+     "description": "1-200, default 50; page also bounded to about 40 KB",
+     "type": "integer"
+    },
+    "table": {
+     "description": "The table in /v1/applet/tables/{table}/rows",
+     "type": "string"
+    },
+    "since": {
+     "description": "Previous next row id; stop at next:null",
+     "type": "string"
+    }
+   },
+   "required": ["table"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "not_found"
+  ],
+  "requires": null
+ }
+}

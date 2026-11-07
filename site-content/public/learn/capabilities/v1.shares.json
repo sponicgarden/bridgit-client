@@ -1,0 +1,57 @@
+{
+ "detail_url": "/v1/discover?id=v1.shares&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.shares.json",
+ "title": "shares",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.shares.json",
+ "prerequisites": ["Check v1.shares supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Your shares transfers, retained 30 days on the phone",
+   "path": "/v1/shares",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-shares.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-shares.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "shares_list"
+  },
+  {
+   "summary": "Read your selected transfer bytes",
+   "path": "/v1/shares/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-shares-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-shares-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "shares_get"
+  },
+  {
+   "summary": "Delete your transfer",
+   "path": "/v1/shares/{id}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-shares-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-shares-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "shares_delete"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.shares",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "remember",
+ "capability_ids": ["v1.shares"]
+}

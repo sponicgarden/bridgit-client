@@ -1,0 +1,87 @@
+{
+ "detail_url": "/v1/discover?id=v1.find_crop&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.find_crop.json",
+ "title": "find crop",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.find_crop.json",
+ "prerequisites": ["Check v1.find_crop supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Find things in a photo and get their boxes: \"the dog\", \"each dirty dish\", \"the face of each person\". Faces are found on the phone; anything else by a cheap cloud vision model (shares the Jev/Clef budget)",
+   "path": "/v1/images/find",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-images-find.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-images-find.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "images_find"
+  },
+  {
+   "summary": "Zoom in on something in a photo: crop to what query finds (or to a box you give) with some margin. which=first (default), all (one crop around every match) or each (one crop per match, 10 at most)",
+   "path": "/v1/images/crop",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-images-crop.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-images-crop.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "images_crop"
+  },
+  {
+   "summary": "Home inventory from a photo: every belonging in it with a box, category, brand and model where they can be read, visible condition, estimated price new and used (US dollars), whether a home or renters policy would normally cover it, and how sure the model is. One cloud vision call (about half a cent; shares the Jev/Clef budget)",
+   "path": "/v1/images/appraise",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-images-appraise.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-images-appraise.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "images_appraise"
+  },
+  {
+   "summary": "The opt-in on-phone vision engines for find and crop, from the Bridgit team's signed software manifest (checked daily, so new engines can appear without an app update): what each is good at, its speed and size on a mid-range phone, its licence, and whether its model is downloaded. They are free and work offline, and run only when you name them (engine, outline)",
+   "path": "/v1/images/engines",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-images-engines.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-images-engines.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "images_engines"
+  },
+  {
+   "summary": "Check the software manifest now instead of waiting for the daily check; engines in use update to their newest version (on Wi-Fi)",
+   "path": "/v1/images/engines/check",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-images-engines-check.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-images-engines-check.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "images_engines_check"
+  },
+  {
+   "summary": "Start downloading an opt-in engine's model now (on Wi-Fi), so the first find with it doesn't wait. A find or crop that names it starts the download too",
+   "path": "/v1/images/engines/download",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-images-engines-download.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-images-engines-download.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "images_engines_download"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.find_crop",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "process",
+ "capability_ids": ["v1.find_crop"]
+}

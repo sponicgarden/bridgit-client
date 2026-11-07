@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The audio after a wake word, when the owner set that wake word to send it (kept in memory 10 minutes unless you chose longer with POST /v1/captures/storage; also GET /v1/captures/{id})",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "listen_clip",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/listen/clip/c0123abcd",
+  "idempotent": false,
+  "path": "/v1/listen/clip/{id}",
+  "capability": "wakewords",
+  "returns": "heard_at, duration_seconds, format (wav), sample_rate_hz, size_bytes, data_base64 (or raw=1 bytes)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/listen/clip/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

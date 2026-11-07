@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notification channels (UI-21) -->
+    <string name="channel_questions">Questions</string>
+    <string name="channel_questions_desc">When a control agent asks you something</string>
+    <string name="channel_notices">Notices</string>
+    <string name="channel_notices_desc">When a control agent tells you something</string>
+
+    <!-- Notifications (CAP-33). The agent name is drawn in bold. -->
+    <string name="interact_notif_asks">%1$s asks:</string>
+    <string name="interact_notif_notice">%1$s:</string>
+    <string name="interact_public_question">%1$s has a question</string>
+    <string name="interact_public_notice">%1$s sent a notice</string>
+    <string name="interact_notif_card">%1$s sent a card:</string>
+    <string name="interact_notif_streaming">%1$s is streaming:</string>
+    <string name="interact_public_card">%1$s sent a card</string>
+    <string name="interact_public_streaming">%1$s is streaming text</string>
+    <string name="interact_reply">Reply</string>
+    <string name="interact_open_link">Open %1$s</string>
+
+    <!-- Link activity (CAP-41) -->
+    <string name="interact_link_failed">This link is no longer available.</string>
+    <string name="interact_link_no_app">No app on this phone can open this link.</string>
+    <string name="interact_link_opened">You opened \"%1$s\" from %2$s</string>
+
+    <!-- Settings -->
+    <string name="settings_lockscreen_text">Show question text on the lock screen</string>
+    <string name="settings_lockscreen_text_desc">Off: the lock screen only says which control agent has a question.</string>
+    <string name="settings_crash_reports">Send crash reports</string>
+    <string name="settings_crash_reports_desc">When Bridgit crashes or freezes, it sends the error, app version and phone model to Sentry. Never photos, screenshots, keys, your location or what control agents asked.</string>
+    <string name="settings_changed_crash_reports">You turned crash reports %1$s</string>
+    <string name="settings_usage_tallies">Send feature-use tallies</string>
+    <string name="settings_usage_tallies_desc">Once a day, a count of which features were used goes to bridgit.cc. Counts only: no install or device id, control agent names, times or content.</string>
+    <string name="settings_changed_usage_tallies">You turned feature-use tallies %1$s</string>
+    <string name="settings_usage_what">See what would be sent</string>
+    <string name="settings_usage_what_desc">The counts waiting for the next daily batch</string>
+    <string name="settings_usage_none">Nothing is waiting to be sent.</string>
+    <string name="settings_speak_urgent">Read urgent questions aloud even in Do Not Disturb</string>
+    <string name="settings_speak_urgent_desc">Only when the control agent marks it urgent and asks for it to be read.</string>
+    <string name="settings_changed_lockscreen">You turned question text on the lock screen %1$s</string>
+    <string name="settings_changed_speak_urgent">You turned reading urgent questions aloud in Do Not Disturb %1$s</string>
+    <string name="settings_open_on_arrival">Open Bridgit when a control agent sends something</string>
+    <string name="settings_open_on_arrival_desc">Brings Bridgit to the front on that card. If the phone is locked, the card is waiting when you unlock. While Bridgit is already open, new cards open directly.</string>
+    <string name="settings_open_on_arrival_needs">Needs \"Display over other apps\". Tap to allow it.</string>
+    <string name="settings_changed_open_on_arrival">You turned opening Bridgit when a control agent sends something %1$s</string>
+</resources>

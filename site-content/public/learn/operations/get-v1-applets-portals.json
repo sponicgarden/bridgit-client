@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Every installed applet that has a portal (its page), and whether it is open on the screen now",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_portals",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/portals",
+  "idempotent": false,
+  "path": "/v1/applets/portals",
+  "capability": "applet_portals",
+  "returns": "portals[{id, name, package_id, status, kind (html|pieces), open, on_screen}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,23 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Deprecated: the old address of GET /v1/tools/bridgit, same helper",
+  "method": "GET",
+  "auth": false,
+  "mcp_tool": null,
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/tools/bridget",
+  "idempotent": false,
+  "path": "/v1/tools/bridget",
+  "capability": "status",
+  "returns": "text/x-python",
+  "errors": [],
+  "requires": null
+ }
+}

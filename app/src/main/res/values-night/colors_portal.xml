@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="portal_paper">@color/b_surface</color>
+    <color name="portal_card">@color/b_surface</color>
+    <color name="portal_ink">@color/b_on_surface</color>
+    <color name="portal_rule">@color/b_outline_variant</color>
+    <color name="portal_bar">@color/b_surface_container</color>
+    <color name="portal_line">@color/b_outline</color>
+    <color name="portal_bar_action">@color/b_primary</color>
+    <color name="portal_pick">@color/b_surface_container</color>
+</resources>

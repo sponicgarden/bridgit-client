@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bridgit photo card</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #f2f7f6;
+    background: radial-gradient(120% 80% at 50% 0%, #11545a 0%, #0f2b3a 55%, #0b1520 100%);
+    min-height: 100vh;
+  }
+  .card { max-width: 440px; margin: 0 auto; padding: 24px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .pill { align-self: center; margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(120, 240, 200, .14);
+    color: #7ff0c8; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .photo { position: relative; border-radius: 20px; overflow: hidden; background: #0a1a22;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .35); }
+  .photo img { display: block; width: 100%; max-height: 46vh; object-fit: cover; }
+  .photo:empty { display: none; }
+  h1 { margin: 0; font-size: 24px; line-height: 1.25; text-align: center; }
+  .text { margin: 0; color: #d6e7e4; text-align: center; }
+  .panel { padding: 14px; border-radius: 18px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .13);
+    display: flex; flex-direction: column; gap: 10px; }
+  .panel:empty { display: none; }
+  .label { margin: 0; font-size: 14px; color: #b4cdc9; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { min-height: 40px; padding: 8px 14px; border-radius: 999px; font: inherit; font-size: 15px;
+    border: 1px solid rgba(255, 255, 255, .25); background: transparent; color: inherit; }
+  .chip[aria-pressed="true"] { background: #7ff0c8; color: #0b1520; border-color: #7ff0c8; font-weight: 650; }
+  input[type=text] { width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 14px; font: inherit;
+    border: 1px solid rgba(255, 255, 255, .25); background: rgba(0, 0, 0, .25); color: inherit; }
+  .actions { display: flex; flex-direction: column; gap: 10px; }
+  button.act { font: inherit; font-weight: 650; border-radius: 16px; min-height: 52px; padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .06); color: inherit; }
+  button.act.primary { border: 0; color: #06231d; background: linear-gradient(135deg, #7ff0c8, #3cc7ff);
+    box-shadow: 0 8px 22px rgba(60, 199, 255, .3); }
+  button:disabled { opacity: .5; }
+  .status { margin: 0; min-height: 1.4em; font-size: 14px; color: #b4cdc9; text-align: center; }
+  .status.error { color: #ff9a9a; }
+</style>
+</head>
+<body>
+<main class="card">
+  <p class="pill" id="pill"></p>
+  <div class="photo" id="photo"></div>
+  <h1 id="title"></h1>
+  <p class="text" id="text"></p>
+  <section class="panel" id="panel"></section>
+  <div class="actions" id="actions"></div>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+</main>
+<script>
+// The card's content. Change only this object; the script below draws it.
+// image: a data:image/jpeg;base64,... URL (cards load nothing from the network).
+// choice / input: optional; their values arrive in answer.data.values by id.
+// Tapping a button answers once: answer.data = {"button": <id>, "values": {...}, ...data}.
+var CARD = /*CARD*/{
+  "pill": "Step 2 of 6",
+  "image": "",
+  "title": "Did I see that right?",
+  "text": "I think this is a blue mug on a wooden desk, next to a phone charger.",
+  "choice": null,
+  "input": {"id": "actually", "label": "What is it really?", "placeholder": "Optional"},
+  "buttons": [
+    {"id": "yes", "label": "Spot on", "style": "primary"},
+    {"id": "no", "label": "Not quite"}
+  ],
+  "data": {"step": 2},
+  "sending": "Sending…",
+  "done_title": "Thanks!",
+  "done_text": "Your answer reached the agent."
+}/*END CARD*/;
+
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var status = $('status');
+  var controls = [];
+  var picked = null;
+  var field = null;
+
+  $('pill').textContent = CARD.pill || '';
+  $('pill').hidden = !CARD.pill;
+  $('title').textContent = CARD.title || '';
+  $('text').textContent = CARD.text || '';
+  if (CARD.image) {
+    var img = document.createElement('img');
+    img.alt = CARD.title || 'Photo';
+    img.src = CARD.image;
+    $('photo').appendChild(img);
+  }
+
+  if (CARD.choice) {
+    var label = document.createElement('p');
+    label.className = 'label';
+    label.textContent = CARD.choice.label;
+    var chips = document.createElement('div');
+    chips.className = 'chips';
+    chips.setAttribute('role', 'group');
+    CARD.choice.options.forEach(function (option) {
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip';
+      chip.textContent = option;
+      chip.setAttribute('aria-pressed', 'false');
+      chip.addEventListener('click', function () {
+        picked = option;
+        chips.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c === chip)); });
+      });
+      chips.appendChild(chip);
+      controls.push(chip);
+    });
+    $('panel').append(label, chips);
+  }
+  if (CARD.input) {
+    var inLabel = document.createElement('label');
+    inLabel.className = 'label';
+    inLabel.textContent = CARD.input.label;
+    field = document.createElement('input');
+    field.type = 'text';
+    field.maxLength = 500;
+    field.placeholder = CARD.input.placeholder || '';
+    inLabel.htmlFor = field.id = 'field';
+    $('panel').append(inLabel, field);
+    controls.push(field);
+  }
+
+  function say(text, isError) { status.textContent = text; status.className = isError ? 'status error' : 'status'; }
+  function lock(on) { controls.forEach(function (c) { c.disabled = on; }); }
+
+  var bridge = window.Bridgit || window.Bridget;
+  var waiting = null;
+
+  function send(id) {
+    if (!bridge || typeof bridge.respond !== 'function') { say('Preview only: open this card in Bridgit to answer.', true); return; }
+    var values = {};
+    if (CARD.choice && picked) values[CARD.choice.id] = picked;
+    if (CARD.input && field.value.trim()) values[CARD.input.id] = field.value.trim();
+    var answer = { button: id, values: values };
+    var extra = CARD.data || {};
+    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) answer[k] = extra[k];
+    lock(true);
+    say(CARD.sending || 'Sending…');
+    bridge.respond(JSON.stringify(answer)); // a JSON string works on every Bridgit build
+    waiting = setTimeout(function () { lock(false); say('Not confirmed yet. Tap again, or close the card.', true); }, 8000);
+  }
+
+  (CARD.buttons || []).forEach(function (spec) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = spec.style === 'primary' ? 'act primary' : 'act';
+    b.textContent = spec.label;
+    b.addEventListener('click', function () { send(spec.id); });
+    $('actions').appendChild(b);
+    controls.push(b);
+  });
+
+  document.addEventListener('bridgit:answered', function (event) {
+    event.preventDefault(); // this card shows its own confirmation instead of Bridgit's panel
+    clearTimeout(waiting);
+    lock(true);
+    var ms = event.detail && event.detail.close_after_ms;
+    say('✓ ' + (CARD.done_text || 'Sent.') + (ms ? ' Closing in ' + Math.round(ms / 1000) + ' s.' : ''));
+    $('title').textContent = '\u2713 ' + (CARD.done_title || 'Sent');
+    // Bridgit shrinks the card a moment after the answer; bring the confirmation back into view then.
+    setTimeout(function () { $('title').scrollIntoView({ block: 'center' }); }, 400);
+  });
+})();
+</script>
+</body>
+</html>

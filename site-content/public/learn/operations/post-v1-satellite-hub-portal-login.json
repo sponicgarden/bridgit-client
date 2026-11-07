@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Phone to phone: a one-use bridgit.cc sign-in code for the hub's account, so a satellite's Portals tab opens the hub's portals signed in (only for a satellite's return key). Not for agents.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "satellite_hub_portal_login",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/satellite/hub/portal-login",
+  "idempotent": false,
+  "path": "/v1/satellite/hub/portal-login",
+  "capability": "status",
+  "returns": "code (null when this phone isn't linked to an account)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

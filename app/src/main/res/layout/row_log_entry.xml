@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One activity row (UI-17) as a shaded card with a small gap: shared by Activity and the feedback report views. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="3dp"
+    android:background="@drawable/design_bg_panel"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:minHeight="64dp">
+
+    <!-- Error accent pill, inset so the card corners don't clip it. -->
+    <View
+        android:id="@+id/error_stripe"
+        android:layout_width="3dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="5dp"
+        android:layout_marginVertical="12dp"
+        android:background="?attr/colorError"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="10dp">
+
+        <cc.bridgit.app.ui.common.AgentAvatarView
+            android:id="@+id/avatar"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="12dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/sentence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                app:chipSpacingHorizontal="4dp"
+                app:chipSpacingVertical="4dp">
+                <TextView android:id="@+id/chip1" style="@style/Widget.Bridgit.MonoChip" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/chip2" style="@style/Widget.Bridgit.MonoChip" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/chip3" style="@style/Widget.Bridgit.MonoChip" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/chip4" style="@style/Widget.Bridgit.MonoChip" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </com.google.android.material.chip.ChipGroup>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Access (UI-25 … UI-27, ui-spec 5.9): Android settings Bridgit can use, one tap each. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="64dp"
+        app:navigationContentDescription="@string/access_back"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="@string/access_title"
+        app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:id="@+id/access_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
+
+            <!-- Read-only explanation: the gradient info panel. -->
+            <TextView
+                style="@style/Widget.Bridgit.InfoPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="12dp"
+                android:text="@string/access_intro"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <!-- Each group is a flat section. The header ids sit on the sections, so AccessFragment.refresh()
+                 hides a whole empty group, not just its heading. Rows go into needs / ok in code. -->
+            <LinearLayout
+                android:id="@+id/needs_header"
+                style="@style/Widget.Bridgit.SettingsSection">
+
+                <TextView
+                    style="@style/SettingsHeader"
+                    android:text="@string/access_needs_you" />
+
+                <LinearLayout
+                    android:id="@+id/needs"
+                    android:divider="@drawable/settings_divider"
+                    android:showDividers="middle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ok_header"
+                style="@style/Widget.Bridgit.SettingsSection">
+
+                <TextView
+                    style="@style/SettingsHeader"
+                    android:text="@string/access_all_set" />
+
+                <LinearLayout
+                    android:id="@+id/ok"
+                    android:divider="@drawable/settings_divider"
+                    android:showDividers="middle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/show_how"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/access_show_me_how" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/app_info"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/access_open_app_info" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

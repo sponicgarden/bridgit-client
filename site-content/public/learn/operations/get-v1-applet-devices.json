@@ -1,0 +1,44 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read selectively assigned external devices for installed applets",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applet_devices_get",
+  "query": [{
+   "name": "applet",
+   "description": "Optional applet id; returns only devices assigned to it",
+   "type": "string",
+   "required": false,
+   "enum": [
+    "dog_monitor",
+    "city_tour"
+   ]
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applet-devices?applet=dog_monitor",
+  "idempotent": false,
+  "path": "/v1/applet-devices",
+  "capability": "app_device_access",
+  "returns": "applets[id,name,execution], devices[id,name,kind,applets]. Filtered by agent's device grants and enrollment ownership; no IPs or credentials.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"applet": {
+    "description": "Optional applet id; returns only devices assigned to it",
+    "type": "string",
+    "enum": [
+     "dog_monitor",
+     "city_tour"
+    ]
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

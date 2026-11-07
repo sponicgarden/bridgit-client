@@ -1,0 +1,46 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read an installed applet's existing free-form key/value records with an owner control key; no installer ownership or extra approval. Complements typed tables for older/custom applets",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_records_list",
+  "query": [{
+   "name": "after",
+   "description": "Last page's next key; omit on the first page",
+   "type": "string",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/installed/ai0123456789abcd/records",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/records",
+  "capability": "applet_install",
+  "returns": "records[{key,value,updated_at,chars}], count, next (pass as after until null); pages capped near 40 KB",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "id": {
+     "description": "The id in /v1/applets/installed/{id}/records",
+     "type": "string"
+    },
+    "after": {
+     "description": "Last page's next key; omit on the first page",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "not_shared",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

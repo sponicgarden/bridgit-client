@@ -1,0 +1,34 @@
+{
+ "detail_url": "/v1/discover?id=v2.sensors&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v2.sensors.json",
+ "title": "Sensor readings",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v2.sensors.json",
+ "prerequisites": ["Check v2.sensors supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [{
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_sensors_read",
+  "documentation": "https://bridgit.cc/learn/operations/v2-sensors.read.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-sensors.read.json",
+  "required_arguments": [],
+  "tool": "sensors.read"
+ }],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
+ "examples_url": null,
+ "id": "v2.sensors",
+ "state": {
+  "ready": null,
+  "blockers": ["check_v2_capabilities"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "sense",
+ "capability_ids": ["v2.sensors"]
+}

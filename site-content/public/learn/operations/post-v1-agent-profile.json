@@ -1,0 +1,64 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Update your self-supplied name and artwork",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "agent_profile_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "name",
+    "description": "1-24 letters, digits, space, _ or -",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "icon_base64",
+    "description": "PNG, at most 128 KiB; null removes",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "wordmark_base64",
+    "description": "PNG, at most 128 KiB; null removes",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/agent/profile {\"name\":\"Soly\"}",
+  "idempotent": true,
+  "path": "/v1/agent/profile",
+  "capability": "status",
+  "returns": "updated profile; unverified self-description",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "name": {
+     "description": "1-24 letters, digits, space, _ or -",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "icon_base64": {
+     "description": "PNG, at most 128 KiB; null removes",
+     "type": "string"
+    },
+    "wordmark_base64": {
+     "description": "PNG, at most 128 KiB; null removes",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

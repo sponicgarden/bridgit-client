@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Capture a JPEG using your active owner-approved grant",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "screen_share_capture",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [],
+  "example": "POST /v1/screen/share/capture",
+  "idempotent": true,
+  "path": "/v1/screen/share/capture",
+  "capability": "screen_share",
+  "returns": "Capture a JPEG using your active owner-approved grant",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"idempotency_key": {
+    "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+    "type": "string"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

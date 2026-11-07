@@ -1,0 +1,475 @@
+{
+ "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
+ "api_revision": 127,
+ "errors": [
+  {
+   "code": "model_unavailable",
+   "you_should": "Read the effective model preference; clear the override to inherit a valid default",
+   "meaning": "The selected registered model is unavailable or incompatible",
+   "http": 503,
+   "returned_today": true
+  },
+  {
+   "code": "account_required",
+   "you_should": "Link this phone to the owner account",
+   "meaning": "A verified linked account is required",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "image_quota_exceeded",
+   "you_should": "Wait until quota.resets_at",
+   "meaning": "The account used its 40 monthly images",
+   "http": 429,
+   "returned_today": true
+  },
+  {
+   "code": "image_in_progress",
+   "you_should": "Retry only with the same Idempotency-Key",
+   "meaning": "Image request is pending or its outcome is unknown",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "image_refused",
+   "you_should": "Correct the request before starting a new generation",
+   "meaning": "Azure refused the request without using an image slot",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "idempotency_conflict",
+   "you_should": "Use identical parameters for retries",
+   "meaning": "This image key was used for different parameters",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "image_provider_failed",
+   "you_should": "Inspect provider_status; never retry an unknown outcome with a new key",
+   "meaning": "Azure could not generate the image",
+   "http": 502,
+   "returned_today": true
+  },
+  {
+   "code": "image_outcome_unknown",
+   "you_should": "Retry only with the same Idempotency-Key",
+   "meaning": "Image generation outcome could not be confirmed",
+   "http": 502,
+   "returned_today": true
+  },
+  {
+   "code": "images_unavailable",
+   "you_should": "Check the configured model task and Azure deployment",
+   "meaning": "The configured Azure image task is unavailable",
+   "http": 503,
+   "returned_today": true
+  },
+  {
+   "code": "speech_no_match",
+   "you_should": "Start a new turn when ready to speak",
+   "meaning": "No speech was recognized during this bounded turn",
+   "http": 422,
+   "returned_today": true
+  },
+  {
+   "code": "speech_unavailable",
+   "you_should": "Check GET /v1/speech/models; no implicit fallback",
+   "meaning": "Selected speech engine or backend is unavailable",
+   "http": 503,
+   "returned_today": true
+  },
+  {
+   "code": "speech_cloud_consent_required",
+   "you_should": "Ask the owner before allow_cloud=true",
+   "meaning": "Selected speech model needs explicit cloud permission",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "speech_model_changed",
+   "you_should": "Resolve again before a new turn",
+   "meaning": "Registry selection changed during this turn",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "bad_request",
+   "you_should": "Fix the request",
+   "meaning": "Malformed HTTP or JSON",
+   "http": 400,
+   "returned_today": true
+  },
+  {
+   "code": "unauthorized",
+   "you_should": "Stop; tell the owner the key needs replacing",
+   "meaning": "Key missing or wrong; `reason` = `key_rotated` or `agent_removed` when Bridgit knows",
+   "http": 401,
+   "returned_today": true
+  },
+  {
+   "code": "forbidden_source",
+   "you_should": "Check Tailscale",
+   "meaning": "Caller is not on the tailnet",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "claim_required",
+   "you_should": "Update Bridgit Portal and pair again with a new link",
+   "meaning": "This Bridgit Portal pairing link expired before it was claimed (relay)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "signed_requests_required",
+   "you_should": "Switch to sealed mode, or ask the owner",
+   "meaning": "The owner allows only sealed (signed) relay requests for agents that can control the phone (relay)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "wrong_device",
+   "you_should": "Call from the device you were set up on, or ask the owner to allow this device; don't retry",
+   "meaning": "This agent's key is locked to another Tailscale device (device lock)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "capability_disabled",
+   "you_should": "Tell the owner which switch (`setting` field)",
+   "meaning": "Master switch off",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "permission_denied",
+   "you_should": "Tell the owner; More > Hardware access fixes it",
+   "meaning": "Android permission not granted (`permission` field)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "access_needed",
+   "you_should": "Tell the owner; Bridgit also notifies them",
+   "meaning": "Android special access off (`setting` field)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "pairing_closed",
+   "you_should": "Ask the owner to open one",
+   "meaning": "No pairing window open",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "screen_denied",
+   "you_should": "Don't ask again soon",
+   "meaning": "The owner denied screen access",
+   "http": 403,
+   "returned_today": false
+  },
+  {
+   "code": "consent_expired",
+   "you_should": "Ask for a new owner-approved grant",
+   "meaning": "No active screen-sharing grant",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "setting_locked",
+   "you_should": "Ask the owner to change it on the phone",
+   "meaning": "Agents can't change this setting (`key`, `reason`: gate, disconnects, owner_only, android or status)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "email_required",
+   "you_should": "Send the owner's address with POST /v1/owner/email, then ask them to tap the link in the email",
+   "meaning": "The first 24 hours are over and the owner hasn't verified an email (`state`: none or pending)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "agent_not_allowed",
+   "you_should": "Ask the owner to change agent permissions",
+   "meaning": "This agent lacks a capability grant",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "not_found",
+   "you_should": "Fix the request",
+   "meaning": "Unknown endpoint or id",
+   "http": 404,
+   "returned_today": true
+  },
+  {
+   "code": "row_not_found",
+   "you_should": "Read the rows again; don't retry unchanged",
+   "meaning": "That row of the applet's table isn't there (deleted, or dropped past max_rows or keep_days)",
+   "http": 404,
+   "returned_today": true
+  },
+  {
+   "code": "photo_not_found",
+   "you_should": "Refresh the list",
+   "meaning": "Gallery item gone or outside access",
+   "http": 404,
+   "returned_today": true
+  },
+  {
+   "code": "sensor_busy",
+   "you_should": "Retry once after a few seconds",
+   "meaning": "Sensor in use or capture running",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "device_locked",
+   "you_should": "Ask the owner to unlock",
+   "meaning": "Needs the phone unlocked",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "share_unavailable",
+   "you_should": "Ask the owner to open Bridgit and tap the button again",
+   "meaning": "Android's share sheet couldn't open (Bridgit isn't on screen)",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "payload_too_large",
+   "you_should": "Ask for a smaller size (`photo_id` given)",
+   "meaning": "Over 12 MB base64 (40 MB raw)",
+   "http": 413,
+   "returned_today": true
+  },
+  {
+   "code": "export_too_large",
+   "you_should": "Use paginated applet rows and individual saved photos, or filter a share report; don't retry unchanged",
+   "meaning": "An export exceeds its row, photo or 20 MB size limit",
+   "http": 413,
+   "returned_today": true
+  },
+  {
+   "code": "invalid_parameter",
+   "you_should": "Fix; never retry unchanged",
+   "meaning": "Bad value",
+   "http": 422,
+   "returned_today": true
+  },
+  {
+   "code": "not_supported",
+   "you_should": "Don't retry",
+   "meaning": "Android doesn't allow this (for example Wi-Fi toggle)",
+   "http": 422,
+   "returned_today": true
+  },
+  {
+   "code": "rate_limited",
+   "you_should": "Wait",
+   "meaning": "Over a limit (`retry_after_s`)",
+   "http": 429,
+   "returned_today": true
+  },
+  {
+   "code": "budget_reached",
+   "you_should": "Wait for the next day or month, or ask the owner to raise the applet's limit in Installed applets",
+   "meaning": "An installed applet's own spending cap for cloud model calls is used up (day or month)",
+   "http": 429,
+   "returned_today": true
+  },
+  {
+   "code": "applet_budget",
+   "you_should": "Don't retry before resets_at; an agent with Budgets can top it up or raise the limit (PUT /v1/applets/{id}/budget)",
+   "meaning": "An installed applet's budget is used up for this period on all the owner's phones (`applet`, `limit`, `resets_at`)",
+   "http": 429,
+   "returned_today": true
+  },
+  {
+   "code": "agents_may_not_change",
+   "you_should": "Ask the owner; don't retry",
+   "meaning": "The owner turned off agent changes to this applet's budget",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "over_ceiling",
+   "you_should": "Stay within the ceiling, or ask the owner to raise it",
+   "meaning": "The new limit (or limit plus top-ups) would pass the owner's ceiling for agents (`ceiling`)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "out_of_range",
+   "you_should": "Pick a value within min_s..max_s (GET /v1/applets/{id}/budget)",
+   "meaning": "every_s is outside the action's min_s..max_s",
+   "http": 400,
+   "returned_today": true
+  },
+  {
+   "code": "too_many_open",
+   "you_should": "Wait for answers or cancel some",
+   "meaning": "Too many open questions/notices",
+   "http": 429,
+   "returned_today": true
+  },
+  {
+   "code": "notifications_required",
+   "you_should": "Tell the owner to turn notifications on",
+   "meaning": "Bridgit's notifications are off, so captures are refused",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "forbidden",
+   "you_should": "Don't retry; for `agent_paused`, wait until the owner resumes you",
+   "meaning": "Not allowed for this agent (`reason`, for example `fixer_mode_off` or `super_powers_off`: the owner hasn't given you Bridgit Fixer Mode or Agent Super Powers; `agent_paused`: the owner paused you)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "in_progress",
+   "you_should": "Wait, then retry with the same key",
+   "meaning": "Same `Idempotency-Key` still running",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "conflict",
+   "you_should": "Read it with GET /v1/interactions/{id}; start a new one if needed",
+   "meaning": "The interaction isn't in a state for this (for example a text panel that's closed or finished)",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "idempotency_expired",
+   "you_should": "Don't repeat; use a new key only if you really want a new capture",
+   "meaning": "Same `Idempotency-Key` already done, but its media result is no longer replayed (15 min)",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "quota_exceeded",
+   "you_should": "Remove old transfers or wait for retention",
+   "meaning": "Daily data, file storage or relay job quota used up (`limit`)",
+   "http": 429,
+   "returned_today": true
+  },
+  {
+   "code": "too_many_waits",
+   "you_should": "Close some waits",
+   "meaning": "Too many open `wait` requests",
+   "http": 429,
+   "returned_today": true
+  },
+  {
+   "code": "upstream_failed",
+   "you_should": "Retry in a few minutes",
+   "meaning": "A service Bridgit asks on your behalf (MET Norway for weather) failed and nothing was cached (`service`, `upstream_status` or `reason`)",
+   "http": 502,
+   "returned_today": true
+  },
+  {
+   "code": "callback_failed",
+   "you_should": "Check the receiver; the owner sees the host in Activity",
+   "meaning": "Your callback URL didn't accept the test event (`http_status` or `reason` field)",
+   "http": 502,
+   "returned_today": true
+  },
+  {
+   "code": "internal_error",
+   "you_should": "Report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md",
+   "meaning": "Bridgit bug",
+   "http": 500,
+   "returned_today": true
+  },
+  {
+   "code": "service_start_blocked",
+   "you_should": "Ask the owner to open Bridgit once",
+   "meaning": "Android hasn't given the service this sensor",
+   "http": 503,
+   "returned_today": true
+  },
+  {
+   "code": "model_not_ready",
+   "you_should": "Retry after retry_after_s; GET /v1/images/engines shows progress",
+   "meaning": "An on-phone engine you named isn't downloaded yet (`engine`, `state`: downloading, waiting_for_wifi or failed, `size_mb`, `retry_after_s`); the request started the download",
+   "http": 503,
+   "returned_today": true
+  },
+  {
+   "code": "team_unavailable",
+   "you_should": "Retry later, or register at the backend directly",
+   "meaning": "The Bridgit team backend can't be reached",
+   "http": 503,
+   "returned_today": true
+  },
+  {
+   "code": "capture_cancelled",
+   "you_should": "Wait for a new deliberate capture; do not retry automatically",
+   "meaning": "The owner cancelled, deleted or closed the capture review",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "viewfinder_required",
+   "you_should": "Open Bridgit and use the visible capture/review flow; do not fall back to hidden capture",
+   "meaning": "The visible camera viewfinder is required but cannot be shown for this action",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "capture_timeout",
+   "you_should": "Retry once",
+   "meaning": "Sensor didn't answer in time",
+   "http": 504,
+   "returned_today": true
+  },
+  {
+   "code": "unknown_target",
+   "you_should": "Fix the target, or leave it out to use this phone",
+   "meaning": "No satellite with that id (`target`); GET /v1/satellites lists them",
+   "http": 404,
+   "returned_today": true
+  },
+  {
+   "code": "target_not_granted",
+   "you_should": "Ask the owner (Devices > the satellite > Agents)",
+   "meaning": "The owner hasn't let this agent use that satellite",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "not_on_satellite",
+   "you_should": "Leave out the target, or use another endpoint",
+   "meaning": "This endpoint can't run on a satellite (yet), or the satellite doesn't offer it",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "not_shared",
+   "you_should": "Read the applet's card on the phone instead, or ship a revision that shares it",
+   "meaning": "The applet's package doesn't share that table with you (share_with_installer)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "satellite_offline",
+   "you_should": "Retry later; the owner may need to check the satellite's Tailscale",
+   "meaning": "The satellite didn't answer (`last_seen`, `retry_after_s`)",
+   "http": 503,
+   "returned_today": true
+  },
+  {
+   "code": "phone_unreachable",
+   "you_should": "Retry later",
+   "meaning": "(Relay) phone didn't pick up the job",
+   "http": 504,
+   "returned_today": false
+  }
+ ]
+}

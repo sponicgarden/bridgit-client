@@ -1,0 +1,164 @@
+{
+  "format": "bridgit-template/1",
+  "id": "receipt-scanner",
+  "version": "2.0.1",
+  "kind": "applet",
+  "name": "Receipt scanner",
+  "summary": "Read a selected receipt locally, check the text and save it on the phone.",
+  "runtime": {
+    "adapter": "android.package.v1",
+    "applet_key": "receipt-scanner",
+    "supports_dynamic_execution": false
+  },
+  "config_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "gallery_id": {
+        "type": "integer",
+        "minimum": 1
+      }
+    }
+  },
+  "defaults": {},
+  "processing": {
+    "tables": [
+      {
+        "id": "receipts",
+        "label": "Receipts",
+        "columns": {
+          "text": {
+            "type": "text",
+            "label": "Receipt text"
+          },
+          "gallery_id": {
+            "type": "integer",
+            "label": "Gallery photo"
+          }
+        },
+        "keep_days": 365,
+        "max_rows": 2000,
+        "share_with_installer": false
+      }
+    ]
+  },
+  "permissions": {
+    "required": [
+      "gallery",
+      "interactions",
+      "ocr"
+    ],
+    "optional": [],
+    "remote": [],
+    "automatic_grants": false
+  },
+  "ui": {
+    "inputs": {
+      "gallery_id": {
+        "label": "Receipt photo",
+        "help": "The gallery id of the receipt photo to read. Leave empty to choose one later."
+      }
+    },
+    "card": {
+      "title": "Receipt scanner",
+      "sources": {
+        "scan": {
+          "reply": "scan"
+        },
+        "receipts": {
+          "table": "receipts",
+          "limit": 20
+        }
+      },
+      "states": {
+        "empty": "Select an authorized receipt image before reading."
+      },
+      "pieces": [
+        {
+          "type": "header",
+          "eyebrow": "Bridgit applet",
+          "text": "Turn a receipt into a draft you can check."
+        },
+        {
+          "type": "buttons",
+          "items": [
+            {
+              "label": "Read selected receipt",
+              "style": "primary",
+              "into": "scan",
+              "do": {
+                "method": "POST",
+                "path": "/v1/ocr",
+                "body": {
+                  "gallery_id": {
+                    "$input": "gallery_id"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "draft",
+          "id": "receipt",
+          "label": "Receipt text",
+          "value": {
+            "$source": "scan.text"
+          },
+          "max": 1024
+        },
+        {
+          "type": "buttons",
+          "items": [
+            {
+              "label": "Save receipt",
+              "confirm": "Save this receipt on the phone?",
+              "do": {
+                "record": "receipts",
+                "row": {
+                  "text": {
+                    "$draft": "receipt"
+                  },
+                  "gallery_id": {
+                    "$input": "gallery_id"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "rows": {
+            "$source": "receipts.items"
+          },
+          "columns": [
+            {
+              "key": "at",
+              "label": "Saved",
+              "format": "time"
+            },
+            {
+              "key": "text",
+              "label": "Receipt"
+            }
+          ],
+          "limit": 20,
+          "empty": "No saved receipts yet.",
+          "owner_delete": true
+        },
+        {
+          "type": "note",
+          "text": "Check the amount, date and currency before saving. Saved receipts stay on this phone."
+        }
+      ]
+    }
+  },
+  "migration": {
+    "strategy": "explicit_owner_opt_in",
+    "from": "2.0.0",
+    "rules": [],
+    "rollback": "Reinstall an earlier approved revision."
+  }
+}

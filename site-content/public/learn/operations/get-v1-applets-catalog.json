@@ -1,0 +1,50 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Browse the applet library without installing or running packages",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_catalog",
+  "query": [
+   {
+    "name": "q",
+    "description": "Search title and summary; at most 100 characters",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "after",
+    "description": "Opaque next-page key",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/catalog?q=kitchen",
+  "idempotent": false,
+  "path": "/v1/applets/catalog",
+  "capability": "applet_install",
+  "returns": "format, applets[{key,id,revision,name,summary,generation}], next",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "q": {
+     "description": "Search title and summary; at most 100 characters",
+     "type": "string"
+    },
+    "after": {
+     "description": "Opaque next-page key",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

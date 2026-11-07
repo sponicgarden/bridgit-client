@@ -1,0 +1,70 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Record the enrolled camera microphone, never the Android microphone",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_cameras_audio_record",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "camera",
+    "description": "Enrolled camera id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "duration_seconds",
+    "description": "1..30 whole seconds",
+    "type": "integer",
+    "required": true
+   },
+   {
+    "name": "raw",
+    "description": "1 returns WAV bytes",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "store",
+    "description": "memory, files or upload subject to owner capture policy",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/lan-cameras/audio/record {\"camera\":\"lan:example\",\"duration_seconds\":5}",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/audio/record",
+  "capability": "lan_camera_audio",
+  "returns": "camera, WAV audio, sample_rate_hz (8000 or 16000), mono, duration, recorded_at, signal (silence metrics; never claims room pickup). Separate lan_camera_audio and lan_camera grants/switches required.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "duration_seconds": {
+     "description": "1..30 whole seconds",
+     "type": "integer"
+    },
+    "store": {
+     "description": "memory, files or upload subject to owner capture policy",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "camera": {
+     "description": "Enrolled camera id",
+     "type": "string"
+    }
+   },
+   "required": [
+    "camera",
+    "duration_seconds"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your account's limits right now, and what is used: Jev and Clef calls an hour, the monthly model budget, paid watch checks, and the limits this phone enforces itself. Limits differ per account and can change: read them here, never assume documented numbers",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "limits",
+  "query": [{
+   "name": "refresh",
+   "description": "true asks the team backend again instead of the copy from the last 10 minutes",
+   "type": "boolean",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/limits",
+  "idempotent": false,
+  "path": "/v1/limits",
+  "capability": "status",
+  "returns": "account {available, applies_to, verified, team, source (default, account or install), limits {model_calls_per_hour, model_usd_per_month, watch_paid_checks_per_hour: {value, used?, resets_at?, enforced_by, about}}, shared {total_usd_per_day, total_usd_per_month, unverified_usd_per_month, clef_free_daily_allowance}, prices, cached} or {available: false, reason} when the backend can't be reached; phone {captures_per_minute_per_agent, open_waits_per_agent, watches, cards, schedule}; watch_paid_checks_per_hour_in_effect; relay (where relay quotas are read)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"refresh": {
+    "description": "true asks the team backend again instead of the copy from the last 10 minutes",
+    "type": "boolean"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

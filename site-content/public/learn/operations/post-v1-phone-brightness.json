@@ -1,0 +1,64 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set brightness or automatic brightness",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "phone_brightness",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "level",
+    "description": "0\u20131",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "auto",
+    "description": "true enables automatic brightness",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "duration_minutes",
+    "description": "Optional timed restoration, 1\u20131440 minutes; null leaves the change in place",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/phone/brightness",
+  "idempotent": true,
+  "path": "/v1/phone/brightness",
+  "capability": "controls",
+  "returns": "Set brightness or automatic brightness",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "auto": {
+     "description": "true enables automatic brightness",
+     "type": "boolean"
+    },
+    "duration_minutes": {
+     "description": "Optional timed restoration, 1\u20131440 minutes; null leaves the change in place",
+     "type": "integer"
+    },
+    "level": {
+     "description": "0\u20131",
+     "type": "number"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

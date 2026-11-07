@@ -1,0 +1,67 @@
+{
+ "detail_url": "/v1/discover?id=v1.screen_share&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.screen_share.json",
+ "title": "screen share",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.screen_share.json",
+ "prerequisites": ["Check v1.screen_share supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Request owner-approved MediaProjection screen access",
+   "path": "/v1/screen/grant",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-screen-grant.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-screen-grant.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "screen_grant_post"
+  },
+  {
+   "summary": "Your screen requests and active grant",
+   "path": "/v1/screen/grants",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-screen-grants.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-screen-grants.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "screen_grants"
+  },
+  {
+   "summary": "Capture a JPEG using your active owner-approved grant",
+   "path": "/v1/screen/share/capture",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-screen-share-capture.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-screen-share-capture.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "screen_share_capture"
+  },
+  {
+   "summary": "End your screen-sharing grant",
+   "path": "/v1/screen/grant",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-screen-grant.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-screen-grant.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "screen_grant_delete"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.screen_share",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "sense",
+ "capability_ids": ["v1.screen_share"]
+}

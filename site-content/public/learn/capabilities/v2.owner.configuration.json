@@ -1,0 +1,61 @@
+{
+ "detail_url": "/v1/discover?id=v2.owner.configuration&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v2.owner.configuration.json",
+ "title": "App configuration and credentials",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v2.owner.configuration.json",
+ "prerequisites": ["Check v2.owner.configuration supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_configuration_get",
+   "documentation": "https://bridgit.cc/learn/operations/v2-configuration.get.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-configuration.get.json",
+   "required_arguments": [],
+   "tool": "configuration.get"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_configuration_set",
+   "documentation": "https://bridgit.cc/learn/operations/v2-configuration.set.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-configuration.set.json",
+   "required_arguments": [
+    "idempotency_key",
+    "operation"
+   ],
+   "tool": "configuration.set"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_owner_configure",
+   "documentation": "https://bridgit.cc/learn/operations/v2-owner.configure.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-owner.configure.json",
+   "required_arguments": [
+    "idempotency_key",
+    "action",
+    "options"
+   ],
+   "tool": "owner.configure"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
+ "examples_url": null,
+ "id": "v2.owner.configuration",
+ "state": {
+  "ready": null,
+  "blockers": ["check_v2_capabilities"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v2.owner.configuration"]
+}

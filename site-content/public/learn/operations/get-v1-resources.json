@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Required downloads and bundled/system dependencies",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "resources",
+  "query": [{
+   "name": "language",
+   "description": "BCP-47 language tag for Android speech/TTS readiness, e.g. en-US; default phone language",
+   "type": "string",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/resources?language=en-US",
+  "idempotent": false,
+  "path": "/v1/resources",
+  "capability": "owner_features",
+  "returns": "resources[id,kind,installed,state,download_bytes,disk_bytes,percent,operations], jobs_url; Android speech/TTS are owner-managed; OCR/barcode bundled",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"language": {
+    "description": "BCP-47 language tag for Android speech/TTS readiness, e.g. en-US; default phone language",
+    "type": "string"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

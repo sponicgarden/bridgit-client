@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One interaction row (D26), flat inside its section's shaded panel (SectionPanelDecoration draws the panel and
+  the dividers): an accent stripe while it still needs the owner, the agent avatar,
+  title and short age on the first line, a one-line summary under it (preview, the owner's answer, or Closed/Missed),
+  and an expandable body (text, image, inline controls, answer, Close).
+  Colours are set in InteractionsAdapter from the status.
+-->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Accent pill: shown only while the row still needs the owner (inset so the card corners don't clip it). -->
+        <View
+            android:id="@+id/stripe"
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="6dp"
+            android:layout_marginVertical="16dp"
+            android:importantForAccessibility="no"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Design pass (Sol 6.1 spec, 4 Nov 2026): agent icon, title, status line, "agent · time", one chevron.
+                 The whole row opens the item; Open, X and expand stay in the binding but are always gone. -->
+            <LinearLayout
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:minHeight="64dp"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="4dp"
+                android:paddingBottom="12dp">
+
+                <cc.bridgit.app.ui.common.AgentAvatarView
+                    android:id="@+id/avatar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="12dp" />
+
+                <LinearLayout
+                    android:id="@+id/text_col"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:importantForAccessibility="no"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/headline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:importantForAccessibility="no"
+                        android:maxLines="2"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/summary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:ellipsize="end"
+                        android:importantForAccessibility="no"
+                        android:maxLines="2"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="14sp" />
+
+                    <!-- "Agent name · Today, 14:03": the time always sits here, so it lines up on every row. -->
+                    <TextView
+                        android:id="@+id/time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:importantForAccessibility="no"
+                        android:maxLines="1"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/open"
+                    style="@style/Widget.Bridgit.Pill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/interactions_open_short"
+                    android:visibility="gone" />
+
+                <ImageButton
+                    android:id="@+id/close_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/interactions_close"
+                    android:src="@drawable/ic_close"
+                    android:visibility="gone" />
+
+                <!-- The one trailing element: says the row opens. Not its own focus stop. -->
+                <ImageView
+                    android:id="@+id/chevron"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:importantForAccessibility="no"
+                    android:padding="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_chevron"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+
+            <!-- Never shown since the design pass; kept for the binding. Starts under the title: 16 + 40 + 12dp. -->
+            <LinearLayout
+                android:id="@+id/body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="68dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="12dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <ImageView
+                    android:id="@+id/image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:adjustViewBounds="true"
+                    android:maxHeight="160dp"
+                    android:maxWidth="240dp"
+                    android:scaleType="fitStart"
+                    android:visibility="gone" />
+
+                <!-- Inline controls (buttons, text, choice chips, links), built in code. -->
+                <LinearLayout
+                    android:id="@+id/controls"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/answer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:visibility="gone" />
+
+                <!-- Kept for the binding; waiting rows close from the X in the header now. -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/close"
+                    style="@style/Widget.Bridgit.Pill.Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:text="@string/interactions_close"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

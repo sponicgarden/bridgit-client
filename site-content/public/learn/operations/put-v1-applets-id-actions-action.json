@@ -1,0 +1,75 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Change how often one action of an installed applet runs (every_s within the action's min_s..max_s), on every phone; the running watches change in place and keep their counts. dry_run returns the new projection without saving",
+  "method": "PUT",
+  "auth": true,
+  "mcp_tool": "applets_action_set",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "every_s",
+    "description": "Seconds between runs, within min_s..max_s (GET \u2026/budget lists the actions)",
+    "type": "integer",
+    "required": true
+   },
+   {
+    "name": "dry_run",
+    "description": "true: only show the projection",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "PUT /v1/applets/ai0123456789abcd/actions/main {\"every_s\":1200,\"dry_run\":true}",
+  "idempotent": true,
+  "path": "/v1/applets/{id}/actions/{action}",
+  "capability": "budgets",
+  "returns": "the backend's projection (dry_run) or the applet's budget after the change",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "action": {
+     "description": "The action in /v1/applets/{id}/actions/{action}",
+     "type": "string"
+    },
+    "every_s": {
+     "description": "Seconds between runs, within min_s..max_s (GET \u2026/budget lists the actions)",
+     "type": "integer"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "dry_run": {
+     "description": "true: only show the projection",
+     "type": "boolean"
+    },
+    "id": {
+     "description": "The id in /v1/applets/{id}/actions/{action}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "action",
+    "every_s"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter",
+   "agents_may_not_change",
+   "over_ceiling",
+   "rate_limited",
+   "out_of_range",
+   "capability_disabled",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

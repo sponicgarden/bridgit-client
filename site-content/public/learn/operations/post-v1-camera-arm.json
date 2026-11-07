@@ -1,0 +1,65 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Open the camera ahead of a photo, so your next snapshot fires in about 0.3 s",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "camera_arm",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "camera",
+    "description": "rear (default) or front: the camera your next snapshot will use",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "rear",
+     "front"
+    ]
+   },
+   {
+    "name": "seconds",
+    "description": "How long to keep it ready, 1-10 (default 10). It closes after your next snapshot, at the end of this time, or when the owner pauses Bridgit",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/camera/arm {\"camera\":\"front\",\"seconds\":10}",
+  "idempotent": false,
+  "path": "/v1/camera/arm",
+  "capability": "camera",
+  "returns": "camera, armed, seconds, armed_until, settle_ms (exposure needs this long after the camera opens; a snapshot sent sooner waits out the rest); the next snapshot says warm: true",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "seconds": {
+     "description": "How long to keep it ready, 1-10 (default 10). It closes after your next snapshot, at the end of this time, or when the owner pauses Bridgit",
+     "type": "integer"
+    },
+    "camera": {
+     "description": "rear (default) or front: the camera your next snapshot will use",
+     "type": "string",
+     "enum": [
+      "rear",
+      "front"
+     ]
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "permission_denied",
+   "notifications_required",
+   "device_locked",
+   "sensor_busy",
+   "service_start_blocked"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Build small Bridgit applets from verified public contracts"><title>Situation counter · Bridgit</title><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/brand.css"><style>main{max-width:940px;margin:50px auto;padding:0 22px}h1{font:600 42px Georgia,serif}h2{margin-top:34px}p,li{line-height:1.65}a{color:#704394}pre{background:#fff8ed;border:1px solid #e6dbe9;border-radius:14px;padding:18px;overflow:auto;max-height:540px}article,section.card{border:1px solid #e6dbe9;border-radius:18px;padding:22px;margin:18px 0;background:#fff8ed}.tag{color:#704394;font-size:13px}.install-cta{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.install-button{background:#704394;color:#fff!important;text-decoration:none;font-weight:600;padding:11px 20px;border-radius:999px}nav{display:flex;gap:20px}.cp-card{position:relative;max-width:420px;border:1px solid #e6dbe9;border-radius:20px;background:#fff;padding:18px;margin:14px 0;box-shadow:0 8px 24px #2b183408;color:#2b1834;font:15px/1.5 system-ui,sans-serif}.cp-card>*{margin:0 0 12px}.cp-card>*:last-child{margin-bottom:0}.cp-label{position:absolute;top:12px;right:14px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6f5f75;background:#fff8ed;border:1px dashed #e6dbe9;border-radius:99px;padding:2px 8px}.cp-head h3{font:600 22px/1.2 Georgia,serif;margin:4px 0 6px}.cp-eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#704394;margin:0}.cp-muted{color:#6f5f75}.cp-head .cp-muted{font-size:14px;margin:0}.cp-note{color:#6f5f75;font-size:12px}.cp-pill{display:inline-block;border-radius:99px;padding:3px 10px;background:#efe4f7;color:#704394;font-size:12px;font-weight:700}.cp-ok{background:#e2f3e8;color:#235c36}.cp-warn{background:#fff0c7;color:#785513}.cp-bad{background:#fde9df;color:#a23520}.cp-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cp-tile{background:#efe4f7;border-radius:12px;padding:12px}.cp-tile strong,.cp-tile small{display:block}.cp-tile strong{font-size:18px}.cp-tile small{font-size:11px;color:#6f5f75;margin-top:4px}.cp-table{width:100%;border-collapse:collapse;font-size:13px}.cp-table th{text-align:left;color:#6f5f75;font-weight:600;border-bottom:1px solid #e6dbe9;padding:6px 4px}.cp-table td{border-bottom:1px solid #e6dbe9;padding:8px 4px}.cp-list{list-style:none;padding:0}.cp-list li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #e6dbe9;padding:9px 0;font-size:14px}.cp-badge{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#efe4f7;color:#704394;font-size:12px}.cp-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#b9adbf}.cp-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.cp-gallery span{aspect-ratio:1;border-radius:10px;background:#efe4f7}.cp-video{display:grid;place-items:center;aspect-ratio:16/9;border-radius:12px;background:#2b1834;color:#fff;font-size:28px}.cp-draft{display:block;font-size:13px;color:#6f5f75}.cp-box{display:block;margin-top:6px;min-height:72px;border:1px solid #e6dbe9;border-radius:12px;background:#fff8ed;padding:10px;color:#6f5f75;font-style:italic}.cp-buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}.cp-button{display:block;text-align:center;border:1px solid #e6dbe9;border-radius:12px;background:#fff;font:600 14px system-ui;padding:12px 8px;cursor:default}.cp-primary{grid-column:1/-1;background:#2b1834;color:#fff}.cp-danger{color:#a23520}</style></head><body><div class="wrap"><nav aria-label="Main navigation">{{SITE_BRAND}}</nav><main><nav><a href="/recipes/">Recipes</a><a href="/learn/builder/recipes.md">Builder guide</a><a href="/learn/index.json">API reference</a></nav><h1>Situation counter</h1><p>Spot and count one camera situation, like a pot boiling over or a dog licking itself.</p><p class="tag">Documentation revision 1 · Contract reference API 54 · Installed readiness unknown</p><p class="install-cta"><a class="install-button" href="https://bridgit.cc/install/?src=%2Frecipes%2Fsituation-counter%2Fapplet.json&amp;sha256=82135c91422f98d3552de0c5cbef25b6ae0a5582b192758bb66dd0cf425d7e27">Import to my phone</a> <span class="tag">One file, one approval on the phone: it sets up the watch, the card and keeps running with no agent. <a href="applet.json">Applet file</a></span></p><h2>The card</h2><p class="tag">A preview of the card the phone draws from this applet's <code>ui.card</code> pieces, with sample values. The buttons do nothing here.</p><div class="cp-card" role="figure" aria-label="Preview of the Situation counter card"><span class="cp-label">Preview</span><header class="cp-head"><p class="cp-eyebrow">Bridgit applet</p><h3>Situation counter</h3><p class="cp-muted">Counts how often the camera sees one situation today.</p></header><div class="cp-tiles"><div class="cp-tile"><strong>12</strong><small>Readings</small></div><div class="cp-tile"><strong>1 h 20 min</strong><small>Watched minutes</small></div></div><table class="cp-table"><thead><tr><th>Situation</th><th>Times seen today</th><th>Minutes</th></tr></thead><tbody><tr><td>Sample 1</td><td>12</td><td>12</td></tr><tr><td>Sample 2</td><td>12</td><td>12</td></tr></tbody></table><ul class="cp-list"><li><span>Sample <small>· 12</small></span><span class="cp-muted">3 min ago</span></li><li><span>Sample <small>· 12</small></span><span class="cp-muted">3 min ago</span></li></ul><p class="cp-note">Sampled photos judged by a model. Gaps and things out of frame are unknown, and it is not a safety alarm.</p><div class="cp-buttons"><span class="cp-button" aria-disabled="true">Pause</span></div></div><p><a href="applet.json">Applet file</a> · <a href="/simulator/?card=recipe-situation-counter">Older HTML card in the card simulator</a> · <a href="request.json">Complete HTML interaction body</a> · <a href="recipe.json">Machine-readable recipe</a></p><h2>What runs where</h2><ul><li>Timer → camera → free local change check → Clef yes/no on changed photos → episode tally on the phone → watch.matched event and, for alert situations, an urgent owner notice.</li><li>The phone expands situation into the tuned question, the tally (track = the situation id, or &quot;situation&quot; for own words) and the alert rule; unchanged photos reuse the last answer for free.</li></ul><h3>Controller integration</h3><ul><li>Optional: read GET /v1/watches/{id}/tally to archive day totals; the card and the count work with no agent.</li><li>Pick the situation with the owner: a library id from GET /v1/situations or the owner&#39;s own words.</li></ul><p>Only Clef photo checks leave the phone (model left out, so Clef is the default for a camera watch); direct or relay transport still requires a running reachable phone.</p><h2>Boundaries</h2><ul><li>A count is sampled photos judged by a model, not continuous coverage or proof: gaps, a locked camera or the thing being out of frame are unknown, not zero.</li><li>It does not diagnose health or detect fire: a smoke or boiling-over count is a nudge, not a safety alarm.</li></ul><h2>Lifecycle</h2><h3>start</h3><p>POST /v1/watches with the start example; retain the returned watch_id. Then render/post the card with resource_id.</p><h3>update</h3><p>GET /v1/watches/{id}/tally first. To change the situation or timing, archive the tally, DELETE the old watch, POST the revised body. No watch PATCH exists.</p><h3>pause</h3><p>POST /v1/watches/{id}/pause with {&quot;paused&quot;:true}; resume with false. Confirm user_paused from the returned metadata. Expiry is unchanged.</p><h3>stop</h3><p>DELETE /v1/watches/{id}; confirm deleted equals the saved id and watch.ended reason deleted. Archive needed tally BEFORE deletion. Cancel the interaction separately.</p><h2>Failures and costs</h2><ul><li>Own words that look like an id (lowercase_with_underscores) but aren&#39;t in the library are refused: describe it with spaces instead.</li><li>A busy or locked camera is a gap; poor light, glare and odd angles cause misses and false counts. Aim the camera and try a known example first.</li><li>Clef photo checks from the phone&#39;s model budget: at most max_paid_per_hour (30 here, under the 50-an-hour limit some phones have) an hour; unchanged pictures reuse the last answer for free. Read GET /v1/limits and lower the cap or lengthen interval_s for long runs.</li></ul><h2>Complete synthetic contract examples</h2><p>These fixtures demonstrate contracts. They are not observations from a phone. Replace image/resource IDs with returned authorized IDs. Load <a href="request.json">request.json</a> as the complete body of POST /v1/interactions; it contains the full offline HTML.</p><h3>start</h3><pre>{
+  &quot;id&quot;: &quot;start&quot;,
+  &quot;request&quot;: {
+    &quot;method&quot;: &quot;POST&quot;,
+    &quot;path&quot;: &quot;/v1/watches&quot;,
+    &quot;body&quot;: {
+      &quot;situation&quot;: &quot;pot_boiling_over&quot;,
+      &quot;data&quot;: [
+        &quot;camera&quot;
+      ],
+      &quot;camera&quot;: &quot;rear&quot;,
+      &quot;interval_s&quot;: 20,
+      &quot;expires_in_s&quot;: 7776000,
+      &quot;max_paid_per_hour&quot;: 30,
+      &quot;local&quot;: {
+        &quot;change_check&quot;: true,
+        &quot;sensitivity&quot;: &quot;normal&quot;,
+        &quot;max_reuse_s&quot;: 300
+      }
+    }
+  },
+  &quot;response&quot;: {
+    &quot;status&quot;: 201,
+    &quot;body&quot;: {
+      &quot;watch_id&quot;: &quot;wsituation01&quot;,
+      &quot;label&quot;: &quot;Pot boiling over&quot;,
+      &quot;user_paused&quot;: false,
+      &quot;created_at&quot;: &quot;2026-11-04T10:00:00Z&quot;,
+      &quot;expires_at&quot;: &quot;2027-02-02T10:00:00Z&quot;,
+      &quot;interval_s&quot;: 20,
+      &quot;data&quot;: [
+        &quot;camera&quot;
+      ],
+      &quot;checks&quot;: 0,
+      &quot;matches&quot;: 0,
+      &quot;last_match_at&quot;: null,
+      &quot;readings_held&quot;: 0,
+      &quot;last_check&quot;: null,
+      &quot;usage&quot;: {
+        &quot;model&quot;: &quot;clef&quot;,
+        &quot;answered_locally&quot;: 0,
+        &quot;paid_calls&quot;: 0,
+        &quot;paid_cost_usd&quot;: 0,
+        &quot;paid_calls_last_hour&quot;: 0,
+        &quot;max_paid_per_hour&quot;: 30,
+        &quot;skipped_over_paid_cap&quot;: 0,
+        &quot;change_check&quot;: true
+      },
+      &quot;spec&quot;: {
+        &quot;interval_s&quot;: 20,
+        &quot;question&quot;: null,
+        &quot;data&quot;: [
+          &quot;camera&quot;
+        ],
+        &quot;expires_in_s&quot;: 7776000,
+        &quot;questions&quot;: {
+          &quot;pot_boiling_over&quot;: {
+            &quot;instructions&quot;: &quot;Is a pot or pan on the stove boiling over, with liquid or foam spilling over its rim? Judge from the newest photo: how likely is it that this is happening in it now?&quot;,
+            &quot;type&quot;: &quot;noul&quot;
+          }
+        },
+        &quot;paid_calls_per_hour_at_most&quot;: 30,
+        &quot;label&quot;: &quot;Pot boiling over&quot;,
+        &quot;min_readings&quot;: 1,
+        &quot;max_paid_per_hour&quot;: 30,
+        &quot;local&quot;: {
+          &quot;max_reuse_s&quot;: 300,
+          &quot;learn_noise&quot;: true,
+          &quot;sensitivity&quot;: &quot;normal&quot;,
+          &quot;change_check&quot;: true
+        },
+        &quot;callback_url&quot;: null,
+        &quot;cooldown_s&quot;: 600,
+        &quot;repeat&quot;: true,
+        &quot;context&quot;: null,
+        &quot;model&quot;: &quot;clef&quot;,
+        &quot;window&quot;: 1,
+        &quot;callback_when&quot;: [],
+        &quot;camera&quot;: &quot;rear&quot;,
+        &quot;tally&quot;: {
+          &quot;min&quot;: 0.7,
+          &quot;gap_s&quot;: 180,
+          &quot;kind&quot;: &quot;noul&quot;,
+          &quot;min_episode_readings&quot;: 1,
+          &quot;rules&quot;: [
+            {
+              &quot;cooldown_s&quot;: 300,
+              &quot;id&quot;: &quot;alert&quot;,
+              &quot;do&quot;: {
+                &quot;path&quot;: &quot;/v1/interactions&quot;,
+                &quot;method&quot;: &quot;POST&quot;,
+                &quot;body&quot;: {
+                  &quot;kind&quot;: &quot;notice&quot;,
+                  &quot;text&quot;: &quot;Seen on the camera just now.&quot;,
+                  &quot;title&quot;: &quot;Pot boiling over&quot;,
+                  &quot;priority&quot;: &quot;urgent&quot;
+                }
+              },
+              &quot;when&quot;: {
+                &quot;of&quot;: &quot;pot_boiling_over&quot;,
+                &quot;within_s&quot;: 120,
+                &quot;at_least&quot;: 1
+              }
+            }
+          ],
+          &quot;track&quot;: &quot;pot_boiling_over&quot;,
+          &quot;seen&quot;: null,
+          &quot;labels&quot;: null,
+          &quot;keep_days&quot;: 30
+        },
+        &quot;situation&quot;: &quot;pot_boiling_over&quot;
+      },
+      &quot;tally_today&quot;: null,
+      &quot;rules_fired&quot;: 0,
+      &quot;callback_secret&quot;: null,
+      &quot;first_check_in_s&quot;: 0,
+      &quot;delivery&quot;: &quot;watch.matched and watch.ended go to your registered callback if you have one, and to GET /v1/events (both need the interactions permission); watch.rule (a rule fired) goes the same way&quot;
+    }
+  },
+  &quot;evidence&quot;: &quot;Synthetic contract fixture, not a device observation.&quot;
+}
+</pre><h3>own-words</h3><pre>{
+  &quot;id&quot;: &quot;own-words&quot;,
+  &quot;request&quot;: {
+    &quot;method&quot;: &quot;POST&quot;,
+    &quot;path&quot;: &quot;/v1/watches&quot;,
+    &quot;body&quot;: {
+      &quot;situation&quot;: {
+        &quot;describe&quot;: &quot;the cat is sleeping on the armchair&quot;,
+        &quot;alert&quot;: false
+      },
+      &quot;data&quot;: [
+        &quot;camera&quot;
+      ],
+      &quot;camera&quot;: &quot;rear&quot;,
+      &quot;interval_s&quot;: 60,
+      &quot;expires_in_s&quot;: 2592000,
+      &quot;max_paid_per_hour&quot;: 20,
+      &quot;local&quot;: {
+        &quot;change_check&quot;: true,
+        &quot;sensitivity&quot;: &quot;normal&quot;,
+        &quot;max_reuse_s&quot;: 900
+      }
+    }
+  },
+  &quot;response&quot;: {
+    &quot;status&quot;: 201,
+    &quot;body&quot;: {
+      &quot;watch_id&quot;: &quot;wsituation02&quot;,
+      &quot;label&quot;: &quot;The cat is sleeping on the armchair&quot;,
+      &quot;user_paused&quot;: false,
+      &quot;created_at&quot;: &quot;2026-11-04T10:00:00Z&quot;,
+      &quot;expires_at&quot;: &quot;2026-12-04T10:00:00Z&quot;,
+      &quot;interval_s&quot;: 60,
+      &quot;data&quot;: [
+        &quot;camera&quot;
+      ],
+      &quot;checks&quot;: 0,
+      &quot;matches&quot;: 0,
+      &quot;last_match_at&quot;: null,
+      &quot;readings_held&quot;: 0,
+      &quot;last_check&quot;: null,
+      &quot;usage&quot;: {
+        &quot;model&quot;: &quot;clef&quot;,
+        &quot;answered_locally&quot;: 0,
+        &quot;paid_calls&quot;: 0,
+        &quot;paid_cost_usd&quot;: 0,
+        &quot;paid_calls_last_hour&quot;: 0,
+        &quot;max_paid_per_hour&quot;: 20,
+        &quot;skipped_over_paid_cap&quot;: 0,
+        &quot;change_check&quot;: true
+      },
+      &quot;spec&quot;: {
+        &quot;interval_s&quot;: 60,
+        &quot;question&quot;: null,
+        &quot;data&quot;: [
+          &quot;camera&quot;
+        ],
+        &quot;expires_in_s&quot;: 2592000,
+        &quot;questions&quot;: {
+          &quot;situation&quot;: {
+            &quot;instructions&quot;: &quot;Does the photo show this: the cat is sleeping on the armchair? Judge from the newest photo: how likely is it that this is happening in it now?&quot;,
+            &quot;type&quot;: &quot;noul&quot;
+          }
+        },
+        &quot;paid_calls_per_hour_at_most&quot;: 20,
+        &quot;label&quot;: &quot;The cat is sleeping on the armchair&quot;,
+        &quot;min_readings&quot;: 1,
+        &quot;max_paid_per_hour&quot;: 20,
+        &quot;local&quot;: {
+          &quot;max_reuse_s&quot;: 900,
+          &quot;learn_noise&quot;: true,
+          &quot;sensitivity&quot;: &quot;normal&quot;,
+          &quot;change_check&quot;: true
+        },
+        &quot;callback_url&quot;: null,
+        &quot;cooldown_s&quot;: 600,
+        &quot;repeat&quot;: true,
+        &quot;context&quot;: null,
+        &quot;model&quot;: &quot;clef&quot;,
+        &quot;window&quot;: 1,
+        &quot;callback_when&quot;: [],
+        &quot;camera&quot;: &quot;rear&quot;,
+        &quot;tally&quot;: {
+          &quot;min&quot;: 0.7,
+          &quot;gap_s&quot;: 180,
+          &quot;kind&quot;: &quot;noul&quot;,
+          &quot;min_episode_readings&quot;: 1,
+          &quot;rules&quot;: [],
+          &quot;track&quot;: &quot;situation&quot;,
+          &quot;seen&quot;: null,
+          &quot;labels&quot;: null,
+          &quot;keep_days&quot;: 30
+        },
+        &quot;situation&quot;: &quot;situation&quot;
+      },
+      &quot;tally_today&quot;: null,
+      &quot;rules_fired&quot;: 0,
+      &quot;callback_secret&quot;: null,
+      &quot;first_check_in_s&quot;: 0,
+      &quot;delivery&quot;: &quot;watch.matched and watch.ended go to your registered callback if you have one, and to GET /v1/events (both need the interactions permission); watch.rule (a rule fired) goes the same way&quot;
+    }
+  },
+  &quot;evidence&quot;: &quot;Synthetic contract fixture, not a device observation: own words count under the track id \&quot;situation\&quot;.&quot;
+}
+</pre><h3>stop</h3><pre>{
+  &quot;id&quot;: &quot;stop&quot;,
+  &quot;request&quot;: {
+    &quot;method&quot;: &quot;DELETE&quot;,
+    &quot;path&quot;: &quot;/v1/watches/wsituation01&quot;
+  },
+  &quot;response&quot;: {
+    &quot;status&quot;: 200,
+    &quot;body&quot;: {
+      &quot;deleted&quot;: &quot;wsituation01&quot;
+    }
+  },
+  &quot;evidence&quot;: &quot;Synthetic contract fixture, not a device observation.&quot;
+}
+</pre><h2>Extensions</h2><ul><li>Send {&quot;situation&quot;: {&quot;describe&quot;: &quot;...&quot;, &quot;alert&quot;: true}} to count own words and notify the owner when one starts.</li><li>Add callback_when on the situation id, or rules, to reach a controller or show other notices; min and count_only_while tune what counts.</li></ul><h2>Source evidence</h2><ul><li><a href="https://github.com/sponicgarden/bridgit-client/blob/main/app/src/main/java/cc/bridgit/app/watch/Situations.kt">app/src/main/java/cc/bridgit/app/watch/Situations.kt</a></li><li><a href="https://github.com/sponicgarden/bridgit-client/blob/main/app/src/main/java/cc/bridgit/app/watch/WatchRules.kt">app/src/main/java/cc/bridgit/app/watch/WatchRules.kt</a></li><li><a href="https://github.com/sponicgarden/bridgit-client/blob/main/app/src/main/java/cc/bridgit/app/watch/WatchTally.kt">app/src/main/java/cc/bridgit/app/watch/WatchTally.kt</a></li><li><a href="https://github.com/sponicgarden/bridgit-client/blob/main/app/src/main/java/cc/bridgit/app/watch/Watches.kt">app/src/main/java/cc/bridgit/app/watch/Watches.kt</a></li><li><a href="https://github.com/sponicgarden/bridgit-client/blob/main/app/src/main/java/cc/bridgit/app/interact/CardActions.kt">app/src/main/java/cc/bridgit/app/interact/CardActions.kt</a></li></ul></main></div></body></html>

@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Pet monitor readings and daily summaries, without taking new photos",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_dog_monitor_history",
+  "query": [{
+   "name": "limit",
+   "description": "Newest 1-500 readings (default 100)",
+   "type": "integer",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/dog-monitor/history?limit=100",
+  "idempotent": false,
+  "path": "/v1/applets/dog-monitor/history",
+  "capability": "owner_features",
+  "returns": "readings, today, timezone",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"limit": {
+    "description": "Newest 1-500 readings (default 100)",
+    "type": "integer"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

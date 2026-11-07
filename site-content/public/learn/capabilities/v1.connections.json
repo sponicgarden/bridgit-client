@@ -1,0 +1,77 @@
+{
+ "detail_url": "/v1/discover?id=v1.connections&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.connections.json",
+ "title": "connections",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.connections.json",
+ "prerequisites": ["Check v1.connections supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "The owner's connections (webhooks out to Home Assistant, Discord, ntfy, Telegram, n8n\u2026) you can send to: id, name and service, never the address or secrets",
+   "path": "/v1/connections",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-connections.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-connections.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "connections_get"
+  },
+  {
+   "summary": "Send a message, data and optionally a kept photo to one of the owner's connections. Queued and retried by default; wait_reply waits up to 15 s and returns the reply",
+   "path": "/v1/connections/send",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-connections-send.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-connections-send.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "connections_send"
+  },
+  {
+   "summary": "Create or replace a connection under App settings, Super Powers and owner.configuration authority; URL, headers and credentials are write-only",
+   "path": "/v1/connections/configure",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-connections-configure.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-connections-configure.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "connections_configure"
+  },
+  {
+   "summary": "Revoke a connection and cancel queued sends; requires configuration authority",
+   "path": "/v1/connections/{id}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-connections-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-connections-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "connections_delete"
+  },
+  {
+   "summary": "Rotate a connection signing key; configuration authority required; the generated key remains owner-only",
+   "path": "/v1/connections/{id}/rotate",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-connections-id-rotate.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-connections-id-rotate.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "connections_rotate"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.connections",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v1.connections"]
+}

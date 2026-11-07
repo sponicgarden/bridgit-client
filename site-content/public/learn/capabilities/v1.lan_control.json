@@ -1,0 +1,47 @@
+{
+ "detail_url": "/v1/discover?id=v1.lan_control&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.lan_control.json",
+ "title": "lan control",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.lan_control.json",
+ "prerequisites": ["Check v1.lan_control supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": ["external-device-dashboard"],
+ "operations": [
+  {
+   "summary": "This agent's enrolled devices and adapter/action schemas",
+   "path": "/v1/lan/devices",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-devices.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-devices.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_devices"
+  },
+  {
+   "summary": "Run a fixed supported action on this agent's enrolled device",
+   "path": "/v1/lan/devices/action",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-devices-action.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-devices-action.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_devices_action"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.lan_control",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "act",
+ "capability_ids": ["v1.lan_control"]
+}

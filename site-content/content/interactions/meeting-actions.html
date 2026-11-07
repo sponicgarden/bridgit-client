@@ -1,0 +1,145 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6f8;color:#1e293b;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 28px}
+.eyebrow{font-size:13px;font-weight:600;color:#0f766e;letter-spacing:.04em;text-transform:uppercase;margin:0 0 6px}
+h1{font-size:22px;line-height:1.25;margin:0 0 10px;letter-spacing:-.01em}
+.meta{display:flex;align-items:center;gap:10px;color:#475569;font-size:14px;margin-bottom:18px;flex-wrap:wrap}
+.avs{display:flex}
+.av{width:32px;height:32px;border-radius:50%;display:grid;place-content:center;font-size:11px;font-weight:700;border:2px solid #f4f6f8;margin-left:-6px;color:#1e293b}
+.av:first-child{margin-left:0}
+.count{display:flex;gap:8px;margin-bottom:12px;font-size:14px;font-variant-numeric:tabular-nums}
+.count span{background:#fff;border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(15,23,42,.06);color:#475569}
+.count b{color:#1e293b}
+.count .you b{color:#0f766e}
+.list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.item{background:#fff;border-radius:16px;padding:14px 14px 12px;display:grid;grid-template-columns:48px 1fr;gap:4px 10px;box-shadow:0 1px 3px rgba(15,23,42,.06),0 4px 14px rgba(15,23,42,.04);border:1.5px solid transparent;transition:border-color .18s,background .18s,opacity .18s}
+.item.mine{border-color:#99e0dc;background:#f0fbfa}
+.item.off{opacity:.55}
+.tick{grid-row:1/3;width:48px;height:48px;border:0;background:none;padding:0;cursor:pointer;display:grid;place-content:center}
+.tick i{width:26px;height:26px;border-radius:8px;border:2px solid #cbd5e1;display:grid;place-content:center;transition:all .18s;color:#fff;font-style:normal;font-size:15px;font-weight:800}
+.tick.on i{background:#0ea5a4;border-color:#0ea5a4}
+.task{font-size:15.5px;font-weight:550;padding-top:2px}
+.item.off .task{text-decoration:line-through}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font:inherit;font-size:13.5px;font-weight:600;border:1px solid #e2e8f0;background:#f8fafc;color:#334155;border-radius:999px;padding:0 14px;min-height:48px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s,border-color .15s,transform .1s}
+.chip.own.me{background:#0f766e;border-color:#0f766e;color:#fff}
+.chip small{font-size:12px;opacity:.75;font-weight:500}
+.chip:active,.main:active{transform:scale(.98)}
+.main{width:100%;font:inherit;font-weight:700;border:0;border-radius:14px;min-height:54px;background:#0f766e;color:#fff;cursor:pointer;box-shadow:0 6px 18px rgba(14,165,164,.28);transition:background .15s,transform .1s}
+.main:disabled{background:#94a3b8;box-shadow:none;cursor:default}
+.alt{width:100%;font:inherit;font-weight:600;border:0;background:none;color:#475569;min-height:48px;margin-top:6px;cursor:pointer}
+.status{text-align:center;color:#475569;font-size:14px;min-height:20px;margin-top:8px}
+.done{color:#0f766e}
+</style>
+<div class="wrap">
+  <p class="eyebrow" id="eyebrow"></p>
+  <h1 id="title"></h1>
+  <div class="meta"><div class="avs" id="avs"></div><span id="when"></span></div>
+  <div class="count"><span class="you"><b id="nYou">0</b> for you</span><span><b id="nOther">0</b> for others</span></div>
+  <div class="list" id="list"></div>
+  <button class="main" id="send"></button>
+  <button class="alt" id="later"></button>
+  <div class="status" id="status"></div>
+</div>
+<script>
+// answer.data: {action:"send"|"later", items:[{id, task, accepted, owner:"you"|"maja"|…, due:"2026-11-06"|null}]}
+// The card's content. Change only this object.
+var CARD = {
+  eyebrow: 'Action items',
+  title: 'Q1 planning call',
+  when: 'Tue 3 Nov · 45 min · 6 people',
+  attendees: [
+    {id:'you', name:'You', initials:'Me', colour:'#99f6e4'},
+    {id:'maja', name:'Maja', initials:'MK', colour:'#fde68a'},
+    {id:'tomasz', name:'Tomasz', initials:'TW', colour:'#c7d2fe'},
+    {id:'ines', name:'Ines', initials:'IR', colour:'#fbcfe8'},
+    {id:'piotr', initials:'PN', colour:'#bbf7d0'},
+    {id:'lea', initials:'LB', colour:'#fed7aa'}
+  ],
+  owners: ['you','maja','tomasz','ines'],
+  dues: [
+    {label:'Fri', date:'2026-11-06'},
+    {label:'Next Mon', date:'2026-11-09'},
+    {label:'Next Fri', date:'2026-11-13'},
+    {label:'No date', date:null}
+  ],
+  items: [
+    {id:'a1', task:'Draft the Q1 budget for the Kraków office', owner:'you', due:0},
+    {id:'a2', task:'Book the venue for the January offsite', owner:'maja', due:2},
+    {id:'a3', task:'Share the hiring plan with finance', owner:'you', due:1},
+    {id:'a4', task:'Update the product roadmap slides', owner:'tomasz', due:2},
+    {id:'a5', task:'Send meeting notes to the Lisbon team', owner:'you', due:0}
+  ],
+  sendLabel: 'Send to the team',
+  laterLabel: 'Edit later',
+  sending: 'Sending…',
+  doneText: {send:'Sent to the team', later:'Saved, edit them later'},
+  preview: 'Preview only: open this card in Bridgit to answer.'
+};
+var $ = function(id){return document.getElementById(id)};
+var sent = false, rows = [], last = 'send';
+var people = {}; CARD.attendees.forEach(function(a){people[a.id]=a});
+$('eyebrow').textContent = CARD.eyebrow;
+$('title').textContent = CARD.title;
+$('when').textContent = CARD.when;
+$('later').textContent = CARD.laterLabel;
+CARD.attendees.forEach(function(a){var d=document.createElement('div');d.className='av';d.style.background=a.colour;d.textContent=a.initials;$('avs').appendChild(d)});
+CARD.items.forEach(function(it){
+  var st = {id:it.id, task:it.task, accepted:true, owner:CARD.owners.indexOf(it.owner), due:it.due};
+  var row = document.createElement('div'); row.className='item';
+  var tick = document.createElement('button'); tick.className='tick on'; tick.setAttribute('aria-label','Accept');
+  var box = document.createElement('i'); box.textContent='✓'; tick.appendChild(box);
+  var task = document.createElement('div'); task.className='task'; task.textContent=it.task;
+  var chips = document.createElement('div'); chips.className='chips';
+  var own = document.createElement('button'); own.className='chip own';
+  var due = document.createElement('button'); due.className='chip';
+  chips.appendChild(own); chips.appendChild(due);
+  row.appendChild(tick); row.appendChild(task); row.appendChild(chips);
+  $('list').appendChild(row);
+  st.el = {row:row, tick:tick, box:box, own:own, due:due};
+  tick.onclick = function(){if(sent)return;st.accepted=!st.accepted;draw()};
+  own.onclick = function(){if(sent)return;st.owner=(st.owner+1)%CARD.owners.length;draw()};
+  due.onclick = function(){if(sent)return;st.due=(st.due+1)%CARD.dues.length;draw()};
+  rows.push(st);
+});
+function draw(){
+  var you=0, other=0;
+  rows.forEach(function(st){
+    var oid = CARD.owners[st.owner], mine = oid==='you';
+    st.el.row.classList.toggle('mine', mine && st.accepted);
+    st.el.row.classList.toggle('off', !st.accepted);
+    st.el.tick.classList.toggle('on', st.accepted);
+    st.el.box.textContent = st.accepted ? '✓' : '';
+    st.el.own.classList.toggle('me', mine);
+    st.el.own.textContent = people[oid].name;
+    st.el.due.textContent = '';
+    var s = document.createElement('small'); s.textContent='Due'; st.el.due.appendChild(s);
+    st.el.due.appendChild(document.createTextNode(CARD.dues[st.due].label));
+    if (st.accepted) { if (mine) you++; else other++; }
+  });
+  $('nYou').textContent = you; $('nOther').textContent = other;
+  var n = you + other;
+  $('send').disabled = n === 0;
+  $('send').textContent = n ? CARD.sendLabel + ' · ' + n + (n === 1 ? ' item' : ' items') : 'Accept at least one item';
+}
+draw();
+function answer(action){
+  if (sent) return;
+  var b = window.Bridgit || window.Bridget;
+  if (!b) { $('status').textContent = CARD.preview; return; }
+  sent = true; last = action;
+  document.querySelectorAll('button').forEach(function(x){x.disabled=true});
+  $('status').textContent = CARD.sending;
+  b.respond(JSON.stringify({action:action, items:rows.map(function(st){return {id:st.id, task:st.task, accepted:st.accepted, owner:CARD.owners[st.owner], due:CARD.dues[st.due].date}})}));
+}
+$('send').onclick = function(){answer('send')};
+$('later').onclick = function(){answer('later')};
+document.addEventListener('bridgit:answered', function(e){
+  e.preventDefault();
+  $('title').textContent = '✓ ' + CARD.doneText[last];
+  $('title').className = 'done';
+  $('status').textContent = '';
+  setTimeout(function(){$('title').scrollIntoView({block:'center'})}, 400);
+});
+</script>

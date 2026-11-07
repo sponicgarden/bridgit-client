@@ -1,0 +1,126 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Propose a new version of this personal applet. Read its development snapshot, validate the complete candidate and include change evidence. The owner or an authorized controlling agent reviews every agent edit. Approval checks the expected instance revision again.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applets_installed_update",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "package",
+    "description": "The applet file itself: a bridgit-template/1 definition with runtime.adapter bridgit.package.v1 (legacy alias android.package.v1; see https://bridgit.cc/learn/builder/applet-packages.md)",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "url",
+    "description": "Instead of package: an https://bridgit.cc/\u2026 package file (for example a recipe's applet.json)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "template",
+    "description": "Instead of package: a template registry key (with revision)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "revision",
+    "description": "With template: the immutable revision",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "bundled",
+    "description": "Instead of package/url/template: a built-in applet id (including a-sorta-fairytale-about-me, chef-helper, insurance-inventory, exercise-check); downloads its registry release",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "config",
+    "description": "Values for the applet's blanks (config_schema); the rest use defaults. The owner can still change them on the review screen",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "practice_review",
+    "description": "Reported GLM practice review: model, source_sha256 and disposition, or unavailable status and reason",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "change",
+    "description": "Required for agent edits: expected_revision, intent (1-1000 chars), acceptance (1-20 behavioral checks), evidence (1-4000 chars); task_id when integrating a prepared template. Read the modification guide first",
+    "type": "object",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/applets/installed/ai0123456789abcd/update {\"template\":\"my-notebook\",\"revision\":2,\"change\":{\"expected_revision\":3,\"intent\":\"Keep an extra month of notes\",\"acceptance\":[\"Existing notes remain readable\"],\"evidence\":\"Dry run passed and previous notes reopened on the test instance.\"}}",
+  "idempotent": true,
+  "path": "/v1/applets/installed/{id}/update",
+  "capability": "applet_install",
+  "returns": "status awaiting_owner, pending_id and review. After the owner or delegated controller approves through /owner/configuration/approvals, read back the installed version and data.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "template": {
+     "description": "Instead of package: a template registry key (with revision)",
+     "type": "string"
+    },
+    "package": {
+     "description": "The applet file itself: a bridgit-template/1 definition with runtime.adapter bridgit.package.v1 (legacy alias android.package.v1; see https://bridgit.cc/learn/builder/applet-packages.md)",
+     "type": "object"
+    },
+    "bundled": {
+     "description": "Instead of package/url/template: a built-in applet id (including a-sorta-fairytale-about-me, chef-helper, insurance-inventory, exercise-check); downloads its registry release",
+     "type": "string"
+    },
+    "change": {
+     "description": "Required for agent edits: expected_revision, intent (1-1000 chars), acceptance (1-20 behavioral checks), evidence (1-4000 chars); task_id when integrating a prepared template. Read the modification guide first",
+     "type": "object"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/applets/installed/{id}/update",
+     "type": "string"
+    },
+    "practice_review": {
+     "description": "Reported GLM practice review: model, source_sha256 and disposition, or unavailable status and reason",
+     "type": "object"
+    },
+    "config": {
+     "description": "Values for the applet's blanks (config_schema); the rest use defaults. The owner can still change them on the review screen",
+     "type": "object"
+    },
+    "url": {
+     "description": "Instead of package: an https://bridgit.cc/\u2026 package file (for example a recipe's applet.json)",
+     "type": "string"
+    },
+    "revision": {
+     "description": "With template: the immutable revision",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "id",
+    "change"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter",
+   "conflict",
+   "capability_disabled"
+  ],
+  "requires": null
+ }
+}

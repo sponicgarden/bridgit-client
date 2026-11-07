@@ -1,0 +1,98 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Ask the owner to install an applet package. Nothing runs and nothing is granted until the owner approves it once on the phone; then the phone creates its watches, schedule, workflow and card itself and keeps them running without you",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applets_install",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "package",
+    "description": "The applet file itself: a bridgit-template/1 definition with runtime.adapter bridgit.package.v1 (legacy alias android.package.v1; see https://bridgit.cc/learn/builder/applet-packages.md)",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "url",
+    "description": "Instead of package: an https://bridgit.cc/\u2026 package file (for example a recipe's applet.json)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "template",
+    "description": "Instead of package: a template registry key (with revision)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "revision",
+    "description": "With template: the immutable revision",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "bundled",
+    "description": "Instead of package/url/template: a built-in applet id (including a-sorta-fairytale-about-me, chef-helper, insurance-inventory, exercise-check); downloads its registry release",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "config",
+    "description": "Values for the applet's blanks (config_schema); the rest use defaults. The owner can still change them on the review screen",
+    "type": "object",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/applets/install {\"url\":\"https://bridgit.cc/recipes/room-change-watcher/applet.json\"}",
+  "idempotent": true,
+  "path": "/v1/applets/install",
+  "capability": "applet_install",
+  "returns": "status awaiting_owner, pending_id, review (as validate). applet.installed or applet.declined follows in /v1/events",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "template": {
+     "description": "Instead of package: a template registry key (with revision)",
+     "type": "string"
+    },
+    "package": {
+     "description": "The applet file itself: a bridgit-template/1 definition with runtime.adapter bridgit.package.v1 (legacy alias android.package.v1; see https://bridgit.cc/learn/builder/applet-packages.md)",
+     "type": "object"
+    },
+    "bundled": {
+     "description": "Instead of package/url/template: a built-in applet id (including a-sorta-fairytale-about-me, chef-helper, insurance-inventory, exercise-check); downloads its registry release",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "config": {
+     "description": "Values for the applet's blanks (config_schema); the rest use defaults. The owner can still change them on the review screen",
+     "type": "object"
+    },
+    "url": {
+     "description": "Instead of package: an https://bridgit.cc/\u2026 package file (for example a recipe's applet.json)",
+     "type": "string"
+    },
+    "revision": {
+     "description": "With template: the immutable revision",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "invalid_parameter",
+   "conflict",
+   "too_many_open"
+  ],
+  "requires": null
+ }
+}

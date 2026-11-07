@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Build small Bridgit applets from verified public contracts"><title>Room change watcher · Bridgit</title><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/brand.css"><style>main{max-width:940px;margin:50px auto;padding:0 22px}h1{font:600 42px Georgia,serif}h2{margin-top:34px}p,li{line-height:1.65}a{color:#704394}pre{background:#fff8ed;border:1px solid #e6dbe9;border-radius:14px;padding:18px;overflow:auto;max-height:540px}article,section.card{border:1px solid #e6dbe9;border-radius:18px;padding:22px;margin:18px 0;background:#fff8ed}.tag{color:#704394;font-size:13px}.install-cta{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.install-button{background:#704394;color:#fff!important;text-decoration:none;font-weight:600;padding:11px 20px;border-radius:999px}nav{display:flex;gap:20px}.cp-card{position:relative;max-width:420px;border:1px solid #e6dbe9;border-radius:20px;background:#fff;padding:18px;margin:14px 0;box-shadow:0 8px 24px #2b183408;color:#2b1834;font:15px/1.5 system-ui,sans-serif}.cp-card>*{margin:0 0 12px}.cp-card>*:last-child{margin-bottom:0}.cp-label{position:absolute;top:12px;right:14px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6f5f75;background:#fff8ed;border:1px dashed #e6dbe9;border-radius:99px;padding:2px 8px}.cp-head h3{font:600 22px/1.2 Georgia,serif;margin:4px 0 6px}.cp-eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#704394;margin:0}.cp-muted{color:#6f5f75}.cp-head .cp-muted{font-size:14px;margin:0}.cp-note{color:#6f5f75;font-size:12px}.cp-pill{display:inline-block;border-radius:99px;padding:3px 10px;background:#efe4f7;color:#704394;font-size:12px;font-weight:700}.cp-ok{background:#e2f3e8;color:#235c36}.cp-warn{background:#fff0c7;color:#785513}.cp-bad{background:#fde9df;color:#a23520}.cp-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cp-tile{background:#efe4f7;border-radius:12px;padding:12px}.cp-tile strong,.cp-tile small{display:block}.cp-tile strong{font-size:18px}.cp-tile small{font-size:11px;color:#6f5f75;margin-top:4px}.cp-table{width:100%;border-collapse:collapse;font-size:13px}.cp-table th{text-align:left;color:#6f5f75;font-weight:600;border-bottom:1px solid #e6dbe9;padding:6px 4px}.cp-table td{border-bottom:1px solid #e6dbe9;padding:8px 4px}.cp-list{list-style:none;padding:0}.cp-list li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #e6dbe9;padding:9px 0;font-size:14px}.cp-badge{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#efe4f7;color:#704394;font-size:12px}.cp-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#b9adbf}.cp-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.cp-gallery span{aspect-ratio:1;border-radius:10px;background:#efe4f7}.cp-video{display:grid;place-items:center;aspect-ratio:16/9;border-radius:12px;background:#2b1834;color:#fff;font-size:28px}.cp-draft{display:block;font-size:13px;color:#6f5f75}.cp-box{display:block;margin-top:6px;min-height:72px;border:1px solid #e6dbe9;border-radius:12px;background:#fff8ed;padding:10px;color:#6f5f75;font-style:italic}.cp-buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}.cp-button{display:block;text-align:center;border:1px solid #e6dbe9;border-radius:12px;background:#fff;font:600 14px system-ui;padding:12px 8px;cursor:default}.cp-primary{grid-column:1/-1;background:#2b1834;color:#fff}.cp-danger{color:#a23520}</style></head><body><div class="wrap"><nav aria-label="Main navigation">{{SITE_BRAND}}</nav><main><nav><a href="/recipes/">Recipes</a><a href="/learn/builder/recipes.md">Builder guide</a><a href="/learn/index.json">API reference</a></nav><h1>Room change watcher</h1><p>A free image-change trigger with an explicit interpretation boundary.</p><p class="tag">Documentation revision 1 · Contract reference API 54 · Installed readiness unknown</p><p class="install-cta"><a class="install-button" href="https://bridgit.cc/install/?src=%2Frecipes%2Froom-change-watcher%2Fapplet.json&amp;sha256=cb5cbc3ca3d6c82f8843cf9d3f39659b4f6a0d0ef3032e55c117cfdba0baaed9">Import to my phone</a> <span class="tag">One file, one approval on the phone: it sets up the watch, the card and keeps running with no agent. <a href="applet.json">Applet file</a></span></p><h2>The card</h2><p class="tag">A preview of the card the phone draws from this applet's <code>ui.card</code> pieces, with sample values. The buttons do nothing here.</p><div class="cp-card" role="figure" aria-label="Preview of the Room change watcher card"><span class="cp-label">Preview</span><header class="cp-head"><p class="cp-eyebrow">Bridgit applet</p><h3>Room change watcher</h3><p class="cp-muted">See when the room&#39;s picture changes.</p></header><div class="cp-tiles"><div class="cp-tile"><strong>12</strong><small>Checks</small></div><div class="cp-tile"><strong>12</strong><small>Change matches</small></div></div><ul class="cp-list"><li><span>Image changed</span><span class="cp-muted">3 min ago</span></li><li><span>Image changed</span><span class="cp-muted">3 min ago</span></li></ul><p class="cp-note">Image change is not person or danger detection. Changes can be light or shadows.</p><div class="cp-buttons"><span class="cp-button" aria-disabled="true">Pause</span></div></div><p><a href="applet.json">Applet file</a> · <a href="/simulator/?card=recipe-room-change-watcher">Older HTML card in the card simulator</a> · <a href="request.json">Complete HTML interaction body</a> · <a href="recipe.json">Machine-readable recipe</a></p><h2>What runs where</h2><ul><li>Timer → camera → free local image comparison → watch.matched event → controller inspection or offline status card.</li><li>model none makes no Jev/Clef calls and establishes a baseline before reporting changes.</li></ul><h3>Controller integration</h3><ul><li>Receive events, avoid duplicate processing by event ID/sequence, persist meaningful history.</li><li>Controller model interpretation and alerts are optional integrations, not features of the change filter.</li></ul><p>Only explicit decision-model/weather requests leave the phone; direct or relay transport still requires a running reachable phone.</p><h2>Boundaries</h2><ul><li>A changed image is not an intrusion, person count, danger or proof that something happened outside the frame.</li><li>The latest state and recent checks are bounded; controller must persist event history it needs.</li></ul><h2>Lifecycle</h2><h3>start</h3><p>POST /v1/watches with the start example; retain the returned watch_id. Then render/post the card with resource_id.</p><h3>update</h3><p>GET state/tally first. To change the definition, export required history, DELETE old watch, POST revised definition. No watch PATCH exists.</p><h3>pause</h3><p>POST /v1/watches/{id}/pause with {&quot;paused&quot;:true}; resume with false. Confirm user_paused from the returned metadata. Expiry is unchanged.</p><h3>stop</h3><p>DELETE /v1/watches/{id}; confirm deleted equals the saved id and watch.ended reason deleted. Archive needed tally BEFORE deletion. Cancel the interaction separately.</p><h2>Failures and costs</h2><ul><li>Lights, shadows and movement can trigger changes. Tune sensitivity using known examples.</li><li>Locked/busy camera is an error gap; first baseline does not count as a change.</li><li>Free local comparison, no paid calls. Captures use battery and require camera permissions and an unlocked phone for built-in cameras.</li></ul><h2>Complete synthetic contract examples</h2><p>These fixtures demonstrate contracts. They are not observations from a phone. Replace image/resource IDs with returned authorized IDs. Load <a href="request.json">request.json</a> as the complete body of POST /v1/interactions; it contains the full offline HTML.</p><h3>start</h3><pre>{
+  &quot;id&quot;: &quot;start&quot;,
+  &quot;request&quot;: {
+    &quot;method&quot;: &quot;POST&quot;,
+    &quot;path&quot;: &quot;/v1/watches&quot;,
+    &quot;body&quot;: {
+      &quot;label&quot;: &quot;Room image changes&quot;,
+      &quot;data&quot;: [
+        &quot;camera&quot;
+      ],
+      &quot;camera&quot;: &quot;rear&quot;,
+      &quot;model&quot;: &quot;none&quot;,
+      &quot;interval_s&quot;: 30,
+      &quot;window&quot;: 1,
+      &quot;min_readings&quot;: 1,
+      &quot;expires_in_s&quot;: 3600,
+      &quot;repeat&quot;: true,
+      &quot;cooldown_s&quot;: 120,
+      &quot;local&quot;: {
+        &quot;change_check&quot;: true,
+        &quot;sensitivity&quot;: &quot;normal&quot;,
+        &quot;max_reuse_s&quot;: 300
+      }
+    }
+  },
+  &quot;response&quot;: {
+    &quot;status&quot;: 201,
+    &quot;body&quot;: {
+      &quot;watch_id&quot;: &quot;w0123456789ab&quot;,
+      &quot;label&quot;: &quot;Room image changes&quot;,
+      &quot;user_paused&quot;: false,
+      &quot;created_at&quot;: &quot;2026-11-04T10:00:00Z&quot;,
+      &quot;expires_at&quot;: &quot;2026-11-04T11:00:00Z&quot;,
+      &quot;interval_s&quot;: 30,
+      &quot;data&quot;: [
+        &quot;camera&quot;
+      ],
+      &quot;checks&quot;: 0,
+      &quot;matches&quot;: 0,
+      &quot;last_match_at&quot;: null,
+      &quot;readings_held&quot;: 0,
+      &quot;last_check&quot;: null,
+      &quot;usage&quot;: {
+        &quot;model&quot;: &quot;none&quot;,
+        &quot;answered_locally&quot;: 0,
+        &quot;paid_calls&quot;: 0,
+        &quot;paid_cost_usd&quot;: 0,
+        &quot;paid_calls_last_hour&quot;: 0,
+        &quot;max_paid_per_hour&quot;: null,
+        &quot;skipped_over_paid_cap&quot;: 0,
+        &quot;change_check&quot;: true
+      },
+      &quot;spec&quot;: {
+        &quot;interval_s&quot;: 30,
+        &quot;question&quot;: null,
+        &quot;data&quot;: [
+          &quot;camera&quot;
+        ],
+        &quot;expires_in_s&quot;: 3600,
+        &quot;questions&quot;: {},
+        &quot;paid_calls_per_hour_at_most&quot;: 0,
+        &quot;label&quot;: &quot;Room image changes&quot;,
+        &quot;min_readings&quot;: 1,
+        &quot;max_paid_per_hour&quot;: null,
+        &quot;local&quot;: {
+          &quot;max_reuse_s&quot;: 300,
+          &quot;learn_noise&quot;: true,
+          &quot;sensitivity&quot;: &quot;normal&quot;,
+          &quot;change_check&quot;: true
+        },
+        &quot;callback_url&quot;: null,
+        &quot;cooldown_s&quot;: 120,
+        &quot;repeat&quot;: true,
+        &quot;context&quot;: null,
+        &quot;model&quot;: &quot;none&quot;,
+        &quot;window&quot;: 1,
+        &quot;callback_when&quot;: [],
+        &quot;camera&quot;: &quot;rear&quot;,
+        &quot;tally&quot;: null
+      },
+      &quot;callback_secret&quot;: null,
+      &quot;first_check_in_s&quot;: 0,
+      &quot;delivery&quot;: &quot;watch.matched and watch.ended go to your registered callback if you have one, and to GET /v1/events (both need the interactions permission)&quot;
+    }
+  },
+  &quot;evidence&quot;: &quot;Synthetic contract fixture, not a device observation.&quot;
+}
+</pre><h3>ask</h3><pre>{
+  &quot;id&quot;: &quot;ask&quot;,
+  &quot;request&quot;: {
+    &quot;method&quot;: &quot;POST&quot;,
+    &quot;path&quot;: &quot;/v1/watches&quot;,
+    &quot;body&quot;: {
+      &quot;label&quot;: &quot;Plant needs water&quot;,
+      &quot;data&quot;: [
+        &quot;camera&quot;
+      ],
+      &quot;camera&quot;: &quot;rear&quot;,
+      &quot;model&quot;: &quot;clef&quot;,
+      &quot;question&quot;: &quot;Does the plant look wilted, or does its soil look dry?&quot;,
+      &quot;interval_s&quot;: 3600,
+      &quot;expires_in_s&quot;: 7776000,
+      &quot;local&quot;: {
+        &quot;change_check&quot;: true,
+        &quot;sensitivity&quot;: &quot;normal&quot;,
+        &quot;max_reuse_s&quot;: 3600
+      },
+      &quot;max_paid_per_hour&quot;: 2,
+      &quot;tally&quot;: {
+        &quot;keep_days&quot;: 30
+      },
+      &quot;rules&quot;: [
+        {
+          &quot;id&quot;: &quot;needs-water&quot;,
+          &quot;when&quot;: {
+            &quot;at_least&quot;: 1,
+            &quot;of&quot;: &quot;match&quot;,
+            &quot;within_s&quot;: 3600
+          },
+          &quot;do&quot;: {
+            &quot;method&quot;: &quot;POST&quot;,
+            &quot;path&quot;: &quot;/v1/interactions&quot;,
+            &quot;body&quot;: {
+              &quot;kind&quot;: &quot;notice&quot;,
+              &quot;title&quot;: &quot;Plant may need water&quot;,
+              &quot;text&quot;: &quot;{message}&quot;
+            }
+          },
+          &quot;cooldown_s&quot;: 43200
+        }
+      ]
+    }
+  },
+  &quot;response&quot;: {
+    &quot;status&quot;: 201,
+    &quot;body&quot;: {
+      &quot;watch_id&quot;: &quot;w0123456789ac&quot;,
+      &quot;label&quot;: &quot;Plant needs water&quot;,
+      &quot;user_paused&quot;: false,
+      &quot;expires_at&quot;: &quot;2027-02-02T10:00:00Z&quot;,
+      &quot;interval_s&quot;: 3600,
+      &quot;data&quot;: [
+        &quot;camera&quot;
+      ],
+      &quot;checks&quot;: 0,
+      &quot;usage&quot;: {
+        &quot;model&quot;: &quot;clef&quot;,
+        &quot;paid_calls&quot;: 0,
+        &quot;max_paid_per_hour&quot;: 2,
+        &quot;change_check&quot;: true
+      },
+      &quot;first_check_in_s&quot;: 0
+    }
+  },
+  &quot;evidence&quot;: &quot;Synthetic contract fixture, not a device observation: the question variant (Clef yes/no question, 90-day tally, notice rule).&quot;
+}
+</pre><h3>stop</h3><pre>{
+  &quot;id&quot;: &quot;stop&quot;,
+  &quot;request&quot;: {
+    &quot;method&quot;: &quot;DELETE&quot;,
+    &quot;path&quot;: &quot;/v1/watches/w0123456789ab&quot;
+  },
+  &quot;response&quot;: {
+    &quot;status&quot;: 200,
+    &quot;body&quot;: {
+      &quot;deleted&quot;: &quot;w0123456789ab&quot;
+    }
+  },
+  &quot;evidence&quot;: &quot;Synthetic contract fixture, not a device observation.&quot;
+}
+</pre><h2>Extensions</h2><ul><li>Escalate only selected changes to a controller model, with a fresh capture.</li><li>For a specific yes/no condition, change model to clef and set a paid-call cap; stop/recreate to update.</li></ul><h2>Source evidence</h2><ul><li><a href="https://github.com/sponicgarden/bridgit-client/blob/main/app/src/main/java/cc/bridgit/app/api/Endpoints.kt">app/src/main/java/cc/bridgit/app/api/Endpoints.kt</a></li><li><a href="https://github.com/sponicgarden/bridgit-client/blob/main/app/src/main/java/cc/bridgit/app/interact/CardRules.kt">app/src/main/java/cc/bridgit/app/interact/CardRules.kt</a></li><li><a href="https://github.com/sponicgarden/bridgit-client/blob/main/app/src/main/java/cc/bridgit/app/interact/CardActions.kt">app/src/main/java/cc/bridgit/app/interact/CardActions.kt</a></li><li><a href="https://github.com/sponicgarden/bridgit-client/blob/main/app/src/main/java/cc/bridgit/app/watch/WatchRules.kt">app/src/main/java/cc/bridgit/app/watch/WatchRules.kt</a></li><li><a href="https://github.com/sponicgarden/bridgit-client/blob/main/app/src/main/java/cc/bridgit/app/watch/Watches.kt">app/src/main/java/cc/bridgit/app/watch/Watches.kt</a></li></ul></main></div></body></html>

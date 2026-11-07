@@ -1,0 +1,306 @@
+#!/usr/bin/env python3
+"""bridgit - call the Bridgit phone API from the command line.
+
+Works on hosts where Tailscale runs in userspace mode (no direct tailnet
+routing, so plain curl times out): the request goes through `tailscale nc`.
+On normal Tailscale hosts it uses a plain socket.
+
+  bridgit GET  /v1/health
+  bridgit GET  "/v1/image/last?type=screenshot&raw=1" -o last.jpg
+  bridgit POST /v1/camera/snapshot '{"camera":"rear","size":"agent"}' --save-image snap.jpg
+  bridgit POST /v1/mic/record '{"duration_seconds":5}' --save-image clip.m4a
+  bridgit POST /v1/camera/snapshot '{"camera":"rear","size":"agent"}' --idempotency-key 3f0c9a2e-... --save-image snap.jpg
+  bridgit wait-interaction 12 --timeout 3600
+
+Settings come from ~/.config/bridgit/env (or environment variables).
+Legacy ~/.config/bridget/env and BRIDGET_* variables remain supported.
+BRIDGIT_ENV (or legacy BRIDGET_ENV) selects one config file exclusively:
+  BRIDGIT_KEY=<your agent key>     required (brg_...), never printed
+  BRIDGIT_HOST=<phone address>     required: the phone's Tailscale IP or MagicDNS name
+  BRIDGIT_PORT=8734                optional (debug builds listen on 8735)
+  BRIDGIT_ENV=<path>               optional: another env file, so several agents
+                                   on one computer can each keep their own key
+  TAILSCALE_BIN, TAILSCALE_SOCKET  optional, for userspace tailscaled
+
+POST requests carry an Idempotency-Key: a new UUID per command, or the one you
+pass with --idempotency-key. If the connection fails, the helper retries once
+with the same key, so a retry never takes two photos. To re-run a command
+whose outcome you didn't see, pass the same --idempotency-key again: on
+endpoints that accept it, within 24 h (15 min for photos and clips) and while
+the app hasn't restarted, the phone returns the first result instead of
+acting again. Otherwise check GET /v1/log?agent=me before repeating.
+
+`wait-interaction` keeps long-polling one interaction (55 s holds, no sleeps)
+and prints only the outcome. Questions and HTML cards finish when answered,
+dismissed, expired or cancelled (opening one is not an answer); notices and
+text panels also finish once seen. --timeout ends the wait and leaves the
+interaction as it is; it never cancels the question.
+
+-o saves the reply's raw bytes (use with raw=1); --save-image decodes the
+data_base64 field of a JSON reply into a file.
+"""
+import argparse, base64, json, math, os, re, select, shutil, socket, subprocess, sys, time, uuid
+from urllib.parse import quote
+
+
+def load_env():
+    cfg = {}
+    # An explicit selector is exclusive, preserving per-agent key isolation.
+    selected = os.environ.get("BRIDGIT_ENV") or os.environ.get("BRIDGET_ENV")
+    paths = [selected] if selected else ["~/.config/bridget/env", "~/.config/bridgit/env"]
+    for config_path in paths:
+        p = os.path.expanduser(config_path)
+        if os.path.exists(p):
+            with open(p) as source:
+                for line in source:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        cfg[k.strip().replace("BRIDGET_", "BRIDGIT_", 1)] = v.strip().strip('"').strip("'")
+    for k in ("BRIDGIT_KEY", "BRIDGIT_HOST", "BRIDGIT_PORT", "TAILSCALE_BIN", "TAILSCALE_SOCKET"):
+        value = os.environ.get(k) or os.environ.get(k.replace("BRIDGIT_", "BRIDGET_", 1))
+        if value:
+            cfg[k] = value
+    return cfg
+
+
+def userspace_tailscale(cfg):
+    """Returns the `tailscale nc` command prefix if a userspace tailscaled is present."""
+    sock = cfg.get("TAILSCALE_SOCKET") or os.path.expanduser("~/.local/tailscale/tailscaled.sock")
+    ts = cfg.get("TAILSCALE_BIN") or os.path.expanduser("~/.local/tailscale/tailscale")
+    if not os.path.exists(ts):
+        ts = shutil.which("tailscale") or ""
+    if ts and os.path.exists(sock):
+        return [ts, "--socket", sock, "nc"]
+    return None
+
+
+def send(cfg, req, host, port, timeout=210):
+    nc = userspace_tailscale(cfg)
+    if nc:
+        p = subprocess.Popen(nc + [host, port], stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            p.stdin.write(req)
+            p.stdin.flush()
+            # Keep stdin open: `tailscale nc` drops the connection as soon as its
+            # input closes, before the phone has answered. Read until the phone
+            # closes the connection (we send Connection: close).
+            chunks, deadline = [], time.monotonic() + timeout
+            fd = p.stdout.fileno()
+            while True:
+                left = deadline - time.monotonic()
+                if left <= 0:
+                    raise TimeoutError("timed out")
+                ready, _, _ = select.select([fd], [], [], min(left, 5))
+                if not ready:
+                    if p.poll() is not None:
+                        break
+                    continue
+                c = os.read(fd, 65536)
+                if not c:
+                    break
+                chunks.append(c)
+            return b"".join(chunks)
+        finally:
+            # Always reap `tailscale nc`, on success, timeout or error.
+            if p.poll() is None:
+                p.kill()
+            p.wait()
+            for stream in (p.stdin, p.stdout, p.stderr):
+                try:
+                    stream.close()
+                except OSError:
+                    pass
+    s = socket.create_connection((host, int(port)), timeout=timeout)
+    s.sendall(req)
+    chunks = []
+    while True:
+        c = s.recv(65536)
+        if not c:
+            break
+        chunks.append(c)
+    return b"".join(chunks)
+
+
+def complete(raw):
+    """True if the whole HTTP response arrived (Content-Length matched, or the final chunk was seen)."""
+    head, sep, body = raw.partition(b"\r\n\r\n")
+    if not sep:
+        return False
+    h = head.decode("latin-1").lower()
+    for line in h.split("\r\n")[1:]:
+        if line.startswith("content-length:"):
+            return len(body) >= int(line.split(":", 1)[1])
+        if line.startswith("transfer-encoding:") and "chunked" in line:
+            return body.endswith(b"0\r\n\r\n")
+    return True
+
+
+def parse_response(raw):
+    """(status, headers, body) from a raw HTTP response, with chunked bodies decoded."""
+    head, _, payload = raw.partition(b"\r\n\r\n")
+    if not head:
+        raise ConnectionError("no response (is this host on Tailscale and Bridgit's listener on?)")
+    lines = head.decode("latin-1").split("\r\n")
+    status = int(lines[0].split()[1])
+    headers = {l.split(":", 1)[0].lower(): l.split(":", 1)[1].strip() for l in lines[1:] if ":" in l}
+    if headers.get("transfer-encoding", "").lower() == "chunked":
+        buf, rb = b"", payload
+        while rb:
+            size_s, _, rb = rb.partition(b"\r\n")
+            size = int(size_s.split(b";")[0] or b"0", 16)
+            if size == 0:
+                break
+            buf += rb[:size]
+            rb = rb[size + 2:]
+        payload = buf
+    return status, headers, payload
+
+
+def bad_request_line(method, path, idem_key=None):
+    """Why this can't go on the HTTP request line, or None. Stops a stray space or newline
+    from breaking the request or adding headers; already-encoded paths pass unchanged."""
+    if not re.fullmatch(r"[A-Z]{3,7}", method):
+        return f"method must be like GET or POST, not {method!r}"
+    if not path.startswith("/") or any(c <= " " or c > "~" for c in path):
+        return "path must start with / and have no spaces or control characters (URL-encode them, e.g. %20)"
+    if idem_key is not None and not re.fullmatch(r"[A-Za-z0-9_-]+", idem_key):
+        return "--idempotency-key may only have letters, digits, - or _"
+    return None
+
+
+def request(cfg, method, path, body=None, timeout=210):
+    """One GET or POST without retries; used by wait-interaction."""
+    host, port = cfg.get("BRIDGIT_HOST"), cfg.get("BRIDGIT_PORT", "8734")
+    if not host:
+        raise ValueError("set BRIDGIT_HOST (the phone's Tailscale IP or MagicDNS name) in ~/.config/bridgit/env")
+    data = (body or "").encode()
+    req = (f"{method} {path} HTTP/1.1\r\nHost: {host}:{port}\r\nAuthorization: Bearer {cfg['BRIDGIT_KEY']}\r\n"
+           f"Content-Type: application/json\r\nContent-Length: {len(data)}\r\n"
+           f"Connection: close\r\n\r\n").encode() + data
+    return parse_response(send(cfg, req, host, port, timeout=timeout))
+
+
+# The phone holds a wait for at most 55 s (it rejects more), so every long poll asks for 55.
+MAX_HOLD = 55
+# Questions and HTML cards stay open after the owner opens them: only these end the wait.
+CLOSED = ("answered", "dismissed", "expired", "cancelled")
+
+
+def wait_interaction(cfg, interaction_id, timeout):
+    """Long-polls one interaction until it has an outcome, so the caller only sees that.
+
+    A question or HTML card is done when it is answered, dismissed, expired or cancelled (opening it is not an
+    answer); a notice or text panel is also done once it has been seen."""
+    deadline = time.monotonic() + timeout
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining < 1:
+            raise TimeoutError("interaction wait deadline reached; the question was not cancelled")
+        hold = min(MAX_HOLD, int(remaining))
+        path = f"/v1/interactions/{quote(str(interaction_id), safe='')}?wait={hold}"
+        status, headers, payload = request(cfg, "GET", path, timeout=min(hold + 15, remaining))
+        if status >= 400:
+            raise RuntimeError(f"HTTP {status}: {payload.decode('utf-8', 'replace')}")
+        result = json.loads(payload)
+        state = result.get("status")
+        if state in CLOSED or (state == "seen" and result.get("kind") not in ("question", "html")):
+            return result
+        if state not in ("pending", "seen"):
+            raise ValueError(f"unexpected interaction status: {state!r}")
+
+
+def main(argv):
+    if argv and argv[0] == "wait-interaction":
+        parser = argparse.ArgumentParser(prog="bridgit wait-interaction", description="Wait for one interaction's outcome.")
+        parser.add_argument("interaction_id")
+        parser.add_argument("--timeout", type=float, default=3600, help="overall deadline in seconds (default: 3600)")
+        args = parser.parse_args(argv[1:])
+        if not math.isfinite(args.timeout) or args.timeout < 1:
+            parser.error("--timeout must be finite and at least 1 second")
+        cfg = load_env()
+        if not cfg.get("BRIDGIT_KEY"):
+            print("bridgit: set BRIDGIT_KEY in ~/.config/bridgit/env", file=sys.stderr)
+            return 2
+        try:
+            print(json.dumps(wait_interaction(cfg, args.interaction_id, args.timeout), indent=1))
+            return 0
+        except (Exception, KeyboardInterrupt) as e:
+            print(f"bridgit: {e or 'interrupted; the question was not cancelled'}", file=sys.stderr)
+            return 1
+    if len(argv) < 2 or argv[0] in ("-h", "--help"):
+        print(__doc__)
+        return 2
+    method, path, rest = argv[0].upper(), argv[1], argv[2:]
+    body = out = save = idem_key = None
+    i = 0
+    while i < len(rest):
+        if rest[i] == "-o":
+            out = rest[i + 1]; i += 2
+        elif rest[i] == "--save-image":
+            save = rest[i + 1]; i += 2
+        elif rest[i] == "--idempotency-key":
+            idem_key = rest[i + 1]; i += 2
+        else:
+            body = rest[i]; i += 1
+    cfg = load_env()
+    key = cfg.get("BRIDGIT_KEY")
+    if not key:
+        print("bridgit: set BRIDGIT_KEY in ~/.config/bridgit/env", file=sys.stderr)
+        return 2
+    host, port = cfg.get("BRIDGIT_HOST"), cfg.get("BRIDGIT_PORT", "8734")
+    if not host:
+        print("bridgit: set BRIDGIT_HOST (the phone's Tailscale IP or MagicDNS name) in ~/.config/bridgit/env", file=sys.stderr)
+        return 2
+    problem = bad_request_line(method, path, idem_key)
+    if problem:
+        print(f"bridgit: {problem}", file=sys.stderr)
+        return 2
+    data = (body or "").encode()
+    idem = f"Idempotency-Key: {idem_key or uuid.uuid4()}\r\n" if method == "POST" else ""
+    req = (f"{method} {path} HTTP/1.1\r\nHost: {host}:{port}\r\nAuthorization: Bearer {key}\r\n"
+           f"Content-Type: application/json\r\nContent-Length: {len(data)}\r\n{idem}"
+           f"Connection: close\r\n\r\n").encode() + data
+    raw = b""
+    for attempt in (1, 2):
+        try:
+            raw = send(cfg, req, host, port)
+            if not complete(raw):
+                raise IOError("the response was cut off")
+            break
+        except Exception as e:
+            if attempt == 2:
+                print(f"bridgit: {e}", file=sys.stderr)
+                return 1
+            time.sleep(2)  # retried once with the same Idempotency-Key
+
+    try:
+        status, headers, payload = parse_response(raw)
+    except ConnectionError as e:
+        print(f"bridgit: {e}", file=sys.stderr)
+        return 1
+    # Phones since the rename send x-bridgit-* and the same values as x-bridget-*; older ones only x-bridget-*.
+    ours = "x-bridgit" if any(k.startswith("x-bridgit") for k in headers) else "x-bridget"
+    meta = {k: v for k, v in headers.items() if k.startswith(ours) or k == "x-request-id"}
+    if meta:
+        print(json.dumps(meta), file=sys.stderr)
+    if out:
+        with open(out, "wb") as f:
+            f.write(payload)
+        print(f"saved {len(payload)} bytes to {out} (HTTP {status})", file=sys.stderr)
+    elif save and status == 200:
+        d = json.loads(payload)
+        b64 = d.pop("data_base64", None)
+        if b64:
+            with open(save, "wb") as f:
+                f.write(base64.b64decode(b64))
+            d["saved_to"] = save
+        print(json.dumps(d, indent=1))
+    else:
+        sys.stdout.write(payload.decode("utf-8", "replace") + "\n")
+    return 0 if status < 400 else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

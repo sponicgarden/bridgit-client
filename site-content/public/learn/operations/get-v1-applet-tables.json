@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "From an installed applet's own card: discover only its declared tables, typed columns and descriptions. Control agents inspect applets with /applets/installed/{id}/data",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applet_tables",
+  "query": [{
+   "name": "after",
+   "description": "Previous schema page next cursor; omit first; columns are paginated near 32 KB",
+   "type": "string",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applet/tables",
+  "idempotent": false,
+  "path": "/v1/applet/tables",
+  "capability": "applet_data",
+  "returns": "tables[{id,label,columns,column_count,count,rows_url,cursor_parameter}], next (pass as after), storage:declared_tables_only",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"after": {
+    "description": "Previous schema page next cursor; omit first; columns are paginated near 32 KB",
+    "type": "string"
+   }},
+   "required": []
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

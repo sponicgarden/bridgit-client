@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Inner list on the Agents screen's Max Agentic Control card: one shade up from the card, as the dialog's panel. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="?attr/colorSurfaceContainerHighest" />
+    <corners android:radius="12dp" />
+</shape>

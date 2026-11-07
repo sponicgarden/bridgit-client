@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Verify the saved host key and credentials without running a command",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "ssh_test",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [{
+   "name": "connection",
+   "description": "This agent's saved SSH connection id",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/ssh/test {\"connection\":\"ssh:example\"}",
+  "idempotent": false,
+  "path": "/v1/ssh/test",
+  "capability": "ssh",
+  "returns": "authenticated=true,fingerprint",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"connection": {
+    "description": "This agent's saved SSH connection id",
+    "type": "string"
+   }},
+   "required": ["connection"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

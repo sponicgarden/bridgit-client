@@ -1,0 +1,74 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Where the phone is now, with altitude, speed, heading and the compass",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "location",
+  "query": [
+   {
+    "name": "fresh",
+    "description": "true (default): a new fix, up to 15 s; false: the last known one at once",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "accuracy",
+    "description": "high (GPS, default) or balanced",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "high",
+     "balanced"
+    ]
+   },
+   {
+    "name": "compass",
+    "description": "Include the compass (default true)",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [],
+  "example": "GET /v1/location",
+  "idempotent": false,
+  "path": "/v1/location",
+  "capability": "location",
+  "returns": "latitude, longitude, altitude_m, accuracy_m, vertical_accuracy_m, speed_mps, bearing_deg, fix_time, age_s, precision, compass{azimuth_deg, direction, pitch_deg, roll_deg}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "compass": {
+     "description": "Include the compass (default true)",
+     "type": "boolean"
+    },
+    "accuracy": {
+     "description": "high (GPS, default) or balanced",
+     "type": "string",
+     "enum": [
+      "high",
+      "balanced"
+     ]
+    },
+    "fresh": {
+     "description": "true (default): a new fix, up to 15 s; false: the last known one at once",
+     "type": "boolean"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "permission_denied",
+   "notifications_required",
+   "capture_timeout",
+   "service_start_blocked"
+  ],
+  "requires": null
+ }
+}

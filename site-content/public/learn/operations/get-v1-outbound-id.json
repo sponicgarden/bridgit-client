@@ -1,0 +1,34 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "One outbound entry with its previews",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "outbound_entry",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/outbound/412",
+  "idempotent": false,
+  "path": "/v1/outbound/{id}",
+  "capability": "outbound",
+  "returns": "the entry",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/outbound/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

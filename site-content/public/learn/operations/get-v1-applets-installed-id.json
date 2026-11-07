@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Inspect an installed applet, including data_url for schemas, saved rows, photos and processing status; control agents can inspect any applet",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_installed_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/installed/ai0123456789abcd",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}",
+  "capability": "applet_install",
+  "returns": "as one entry of the list",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/applets/installed/{id}",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

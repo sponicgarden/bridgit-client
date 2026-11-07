@@ -1,0 +1,37 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Rotate a connection signing key; configuration authority required; the generated key remains owner-only",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "connections_rotate",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/connections/connection-id/rotate",
+  "idempotent": true,
+  "path": "/v1/connections/{id}/rotate",
+  "capability": "connections",
+  "returns": "connection metadata only; owner copies the signing key from Connections",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/connections/{id}/rotate",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Listener card (UI-09, ui-spec 5.2): Tailscale, state, uptime, Pause/Resume and the address.
+     Moved from Home to the Agents tab when Home became Level 1 Diagnostics (2 Nov 2026). -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/hero"
+    style="@style/Widget.Bridgit.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="?attr/colorPrimaryContainer"
+    app:contentPaddingBottom="8dp"
+    app:contentPaddingEnd="10dp"
+    app:contentPaddingStart="12dp"
+    app:contentPaddingTop="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- One focus stop for state, address and chips (ui-spec 5.2 A11y). -->
+        <LinearLayout
+            android:id="@+id/heroInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:accessibilityLiveRegion="polite"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:screenReaderFocusable="true">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/heroChips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:importantForAccessibility="noHideDescendants"
+                app:chipSpacingHorizontal="4dp"
+                app:chipSpacingVertical="4dp">
+
+                <TextView android:id="@+id/chipTailscale" style="@style/HomeHeroChip" />
+
+                <!-- State after Tailscale: beacon dot and a short word. -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/home_bg_chip_outline"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="8dp">
+
+                    <cc.bridgit.app.ui.home.BeaconDotView
+                        android:id="@+id/beacon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="-2dp"
+                        android:layout_marginEnd="-2dp" />
+
+                    <TextView
+                        android:id="@+id/state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:importantForAccessibility="no"
+                        android:maxLines="1"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:textAppearance="?attr/textAppearanceLabelMedium"
+                        android:textColor="?attr/colorOnPrimaryContainer"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView android:id="@+id/chipUptime" style="@style/HomeHeroChip" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="?attr/selectableItemBackground"
+                android:importantForAccessibility="no"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.Bridgit.Mono"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                app:autoSizeMaxTextSize="12sp"
+                app:autoSizeMinTextSize="9sp"
+                app:autoSizeTextType="uniform" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/pause"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:minHeight="48dp"
+            android:text="@string/home_pause"
+            android:textColor="?attr/colorOnPrimaryContainer" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/resume"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:minHeight="48dp"
+            android:text="@string/home_resume"
+            android:visibility="gone" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

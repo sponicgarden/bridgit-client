@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Probe controls for this camera's active ONVIF video profile",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_cameras_controls",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [],
+  "example": "GET /v1/lan-cameras/{id}/controls",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/{id}/controls",
+  "capability": "lan_camera",
+  "returns": "Relative/absolute PTZ and zoom advertisement, implemented controls, normalized ranges, checked_at. Zoom advertisement does not establish optical zoom. Unknown stays unknown.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/lan-cameras/{id}/controls",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

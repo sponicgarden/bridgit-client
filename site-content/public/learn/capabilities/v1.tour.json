@@ -1,0 +1,57 @@
+{
+ "detail_url": "/v1/discover?id=v1.tour&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.tour.json",
+ "title": "tour",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.tour.json",
+ "prerequisites": ["Check v1.tour supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Your running City tour, if the owner started one with you",
+   "path": "/v1/tour",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-tour.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-tour.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "tour_get"
+  },
+  {
+   "summary": "A photo the owner took with Take photo on your tour (n from tour.photo), sized for you",
+   "path": "/v1/tour/photo/{n}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-tour-photo-n.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-tour-photo-n.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "tour_photo"
+  },
+  {
+   "summary": "End your City tour",
+   "path": "/v1/tour",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-tour.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-tour.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "tour_end"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.tour",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "interact",
+ "capability_ids": ["v1.tour"]
+}

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Saved AI provider key presence; never keys or suffixes",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "settings_ai_keys_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/settings/ai-keys",
+  "idempotent": false,
+  "path": "/v1/settings/ai-keys",
+  "capability": "settings",
+  "returns": "providers[{provider,configured,readable:false,field_count}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

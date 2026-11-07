@@ -1,0 +1,5 @@
+<!-- Camera tab shutter: a white disc inside a white ring. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item><shape android:shape="oval"><stroke android:width="4dp" android:color="#FFFFFF" /><solid android:color="#00000000" /></shape></item>
+    <item android:bottom="8dp" android:left="8dp" android:right="8dp" android:top="8dp"><shape android:shape="oval"><solid android:color="#FFFFFF" /></shape></item>
+</layer-list>

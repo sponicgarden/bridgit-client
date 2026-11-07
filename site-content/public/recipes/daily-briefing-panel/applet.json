@@ -1,0 +1,193 @@
+{
+  "format": "bridgit-template/1",
+  "id": "daily-briefing-panel",
+  "version": "2.0.0",
+  "kind": "applet",
+  "name": "Daily briefing panel",
+  "summary": "An owner-approved reminder and a card that reads current weather on demand.",
+  "runtime": {
+    "adapter": "android.package.v1",
+    "applet_key": "daily-briefing-panel",
+    "supports_dynamic_execution": false
+  },
+  "config_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "time",
+      "timezone"
+    ],
+    "properties": {
+      "time": {
+        "type": "string",
+        "enum": [
+          "06:00",
+          "06:30",
+          "07:00",
+          "07:30",
+          "08:00",
+          "08:30",
+          "09:00",
+          "09:30",
+          "10:00"
+        ]
+      },
+      "timezone": {
+        "type": "string",
+        "maxLength": 64,
+        "format": "timezone"
+      }
+    }
+  },
+  "defaults": {
+    "time": "08:00",
+    "timezone": "Europe/Warsaw"
+  },
+  "processing": {
+    "schedule": {
+      "manifest": {
+        "timezone": {
+          "$input": "timezone"
+        },
+        "actions": [
+          {
+            "id": "briefing-reminder",
+            "when": {
+              "daily": [
+                {
+                  "$input": "time"
+                }
+              ]
+            },
+            "do": {
+              "call": "POST /v1/interactions",
+              "body": {
+                "kind": "notice",
+                "title": "Daily briefing",
+                "text": "Your briefing is ready to refresh. Open the briefing card.",
+                "no_takeover": true
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "permissions": {
+    "required": [
+      "interactions",
+      "schedule",
+      "weather"
+    ],
+    "optional": [],
+    "remote": [],
+    "automatic_grants": false
+  },
+  "ui": {
+    "inputs": {
+      "time": {
+        "label": "Reminder time",
+        "help": "When the daily reminder appears."
+      },
+      "timezone": {
+        "label": "Time zone",
+        "help": "For example Europe/Warsaw or America/New_York."
+      }
+    },
+    "card": {
+      "title": "Daily briefing panel",
+      "sources": {
+        "weather": {
+          "call": {
+            "method": "GET",
+            "path": "/v1/weather",
+            "query": {
+              "hours": 3
+            }
+          },
+          "every_s": 900
+        }
+      },
+      "fresh_s": 3600,
+      "states": {
+        "empty": "No forecast fetched. Weather requires internet and owner permission."
+      },
+      "pieces": [
+        {
+          "type": "header",
+          "eyebrow": "Bridgit applet",
+          "text": "A quick look at the day ahead."
+        },
+        {
+          "type": "text",
+          "text": {
+            "$source": "weather.now.summary"
+          }
+        },
+        {
+          "type": "metrics",
+          "items": [
+            {
+              "label": "Temperature",
+              "value": {
+                "$source": "weather.now.temperature_c"
+              },
+              "format": "celsius"
+            },
+            {
+              "label": "Wind",
+              "value": {
+                "$source": "weather.now.wind_speed_mps"
+              },
+              "format": "number",
+              "unit": "m/s"
+            },
+            {
+              "label": "Low today",
+              "value": {
+                "$source": "weather.next_24_hours.min_temperature_c"
+              },
+              "format": "celsius"
+            },
+            {
+              "label": "High today",
+              "value": {
+                "$source": "weather.next_24_hours.max_temperature_c"
+              },
+              "format": "celsius"
+            },
+            {
+              "label": "Rain, next 24 h",
+              "value": {
+                "$source": "weather.next_24_hours.precipitation_mm"
+              },
+              "format": "number",
+              "unit": "mm"
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "text": [
+            "Weather needs internet. The daily reminder is managed separately from this card. ",
+            {
+              "$source": "weather.attribution"
+            }
+          ]
+        },
+        {
+          "type": "buttons",
+          "items": [
+            {
+              "label": "Refresh",
+              "style": "primary",
+              "do": {
+                "refresh": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

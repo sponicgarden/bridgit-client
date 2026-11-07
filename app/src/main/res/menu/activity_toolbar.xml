@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Activity overflow (ui-spec 5.7). Report a bug / Request a feature are appended from menu/feedback_overflow.xml (FBK-01). -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/activity_export" android:title="@string/activity_menu_export" app:showAsAction="never" />
+    <item android:id="@+id/activity_clear" android:title="@string/activity_menu_clear" app:showAsAction="never" />
+    <item android:id="@+id/activity_diagnostics" android:title="@string/activity_menu_diagnostics" app:showAsAction="never" />
+    <item android:id="@+id/activity_back" android:title="@string/activity_menu_back" android:visible="false" app:showAsAction="never" />
+</menu>

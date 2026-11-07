@@ -1,0 +1,53 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "One kept capture: from memory, or from its phone file after memory let it go; optional max_edge_px returns a bounded image preview",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "captures_get",
+  "query": [
+   {
+    "name": "max_edge_px",
+    "description": "Optional image preview edge, 80\u20131600 pixels",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "raw",
+    "description": "1 = the bytes, details in X-Bridgit-* headers",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/captures/c0123abcd?raw=1",
+  "idempotent": false,
+  "path": "/v1/captures/{id}",
+  "capability": "captures",
+  "returns": "the capture's details (as in the list) and data_base64, or raw=1 bytes",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "max_edge_px": {
+     "description": "Optional image preview edge, 80\u20131600 pixels",
+     "type": "integer"
+    },
+    "id": {
+     "description": "The id in /v1/captures/{id}",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "payload_too_large"
+  ],
+  "requires": null
+ }
+}

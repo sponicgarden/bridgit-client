@@ -1,0 +1,68 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Replace supplied listening configuration with native validation; wake_words=[] or sounds=null clears; existing recipient/capture and Android permission checks remain; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_listening_post",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "wake_words",
+    "description": "Complete wake-word object list {phrase,agent_id,send_clip}; 0-10; native grammar, overlap and available vocabulary validation",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "sounds",
+    "description": "Recipient {agent_id,sensitivity:quiet|normal|loud,send_clip}; null clears",
+    "type": [
+     "object",
+     "null"
+    ],
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/listening {\"wake_words\":[]}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/listening",
+  "capability": "owner_features",
+  "returns": "same listening state as GET; no authority grants or model downloads",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "sounds": {
+     "description": "Recipient {agent_id,sensitivity:quiet|normal|loud,send_clip}; null clears",
+     "type": [
+      "object",
+      "null"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "wake_words": {
+     "description": "Complete wake-word object list {phrase,agent_id,send_clip}; 0-10; native grammar, overlap and available vocabulary validation",
+     "type": "array",
+     "items": {"type": "object"}
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

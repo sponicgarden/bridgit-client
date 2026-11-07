@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="device_add_to_apps">Add to applets</string>
+    <string name="device_add_to_apps_title">Add %1$s to applets</string>
+    <string name="device_access_save">Save</string>
+    <string name="device_no_apps">Not added to any applets</string>
+    <string name="device_in_apps">Included in: %1$s</string>
+    <string name="app_device_access">Device access</string>
+    <string name="app_devices_empty">No external devices yet. Add a camera in Devices, then choose which applets can access it.</string>
+    <string name="app_device_revoked">Camera access removed. Choose an allowed camera in Pet monitor.</string>
+    <string name="app_device_removed">Camera removed. Choose another camera in Pet monitor.</string>
+</resources>

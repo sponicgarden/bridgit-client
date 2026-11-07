@@ -1,0 +1,133 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Find things in a photo and get their boxes: \"the dog\", \"each dirty dish\", \"the face of each person\". Faces are found on the phone; anything else by a cheap cloud vision model (shares the Jev/Clef budget)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "images_find",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "query",
+    "description": "What to find, in plain words (300 characters at most)",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "capture_id",
+    "description": "A photo this agent captured and kept (POST /v1/camera/snapshot with store), or one shared with it",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "gallery_id",
+    "description": "An accessible gallery photo (also needs the gallery grant)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "data_base64",
+    "description": "The image bytes instead (JPEG, PNG or WebP; about 1.5 MB of image at most, so use capture_id or gallery_id for big photos)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "mode",
+    "description": "auto (default: faces on the phone, everything else in the cloud), on_device (faces only, never uploads) or cloud",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "auto",
+     "on_device",
+     "cloud"
+    ]
+   },
+   {
+    "name": "engine",
+    "description": "Opt-in: on_device_detector finds anything named in words on the phone (free, offline, 7-16 s; GET /v1/images/engines). Never falls back to the cloud; model_not_ready while its model downloads. Other detector engines may appear in GET /v1/images/engines",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "outline",
+    "description": "Opt-in: also trace each item's outline on the phone (on_device_outline engine, +3-4 s): items get outline [[x, y], ...] fractions. On crop, each crop is a PNG cut out along the outline (transparent outside)",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "max_items",
+    "description": "1-50, default 20",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/images/find {\"capture_id\":\"cap_...\",\"query\":\"each dirty dish\"}",
+  "idempotent": true,
+  "path": "/v1/images/find",
+  "capability": "find_crop",
+  "returns": "items [{label, box {x0,y0,x1,y1 fractions, px {left,top,right,bottom}}, outline [[x,y],...] with outline}], count, source on_device|cloud, model, cost_usd, width_px, height_px",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "mode": {
+     "description": "auto (default: faces on the phone, everything else in the cloud), on_device (faces only, never uploads) or cloud",
+     "type": "string",
+     "enum": [
+      "auto",
+      "on_device",
+      "cloud"
+     ]
+    },
+    "data_base64": {
+     "description": "The image bytes instead (JPEG, PNG or WebP; about 1.5 MB of image at most, so use capture_id or gallery_id for big photos)",
+     "type": "string"
+    },
+    "outline": {
+     "description": "Opt-in: also trace each item's outline on the phone (on_device_outline engine, +3-4 s): items get outline [[x, y], ...] fractions. On crop, each crop is a PNG cut out along the outline (transparent outside)",
+     "type": "boolean"
+    },
+    "engine": {
+     "description": "Opt-in: on_device_detector finds anything named in words on the phone (free, offline, 7-16 s; GET /v1/images/engines). Never falls back to the cloud; model_not_ready while its model downloads. Other detector engines may appear in GET /v1/images/engines",
+     "type": "string"
+    },
+    "query": {
+     "description": "What to find, in plain words (300 characters at most)",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "gallery_id": {
+     "description": "An accessible gallery photo (also needs the gallery grant)",
+     "type": "integer"
+    },
+    "capture_id": {
+     "description": "A photo this agent captured and kept (POST /v1/camera/snapshot with store), or one shared with it",
+     "type": "string"
+    },
+    "max_items": {
+     "description": "1-50, default 20",
+     "type": "integer"
+    }
+   },
+   "required": ["query"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "capability_disabled",
+   "photo_not_found",
+   "not_supported",
+   "model_not_ready",
+   "rate_limited",
+   "team_unavailable",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

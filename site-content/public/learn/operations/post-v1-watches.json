@@ -1,0 +1,315 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Call me back when ...: the phone reads the data you pick (location, motion, a camera photo, ...) on an interval, asks Clef or Jev (paid) your question about the last few readings, and calls you back when the answer matches. With a photo, a free change check on the phone skips the paid call while the picture stays the same; model none is local only. Designing one (which model, the change check, a worked door-camera example, cost): https://bridgit.cc/learn/decisions.md",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "watches_start",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "situation",
+    "description": "Instead of question: a common picture situation to spot and count on the camera, by library id (GET /v1/situations: dog_licking_itself, pot_boiling_over, sunlight_in_room, ...) or in your own words (\"the cat is on the kitchen counter\"), or {id | describe, alert?: true sends the owner an urgent notice when an episode starts (default: the library's choice; on for pot_boiling_over, smoke_in_room, water_on_floor), min?: 0-1 how likely to count, count_only_while?: a question like \"Is a dog visible?\"}. The phone fills in data [\"camera\"], the tuned question (id = the situation id, or \"situation\" for own words), a tally of episodes, the interval and the label; send model, camera, interval_s, max_paid_per_hour, expires_in_s, callback_when (on the situation id) or rules to change them, not question, questions or tally. Read the counts with GET /v1/watches/{id}/tally",
+    "type": [
+     "string",
+     "object"
+    ],
+    "required": false
+   },
+   {
+    "name": "question",
+    "description": "A yes/no question in words, e.g. \"Is the phone on a bicycle?\". You're called back when Jev's probability of yes reaches min_probability. Send this or questions",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "min_probability",
+    "description": "With question: how likely yes must be, 0-1 (default 0.8)",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "questions",
+    "description": "Instead of question: 1-10 typed questions, {id: {type: choice|noul, instructions, criteria?}}, as https://docs.typesafe.ai/primitives",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "callback_when",
+    "description": "With questions: the answer that calls you back, 1-5 conditions that must all hold: {answer, min?, max?} on a noul probability, or {answer, choice, min_confidence?} (default 0.8) on a choice. Jev's confidence is not the probability: 0.67 likely is about 0.34 confident",
+    "type": [
+     "object",
+     "array"
+    ],
+    "required": false
+   },
+   {
+    "name": "data",
+    "description": "What to read each time (default [\"location\", \"motion\"]): location (with speed), motion (2 s accelerometer burst), steps, light, pressure, proximity, battery, device (screen, lock, headphones, network), camera (a 640 px photo; only the newest is sent to the model), sound (loud sounds: the watch runs on each loud sound instead of an interval and sends that clip to Clef; use it alone). location needs the location permission, the sensors ones the sensors permission, camera the camera permission and an unlocked phone. With only camera, window and min_readings default to 1",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "interval_s",
+    "description": "Seconds between readings: 30-3600 (default 60); down to 10 only for a camera tally with local.change_check enabled. Set max_paid_per_hour to bound optional model calls. A watch keeps the phone awake and reads location each time, so pick the longest interval and expiry that work. Phone-wide limit on paid watch checks, and the account's Jev and Clef calls an hour and monthly budget: read them with GET /v1/limits (they differ per account). A still, unplugged phone may pause checks until it wakes",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "window",
+    "description": "How many recent readings Jev sees, 1-20 (default 5)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "min_readings",
+    "description": "Readings to collect before the first question (default 3, at most window)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "expires_in_s",
+    "description": "Stop after this long, up to 86400 (default 7200). With a tally: up to 7776000 (90 days, default 30 days)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "repeat",
+    "description": "false (default): one callback, then the watch ends. true: keep watching, at most one callback per cooldown_s",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "cooldown_s",
+    "description": "With repeat: seconds between callbacks (default 600)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "callback_url",
+    "description": "Where to POST the result, as well as your registered callback and /v1/events. Same rules as callbacks: a tailnet address, or https on the internet if the owner allows internet callbacks. Signed with the callback_secret in the reply",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "context",
+    "description": "Anything Jev should know, up to 2000 characters (\"the owner commutes by bike\")",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "label",
+    "description": "A short name for logs and lists (default: the question)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "model",
+    "description": "Who answers, and whether you pay: clef (Cloudflare Clef-omni, paid; the default with camera, about $0.000105 a photo), jev (TypeSafe, paid; the default without camera, about $0.000065 a photo, $0.000008 for text), glm (GLM 5.3 Flash through OpenRouter, paid), or none (local only, free: needs camera, takes no question, and calls you back when the picture changes). Paid models share the phone's hourly limit",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "jev",
+     "clef",
+     "glm",
+     "none"
+    ]
+   },
+   {
+    "name": "camera",
+    "description": "With camera in data: rear (default), front or an enrolled lan:<id> (needs lan_camera access)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "additional_cameras",
+    "description": "Up to seven other enrolled camera ids or phone lenses. The watch rotates one per reading under its shared hourly cap; each source keeps its own change history. Excludes people watches.",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "local",
+    "description": "With camera in data: the free change check on the phone before any paid call. {change_check: true (default; false = pay for every photo), sensitivity: low | normal (default) | high (high notices smaller changes, so pays more often), learn_noise: true (default; when a paid call for a change gave the same answer, ignore those spots for 10 min), max_reuse_s: 30-3600 (default 300; ask again after this long even if nothing changed)}. A reused answer can still call you back (answered_locally: true). It looks at the photo only: other data you read doesn't make it pay",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "people",
+    "description": "With model none and camera in data: when the picture changes, take a short burst of photos, find faces on the phone, crop them (and embed them with an on-phone face model once it has downloaded) and hand them to the applet's private web portal. {burst: 1-5 (default 3; the changed photo counts), burst_gap_ms: 300-3000 (default 800), battery_floor: 0-100 (default 50; only while charging or at least this full), max_bursts_per_hour: 1-60 (default 20), min_face_share: 0.005-0.5 (default 0.01; smaller faces are ignored)}. Crops stay in memory only (at most 48, 6 hours). Needs repeat: true. Only in an installed applet's own plan with the people_seen permission the owner approved (refused here and from card actions), and it captures only while that applet's web portal is on with photo sharing",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "sound",
+    "description": "With data [\"sound\"]: {sensitivity: quiet | normal (default) | loud (how much louder than the room's quiet level a sound must be), reuse_s: 0-1800 (default 300; a loud sound this soon after the last paid check that sounds like it, compared on the phone by its frequency fingerprint, reuses that answer for free (answered_locally, similarity in last_check); a different-sounding one is checked; 0 = ask every time)}. No interval_s: the phone's loudness check wakes the watch, at most once every 30 s. Model must be clef. Paid checks default to 6 an hour; set max_paid_per_hour to change it. Needs the sounds permission and switch and the microphone permission. The watch shows listening true/false and not_listening_reason",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "start_paused",
+    "description": "Create the watch paused until resumed. Default false. A paused watch takes no readings and fires no rules.",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "max_paid_per_hour",
+    "description": "At most this many paid model calls an hour for this watch, 1-240 (default: only the phone-wide limit). Checks over it are skipped, not paid. Also lowers what the watch takes from the phone-wide limit",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "tally",
+    "description": "Count on the phone, for weeks, with you offline (\"how many times did the dog eat today\"). {track: the question id to count (default: your only question; with question, \"match\"), labels?: the choice options to count (default all), min_confidence?: 0-1 for a choice (default 0.5), min?: 0-1 for a noul, which counts as its own id when that likely (default 0.5), seen?: one condition, e.g. {answer: \"dog_present\", min: 0.6}; readings count, and add to watched time, only while it holds, gap_s?: readings this far apart are one episode (default 3 x interval_s, at least 60), label_gap_s?: map tracked labels to individual episode gaps in seconds (1-21600); coverage still uses gap_s, min_episode_readings?: drop shorter episodes (default 1), keep_days?: 1-30 (default 30)}. callback_when becomes optional (with it, callbacks come at most once per cooldown_s, and the watch never ends on a match). Read it with GET /v1/watches/{id}/tally; a card reads it with Bridgit.act, on a button or a timer of 5 minutes or more (each call is an action.executed event, and events keep only your newest 1,000)",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "rules",
+    "description": "With tally: up to 5 rules the phone checks after every reading. {id, when, do?, cooldown_s?}. when: {none_for_s, of, while_seen?: true} (no episode of that label for so long; while_seen counts only watched time), {fewer_than, of, by: \"10:00\"} (fewer episodes today by that local time; once a day), or {at_least, of, within_s}. A rule that fires sends you a watch.rule event {watch_id, rule, message, today, action} and runs do, exactly one of: {\"flow\":\"<workflow id>\", \"with\"?: {\u2026}} starts one of your called or button workflows (its steps read the rule as {\"$trigger\":\"message\"}, \"of\", \"today\", \"rule\", \"watch_id\"; action is {flow, status: started|dropped|flow_not_active|flow_not_found|bad_with, run_id}); {\"step\":{\"type\":\"notice\",\"title\":\"No meal seen yet\",\"text\":{\"$trigger\":\"message\"},\"priority\"?:\"urgent\"}} or {\"step\":{\"type\":\"speak\",\"text\":\u2026}} runs one step from the workflow menu (needs interactions or speaker); or one of your own endpoint calls {method, path, body?, query?}, as a card's Bridgit.act would ({message} and {label} in its text are filled in). cooldown_s: default the rule's own time span",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/watches {\"question\":\"Is a person at the front door?\",\"data\":[\"camera\"],\"interval_s\":30,\"model\":\"clef\",\"local\":{\"sensitivity\":\"normal\"},\"max_paid_per_hour\":30,\"repeat\":true,\"callback_url\":\"http://my-mac.your-tailnet.ts.net:8080/bridgit\"}",
+  "idempotent": false,
+  "path": "/v1/watches",
+  "capability": "watches",
+  "returns": "201: watch_id, label, created_at, expires_at, spec, callback_secret (only with callback_url; shown once), first_check_in_s (null while paused), delivery, usage. Each match is a watch.matched event {watch_id, label, question, answers, callback_when, model, answered_locally, cost_usd, checked_at, match, state (the readings the model saw), usage} (model none: change {largest_patch_share, sensitivity} instead of answers); the end is watch.ended {watch_id, reason: matched|expired|deleted|stopped_by_owner|access_revoked|budget|rejected|failing, message, checks, matches, usage, tally? (its last summary)}. A tally watch's rule firing is watch.rule {watch_id, label, rule, message, when, fired_at, today, action {method, path, ok, status, body} or null}. usage: {model, answered_locally (free checks), paid_calls, paid_cost_usd, paid_calls_last_hour, max_paid_per_hour, skipped_over_paid_cap, change_check}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "data": {
+     "description": "What to read each time (default [\"location\", \"motion\"]): location (with speed), motion (2 s accelerometer burst), steps, light, pressure, proximity, battery, device (screen, lock, headphones, network), camera (a 640 px photo; only the newest is sent to the model), sound (loud sounds: the watch runs on each loud sound instead of an interval and sends that clip to Clef; use it alone). location needs the location permission, the sensors ones the sensors permission, camera the camera permission and an unlocked phone. With only camera, window and min_readings default to 1",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "expires_in_s": {
+     "description": "Stop after this long, up to 86400 (default 7200). With a tally: up to 7776000 (90 days, default 30 days)",
+     "type": "integer"
+    },
+    "sound": {
+     "description": "With data [\"sound\"]: {sensitivity: quiet | normal (default) | loud (how much louder than the room's quiet level a sound must be), reuse_s: 0-1800 (default 300; a loud sound this soon after the last paid check that sounds like it, compared on the phone by its frequency fingerprint, reuses that answer for free (answered_locally, similarity in last_check); a different-sounding one is checked; 0 = ask every time)}. No interval_s: the phone's loudness check wakes the watch, at most once every 30 s. Model must be clef. Paid checks default to 6 an hour; set max_paid_per_hour to change it. Needs the sounds permission and switch and the microphone permission. The watch shows listening true/false and not_listening_reason",
+     "type": "object"
+    },
+    "questions": {
+     "description": "Instead of question: 1-10 typed questions, {id: {type: choice|noul, instructions, criteria?}}, as https://docs.typesafe.ai/primitives",
+     "type": "object"
+    },
+    "rules": {
+     "description": "With tally: up to 5 rules the phone checks after every reading. {id, when, do?, cooldown_s?}. when: {none_for_s, of, while_seen?: true} (no episode of that label for so long; while_seen counts only watched time), {fewer_than, of, by: \"10:00\"} (fewer episodes today by that local time; once a day), or {at_least, of, within_s}. A rule that fires sends you a watch.rule event {watch_id, rule, message, today, action} and runs do, exactly one of: {\"flow\":\"<workflow id>\", \"with\"?: {\u2026}} starts one of your called or button workflows (its steps read the rule as {\"$trigger\":\"message\"}, \"of\", \"today\", \"rule\", \"watch_id\"; action is {flow, status: started|dropped|flow_not_active|flow_not_found|bad_with, run_id}); {\"step\":{\"type\":\"notice\",\"title\":\"No meal seen yet\",\"text\":{\"$trigger\":\"message\"},\"priority\"?:\"urgent\"}} or {\"step\":{\"type\":\"speak\",\"text\":\u2026}} runs one step from the workflow menu (needs interactions or speaker); or one of your own endpoint calls {method, path, body?, query?}, as a card's Bridgit.act would ({message} and {label} in its text are filled in). cooldown_s: default the rule's own time span",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "start_paused": {
+     "description": "Create the watch paused until resumed. Default false. A paused watch takes no readings and fires no rules.",
+     "type": "boolean"
+    },
+    "min_readings": {
+     "description": "Readings to collect before the first question (default 3, at most window)",
+     "type": "integer"
+    },
+    "local": {
+     "description": "With camera in data: the free change check on the phone before any paid call. {change_check: true (default; false = pay for every photo), sensitivity: low | normal (default) | high (high notices smaller changes, so pays more often), learn_noise: true (default; when a paid call for a change gave the same answer, ignore those spots for 10 min), max_reuse_s: 30-3600 (default 300; ask again after this long even if nothing changed)}. A reused answer can still call you back (answered_locally: true). It looks at the photo only: other data you read doesn't make it pay",
+     "type": "object"
+    },
+    "callback_url": {
+     "description": "Where to POST the result, as well as your registered callback and /v1/events. Same rules as callbacks: a tailnet address, or https on the internet if the owner allows internet callbacks. Signed with the callback_secret in the reply",
+     "type": "string"
+    },
+    "cooldown_s": {
+     "description": "With repeat: seconds between callbacks (default 600)",
+     "type": "integer"
+    },
+    "repeat": {
+     "description": "false (default): one callback, then the watch ends. true: keep watching, at most one callback per cooldown_s",
+     "type": "boolean"
+    },
+    "context": {
+     "description": "Anything Jev should know, up to 2000 characters (\"the owner commutes by bike\")",
+     "type": "string"
+    },
+    "model": {
+     "description": "Who answers, and whether you pay: clef (Cloudflare Clef-omni, paid; the default with camera, about $0.000105 a photo), jev (TypeSafe, paid; the default without camera, about $0.000065 a photo, $0.000008 for text), glm (GLM 5.3 Flash through OpenRouter, paid), or none (local only, free: needs camera, takes no question, and calls you back when the picture changes). Paid models share the phone's hourly limit",
+     "type": "string",
+     "enum": [
+      "jev",
+      "clef",
+      "glm",
+      "none"
+     ]
+    },
+    "camera": {
+     "description": "With camera in data: rear (default), front or an enrolled lan:<id> (needs lan_camera access)",
+     "type": "string"
+    },
+    "situation": {
+     "description": "Instead of question: a common picture situation to spot and count on the camera, by library id (GET /v1/situations: dog_licking_itself, pot_boiling_over, sunlight_in_room, ...) or in your own words (\"the cat is on the kitchen counter\"), or {id | describe, alert?: true sends the owner an urgent notice when an episode starts (default: the library's choice; on for pot_boiling_over, smoke_in_room, water_on_floor), min?: 0-1 how likely to count, count_only_while?: a question like \"Is a dog visible?\"}. The phone fills in data [\"camera\"], the tuned question (id = the situation id, or \"situation\" for own words), a tally of episodes, the interval and the label; send model, camera, interval_s, max_paid_per_hour, expires_in_s, callback_when (on the situation id) or rules to change them, not question, questions or tally. Read the counts with GET /v1/watches/{id}/tally",
+     "type": [
+      "string",
+      "object"
+     ]
+    },
+    "interval_s": {
+     "description": "Seconds between readings: 30-3600 (default 60); down to 10 only for a camera tally with local.change_check enabled. Set max_paid_per_hour to bound optional model calls. A watch keeps the phone awake and reads location each time, so pick the longest interval and expiry that work. Phone-wide limit on paid watch checks, and the account's Jev and Clef calls an hour and monthly budget: read them with GET /v1/limits (they differ per account). A still, unplugged phone may pause checks until it wakes",
+     "type": "integer"
+    },
+    "question": {
+     "description": "A yes/no question in words, e.g. \"Is the phone on a bicycle?\". You're called back when Jev's probability of yes reaches min_probability. Send this or questions",
+     "type": "string"
+    },
+    "label": {
+     "description": "A short name for logs and lists (default: the question)",
+     "type": "string"
+    },
+    "max_paid_per_hour": {
+     "description": "At most this many paid model calls an hour for this watch, 1-240 (default: only the phone-wide limit). Checks over it are skipped, not paid. Also lowers what the watch takes from the phone-wide limit",
+     "type": "integer"
+    },
+    "people": {
+     "description": "With model none and camera in data: when the picture changes, take a short burst of photos, find faces on the phone, crop them (and embed them with an on-phone face model once it has downloaded) and hand them to the applet's private web portal. {burst: 1-5 (default 3; the changed photo counts), burst_gap_ms: 300-3000 (default 800), battery_floor: 0-100 (default 50; only while charging or at least this full), max_bursts_per_hour: 1-60 (default 20), min_face_share: 0.005-0.5 (default 0.01; smaller faces are ignored)}. Crops stay in memory only (at most 48, 6 hours). Needs repeat: true. Only in an installed applet's own plan with the people_seen permission the owner approved (refused here and from card actions), and it captures only while that applet's web portal is on with photo sharing",
+     "type": "object"
+    },
+    "additional_cameras": {
+     "description": "Up to seven other enrolled camera ids or phone lenses. The watch rotates one per reading under its shared hourly cap; each source keeps its own change history. Excludes people watches.",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "min_probability": {
+     "description": "With question: how likely yes must be, 0-1 (default 0.8)",
+     "type": "number"
+    },
+    "window": {
+     "description": "How many recent readings Jev sees, 1-20 (default 5)",
+     "type": "integer"
+    },
+    "callback_when": {
+     "description": "With questions: the answer that calls you back, 1-5 conditions that must all hold: {answer, min?, max?} on a noul probability, or {answer, choice, min_confidence?} (default 0.8) on a choice. Jev's confidence is not the probability: 0.67 likely is about 0.34 confident",
+     "type": [
+      "object",
+      "array"
+     ],
+     "items": {"type": "object"}
+    },
+    "tally": {
+     "description": "Count on the phone, for weeks, with you offline (\"how many times did the dog eat today\"). {track: the question id to count (default: your only question; with question, \"match\"), labels?: the choice options to count (default all), min_confidence?: 0-1 for a choice (default 0.5), min?: 0-1 for a noul, which counts as its own id when that likely (default 0.5), seen?: one condition, e.g. {answer: \"dog_present\", min: 0.6}; readings count, and add to watched time, only while it holds, gap_s?: readings this far apart are one episode (default 3 x interval_s, at least 60), label_gap_s?: map tracked labels to individual episode gaps in seconds (1-21600); coverage still uses gap_s, min_episode_readings?: drop shorter episodes (default 1), keep_days?: 1-30 (default 30)}. callback_when becomes optional (with it, callbacks come at most once per cooldown_s, and the watch never ends on a match). Read it with GET /v1/watches/{id}/tally; a card reads it with Bridgit.act, on a button or a timer of 5 minutes or more (each call is an action.executed event, and events keep only your newest 1,000)",
+     "type": "object"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "invalid_parameter",
+   "agent_not_allowed",
+   "capability_disabled",
+   "too_many_open",
+   "rate_limited",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,50 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "A bundled manufacturer logo, as GET /v1/lan/brands/{id}/logo, without the Network discovery switch. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "portal_brands_logo",
+  "query": [
+   {
+    "name": "client",
+    "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "raw",
+    "description": "1 = the image bytes",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/portal/brands/apple/logo",
+  "idempotent": false,
+  "path": "/v1/portal/brands/{id}/logo",
+  "capability": "portal",
+  "returns": "id, name, logo_url, mime, data_base64 (or the image with raw=1)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "client": {
+     "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/portal/brands/{id}/logo",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

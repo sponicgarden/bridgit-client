@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Agents list, Agent detail, Add agent and Pair with code (UI-12 … UI-14, section 6). -->
+<resources>
+    <!-- Agents list (ui-spec 5.3) -->
+    <string name="agents_title">Control agents</string>
+    <string name="agents_add">Add control agent</string>
+    <string name="agents_empty_title">No control agents yet</string>
+    <string name="agents_empty_body">Each AI control agent gets its own key. Add one and paste the setup prompt into it.</string>
+    <string name="agents_full">Bridgit holds up to 16 control agents. Remove one to add another.</string>
+    <string name="agents_badge_fixer">Fixer</string>
+    <string name="agents_badge_super">Super Powers</string>
+    <string name="agents_badge_both">Fixer · Super Powers</string>
+    <string name="agents_line2">last used %1$s · %2$d today</string>
+    <string name="agents_not_used">Not used yet · %1$d today</string>
+    <string name="agents_key_rotated">Key rotated · waiting for new prompt</string>
+    <string name="agents_active">Active</string>
+    <string name="agents_idle">Idle</string>
+    <string name="agents_card_desc">%1$s, %2$s, %3$s, %4$d requests today, %5$s</string>
+    <string name="agents_card_desc_rotated">%1$s, %2$s, key rotated, waiting for new prompt, %3$s</string>
+    <string name="agents_model_unknown">Last model unknown</string>
+    <string name="agents_model_via">%1$s · via %2$s</string>
+    <string name="agents_card_desc_powers">, %1$s</string>
+    <string name="agents_desc_last_used">last used %1$s</string>
+    <string name="agents_desc_not_used">not used yet</string>
+    <string name="agents_key_desc">Key starts with %1$s</string>
+
+    <!-- Add agent (ui-spec 5.4) -->
+    <string name="addagent_title">Add control agent</string>
+    <string name="addagent_title_named">Add %1$s</string>
+    <string name="addagent_close">Close</string>
+    <string name="addagent_step_name">Name</string>
+    <string name="addagent_step_connection">Connection</string>
+    <string name="addagent_step_check">Check</string>
+    <string name="addagent_step_prompt">Setup prompt</string>
+    <string name="addagent_progress_desc">Step %1$d of 4: %2$s</string>
+    <string name="addagent_back">Back</string>
+    <string name="addagent_next">Next</string>
+    <string name="addagent_continue_anyway">Continue anyway</string>
+
+    <string name="addagent_name_heading">What do you call this control agent?</string>
+    <string name="addagent_name_label">Name</string>
+    <string name="addagent_name_helper">Letters, numbers, spaces, - and _. Up to 24.</string>
+
+    <string name="addagent_conn_heading">Use Tailscale for %1$s?</string>
+    <string name="addagent_conn_direct">Yes, use Tailscale</string>
+    <string name="addagent_conn_direct_desc">Recommended when the control agent runs on a computer connected to your Tailscale network. Just tap Next.</string>
+    <string name="addagent_conn_userspace">Tailscale on a restricted server</string>
+    <string name="addagent_conn_userspace_desc">Advanced: use this only when the control agent uses Tailscale in userspace mode.</string>
+    <string name="addagent_conn_explanation">Tailscale privately connects this device and the control agent’s computer. Both must be signed in to the same Tailscale network.</string>
+    <string name="addagent_conn_relay">No, the control agent cannot use Tailscale</string>
+    <string name="addagent_conn_relay_desc">For hosted control agents or computers without Tailscale. Next opens relay setup to connect over the internet.</string>
+    <string name="addagent_conn_claude">Claude Duet or claude.ai</string>
+    <string name="addagent_conn_claude_desc">Custom connector.</string>
+    <string name="addagent_conn_chatgpt">ChatGPT Dots</string>
+    <string name="addagent_conn_chatgpt_desc">Custom MCP server.</string>
+    <string name="addagent_conn_advanced">Advanced Tailscale options</string>
+    <string name="addagent_check_ready">This device is ready</string>
+    <string name="addagent_prompt_expand">Expand</string>
+    <string name="addagent_prompt_collapse">Collapse</string>
+    <string name="addagent_conn_position">%1$d of %2$d</string>
+
+    <string name="addagent_check_heading">Preparing this device for %1$s</string>
+    <string name="addagent_check_listener">Listener running</string>
+    <string name="addagent_check_tailscale">Tailscale address (%1$s)</string>
+    <string name="addagent_check_tailscale_none">Tailscale address</string>
+    <string name="addagent_check_port">Reachable on port %1$d</string>
+    <string name="addagent_check_listener_fail">The listener isn\'t running.</string>
+    <string name="addagent_check_tailscale_fail">The phone has no Tailscale address. Open Tailscale and connect.</string>
+    <string name="addagent_check_port_fail">Couldn\'t confirm from the phone itself; it may still work from the control agent</string>
+    <string name="addagent_check_port_blocked">Waiting for the Tailscale address first.</string>
+    <string name="addagent_fix">Fix</string>
+    <string name="addagent_state_pending">checking</string>
+    <string name="addagent_state_ok">passed</string>
+    <string name="addagent_state_fail">failed</string>
+    <string name="addagent_state_warn">warning</string>
+
+    <string name="addagent_prompt_intro">Paste into %1$s.</string>
+    <string name="addagent_prompt_warning">This key gives control of your device. Share only with agents you trust to act safely and protect against malicious actors. Revoke access in Control agents.</string>
+    <string name="addagent_prompt_risk">Pasting it into a hosted AI service is your call; you can rotate the key any time from the control agent\'s page.</string>
+    <string name="addagent_trust_title">You\'re handing over this phone</string>
+    <string name="addagent_trust_body">This key gives control of your phone. Share only with agents you trust to act safely and protect against malicious actors. Revoke access in Control agents.</string>
+    <string name="addagent_trust_confirm">I understand</string>
+    <string name="addagent_prompt_card_desc">Setup prompt</string>
+    <string name="addagent_copy_prompt">Copy prompt</string>
+    <string name="addagent_share">Share</string>
+    <string name="addagent_share_subject">Bridgit setup for %1$s on %2$s</string>
+    <string name="addagent_qr">Show QR code</string>
+    <string name="addagent_copy_key">Copy key only</string>
+    <string name="addagent_pair">Pair with code</string>
+    <string name="addagent_copied">Copied. Paste it into %1$s. Bridgit clears it the next time you open the app.</string>
+    <string name="addagent_share_title">Send the setup prompt</string>
+    <string name="addagent_qr_caption">Scan with the control agent\'s phone app. Holds the address and key only.</string>
+    <string name="addagent_qr_desc">QR code with %1$s\'s address and key</string>
+
+    <string name="addagent_waiting">Waiting for %1$s\'s first call…</string>
+    <string name="addagent_connected">%1$s connected</string>
+    <string name="addagent_no_call">No call yet. Check that the control agent\'s computer is on Tailscale, or show the troubleshooting steps.</string>
+    <string name="addagent_troubleshooting">Troubleshooting</string>
+    <string name="addagent_trouble_direct">1. On the control agent\'s computer, check Tailscale is connected and signed in to the same account as this phone.\n2. Check this phone\'s Tailscale app is on.\n3. Ask the control agent to run its health check again: curl -s -m 30 -H @$HOME/.config/bridgit/header %1$s/health\n4. A 401 means the key is wrong: paste the prompt again or rotate the key.\n5. A timeout means the network path is blocked: try the userspace option instead.</string>
+    <string name="addagent_trouble_userspace">1. On the control agent\'s host, check tailscaled is running and signed in to the same account as this phone.\n2. Check this phone\'s Tailscale app is on.\n3. Check ~/bin/bridgit exists and is executable, and ~/.config/bridgit/env has BRIDGIT_HOST, BRIDGIT_PORT and BRIDGIT_KEY.\n4. Ask the control agent to run: ~/bin/bridgit GET /v1/health\n5. A 401 means the key is wrong: paste the prompt again or rotate the key.</string>
+    <string name="addagent_done">Done</string>
+
+    <string name="addagent_leave_title">You won\'t see this key again</string>
+    <string name="addagent_leave_body">Copied it?</string>
+    <string name="addagent_leave_copy">Copy and leave</string>
+    <string name="addagent_leave_stay">Stay</string>
+    <string name="addagent_leave">Leave</string>
+
+    <string name="addagent_resumed">Picked up where you left off. The key is still here for %1$d more minutes.</string>
+    <string name="addagent_key_gone">This key can\'t be shown again. Rotate the key to get a new prompt.</string>
+    <string name="addagent_rotate">Rotate key</string>
+    <string name="addagent_added_log">You added %1$s</string>
+
+    <!-- Pair with code (AGT-13) -->
+    <string name="pair_title">Pair with code</string>
+    <string name="pair_instruction">Ask the control agent to call POST /v1/pair with this code.</string>
+    <string name="pair_expires">Expires in %1$s</string>
+    <string name="pair_expired">Code expired</string>
+    <string name="pair_new_code">New code</string>
+    <string name="pair_rotate_needed">The key isn\'t held any more, so a new code can\'t be made. Rotate the key from the control agent\'s page to pair again.</string>
+    <string name="pair_redeemed">%1$s fetched its key.</string>
+    <string name="pair_too_many">Too many wrong codes. Start again.</string>
+    <string name="pair_code_desc">Pairing code %1$s</string>
+    <!-- AGT-08a: read out by accessibility in place of a key or secret. -->
+    <string name="secret_hidden">[key hidden, use Copy]</string>
+
+    <!-- Agent detail (ui-spec 5.5) -->
+    <string name="agents_back">Back</string>
+    <string name="agents_rename">Rename</string>
+    <string name="agents_rename_title">Rename %1$s</string>
+    <string name="agents_save">Save</string>
+    <string name="agents_renamed_log">You renamed %1$s to %2$s</string>
+    <string name="agents_added_line">Added %1$s · last used %2$s from</string>
+    <string name="agents_added_line_never">Added %1$s · not used yet</string>
+    <string name="agents_stat_requests">requests today</string>
+    <string name="agents_stat_errors">errors today</string>
+    <string name="agents_stat_sent">sent today</string>
+    <string name="agents_section_key">Key</string>
+    <string name="agents_rotate">Rotate key</string>
+    <string name="agents_rotate_body">Rotate %1$s\'s key? The old key stops working right away. You\'ll get a new setup prompt to paste into %1$s.</string>
+    <string name="agents_rotate_confirm">Rotate</string>
+    <string name="agents_rotated_log">You rotated %1$s\'s key</string>
+    <string name="agents_section_powers">Extra powers</string>
+    <string name="agents_fixer_switch">Bridgit Fixer Mode</string>
+    <string name="agents_fixer_hint">Reads every bug report with screenshots and marks them fixed. For control agents that work on Bridgit itself.</string>
+    <string name="agents_fixer_on_log">You turned on Bridgit Fixer Mode for %1$s</string>
+    <string name="agents_fixer_off_log">You turned off Bridgit Fixer Mode for %1$s</string>
+    <string name="agents_super_switch">Add Superpowers (control other agents)</string>
+    <string name="agents_super_hint">Runs commands on this phone (ADB), changes settings, sees every control agent\'s activity. Only for control agents you trust like yourself.</string>
+    <string name="agents_super_on_log">You gave %1$s Agent Super Powers</string>
+    <string name="agents_super_off_log">You took Agent Super Powers away from %1$s</string>
+    <string name="agents_section_notes">Notes</string>
+    <string name="agents_notes_hint">Notes</string>
+    <string name="agents_section_activity">Recent activity</string>
+    <string name="agents_see_all">See all</string>
+    <string name="agents_no_calls">%1$s hasn\'t made any calls yet.</string>
+    <string name="agents_section_permissions">Permissions</string>
+    <string name="agents_permissions_later">Coming later: choose what each control agent can do. Today all control agents share the switches in Feature enablement.</string>
+    <string name="agents_remove">Remove control agent</string>
+    <string name="agents_remove_body">Remove %1$s? Its key stops working. %1$s will be told the control agent was removed.</string>
+    <string name="agents_remove_last">Bridgit will stop listening until you add another control agent.</string>
+    <string name="agents_remove_confirm">Remove</string>
+    <string name="agents_removed_log">You removed %1$s</string>
+    <!-- Revoke Super Powers (AGT-15b) -->
+    <string name="revoke_super_button">Revoke Super Powers</string>
+    <string name="revoke_super_title">Revoke Super Powers?</string>
+    <string name="revoke_super_body">This turns off Super Powers for every control agent, turns off ADB control, takes back everything ADB gave Bridgit (secure settings, accessibility, notification access, background running and more), then forgets the ADB pairing and turns off Wireless debugging.\n\nTo get them back you\'d set up ADB again.</string>
+    <string name="revoke_super_confirm">Revoke</string>
+    <string name="revoke_super_working">Revoking…</string>
+    <string name="revoke_super_done_title">Super Powers revoked</string>
+    <string name="revoke_super_log">You revoked Super Powers: %1$s</string>
+    <!-- Agents tab: Control panel and per-agent status (2 Nov 2026). -->
+        <string name="agents_section_list">Control agents</string>
+    <string name="agents_section_tools">External Tools and Budgets</string>
+    <string name="tools_jev">Jev by TypeSafe.ai</string>
+    <string name="tools_jev_detail">Yes/no and pick-one decisions, via Bridgit</string>
+    <string name="tools_clef">Clef by Cloudflare</string>
+    <string name="tools_clef_detail">Workers AI decisions on photos, sound and video, via Bridgit</string>
+    <string name="tools_reports">Bug reports</string>
+    <string name="tools_reports_detail">Sends reports to the Bridgit team</string>
+    <string name="tools_relay">Relay</string>
+    <string name="tools_relay_detail">Reaches control agents off Tailscale</string>
+    <string name="tools_watch">Remote view</string>
+    <string name="tools_watch_detail">Control agent actions at bridgit.cc/watch</string>
+    <string name="tools_updates">Update checks</string>
+    <string name="tools_updates_detail">Looks for new Bridgit versions</string>
+    <string name="tools_own_key">your own %1$s key as backup</string>
+    <string name="tools_last_call">last call %1$s</string>
+    <string name="tools_last_failed">last call failed %1$s</string>
+    <string name="tools_never">not called yet</string>
+    <string name="tools_state_ready">Ready</string>
+    <string name="tools_state_on">On</string>
+    <string name="tools_state_off">Off</string>
+    <string name="tools_state_paused">Paused</string>
+    <string name="tools_state_missing">Not in this build</string>
+    <string name="agents_pause_all">Pause all control agents</string>
+    <string name="agents_pause_all_off">Every control agent can reach this phone</string>
+    <string name="agents_pause_all_on">No control agent can reach this phone</string>
+    <string name="agents_pause_all_tailscale_down">Tailscale is off, so control agents on Tailscale can\'t reach this phone</string>
+    <string name="agents_pause_all_error">Bridgit can\'t listen on port %1$d. Restart Bridgit or change the port in Settings</string>
+    <string name="agents_pause_external">External calls</string>
+    <string name="agents_pause_external_off">On: Jev, Clef, bug reports, the relay and update checks work. Turn off to stop them</string>
+    <string name="agents_pause_external_on">Off: Jev, Clef, bug reports, relay and updates are refused</string>
+    <string name="agents_pause_external_on_log">You paused all external calls</string>
+    <string name="agents_pause_external_off_log">You turned external calls back on</string>
+    <string name="agents_status_tailscale">Tailscale</string>
+    <string name="agents_status_applet">Installed applet</string>
+    <string name="agents_status_tailscale_off">Tailscale off</string>
+    <string name="agents_status_userspace">Userspace</string>
+    <string name="agents_status_relay">Relay</string>
+    <string name="agents_status_relay_paused">Relay stopped: external calls paused</string>
+    <string name="agents_status_paused">Paused</string>
+    <string name="agents_status_all_paused">All paused</string>
+    <string name="agents_status_active">active now</string>
+    <string name="agents_status_seen">seen %1$s</string>
+    <string name="agents_status_never">never connected</string>
+    <string name="agents_status_rotated">key rotated, waiting for new prompt</string>
+    <string name="agents_status_today">%1$d today</string>
+    <string name="agents_pause_one">Pause %1$s</string>
+    <string name="agents_resume_one">Resume %1$s</string>
+    <string name="agents_paused_log">You paused %1$s</string>
+    <string name="agents_resumed_log">You resumed %1$s</string>
+    <string name="agents_paused_snack">%1$s is paused: its requests are refused</string>
+    <string name="agents_resumed_snack">%1$s can reach this phone again</string>
+
+    <!-- Small-caps section label, like the welcome page's "THINGS TO TRY". -->
+    <style name="AgentsSectionLabel" parent="Widget.Bridgit.SectionHeader">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelMedium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    <string name="tools_glm">GLM 5.3 Flash</string>
+    <string name="tools_glm_detail">OpenRouter</string>
+    <string name="tools_locate">Find in photo</string>
+    <string name="tools_appraise">Inventory</string>
+    <string name="tools_chef">Chef’s Helper</string>
+    <string name="tools_budget">Budget</string>
+    <string name="tools_speech">Cloud speech</string>
+    <string name="tools_speech_detail">Cloudflare</string>
+    <string name="agents_maximum_control">Maximum Agentic Control</string>
+    <string name="agents_advanced_permissions">Advanced permissions</string>
+    <string name="applet_agent_required">Your favorite agent can create an applet. Please Add and configure it first.</string>
+</resources>

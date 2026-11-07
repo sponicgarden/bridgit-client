@@ -1,0 +1,77 @@
+{
+ "detail_url": "/v1/discover?id=v1.applet_portals&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.applet_portals.json",
+ "title": "applet portals",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.applet_portals.json",
+ "prerequisites": ["Check v1.applet_portals supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Every installed applet that has a portal (its page), and whether it is open on the screen now",
+   "path": "/v1/applets/portals",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-portals.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-portals.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_portals"
+  },
+  {
+   "summary": "Bring an installed applet's portal to the front of the screen (any applet), as if the owner tapped Open. Waits for its page to load and expose its functions",
+   "path": "/v1/applets/{id}/portal/open",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-id-portal-open.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-id-portal-open.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_portal_open"
+  },
+  {
+   "summary": "What an applet's portal shows now: the functions its page exposes, the state it published, its visible words, and who used it last (the owner by touch, or an agent)",
+   "path": "/v1/applets/{id}/portal",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-id-portal.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-id-portal.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_portal"
+  },
+  {
+   "summary": "Call one function an open portal's page exposes (GET \u2026/portal lists them) and wait for its answer. The page decides what it does and what the screen shows",
+   "path": "/v1/applets/{id}/portal/call",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-id-portal-call.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-id-portal-call.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_portal_call"
+  },
+  {
+   "summary": "Close an applet's portal screen",
+   "path": "/v1/applets/{id}/portal/close",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-id-portal-close.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-id-portal-close.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_portal_close"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.applet_portals",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "run",
+ "capability_ids": ["v1.applet_portals"]
+}

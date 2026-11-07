@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Where your captures go: your choice and what the owner allows",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "captures_storage_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/captures/storage",
+  "idempotent": false,
+  "path": "/v1/captures/storage",
+  "capability": "captures",
+  "returns": "yours {store, kinds, upload_url, upload_headers (names only), keep_minutes}, effective {<kind>: {store, keep_minutes}}, owner {agent_files, agent_upload, max_keep_minutes, any_agent_can_fetch, owner_files, owner_upload}, destinations, kinds",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Design pass (2 Nov 2026): section headings for Activity sheets and Applets. -->
+<resources>
+    <string name="design_activity_fields_header">Entry details</string>
+    <string name="design_activity_export_format_header">Format</string>
+    <string name="design_applets_ready_header">Ready-made applets</string>
+    <string name="design_applets_build_header">Make your own</string>
+</resources>

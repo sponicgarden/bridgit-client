@@ -1,0 +1,34 @@
+/* Generated from docs/design/lilac-frost.tokens.json. */
+html.portal-frost {
+ --frost-page:#F1EEF6;
+ --frost-paper:#FDFCFE;
+ --frost-soft:#F1EEF6;
+ --frost-ink:#332C3D;
+ --frost-muted:#675D71;
+ --frost-line:#E2DCE9;
+ --frost-accent:#6D587E;
+ --frost-success:#164D31;
+ --frost-success-bg:#E6F3EB;
+ --frost-warn:#5E3715;
+ --frost-warn-bg:#FBEFDF;
+ --frost-danger:#5F1631;
+ --frost-danger-bg:#F9E9ED;
+}
+
+@media(prefers-color-scheme:dark) {
+html.portal-frost {
+ --frost-page:#201D25;
+ --frost-paper:#24212A;
+ --frost-soft:#302B38;
+ --frost-ink:#F0EBF5;
+ --frost-muted:#BDB3C9;
+ --frost-line:#484051;
+ --frost-accent:#C4AED8;
+ --frost-success:#B7ECCB;
+ --frost-success-bg:#203B2D;
+ --frost-warn:#FFE1BA;
+ --frost-warn-bg:#403326;
+ --frost-danger:#FFD7DF;
+ --frost-danger-bg:#452933;
+}
+}

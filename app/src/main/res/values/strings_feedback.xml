@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bug reports and feature requests (section 11, ui-spec 5.11 / 5.12). -->
+<resources>
+    <!-- Overflow entry points (FBK-01) -->
+    <string name="feedback_menu_report_bug">Report a bug</string>
+    <string name="feedback_menu_request_feature">Request a feature</string>
+    <string name="feedback_report_about_this">Report a bug about this</string>
+
+    <!-- Form (FBK-03, FBK-04) -->
+    <string name="feedback_title_bug">Report a bug</string>
+    <string name="feedback_title_feature">Request a feature</string>
+    <string name="feedback_submit">Submit</string>
+    <string name="feedback_sending">Sending…</string>
+    <string name="feedback_intro_bug">Tell your agent to file a bug or a feature request. Or describe what went wrong.</string>
+    <string name="feedback_intro_feature">Tell your agent to file a bug or a feature request. Or describe what you’d like.</string>
+    <string name="feedback_label_bug">What happened?</string>
+    <string name="feedback_label_feature">What would you like to see?</string>
+    <string name="feedback_no_autofix">Attempt Auto-fix</string>
+    <string name="feedback_no_autofix_hint">Auto-fix is off: this is left for a person to look at. Nothing gets fixed automatically.</string>
+    <string name="feedback_description">Description</string>
+    <string name="feedback_feature_placeholder">What would you like Bridgit to do?</string>
+    <string name="feedback_description_placeholder">What you expected, what you saw…</string>
+    <string name="feedback_description_required">Please describe the problem before sending.</string>
+    <string name="feedback_include_last_screen">Include last screen</string>
+    <string name="feedback_last_screen_sub">%1$s, as you left it</string>
+    <string name="feedback_last_screen_sub_generic">The screen you were on</string>
+    <string name="feedback_last_screen_desc">Screenshot of the screen you were on</string>
+    <string name="feedback_add_screenshot">Add screenshot</string>
+    <string name="feedback_add_another">Add another</string>
+    <string name="feedback_max_screenshots">Up to 5 screenshots per report.</string>
+    <string name="feedback_screenshot_failed">Couldn\'t add one of those pictures. Please try again.</string>
+    <string name="feedback_screenshot_desc">Screenshot %1$d</string>
+    <string name="feedback_remove_screenshot">Remove screenshot %1$d</string>
+    <string name="feedback_include_log">Include recent log</string>
+    <plurals name="feedback_log_entries">
+        <item quantity="one">%d log entry</item>
+        <item quantity="other">%d log entries</item>
+    </plurals>
+    <string name="feedback_log_plus_entry">%1$s, plus the entry you picked</string>
+    <string name="feedback_preview">Preview</string>
+    <string name="feedback_preview_desc">Preview the log entries</string>
+    <string name="feedback_preview_title">Recent log</string>
+    <string name="feedback_preview_picked">The entry you picked</string>
+    <string name="feedback_preview_empty">No log entries yet.</string>
+    <string name="feedback_type">Type</string>
+    <string name="feedback_type_bug">Bug</string>
+    <string name="feedback_type_feature">Feature</string>
+    <string name="feedback_auto_caption">App version, device info and the screen you were on are included automatically.</string>
+    <string name="feedback_rate_limited">That\'s 10 reports this hour. Try again later.</string>
+    <string name="feedback_save_failed">Couldn\'t save the report. Please try again.</string>
+    <string name="feedback_keep_draft_title">Keep this draft?</string>
+    <string name="feedback_keep">Keep</string>
+    <string name="feedback_discard">Discard</string>
+
+    <!-- After submitting (FBK-08) -->
+    <string name="feedback_saved_title">Report saved</string>
+    <string name="feedback_saved_body">Thanks. It\'s saved on your phone but not sent yet. Bridgit sends it to the Bridgit team when you\'re online, and it gets its report number then. Control agents in Bridgit Fixer Mode can also pick it up from Bridgit\'s API.</string>
+    <string name="feedback_saved_body_sent">Thanks. It\'s report %1$s, and the Bridgit team has it. Control agents in Bridgit Fixer Mode can also pick it up from Bridgit\'s API.</string>
+    <string name="feedback_saved_body_local">Thanks. It\'s saved on your phone. Sending reports to the Bridgit team is off, so it has no report number. Control agents in Bridgit Fixer Mode can pick it up from Bridgit\'s API.</string>
+    <string name="feedback_not_sent_yet">Not sent yet</string>
+    <string name="feedback_upload_sent">Sent to the Bridgit team %1$s</string>
+    <string name="feedback_upload_pending">Waiting to send to the Bridgit team</string>
+    <string name="feedback_upload_failed">Couldn\'t send to the Bridgit team: %1$s</string>
+    <string name="feedback_upload_off">Kept on this phone (sending to the Bridgit team was off)</string>
+    <string name="feedback_upload_skipped">Kept on this phone</string>
+    <string name="settings_feedback_upload">Send bug reports to the Bridgit team</string>
+    <string name="settings_feedback_upload_desc">Reports from you or a control agent go to the Bridgit team with screenshots, recent log, app version, phone model, settings and the filing control agent. Off: they stay on this phone.</string>
+    <string name="settings_install_id">This install: %1$s (%2$s). Touch and hold to copy.</string>
+    <string name="settings_install_attested">verified Bridgit build</string>
+    <string name="settings_install_unverified">not verified: %1$s</string>
+    <string name="settings_install_id_copied">Install ID copied</string>
+    <string name="settings_changed_feedback_upload">You turned sending bug reports to the Bridgit team %1$s</string>
+    <string name="feedback_view_report">View report</string>
+    <string name="feedback_filed_log_bug">You filed a bug report</string>
+    <string name="feedback_filed_log_feature">You filed a feature request</string>
+
+    <!-- My reports (FBK-09, ui-spec 5.12) -->
+    <string name="feedback_my_reports">My reports</string>
+    <string name="feedback_back">Back</string>
+    <string name="feedback_filter_all">All</string>
+    <string name="feedback_filter_bugs">Bugs</string>
+    <string name="feedback_filter_features">Features</string>
+    <string name="feedback_filter_open">Open</string>
+    <string name="feedback_empty">No reports yet.</string>
+    <string name="feedback_empty_filtered">No reports match this filter.</string>
+    <string name="feedback_kind_bug">Bug</string>
+    <string name="feedback_kind_feature">Feature request</string>
+    <string name="feedback_row_meta">%1$s · %2$s</string>
+    <string name="feedback_row_meta_updated">%1$s · %2$s · updated by %3$s</string>
+    <string name="feedback_row_desc">%1$s %2$s, %3$s. Status: %4$s. %5$s</string>
+
+    <!-- Report detail (UI-20, FBK-11) -->
+    <string name="feedback_detail_title">%1$s %2$s</string>
+    <string name="feedback_detail_title_unsent">%1$s · not sent yet</string>
+    <string name="feedback_detail_filed">Filed %1$s by %2$s</string>
+    <string name="feedback_section_description">Description</string>
+    <string name="feedback_section_images">Screenshots</string>
+    <string name="feedback_section_log">Attached log</string>
+    <string name="feedback_section_context">Context</string>
+    <string name="feedback_section_history">Status history</string>
+    <string name="feedback_flag_no_autofix">Don\'t auto-fix</string>
+    <string name="feedback_flag_no_autofix_desc">Marked don\'t auto-fix: control agents in Fixer Mode must not fix this automatically.</string>
+    <plurals name="feedback_log_count">
+        <item quantity="one">%d entry</item>
+        <item quantity="other">%d entries</item>
+    </plurals>
+    <string name="feedback_log_none">No log was attached.</string>
+    <string name="feedback_log_expand">Show</string>
+    <string name="feedback_log_collapse">Hide</string>
+    <string name="feedback_context_version">Version</string>
+    <string name="feedback_context_device">Device</string>
+    <string name="feedback_context_screen">Screen</string>
+    <string name="feedback_context_source">Filed from</string>
+    <string name="feedback_source_form">The form on this phone</string>
+    <string name="feedback_source_agent">A control agent (%1$s)</string>
+    <string name="feedback_image_desc">Screenshot %1$d of %2$d. Tap to view bigger.</string>
+    <string name="feedback_image_unavailable">This picture is no longer on the phone.</string>
+    <string name="feedback_history_row_desc">%1$s, by %2$s, %3$s</string>
+    <!-- A history line that is a note from the agent that filed the report, not a status change. -->
+    <string name="feedback_history_comment">Follow-up</string>
+    <string name="feedback_verify_hint">A control agent marked this %1$s. Is it sorted?</string>
+    <string name="feedback_verify_hint_team">The Bridgit team marked this %1$s. Is it sorted?</string>
+    <string name="feedback_confirmed_log">You marked report %1$s confirmed</string>
+    <string name="feedback_reopened_log">You marked report %1$s still broken</string>
+    <string name="feedback_not_found">This report is no longer here.</string>
+    <string name="feedback_close">Close</string>
+    <!-- Remote view (bridgit.cc/watch), RemoteView.kt -->
+    <string name="settings_remote_view">Remote view</string>
+    <string name="settings_remote_view_desc">Watch what your control agents do on this phone from anywhere, at bridgit.cc/watch, signed in with Google. The phone sends one short line per control agent action (the time, the control agent\'s name and which part of the phone, like Camera) and which parts are switched on. While the Pet monitor runs it also sends what your dog is doing and today\'s totals, and its newest photo unless you turn that off on the Pet monitor screen. Otherwise never photos, audio, screenshots, what was said or typed, notification or card text, or locations. Off deletes it all on the server.</string>
+    <string name="settings_changed_remote_view">You turned remote view %1$s</string>
+    <string name="remote_view_code_failed">Couldn\'t get a code: %1$s</string>
+    <string name="remote_view_linked_audit">You linked remote view to %1$s</string>
+    <!-- More › Link web view (LinkWebViewActivity) -->
+    <string name="more_link_web_view">Web portal</string>
+    <string name="link_web_view_title">Web portal</string>
+    <string name="link_web_view_steps">See this device’s recent actions in your account on bridgit.cc.</string>
+    <string name="link_web_view_copy">Copy</string>
+    <string name="link_web_view_share">Share link</string>
+    <string name="link_web_view_share_text">"Connect your Bridgit device\n───────────────\n\nOpen this link to set up your own device. It already includes the setup code:\n\n%1$s\n\nSign in with Google or a verified email address.\n\nManual setup code:   %2$s\n\nAfter setup, you can invite other people from My applets.\n\n—\nSent from Bridgit · bridgit.cc"</string>
+    <string name="link_web_view_copied">Code copied</string>
+    <string name="link_web_view_new_code">New code</string>
+    <string name="link_web_view_code_note">Works once · %1$d:%2$02d left</string>
+    <string name="link_web_view_code_expired">This code expired. Tap New code.</string>
+    <string name="link_web_view_code_loading">Getting a code…</string>
+    <string name="link_web_view_code_used">Account connected.</string>
+    <string name="link_web_view_linked">Connected to %1$s</string>
+    <string name="link_web_view_not_linked">Sign in to connect your account.</string>
+    <string name="link_web_view_turn_off">Turn off web view</string>
+    <string name="link_web_view_open">Open portal</string>
+    <string name="link_web_view_connect">Sign in to connect</string>
+    <string name="link_web_view_manual">Set up on another device</string>
+    <string name="link_web_view_privacy">What is shared?</string>
+    <string name="link_web_view_privacy_hide">Hide sharing details</string>
+    <string name="link_web_view_sharing_hint">Manage who can view your applets from My applets on the web.</string>
+    <string name="link_web_view_applet_title">Pet monitor web portal</string>
+    <string name="link_web_view_applet_steps">View Pet monitor status, photos and history from anywhere.</string>
+    <string name="link_web_view_applet_privacy">Only Pet monitor on this device uses this portal. New observations and daily totals are uploaded after setup. Photos follow the photo-sharing switch in Pet monitor. Earlier history stays on the device. Deleting the web portal stops monitoring and removes its server history, app details and viewer access. Local records and your account connection stay.</string>
+    <string name="link_web_view_activity_privacy">Uploads control agent action summaries and which device features are enabled. Action summaries exclude message text, audio, screenshots and locations. Each applet has its own portal and photo choices. Turning off web view deletes this device’s server history and viewer access.</string>
+    <string name="link_web_view_device_only">Delete Web Portal</string>
+    <string name="link_web_view_share_subject">Connect your device to Bridgit</string>
+    <string name="link_web_view_setup_failed">Could not prepare sign-in. Check your connection and try again.</string>
+    <string name="link_web_view_device">%1$s · %2$s</string>
+    <string name="link_web_view_tablet">Tablet</string>
+    <string name="link_web_view_phone">Phone</string>
+    <string name="link_web_view_backend_pending">Portal setup is still in progress. Keep this device online.</string>
+    <string name="link_web_view_delete_title">Delete Web Portal?</string>
+    <string name="link_web_view_delete_message">Delete this app’s web portal, including its photos, metrics, app details and sharing access? Monitoring and uploads will stop. Local history and your account connection stay. This cannot be undone. If offline, server deletion will finish when this device reconnects.</string>
+</resources>

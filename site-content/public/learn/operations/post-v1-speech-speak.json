@@ -1,0 +1,119 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Speak one turn through the model registry and guarded speaker queue",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "speech_speak",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "text",
+    "description": "1-600 characters",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "language",
+    "description": "BCP 47 language",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "allow_cloud",
+    "description": "Explicit cloud processing permission; default false",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "presentation_token",
+    "description": "Optional story presentation token; invalidated tokens refuse synthesis/enqueue",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "task_key",
+    "description": "Optional registered applet narration task",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "wait_for_reveal",
+    "description": "Prepare speech now and play after /story/reveal",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "expected_model",
+    "description": "Optional registry model id; refuses before synthesis if selection changed",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "replace",
+    "description": "after_current, now or queue",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/speech/speak {\"text\":\"The timer is ready.\"}",
+  "idempotent": true,
+  "path": "/v1/speech/speak",
+  "capability": "speaker",
+  "returns": "play_id, position, status, speech{model, processing, cost_usd, elapsed_ms}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "presentation_token": {
+     "description": "Optional story presentation token; invalidated tokens refuse synthesis/enqueue",
+     "type": "string"
+    },
+    "allow_cloud": {
+     "description": "Explicit cloud processing permission; default false",
+     "type": "boolean"
+    },
+    "task_key": {
+     "description": "Optional registered applet narration task",
+     "type": "string"
+    },
+    "replace": {
+     "description": "after_current, now or queue",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "language": {
+     "description": "BCP 47 language",
+     "type": "string"
+    },
+    "text": {
+     "description": "1-600 characters",
+     "type": "string"
+    },
+    "wait_for_reveal": {
+     "description": "Prepare speech now and play after /story/reveal",
+     "type": "boolean"
+    },
+    "expected_model": {
+     "description": "Optional registry model id; refuses before synthesis if selection changed",
+     "type": "string"
+    }
+   },
+   "required": ["text"]
+  },
+  "errors": [
+   "capability_disabled",
+   "invalid_parameter",
+   "rate_limited",
+   "not_found"
+  ],
+  "requires": null
+ }
+}

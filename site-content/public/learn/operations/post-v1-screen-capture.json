@@ -1,0 +1,127 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "What's on the owner's screen right now (no prompt once they've turned it on)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "screen_capture",
+  "query": [
+   {
+    "name": "size",
+    "description": "Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "agent",
+     "thumb",
+     "large",
+     "original"
+    ]
+   },
+   {
+    "name": "max_edge_px",
+    "description": "Long edge limit, 64-20000; overrides the preset",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "max_width_px",
+    "description": "Width limit, 64-20000",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "quality",
+    "description": "JPEG quality 40-100",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "raw",
+    "description": "1 = return the image bytes, details in X-Bridgit-* headers",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "mode",
+    "description": "private (default): taken in memory, never put in the gallery",
+    "type": "string",
+    "required": false,
+    "enum": ["private"]
+   },
+   {
+    "name": "store",
+    "description": "Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or \"none\" = only return it. Default: your POST /v1/captures/storage choice, else only returned",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/screen/capture?size=agent",
+  "idempotent": true,
+  "path": "/v1/screen/capture",
+  "capability": "screen",
+  "returns": "captured_at, width_px, height_px, format, size_bytes, mode, data_base64 (or raw=1 bytes); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "mode": {
+     "description": "private (default): taken in memory, never put in the gallery",
+     "type": "string",
+     "enum": ["private"]
+    },
+    "max_edge_px": {
+     "description": "Long edge limit, 64-20000; overrides the preset",
+     "type": "integer"
+    },
+    "max_width_px": {
+     "description": "Width limit, 64-20000",
+     "type": "integer"
+    },
+    "size": {
+     "description": "Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original",
+     "type": "string",
+     "enum": [
+      "agent",
+      "thumb",
+      "large",
+      "original"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "store": {
+     "description": "Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or \"none\" = only return it. Default: your POST /v1/captures/storage choice, else only returned",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "quality": {
+     "description": "JPEG quality 40-100",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "access_needed",
+   "notifications_required",
+   "device_locked",
+   "rate_limited",
+   "sensor_busy",
+   "not_supported",
+   "capture_timeout",
+   "service_start_blocked",
+   "payload_too_large"
+  ],
+  "requires": null
+ }
+}

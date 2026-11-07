@@ -1,0 +1,151 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(170deg,#2b1b5a 0%,#45288a 55%,#6a3fb5 100%);color:#fff;font:17px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{position:relative;max-width:520px;margin:0 auto;padding:20px 18px 28px;overflow:hidden}
+.sky{position:absolute;left:0;right:0;top:0;height:96px;pointer-events:none}
+.sky i{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:.8;animation:tw 3s ease-in-out infinite}
+@keyframes tw{50%{opacity:.25}}
+.moon{position:absolute;top:14px;right:18px;width:56px;height:56px}
+.top{position:relative;padding-right:70px;margin-bottom:18px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#ffd23f;margin:0 0 4px}
+h1{font-size:25px;line-height:1.2;margin:0;letter-spacing:-.01em}
+h2{position:relative;font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+h2 span{font-size:13px;font-weight:600;color:#d9ccf5}
+.grid{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.tile{font:inherit;color:#fff;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.09);border-radius:20px;min-height:96px;padding:10px 4px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:transform .18s,box-shadow .18s,background .18s,border-color .18s}
+.tile b{font-size:38px;line-height:1;font-weight:400}
+.tile small{font-size:12.5px;font-weight:600;line-height:1.15;text-align:center;color:#ece4ff}
+.tile:active{transform:scale(.96)}
+.tile.on{background:rgba(255,210,63,.18);border-color:#ffd23f;transform:scale(1.06);box-shadow:0 0 0 4px rgba(255,210,63,.25),0 0 24px rgba(255,210,63,.55)}
+.len{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:rgba(0,0,0,.22);border-radius:16px;padding:4px;margin-bottom:20px}
+.len button{font:inherit;font-size:15px;font-weight:700;border:0;border-radius:12px;min-height:52px;background:transparent;color:#ece4ff;cursor:pointer;transition:background .18s,color .18s}
+.len button small{display:block;font-size:12px;font-weight:600;opacity:.85}
+.len button.on{background:#fff;color:#2b1b5a}
+.preview{position:relative;background:rgba(255,255,255,.1);border:1px dashed rgba(255,255,255,.35);border-radius:18px;padding:14px 16px;margin-bottom:18px;font-size:17px;line-height:1.45;min-height:76px}
+.preview em{font-style:normal;color:#ffd23f;font-weight:700}
+.preview .ph{color:#d9ccf5}
+.main{position:relative;width:100%;font:inherit;font-size:19px;font-weight:800;border:0;border-radius:18px;min-height:60px;background:#ffd23f;color:#2b1b5a;cursor:pointer;box-shadow:0 6px 0 #c99a00;transition:transform .1s,box-shadow .1s,background .18s}
+.main:active{transform:translateY(3px) scale(.98);box-shadow:0 3px 0 #c99a00}
+.main:disabled{background:#8c7bb8;color:#2b1b5a;box-shadow:none;cursor:default}
+.alt{position:relative;width:100%;font:inherit;font-weight:600;border:0;background:none;color:#d9ccf5;min-height:48px;margin-top:8px;cursor:pointer}
+.status{position:relative;text-align:center;color:#ece4ff;font-size:14px;min-height:20px;margin-top:6px}
+</style>
+<div class="wrap">
+  <div class="sky" id="sky"></div>
+  <svg class="moon" viewBox="0 0 56 56" aria-hidden="true"><path d="M38.3 9.8A22 22 0 1 0 47.9 37.9A20 20 0 0 1 38.3 9.8Z" fill="#ffe89a"/><circle cx="18" cy="36" r="2.5" fill="#f2d36b"/><circle cx="14" cy="24" r="1.8" fill="#f2d36b"/></svg>
+  <div class="top"><p class="eyebrow" id="eyebrow"></p><h1 id="title"></h1></div>
+  <div id="rows"></div>
+  <h2 id="lenTitle"></h2>
+  <div class="len" id="len"></div>
+  <div class="preview" id="preview"></div>
+  <button class="main" id="go" disabled></button>
+  <button class="alt" id="surprise"></button>
+  <div class="status" id="status"></div>
+</div>
+<script>
+// answer.data: {hero:"fox", place:"volcano", twist:"key", minutes:6, surprise:false}
+// The card's content. Change only this object.
+var CARD = {
+  eyebrow: 'Bedtime',
+  title: 'Zosia, build your story!',
+  rows: [
+    {key:'hero', title:"Who's the hero?", options:[
+      {id:'fox', emoji:'🦊', label:'Fox', phrase:'A brave fox'},
+      {id:'dragon', emoji:'🐉', label:'Dragon', phrase:'A little dragon'},
+      {id:'robot', emoji:'🤖', label:'Robot', phrase:'A clever robot'},
+      {id:'mermaid', emoji:'🧜', label:'Mermaid', phrase:'A kind mermaid'}]},
+    {key:'place', title:'Where?', options:[
+      {id:'castle', emoji:'🏰', label:'Castle', phrase:'in a sparkly castle'},
+      {id:'volcano', emoji:'🌋', label:'Volcano island', phrase:'on a volcano island'},
+      {id:'space', emoji:'🚀', label:'Space', phrase:'far out in space'},
+      {id:'forest', emoji:'🌲', label:'Forest', phrase:'in a whispering forest'}]},
+    {key:'twist', title:'What happens?', options:[
+      {id:'party', emoji:'🎂', label:'Surprise party', phrase:'plans a surprise party'},
+      {id:'key', emoji:'🗝️', label:'Lost key', phrase:'finds a lost key'},
+      {id:'rainbow', emoji:'🌈', label:'Rainbow bridge', phrase:'crosses a rainbow bridge'},
+      {id:'friend', emoji:'🐣', label:'New friend', phrase:'meets a new friend'}]}
+  ],
+  lenTitle: 'How long?',
+  lengths: [{label:'Short', minutes:3}, {label:'Medium', minutes:6}, {label:'Long', minutes:10}],
+  defaultMinutes: 6,
+  placeholder: 'Pick a hero, a place and what happens…',
+  go: 'Tell my story ✨',
+  goNotReady: 'Pick all three first',
+  surprise: 'Surprise me!',
+  sending: 'Sending…',
+  doneText: 'Story time! Get cosy 🌙',
+  preview: 'Preview only: open this card in Bridgit to answer.'
+};
+var $ = function(id){return document.getElementById(id)};
+var pick = {}, minutes = CARD.defaultMinutes, sent = false, surprised = false;
+$('eyebrow').textContent = CARD.eyebrow; $('title').textContent = CARD.title;
+$('lenTitle').textContent = CARD.lenTitle; $('surprise').textContent = CARD.surprise;
+for (var s = 0; s < 16; s++) {
+  var st = document.createElement('i');
+  st.style.left = (Math.random()*100) + '%'; st.style.top = (Math.random()*100) + '%';
+  st.style.animationDelay = (Math.random()*3) + 's';
+  if (s % 5 === 0) { st.style.width = st.style.height = '4px'; }
+  $('sky').appendChild(st);
+}
+CARD.rows.forEach(function(row){
+  var h = document.createElement('h2'); h.textContent = row.title; $('rows').appendChild(h);
+  var g = document.createElement('div'); g.className = 'grid'; $('rows').appendChild(g);
+  row.options.forEach(function(o){
+    var b = document.createElement('button'); b.className = 'tile';
+    var e = document.createElement('b'); e.textContent = o.emoji;
+    var l = document.createElement('small'); l.textContent = o.label;
+    b.appendChild(e); b.appendChild(l); g.appendChild(b);
+    o.el = b;
+    b.onclick = function(){ if (sent) return; pick[row.key] = o; draw(); };
+  });
+});
+CARD.lengths.forEach(function(L){
+  var b = document.createElement('button'); b.textContent = L.label;
+  var m = document.createElement('small'); m.textContent = L.minutes + ' min'; b.appendChild(m);
+  L.el = b; b.onclick = function(){ if (sent) return; minutes = L.minutes; draw(); };
+  $('len').appendChild(b);
+});
+function draw(){
+  CARD.rows.forEach(function(row){ row.options.forEach(function(o){ o.el.classList.toggle('on', pick[row.key] === o) }) });
+  CARD.lengths.forEach(function(L){ L.el.classList.toggle('on', L.minutes === minutes) });
+  var p = $('preview'); p.textContent = '';
+  var ready = pick.hero && pick.place && pick.twist;
+  if (!pick.hero && !pick.place && !pick.twist) {
+    var ph = document.createElement('span'); ph.className = 'ph'; ph.textContent = CARD.placeholder; p.appendChild(ph);
+  } else {
+    var parts = [[pick.hero, 'Someone'], [pick.twist, 'does something'], [pick.place, 'somewhere']];
+    parts.forEach(function(pt, i){
+      if (i) p.appendChild(document.createTextNode(' '));
+      var em = document.createElement(pt[0] ? 'em' : 'span');
+      if (!pt[0]) em.className = 'ph';
+      em.textContent = pt[0] ? pt[0].phrase : pt[1];
+      p.appendChild(em);
+    });
+    p.appendChild(document.createTextNode('…'));
+  }
+  $('go').disabled = !ready;
+  $('go').textContent = ready ? CARD.go : CARD.goNotReady;
+}
+draw();
+function answer(){
+  if (sent) return;
+  var b = window.Bridgit || window.Bridget;
+  if (!b) { $('status').textContent = CARD.preview; return; }
+  sent = true;
+  document.querySelectorAll('button').forEach(function(x){ x.disabled = true });
+  $('status').textContent = CARD.sending;
+  b.respond(JSON.stringify({hero:pick.hero.id, place:pick.place.id, twist:pick.twist.id, minutes:minutes, surprise:surprised}));
+}
+$('go').onclick = answer;
+$('surprise').onclick = function(){
+  if (sent) return;
+  CARD.rows.forEach(function(row){ pick[row.key] = row.options[Math.floor(Math.random()*row.options.length)] });
+  surprised = true; draw();
+};
+document.addEventListener('bridgit:answered', function(e){
+  e.preventDefault();
+  $('title').textContent = '✓ ' + CARD.doneText;
+  $('status').textContent = '';
+  setTimeout(function(){ $('title').scrollIntoView({block:'center'}) }, 400);
+});
+</script>

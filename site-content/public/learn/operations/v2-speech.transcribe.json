@@ -1,0 +1,78 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_speech_transcribe",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-speech.transcribe.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-speech.transcribe.json",
+  "required_arguments": ["idempotency_key"],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {"language": {
+     "description": "BCP 47 tag (default the phone's)",
+     "type": "string",
+     "maxLength": 32
+    }},
+    "required": []
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": ["tool"],
+    "properties": {
+     "arguments": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {"language": {
+       "description": "BCP 47 tag (default the phone's)",
+       "type": "string",
+       "maxLength": 32
+      }},
+      "required": []
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["speech.transcribe"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    },
+    "language": {
+     "description": "BCP 47 tag (default the phone's)",
+     "type": "string",
+     "maxLength": 32
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_speech_transcribe"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "speech.transcribe"
+ }
+}

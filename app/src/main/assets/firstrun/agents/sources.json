@@ -1,0 +1,17 @@
+{
+  "retrieved": "2026-10-30",
+  "usage": "Provider artwork reused from bridgit.cc for the welcome screen.",
+  "assets": {
+    "grok.svg": "https://grok.com/images/favicon.svg",
+    "claude.png": "https://assets.claude.com/95a868946ac8a31e5ff832e2899f294aa368b836.png?w=128&h=128",
+    "openrouter.svg": "https://openrouter.ai/brand/logos/transparent/glyph/svg/glyph-grape.svg",
+    "gemini.png": "https://www.gstatic.com/lamda/images/gemini_sparkle_4g_512_lt_f94943af3be039176192d.png",
+    "chatgpt.svg": "https://raw.githubusercontent.com/openai/openai-cookbook/main/examples/voice_solutions/realtime_translation_guide/livekit-translation-demo/public/brand/chatgpt-blossom-black.svg",
+    "opencode.png": "https://opencode.ai/favicon-96x96-v3.png",
+    "muse.svg": "https://muse.ai/images/landing/brand/muse-logo.svg",
+    "instinct.png": "https://instinct.com/redesign/stickman.png"
+  },
+  "adjustments": {
+    "chatgpt.svg": "ViewBox trimmed to the existing artwork bounds; paths unchanged."
+  }
+}

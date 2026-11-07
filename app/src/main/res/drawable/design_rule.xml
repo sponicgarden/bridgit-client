@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Short accent line (48 x 3dp) between a lead and the first section, as on the welcome page. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="0"
+        android:endColor="@color/design_rule_end"
+        android:startColor="@color/design_rule_start" />
+    <corners android:radius="2dp" />
+    <size android:width="48dp" android:height="3dp" />
+</shape>

@@ -1,0 +1,127 @@
+{
+ "detail_url": "/v1/discover?id=v1.settings&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.settings.json",
+ "title": "settings",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.settings.json",
+ "prerequisites": ["Check v1.settings supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Existing Super agents can inspect and delegate app-owned feature switches, capabilities, roles and control grants without a separate configuration grant",
+   "path": "/v1/owner/configuration/access",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-access.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-access.json",
+   "control_scope": null,
+   "requires_power": "SUPER",
+   "tool": "owner_configuration_access"
+  },
+  {
+   "summary": "Super agent changes app-owned enabled device features; actual Android consent remains required",
+   "path": "/v1/owner/configuration/access/features",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-access-features.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-access-features.json",
+   "control_scope": null,
+   "requires_power": "SUPER",
+   "tool": "owner_configuration_access_features"
+  },
+  {
+   "summary": "An already authorized Super agent replaces grants or changes roles for an existing paired control agent, including its own configuration bootstrap; applets, portals and device peers excluded",
+   "path": "/v1/owner/configuration/access/agents/{agent}",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-access-agents-agent.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-access-agents-agent.json",
+   "control_scope": null,
+   "requires_power": "SUPER",
+   "tool": "owner_configuration_access_agents"
+  },
+  {
+   "summary": "Every Bridgit setting and the phone settings it manages: value, type, range, and whether you may change it",
+   "path": "/v1/settings",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-settings.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-settings.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "settings_get"
+  },
+  {
+   "summary": "Change settings (agents with Agent Super Powers, once the owner turns on App settings); every change is checked first, so one bad change changes nothing",
+   "path": "/v1/settings",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-settings.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-settings.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "settings_post"
+  },
+  {
+   "summary": "Read built-in and custom mode definitions and the current mode",
+   "path": "/v1/settings/modes",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-settings-modes.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-settings-modes.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "settings_modes_get"
+  },
+  {
+   "summary": "Replace custom mode definitions; create, rename or remove unused custom modes; [] clears them. Built-in modes and the current mode cannot be removed. Needs App settings and Agent Super Powers",
+   "path": "/v1/settings/modes",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-settings-modes.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-settings-modes.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "settings_modes_post"
+  },
+  {
+   "summary": "Saved AI provider key presence; never keys or suffixes",
+   "path": "/v1/settings/ai-keys",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-settings-ai-keys.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-settings-ai-keys.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "settings_ai_keys_get"
+  },
+  {
+   "summary": "Set, replace or remove a saved AI key with App settings and Super Powers; write-only",
+   "path": "/v1/settings/ai-keys",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-settings-ai-keys.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-settings-ai-keys.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "settings_ai_keys_post"
+  },
+  {
+   "summary": "Set or clear the owner's write-only capture upload URL with App settings and Super Powers",
+   "path": "/v1/settings/capture-upload",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-settings-capture-upload.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-settings-capture-upload.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "settings_capture_upload"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.settings",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v1.settings"]
+}

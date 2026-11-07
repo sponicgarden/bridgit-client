@@ -1,0 +1,165 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fbf6ef;color:#2b2420;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 28px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#a8432d}
+h1{font-size:24px;line-height:1.2;margin:4px 0 4px;letter-spacing:-.01em}
+.sub{color:#6b5d54;font-size:15px;margin:0 0 16px}
+.lbl{font-size:13px;font-weight:700;color:#6b5d54;margin:0 0 8px}
+.chips{display:flex;gap:8px;margin-bottom:14px}
+.chip{flex:1;font:inherit;font-weight:700;font-variant-numeric:tabular-nums;min-height:48px;border-radius:999px;border:1.5px solid #e4d6c6;background:#fff;color:#2b2420;cursor:pointer;transition:all .18s}
+.chip.on{background:#c8553d;border-color:#c8553d;color:#fff;box-shadow:0 4px 12px rgba(200,85,61,.28)}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(43,36,32,.07);margin-bottom:18px}
+.sum div{padding:12px 6px;text-align:center}
+.sum div+div{border-left:1px solid #f0e6da}
+.sum b{display:block;font-size:20px;font-variant-numeric:tabular-nums;color:#1f6f6f;transition:color .2s}
+.sum span{font-size:12px;color:#6b5d54}
+.stop{display:grid;grid-template-columns:46px 1fr;gap:8px;position:relative}
+.time{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;padding-top:14px;text-align:right;transition:opacity .2s;line-height:1.2}
+.time small{display:block;font-weight:500;font-size:12px;color:#6b5d54}
+.card{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:12px;box-shadow:0 2px 10px rgba(43,36,32,.07);transition:opacity .2s,transform .2s;border-left:4px solid #c8553d}
+.ico{flex:none;width:40px;height:40px;border-radius:12px;background:#f8e7e1;display:grid;place-content:center;font-size:21px}
+.txt{flex:1;min-width:0}
+.txt b{display:block;font-size:16px;line-height:1.25}
+.txt small{color:#6b5d54;font-size:13px}
+.tg{flex:none;font:inherit;font-size:14px;font-weight:700;min-width:68px;min-height:48px;border-radius:12px;border:1.5px solid #1f6f6f;background:#e5f1f0;color:#1f6f6f;cursor:pointer;transition:all .18s}
+.stop.off .card{background:#f6efe6;box-shadow:none;border-left-color:#d8ccc0}
+.stop.off .ico,.stop.off .txt{opacity:.45}
+.stop.off .time{opacity:.35;text-decoration:line-through}
+.stop.off .tg{background:#fff;border-color:#cdbfb2;color:#5a4d44}
+.walk{display:grid;grid-template-columns:46px 1fr;gap:8px;height:34px}
+.walk i{display:block;border-left:2px dashed #d9c7b6;margin-left:18px;height:100%}
+.walk span{font-size:13px;color:#1f6f6f;font-weight:600;align-self:center;font-variant-numeric:tabular-nums}
+.walk.off span{color:#a89a8e}
+.foot{margin-top:20px}
+button.main{width:100%;font:inherit;font-weight:700;font-size:17px;border:0;border-radius:16px;padding:16px;min-height:56px;background:#c8553d;color:#fff;cursor:pointer;box-shadow:0 6px 16px rgba(200,85,61,.3);transition:transform .15s,opacity .2s}
+button.alt{width:100%;font:inherit;font-weight:600;border:0;border-radius:14px;padding:14px;min-height:48px;background:transparent;color:#1f6f6f;cursor:pointer;margin-top:6px}
+button:active{transform:scale(.98)}
+button:disabled{opacity:.5;cursor:default;transform:none}
+.status{text-align:center;color:#6b5d54;font-size:14px;min-height:20px;margin-top:6px}
+.done{color:#1f6f6f}
+</style>
+<div class="wrap">
+  <div class="eyebrow" id="eyebrow"></div>
+  <h1 id="title"></h1>
+  <p class="sub" id="sub"></p>
+  <p class="lbl" id="startLbl"></p>
+  <div class="chips" id="chips"></div>
+  <div class="sum"><div><b id="sEnd"></b><span id="sEndL"></span></div><div><b id="sWalk"></b><span id="sWalkL"></span></div><div><b id="sKm"></b><span id="sKmL"></span></div></div>
+  <div id="line"></div>
+  <div class="foot"><button class="main" id="go"></button><button class="alt" id="alt"></button><div class="status" id="status"></div></div>
+</div>
+<script>
+// The card's content. Change only this object.
+// answer.data: {start:"09:30", keep:[ids], skip:[ids], ends_at:"18:40", walk_minutes:57} or {action:"replan"}
+var CARD = {
+  eyebrow: "Porto · Sat 14 Nov",
+  title: "Your Saturday in Porto: keep or skip?",
+  sub: "I planned six stops. Skip any you don't fancy and the day re-times itself.",
+  startLabel: "Leave the hotel at",
+  starts: ["09:00", "09:30", "10:00"],
+  start: "09:30",
+  stats: { end: "back by", walk: "min walking", km: "km on foot" },
+  walkWord: "min walk", keepWord: "✓ Keep", skipWord: "Skipped",
+  // x, y: rough map position in km, used to time the walk between kept stops
+  stops: [
+    { id: "livraria", icon: "📚", name: "Livraria Lello", note: "Booked entry", stay: 45, x: 0, y: 0, keep: true },
+    { id: "clerigos", icon: "🗼", name: "Clérigos Tower", note: "Best city view", stay: 40, x: 0.15, y: -0.1, keep: true },
+    { id: "bolhao", icon: "🐟", name: "Mercado do Bolhão", note: "Lunch at the market", stay: 90, x: 0.9, y: 0.5, keep: true },
+    { id: "serralves", icon: "🌳", name: "Serralves Park", note: "Lovely, but far out west", stay: 120, x: -4.0, y: 1.0, keep: false },
+    { id: "ribeira", icon: "⛵", name: "Ribeira riverside", note: "Walk the Dom Luís bridge", stay: 120, x: 0.4, y: -0.9, keep: true },
+    { id: "gaia", icon: "🍷", name: "Graham's cellars", note: "Port tasting, 3 glasses", stay: 90, x: -0.3, y: -1.6, keep: true }
+  ],
+  walkKmh: 4.8,
+  primary: "Lock in {n} stops",
+  primaryOne: "Lock in 1 stop",
+  emptyPrimary: "Keep at least one stop",
+  secondary: "Plan a different day",
+  sending: "Sending…",
+  doneTitle: "Day locked in",
+  doneSub: "I'll put it in your calendar with walking directions.",
+  preview: "Preview only: open this card in Bridgit to answer."
+};
+
+var sent = false, start = CARD.start;
+function $(id){ return document.getElementById(id); }
+function mins(t){ var p = t.split(":"); return +p[0] * 60 + +p[1]; }
+function hhmm(m){ var h = Math.floor(m / 60) % 24, x = m % 60; return (h < 10 ? "0" : "") + h + ":" + (x < 10 ? "0" : "") + x; }
+function dur(m){ return m >= 60 && m % 60 === 0 ? m / 60 + "\u00a0h" : m + "\u00a0min"; }
+function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+$("eyebrow").textContent = CARD.eyebrow; $("title").textContent = CARD.title; $("sub").textContent = CARD.sub;
+$("startLbl").textContent = CARD.startLabel; $("alt").textContent = CARD.secondary;
+$("sEndL").textContent = CARD.stats.end; $("sWalkL").textContent = CARD.stats.walk; $("sKmL").textContent = CARD.stats.km;
+
+CARD.starts.forEach(function(t){
+  var b = el("button", "chip", t);
+  b.onclick = function(){ if (sent) return; start = t; render(); };
+  b.dataset.t = t; $("chips").appendChild(b);
+});
+
+var rows = CARD.stops.map(function(s, i){
+  var w = null;
+  if (i > 0) { w = el("div", "walk"); w.appendChild(el("i")); w.appendChild(el("span")); $("line").appendChild(w); }
+  var r = el("div", "stop"), t = el("div", "time"), c = el("div", "card"), tx = el("div", "txt"), tg = el("button", "tg");
+  c.appendChild(el("div", "ico", s.icon));
+  tx.appendChild(el("b", null, s.name)); tx.appendChild(el("small", null, s.note)); c.appendChild(tx);
+  tg.onclick = function(){ if (sent) return; s.keep = !s.keep; render(); };
+  c.appendChild(tg); r.appendChild(t); r.appendChild(c); $("line").appendChild(r);
+  return { s: s, row: r, time: t, tg: tg, walk: w };
+});
+
+function render(){
+  document.querySelectorAll(".chip").forEach(function(b){ b.classList.toggle("on", b.dataset.t === start); });
+  var now = mins(start), walk = 0, km = 0, prev = null, n = 0;
+  rows.forEach(function(r){
+    var s = r.s;
+    if (r.walk) r.walk.classList.toggle("off", !s.keep);
+    if (s.keep) {
+      if (prev) {
+        var d = Math.hypot(s.x - prev.x, s.y - prev.y) * 1.3, m = Math.round(d / CARD.walkKmh * 60);
+        now += m; walk += m; km += d;
+        if (r.walk) r.walk.lastChild.textContent = "🚶 " + m + " " + CARD.walkWord;
+      } else if (r.walk) r.walk.lastChild.textContent = "";
+      r.time.textContent = hhmm(now); r.time.appendChild(el("small", null, dur(s.stay))); now += s.stay; prev = s; n++;
+    } else {
+      if (r.walk) r.walk.lastChild.textContent = "";
+      r.time.textContent = "";
+    }
+    r.row.classList.toggle("off", !s.keep);
+    r.tg.textContent = s.keep ? CARD.keepWord : CARD.skipWord;
+    r.tg.setAttribute("aria-pressed", s.keep ? "true" : "false");
+  });
+  $("sEnd").textContent = n ? hhmm(now) : "–";
+  $("sWalk").textContent = walk; $("sKm").textContent = km.toFixed(1);
+  var go = $("go");
+  go.disabled = !n || sent;
+  go.textContent = !n ? CARD.emptyPrimary : n === 1 ? CARD.primaryOne : CARD.primary.replace("{n}", n);
+  return { ends: hhmm(now), walk: walk };
+}
+
+function send(answer){
+  if (sent) return;
+  var B = window.Bridgit || window.Bridget;
+  if (!B || !B.respond) { $("status").textContent = CARD.preview; return; }
+  sent = true;
+  document.querySelectorAll("button").forEach(function(b){ b.disabled = true; });
+  $("status").textContent = CARD.sending;
+  B.respond(JSON.stringify(answer));
+}
+$("go").onclick = function(){
+  var r = render();
+  send({ start: start,
+    keep: CARD.stops.filter(function(s){ return s.keep; }).map(function(s){ return s.id; }),
+    skip: CARD.stops.filter(function(s){ return !s.keep; }).map(function(s){ return s.id; }),
+    ends_at: r.ends, walk_minutes: r.walk });
+};
+$("alt").onclick = function(){ send({ action: "replan" }); };
+document.addEventListener("bridgit:answered", function(e){
+  e.preventDefault();
+  $("title").textContent = "✓ " + CARD.doneTitle; $("title").className = "done";
+  $("sub").textContent = CARD.doneSub; $("status").textContent = "";
+  setTimeout(function(){ $("title").scrollIntoView({ block: "center" }); }, 400);
+});
+render();
+</script>

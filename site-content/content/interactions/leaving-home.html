@@ -1,0 +1,204 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#f7f5f2 0%,#f3f1ee 40%,#ece8e2 100%);background-color:#f3f1ee;color:#24221f;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 28px}
+.head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.house{width:60px;height:60px;border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(60,45,20,.08);display:grid;place-content:center;flex:none}
+h1{font-size:21px;line-height:1.3;margin:0 0 2px;letter-spacing:-.01em}
+h1.done{color:#2f8a4f}
+.since{font-size:14px;color:#6b655d;margin:0}
+.since:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#b8b1a6;margin-right:6px;vertical-align:1px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.tile{position:relative;font:inherit;text-align:left;color:inherit;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);border-radius:20px;padding:14px;min-height:118px;box-shadow:0 4px 16px rgba(60,45,20,.07);cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;transition:background-color .2s,color .2s,box-shadow .2s,transform .15s}
+.tile:active,.main:active,.step:active,.away:active{transform:scale(.98)}
+.tile.wide{grid-column:1/-1;min-height:0;cursor:default}
+.ic{width:38px;height:38px;border-radius:12px;background:#ebe7e1;display:grid;place-content:center;transition:background-color .2s,color .2s;color:#6b655d}
+.ic svg{width:22px;height:22px}
+.tn{display:block;font-weight:600;font-size:15px;margin-top:12px}
+.ts{display:block;font-size:13px;color:#6b655d;font-variant-numeric:tabular-nums}
+.tile.lit{background:#fff7e6;border-color:#f8d48a;box-shadow:0 6px 20px rgba(245,165,36,.25)}
+.tile.lit .ic{background:#f5a524;color:#fff}
+.tile.lit .ts{color:#8a5a00;font-weight:600}
+.tile.unlocked .ic{background:#fde4df;color:#c4321f}
+.tile.unlocked .ts{color:#b02a17;font-weight:600}
+.tile.locked .ic{background:#dcf1e2;color:#2f8a4f}
+.tile.locked .ts{color:#2a7a46;font-weight:600}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.wide .chg{position:absolute;top:12px;right:12px}
+.chg{white-space:nowrap;font-size:12px;font-weight:600;color:#7a4f00;background:#fdecc8;border-radius:10px;padding:2px 9px;opacity:0;transform:scale(.8);transition:opacity .18s,transform .18s}
+.tile.changed .chg{opacity:1;transform:none}
+.heat{display:flex;align-items:center;gap:12px}
+.heat .tx{flex:1}
+.deg{font-size:30px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.ctl{display:flex;align-items:center;gap:8px;margin-top:12px}
+.step{width:48px;height:48px;border-radius:14px;border:0;background:#ebe7e1;font:inherit;font-size:24px;font-weight:600;color:#24221f;cursor:pointer;transition:background-color .15s,transform .15s}
+.away{flex:1;min-height:48px;border-radius:14px;border:1.5px solid #ddd6cc;background:#fff;font:inherit;font-weight:600;font-size:15px;color:#24221f;cursor:pointer;transition:background-color .18s,border-color .18s,color .18s,transform .15s}
+.away.on{background:#24221f;border-color:#24221f;color:#fff}
+.wash{display:flex;align-items:center;gap:12px}
+.wash svg.r{width:44px;height:44px;transform:rotate(-90deg);flex:none}
+.main{width:100%;min-height:54px;font:inherit;font-weight:700;font-size:16px;border:0;border-radius:16px;background:#24221f;color:#fff;cursor:pointer;box-shadow:0 8px 22px rgba(36,34,31,.22);transition:transform .15s,opacity .2s}
+.main:disabled{opacity:.4;cursor:default;box-shadow:none}
+.alt{width:100%;min-height:48px;font:inherit;font-size:15px;border:0;background:none;color:#6b655d;cursor:pointer;margin-top:6px}
+.tile:disabled,.step:disabled,.away:disabled,.alt:disabled{opacity:.6;cursor:default}
+.status{text-align:center;font-size:14px;color:#6b655d;min-height:20px;margin:6px 0 0}
+</style>
+<div class="wrap">
+  <div class="head">
+    <div class="house"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M5 17 18 6l13 11" stroke="#24221f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 15v14h18V15" stroke="#24221f" stroke-width="2.4" stroke-linejoin="round"/><rect x="15" y="20" width="6" height="9" rx="1.5" fill="#f5a524"/><circle cx="26" cy="9" r="2.4" fill="#f5a524"/></svg></div>
+    <div><h1 id="title"></h1><p class="since" id="since"></p></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <button class="main" id="go"></button>
+  <button class="alt" id="skip"></button>
+  <p class="status" id="status" role="status"></p>
+</div>
+<script>
+// The card's content. Change only this object.
+// answer.data: {"lights_off":["living","kitchen"],"heating_c":17,"lock_door":true,"close_garage":false}
+// "now" is how the house is; "want" is what I suggest. The card starts on my suggestions.
+var CARD = {
+  title: 'You’ve left home. Tidy up the house?',
+  since: 'Nobody home since 08:42',
+  lights: [
+    {id: 'living', name: 'Living room lights', now: true, want: false},
+    {id: 'kitchen', name: 'Kitchen lights', now: true, want: false}
+  ],
+  heating: {name: 'Heating', now: 21.5, want: 17, away: 17, min: 12, max: 25, step: 0.5, away_label: 'Away 17°', hint: 'Back to 21.5° when you’re 20 min away'},
+  door: {name: 'Front door', now_locked: false, want_locked: true},
+  garage: {name: 'Garage', now_closed: true, want_closed: true},
+  washer: {name: 'Washing machine', status: 'Finishing in 12 min', pct: 0.84},
+  words: {on: 'On', off: 'Off', locked: 'Locked', unlocked: 'Unlocked', closed: 'Closed', open: 'Open', was: 'Was'},
+  skip: 'Leave everything as it is',
+  none: 'Nothing to change',
+  sending: 'Sending…',
+  preview: 'Preview only: open this card in Bridgit to answer.',
+  done: 'Done. The house is tidied up'
+};
+
+var ICONS = {
+  bulb: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z',
+  lock: 'M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z',
+  unlock: 'M7 11V8a5 5 0 0 1 9.6-2M6 11h12v9H6z',
+  garage: 'M3 10 12 4l9 6v10H3zM7 20v-7h10v7M7 16h10',
+  flame: 'M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5.5 1 1.5 1.5 2 2 2.5C11.5 8 11 5.5 12 3Z',
+  wash: 'M5 3h14v18H5zM5 7h14M12 10a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z'
+};
+var sent = false, S = {}, NS = 'http://www.w3.org/2000/svg';
+function $(id) { return document.getElementById(id); }
+function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+function icon(name) {
+  var w = el('div', 'ic'), s = document.createElementNS(NS, 'svg'), p = document.createElementNS(NS, 'path');
+  s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none');
+  p.setAttribute('d', ICONS[name]); p.setAttribute('stroke', 'currentColor'); p.setAttribute('stroke-width', '2');
+  p.setAttribute('stroke-linecap', 'round'); p.setAttribute('stroke-linejoin', 'round');
+  s.appendChild(p); w.appendChild(s); return {wrap: w, path: p};
+}
+function tile(name, iconName, wide) {
+  var t = el(wide ? 'div' : 'button', 'tile' + (wide ? ' wide' : '')), i = icon(iconName);
+  var badge = el('span', 'chg');
+  if (wide) { t.appendChild(badge); t.appendChild(i.wrap); }
+  else { var top = el('div', 'top'); top.appendChild(i.wrap); top.appendChild(badge); t.appendChild(top); }
+  var txt = el('div'); var n = el('span', 'tn', name), s = el('span', 'ts');
+  txt.appendChild(n); txt.appendChild(s);
+  return {t: t, i: i, n: n, s: s, txt: txt, badge: badge};
+}
+$('title').textContent = CARD.title;
+$('since').textContent = CARD.since;
+$('skip').textContent = CARD.skip;
+var grid = $('grid'), T = {};
+
+CARD.lights.forEach(function (l) {
+  S[l.id] = l.want;
+  var x = tile(l.name, 'bulb'); x.t.appendChild(x.txt); grid.appendChild(x.t); T[l.id] = x;
+  x.t.onclick = function () { if (!sent) { S[l.id] = !S[l.id]; update(); } };
+});
+
+// Heating (wide)
+var H = CARD.heating; S.heat = H.want;
+var hx = tile(H.name, 'flame', true), hrow = el('div', 'heat'), htx = el('div', 'tx');
+var deg = el('div', 'deg'); hx.n.style.marginTop = '0';
+htx.appendChild(hx.n); htx.appendChild(deg); htx.appendChild(hx.s);
+hx.t.removeChild(hx.i.wrap); hrow.appendChild(hx.i.wrap); hrow.appendChild(htx); hx.t.appendChild(hrow);
+var ctl = el('div', 'ctl'), minus = el('button', 'step', '−'), plus = el('button', 'step', '+'), away = el('button', 'away', H.away_label);
+minus.setAttribute('aria-label', 'Lower'); plus.setAttribute('aria-label', 'Raise');
+ctl.appendChild(minus); ctl.appendChild(away); ctl.appendChild(plus); hx.t.appendChild(ctl);
+grid.appendChild(hx.t); T.heat = hx;
+minus.onclick = function () { if (!sent) { S.heat = Math.max(H.min, S.heat - H.step); update(); } };
+plus.onclick = function () { if (!sent) { S.heat = Math.min(H.max, S.heat + H.step); update(); } };
+away.onclick = function () { if (!sent) { S.heat = S.heat === H.away ? H.now : H.away; update(); } };
+
+// Door and garage
+S.door = CARD.door.want_locked; S.garage = CARD.garage.want_closed;
+var dx = tile(CARD.door.name, 'lock'); dx.t.appendChild(dx.txt); grid.appendChild(dx.t); T.door = dx;
+dx.t.onclick = function () { if (!sent) { S.door = !S.door; update(); } };
+var gx = tile(CARD.garage.name, 'garage'); gx.t.appendChild(gx.txt); grid.appendChild(gx.t); T.garage = gx;
+gx.t.onclick = function () { if (!sent) { S.garage = !S.garage; update(); } };
+
+// Washer (info only)
+var W = CARD.washer, wx = el('div', 'tile wide'), wr = el('div', 'wash');
+var ring = document.createElementNS(NS, 'svg'); ring.setAttribute('viewBox', '0 0 44 44'); ring.setAttribute('class', 'r');
+[['#ebe7e1', 0], ['#4f8fd6', 1]].forEach(function (c) {
+  var ci = document.createElementNS(NS, 'circle');
+  ci.setAttribute('cx', 22); ci.setAttribute('cy', 22); ci.setAttribute('r', 18); ci.setAttribute('fill', 'none');
+  ci.setAttribute('stroke', c[0]); ci.setAttribute('stroke-width', 5); ci.setAttribute('stroke-linecap', 'round');
+  if (c[1]) ci.setAttribute('stroke-dasharray', (113.1 * W.pct) + ' 113.1');
+  ring.appendChild(ci);
+});
+var wt = el('div'); wt.appendChild(el('span', 'tn', W.name)); wt.appendChild(el('span', 'ts', W.status));
+wt.firstChild.style.marginTop = '0';
+wr.appendChild(ring); wr.appendChild(wt); wx.appendChild(wr); grid.appendChild(wx);
+
+function mark(x, changed, was) { x.t.classList.toggle('changed', changed); if (changed) x.badge.textContent = CARD.words.was + ' ' + was.toLowerCase(); }
+function changes() {
+  var n = 0;
+  CARD.lights.forEach(function (l) { if (S[l.id] !== l.now) n++; });
+  if (S.heat !== H.now) n++;
+  if (S.door !== CARD.door.now_locked) n++;
+  if (S.garage !== CARD.garage.now_closed) n++;
+  return n;
+}
+function update() {
+  var w = CARD.words;
+  CARD.lights.forEach(function (l) {
+    var x = T[l.id], on = S[l.id];
+    x.t.classList.toggle('lit', on); x.s.textContent = on ? w.on : w.off;
+    x.t.setAttribute('aria-pressed', String(on)); mark(x, on !== l.now, l.now ? w.on : w.off);
+  });
+  deg.textContent = S.heat.toFixed(1) + '°';
+  hx.s.textContent = S.heat === H.now ? '' : H.hint;
+  away.classList.toggle('on', S.heat === H.away); mark(hx, S.heat !== H.now, H.now.toFixed(1) + '°');
+  dx.t.classList.toggle('locked', S.door); dx.t.classList.toggle('unlocked', !S.door);
+  dx.s.textContent = S.door ? w.locked : w.unlocked; dx.i.path.setAttribute('d', ICONS[S.door ? 'lock' : 'unlock']);
+  mark(dx, S.door !== CARD.door.now_locked, CARD.door.now_locked ? w.locked : w.unlocked);
+  gx.t.classList.toggle('locked', S.garage); gx.t.classList.toggle('unlocked', !S.garage);
+  gx.s.textContent = S.garage ? w.closed : w.open; mark(gx, S.garage !== CARD.garage.now_closed, CARD.garage.now_closed ? w.closed : w.open);
+  var n = changes();
+  $('go').textContent = n ? 'Apply ' + n + ' change' + (n > 1 ? 's' : '') : CARD.none;
+  $('go').disabled = n === 0;
+}
+
+function send(data) {
+  if (sent) return;
+  var B = window.Bridgit || window.Bridget;
+  if (!B) { $('status').textContent = CARD.preview; return; }
+  sent = true;
+  document.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+  $('status').textContent = CARD.sending;
+  B.respond(JSON.stringify(data));
+}
+$('go').onclick = function () {
+  var d = {lights_off: [], lights_on: [], heating_c: S.heat === H.now ? null : S.heat, lock_door: S.door && !CARD.door.now_locked, close_garage: S.garage && !CARD.garage.now_closed};
+  CARD.lights.forEach(function (l) { if (S[l.id] !== l.now) (S[l.id] ? d.lights_on : d.lights_off).push(l.id); });
+  if (CARD.door.now_locked && !S.door) d.unlock_door = true;
+  if (CARD.garage.now_closed && !S.garage) d.open_garage = true;
+  send(d);
+};
+$('skip').onclick = function () { send({action: 'leave_as_is'}); };
+document.addEventListener('bridgit:answered', function (e) {
+  e.preventDefault();
+  $('title').textContent = '✓ ' + CARD.done; $('title').classList.add('done');
+  $('status').textContent = '';
+  setTimeout(function () { $('title').scrollIntoView({block: 'center', behavior: 'smooth'}); }, 400);
+});
+update();
+</script>

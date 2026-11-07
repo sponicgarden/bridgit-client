@@ -1,0 +1,75 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Report an explicit catalog selection or bounded self-reported feedback; never verified evidence",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "discover_report",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "event",
+    "description": "selection, relevance, attempt or outcome",
+    "type": "string",
+    "required": true,
+    "enum": [
+     "selection",
+     "relevance",
+     "attempt",
+     "outcome"
+    ]
+   },
+   {
+    "name": "id",
+    "description": "Catalog ID for selection; recipe ID for attempt",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "value",
+    "description": "helpful/not_helpful for relevance; works/still_broken/unverified for outcome",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/discover/report {\"event\":\"selection\",\"id\":\"receipt-scanner\"}",
+  "idempotent": false,
+  "path": "/v1/discover/report",
+  "capability": "status",
+  "returns": "accepted (validation only), measurement self_report; respects usage-tally opt-out. No content or evidence accepted.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "id": {
+     "description": "Catalog ID for selection; recipe ID for attempt",
+     "type": "string"
+    },
+    "event": {
+     "description": "selection, relevance, attempt or outcome",
+     "type": "string",
+     "enum": [
+      "selection",
+      "relevance",
+      "attempt",
+      "outcome"
+     ]
+    },
+    "value": {
+     "description": "helpful/not_helpful for relevance; works/still_broken/unverified for outcome",
+     "type": "string"
+    }
+   },
+   "required": ["event"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

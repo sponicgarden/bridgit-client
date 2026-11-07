@@ -1,0 +1,186 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Find a reference-like target, center with bounded PTZ and hold aim; sends images to Jev",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_cameras_framing_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "reference",
+    "description": "{mime:image/jpeg|image/png,data_base64}; <=300000 bytes and <=1568px per edge",
+    "type": "object",
+    "required": true
+   },
+   {
+    "name": "cameras",
+    "description": "Explicit enrolled camera ids; 1..4",
+    "type": "array",
+    "required": true
+   },
+   {
+    "name": "app",
+    "description": "Optional native app id; every camera must be assigned to that app",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "description",
+    "description": "Target description, at most 500 characters; not identity proof",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "framing",
+    "description": "Whole target is the default",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "whole_target",
+     "whole_target_context"
+    ]
+   },
+   {
+    "name": "calibrate",
+    "description": "Default true: bounded per-axis probes verify camera direction; false permits observation only until a move is needed",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "max_moves",
+    "description": "0..24; default 6",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "max_checks",
+    "description": "2..48; default 12",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "timeout_s",
+    "description": "15..300; default 90",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "settle_ms",
+    "description": "1000..5000; default 1500",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "max_step",
+    "description": ".005.. .05",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "max_travel",
+    "description": ".01.. .60",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "min_confidence",
+    "description": ".6.. .99; default .8",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "min_similarity",
+    "description": ".6.. .99; default .75",
+    "type": "number",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/lan-cameras/framing {\"reference\":{\"mime\":\"image/jpeg\",\"data_base64\":\"...\"},\"cameras\":[\"lan:example\"]}",
+  "idempotent": true,
+  "path": "/v1/lan-cameras/framing",
+  "capability": "lan_camera",
+  "returns": "Operation id, active, state, limits; poll status. Requires lan_camera and judgment grants. Default 6 moves, 12 model calls, 90s across all cameras. One active operation per phone. Hold makes no further moves or captures.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "app": {
+     "description": "Optional native app id; every camera must be assigned to that app",
+     "type": "string"
+    },
+    "settle_ms": {
+     "description": "1000..5000; default 1500",
+     "type": "integer"
+    },
+    "max_travel": {
+     "description": ".01.. .60",
+     "type": "number"
+    },
+    "framing": {
+     "description": "Whole target is the default",
+     "type": "string",
+     "enum": [
+      "whole_target",
+      "whole_target_context"
+     ]
+    },
+    "timeout_s": {
+     "description": "15..300; default 90",
+     "type": "integer"
+    },
+    "min_similarity": {
+     "description": ".6.. .99; default .75",
+     "type": "number"
+    },
+    "description": {
+     "description": "Target description, at most 500 characters; not identity proof",
+     "type": "string"
+    },
+    "max_checks": {
+     "description": "2..48; default 12",
+     "type": "integer"
+    },
+    "reference": {
+     "description": "{mime:image/jpeg|image/png,data_base64}; <=300000 bytes and <=1568px per edge",
+     "type": "object"
+    },
+    "cameras": {
+     "description": "Explicit enrolled camera ids; 1..4",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "max_step": {
+     "description": ".005.. .05",
+     "type": "number"
+    },
+    "calibrate": {
+     "description": "Default true: bounded per-axis probes verify camera direction; false permits observation only until a move is needed",
+     "type": "boolean"
+    },
+    "max_moves": {
+     "description": "0..24; default 6",
+     "type": "integer"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "min_confidence": {
+     "description": ".6.. .99; default .8",
+     "type": "number"
+    }
+   },
+   "required": [
+    "reference",
+    "cameras"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

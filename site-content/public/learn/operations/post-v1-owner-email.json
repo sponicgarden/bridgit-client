@@ -1,0 +1,41 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Give the owner's email address: bridgit.cc emails them a link, and tapping it verifies the address (the same address gets email alerts). Works during and after the 24 hours; not once an address is verified (the owner changes it on the phone)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_email_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "email",
+   "description": "The owner's email address",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/owner/email {\"email\":\"owner@example.com\"}",
+  "idempotent": false,
+  "path": "/v1/owner/email",
+  "capability": "status",
+  "returns": "status, state (pending), email (masked), next (what to tell the owner)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"email": {
+    "description": "The owner's email address",
+    "type": "string"
+   }},
+   "required": ["email"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "conflict",
+   "rate_limited",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

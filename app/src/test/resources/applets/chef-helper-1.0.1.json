@@ -1,0 +1,486 @@
+{
+  "format": "bridgit-template/1",
+  "id": "chef-helper",
+  "version": "1.0.1",
+  "kind": "applet",
+  "name": "Chef’s Helper",
+  "summary": "Photograph your fridge, cupboards and spices. Choose your cooking goals, place the phone facing your workspace, and get occasional spoken suggestions as you cook. Ingredients are listed automatically; edits are optional.",
+  "runtime": {
+    "adapter": "android.package.v1",
+    "applet_key": "chef-helper",
+    "supports_dynamic_execution": false
+  },
+  "config_schema": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+  },
+  "defaults": {},
+  "processing": {
+    "tables": [
+      {
+        "id": "photos",
+        "label": "Kitchen photos",
+        "keep_days": 30,
+        "max_rows": 200,
+        "columns": {
+          "photo": {
+            "type": "photo",
+            "label": "Photo"
+          },
+          "status": {
+            "type": "choice",
+            "label": "Status",
+            "options": [
+              "new",
+              "done",
+              "failed"
+            ]
+          },
+          "area": {
+            "type": "text",
+            "label": "Area"
+          },
+          "items": {
+            "type": "integer",
+            "label": "Ingredients"
+          }
+        }
+      },
+      {
+        "id": "ingredients",
+        "label": "Ingredients",
+        "keep_days": 30,
+        "max_rows": 200,
+        "columns": {
+          "label": {
+            "type": "text",
+            "label": "Ingredient"
+          },
+          "category": {
+            "type": "text",
+            "label": "Location"
+          },
+          "note": {
+            "type": "text",
+            "label": "Note"
+          },
+          "photo": {
+            "type": "photo",
+            "label": "Photo"
+          }
+        }
+      },
+      {
+        "id": "activity",
+        "label": "Cooking session",
+        "keep_days": 7,
+        "max_rows": 1000,
+        "columns": {
+          "kind": {
+            "type": "choice",
+            "label": "Kind",
+            "options": [
+              "settings",
+              "observation",
+              "tip"
+            ]
+          },
+          "goals": {
+            "type": "text",
+            "label": "Cooking goals"
+          },
+          "watching": {
+            "type": "boolean",
+            "label": "Watching"
+          },
+          "muted": {
+            "type": "boolean",
+            "label": "Muted"
+          },
+          "started_at": {
+            "type": "number",
+            "label": "Session start"
+          },
+          "cooking": {
+            "type": "boolean",
+            "label": "Cooking detected"
+          },
+          "action": {
+            "type": "text",
+            "label": "What is happening"
+          },
+          "tip": {
+            "type": "text",
+            "label": "Suggestion"
+          },
+          "camera": {
+            "type": "choice",
+            "label": "Camera",
+            "options": [
+              "rear",
+              "front"
+            ]
+          }
+        }
+      }
+    ],
+    "flows": [
+      {
+        "id": "read",
+        "name": "Read kitchen photo",
+        "max_paid_per_day": 200,
+        "trigger": {
+          "type": "called",
+          "with": {
+            "row": "text",
+            "photo": "text",
+            "area": "text"
+          }
+        },
+        "steps": [
+          {
+            "id": "look",
+            "type": "kitchen",
+            "mode": "scan",
+            "photo": {
+              "$trigger": "with.photo"
+            }
+          },
+          {
+            "id": "save",
+            "type": "record",
+            "table": "ingredients",
+            "for_each": {
+              "$step": "look.items"
+            },
+            "row": {
+              "label": {
+                "$item": "label"
+              },
+              "category": {
+                "$item": "category"
+              },
+              "note": {
+                "$item": "note"
+              },
+              "photo": {
+                "$trigger": "with.photo"
+              }
+            }
+          },
+          {
+            "type": "update",
+            "table": "photos",
+            "row": {
+              "$trigger": "with.row"
+            },
+            "set": {
+              "status": "done",
+              "items": {
+                "$step": "save.count"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "watch",
+        "name": "Watch cooking",
+        "trigger": {
+          "type": "interval",
+          "seconds": 10
+        },
+        "max_paid_per_day": 500,
+        "steps": [
+          {
+            "id": "look",
+            "type": "kitchen",
+            "mode": "observe"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "required": [
+      "camera",
+      "interactions",
+      "workflows",
+      "decisions",
+      "speaker",
+      "camera.snapshot",
+      "audio.speak"
+    ],
+    "optional": [],
+    "remote": [],
+    "automatic_grants": false
+  },
+  "ui": {
+    "inputs": {},
+    "portal": {
+      "include": "always",
+      "tables": [
+        "photos",
+        "ingredients",
+        "activity"
+      ],
+      "actions": [
+        "fridge",
+        "cupboards",
+        "spices",
+        "scan"
+      ]
+    },
+    "card": {
+      "title": "Chef’s Helper",
+      "sources": {
+        "photos": {
+          "table": "photos",
+          "limit": 200
+        },
+        "ingredients": {
+          "table": "ingredients",
+          "limit": 200
+        },
+        "activity": {
+          "table": "activity",
+          "limit": 100
+        },
+        "reading": {
+          "batch": "scan"
+        }
+      },
+      "pieces": [
+        {
+          "type": "header",
+          "text": "Your kitchen. A little inspiration.",
+          "eyebrow": "Chef’s Helper"
+        },
+        {
+          "type": "note",
+          "text": "Open this applet’s portal to choose goals and start watching. Photograph the fridge, cupboards and spices. Ingredient corrections are optional."
+        },
+        {
+          "type": "buttons",
+          "items": [
+            {
+              "id": "fridge",
+              "label": "Photograph fridge",
+              "do": {
+                "camera": {
+                  "table": "photos",
+                  "photo": "photo",
+                  "row": {
+                    "status": "new",
+                    "area": "Fridge"
+                  },
+                  "size": "large",
+                  "lens": "back"
+                }
+              }
+            },
+            {
+              "id": "cupboards",
+              "label": "Photograph cupboards",
+              "do": {
+                "camera": {
+                  "table": "photos",
+                  "photo": "photo",
+                  "row": {
+                    "status": "new",
+                    "area": "Cupboard"
+                  },
+                  "size": "large",
+                  "lens": "back"
+                }
+              }
+            },
+            {
+              "id": "spices",
+              "label": "Photograph spices",
+              "do": {
+                "camera": {
+                  "table": "photos",
+                  "photo": "photo",
+                  "row": {
+                    "status": "new",
+                    "area": "Spices"
+                  },
+                  "size": "large",
+                  "lens": "back"
+                }
+              }
+            },
+            {
+              "id": "scan",
+              "label": "Read kitchen photos",
+              "style": "primary",
+              "do": {
+                "flow": {
+                  "$flow": "read"
+                },
+                "for_each": {
+                  "$source": "photos"
+                },
+                "only_if": {
+                  "item": "status",
+                  "is_not": "done"
+                },
+                "with": {
+                  "row": {
+                    "$item": "id"
+                  },
+                  "photo": {
+                    "$item": "photo"
+                  },
+                  "area": {
+                    "$item": "area"
+                  }
+                },
+                "max": 200,
+                "progress": "Reading your kitchen"
+              }
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "rows": {
+            "$source": "ingredients"
+          },
+          "columns": [
+            {
+              "key": "label",
+              "label": "Ingredient"
+            },
+            {
+              "key": "category",
+              "label": "Location"
+            },
+            {
+              "key": "note",
+              "label": "Note"
+            }
+          ],
+          "group_by": "category",
+          "owner_edit": true,
+          "owner_delete": true,
+          "empty": "Your ingredients appear here as photos are read."
+        },
+        {
+          "type": "note",
+          "text": "Cooking photos are checked about every 10 seconds while a session is active, and are not saved. GLM 5.3 Flash receives images and kitchen context. Spoken tips are spaced at least 45 seconds apart. Sessions end after one hour; Mute and Stop are always available in the portal."
+        }
+      ]
+    },
+    "library": {
+      "slug": "chef-helper",
+      "eyebrow": "Your kitchen companion",
+      "headline": "Your kitchen. New possibilities.",
+      "intro": "Show your fridge, cupboards and spice rack. Choose what matters to you, then let a little timely inspiration find you as you cook.",
+      "highlights": [
+        {
+          "title": "Scan what you have",
+          "description": "Several photos become an editable ingredient list. Corrections are optional.",
+          "metrics": []
+        },
+        {
+          "title": "Cook toward your goals",
+          "description": "Exotic tastes, protein, fiber, gluten-free, vegan and your own goals shape each suggestion.",
+          "metrics": []
+        },
+        {
+          "title": "Watch and suggest",
+          "description": "The phone checks your worktop about every 10 seconds and offers occasional spoken tips when cooking is visible.",
+          "metrics": []
+        },
+        {
+          "title": "Stay in control",
+          "description": "Large Mute and Stop controls, written tip history, and one-hour sessions.",
+          "metrics": []
+        }
+      ],
+      "scope": "Front or rear phone camera; no microphone.",
+      "setup": "Install the current Bridgit app, approve the applet and its portal, select goals, photograph your kitchen, read the photos and tap Start watching. Keep the listener active.",
+      "privacy": "Kitchen photos and ingredients go to GLM 5.3 Flash for analysis with your approval. Cooking frames are not saved. Your portal’s ingredients and tips are private to this device instance and invited viewers.",
+      "actions": {
+        "primary": "Open My applets",
+        "secondary": "Customize the template"
+      },
+      "illustration_alt": "Kitchen ingredients and timely cooking inspiration.",
+      "visual_caption": "Scan · Discover · Cook",
+      "visual_icon": "tiles"
+    }
+  },
+  "observation_schema": {
+    "type": "object",
+    "properties": {
+      "cooking": {
+        "type": "boolean"
+      },
+      "tip": {
+        "type": "string",
+        "maxLength": 400
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "metrics": [],
+  "lifecycle": {
+    "states": [
+      "ready",
+      "watching",
+      "stopped"
+    ],
+    "start": "The owner taps Start watching in the portal.",
+    "stop": "Stop or one-hour session expiry prevents further captures.",
+    "delete": "Uninstall removes the applet’s tables and portal."
+  },
+  "migration": {
+    "strategy": "explicit_owner_opt_in",
+    "from": null,
+    "rules": [],
+    "rollback": "Remove this version and install an earlier approved package."
+  },
+  "assets": {},
+  "data_policy": {
+    "backend_default": "device_only",
+    "scope": [
+      "device_id",
+      "applet_instance_id"
+    ],
+    "device_only": {
+      "server_registration": false,
+      "uploads": false,
+      "remote_models": false,
+      "derived_telemetry": false,
+      "queue": false
+    },
+    "enable": "Owner approval of this applet’s portal and model permissions enables kitchen analysis. Start watching is a separate explicit action.",
+    "disable": "Stop before serialization/enqueue; discard queued uploads; delete server content/config/grants and confirm deletion or show pending retry; preserve local records.",
+    "sharing": {
+      "creation": "explicit_owner_invitation",
+      "scope": [
+        "device_id",
+        "applet_instance_id"
+      ],
+      "role": "viewer",
+      "acceptance": "matching verified Google identity and explicit acceptance",
+      "revocation": "every request rechecks active membership; private no-store images; resend invalidates prior token",
+      "expires_days": 7
+    },
+    "retention": {
+      "days": 30,
+      "image_max_bytes": 102400,
+      "image_max_edge_px": 640,
+      "image_min_interval_ms": 30000,
+      "storage_default_bytes_per_account": 1000000000,
+      "storage_scope": "account",
+      "full_behavior": "pause_new_history_keep_monitoring"
+    },
+    "execution": "Native workflows on the phone; GLM 5.3 Flash on OpenRouter reads kitchen photos. Cooking frames are transient and not retained. No microphone is used."
+  }
+}

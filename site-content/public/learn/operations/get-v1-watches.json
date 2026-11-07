@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your running watches, with their last check",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "watches_list",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/watches",
+  "idempotent": false,
+  "path": "/v1/watches",
+  "capability": "watches",
+  "returns": "watches [{watch_id, label, created_at, expires_at, interval_s, data, checks, matches, last_match_at, readings_held, last_check, usage {model, answered_locally, paid_calls, paid_cost_usd, ...}}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,72 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Phone to phone: a photo the owner took on a satellite's Camera tab, checked by this hub's photo applets (only for a satellite's return key). Not for agents.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "satellite_hub_photo",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "data_base64",
+    "description": "The photo, JPEG",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "camera",
+    "description": "rear (default) or front",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "rear",
+     "front"
+    ]
+   },
+   {
+    "name": "targets",
+    "description": "Applet ids from GET /v1/satellite/hub; omitted or empty = all",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/satellite/hub/photo {\"camera\":\"rear\",\"data_base64\":\"/9j/...\"}",
+  "idempotent": false,
+  "path": "/v1/satellite/hub/photo",
+  "capability": "status",
+  "returns": "camera, targets[{id, name, checks[{watch_id, label, kind, status, summary, answers?}]}] (as POST /v1/portal/photo)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "data_base64": {
+     "description": "The photo, JPEG",
+     "type": "string"
+    },
+    "camera": {
+     "description": "rear (default) or front",
+     "type": "string",
+     "enum": [
+      "rear",
+      "front"
+     ]
+    },
+    "targets": {
+     "description": "Applet ids from GET /v1/satellite/hub; omitted or empty = all",
+     "type": "array",
+     "items": {"type": "object"}
+    }
+   },
+   "required": ["data_base64"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "not_found"
+  ],
+  "requires": null
+ }
+}

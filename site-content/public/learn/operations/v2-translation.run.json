@@ -1,0 +1,121 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_translation_run",
+  "idempotency_required": false,
+  "documentation": "https://bridgit.cc/learn/operations/v2-translation.run.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-translation.run.json",
+  "required_arguments": [
+   "source",
+   "target",
+   "text"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {"Authorization": "Bearer <your key>"},
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "source": {
+      "description": "Language tag, e.g. en",
+      "type": "string",
+      "maxLength": 16
+     },
+     "text": {
+      "type": "string",
+      "maxLength": 10000
+     },
+     "target": {
+      "description": "Language tag, e.g. de",
+      "type": "string",
+      "maxLength": 16
+     }
+    },
+    "required": [
+     "source",
+     "target",
+     "text"
+    ]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "source": {
+        "description": "Language tag, e.g. en",
+        "type": "string",
+        "maxLength": 16
+       },
+       "text": {
+        "type": "string",
+        "maxLength": 10000
+       },
+       "target": {
+        "description": "Language tag, e.g. de",
+        "type": "string",
+        "maxLength": 16
+       }
+      },
+      "required": [
+       "source",
+       "target",
+       "text"
+      ]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["translation.run"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "source": {
+     "description": "Language tag, e.g. en",
+     "type": "string",
+     "maxLength": 16
+    },
+    "text": {
+     "type": "string",
+     "maxLength": 10000
+    },
+    "target": {
+     "description": "Language tag, e.g. de",
+     "type": "string",
+     "maxLength": 16
+    }
+   },
+   "required": [
+    "source",
+    "target",
+    "text"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_translation_run"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "translation.run"
+ }
+}

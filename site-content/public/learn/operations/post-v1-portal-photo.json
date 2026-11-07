@@ -1,0 +1,72 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "A photo the owner took with the Portal's camera: every photo watch of the chosen targets checks it right away, as if it had taken it (the Camera tab's path). Answers that take longer than about 25 s finish on the phone and show in the applet. The owner's portal pairing only; this is the portal's one write.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "portal_photo",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "data_base64",
+    "description": "The photo, JPEG (about 1.4 MB at most after base64; send about 1280 px)",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "camera",
+    "description": "Which camera took it: rear (default) or front",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "rear",
+     "front"
+    ]
+   },
+   {
+    "name": "targets",
+    "description": "Agent ids from GET /v1/portal/photo/targets; omitted or empty = all",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/portal/photo {\"camera\":\"rear\",\"data_base64\":\"/9j/...\"}",
+  "idempotent": false,
+  "path": "/v1/portal/photo",
+  "capability": "portal",
+  "returns": "camera, targets[{id, name, checks[{watch_id, label, kind: check|people|change, status: answered|people_checked|skipped|checking|error, summary (one line for the owner), answers?}]}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "data_base64": {
+     "description": "The photo, JPEG (about 1.4 MB at most after base64; send about 1280 px)",
+     "type": "string"
+    },
+    "camera": {
+     "description": "Which camera took it: rear (default) or front",
+     "type": "string",
+     "enum": [
+      "rear",
+      "front"
+     ]
+    },
+    "targets": {
+     "description": "Agent ids from GET /v1/portal/photo/targets; omitted or empty = all",
+     "type": "array",
+     "items": {"type": "object"}
+    }
+   },
+   "required": ["data_base64"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "not_found"
+  ],
+  "requires": null
+ }
+}

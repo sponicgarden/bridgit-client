@@ -1,0 +1,102 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_images_ocr",
+  "idempotency_required": false,
+  "documentation": "https://bridgit.cc/learn/operations/v2-images.ocr.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-images.ocr.json",
+  "required_arguments": [],
+  "http": {
+   "path": "/v2/call",
+   "headers": {"Authorization": "Bearer <your key>"},
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "description": "Give exactly one of file_id, gallery_id or image_base64",
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "image_base64": {
+      "description": "Image bytes, base64",
+      "type": "string",
+      "maxLength": 720000
+     },
+     "file_id": {
+      "description": "A file from file.put",
+      "type": "string"
+     },
+     "gallery_id": {
+      "description": "A gallery photo id",
+      "type": "string"
+     }
+    },
+    "required": []
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": ["tool"],
+    "properties": {
+     "arguments": {
+      "description": "Give exactly one of file_id, gallery_id or image_base64",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "image_base64": {
+        "description": "Image bytes, base64",
+        "type": "string",
+        "maxLength": 720000
+       },
+       "file_id": {
+        "description": "A file from file.put",
+        "type": "string"
+       },
+       "gallery_id": {
+        "description": "A gallery photo id",
+        "type": "string"
+       }
+      },
+      "required": []
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["images.ocr"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "description": "Give exactly one of file_id, gallery_id or image_base64",
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "image_base64": {
+     "description": "Image bytes, base64",
+     "type": "string",
+     "maxLength": 720000
+    },
+    "file_id": {
+     "description": "A file from file.put",
+     "type": "string"
+    },
+    "gallery_id": {
+     "description": "A gallery photo id",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_images_ocr"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "images.ocr"
+ }
+}

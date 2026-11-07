@@ -1,0 +1,50 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Observe an SSH host key without sending credentials; verify it independently before enrollment",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "ssh_probe",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "host",
+    "description": "Authorized DNS name, IPv4 or unbracketed IPv6; no URL",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "port",
+    "description": "1..65535; default 22",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/ssh/probe {\"host\":\"192.168.1.127\"}",
+  "idempotent": false,
+  "path": "/v1/ssh/probe",
+  "capability": "ssh",
+  "returns": "host,port,fingerprint (SHA256),algorithm,verified=false,authenticated=false",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "port": {
+     "description": "1..65535; default 22",
+     "type": "integer"
+    },
+    "host": {
+     "description": "Authorized DNS name, IPv4 or unbracketed IPv6; no URL",
+     "type": "string"
+    }
+   },
+   "required": ["host"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

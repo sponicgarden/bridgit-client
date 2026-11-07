@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Model tasks and explicit account overrides; defaults apply live to every instance of an applet",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "services_models_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/services/models",
+  "idempotent": false,
+  "path": "/v1/services/models",
+  "capability": "owner_features",
+  "returns": "tasks,overrides,inheritance[account_override,applet_default,shared_default],defaults_resolved_live",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

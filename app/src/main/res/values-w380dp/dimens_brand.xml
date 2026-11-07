@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Update branding shares one width, with a proportional wordmark height. -->
+    <dimen name="brand_tagline_width">173.6dp</dimen>
+    <dimen name="update_wordmark_height">54.597dp</dimen>
+</resources>

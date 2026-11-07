@@ -1,0 +1,39 @@
+{
+ "detail_url": "/v1/discover?id=v2.notifications.reply&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v2.notifications.reply.json",
+ "title": "Notification replies",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v2.notifications.reply.json",
+ "prerequisites": ["Check v2.notifications.reply supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [{
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_notification_reply",
+  "documentation": "https://bridgit.cc/learn/operations/v2-notification.reply.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-notification.reply.json",
+  "required_arguments": [
+   "idempotency_key",
+   "id",
+   "fingerprint",
+   "text"
+  ],
+  "tool": "notification.reply"
+ }],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Private build only; owner grants and session/transport requirements apply. See control guide.",
+ "examples_url": null,
+ "id": "v2.notifications.reply",
+ "state": {
+  "ready": null,
+  "blockers": ["check_v2_capabilities"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "interact",
+ "capability_ids": ["v2.notifications.reply"]
+}

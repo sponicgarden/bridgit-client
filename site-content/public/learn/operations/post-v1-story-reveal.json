@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Allow prepared narration and illustration to appear",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "story_reveal",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "presentation_token",
+   "description": "Current story token",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/story/reveal",
+  "idempotent": false,
+  "path": "/v1/story/reveal",
+  "capability": "judgment",
+  "returns": "revealed",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"presentation_token": {
+    "description": "Current story token",
+    "type": "string"
+   }},
+   "required": ["presentation_token"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

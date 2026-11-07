@@ -1,0 +1,114 @@
+{
+ "detail_url": "/v1/discover?id=v2.screen.control&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v2.screen.control.json",
+ "title": "Private app control",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v2.screen.control.json",
+ "prerequisites": ["Check v2.screen.control supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_screen_wait",
+   "documentation": "https://bridgit.cc/learn/operations/v2-screen.wait.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-screen.wait.json",
+   "required_arguments": [
+    "session_id",
+    "expect"
+   ],
+   "tool": "screen.wait"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_session_heartbeat",
+   "documentation": "https://bridgit.cc/learn/operations/v2-session.heartbeat.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-session.heartbeat.json",
+   "required_arguments": [
+    "idempotency_key",
+    "id"
+   ],
+   "tool": "session.heartbeat"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_session_list",
+   "documentation": "https://bridgit.cc/learn/operations/v2-session.list.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-session.list.json",
+   "required_arguments": [],
+   "tool": "session.list"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_session_request",
+   "documentation": "https://bridgit.cc/learn/operations/v2-session.request.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-session.request.json",
+   "required_arguments": [
+    "idempotency_key",
+    "apps",
+    "purpose"
+   ],
+   "tool": "session.request"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_session_stop",
+   "documentation": "https://bridgit.cc/learn/operations/v2-session.stop.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-session.stop.json",
+   "required_arguments": [
+    "idempotency_key",
+    "id"
+   ],
+   "tool": "session.stop"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_ui_action",
+   "documentation": "https://bridgit.cc/learn/operations/v2-ui.action.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-ui.action.json",
+   "required_arguments": [
+    "idempotency_key",
+    "session_id",
+    "fence",
+    "observation_id",
+    "type"
+   ],
+   "tool": "ui.action"
+  },
+  {
+   "path": "/v2/call",
+   "method": "POST",
+   "mcp_tool": "bridgit_ui_sequence",
+   "documentation": "https://bridgit.cc/learn/operations/v2-ui.sequence.json",
+   "operation_url": "https://bridgit.cc/learn/operations/v2-ui.sequence.json",
+   "required_arguments": [
+    "idempotency_key",
+    "session_id",
+    "fence",
+    "steps"
+   ],
+   "tool": "ui.sequence"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Private build only; owner grants and session/transport requirements apply. See control guide.",
+ "examples_url": null,
+ "id": "v2.screen.control",
+ "state": {
+  "ready": null,
+  "blockers": ["check_v2_capabilities"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "act",
+ "capability_ids": ["v2.screen.control"]
+}

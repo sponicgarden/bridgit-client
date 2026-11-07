@@ -1,0 +1,183 @@
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(120% 60% at 50% 0%,#164336 0%,#0f2e25 60%);background-color:#0f2e25;color:#eaf6f0;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 28px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5ee6a8;margin:0 0 4px}
+h1{font-size:22px;line-height:1.25;margin:0 0 4px;letter-spacing:-.01em}
+h1.done{color:#5ee6a8}
+.sub{color:#a9c7bb;font-size:15px;margin:0 0 18px}
+.chart{position:relative;width:212px;height:212px;margin:0 auto 20px}
+.chart svg{width:100%;height:100%;transform:rotate(-90deg)}
+.chart circle{transition:stroke-dasharray .2s,stroke-dashoffset .2s}
+.mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.mid b{font-size:32px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.mid span{font-size:14px;color:#a9c7bb;font-variant-numeric:tabular-nums}
+.mid em{font-style:normal;font-size:13px;font-weight:600;color:#5ee6a8;margin-top:4px;font-variant-numeric:tabular-nums}
+.list{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:4px 16px;margin-bottom:18px}
+.row{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.row:last-child{border-bottom:0}
+.rh{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.nm{flex:1;font-weight:600;font-size:15px}
+.amt{font-size:14px;color:#a9c7bb;font-variant-numeric:tabular-nums}
+.amt b{color:#eaf6f0;font-weight:600}
+.amt i{font-style:normal;font-weight:700;color:#5ee6a8;margin-left:6px}
+.amt i:empty{display:none}
+.over .amt b,.flag{color:#ff7a6b}
+.flag{display:block;font-size:13px;font-weight:600;margin-top:6px}
+.flag:empty{display:none}
+.meter{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.fill{height:100%;border-radius:3px;transition:width .2s,background-color .2s}
+.ask{background:rgba(94,230,168,.08);border:1px solid rgba(94,230,168,.22);border-radius:16px;padding:14px 16px;margin-bottom:12px;font-size:15px;color:#cfe8dd}
+.ask b{color:#eaf6f0}
+.chips{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.chip{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;font:inherit;font-size:15px;text-align:left;color:#eaf6f0;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 14px;cursor:pointer;transition:background-color .18s,border-color .18s,transform .15s}
+.chip:active,.main:active{transform:scale(.98)}
+.chip .r{width:20px;height:20px;border-radius:50%;border:2px solid #6f9586;flex:none;transition:border .18s}
+.chip .t{flex:1}
+.chip small{font-size:12px;font-weight:700;color:#0f2e25;background:#5ee6a8;border-radius:20px;padding:2px 8px}
+.chip.on{border-color:#5ee6a8;background:rgba(94,230,168,.12)}
+.chip.on .r{border:6px solid #5ee6a8}
+.main{width:100%;min-height:54px;font:inherit;font-weight:700;font-size:16px;border:0;border-radius:16px;background:#5ee6a8;color:#0b2a20;cursor:pointer;box-shadow:0 8px 24px rgba(94,230,168,.22);transition:transform .15s,opacity .2s}
+.main:disabled,.chip:disabled{opacity:.55;cursor:default}
+.status{text-align:center;font-size:14px;color:#a9c7bb;min-height:20px;margin:10px 0 0}
+</style>
+<div class="wrap">
+  <p class="eyebrow" id="eyebrow"></p>
+  <h1 id="title"></h1>
+  <p class="sub" id="sub"></p>
+  <div class="chart"><svg viewBox="0 0 120 120" id="donut"><circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="12"/></svg>
+    <div class="mid"><b id="spent"></b><span id="of"></span><em id="left"></em></div></div>
+  <div class="list" id="list"></div>
+  <div class="ask" id="ask"></div>
+  <div class="chips" id="chips"></div>
+  <button class="main" id="go"></button>
+  <p class="status" id="status" role="status"></p>
+</div>
+<script>
+// The card's content. Change only this object.
+// answer.data: {"action":"move"|"raise"|"leave","from":"eating_out","to":"groceries","amount_eur":50}
+var CARD = {
+  eyebrow: 'October budget',
+  title: 'October spending: €2,184 of €2,400',
+  sub: 'Six days left. Groceries went over; everything else is on track.',
+  currency: '€',
+  categories: [
+    {id: 'home', name: 'Home & bills', spent: 1120, budget: 1150, color: '#7fb7d9'},
+    {id: 'groceries', name: 'Groceries', spent: 466, budget: 420, color: '#e8c468'},
+    {id: 'eating_out', name: 'Eating out', spent: 148, budget: 240, color: '#c49cf0'},
+    {id: 'transport', name: 'Transport', spent: 162, budget: 200, color: '#6fd3c7'},
+    {id: 'fun', name: 'Fun & hobbies', spent: 178, budget: 230, color: '#f2a6c0'},
+    {id: 'health', name: 'Health', spent: 110, budget: 160, color: '#a7cf8c'}
+  ],
+  over_label: 'over budget so far',
+  of_label: 'of',
+  left_label: 'left',
+  suggestion: 'Groceries is €46 over. Eating out still has €92 spare, so I suggest moving €50 across.',
+  from: 'eating_out', to: 'groceries', amount: 50, raise_to: 470,
+  choices: [
+    {action: 'move', label: 'Move €50 from Eating out', badge: 'My pick', button: 'Apply · move €50'},
+    {action: 'raise', label: 'Raise Groceries budget to €470', button: 'Apply · raise to €470'},
+    {action: 'leave', label: 'Leave it as it is', button: 'Leave budgets as they are'}
+  ],
+  sending: 'Sending…',
+  preview: 'Preview only: open this card in Bridgit to answer.',
+  done: 'Budget updated for October'
+};
+
+var choice = CARD.choices[0], sent = false, C = 2 * Math.PI * 50;
+function $(id) { return document.getElementById(id); }
+function eur(v) { return CARD.currency + v.toLocaleString('en-GB'); }
+$('eyebrow').textContent = CARD.eyebrow;
+$('title').textContent = CARD.title;
+$('sub').textContent = CARD.sub;
+$('ask').textContent = CARD.suggestion;
+
+// Donut
+var svg = $('donut'), NS = 'http://www.w3.org/2000/svg';
+var total = CARD.categories.reduce(function (a, c) { return a + c.spent; }, 0), off = 0, gap = 2.2;
+CARD.categories.forEach(function (c) {
+  var len = C * c.spent / total, el = document.createElementNS(NS, 'circle');
+  el.setAttribute('cx', 60); el.setAttribute('cy', 60); el.setAttribute('r', 50);
+  el.setAttribute('fill', 'none'); el.setAttribute('stroke', c.color); el.setAttribute('stroke-width', 12);
+  el.setAttribute('stroke-dasharray', Math.max(len - gap, 0.5) + ' ' + C);
+  el.setAttribute('stroke-dashoffset', -off);
+  svg.appendChild(el); off += len;
+});
+
+// Rows
+var rows = {};
+CARD.categories.forEach(function (c) {
+  var r = document.createElement('div'); r.className = 'row';
+  var h = document.createElement('div'); h.className = 'rh';
+  var d = document.createElement('span'); d.className = 'dot'; d.style.background = c.color;
+  var n = document.createElement('span'); n.className = 'nm'; n.textContent = c.name;
+  var f = document.createElement('span'); f.className = 'flag';
+  var a = document.createElement('span'); a.className = 'amt';
+  var b = document.createElement('b'); var s = document.createElement('span'); var t = document.createElement('i');
+  a.appendChild(b); a.appendChild(s); a.appendChild(t); h.appendChild(d); h.appendChild(n); h.appendChild(a);
+  var m = document.createElement('div'); m.className = 'meter';
+  var fl = document.createElement('div'); fl.className = 'fill'; m.appendChild(fl);
+  r.appendChild(h); r.appendChild(m); r.appendChild(f); $('list').appendChild(r);
+  rows[c.id] = {row: r, b: b, s: s, t: t, f: f, fill: fl, c: c};
+});
+
+function budgetOf(c) {
+  if (choice.action === 'move' && c.id === CARD.from) return c.budget - CARD.amount;
+  if (choice.action === 'move' && c.id === CARD.to) return c.budget + CARD.amount;
+  if (choice.action === 'raise' && c.id === CARD.to) return CARD.raise_to;
+  return c.budget;
+}
+function render() {
+  var budget = 0;
+  CARD.categories.forEach(function (c) {
+    var R = rows[c.id], bud = budgetOf(c), over = c.spent > c.budget;
+    budget += bud;
+    R.b.textContent = eur(c.spent); R.s.textContent = ' / ' + eur(c.budget);
+    R.t.textContent = bud !== c.budget ? '→ ' + eur(bud) : '';
+    R.f.textContent = over ? eur(c.spent - c.budget) + ' ' + CARD.over_label : '';
+    R.row.classList.toggle('over', over);
+    R.fill.style.width = Math.min(100, c.spent / c.budget * 100) + '%';
+    R.fill.style.backgroundColor = over ? '#ff7a6b' : c.color;
+  });
+  $('spent').textContent = eur(total);
+  $('of').textContent = CARD.of_label + ' ' + eur(budget);
+  $('left').textContent = eur(budget - total) + ' ' + CARD.left_label;
+  $('go').textContent = choice.button;
+}
+
+// Choices
+CARD.choices.forEach(function (ch, i) {
+  var b = document.createElement('button'); b.className = 'chip' + (i === 0 ? ' on' : '');
+  var r = document.createElement('span'); r.className = 'r';
+  var t = document.createElement('span'); t.className = 't'; t.textContent = ch.label;
+  b.appendChild(r); b.appendChild(t);
+  if (ch.badge) { var s = document.createElement('small'); s.textContent = ch.badge; b.appendChild(s); }
+  b.onclick = function () {
+    if (sent) return; choice = ch;
+    document.querySelectorAll('.chip').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on'); render();
+  };
+  $('chips').appendChild(b);
+});
+
+$('go').onclick = function () {
+  if (sent) return;
+  var B = window.Bridgit || window.Bridget;
+  if (!B) { $('status').textContent = CARD.preview; return; }
+  var data = {action: choice.action};
+  if (choice.action === 'move') { data.from = CARD.from; data.to = CARD.to; data.amount_eur = CARD.amount; }
+  if (choice.action === 'raise') { data.category = CARD.to; data.new_budget_eur = CARD.raise_to; }
+  sent = true;
+  document.querySelectorAll('button').forEach(function (x) { x.disabled = true; });
+  $('status').textContent = CARD.sending;
+  B.respond(JSON.stringify(data));
+};
+document.addEventListener('bridgit:answered', function (e) {
+  e.preventDefault();
+  $('title').textContent = '✓ ' + CARD.done; $('title').classList.add('done');
+  $('status').textContent = '';
+  setTimeout(function () { $('title').scrollIntoView({block: 'center', behavior: 'smooth'}); }, 400);
+});
+render();
+</script>

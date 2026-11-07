@@ -1,0 +1,49 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Save the current physical position of the reviewed camera",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_cameras_applet_views_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [{
+   "name": "revision",
+   "description": "Current revision when replacing",
+   "type": "string",
+   "required": false
+  }],
+  "example": "POST /v1/lan-cameras/applet-views/{instance}/{view} {}",
+  "idempotent": false,
+  "path": "/v1/lan-cameras/applet-views/{instance}/{view}",
+  "capability": "lan_camera",
+  "returns": "Saved view and new revision",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "view": {
+     "description": "The view in /v1/lan-cameras/applet-views/{instance}/{view}",
+     "type": "string"
+    },
+    "instance": {
+     "description": "The instance in /v1/lan-cameras/applet-views/{instance}/{view}",
+     "type": "string"
+    },
+    "revision": {
+     "description": "Current revision when replacing",
+     "type": "string"
+    }
+   },
+   "required": [
+    "instance",
+    "view"
+   ]
+  },
+  "errors": [],
+  "requires": "fixer_mode"
+ }
+}

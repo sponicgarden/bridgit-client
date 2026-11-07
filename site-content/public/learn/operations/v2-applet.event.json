@@ -1,0 +1,127 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_applet_event",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-applet.event.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-applet.event.json",
+  "required_arguments": [
+   "idempotency_key",
+   "workflow_id",
+   "event_id",
+   "payload"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "workflow_id": {
+      "description": "The id returned when it was created",
+      "type": "string"
+     },
+     "event_id": {
+      "description": "Stable source event id; retries must preserve it",
+      "type": "string",
+      "maxLength": 128
+     },
+     "payload": {
+      "description": "Source JSON, at most 16 KiB; normalized by the owner-approved applet trigger",
+      "type": "object"
+     }
+    },
+    "required": [
+     "workflow_id",
+     "event_id",
+     "payload"
+    ]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "workflow_id": {
+        "description": "The id returned when it was created",
+        "type": "string"
+       },
+       "event_id": {
+        "description": "Stable source event id; retries must preserve it",
+        "type": "string",
+        "maxLength": 128
+       },
+       "payload": {
+        "description": "Source JSON, at most 16 KiB; normalized by the owner-approved applet trigger",
+        "type": "object"
+       }
+      },
+      "required": [
+       "workflow_id",
+       "event_id",
+       "payload"
+      ]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["applet.event"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "workflow_id": {
+     "description": "The id returned when it was created",
+     "type": "string"
+    },
+    "event_id": {
+     "description": "Stable source event id; retries must preserve it",
+     "type": "string",
+     "maxLength": 128
+    },
+    "payload": {
+     "description": "Source JSON, at most 16 KiB; normalized by the owner-approved applet trigger",
+     "type": "object"
+    },
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    }
+   },
+   "required": [
+    "idempotency_key",
+    "workflow_id",
+    "event_id",
+    "payload"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_applet_event"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "applet.event"
+ }
+}

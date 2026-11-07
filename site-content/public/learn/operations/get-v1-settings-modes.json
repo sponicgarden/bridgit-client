@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read built-in and custom mode definitions and the current mode",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "settings_modes_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/settings/modes",
+  "idempotent": false,
+  "path": "/v1/settings/modes",
+  "capability": "settings",
+  "returns": "modes, custom, mode, since, set_by, log",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

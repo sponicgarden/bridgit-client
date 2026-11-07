@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Phone to phone: the hub's control agents, so a satellite switched to its hub can see and pause them (only for a satellite's return key, while the hub hasn't paused that satellite). Not for agents.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "satellite_hub_agents",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/satellite/hub/agents",
+  "idempotent": false,
+  "path": "/v1/satellite/hub/agents",
+  "capability": "status",
+  "returns": "agents[{id, name, model, paused, last_used_at (ms, 0 = never)}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

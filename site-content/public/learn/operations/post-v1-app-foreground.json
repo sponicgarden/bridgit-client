@@ -1,0 +1,57 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Bring Bridgit itself forward using the owner-granted app.foreground scope",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "app_foreground",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "reason",
+    "description": "Required 1-256 character audit reason; 1-second minimum interval, maximum 12 switches/minute",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "target",
+    "description": "Optional {type:screen|card|applet|portal,id:<discovered id>} from GET /v1/app/foreground/targets",
+    "type": "object",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/app/foreground {\"reason\":\"Restart screenshot service for the morning review\"}",
+  "idempotent": true,
+  "path": "/v1/app/foreground",
+  "capability": "owner_features",
+  "returns": "durable v2 operation; result.foreground is observed requested target visibility, notification_posted is a fallback requiring an owner tap; error=foreground_user_action_required|foreground_not_confirmed|device_locked when not visible; platform=android; never unlocks or grants Android consent",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "reason": {
+     "description": "Required 1-256 character audit reason; 1-second minimum interval, maximum 12 switches/minute",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "target": {
+     "description": "Optional {type:screen|card|applet|portal,id:<discovered id>} from GET /v1/app/foreground/targets",
+     "type": "object"
+    }
+   },
+   "required": [
+    "reason",
+    "idempotency_key"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

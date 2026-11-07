@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Stop a body tracking session early and free the camera; its frames stay readable for 15 minutes",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "camera_pose_stop",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/camera/pose/pose_abc/stop",
+  "idempotent": false,
+  "path": "/v1/camera/pose/{id}/stop",
+  "capability": "camera",
+  "returns": "The session as GET /v1/camera/pose/{id} shows it (no frames)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"id": {
+    "description": "The id in /v1/camera/pose/{id}/stop",
+    "type": "string"
+   }},
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

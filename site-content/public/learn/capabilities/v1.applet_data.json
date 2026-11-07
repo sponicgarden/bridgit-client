@@ -1,0 +1,127 @@
+{
+ "detail_url": "/v1/discover?id=v1.applet_data&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.applet_data.json",
+ "title": "applet data",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.applet_data.json",
+ "prerequisites": ["Check v1.applet_data supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Your own records on the phone, in key order with their values, about 48 KB a page (pass next as after for the next page)",
+   "path": "/v1/applet/records",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applet-records.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applet-records.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_records_list"
+  },
+  {
+   "summary": "One of your records",
+   "path": "/v1/applet/records/{key}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applet-records-key.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applet-records-key.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_records_get"
+  },
+  {
+   "summary": "Save a control agent record (replaces it). Applet execution principals must use declared processing.tables, including described json columns; this legacy store refuses applet writes",
+   "path": "/v1/applet/records/{key}",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applet-records-key.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applet-records-key.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_records_save"
+  },
+  {
+   "summary": "Delete one of your records (no error if it's already gone)",
+   "path": "/v1/applet/records/{key}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-applet-records-key.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-applet-records-key.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_records_delete"
+  },
+  {
+   "summary": "From an installed applet's card: send one result to the applet's private web portal (the kind its package declares in ui.portal.records, e.g. a workout). Words and numbers only, never free text or pictures; it goes only while the owner has the applet's web portal on",
+   "path": "/v1/applet/portal/record",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applet-portal-record.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applet-portal-record.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_portal_record"
+  },
+  {
+   "summary": "From an installed applet's own card: discover only its declared tables, typed columns and descriptions. Control agents inspect applets with /applets/installed/{id}/data",
+   "path": "/v1/applet/tables",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applet-tables.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applet-tables.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_tables"
+  },
+  {
+   "summary": "Read this applet principal's own declared table, oldest first. No instance id or installer sharing needed; other applets are inaccessible",
+   "path": "/v1/applet/tables/{table}/rows",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applet-tables-table-rows.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applet-tables-table-rows.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_tables_rows_get"
+  },
+  {
+   "summary": "Save a row in this applet principal's own declared table. Use typed columns or a json column with a description; no undeclared keys or blobs",
+   "path": "/v1/applet/tables/{table}/rows",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applet-tables-table-rows.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applet-tables-table-rows.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_tables_rows_post"
+  },
+  {
+   "summary": "Update declared columns of this applet principal's own row; preserves its id and other columns",
+   "path": "/v1/applet/tables/{table}/rows/{row}",
+   "method": "PATCH",
+   "documentation": "https://bridgit.cc/learn/operations/patch-v1-applet-tables-table-rows-row.json",
+   "operation_url": "https://bridgit.cc/learn/operations/patch-v1-applet-tables-table-rows-row.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_tables_rows_patch"
+  },
+  {
+   "summary": "Delete one row in this applet principal's own declared table using the same table-store cleanup as the owner UI",
+   "path": "/v1/applet/tables/{table}/rows/{row}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-applet-tables-table-rows-row.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-applet-tables-table-rows-row.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applet_tables_rows_delete"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.applet_data",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "run",
+ "capability_ids": ["v1.applet_data"]
+}

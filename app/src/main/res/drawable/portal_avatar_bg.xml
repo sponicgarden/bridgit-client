@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The portal account button: the same lilac-to-amber circle as the bridgit.cc profile chip. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <gradient android:angle="315" android:startColor="#BB8CF0" android:endColor="#FFBB70" />
+</shape>

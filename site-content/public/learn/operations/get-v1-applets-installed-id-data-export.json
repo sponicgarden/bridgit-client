@@ -1,0 +1,46 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Export all accessible saved rows, schemas, status and photo references as JSON, or ZIP with manifest.json and original JPEGs. Read-only; no model calls, captures or Android share sheet. Same control-key authorization as data",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "applets_data_export",
+  "query": [{
+   "name": "format",
+   "description": "json (default) or zip; at most 20 MB; larger datasets use paginated rows and individual photos",
+   "type": "string",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/applets/installed/ai0123456789abcd/data/export?format=zip",
+  "idempotent": false,
+  "path": "/v1/applets/installed/{id}/data/export",
+  "capability": "applet_install",
+  "returns": "JSON bridgit-applet-data/2 with tables[].rows, or application/zip containing manifest.json and photos/*.jpg; missing photos are explicitly marked, not recaptured; live read, not an atomic snapshot",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "format": {
+     "description": "json (default) or zip; at most 20 MB; larger datasets use paginated rows and individual photos",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/applets/installed/{id}/data/export",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter",
+   "export_too_large"
+  ],
+  "requires": null
+ }
+}

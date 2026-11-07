@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared list divider (design pass, 4 Nov 2026): 1dp colorOutlineVariant, inset 16dp from the start. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android" android:insetLeft="16dp">
+    <shape android:shape="rectangle">
+        <size android:height="1dp" />
+        <solid android:color="?attr/colorOutlineVariant" />
+    </shape>
+</inset>

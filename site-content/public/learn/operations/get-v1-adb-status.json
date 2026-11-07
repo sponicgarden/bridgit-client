@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "ADB setup progress: developer options, wireless debugging, paired, grants",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "adb_status",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/adb/status",
+  "idempotent": false,
+  "path": "/v1/adb/status",
+  "capability": "adb",
+  "returns": "developer_options, usb_debugging, wireless_debugging, paired, connected, shell_switch, ready, blocked_reason, grants[key, title, granted]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

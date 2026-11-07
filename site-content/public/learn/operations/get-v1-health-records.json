@@ -1,0 +1,60 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read-only steps, sleep or heart-rate source records (maximum 100)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "health_records",
+  "query": [
+   {
+    "name": "type",
+    "description": "steps, sleep, heart_rate",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "since",
+    "description": "ISO-8601 UTC",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "until",
+    "description": "ISO-8601 UTC",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/health/records",
+  "idempotent": false,
+  "path": "/v1/health/records",
+  "capability": "health_connect",
+  "returns": "Read-only steps, sleep or heart-rate source records (maximum 100)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "until": {
+     "description": "ISO-8601 UTC",
+     "type": "string"
+    },
+    "type": {
+     "description": "steps, sleep, heart_rate",
+     "type": "string"
+    },
+    "since": {
+     "description": "ISO-8601 UTC",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,547 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_device_action",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-device.action.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-device.action.json",
+  "required_arguments": [
+   "idempotency_key",
+   "type"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "description": "Besides type: open_link needs url; open_app needs package; speak and clipboard need text; message_draft and email_draft need recipient and text; dial needs number; calendar_draft needs title; open_file needs file_id; media needs command",
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "subject": {
+      "description": "For email_draft",
+      "type": "string",
+      "maxLength": 256
+     },
+     "language": {
+      "description": "BCP 47 tag for speak",
+      "type": "string",
+      "maxLength": 32
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "open_link",
+       "open_app",
+       "calendar_draft",
+       "message_draft",
+       "email_draft",
+       "dial",
+       "alarm",
+       "timer",
+       "contact_picker",
+       "open_file",
+       "clipboard",
+       "speak",
+       "camera.snapshot",
+       "microphone.clip",
+       "flashlight",
+       "volume",
+       "dnd",
+       "brightness",
+       "ring",
+       "media",
+       "battery_saver",
+       "screen_timeout"
+      ]
+     },
+     "title": {
+      "description": "Required for calendar_draft",
+      "type": "string",
+      "maxLength": 256
+     },
+     "percent": {
+      "description": "For volume and brightness",
+      "maximum": 100,
+      "type": "integer",
+      "minimum": 0
+     },
+     "mode": {
+      "description": "For dnd (default priority)",
+      "type": "string",
+      "enum": [
+       "priority",
+       "all"
+      ]
+     },
+     "number": {
+      "description": "Required for dial",
+      "type": "string",
+      "maxLength": 64
+     },
+     "seconds": {
+      "description": "For timer or screen_timeout",
+      "type": "integer",
+      "minimum": 1
+     },
+     "hour": {
+      "description": "For alarm",
+      "maximum": 23,
+      "type": "integer",
+      "minimum": 0
+     },
+     "stream": {
+      "description": "For volume (default media)",
+      "type": "string",
+      "enum": [
+       "media",
+       "alarm"
+      ]
+     },
+     "text": {
+      "description": "Required for speak, clipboard, message_draft and email_draft",
+      "type": "string",
+      "maxLength": 4096
+     },
+     "end_ms": {
+      "description": "For calendar_draft",
+      "type": "integer"
+     },
+     "camera": {
+      "description": "Which camera (default rear)",
+      "type": "string",
+      "enum": [
+       "rear",
+       "front"
+      ]
+     },
+     "on": {
+      "description": "For flashlight and battery_saver (default true)",
+      "type": "boolean"
+     },
+     "duration_seconds": {
+      "description": "For microphone.clip (1-120), flashlight, dnd and ring",
+      "maximum": 3600,
+      "type": "integer",
+      "minimum": 1
+     },
+     "package": {
+      "description": "Required for open_app",
+      "type": "string",
+      "maxLength": 256
+     },
+     "label": {
+      "description": "For alarm and timer",
+      "type": "string",
+      "maxLength": 120
+     },
+     "url": {
+      "description": "Required for open_link: https, geo, tel or mailto",
+      "type": "string",
+      "maxLength": 2048
+     },
+     "command": {
+      "description": "Required for media",
+      "type": "string",
+      "enum": [
+       "play_pause",
+       "next",
+       "previous"
+      ]
+     },
+     "minute": {
+      "description": "For alarm",
+      "maximum": 59,
+      "type": "integer",
+      "minimum": 0
+     },
+     "max_width_px": {
+      "description": "For camera.snapshot",
+      "maximum": 4096,
+      "type": "integer",
+      "minimum": 256
+     },
+     "file_id": {
+      "description": "Required for open_file",
+      "type": "string"
+     },
+     "recipient": {
+      "description": "Required for message_draft and email_draft",
+      "type": "string",
+      "maxLength": 256
+     },
+     "begin_ms": {
+      "description": "For calendar_draft",
+      "type": "integer"
+     }
+    },
+    "required": ["type"]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "description": "Besides type: open_link needs url; open_app needs package; speak and clipboard need text; message_draft and email_draft need recipient and text; dial needs number; calendar_draft needs title; open_file needs file_id; media needs command",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "subject": {
+        "description": "For email_draft",
+        "type": "string",
+        "maxLength": 256
+       },
+       "language": {
+        "description": "BCP 47 tag for speak",
+        "type": "string",
+        "maxLength": 32
+       },
+       "type": {
+        "type": "string",
+        "enum": [
+         "open_link",
+         "open_app",
+         "calendar_draft",
+         "message_draft",
+         "email_draft",
+         "dial",
+         "alarm",
+         "timer",
+         "contact_picker",
+         "open_file",
+         "clipboard",
+         "speak",
+         "camera.snapshot",
+         "microphone.clip",
+         "flashlight",
+         "volume",
+         "dnd",
+         "brightness",
+         "ring",
+         "media",
+         "battery_saver",
+         "screen_timeout"
+        ]
+       },
+       "title": {
+        "description": "Required for calendar_draft",
+        "type": "string",
+        "maxLength": 256
+       },
+       "percent": {
+        "description": "For volume and brightness",
+        "maximum": 100,
+        "type": "integer",
+        "minimum": 0
+       },
+       "mode": {
+        "description": "For dnd (default priority)",
+        "type": "string",
+        "enum": [
+         "priority",
+         "all"
+        ]
+       },
+       "number": {
+        "description": "Required for dial",
+        "type": "string",
+        "maxLength": 64
+       },
+       "seconds": {
+        "description": "For timer or screen_timeout",
+        "type": "integer",
+        "minimum": 1
+       },
+       "hour": {
+        "description": "For alarm",
+        "maximum": 23,
+        "type": "integer",
+        "minimum": 0
+       },
+       "stream": {
+        "description": "For volume (default media)",
+        "type": "string",
+        "enum": [
+         "media",
+         "alarm"
+        ]
+       },
+       "text": {
+        "description": "Required for speak, clipboard, message_draft and email_draft",
+        "type": "string",
+        "maxLength": 4096
+       },
+       "end_ms": {
+        "description": "For calendar_draft",
+        "type": "integer"
+       },
+       "camera": {
+        "description": "Which camera (default rear)",
+        "type": "string",
+        "enum": [
+         "rear",
+         "front"
+        ]
+       },
+       "on": {
+        "description": "For flashlight and battery_saver (default true)",
+        "type": "boolean"
+       },
+       "duration_seconds": {
+        "description": "For microphone.clip (1-120), flashlight, dnd and ring",
+        "maximum": 3600,
+        "type": "integer",
+        "minimum": 1
+       },
+       "package": {
+        "description": "Required for open_app",
+        "type": "string",
+        "maxLength": 256
+       },
+       "label": {
+        "description": "For alarm and timer",
+        "type": "string",
+        "maxLength": 120
+       },
+       "url": {
+        "description": "Required for open_link: https, geo, tel or mailto",
+        "type": "string",
+        "maxLength": 2048
+       },
+       "command": {
+        "description": "Required for media",
+        "type": "string",
+        "enum": [
+         "play_pause",
+         "next",
+         "previous"
+        ]
+       },
+       "minute": {
+        "description": "For alarm",
+        "maximum": 59,
+        "type": "integer",
+        "minimum": 0
+       },
+       "max_width_px": {
+        "description": "For camera.snapshot",
+        "maximum": 4096,
+        "type": "integer",
+        "minimum": 256
+       },
+       "file_id": {
+        "description": "Required for open_file",
+        "type": "string"
+       },
+       "recipient": {
+        "description": "Required for message_draft and email_draft",
+        "type": "string",
+        "maxLength": 256
+       },
+       "begin_ms": {
+        "description": "For calendar_draft",
+        "type": "integer"
+       }
+      },
+      "required": ["type"]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["device.action"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "description": "Besides type: open_link needs url; open_app needs package; speak and clipboard need text; message_draft and email_draft need recipient and text; dial needs number; calendar_draft needs title; open_file needs file_id; media needs command",
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "subject": {
+     "description": "For email_draft",
+     "type": "string",
+     "maxLength": 256
+    },
+    "language": {
+     "description": "BCP 47 tag for speak",
+     "type": "string",
+     "maxLength": 32
+    },
+    "type": {
+     "type": "string",
+     "enum": [
+      "open_link",
+      "open_app",
+      "calendar_draft",
+      "message_draft",
+      "email_draft",
+      "dial",
+      "alarm",
+      "timer",
+      "contact_picker",
+      "open_file",
+      "clipboard",
+      "speak",
+      "camera.snapshot",
+      "microphone.clip",
+      "flashlight",
+      "volume",
+      "dnd",
+      "brightness",
+      "ring",
+      "media",
+      "battery_saver",
+      "screen_timeout"
+     ]
+    },
+    "title": {
+     "description": "Required for calendar_draft",
+     "type": "string",
+     "maxLength": 256
+    },
+    "percent": {
+     "description": "For volume and brightness",
+     "maximum": 100,
+     "type": "integer",
+     "minimum": 0
+    },
+    "mode": {
+     "description": "For dnd (default priority)",
+     "type": "string",
+     "enum": [
+      "priority",
+      "all"
+     ]
+    },
+    "number": {
+     "description": "Required for dial",
+     "type": "string",
+     "maxLength": 64
+    },
+    "seconds": {
+     "description": "For timer or screen_timeout",
+     "type": "integer",
+     "minimum": 1
+    },
+    "hour": {
+     "description": "For alarm",
+     "maximum": 23,
+     "type": "integer",
+     "minimum": 0
+    },
+    "stream": {
+     "description": "For volume (default media)",
+     "type": "string",
+     "enum": [
+      "media",
+      "alarm"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    },
+    "text": {
+     "description": "Required for speak, clipboard, message_draft and email_draft",
+     "type": "string",
+     "maxLength": 4096
+    },
+    "end_ms": {
+     "description": "For calendar_draft",
+     "type": "integer"
+    },
+    "camera": {
+     "description": "Which camera (default rear)",
+     "type": "string",
+     "enum": [
+      "rear",
+      "front"
+     ]
+    },
+    "on": {
+     "description": "For flashlight and battery_saver (default true)",
+     "type": "boolean"
+    },
+    "duration_seconds": {
+     "description": "For microphone.clip (1-120), flashlight, dnd and ring",
+     "maximum": 3600,
+     "type": "integer",
+     "minimum": 1
+    },
+    "package": {
+     "description": "Required for open_app",
+     "type": "string",
+     "maxLength": 256
+    },
+    "label": {
+     "description": "For alarm and timer",
+     "type": "string",
+     "maxLength": 120
+    },
+    "url": {
+     "description": "Required for open_link: https, geo, tel or mailto",
+     "type": "string",
+     "maxLength": 2048
+    },
+    "command": {
+     "description": "Required for media",
+     "type": "string",
+     "enum": [
+      "play_pause",
+      "next",
+      "previous"
+     ]
+    },
+    "minute": {
+     "description": "For alarm",
+     "maximum": 59,
+     "type": "integer",
+     "minimum": 0
+    },
+    "max_width_px": {
+     "description": "For camera.snapshot",
+     "maximum": 4096,
+     "type": "integer",
+     "minimum": 256
+    },
+    "file_id": {
+     "description": "Required for open_file",
+     "type": "string"
+    },
+    "recipient": {
+     "description": "Required for message_draft and email_draft",
+     "type": "string",
+     "maxLength": 256
+    },
+    "begin_ms": {
+     "description": "For calendar_draft",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "idempotency_key",
+    "type"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_device_action"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "device.action"
+ }
+}

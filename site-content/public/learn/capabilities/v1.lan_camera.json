@@ -1,0 +1,177 @@
+{
+ "detail_url": "/v1/discover?id=v1.lan_camera&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.lan_camera.json",
+ "title": "lan camera",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.lan_camera.json",
+ "prerequisites": ["Check v1.lan_camera supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Owner-configured local cameras (no credentials)",
+   "path": "/v1/lan-cameras",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-cameras.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-cameras.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras"
+  },
+  {
+   "summary": "Decode a fresh frame directly from a local camera",
+   "path": "/v1/lan-cameras/snapshot",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-snapshot.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-snapshot.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_snapshot"
+  },
+  {
+   "summary": "Small relative pan / tilt, only if advertised by the camera",
+   "path": "/v1/lan-cameras/move",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-move.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-move.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_move"
+  },
+  {
+   "summary": "Refresh enrolled camera capabilities without recording audio, playing a sound or moving motors",
+   "path": "/v1/lan-cameras/probe",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-probe.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-probe.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_probe"
+  },
+  {
+   "summary": "Reference framing defaults, hard limits and retention",
+   "path": "/v1/lan-cameras/framing/config",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-framing-config.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-framing-config.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_framing_config_get"
+  },
+  {
+   "summary": "Set bounded reference-framing defaults (Fixer Mode)",
+   "path": "/v1/lan-cameras/framing/config",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-framing-config.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-framing-config.json",
+   "control_scope": null,
+   "requires_power": "FIXER",
+   "tool": "lan_cameras_framing_config_post"
+  },
+  {
+   "summary": "Find a reference-like target, center with bounded PTZ and hold aim; sends images to Jev",
+   "path": "/v1/lan-cameras/framing",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-framing.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-framing.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_framing_post"
+  },
+  {
+   "summary": "Your retained reference-framing operations",
+   "path": "/v1/lan-cameras/framing",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-framing.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-framing.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_framing_get"
+  },
+  {
+   "summary": "Your operation's camera, confidence, progress, stop result and framing limits",
+   "path": "/v1/lan-cameras/framing/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-framing-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-framing-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_framing_status"
+  },
+  {
+   "summary": "Cancel your framing operation and request camera Stop",
+   "path": "/v1/lan-cameras/framing/{id}/cancel",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-framing-id-cancel.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-framing-id-cancel.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_framing_cancel"
+  },
+  {
+   "summary": "Latest uncropped frame of your operation, subject to current camera/app access",
+   "path": "/v1/lan-cameras/framing/{id}/photo",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-framing-id-photo.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-framing-id-photo.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_framing_photo"
+  },
+  {
+   "summary": "Probe controls for this camera's active ONVIF video profile",
+   "path": "/v1/lan-cameras/{id}/controls",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-id-controls.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-id-controls.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_controls"
+  },
+  {
+   "summary": "Inspect an installed applet's selected camera view",
+   "path": "/v1/lan-cameras/applet-views/{instance}/{view}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-applet-views-instance-view.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-cameras-applet-views-instance-view.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_cameras_applet_views_get"
+  },
+  {
+   "summary": "Save the current physical position of the reviewed camera",
+   "path": "/v1/lan-cameras/applet-views/{instance}/{view}",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-applet-views-instance-view.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-cameras-applet-views-instance-view.json",
+   "control_scope": null,
+   "requires_power": "FIXER",
+   "tool": "lan_cameras_applet_views_post"
+  },
+  {
+   "summary": "Forget the saved position",
+   "path": "/v1/lan-cameras/applet-views/{instance}/{view}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-lan-cameras-applet-views-instance-view.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-lan-cameras-applet-views-instance-view.json",
+   "control_scope": null,
+   "requires_power": "FIXER",
+   "tool": "lan_cameras_applet_views_delete"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.lan_camera",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "sense",
+ "capability_ids": ["v1.lan_camera"]
+}

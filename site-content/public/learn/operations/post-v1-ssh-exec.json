@@ -1,0 +1,148 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Run a remote command with this connection's exec permission; can be scheduled",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "ssh_exec",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": true,
+  "body": [
+   {
+    "name": "connection",
+    "description": "This agent's saved SSH connection id",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "command",
+    "description": "Remote shell command, 1..32768 characters; no automatic sudo",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "timeout_seconds",
+    "description": "Total connect + operation deadline, 1..120 seconds; default 30. Disconnect does not guarantee remote termination.",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "stdin",
+    "description": "UTF-8 standard input, up to 512 KiB; EOF follows",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "cwd",
+    "description": "Optional working directory; requires POSIX remote shell; safely quoted",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "env",
+    "description": "Up to 64 SSH environment requests. Remote server AcceptEnv policy controls acceptance.",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "pty",
+    "description": "Request a pseudo-terminal; default false. May merge stderr and alter output. Not an interactive session.",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "terminal",
+    "description": "PTY type; default xterm",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "columns",
+    "description": "PTY columns 1..500; default 80",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "rows",
+    "description": "PTY rows 1..500; default 24",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "max_output_bytes",
+    "description": "1..1048576 per stream, default 65536. Extra output is drained and discarded.",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/ssh/exec {\"connection\":\"ssh:example\",\"command\":\"uname -a\",\"timeout_seconds\":10}",
+  "idempotent": true,
+  "path": "/v1/ssh/exec",
+  "capability": "ssh",
+  "returns": "exit_code (null if unknown),stdout,stderr,stdout_truncated,stderr_truncated,timed_out=false,pty; transport/deadline/revocation errors include ssh_error; remote effects may continue after disconnect",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "cwd": {
+     "description": "Optional working directory; requires POSIX remote shell; safely quoted",
+     "type": "string"
+    },
+    "stdin": {
+     "description": "UTF-8 standard input, up to 512 KiB; EOF follows",
+     "type": "string"
+    },
+    "pty": {
+     "description": "Request a pseudo-terminal; default false. May merge stderr and alter output. Not an interactive session.",
+     "type": "boolean"
+    },
+    "columns": {
+     "description": "PTY columns 1..500; default 80",
+     "type": "integer"
+    },
+    "max_output_bytes": {
+     "description": "1..1048576 per stream, default 65536. Extra output is drained and discarded.",
+     "type": "integer"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "connection": {
+     "description": "This agent's saved SSH connection id",
+     "type": "string"
+    },
+    "terminal": {
+     "description": "PTY type; default xterm",
+     "type": "string"
+    },
+    "timeout_seconds": {
+     "description": "Total connect + operation deadline, 1..120 seconds; default 30. Disconnect does not guarantee remote termination.",
+     "type": "integer"
+    },
+    "env": {
+     "description": "Up to 64 SSH environment requests. Remote server AcceptEnv policy controls acceptance.",
+     "type": "object"
+    },
+    "rows": {
+     "description": "PTY rows 1..500; default 24",
+     "type": "integer"
+    },
+    "command": {
+     "description": "Remote shell command, 1..32768 characters; no automatic sudo",
+     "type": "string"
+    }
+   },
+   "required": [
+    "connection",
+    "command",
+    "idempotency_key"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The opt-in on-phone vision engines for find and crop, from the Bridgit team's signed software manifest (checked daily, so new engines can appear without an app update): what each is good at, its speed and size on a mid-range phone, its licence, and whether its model is downloaded. They are free and work offline, and run only when you name them (engine, outline)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "images_engines",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/images/engines",
+  "idempotent": false,
+  "path": "/v1/images/engines",
+  "capability": "find_crop",
+  "returns": "default_routing, manifest {serial, published_at, source bundled|downloaded, checked_at, signed_by, last_error}, engines [{engine, kind detector|outline, model, version, good_at, not_good_at, speed, memory, size_mb, licence, cost, installed, state ready|downloading|not_downloaded|waiting_for_wifi|failed|unsupported, kept_up_to_date, downloaded_mb, reason, how_to_use, runtime {model, size_mb, state}}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

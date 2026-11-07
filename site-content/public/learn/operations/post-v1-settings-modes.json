@@ -1,0 +1,49 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Replace custom mode definitions; create, rename or remove unused custom modes; [] clears them. Built-in modes and the current mode cannot be removed. Needs App settings and Agent Super Powers",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "settings_modes_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "custom",
+   "description": "Complete replacement list, at most 8 unique names, 1-24 letters/digits/underscore starting with a letter; spaces normalize to underscores; built-in names refused",
+   "type": "array",
+   "required": true
+  }],
+  "example": "POST /v1/settings/modes {\"custom\":[\"late_shift\",\"guests\"]}",
+  "idempotent": true,
+  "path": "/v1/settings/modes",
+  "capability": "settings",
+  "returns": "modes, custom, mode, since, set_by, log",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "custom": {
+     "description": "Complete replacement list, at most 8 unique names, 1-24 letters/digits/underscore starting with a letter; spaces normalize to underscores; built-in names refused",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": ["custom"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "conflict",
+   "forbidden",
+   "agent_not_allowed",
+   "capability_disabled"
+  ],
+  "requires": null
+ }
+}

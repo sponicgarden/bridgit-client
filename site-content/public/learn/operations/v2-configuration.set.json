@@ -1,0 +1,172 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_configuration_set",
+  "idempotency_required": false,
+  "documentation": "https://bridgit.cc/learn/operations/v2-configuration.set.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-configuration.set.json",
+  "required_arguments": [
+   "idempotency_key",
+   "operation"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {"Authorization": "Bearer <your key>"},
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "description": "Configuration delegation required; access operations also accept existing Agent Super Powers with App settings for bootstrap. Returns the result directly, never a durable operation or per-change GUI approval",
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "body": {
+      "description": "Exact native configuration payload; omit on reads/deletes. Credentials are write-only and never saved in operation history",
+      "type": "object"
+     },
+     "operation": {
+      "description": "Exact method and path template from configuration discovery; GET defaults to its index",
+      "type": "string",
+      "enum": [
+       "POST /v1/owner/configuration/access/features",
+       "POST /v1/owner/configuration/access/agents/{agent}",
+       "POST /v1/owner/configuration/approvals/{kind}/{id}",
+       "POST /v1/owner/configuration/settings",
+       "POST /v1/owner/configuration/actions",
+       "POST /v1/owner/configuration/keys/{provider}",
+       "DELETE /v1/owner/configuration/keys/{provider}",
+       "POST /v1/owner/configuration/connections",
+       "PATCH /v1/owner/configuration/connections/{id}",
+       "DELETE /v1/owner/configuration/connections/{id}",
+       "POST /v1/owner/configuration/connections/{id}/rotate",
+       "POST /v1/owner/configuration/callbacks/{agent}",
+       "DELETE /v1/owner/configuration/callbacks/{agent}",
+       "POST /v1/owner/configuration/notifications/{agent}",
+       "POST /v1/owner/configuration/email",
+       "POST /v1/owner/configuration/feeding",
+       "POST /v1/owner/configuration/modes",
+       "POST /v1/owner/configuration/listening"
+      ]
+     },
+     "parameters": {
+      "description": "Path parameter values, e.g. {provider:openrouter}; omit when none",
+      "type": "object"
+     }
+    },
+    "required": ["operation"]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "description": "Configuration delegation required; access operations also accept existing Agent Super Powers with App settings for bootstrap. Returns the result directly, never a durable operation or per-change GUI approval",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "body": {
+        "description": "Exact native configuration payload; omit on reads/deletes. Credentials are write-only and never saved in operation history",
+        "type": "object"
+       },
+       "operation": {
+        "description": "Exact method and path template from configuration discovery; GET defaults to its index",
+        "type": "string",
+        "enum": [
+         "POST /v1/owner/configuration/access/features",
+         "POST /v1/owner/configuration/access/agents/{agent}",
+         "POST /v1/owner/configuration/approvals/{kind}/{id}",
+         "POST /v1/owner/configuration/settings",
+         "POST /v1/owner/configuration/actions",
+         "POST /v1/owner/configuration/keys/{provider}",
+         "DELETE /v1/owner/configuration/keys/{provider}",
+         "POST /v1/owner/configuration/connections",
+         "PATCH /v1/owner/configuration/connections/{id}",
+         "DELETE /v1/owner/configuration/connections/{id}",
+         "POST /v1/owner/configuration/connections/{id}/rotate",
+         "POST /v1/owner/configuration/callbacks/{agent}",
+         "DELETE /v1/owner/configuration/callbacks/{agent}",
+         "POST /v1/owner/configuration/notifications/{agent}",
+         "POST /v1/owner/configuration/email",
+         "POST /v1/owner/configuration/feeding",
+         "POST /v1/owner/configuration/modes",
+         "POST /v1/owner/configuration/listening"
+        ]
+       },
+       "parameters": {
+        "description": "Path parameter values, e.g. {provider:openrouter}; omit when none",
+        "type": "object"
+       }
+      },
+      "required": ["operation"]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["configuration.set"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "description": "Configuration delegation required; access operations also accept existing Agent Super Powers with App settings for bootstrap. Returns the result directly, never a durable operation or per-change GUI approval",
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    },
+    "body": {
+     "description": "Exact native configuration payload; omit on reads/deletes. Credentials are write-only and never saved in operation history",
+     "type": "object"
+    },
+    "operation": {
+     "description": "Exact method and path template from configuration discovery; GET defaults to its index",
+     "type": "string",
+     "enum": [
+      "POST /v1/owner/configuration/access/features",
+      "POST /v1/owner/configuration/access/agents/{agent}",
+      "POST /v1/owner/configuration/approvals/{kind}/{id}",
+      "POST /v1/owner/configuration/settings",
+      "POST /v1/owner/configuration/actions",
+      "POST /v1/owner/configuration/keys/{provider}",
+      "DELETE /v1/owner/configuration/keys/{provider}",
+      "POST /v1/owner/configuration/connections",
+      "PATCH /v1/owner/configuration/connections/{id}",
+      "DELETE /v1/owner/configuration/connections/{id}",
+      "POST /v1/owner/configuration/connections/{id}/rotate",
+      "POST /v1/owner/configuration/callbacks/{agent}",
+      "DELETE /v1/owner/configuration/callbacks/{agent}",
+      "POST /v1/owner/configuration/notifications/{agent}",
+      "POST /v1/owner/configuration/email",
+      "POST /v1/owner/configuration/feeding",
+      "POST /v1/owner/configuration/modes",
+      "POST /v1/owner/configuration/listening"
+     ]
+    },
+    "parameters": {
+     "description": "Path parameter values, e.g. {provider:openrouter}; omit when none",
+     "type": "object"
+    }
+   },
+   "required": [
+    "idempotency_key",
+    "operation"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_configuration_set"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "configuration.set"
+ }
+}

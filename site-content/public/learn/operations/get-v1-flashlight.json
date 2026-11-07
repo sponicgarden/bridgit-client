@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Whether the torch is on",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "flashlight_get",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/flashlight",
+  "idempotent": false,
+  "path": "/v1/flashlight",
+  "capability": "flashlight",
+  "returns": "Whether the torch is on",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

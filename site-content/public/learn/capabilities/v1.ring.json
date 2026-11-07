@@ -1,0 +1,47 @@
+{
+ "detail_url": "/v1/discover?id=v1.ring&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.ring.json",
+ "title": "ring",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.ring.json",
+ "prerequisites": ["Check v1.ring supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Ring and vibrate within Android sound restrictions",
+   "path": "/v1/phone/ring",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-phone-ring.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-phone-ring.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "phone_ring_post"
+  },
+  {
+   "summary": "Stop ringing and vibration",
+   "path": "/v1/phone/ring",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-phone-ring.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-phone-ring.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "phone_ring_delete"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.ring",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "act",
+ "capability_ids": ["v1.ring"]
+}

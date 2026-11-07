@@ -1,0 +1,47 @@
+{
+  "kind": "question",
+  "title": "Book Osteria Lupa for Saturday?",
+  "text": "They have these tables free on Sat 8 Nov. 4.7★, 12 min walk from you.",
+  "controls": [
+    {
+      "type": "choice",
+      "id": "time",
+      "label": "Time",
+      "options": [
+        "18:00",
+        "19:30",
+        "21:15"
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "party",
+      "label": "How many?",
+      "options": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    },
+    {
+      "type": "text",
+      "id": "notes",
+      "label": "Anything they should know?",
+      "placeholder": "Allergies, high chair, birthday"
+    },
+    {
+      "type": "button",
+      "id": "book",
+      "label": "Book it",
+      "style": "primary"
+    },
+    {
+      "type": "link",
+      "id": "menu",
+      "label": "View the menu",
+      "url": "https://example.com/osteria-lupa/menu"
+    }
+  ]
+}

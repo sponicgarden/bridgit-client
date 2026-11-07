@@ -1,0 +1,27 @@
+{
+  "kind": "question",
+  "title": "Card declined: 412.00 zł at MediaExpert",
+  "text": "Your Visa ending 4417 was just declined online at 21:14. Fraud check flagged it: new device, different city.\n\nWas this you?",
+  "priority": "urgent",
+  "speak": true,
+  "expires_in_seconds": 900,
+  "controls": [
+    {
+      "type": "button",
+      "id": "retry",
+      "label": "Yes, that was me",
+      "style": "primary"
+    },
+    {
+      "type": "button",
+      "id": "freeze",
+      "label": "No, freeze the card"
+    },
+    {
+      "type": "link",
+      "id": "call_bank",
+      "label": "Call the bank",
+      "url": "tel:+48800123456"
+    }
+  ]
+}

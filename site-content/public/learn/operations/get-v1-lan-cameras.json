@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Owner-configured local cameras (no credentials)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_cameras",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan-cameras",
+  "idempotent": false,
+  "path": "/v1/lan-cameras",
+  "capability": "lan_camera",
+  "returns": "cameras: id, name, host; setup and live viewing instructions",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

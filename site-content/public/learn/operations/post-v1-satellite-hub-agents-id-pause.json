@@ -1,0 +1,48 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Phone to phone: a satellite pauses or resumes one of its hub's control agents (only for a satellite's return key). Not for agents.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "satellite_hub_agents_pause",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "paused",
+   "description": "true pauses, false resumes",
+   "type": "boolean",
+   "required": true
+  }],
+  "example": "POST /v1/satellite/hub/agents/agt_123/pause {\"paused\":true}",
+  "idempotent": false,
+  "path": "/v1/satellite/hub/agents/{id}/pause",
+  "capability": "status",
+  "returns": "id, name, paused",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "paused": {
+     "description": "true pauses, false resumes",
+     "type": "boolean"
+    },
+    "id": {
+     "description": "The id in /v1/satellite/hub/agents/{id}/pause",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "paused"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

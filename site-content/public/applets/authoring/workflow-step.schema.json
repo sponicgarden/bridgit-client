@@ -1,0 +1,2097 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bridgit workflow step for new packages",
+  "description": "Validate one step after package inputs and bindings are filled. The bundled JVM validator enforces data-dependent constraints, condition syntax, declared tables, scopes, forward references, byte limits and run budgets. See workflow-steps.md for the results and side effects.",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,31}$"
+    },
+    "stepRef": {
+      "type": "object",
+      "properties": {
+        "$step": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}(?:\\.[A-Za-z0-9_-]{1,40})+$"
+        }
+      },
+      "required": [
+        "$step"
+      ],
+      "additionalProperties": false
+    },
+    "triggerRef": {
+      "type": "object",
+      "properties": {
+        "$trigger": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,40}(?:\\.[A-Za-z0-9_-]{1,40})*$"
+        }
+      },
+      "required": [
+        "$trigger"
+      ],
+      "additionalProperties": false
+    },
+    "ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/stepRef"
+        },
+        {
+          "$ref": "#/$defs/triggerRef"
+        }
+      ]
+    },
+    "columnValue": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1024
+            },
+            {
+              "type": [
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/ref"
+        }
+      ]
+    },
+    "itemRef": {
+      "type": "object",
+      "properties": {
+        "$item": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,40}(?:\\.[A-Za-z0-9_-]{1,40})*$"
+        }
+      },
+      "required": [
+        "$item"
+      ],
+      "additionalProperties": false
+    },
+    "columns": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{0,31}$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/columnValue"
+      },
+      "minProperties": 1,
+      "maxProperties": 16
+    },
+    "batchColumns": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{0,31}$"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/columnValue"
+          },
+          {
+            "$ref": "#/$defs/itemRef"
+          }
+        ]
+      },
+      "minProperties": 1,
+      "maxProperties": 16
+    },
+    "where": {
+      "type": "object",
+      "properties": {
+        "column": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        "is": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "column",
+        "is"
+      ],
+      "additionalProperties": false
+    },
+    "keptPhoto": {
+      "type": "string",
+      "pattern": "^kept:[a-z0-9]{1,40}$"
+    },
+    "common": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        "only_if": {
+          "$ref": "#/$defs/condition"
+        },
+        "on_error": {
+          "enum": [
+            "stop",
+            "skip",
+            "retry"
+          ]
+        },
+        "retries": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3,
+          "default": 1
+        }
+      },
+      "if": {
+        "required": [
+          "retries"
+        ]
+      },
+      "then": {
+        "properties": {
+          "on_error": {
+            "const": "retry"
+          }
+        },
+        "required": [
+          "on_error"
+        ]
+      }
+    },
+    "question": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "criteria": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "type",
+        "instructions"
+      ]
+    },
+    "exportColumn": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,31}$"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "format": {
+              "enum": [
+                "text",
+                "number",
+                "money",
+                "yes_no",
+                "date",
+                "time"
+              ]
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            }
+          },
+          "required": [
+            "key"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "conditionTest": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "step": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,31}(?:\\.[A-Za-z0-9_-]{1,40})+$"
+            },
+            "is": {
+              "type": [
+                "string",
+                "boolean",
+                "number"
+              ]
+            },
+            "is_not": {
+              "type": [
+                "string",
+                "boolean",
+                "number"
+              ]
+            },
+            "in": {
+              "type": "array",
+              "items": {},
+              "minItems": 1,
+              "maxItems": 20
+            },
+            "exists": {
+              "type": "boolean"
+            },
+            "at_least": {
+              "type": "number"
+            },
+            "below": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "step"
+          ],
+          "additionalProperties": false,
+          "minProperties": 2,
+          "maxProperties": 2
+        },
+        {
+          "type": "object",
+          "properties": {
+            "trigger": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,40}(?:\\.[A-Za-z0-9_-]{1,40})*$"
+            },
+            "is": {
+              "type": [
+                "string",
+                "boolean",
+                "number"
+              ]
+            },
+            "is_not": {
+              "type": [
+                "string",
+                "boolean",
+                "number"
+              ]
+            },
+            "in": {
+              "type": "array",
+              "items": {},
+              "minItems": 1,
+              "maxItems": 20
+            },
+            "exists": {
+              "type": "boolean"
+            },
+            "at_least": {
+              "type": "number"
+            },
+            "below": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "trigger"
+          ],
+          "additionalProperties": false,
+          "minProperties": 2,
+          "maxProperties": 2
+        },
+        {
+          "type": "object",
+          "properties": {
+            "time": {
+              "type": "object",
+              "properties": {
+                "between": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                  },
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "uniqueItems": true
+                },
+                "days": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "mon",
+                      "tue",
+                      "wed",
+                      "thu",
+                      "fri",
+                      "sat",
+                      "sun"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 7
+                }
+              },
+              "required": [],
+              "additionalProperties": false,
+              "minProperties": 1
+            }
+          },
+          "required": [
+            "time"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "sun": {
+              "type": "object",
+              "properties": {
+                "before": {
+                  "enum": [
+                    "sunrise",
+                    "sunset"
+                  ]
+                },
+                "after": {
+                  "enum": [
+                    "sunrise",
+                    "sunset"
+                  ]
+                },
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "offset_min": {
+                  "type": "integer",
+                  "minimum": -180,
+                  "maximum": 180
+                }
+              },
+              "required": [],
+              "additionalProperties": false,
+              "oneOf": [
+                {
+                  "required": [
+                    "before"
+                  ]
+                },
+                {
+                  "required": [
+                    "after"
+                  ]
+                }
+              ],
+              "dependentRequired": {
+                "latitude": [
+                  "longitude"
+                ],
+                "longitude": [
+                  "latitude"
+                ]
+              }
+            }
+          },
+          "required": [
+            "sun"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "phone": {
+              "const": "battery"
+            },
+            "at_least": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "below": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "phone"
+          ],
+          "additionalProperties": false,
+          "minProperties": 2,
+          "maxProperties": 2
+        },
+        {
+          "type": "object",
+          "properties": {
+            "phone": {
+              "const": "charging"
+            },
+            "is": {
+              "type": "boolean"
+            },
+            "is_not": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "phone"
+          ],
+          "additionalProperties": false,
+          "minProperties": 2,
+          "maxProperties": 2
+        },
+        {
+          "type": "object",
+          "properties": {
+            "phone": {
+              "const": "network"
+            },
+            "is": {
+              "enum": [
+                "wifi",
+                "mobile",
+                "none"
+              ]
+            },
+            "is_not": {
+              "enum": [
+                "wifi",
+                "mobile",
+                "none"
+              ]
+            },
+            "in": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "wifi",
+                  "mobile",
+                  "none"
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "phone"
+          ],
+          "additionalProperties": false,
+          "minProperties": 2,
+          "maxProperties": 2
+        },
+        {
+          "type": "object",
+          "properties": {
+            "zone": {
+              "type": "object",
+              "properties": {
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "radius_m": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 10000
+                }
+              },
+              "required": [
+                "latitude",
+                "longitude"
+              ],
+              "additionalProperties": false
+            },
+            "is": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "zone"
+          ],
+          "additionalProperties": false,
+          "minProperties": 2,
+          "maxProperties": 2
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "const": true
+            },
+            "is": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,23}$"
+            },
+            "is_not": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,23}$"
+            },
+            "in": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,23}$"
+              },
+              "minItems": 1,
+              "maxItems": 12
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "additionalProperties": false,
+          "minProperties": 2,
+          "maxProperties": 2
+        },
+        {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "object",
+              "properties": {
+                "table": {
+                  "$ref": "#/$defs/id"
+                },
+                "since": {
+                  "enum": [
+                    "today",
+                    "this_week",
+                    "all"
+                  ]
+                },
+                "hours": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 720
+                },
+                "where": {
+                  "$ref": "#/$defs/where"
+                }
+              },
+              "required": [
+                "table"
+              ],
+              "additionalProperties": false,
+              "not": {
+                "required": [
+                  "since",
+                  "hours"
+                ]
+              }
+            },
+            "at_least": {
+              "type": "number"
+            },
+            "below": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "count"
+          ],
+          "additionalProperties": false,
+          "minProperties": 2,
+          "maxProperties": 2
+        },
+        {
+          "type": "object",
+          "properties": {
+            "sum": {
+              "type": "object",
+              "properties": {
+                "table": {
+                  "$ref": "#/$defs/id"
+                },
+                "column": {
+                  "$ref": "#/$defs/id"
+                },
+                "since": {
+                  "enum": [
+                    "today",
+                    "this_week",
+                    "all"
+                  ]
+                },
+                "hours": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 720
+                },
+                "where": {
+                  "$ref": "#/$defs/where"
+                }
+              },
+              "required": [
+                "table",
+                "column"
+              ],
+              "additionalProperties": false,
+              "not": {
+                "required": [
+                  "since",
+                  "hours"
+                ]
+              }
+            },
+            "at_least": {
+              "type": "number"
+            },
+            "below": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "sum"
+          ],
+          "additionalProperties": false,
+          "minProperties": 2,
+          "maxProperties": 2
+        }
+      ]
+    },
+    "condition": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/conditionTest"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "all": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/conditionTest"
+              },
+              "minItems": 2,
+              "maxItems": 8
+            }
+          },
+          "required": [
+            "all"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "any": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/conditionTest"
+              },
+              "minItems": 2,
+              "maxItems": 8
+            }
+          },
+          "required": [
+            "any"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "photo"
+        },
+        "camera": {
+          "anyOf": [
+            {
+              "enum": [
+                "rear",
+                "front"
+              ]
+            },
+            {
+              "type": "string",
+              "pattern": "^lan:",
+              "maxLength": 128
+            }
+          ]
+        },
+        "view": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,31}$" },
+        "keep": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "photo",
+          "id": "shot",
+          "camera": "rear",
+          "keep": true
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "ask_model"
+        },
+        "model": {
+          "enum": [
+            "jev",
+            "clef",
+            "glm"
+          ]
+        },
+        "questions": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,40}$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/question"
+          },
+          "minProperties": 1,
+          "maxProperties": 10
+        },
+        "photo": {
+          "type": "object",
+          "properties": {
+            "$step": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,31}\\.photo$"
+            }
+          },
+          "required": [
+            "$step"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "type",
+        "model",
+        "questions"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "ask_model",
+          "model": "clef",
+          "questions": {
+            "pet": {
+              "type": "noul",
+              "instructions": "Is a pet visible?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "ask_owner"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 120
+                },
+                {
+                  "$ref": "#/$defs/ref"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  {
+                    "$ref": "#/$defs/ref"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          ]
+        },
+        "text": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "$ref": "#/$defs/ref"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  {
+                    "$ref": "#/$defs/ref"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          ]
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "minItems": 2,
+          "maxItems": 6,
+          "uniqueItems": true
+        },
+        "wait_s": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 3600,
+          "default": 300
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "choices"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "ask_owner",
+          "title": "Water plant?",
+          "choices": [
+            "Yes",
+            "No"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "wait"
+        },
+        "seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300
+        }
+      },
+      "required": [
+        "type",
+        "seconds"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "wait",
+          "seconds": 15
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "stop"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "stop"
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "notice"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 120
+                },
+                {
+                  "$ref": "#/$defs/ref"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  {
+                    "$ref": "#/$defs/ref"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          ]
+        },
+        "text": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "$ref": "#/$defs/ref"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  {
+                    "$ref": "#/$defs/ref"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          ]
+        },
+        "priority": {
+          "enum": [
+            "normal",
+            "urgent"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "title"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "notice",
+          "title": "Check complete"
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "speak"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 600
+                },
+                {
+                  "$ref": "#/$defs/ref"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 600
+                  },
+                  {
+                    "$ref": "#/$defs/ref"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          ]
+        },
+        "allow_cloud": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        },
+        {
+          "if": {
+            "required": [
+              "allow_cloud"
+            ],
+            "properties": {
+              "allow_cloud": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "on_error": {
+                "enum": [
+                  "skip",
+                  "stop"
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "speak",
+          "text": "Check complete",
+          "allow_cloud": false
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "hear"
+        },
+        "duration_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30,
+          "default": 5
+        },
+        "language": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 32
+        },
+        "allow_cloud": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        },
+        {
+          "if": {
+            "required": [
+              "allow_cloud"
+            ],
+            "properties": {
+              "allow_cloud": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "on_error": {
+                "enum": [
+                  "skip",
+                  "stop"
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "hear",
+          "duration_seconds": 5,
+          "language": "en-US",
+          "allow_cloud": false
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "ring"
+        },
+        "seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30,
+          "default": 10
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "ring",
+          "seconds": 3
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "alert"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 1024
+                },
+                {
+                  "$ref": "#/$defs/ref"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 1024
+                  },
+                  {
+                    "$ref": "#/$defs/ref"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          ]
+        },
+        "destinations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "minItems": 1,
+          "maxItems": 3
+        }
+      },
+      "required": [
+        "type",
+        "text",
+        "destinations"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "alert",
+          "text": "The door opened",
+          "destinations": [
+            "approved-contact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "event"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 120
+                },
+                {
+                  "$ref": "#/$defs/ref"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  {
+                    "$ref": "#/$defs/ref"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "event",
+          "text": "check_done"
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "record"
+        },
+        "table": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        "row": {
+          "$ref": "#/$defs/batchColumns"
+        },
+        "for_each": {
+          "$ref": "#/$defs/stepRef"
+        }
+      },
+      "required": [
+        "type",
+        "table",
+        "row"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        },
+        {
+          "if": {
+            "not": {
+              "required": [
+                "for_each"
+              ]
+            }
+          },
+          "then": {
+            "properties": {
+              "row": {
+                "$ref": "#/$defs/columns"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "record",
+          "table": "checks",
+          "row": {
+            "label": "done"
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "appraise"
+        },
+        "photo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/keptPhoto"
+            },
+            {
+              "$ref": "#/$defs/ref"
+            }
+          ]
+        },
+        "max_items": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30,
+          "default": 20
+        }
+      },
+      "required": [
+        "type",
+        "photo"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "appraise",
+          "photo": {
+            "$trigger": "with.photo"
+          },
+          "max_items": 10
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "service"
+        },
+        "service": {
+          "enum": [
+            "chef.signed-edition-budget.v2",
+            "appraise.signed-edition-budget.v2"
+          ]
+        },
+        "operation": {
+          "enum": [
+            "scan",
+            "observe",
+            "appraise"
+          ]
+        },
+        "photo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/keptPhoto"
+            },
+            {
+              "$ref": "#/$defs/ref"
+            }
+          ]
+        },
+        "area": {
+          "enum": [
+            "Fridge",
+            "Cupboard",
+            "Spices"
+          ]
+        },
+        "session_s": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 3600,
+          "default": 3600
+        },
+        "tip_gap_s": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 3600,
+          "default": 45
+        },
+        "max_items": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30,
+          "default": 20
+        }
+      },
+      "required": [
+        "type",
+        "service",
+        "operation"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        },
+        {
+          "properties": {
+            "on_error": {
+              "enum": [
+                "skip",
+                "stop"
+              ]
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "service": {
+                  "const": "chef.signed-edition-budget.v2"
+                },
+                "operation": {
+                  "const": "scan"
+                },
+                "max_items": false,
+                "session_s": false,
+                "tip_gap_s": false,
+                "photo": {
+                  "$ref": "#/$defs/ref"
+                }
+              },
+              "required": [
+                "photo"
+              ]
+            },
+            {
+              "properties": {
+                "service": {
+                  "const": "chef.signed-edition-budget.v2"
+                },
+                "operation": {
+                  "const": "observe"
+                },
+                "max_items": false,
+                "photo": false,
+                "area": false
+              }
+            },
+            {
+              "properties": {
+                "service": {
+                  "const": "appraise.signed-edition-budget.v2"
+                },
+                "operation": {
+                  "const": "appraise"
+                },
+                "session_s": false,
+                "tip_gap_s": false,
+                "area": false
+              },
+              "required": [
+                "photo"
+              ]
+            }
+          ]
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "service",
+          "service": "chef.signed-edition-budget.v2",
+          "operation": "scan",
+          "photo": {
+            "$trigger": "with.photo"
+          }
+        },
+        {
+          "type": "service",
+          "service": "chef.signed-edition-budget.v2",
+          "operation": "observe",
+          "session_s": 120
+        },
+        {
+          "type": "service",
+          "service": "appraise.signed-edition-budget.v2",
+          "operation": "appraise",
+          "max_items": 12,
+          "photo": {
+            "$trigger": "with.photo"
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "kitchen"
+        },
+        "mode": {
+          "enum": [
+            "observe",
+            "scan"
+          ]
+        },
+        "photo": {
+          "$ref": "#/$defs/ref"
+        },
+        "area": {
+          "enum": [
+            "Fridge",
+            "Cupboard",
+            "Spices"
+          ]
+        },
+        "session_s": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 3600,
+          "default": 3600
+        },
+        "tip_gap_s": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 3600,
+          "default": 45
+        }
+      },
+      "required": [
+        "type",
+        "mode"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "scan"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "photo"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "session_s"
+                  ]
+                },
+                {
+                  "required": [
+                    "tip_gap_s"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "kitchen",
+          "mode": "scan",
+          "area": "Fridge",
+          "photo": {
+            "$trigger": "with.photo"
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "update"
+        },
+        "table": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        "row": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9]{1,40}$"
+            },
+            {
+              "$ref": "#/$defs/ref"
+            }
+          ]
+        },
+        "set": {
+          "$ref": "#/$defs/columns"
+        }
+      },
+      "required": [
+        "type",
+        "table",
+        "row",
+        "set"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "update",
+          "table": "checks",
+          "row": {
+            "$trigger": "with.row"
+          },
+          "set": {
+            "label": "reviewed"
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "share"
+        },
+        "table": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        "as": {
+          "enum": [
+            "pdf",
+            "csv"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "group_by": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/exportColumn"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "totals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,31}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "photos": {
+          "enum": [
+            "thumbs",
+            "none"
+          ]
+        },
+        "where": {
+          "type": "object",
+          "required": [
+            "column"
+          ],
+          "minProperties": 2,
+          "maxProperties": 2,
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "$ref": "#/$defs/id"
+            },
+            "is": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "is_not": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "exists": {
+              "type": "boolean"
+            },
+            "below": {
+              "type": "number"
+            },
+            "at_least": {
+              "type": "number"
+            },
+            "in": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 20
+            }
+          }
+        }
+      },
+      "required": [
+        "type",
+        "table",
+        "as"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "share",
+          "table": "checks",
+          "as": "csv",
+          "columns": [
+            "label"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "send"
+        },
+        "to": {
+          "type": "string",
+          "pattern": "^\\S+$",
+          "maxLength": 256
+        },
+        "data": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,40}$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/columnValue"
+          },
+          "minProperties": 0,
+          "maxProperties": 32
+        },
+        "text": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                {
+                  "$ref": "#/$defs/ref"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 1000
+                  },
+                  {
+                    "$ref": "#/$defs/ref"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          ]
+        },
+        "photo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/keptPhoto"
+            },
+            {
+              "$ref": "#/$defs/ref"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$step": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,31}$"
+                }
+              },
+              "required": [
+                "$step"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "wait_reply": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "to"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "send",
+          "to": "approved-connection",
+          "text": "Check complete"
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "context"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "context"
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "set_mode"
+        },
+        "mode": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,23}$"
+        }
+      },
+      "required": [
+        "type",
+        "mode"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "set_mode",
+          "mode": "away"
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "lookup"
+        },
+        "table": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
+        "since": {
+          "enum": [
+            "today",
+            "this_week",
+            "all"
+          ]
+        },
+        "hours": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 720
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 1
+        },
+        "where": {
+          "$ref": "#/$defs/where"
+        }
+      },
+      "required": [
+        "type",
+        "table"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        },
+        {
+          "not": {
+            "required": [
+              "since",
+              "hours"
+            ]
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "examples": [
+        {
+          "type": "lookup",
+          "table": "checks",
+          "since": "today",
+          "limit": 2
+        }
+      ]
+    }
+  ]
+}

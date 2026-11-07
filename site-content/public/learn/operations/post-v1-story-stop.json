@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Stop this caller's story presentation; discard late model results and stop its audio and video",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "story_stop",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/story/stop {}",
+  "idempotent": false,
+  "path": "/v1/story/stop",
+  "capability": "judgment",
+  "returns": "stopped",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

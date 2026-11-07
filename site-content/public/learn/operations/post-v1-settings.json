@@ -1,0 +1,48 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Change settings (agents with Agent Super Powers, once the owner turns on App settings); every change is checked first, so one bad change changes nothing",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "settings_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "changes",
+   "description": "{\"<key>\": <value>, ...}, up to 50; keys and allowed values from GET /v1/settings",
+   "type": "object",
+   "required": true
+  }],
+  "example": "POST /v1/settings {\"changes\":{\"appearance.theme\":\"dark\",\"phone.volume_media\":40,\"features.camera\":true}}",
+  "idempotent": true,
+  "path": "/v1/settings",
+  "capability": "settings",
+  "returns": "changed[key, from, to], unchanged, settings (as in GET)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "changes": {
+     "description": "{\"<key>\": <value>, ...}, up to 50; keys and allowed values from GET /v1/settings",
+     "type": "object"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": ["changes"]
+  },
+  "errors": [
+   "capability_disabled",
+   "forbidden",
+   "setting_locked",
+   "access_needed",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

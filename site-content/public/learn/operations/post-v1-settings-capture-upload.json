@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set or clear the owner's write-only capture upload URL with App settings and Super Powers",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "settings_capture_upload",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "url",
+   "description": "Upload URL; null or empty clears it",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/settings/capture-upload {\"url\":null}",
+  "idempotent": false,
+  "path": "/v1/settings/capture-upload",
+  "capability": "settings",
+  "returns": "configured; never the saved URL",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"url": {
+    "description": "Upload URL; null or empty clears it",
+    "type": "string"
+   }},
+   "required": ["url"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

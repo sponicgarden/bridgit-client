@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read saved Pet monitor food-view and eating-sound response configuration",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_feeding_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/feeding",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/feeding",
+  "capability": "owner_features",
+  "returns": "enabled,camera,position{x,y},view_saved,status; no camera/network access or capture is triggered by the read",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

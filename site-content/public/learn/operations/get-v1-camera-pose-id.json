@@ -1,0 +1,77 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read a body tracking session: its state and the frames since an index (each frame is the 33 points as [x, y, v, ...]: x and y fractions of the upright picture, v how sure the point is in view), plus the latest preview picture",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "camera_pose",
+  "query": [
+   {
+    "name": "since",
+    "description": "First frame index to return (0 = from the start; pass the last reply's next)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "Frames per reply, 1-80 (default 40)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "preview_after",
+    "description": "Include the preview picture when it is newer than this many ms into the session (-1 = the latest)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "wait_ms",
+    "description": "Wait up to this long (0-1000) for a new frame before answering",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/camera/pose/pose_abc?since=0&preview_after=-1",
+  "idempotent": false,
+  "path": "/v1/camera/pose/{id}",
+  "capability": "camera",
+  "returns": "session_id, state starting|running|done|stopped|failed, camera, mirror, width_px, height_px, elapsed_ms, max_ms, analyzed, fps, frames_total, frames [{i, t ms, p [99 numbers]}], next, thumbs (replay pictures kept), points (the 33 names, when since=0), preview {t, width_px, height_px, data_base64} when asked and newer",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "preview_after": {
+     "description": "Include the preview picture when it is newer than this many ms into the session (-1 = the latest)",
+     "type": "integer"
+    },
+    "limit": {
+     "description": "Frames per reply, 1-80 (default 40)",
+     "type": "integer"
+    },
+    "wait_ms": {
+     "description": "Wait up to this long (0-1000) for a new frame before answering",
+     "type": "integer"
+    },
+    "id": {
+     "description": "The id in /v1/camera/pose/{id}",
+     "type": "string"
+    },
+    "since": {
+     "description": "First frame index to return (0 = from the start; pass the last reply's next)",
+     "type": "integer"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

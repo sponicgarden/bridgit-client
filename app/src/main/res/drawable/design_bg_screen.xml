@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Background for purely informational screens: a plum glow at the top fading into the app surface. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:centerColor="@color/b_surface"
+        android:centerY="0.35"
+        android:endColor="@color/b_surface"
+        android:startColor="@color/design_screen_glow" />
+</shape>

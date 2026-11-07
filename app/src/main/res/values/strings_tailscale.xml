@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tailscale setup screen. -->
+<resources>
+    <string name="ts_title">Tailscale setup</string>
+    <string name="more_tailscale_setup">Tailscale setup</string>
+    <string name="ts_intro">Control agents reach this phone over Tailscale, a free private network between your own devices. You don\'t need to create a network: signing in to Tailscale makes one for you. Sign in with the same account on this phone and on the computer where your control agent runs. Each step below shows when it\'s done.</string>
+    <string name="ts_section_phone">This phone</string>
+    <string name="ts_section_computer">The control agent\'s computer</string>
+    <string name="ts_section_relay">Can\'t use Tailscale?</string>
+
+    <string name="ts_step_install">1. Install Tailscale</string>
+    <string name="ts_step_install_how">Get the free Tailscale app from the Play Store.</string>
+    <string name="ts_step_install_button">Install</string>
+    <string name="ts_step_install_how_direct">Tap Install. Bridgit downloads the free Tailscale app from Tailscale\'s own site (about 100 MB) and installs it. Android may ask you to confirm once.</string>
+    <string name="ts_install_starting">Getting Tailscale…</string>
+    <string name="ts_install_downloading">Downloading Tailscale… %1$d%%</string>
+    <string name="ts_install_downloading_unknown">Downloading Tailscale…</string>
+    <string name="ts_install_installing">Installing Tailscale…</string>
+    <string name="ts_install_confirm">Tap Install in Android\'s box. Tailscale opens next so you can sign in.</string>
+    <string name="ts_install_done">Tailscale is installed. Sign in to it, then come back here.</string>
+    <string name="ts_install_unknown_sources">Turn on \"Allow from this source\" for Bridgit, come back, and tap Install again.</string>
+    <string name="ts_install_failed">Couldn\'t install Tailscale: %1$s. Tap Install to try again.</string>
+    <string name="firstrun_install_tailscale">Install Tailscale</string>
+    <string name="ts_step_connect">2. Sign in and turn it on</string>
+    <string name="ts_step_connect_how">Open Tailscale and sign in with Google, Microsoft, Apple or GitHub. The first time, tap Connect and allow Android\'s VPN request. After that, Bridgit can turn it on for you.</string>
+    <string name="ts_step_connect_done">On. This phone is %1$s on your network %2$s.</string>
+    <string name="ts_step_connect_done_ip">On. This phone\'s Tailscale address is %1$s.</string>
+    <string name="ts_step_turn_on">Turn on</string>
+    <string name="ts_step_open">Open Tailscale</string>
+    <string name="ts_step_keep">3. Keep it on</string>
+    <string name="ts_step_keep_how_adb">Bridgit can do this with its ADB link: no VPN request, Tailscale comes back after a restart, and battery saving never stops it.</string>
+    <string name="ts_step_keep_how">So Tailscale comes back after a restart: in VPN settings tap the gear next to Tailscale and turn on Always-on VPN. Leave Block connections without VPN off.</string>
+    <string name="ts_step_keep_adb_button">Do it</string>
+    <string name="ts_step_keep_vpn_button">VPN settings</string>
+    <string name="ts_step_battery">4. No battery limits for Tailscale</string>
+    <string name="ts_step_battery_how">Tap Open, then tap the words “Allow background usage” (not the switch) and pick Unrestricted, so Android doesn\'t put Tailscale to sleep. On older phones: Battery → Unrestricted, or Battery optimisation → Don\'t optimise.</string>
+    <string name="ts_step_battery_button">Open</string>
+
+    <string name="ts_done">Done</string>
+    <string name="ts_not_done">Not yet</string>
+    <string name="ts_connecting">Asking Tailscale to connect…</string>
+    <string name="ts_connect_failed">Tailscale didn\'t connect. Open it, check you\'re signed in, and tap Connect.</string>
+    <string name="ts_keep_working">Setting Tailscale to stay on…</string>
+    <string name="ts_keep_result">%1$d of %2$d settings worked. Always-on VPN starts with the next restart.</string>
+    <string name="ts_keep_failed">Couldn\'t reach ADB: %1$s</string>
+
+    <string name="ts_computer_text">Install Tailscale on the computer where your control agent runs and sign in with the same account as this phone. The easiest way: give your control agent this prompt and let it do the work. It will send you a sign-in link to open.</string>
+    <string name="ts_computer_text_net">Install Tailscale on the computer where your control agent runs and sign in with the same account as this phone (your network is %1$s). The easiest way: give your control agent this prompt and let it do the work. It will send you a sign-in link to open.</string>
+    <string name="ts_share_prompt">Share prompt</string>
+    <string name="ts_copy_prompt">Copy prompt</string>
+    <string name="ts_prompt_copied">Prompt copied</string>
+    <string name="ts_share_link">Send the download link instead</string>
+    <string name="ts_share_link_text">"Join my Tailscale network\n──────────────\n\n1.  Install Tailscale on this computer:\n    https://tailscale.com/download\n\n2.  Sign in with the same Tailscale account my phone uses.\n\nOnce signed in, this computer and my phone are on the same private network.\n\n—\nSent from Bridgit · bridgit.cc"</string>
+    <string name="ts_share_subject">Put your computer on my Tailscale network</string>
+
+    <string name="ts_relay_text">Bridgit\'s relay reaches this phone without Tailscale. It does most of what Tailscale does, but replies are smaller, it\'s slower, and live features like video and screen sharing are off by default.</string>
+    <string name="ts_open_relay">Set up the relay</string>
+    <string name="home_banner_setup_tailscale">Set up</string>
+</resources>

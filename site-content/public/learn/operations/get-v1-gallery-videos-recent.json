@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Accessible videos and metadata",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "gallery_videos_recent",
+  "query": [{
+   "name": "limit",
+   "description": "1\u2013100, default 20",
+   "type": "integer",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/gallery/videos/recent",
+  "idempotent": false,
+  "path": "/v1/gallery/videos/recent",
+  "capability": "gallery_video",
+  "returns": "Accessible videos and metadata",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"limit": {
+    "description": "1\u2013100, default 20",
+    "type": "integer"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

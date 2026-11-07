@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- City tour notification, battery, coordinates and the Microphone switch (8.25, TOUR-01, TOUR-04). -->
+<resources>
+    <string name="tour_channel">City tour</string>
+    <string name="tour_channel_desc">While a city tour runs: what\'s playing, with Ask, Pause and End</string>
+    <string name="tour_notif_title">City tour with %1$s · %2$s</string>
+    <string name="tour_notif_paused">Paused. Tap Resume to carry on.</string>
+    <string name="tour_notif_waiting">Waiting for %1$s to say something</string>
+    <string name="tour_notif_ask">Ask</string>
+    <string name="tour_notif_ask_label">Ask %1$s</string>
+    <string name="tour_battery_used">Battery used: %1$d%%</string>
+    <string name="tour_battery_charging">Battery used: – (charging)</string>
+    <string name="tour_battery_unknown">Battery used: –</string>
+    <string name="tour_coords">%1$s · ±%2$d m</string>
+    <string name="tour_mic_off_title">Microphone is off</string>
+    <string name="tour_mic_off_body">Turn on the Microphone switch to ask out loud. You can type your question instead.</string>
+    <string name="tour_mic_turn_on">Turn on</string>
+    <string name="tour_mic_type_instead">Type instead</string>
+    <string name="tour_opt_mic_switch">The Microphone switch is off, so you can\'t ask out loud (typing works)</string>
+</resources>

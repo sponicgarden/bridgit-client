@@ -1,0 +1,115 @@
+{
+ "detail_url": "/v1/discover?id=v1.interactions&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.interactions.json",
+ "title": "interactions",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.interactions.json",
+ "prerequisites": ["Check v1.interactions supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [
+  "pet-monitor",
+  "receipt-scanner",
+  "voice-notebook",
+  "room-change-watcher",
+  "daily-briefing-panel",
+  "external-device-dashboard",
+  "situation-counter"
+ ],
+ "operations": [
+  {
+   "summary": "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Prefer a native question for simple choices, normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
+   "path": "/v1/interactions",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-interactions.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-interactions.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "interactions_send"
+  },
+  {
+   "summary": "Your interactions, newest first",
+   "path": "/v1/interactions",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-interactions.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-interactions.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "interactions_list"
+  },
+  {
+   "summary": "One of your interactions; with wait, holds until the owner answers or closes it",
+   "path": "/v1/interactions/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-interactions-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-interactions-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "interactions_get"
+  },
+  {
+   "summary": "Cancel one of your interactions",
+   "path": "/v1/interactions/{id}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-interactions-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-interactions-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "interactions_cancel"
+  },
+  {
+   "summary": "Notify the owner again about one of your pending or seen cards. Opening a card clears its alert; only this explicit request restores it. Preserves seen status, answers and expiry; does not open the screen or speak. Closed or expired cards are refused",
+   "path": "/v1/interactions/{id}/renotify",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-interactions-id-renotify.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-interactions-id-renotify.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "interactions_renotify"
+  },
+  {
+   "summary": "Your events, oldest first: answers, closes, expiries, switch changes. interaction.renotified records an explicit card reminder. Repeated phone answers emit interaction.answered with resubmission=true and previous_answer; agents decide whether to accept the change. An answer given after the question expired comes as interaction.answered with late=true. action.executed: one of your HTML cards ran Bridgit.act (interaction_id, method, path, status, ok, error)",
+   "path": "/v1/events",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-events.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-events.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "events"
+  },
+  {
+   "summary": "Add text to your live text panel (an interaction of kind text); it scrolls on the phone as it arrives",
+   "path": "/v1/text/stream",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-text-stream.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-text-stream.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "text_stream"
+  },
+  {
+   "summary": "Send a signed test event to the callback URL the owner set for you",
+   "path": "/v1/callback/test",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-callback-test.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-callback-test.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "callback_test"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.interactions",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "interact",
+ "capability_ids": ["v1.interactions"]
+}

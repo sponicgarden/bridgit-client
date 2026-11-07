@@ -1,0 +1,58 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Replace an agent's notification-app selection; [] clears; native removal also pauses affected workflows; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_notifications_post",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "packages",
+   "description": "At most 20 unique package strings from available; this does not grant notification scope or OS access",
+   "type": "array",
+   "required": true
+  }],
+  "example": "POST /v1/owner/configuration/notifications/{agent} {\"packages\":[]}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/notifications/{agent}",
+  "capability": "owner_features",
+  "returns": "same selection/status as GET; private build only",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "agent": {
+     "description": "The agent in /v1/owner/configuration/notifications/{agent}",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "packages": {
+     "description": "At most 20 unique package strings from available; this does not grant notification scope or OS access",
+     "type": "array",
+     "items": {"type": "string"}
+    }
+   },
+   "required": [
+    "agent",
+    "packages",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

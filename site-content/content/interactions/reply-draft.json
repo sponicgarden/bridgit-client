@@ -1,0 +1,24 @@
+{
+  "kind": "question",
+  "title": "Reply to Anna about the venue?",
+  "text": "Anna asked if Friday still works for the venue visit.\n\nMy draft:\n“Hi Anna, Friday at 3 works. I’ll bring the floor plans and the catering quote. See you at the front desk. Best, Alex”",
+  "controls": [
+    {
+      "type": "text",
+      "id": "changes",
+      "label": "Changes (optional)",
+      "placeholder": "e.g. make it shorter"
+    },
+    {
+      "type": "button",
+      "id": "send",
+      "label": "Send as is",
+      "style": "primary"
+    },
+    {
+      "type": "button",
+      "id": "revise",
+      "label": "Send with my changes"
+    }
+  ]
+}

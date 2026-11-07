@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Counts, errors and p50/p95 time per agent and endpoint",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "log_stats",
+  "query": [{
+   "name": "since",
+   "description": "Log id or ISO time; default the last 24 h",
+   "type": "string",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/log/stats?since=2026-10-27T00:00:00%2B01:00",
+  "idempotent": false,
+  "path": "/v1/log/stats",
+  "capability": "log",
+  "returns": "by_agent[], by_endpoint[]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"since": {
+    "description": "Log id or ISO time; default the last 24 h",
+    "type": "string"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

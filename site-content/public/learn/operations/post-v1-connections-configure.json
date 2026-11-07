@@ -1,0 +1,107 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Create or replace a connection under App settings, Super Powers and owner.configuration authority; URL, headers and credentials are write-only",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "connections_configure",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "id",
+    "description": "Existing connection id to replace; omit to create",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "name",
+    "description": "Display name",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "url",
+    "description": "Complete replacement destination URL",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "allow_private",
+    "description": "Allow the exact private-network destination; default false",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "preset",
+    "description": "Service id; omitted recognizes URL",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "headers",
+    "description": "Complete replacement HTTP headers",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "extra",
+    "description": "Complete replacement provider fields, e.g. chat_id/user/token",
+    "type": "object",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/connections/configure {\"name\":\"Automation\",\"url\":\"https://example.com/webhook\"}",
+  "idempotent": true,
+  "path": "/v1/connections/configure",
+  "capability": "connections",
+  "returns": "connection metadata; no URL, headers or signing secrets",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "headers": {
+     "description": "Complete replacement HTTP headers",
+     "type": "object"
+    },
+    "allow_private": {
+     "description": "Allow the exact private-network destination; default false",
+     "type": "boolean"
+    },
+    "extra": {
+     "description": "Complete replacement provider fields, e.g. chat_id/user/token",
+     "type": "object"
+    },
+    "name": {
+     "description": "Display name",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "Existing connection id to replace; omit to create",
+     "type": "string"
+    },
+    "preset": {
+     "description": "Service id; omitted recognizes URL",
+     "type": "string"
+    },
+    "url": {
+     "description": "Complete replacement destination URL",
+     "type": "string"
+    }
+   },
+   "required": [
+    "name",
+    "url"
+   ]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

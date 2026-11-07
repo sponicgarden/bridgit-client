@@ -1,0 +1,247 @@
+{
+ "detail_url": "/v1/discover?id=v1.applet_install&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.applet_install.json",
+ "title": "applet install",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.applet_install.json",
+ "prerequisites": ["Check v1.applet_install supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "Browse the applet library without installing or running packages",
+   "path": "/v1/applets/catalog",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-catalog.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-catalog.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_catalog"
+  },
+  {
+   "summary": "Read the exact personal package, template baseline, customization journal, revision and pending upgrade task. Owner control agents can inspect any installed applet; private, keep local unless the owner consents to model upload",
+   "path": "/v1/applets/installed/{id}/development",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-development.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-development.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_development"
+  },
+  {
+   "summary": "Track, pause template updates, or detach and repurpose your applet; never pauses execution or deletes data. Detached copies cannot silently reattach",
+   "path": "/v1/applets/installed/{id}/template-policy",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-installed-id-template-policy.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-installed-id-template-policy.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_template_policy"
+  },
+  {
+   "summary": "Fetch the same template origin. An unchanged applet gets an owner update review; a customized applet gets a local three-way upgrade task. Nothing applies automatically or calls a model. Read development first",
+   "path": "/v1/applets/installed/{id}/template-upgrade",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-installed-id-template-upgrade.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-installed-id-template-upgrade.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_template_upgrade"
+  },
+  {
+   "summary": "Discover typed device-context variables without collecting readings or granting access; consult live capabilities before reading",
+   "path": "/v1/applets/context",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-context.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-context.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_context"
+  },
+  {
+   "summary": "Read the shared applet practice catalog, applicability, defaults, acceptance checks and exception rules",
+   "path": "/v1/applets/practices",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-practices.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-practices.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_practices"
+  },
+  {
+   "summary": "Dry run: check an applet package and fill its blanks without storing or creating anything; returns exactly what the owner would review",
+   "path": "/v1/applets/validate",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-validate.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-validate.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_validate"
+  },
+  {
+   "summary": "Ask the owner to install an applet package. Nothing runs and nothing is granted until the owner approves it once on the phone; then the phone creates its watches, schedule, workflow and card itself and keeps them running without you",
+   "path": "/v1/applets/install",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-install.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-install.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_install"
+  },
+  {
+   "summary": "Discover installed applets and their data_url. Owner control agents see all applets, including owner-installed ones; no installer ownership or new approval required",
+   "path": "/v1/applets/installed",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-installed.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-installed.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_list"
+  },
+  {
+   "summary": "Inspect an installed applet, including data_url for schemas, saved rows, photos and processing status; control agents can inspect any applet",
+   "path": "/v1/applets/installed/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_get"
+  },
+  {
+   "summary": "Propose a new version of this personal applet. Read its development snapshot, validate the complete candidate and include change evidence. The owner or an authorized controlling agent reviews every agent edit. Approval checks the expected instance revision again.",
+   "path": "/v1/applets/installed/{id}/update",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-installed-id-update.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-installed-id-update.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_update"
+  },
+  {
+   "summary": "Pause or resume an applet monitoring task and its device work; manual actions remain available once paused",
+   "path": "/v1/applets/installed/{id}/pause",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-installed-id-pause.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-installed-id-pause.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_pause"
+  },
+  {
+   "summary": "Remove an installed applet you asked for and everything it created (watches, schedule, workflow, card, its grants)",
+   "path": "/v1/applets/installed/{id}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-applets-installed-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-applets-installed-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_remove"
+  },
+  {
+   "summary": "Discover an applet's saved data without running it: uniform schemas, row counts, choice/status counts, batch outcomes, export and original-photo URLs. Works for existing and future templates; owner control keys need no extra approval",
+   "path": "/v1/applets/installed/{id}/data",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-data.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-data.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_data_get"
+  },
+  {
+   "summary": "Read an installed applet's existing free-form key/value records with an owner control key; no installer ownership or extra approval. Complements typed tables for older/custom applets",
+   "path": "/v1/applets/installed/{id}/records",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-records.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-records.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_records_list"
+  },
+  {
+   "summary": "Export all accessible saved rows, schemas, status and photo references as JSON, or ZIP with manifest.json and original JPEGs. Read-only; no model calls, captures or Android share sheet. Same control-key authorization as data",
+   "path": "/v1/applets/installed/{id}/data/export",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-data-export.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-data-export.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_data_export"
+  },
+  {
+   "summary": "Read an existing applet JPEG using a photo URL from data; never captures a new photo. Control agents can read all saved applet photos; other principals only photos linked in accessible tables",
+   "path": "/v1/applets/installed/{id}/photos/{photo}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-photos-photo.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-photos-photo.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_photo_get"
+  },
+  {
+   "summary": "Saved table rows, oldest first after since. Owner control agents can read every applet table without approval or share_with_installer; applet principals remain restricted. Discover tables at /applets/installed/{id}/data",
+   "path": "/v1/applets/installed/{id}/tables/{table}/rows",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-tables-table-rows.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-installed-id-tables-table-rows.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_tables_rows_get"
+  },
+  {
+   "summary": "Add a table row, checked against its columns. Owner control agents can act on any applet; applet principals need installer sharing",
+   "path": "/v1/applets/installed/{id}/tables/{table}/rows",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-applets-installed-id-tables-table-rows.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-applets-installed-id-tables-table-rows.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_tables_rows_post"
+  },
+  {
+   "summary": "Change table columns while preserving the row id and other values. Owner control agents can act on any applet; applet principals need installer sharing; values are validated",
+   "path": "/v1/applets/installed/{id}/tables/{table}/rows/{row}",
+   "method": "PATCH",
+   "documentation": "https://bridgit.cc/learn/operations/patch-v1-applets-installed-id-tables-table-rows-row.json",
+   "operation_url": "https://bridgit.cc/learn/operations/patch-v1-applets-installed-id-tables-table-rows-row.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_tables_rows_patch"
+  },
+  {
+   "summary": "Delete a declared table row using owner-UI table-store cleanup. Owner control agents can act on every applet; applet principals need installer sharing",
+   "path": "/v1/applets/installed/{id}/tables/{table}/rows/{row}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-applets-installed-id-tables-table-rows-row.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-applets-installed-id-tables-table-rows-row.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_installed_tables_rows_delete"
+  },
+  {
+   "summary": "An installed applet's budget on all the owner's phones: limits with used, forecast and reset, state (ok, warning, out), the owner's ceiling, whether agents may change it, its actions with intervals and projections, and the last changes. For the applet you asked for, or any applet when you have Budgets",
+   "path": "/v1/applets/{id}/budget",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-applets-id-budget.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-applets-id-budget.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "applets_budget_get"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.applet_install",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "run",
+ "capability_ids": ["v1.applet_install"]
+}

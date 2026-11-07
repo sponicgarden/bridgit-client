@@ -1,0 +1,147 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Commands + ToolSchemas + PlatformApi.openApi",
+ "operation": {
+  "path": "/v2/call",
+  "method": "POST",
+  "mcp_tool": "bridgit_session_request",
+  "idempotency_required": true,
+  "documentation": "https://bridgit.cc/learn/operations/v2-session.request.json",
+  "operation_url": "https://bridgit.cc/learn/operations/v2-session.request.json",
+  "required_arguments": [
+   "idempotency_key",
+   "apps",
+   "purpose"
+  ],
+  "http": {
+   "path": "/v2/call",
+   "headers": {
+    "Authorization": "Bearer <your key>",
+    "Idempotency-Key": "Required: one UUID per logical action; preserve it on retries"
+   },
+   "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
+   "method": "POST",
+   "arguments_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+     "duration_seconds": {
+      "maximum": 1800,
+      "type": "integer",
+      "minimum": 30
+     },
+     "purpose": {
+      "description": "Shown to the owner when they approve",
+      "type": "string",
+      "maxLength": 256
+     },
+     "apps": {
+      "minItems": 1,
+      "maxItems": 10,
+      "description": "Apps the session may use",
+      "type": "array",
+      "items": {
+       "description": "Android package name",
+       "type": "string",
+       "maxLength": 256
+      }
+     }
+    },
+    "required": [
+     "apps",
+     "purpose"
+    ]
+   },
+   "request_schema": {
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "tool",
+     "arguments"
+    ],
+    "properties": {
+     "arguments": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+       "duration_seconds": {
+        "maximum": 1800,
+        "type": "integer",
+        "minimum": 30
+       },
+       "purpose": {
+        "description": "Shown to the owner when they approve",
+        "type": "string",
+        "maxLength": 256
+       },
+       "apps": {
+        "minItems": 1,
+        "maxItems": 10,
+        "description": "Apps the session may use",
+        "type": "array",
+        "items": {
+         "description": "Android package name",
+         "type": "string",
+         "maxLength": 256
+        }
+       }
+      },
+      "required": [
+       "apps",
+       "purpose"
+      ]
+     },
+     "tool": {
+      "description": "Dotted tool name, e.g. screen.observe (x-bridgit-tools lists the MCP names: drop the bridgit_ prefix and use dots)",
+      "type": "string",
+      "enum": ["session.request"]
+     }
+    }
+   }
+  },
+  "mcp_input_schema": {
+   "additionalProperties": false,
+   "type": "object",
+   "properties": {
+    "duration_seconds": {
+     "maximum": 1800,
+     "type": "integer",
+     "minimum": 30
+    },
+    "purpose": {
+     "description": "Shown to the owner when they approve",
+     "type": "string",
+     "maxLength": 256
+    },
+    "idempotency_key": {
+     "description": "Unique per logical request. Retries reuse the same key and exact input.",
+     "type": "string"
+    },
+    "apps": {
+     "minItems": 1,
+     "maxItems": 10,
+     "description": "Apps the session may use",
+     "type": "array",
+     "items": {
+      "description": "Android package name",
+      "type": "string",
+      "maxLength": 256
+     }
+    }
+   },
+   "required": [
+    "idempotency_key",
+    "apps",
+    "purpose"
+   ]
+  },
+  "mcp": {
+   "path": "/mcp",
+   "arguments_schema": "mcp_input_schema",
+   "tool": "bridgit_session_request"
+  },
+  "required_arguments_transport": "mcp",
+  "tool": "session.request"
+ }
+}

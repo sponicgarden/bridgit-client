@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Is Bridgit up, and which agent you are",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "health",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/health",
+  "idempotent": false,
+  "path": "/v1/health",
+  "capability": "status",
+  "returns": "status, app, app_version, mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Queue a five-minute owner approval; never copies until owner taps Copy",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "clipboard_post",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "text",
+   "description": "1\u201310000 characters",
+   "type": "string",
+   "required": true
+  }],
+  "example": "POST /v1/clipboard",
+  "idempotent": true,
+  "path": "/v1/clipboard",
+  "capability": "clipboard",
+  "returns": "Queue a five-minute owner approval; never copies until owner taps Copy",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "text": {
+     "description": "1\u201310000 characters",
+     "type": "string"
+    }
+   },
+   "required": ["text"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

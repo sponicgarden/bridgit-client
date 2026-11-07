@@ -1,0 +1,70 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "portal_snapshot",
+  "query": [
+   {
+    "name": "client",
+    "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "client_device",
+    "description": "Optional: the viewing device's model, system and app version, e.g. iPhone 16 Pro · iOS 26.1 · Portal 1.4 (1-80 characters). Shown on the phone's Linked devices",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "client_type",
+    "description": "Optional: the viewing device's kind: phone, tablet, computer, tv, watch or camera. Shown on the phone's Linked devices",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "logs",
+    "description": "Newest log entries to include, 0-50 (default 20)",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/portal/snapshot?logs=20",
+  "idempotent": false,
+  "path": "/v1/portal/snapshot",
+  "capability": "portal",
+  "returns": "home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for a Bridgit Portal pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "client_device": {
+     "description": "Optional: the viewing device's model, system and app version, e.g. iPhone 16 Pro · iOS 26.1 · Portal 1.4 (1-80 characters). Shown on the phone's Linked devices",
+     "type": "string"
+    },
+    "client": {
+     "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+     "type": "string"
+    },
+    "client_type": {
+     "description": "Optional: the viewing device's kind: phone, tablet, computer, tv, watch or camera. Shown on the phone's Linked devices",
+     "type": "string"
+    },
+    "logs": {
+     "description": "Newest log entries to include, 0-50 (default 20)",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

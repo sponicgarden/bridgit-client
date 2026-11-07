@@ -1,0 +1,71 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Add money to one limit of an installed applet for the current period only (it ends at the reset); stopped checks resume at once",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "applets_budget_top_up",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "limit_id",
+    "description": "The limit to top up (GET \u2026/budget lists them)",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "usd",
+    "description": "Dollars to add for this period, 0.01-100",
+    "type": "number",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/applets/ai0123456789abcd/budget/top-up {\"limit_id\":\"l2\",\"usd\":1}",
+  "idempotent": true,
+  "path": "/v1/applets/{id}/budget/top-up",
+  "capability": "budgets",
+  "returns": "the applet's budget (after the top-up)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "limit_id": {
+     "description": "The limit to top up (GET \u2026/budget lists them)",
+     "type": "string"
+    },
+    "usd": {
+     "description": "Dollars to add for this period, 0.01-100",
+     "type": "number"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/applets/{id}/budget/top-up",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "limit_id",
+    "usd"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter",
+   "agents_may_not_change",
+   "over_ceiling",
+   "rate_limited",
+   "out_of_range",
+   "capability_disabled",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

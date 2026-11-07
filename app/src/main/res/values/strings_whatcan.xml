@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="more_what_can">What can Bridgit do?</string>
+    <string name="whatcan_title">What can Bridgit do?</string>
+    <string name="whatcan_subtitle">%1$d of %2$d things available now</string>
+    <string name="whatcan_back">Back</string>
+    <string name="whatcan_group_now">Available now</string>
+    <string name="whatcan_group_next">Coming next</string>
+    <string name="whatcan_group_planned">Planned</string>
+    <string name="whatcan_group_ideas">Later, or needs your decision</string>
+    <string name="whatcan_example">For example</string>
+    <string name="whatcan_options">Options</string>
+    <string name="whatcan_section_abilities">Supported Control agent Requests:</string>
+    <string name="whatcan_section_abilities_intro">Everything a control agent can ask of this phone, with an example of each. Each one works only while its switch is on.</string>
+    <string name="whatcan_section_mechanics">How Bridgit works (the technical part)</string>
+    <string name="whatcan_section_mechanics_intro">How control agents connect, and how you stay in control.</string>
+    <string name="whatcan_ref">Spec %1$s</string>
+    <string name="whatcan_share">Share the API details for %1$s</string>
+    <string name="whatcan_share_title">Share %1$s</string>
+    <string name="whatcan_share_text">"Bridgit: %1$s\n──────────\n\nWhat a control agent can ask for, and the exact API calls to use:\n\n%2$s\n\n—\nSent from Bridgit · bridgit.cc"</string>
+    <dimen name="whatcan_gap">12dp</dimen>
+</resources>

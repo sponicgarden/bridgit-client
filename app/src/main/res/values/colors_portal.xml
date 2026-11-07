@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lilac frost: native portal chrome matches the shared web canvas. -->
+<resources>
+    <color name="portal_paper">@color/b_surface</color>
+    <color name="portal_card">@color/b_surface</color>
+    <color name="portal_ink">@color/b_on_surface</color>
+    <color name="portal_rule">@color/b_outline_variant</color>
+    <color name="portal_bar">@color/b_surface_container</color>
+    <color name="portal_line">@color/b_outline</color>
+    <color name="portal_bar_action">@color/b_primary</color>
+    <color name="portal_pick">@color/b_surface_container</color>
+
+    <color name="portal_avatar_ink">#2B1834</color>
+
+    <!-- The picker's list opens in the same surface colours (its popup takes the field's theme). -->
+    <style name="ThemeOverlay.Bridgit.PortalPicker" parent="">
+        <item name="colorSurface">@color/portal_card</item>
+        <item name="colorSurfaceContainer">@color/portal_card</item>
+        <item name="colorSurfaceContainerHigh">@color/portal_card</item>
+        <item name="colorOnSurface">@color/portal_ink</item>
+        <item name="android:textColorPrimary">@color/portal_ink</item>
+        <item name="android:textColorSecondary">@color/portal_ink</item>
+        <item name="android:textColor">@color/portal_ink</item>
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="colorOnSurfaceVariant">@color/portal_ink</item>
+        <item name="colorPrimary">@color/portal_ink</item>
+        <item name="colorPrimaryContainer">@color/portal_pick</item>
+        <item name="colorOnPrimaryContainer">@color/portal_ink</item>
+        <item name="colorSecondaryContainer">@color/portal_pick</item>
+        <item name="colorOnSecondaryContainer">@color/portal_ink</item>
+        <item name="colorControlHighlight">#33806C91</item>
+    </style>
+</resources>

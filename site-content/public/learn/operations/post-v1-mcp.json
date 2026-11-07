@@ -1,0 +1,48 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Model Context Protocol (Streamable HTTP, JSON replies): every endpoint you can use is an MCP tool",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": null,
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "jsonrpc",
+    "description": "\"2.0\"",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "method",
+    "description": "initialize, tools/list, tools/call, ping",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "params",
+    "description": "For tools/call: {name, arguments}",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "id",
+    "description": "Request id",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/mcp {\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}",
+  "idempotent": false,
+  "path": "/v1/mcp",
+  "capability": "status",
+  "returns": "JSON-RPC result",
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

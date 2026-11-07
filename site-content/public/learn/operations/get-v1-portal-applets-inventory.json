@@ -1,0 +1,58 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Enrolled devices for one approved applet card on this phone. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "portal_applets_inventory",
+  "query": [
+   {
+    "name": "template",
+    "description": "Exact registry key",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "revision",
+    "description": "Approved registry revision",
+    "type": "integer",
+    "required": true
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/portal/applets/inventory?template=external-device-dashboard&revision=1",
+  "idempotent": false,
+  "path": "/v1/portal/applets/inventory",
+  "capability": "portal",
+  "returns": "template, revision, devices[{id,name,adapter,availability,verified_at}]. Listing does not probe devices.",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "template": {
+     "description": "Exact registry key",
+     "type": "string"
+    },
+    "revision": {
+     "description": "Approved registry revision",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "template",
+    "revision"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "not_found",
+   "agent_not_allowed",
+   "capability_disabled"
+  ],
+  "requires": null
+ }
+}

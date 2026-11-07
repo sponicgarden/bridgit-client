@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- App updates (spec 12.14, UPD-02 … UPD-06). Plain second-person copy. -->
+<resources>
+    <string name="update_check">Check for updates</string>
+    <string name="update_title">Bridgit updates</string>
+    <string name="update_debug">Debug build: install new builds with adb.</string>
+
+    <string name="update_checking">Checking for a newer Bridgit…</string>
+    <string name="update_current">You have the latest Bridgit (%1$s).</string>
+    <string name="update_current_title">You\'re up to date</string>
+    <string name="update_install_qr">Install QR</string>
+    <string name="update_current_body">You have the newest version of Bridgit.</string>
+    <string name="update_local_ahead_title">You\'re ahead</string>
+    <string name="update_version_pill">Version %1$s</string>
+    <string name="update_version_change">%1$s → %2$s</string>
+    <string name="update_tap_to_close">Closes by itself. Tap to close now.</string>
+    <string name="update_local_ahead">You have Bridgit %1$s, which is newer than the published %2$s.</string>
+
+    <string name="update_available_title">Update available</string>
+    <string name="update_available">Bridgit %1$s is available. You have %2$s.</string>
+    <string name="update_notes">What\'s new: %1$s</string>
+    <string name="update_size">Download size: %1$s.</string>
+    <string name="update_download">Download</string>
+    <string name="update_not_now">Not now</string>
+    <string name="update_dont_show_again">Don\'t show again</string>
+    <string name="update_auto_off_toast">Update offers off. Check for updates is in More.</string>
+    <string name="update_auto_offers">Offer updates automatically</string>
+    <string name="update_auto_offers_desc">Once a day, when you open Bridgit, it checks for a newer version and offers it</string>
+
+    <string name="update_downloading">Downloading Bridgit %1$s…</string>
+    <string name="update_downloading_pct">Downloading Bridgit %1$s… %2$d%%</string>
+    <string name="update_downloading_hint">After the download, Bridgit checks it, then you tap Install.</string>
+
+    <string name="update_ready_title">Ready to install</string>
+    <string name="update_ready">Bridgit %1$s is downloaded and checked. Android will ask you to confirm the install. Your control agents, keys, switches and log are not modified by this upgrade.</string>
+    <string name="update_install">Install</string>
+    <string name="update_done_notice_title">Bridgit updated to %1$s</string>
+    <string name="update_done_notice_text">Tap to open Bridgit.</string>
+    <string name="update_ready_direct">Bridgit %1$s is downloaded and checked. Tap Install: Bridgit closes and updates, then a notice lets you open it again. Your control agents, keys, switches and log are not modified by this upgrade.</string>
+    <string name="update_ready_adb">Bridgit %1$s is downloaded and checked. Bridgit installs it over its own ADB link, with no confirm, and opens again by itself. Your control agents, keys, switches and log are not modified by this upgrade.</string>
+    <string name="update_installing_direct">Installing Bridgit %1$s. Bridgit closes; tap the notice to open it again.</string>
+    <string name="update_installing">Installing Bridgit %1$s. Bridgit closes and opens again by itself.</string>
+
+    <string name="update_allow_title">Allow installs from Bridgit</string>
+    <string name="update_allow">To install its own updates, Bridgit needs Android\'s \"Install unknown apps\" permission. On the next page, turn on \"Allow from this source\", then come back and tap Install.</string>
+    <string name="update_open_settings">Open settings</string>
+    <string name="update_no_installer">Android\'s installer didn\'t open. Try again, or install the file with adb.</string>
+
+    <string name="update_error_title">Couldn\'t update</string>
+    <string name="update_err_network">Bridgit couldn\'t reach the update server. Check your connection and try again.</string>
+    <string name="update_err_http">The update server didn\'t answer properly. Try again later.</string>
+    <string name="update_err_forbidden">The update server refused the request.</string>
+    <string name="update_err_redirect">The update server tried to send Bridgit somewhere else, so Bridgit stopped. Nothing was installed.</string>
+    <string name="update_err_manifest">The published update information isn\'t valid, so Bridgit ignored it.</string>
+    <string name="update_err_mismatch">The download doesn\'t match the published update, so Bridgit deleted it.</string>
+    <string name="update_err_not_apk">The download isn\'t a valid app file, so Bridgit deleted it.</string>
+    <string name="update_err_wrong_build">The download isn\'t the version that was published, so Bridgit deleted it.</string>
+    <string name="update_err_not_newer">The download isn\'t newer than the Bridgit you have, so Bridgit deleted it.</string>
+    <string name="update_err_signature">The download isn\'t signed with Bridgit\'s key, so Bridgit deleted it.</string>
+    <string name="update_err_storage">Bridgit couldn\'t save the download. Free some space and try again.</string>
+
+    <!-- Access row (UPD-04). -->
+    <string name="access_installs">Install unknown apps</string>
+    <string name="access_installs_unlocks">Lets Bridgit install its own updates after you confirm.</string>
+    <string-array name="access_how_installs">
+        <item>Tap Turn on.</item>
+        <item>Turn on \"Allow from this source\".</item>
+        <item>Come back here.</item>
+    </string-array>
+</resources>

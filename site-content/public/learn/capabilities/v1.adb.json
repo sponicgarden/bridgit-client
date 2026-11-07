@@ -1,0 +1,77 @@
+{
+ "detail_url": "/v1/discover?id=v1.adb&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.adb.json",
+ "title": "adb",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.adb.json",
+ "prerequisites": ["Check v1.adb supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "How to help the owner turn on ADB for Bridgit, and what to do once it's on (Markdown)",
+   "path": "/v1/adb/setup",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-adb-setup.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-adb-setup.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "adb_setup"
+  },
+  {
+   "summary": "ADB setup progress: developer options, wireless debugging, paired, grants",
+   "path": "/v1/adb/status",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-adb-status.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-adb-status.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "adb_status"
+  },
+  {
+   "summary": "Run a shell command as Android's shell user (agents with Agent Super Powers)",
+   "path": "/v1/adb/shell",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-adb-shell.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-adb-shell.json",
+   "control_scope": null,
+   "requires_power": "SUPER",
+   "tool": "adb_shell"
+  },
+  {
+   "summary": "Give Bridgit every useful permission and access through ADB (agents with Agent Super Powers)",
+   "path": "/v1/adb/grant",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-adb-grant.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-adb-grant.json",
+   "control_scope": null,
+   "requires_power": "SUPER",
+   "tool": "adb_grant"
+  },
+  {
+   "summary": "System-wide Android logcat snapshot; requires Agent Super Powers, adb grant, private build and the owner's ADB switch",
+   "path": "/v1/adb/logcat",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-adb-logcat.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-adb-logcat.json",
+   "control_scope": null,
+   "requires_power": "SUPER",
+   "tool": "adb_logcat"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.adb",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "act",
+ "capability_ids": ["v1.adb"]
+}

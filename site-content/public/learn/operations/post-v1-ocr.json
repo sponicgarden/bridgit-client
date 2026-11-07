@@ -1,0 +1,54 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Recognize Latin-script text locally; no image upload",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "ocr",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "gallery_id",
+    "description": "Accessible gallery image (also requires gallery grant)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "data_base64",
+    "description": "Image bytes instead of gallery_id",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/ocr",
+  "idempotent": true,
+  "path": "/v1/ocr",
+  "capability": "ocr",
+  "returns": "Recognize Latin-script text locally; no image upload",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "data_base64": {
+     "description": "Image bytes instead of gallery_id",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "gallery_id": {
+     "description": "Accessible gallery image (also requires gallery grant)",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

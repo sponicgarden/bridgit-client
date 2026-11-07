@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Section headings added in the design pass (panels and small-caps headings on every screen). -->
+<resources>
+    <string name="design_dog_options">Options</string>
+    <string name="design_feedback_attach">Attachments</string>
+</resources>

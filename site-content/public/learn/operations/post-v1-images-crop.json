@@ -1,0 +1,210 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Zoom in on something in a photo: crop to what query finds (or to a box you give) with some margin. which=first (default), all (one crop around every match) or each (one crop per match, 10 at most)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "images_crop",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "capture_id",
+    "description": "A photo this agent captured and kept (POST /v1/camera/snapshot with store), or one shared with it",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "gallery_id",
+    "description": "An accessible gallery photo (also needs the gallery grant)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "data_base64",
+    "description": "The image bytes instead (JPEG, PNG or WebP; about 1.5 MB of image at most, so use capture_id or gallery_id for big photos)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "query",
+    "description": "What to crop to; or give box instead",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "box",
+    "description": "{x0, y0, x1, y1} fractions (0-1) of the upright photo, for example from /v1/images/find",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "which",
+    "description": "first, all or each",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "first",
+     "all",
+     "each"
+    ]
+   },
+   {
+    "name": "index",
+    "description": "With which=first: the match to use, 0 = most prominent",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "pad",
+    "description": "Margin around the box as a fraction of its size on each side, 0-2, default 0.15",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "aspect",
+    "description": "Optional width/height of the crop, for example 1 for square",
+    "type": "number",
+    "required": false
+   },
+   {
+    "name": "mode",
+    "description": "auto (default: faces on the phone, everything else in the cloud), on_device (faces only, never uploads) or cloud",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "auto",
+     "on_device",
+     "cloud"
+    ]
+   },
+   {
+    "name": "engine",
+    "description": "Opt-in: on_device_detector finds anything named in words on the phone (free, offline, 7-16 s; GET /v1/images/engines). Never falls back to the cloud; model_not_ready while its model downloads. Other detector engines may appear in GET /v1/images/engines",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "outline",
+    "description": "Opt-in: also trace each item's outline on the phone (on_device_outline engine, +3-4 s): items get outline [[x, y], ...] fractions. On crop, each crop is a PNG cut out along the outline (transparent outside)",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "max_edge_px",
+    "description": "Longest side of each crop, 64-4096, default 2048",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "quality",
+    "description": "JPEG quality 40-100, default 90",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "raw",
+    "description": "1 = return the JPEG bytes (which=first or all only)",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/images/crop {\"capture_id\":\"cap_...\",\"query\":\"the dog\"}",
+  "idempotent": true,
+  "path": "/v1/images/crop",
+  "capability": "find_crop",
+  "returns": "JPEG (PNG cut-out with outline) (data_base64, width_px, height_px) with crop {left,top,right,bottom px} and the found items; which=each: crops [...]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "which": {
+     "description": "first, all or each",
+     "type": "string",
+     "enum": [
+      "first",
+      "all",
+      "each"
+     ]
+    },
+    "max_edge_px": {
+     "description": "Longest side of each crop, 64-4096, default 2048",
+     "type": "integer"
+    },
+    "query": {
+     "description": "What to crop to; or give box instead",
+     "type": "string"
+    },
+    "index": {
+     "description": "With which=first: the match to use, 0 = most prominent",
+     "type": "integer"
+    },
+    "box": {
+     "description": "{x0, y0, x1, y1} fractions (0-1) of the upright photo, for example from /v1/images/find",
+     "type": "object"
+    },
+    "quality": {
+     "description": "JPEG quality 40-100, default 90",
+     "type": "integer"
+    },
+    "mode": {
+     "description": "auto (default: faces on the phone, everything else in the cloud), on_device (faces only, never uploads) or cloud",
+     "type": "string",
+     "enum": [
+      "auto",
+      "on_device",
+      "cloud"
+     ]
+    },
+    "data_base64": {
+     "description": "The image bytes instead (JPEG, PNG or WebP; about 1.5 MB of image at most, so use capture_id or gallery_id for big photos)",
+     "type": "string"
+    },
+    "pad": {
+     "description": "Margin around the box as a fraction of its size on each side, 0-2, default 0.15",
+     "type": "number"
+    },
+    "outline": {
+     "description": "Opt-in: also trace each item's outline on the phone (on_device_outline engine, +3-4 s): items get outline [[x, y], ...] fractions. On crop, each crop is a PNG cut out along the outline (transparent outside)",
+     "type": "boolean"
+    },
+    "engine": {
+     "description": "Opt-in: on_device_detector finds anything named in words on the phone (free, offline, 7-16 s; GET /v1/images/engines). Never falls back to the cloud; model_not_ready while its model downloads. Other detector engines may appear in GET /v1/images/engines",
+     "type": "string"
+    },
+    "aspect": {
+     "description": "Optional width/height of the crop, for example 1 for square",
+     "type": "number"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "gallery_id": {
+     "description": "An accessible gallery photo (also needs the gallery grant)",
+     "type": "integer"
+    },
+    "capture_id": {
+     "description": "A photo this agent captured and kept (POST /v1/camera/snapshot with store), or one shared with it",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "invalid_parameter",
+   "capability_disabled",
+   "photo_not_found",
+   "not_found",
+   "not_supported",
+   "model_not_ready",
+   "rate_limited",
+   "team_unavailable",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

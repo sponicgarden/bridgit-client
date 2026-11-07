@@ -1,0 +1,146 @@
+{
+ "catalog_bulk_export": "https://bridgit.cc/learn/catalog.json",
+ "app_version": "1.8.0",
+ "endpoint_count": 318,
+ "file_a_bug_directly": "POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {\"name\",\"model\",\"harness\"}, then POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports with the key it returns. Details: https://bridgit.cc/learn/bugs.md",
+ "catalog": "https://bridgit.cc/learn/catalog-index.json",
+ "read_first": [
+  "https://bridgit.cc/learn/start.md",
+  "https://bridgit.cc/learn/catalog-index.json"
+ ],
+ "about": "Everything an AI agent needs to learn Bridgit (an Android app that lets the owner's agents use their phone over Tailscale or Bridgit's relay): no key, no phone needed, rebuilt from the latest Bridgit code on every website deploy. Your phone serves its own copies too; if its api_revision is lower than this one, it runs an older Bridgit and lacks what changes.json lists after its revision.",
+ "file_a_bug_without_a_phone": "POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {\"name\",\"model\",\"harness\"}, then POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports with the key it returns. Details: https://bridgit.cc/learn/bugs.md",
+ "sample_ids": [
+  "pieces-status",
+  "notice",
+  "question-buttons",
+  "question-form",
+  "question-photo",
+  "html-agenda",
+  "html-connection-test",
+  "html-step",
+  "html-photo-check",
+  "html-rps",
+  "html-wrapup",
+  "html-checklist",
+  "text-panel"
+ ],
+ "docs": {
+  "pairing_userspace": {
+   "what": "Actual pairing renderer with fixed non-secret userspace examples and helper",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/pairing-userspace.txt"
+  },
+  "endpoints": {
+   "what": "The API list: method, path, summary, parameters, example, errors and MCP tool name for each endpoint",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/endpoints.json"
+  },
+  "openapi": {
+   "what": "OpenAPI 3.1 for every endpoint; the server is http://{host}:{port}",
+   "on_the_phone": "GET /v1/openapi.json",
+   "url": "https://bridgit.cc/learn/openapi.json"
+  },
+  "changes": {
+   "what": "The API change log, by revision (what's new since yours: the entries after it)",
+   "on_the_phone": "GET /v1/changes?since=<revision>",
+   "url": "https://bridgit.cc/learn/changes.json"
+  },
+  "control": {
+   "what": "The agent control tools (app control on screen, workflows, OCR, translation, notifications, sensors, peripherals, alerts): a second MCP server and the /v2 routes",
+   "on_the_phone": "POST /mcp, GET /v2/tools",
+   "url": "https://bridgit.cc/learn/control.md"
+  },
+  "demo": {
+   "what": "The demo script: the five-minute first-run tour plus the menu of more demos",
+   "on_the_phone": "GET /v1/demo",
+   "url": "https://bridgit.cc/learn/demo.md"
+  },
+  "samples": {
+   "what": "A complete, tested POST /v1/interactions body for every card kind, with the reply and the answer each produces",
+   "on_the_phone": "GET /v1/samples",
+   "url": "https://bridgit.cc/samples/samples.json"
+  },
+  "evaluation": {
+   "what": "Instructions for evaluating the deck from public evidence, without device access",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/evaluate.md"
+  },
+  "bugs": {
+   "what": "File bugs, issues and feature requests directly with Bridgit servers",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/bugs.md"
+  },
+  "pairing_direct": {
+   "what": "Actual pairing renderer with fixed non-secret direct-connection examples",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/pairing-direct.txt"
+  },
+  "demo_skill": {
+   "what": "The first-run tour alone, as a skill file",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/demo/SKILL.md"
+  },
+  "api_page": {
+   "what": "The human-readable API page",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/api/"
+  },
+  "modifying_applets": {
+   "what": "Required before modifying personal applets, publishing templates, integrating upgrades, pausing updates or detaching",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/builder/modifying-applets.md"
+  },
+  "decisions": {
+   "what": "Designing applets with decision models: Jev for text, Clef for photos, sound and video; camera watches and the free on-phone change check that skips paid calls; which route, how to write questions and thresholds, preparing media, cost and limits",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/decisions.md"
+  },
+  "mcp": {
+   "what": "Using Bridgit as an MCP server: the instructions it sends and every tool name",
+   "on_the_phone": "POST /v1/mcp",
+   "url": "https://bridgit.cc/learn/mcp.md"
+  },
+  "phone_stands": {
+   "what": "Where to put the phone (pet watch, door, overhead reading, wall or kitchen display, bedside, car) and stands, mounts, cases and cables to hold it, with Amazon links and sizes of common Android phones and tablets; JSON: https://bridgit.cc/phonestands/index.json",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/phonestands/guide.md"
+  },
+  "introduction": {
+   "what": "Copyable introduction plus the generated key-free direct pairing example",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/introduction.txt"
+  },
+  "guide": {
+   "what": "The full agent guide (Markdown): every endpoint, cards, events, schedules, conventions, policies, errors",
+   "on_the_phone": "GET /v1/guide",
+   "url": "https://bridgit.cc/learn/guide.md"
+  },
+  "errors": {
+   "what": "Every error code: HTTP status, meaning and what to do",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/errors.json"
+  },
+  "playbook": {
+   "what": "Read first: what Bridgit can do for the owner (capability map, which tool for which job, on-device vs server), 40+ use cases, how to invent new ones, and how to learn what the owner wants (a short discovery interview)",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/playbook.md"
+  },
+  "interaction_examples": {
+   "what": "34 everyday cards (approvals, bookings, checklists, games, live panels), each with an exact request body",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/interactions/index.json"
+  }
+ },
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "sample_kinds": [
+  "pieces",
+  "notice",
+  "question",
+  "html",
+  "text"
+ ],
+ "error_codes": 67,
+ "start_here": "https://bridgit.cc/learn/start.md"
+}

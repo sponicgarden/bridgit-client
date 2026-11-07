@@ -1,0 +1,44 @@
+{
+  "kind": "question",
+  "title": "Evening check-in",
+  "text": "Ten seconds. I keep these private and send you a weekly summary on Sundays.",
+  "expires_in_seconds": 14400,
+  "controls": [
+    {
+      "type": "choice",
+      "id": "mood",
+      "label": "How was today?",
+      "options": [
+        "😄 Great",
+        "🙂 Good",
+        "😐 Okay",
+        "😕 Rough",
+        "😫 Awful"
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "sleep",
+      "label": "Sleep last night",
+      "options": [
+        "Under 5 h",
+        "5-6 h",
+        "6-7 h",
+        "7-8 h",
+        "Over 8 h"
+      ]
+    },
+    {
+      "type": "text",
+      "id": "note",
+      "label": "One line about today (optional)",
+      "placeholder": "What stood out?"
+    },
+    {
+      "type": "button",
+      "id": "save",
+      "label": "Save",
+      "style": "primary"
+    }
+  ]
+}

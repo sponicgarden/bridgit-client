@@ -1,0 +1,47 @@
+{
+ "detail_url": "/v1/discover?id=v1.modes&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.modes.json",
+ "title": "modes",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.modes.json",
+ "prerequisites": ["Check v1.modes supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [
+  {
+   "summary": "The phone's mode (home, away, night, vacation or one the owner added), since when, who set it, every mode it can be, and the newest changes",
+   "path": "/v1/mode",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-mode.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-mode.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "mode_get"
+  },
+  {
+   "summary": "Set the phone's mode. Setting the mode it already is changes nothing; flows with a mode trigger start on a change",
+   "path": "/v1/mode",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-mode.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-mode.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "mode_post"
+  }
+ ],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.modes",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "extend",
+ "capability_ids": ["v1.modes"]
+}

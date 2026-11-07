@@ -1,0 +1,149 @@
+{
+  "application": "shared-practice-contract",
+  "observations": [
+    {
+      "practice": "TABLE-001",
+      "finding": "Each data column toggles ascending/descending. Use raw typed values, stable ties and nulls last. Keep the sort after refresh.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "TABLE-002",
+      "finding": "Sort the complete query before pagination. Keep groups and totals fixed. Action columns declare no comparator. Photo columns use capture time.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "MEDIA-001",
+      "finding": "Open the shared lightbox on click or Enter. Escape closes. Trap focus and restore the opener. Arrow keys and buttons page.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "MEDIA-002",
+      "finding": "Page across cursors without duplicate photos. Keep selection by id. Show index or unknown total, caption, load failure and retry. Revoke blob URLs.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "MEDIA-003",
+      "finding": "Use the camera SVG/path and button tokens. Give a name. Disable duplicate capture. No emoji-only control.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "STATE-001",
+      "finding": "Map source states to taken, queued, processing, processed, failed. Keep failed separate from pending. Show unknown totals as unknown.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "STATE-002",
+      "finding": "Show queued, sent, acknowledged, failed or expired. Mark success only after acknowledgement. Reconcile retries by operation id.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "STATE-003",
+      "finding": "Render loading, empty, ready, stale, offline, paused, denied and error when applicable. Retry preserves inputs and prior data.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "UI-001",
+      "finding": "Use shared tokens, type scale, spacing, focus ring and disabled style. Icons keep accessible names. Test light and dark themes.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "UI-002",
+      "finding": "Use only text needed for operation or structure. No repeated helper prose. Preserve names for assistive tools.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "A11Y-001",
+      "finding": "Complete each action by keyboard and screen reader. Use semantic roles, labels, focus order, aria-sort and live status. No color-only state.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "A11Y-002",
+      "finding": "Meet WCAG 2.2 AA contrast as the test target. Use 44 CSS px web and 48 dp native targets. Respect reduced motion and text scaling.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "LAYOUT-001",
+      "finding": "At 320, 768 and 1280 CSS px and 200% text, keep actions reachable. Only the table region can scroll horizontally. Preserve focus and draft on redraw.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "DATA-001",
+      "finding": "Use declared typed tables and photo refs. Follow every data cursor. Export includes all accessible rows and source-photo links. Stateless applets need no table.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "DATA-002",
+      "finding": "Use expected revision, stable ids and idempotency keys. Reject stale writes. Use undo or explicit confirmation for destructive actions. Never run an automatic account reset.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "DATA-003",
+      "finding": "Preserve per-owner and per-instance grants. Keep secrets write-only. Redact logs. Test revoke, deletion, retention and cross-owner denial.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "API-001",
+      "finding": "Expose authenticated reads and applicable create/update/clear/delete/rotate operations. Share UI validation. Publish discovery and HTTP/MCP contracts.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "API-002",
+      "finding": "Discover actual capability, permission and readiness. Keep OS and owner consent. Never add a grant, paid call or upload during inspection.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "UPGRADE-001",
+      "finding": "Read development snapshot. Preserve baseline, settings, stable ids, intentional removals and journal. Use three-way merge. Block conflicts before activation.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "UPGRADE-002",
+      "finding": "Negotiate catalog and component versions. Reject unsupported changes before mutation. Keep the working revision. Respect paused and detached copies.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "UPGRADE-003",
+      "finding": "Dry-run migration on a copy. Test interrupted apply and recovery. Keep records and photos. Do not promise rollback until restore tests pass.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "PERF-001",
+      "finding": "Bound fetches, image decode, retries and polling. Abort on instance switch. Ignore stale replies. Test large data and slow networks.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "GOV-001",
+      "finding": "Record catalog review: added, changed or no-new-practice with reason. Name affected rule ids and changed surfaces. No empty attestation.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "GOV-002",
+      "finding": "Derive applicability from package and code. Emit pass, fail, exception, not-applicable, unverified or legacy-debt. Bind evidence to artifact and runtime hashes.",
+      "basis": "policy",
+      "source": "docs/applet-practices.md"
+    }
+  ]
+}

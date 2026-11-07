@@ -1,0 +1,26 @@
+{
+  "kind": "question",
+  "title": "The courier is downstairs with your parcel",
+  "text": "DPD, 1 parcel (the monitor arm). He can wait about 2 minutes.",
+  "priority": "urgent",
+  "speak": true,
+  "expires_in_seconds": 300,
+  "controls": [
+    {
+      "type": "button",
+      "id": "coming",
+      "label": "I’m coming down",
+      "style": "primary"
+    },
+    {
+      "type": "button",
+      "id": "door",
+      "label": "Leave it at the door"
+    },
+    {
+      "type": "button",
+      "id": "neighbour",
+      "label": "Leave with flat 3"
+    }
+  ]
+}

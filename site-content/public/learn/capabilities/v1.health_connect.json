@@ -1,0 +1,35 @@
+{
+ "detail_url": "/v1/discover?id=v1.health_connect&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.health_connect.json",
+ "title": "health connect",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.health_connect.json",
+ "prerequisites": ["Check v1.health_connect supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [{
+  "summary": "Read-only steps, sleep or heart-rate source records (maximum 100)",
+  "path": "/v1/health/records",
+  "method": "GET",
+  "documentation": "https://bridgit.cc/learn/operations/get-v1-health-records.json",
+  "operation_url": "https://bridgit.cc/learn/operations/get-v1-health-records.json",
+  "control_scope": null,
+  "requires_power": null,
+  "tool": "health_records"
+ }],
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.health_connect",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "sense",
+ "capability_ids": ["v1.health_connect"]
+}

@@ -1,0 +1,45 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "One of your interactions; with wait, holds until the owner answers or closes it",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "interactions_get",
+  "query": [{
+   "name": "wait",
+   "description": "Hold up to this many seconds (max 55) for the answer",
+   "type": "integer",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/interactions/12?wait=55",
+  "idempotent": false,
+  "path": "/v1/interactions/{id}",
+  "capability": "interactions",
+  "returns": "kind, status, answer{button, values} (html cards: answer{button: null, values: {}, data: what the page sent}), answered_at, closed_at",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "wait": {
+     "description": "Hold up to this many seconds (max 55) for the answer",
+     "type": "integer"
+    },
+    "id": {
+     "description": "The id in /v1/interactions/{id}",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "too_many_waits"
+  ],
+  "requires": null
+ }
+}

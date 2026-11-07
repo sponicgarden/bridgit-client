@@ -1,0 +1,50 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Tell the owner which model you are and what runs you; shown on your agent card",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "me",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "model",
+    "description": "Your model, as exact as you know it, e.g. claude-opus-5-5 or gpt-6.1 (1-60 chars)",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "harness",
+    "description": "The program running you, e.g. Claude Code, Codex CLI, a Python script (1-40 chars)",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/me {\"model\":\"claude-opus-5-5\",\"harness\":\"Claude Code\"}",
+  "idempotent": false,
+  "path": "/v1/me",
+  "capability": "status",
+  "returns": "agent, model, harness",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "harness": {
+     "description": "The program running you, e.g. Claude Code, Codex CLI, a Python script (1-40 chars)",
+     "type": "string"
+    },
+    "model": {
+     "description": "Your model, as exact as you know it, e.g. claude-opus-5-5 or gpt-6.1 (1-60 chars)",
+     "type": "string"
+    }
+   },
+   "required": ["model"]
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

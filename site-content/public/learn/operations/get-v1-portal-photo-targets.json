@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Who checks a photo sent with POST /v1/portal/photo: each agent (usually an installed applet) with a watch that checks photos, and the owner's last pick on the phone's Camera tab. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "portal_photo_targets",
+  "query": [{
+   "name": "client",
+   "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+   "type": "string",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/portal/photo/targets",
+  "idempotent": false,
+  "path": "/v1/portal/photo/targets",
+  "capability": "portal",
+  "returns": "targets[{id (agent id), name, watches[{watch_id, label, model, kind: check|people|change}]}], chosen[ids] (empty = all)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"client": {
+    "description": "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it",
+    "type": "string"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

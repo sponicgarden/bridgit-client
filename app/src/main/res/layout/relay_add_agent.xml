@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cc.bridgit.app.ui.common.MaxHeightScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="8dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/nameLayout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/relay_agent_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <RadioGroup
+            android:id="@+id/modes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:checkedButton="@+id/connector">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/connector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/relay_connector_option" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/sealed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/relay_sealed_option" />
+        </RadioGroup>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/keyLayout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:hint="@string/relay_sealed_key"
+            android:visibility="gone"
+            app:helperText="@string/relay_sealed_key_helper">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine|textNoSuggestions"
+                android:maxLines="4" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/maximumControl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/agents_maximum_control" />
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/superPowers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/agents_super_switch" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/choose"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="-12dp"
+            android:text="@string/agents_advanced_permissions" />
+    </LinearLayout>
+</cc.bridgit.app.ui.common.MaxHeightScrollView>

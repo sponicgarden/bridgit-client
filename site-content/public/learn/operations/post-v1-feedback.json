@@ -1,0 +1,100 @@
+{
+ "documentation_revision": 104,
+ "api_revision": 127,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Legacy phone-local reporting (any agent; images only in Bridgit Fixer Mode). Control agents should report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "feedback_file",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "kind",
+    "description": "bug or feature",
+    "type": "string",
+    "required": true,
+    "enum": [
+     "bug",
+     "feature"
+    ]
+   },
+   {
+    "name": "description",
+    "description": "What happened, up to 10,000 characters",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "no_autofix",
+    "description": "true = leave it for a person",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "images",
+    "description": "Fixer Mode only: up to 5 {\"data_base64\"} images",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "agent_info",
+    "description": "About you, sent with the report to the Bridgit team: e.g. {\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"} (up to 20 short string, number or boolean fields)",
+    "type": "object",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/feedback {\"kind\":\"bug\",\"description\":\"image/last returned 500 twice\",\"agent_info\":{\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"}}",
+  "idempotent": true,
+  "path": "/v1/feedback",
+  "capability": "feedback",
+  "returns": "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "images": {
+     "description": "Fixer Mode only: up to 5 {\"data_base64\"} images",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "kind": {
+     "description": "bug or feature",
+     "type": "string",
+     "enum": [
+      "bug",
+      "feature"
+     ]
+    },
+    "agent_info": {
+     "description": "About you, sent with the report to the Bridgit team: e.g. {\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"} (up to 20 short string, number or boolean fields)",
+     "type": "object"
+    },
+    "description": {
+     "description": "What happened, up to 10,000 characters",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "no_autofix": {
+     "description": "true = leave it for a person",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "kind",
+    "description"
+   ]
+  },
+  "errors": [
+   "forbidden",
+   "invalid_parameter",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

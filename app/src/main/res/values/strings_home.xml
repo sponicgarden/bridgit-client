@@ -79,7 +79,8 @@
     <string name="perm_location">Location</string>
 
     <!-- First run (UI-08) -->
-    <string name="firstrun_p1_headline">Designed for your favorite agent.</string>
+    <!-- Always two lines: "Designed for your" / "favorite agent." (owner, 7 Nov 2026). The no-break space keeps "agent." with "favorite". -->
+    <string name="firstrun_p1_headline">Designed for your\nfavorite\u00A0agent.</string>
     <string name="firstrun_p1_tagline">Build distributed applications with real-world senses and networked intelligence.</string>
     <string name="firstrun_agent_logos">Control agents and providers</string>
     <string name="firstrun_p1_body">Your AI control agents get a device to work with. They reach it over your private Tailscale network, through a simple API or MCP, and you see every request.</string>

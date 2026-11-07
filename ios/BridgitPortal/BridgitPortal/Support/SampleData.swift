@@ -118,3 +118,44 @@ enum SampleData {
                           method: i % 4 == 2 ? "POST" : "GET", endpoint: paths[i % paths.count], http: i == 17 ? 403 : 200, caption: nil, source: nil)
     }
 }
+
+extension SampleData {
+    /// Linked Bridgits in every state the map draws: on, waiting, paused, an old Portal pairing, and a
+    /// device seen only through another one ("via kitchen-tab").
+    static var linkSample: (links: [LinkedBridgit], log: [LinkEvent], introductions: [Introduction]) {
+        let day: TimeInterval = 86_400
+        let me = "rahuls-ipad"
+        func dir(_ s: DirectionState, _ services: [String], _ g: Granter, _ ago: TimeInterval) -> LinkDirection {
+            LinkDirection(state: s, services: services, grantedBy: g, grantedAt: Date().addingTimeInterval(-ago))
+        }
+        let links = [
+            LinkedBridgit(id: "lnk_sample_kitchen", name: "kitchen-tab", platform: "android", deviceType: "tablet", relayDeviceId: "sample-kitchen-tab",
+                          out: dir(.on, ["camera", "mic", "speaker", "interactions", "view"], .person(on: me), day * 2),
+                          linkedAt: Date().addingTimeInterval(-day * 2),
+                          peers: [LinkPeer(name: "porch-cam", uses: true, usedBy: false)]),
+            LinkedBridgit(id: SampleData.pairings[0].linkId ?? LinkStore.localId(relayDevice: SampleData.pairings[0].deviceId),
+                          name: SampleData.pairings[0].name, platform: "android", deviceType: "phone", relayDeviceId: SampleData.pairings[0].deviceId,
+                          out: dir(.on, ["view"], Granter(kind: .migrated), day * 9), migrated: true, linkRoutes: false,
+                          linkedAt: Date().addingTimeInterval(-day * 9)),
+            LinkedBridgit(id: "lnk_sample_garage", name: "garage-tab", platform: "android", deviceType: "tablet", relayDeviceId: "sample-garage-tab",
+                          out: dir(.waiting_for_target, [], .person(on: me), 600), linkedAt: Date().addingTimeInterval(-600)),
+            LinkedBridgit(id: "lnk_sample_hall", name: "hall-phone", platform: "android", deviceType: "phone", relayDeviceId: "sample-hall-phone",
+                          out: dir(.paused, ["camera", "view"], Granter(kind: .agent, device: "hall-phone", agentName: "Muse"), day * 4),
+                          linkedAt: Date().addingTimeInterval(-day * 4)),
+        ]
+        func ev(_ l: LinkedBridgit, _ e: String, _ ago: TimeInterval, _ g: Granter, after: String? = nil) -> LinkEvent {
+            LinkEvent(id: "lev_sample_\(l.id)_\(e)", at: Date().addingTimeInterval(-ago), linkId: l.id, peer: l.name, direction: "out",
+                      event: e, before: nil, after: after, granter: g, device: me, sent: true)
+        }
+        let log = [
+            ev(links[1], "migrated", day * 9, Granter(kind: .migrated), after: "view"),
+            ev(links[3], "code_claimed", day * 4, Granter(kind: .agent, device: "hall-phone", agentName: "Muse"), after: "camera, view"),
+            ev(links[0], "code_claimed", day * 2, .person(on: me), after: "camera, microphone, speaker, interactions, view"),
+            ev(links[3], "paused", day, .person(on: me)),
+            ev(links[2], "code_claimed", 600, .person(on: me)),
+        ]
+        let intro = Introduction(id: "int_sample_porch", fromName: "porch-cam", code: "K7QX3MPA", services: ["camera", "mic"],
+                                 agentName: "Muse", via: "kitchen-tab", viaLink: "lnk_sample_kitchen", note: nil, at: Date().addingTimeInterval(-120))
+        return (links, log, [intro])
+    }
+}

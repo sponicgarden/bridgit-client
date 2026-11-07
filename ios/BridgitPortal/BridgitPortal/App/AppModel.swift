@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import UIKit
+import UserNotifications
 import CryptoKit
 import BridgitAppletRuntime
 
@@ -22,6 +23,8 @@ final class AppModel: ObservableObject {
     /// A pairing that arrived as a link: shown for confirmation before it is saved.
     @Published var pendingSettings: URL?
     @Published var pendingPairing: Pairing?
+    /// A name and code that arrived as a link or QR code: opens Link a Bridgit, filled in.
+    @Published var pendingLinkOffer: LinkOffer?
 
     struct Notice: Identifiable { var id = UUID(); var title: String; var message: String }
 
@@ -116,13 +119,27 @@ final class AppModel: ObservableObject {
     }
 
     let cloud = WatchClient()
-    let relays = RelayStore()
+    let relays: RelayStore
+    /// This device's Device Domain Name (bridgit.cc/names).
+    let names = DeviceNameStore()
+    /// Linked Bridgits (docs/spec-linked-bridgits.md, Apple user role).
+    let links: LinkStore
+    private let introductionDelegate = IntroductionNotificationDelegate()
     private let signIn = SignIn()
 
     private static let sessionKey = "watch-session"
     private static let emailKey = "watch-email"
 
     init() {
+        let relays = RelayStore()
+        self.relays = relays
+        links = LinkStore(relays: relays, wire: RelayLinkWire(backend: { TeamBackend(identity: try DeviceIdentity.load()) }))
+        links.deviceName = { [names] in names.name ?? UIDevice.current.name }
+        links.notify = { IntroductionNotifications.post($0) }
+        links.reconcile()
+        IntroductionNotifications.register()
+        UNUserNotificationCenter.current().delegate = introductionDelegate
+        introductionDelegate.onAnswer = { [weak self] id, allow in Task { await self?.answerIntroduction(id, allow: allow) } }
         if let data = UserDefaults.standard.data(forKey: Self.attachmentKey) {
             attachment = try? JSONDecoder().decode(Attachment.self, from: data)
         }
@@ -167,6 +184,7 @@ final class AppModel: ObservableObject {
         if let target = AppletLists.settingsTarget(url) { pendingSettings = target; return }
         if let r = SignIn.parse(url) { Task { await adopt(session: r.session, email: r.email) }; return }
         if let p = Pairing.parse(link: url) { pendingPairing = p; return }
+        if let o = LinkOffer.parse(url.absoluteString) { pendingLinkOffer = o; return }
         notice = Notice(title: "Link not recognised", message: "Open a fresh pairing link or QR code from Bridgit on the phone.")
     }
 
@@ -183,13 +201,34 @@ final class AppModel: ObservableObject {
             return
         }
         relays.add(p)
+        links.reconcile()
         lives = lives.filter { $0.key != "relay:" + p.deviceId }
         notice = Notice(title: "Added \(p.name)", message: "Checking the phone now. The phone's owner can remove this access on the phone at any time.")
     }
 
     func removePairing(_ p: Pairing) {
         relays.remove(p)
+        links.reconcile()
         lives["relay:" + p.deviceId] = nil
+    }
+
+    /// What this device says about itself when it claims a link; nil until it has a Device Domain Name.
+    var linkSelf: LinkSelf? {
+        guard let name = names.name else { return nil }
+        if isSample { return LinkSelf(name: name, displayName: UIDevice.current.name, install: "bgi_sample_this_device", platform: DeviceKind.platform.platform, deviceType: DeviceKind.platform.deviceType) }
+        guard let id = try? DeviceIdentity.load().id else { return nil }
+        return LinkSelf(name: name, displayName: UIDevice.current.name, install: id, platform: DeviceKind.platform.platform, deviceType: DeviceKind.platform.deviceType)
+    }
+
+    func claimLink(_ offer: LinkOffer) async throws -> LinkedBridgit {
+        let l = try await links.claim(offer, me: linkSelf)
+        lives = lives.filter { $0.key != "relay:" + l.relayDeviceId }
+        return l
+    }
+
+    func answerIntroduction(_ id: String, allow: Bool) async {
+        do { try await links.answer(id, allow: allow, me: linkSelf) }
+        catch { notice = Notice(title: "Couldn't link", message: error.localizedDescription) }
     }
 
     /// Asks a phone on this account for live access and waits (up to 10 minutes) for its owner to tap Allow.
@@ -238,6 +277,7 @@ final class AppModel: ObservableObject {
         librarySessionGeneration = UUID()
         cloud.session = nil
         email = nil
+        if mode == .sample { links.leaveSample(); names.reloadCached() }
         phones = []
         applets = []
         lives = [:]
@@ -250,6 +290,10 @@ final class AppModel: ObservableObject {
         email = "sample@bridgit.cc"
         phones = SampleData.phones
         applets = SampleData.applets
+        names.setSampleName("rahuls-ipad")
+        let fixture = FixtureLinkWire()
+        Task { await fixture.addOffer(name: "porch-cam", code: "K7QX3MPA"); await fixture.addOffer(name: "living-tv", code: "4M9R2KQZ") }
+        links.loadSample(SampleData.linkSample, wire: fixture)
         lastRefresh = Date()
     }
 

@@ -50,18 +50,18 @@ actor RelayClient {
     }
 
     /// `deadline` (epoch ms) overrides the default of wait + 60 s.
-    func call(method: String, path: String, query: [String: String], body: Any?, wait: Int, deadline: Int? = nil) async throws -> RelayResponse {
+    func call(method: String, path: String, query: [String: String], body: Any?, wait: Int, deadline: Int? = nil, raw: Bool = false) async throws -> RelayResponse {
         // Serialize: wait for the previous call on this phone to finish first.
         let previous = chain
         let task = Task<RelayResponse, Error> {
             _ = await previous?.value
-            return try await self.send(method: method, path: path, query: query, body: body, wait: wait, deadline: deadline)
+            return try await self.send(method: method, path: path, query: query, body: body, wait: wait, deadline: deadline, raw: raw)
         }
         chain = Task { _ = try? await task.value }
         return try await task.value
     }
 
-    private func send(method: String, path: String, query: [String: String], body: Any?, wait: Int, deadline fixed: Int?) async throws -> RelayResponse {
+    private func send(method: String, path: String, query: [String: String], body: Any?, wait: Int, deadline fixed: Int?, raw: Bool) async throws -> RelayResponse {
         let w = max(0, min(wait, 55))
         var request: [String: Any] = ["method": method, "path": path]
         if !query.isEmpty { request["query"] = query }
@@ -93,7 +93,7 @@ actor RelayClient {
             g.timeoutInterval = 30
             (data, status) = try await fetch(g)
         }
-        return try Self.decodeCompletion(status: status, data: data)
+        return try Self.decodeCompletion(status: status, data: data, raw: raw)
     }
 
     private func fetch(_ r: URLRequest) async throws -> (Data, Int) {
@@ -101,8 +101,14 @@ actor RelayClient {
         return (data, (response as? HTTPURLResponse)?.statusCode ?? 0)
     }
 
-    /// Maps the relay's job completion (or error) to the phone's own HTTP response.
-    static func decodeCompletion(status: Int, data: Data) throws -> RelayResponse {
+    /// Like `call`, but returns the phone's own status and body for any phone answer (link calls read the
+    /// phone's error codes, such as `code_invalid` or `link_revoked`). Relay-level failures still throw.
+    func callRaw(method: String, path: String, body: Any?, wait: Int = 25) async throws -> RelayResponse {
+        try await call(method: method, path: path, query: [:], body: body, wait: wait, raw: true)
+    }
+
+    /// The phone's reply inside a finished job, before any check of the phone's status.
+    static func unwrap(status: Int, data: Data) throws -> RelayResponse {
         let obj = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] ?? [:]
         let code = obj["error"] as? String ?? ""
         if code == "agent_revoked" { throw RelayError.revoked }
@@ -116,7 +122,6 @@ actor RelayClient {
         default: throw RelayError.failed(status, code.isEmpty ? "unexpected reply" : code)
         }
         guard let resp = obj["response"] as? [String: Any] else { throw RelayError.failed(status, "no response") }
-        let phoneStatus = resp["status"] as? Int ?? 0
         var body = Data()
         if let b64 = resp["body_base64"] as? String {
             guard let d = Data(base64Encoded: b64) else { throw RelayError.failed(status, "unreadable reply from the phone") }
@@ -125,6 +130,14 @@ actor RelayClient {
             if let s = b as? String { body = Data(s.utf8) }
             else if JSONSerialization.isValidJSONObject(b) { body = (try? JSONSerialization.data(withJSONObject: b)) ?? Data() }
         }
+        return RelayResponse(status: resp["status"] as? Int ?? 0, body: body)
+    }
+
+    /// Maps the relay's job completion (or error) to the phone's own HTTP response.
+    static func decodeCompletion(status: Int, data: Data, raw: Bool = false) throws -> RelayResponse {
+        let r = try unwrap(status: status, data: data)
+        if raw { return r }
+        let phoneStatus = r.status, body = r.body
         if phoneStatus == 401 { throw RelayError.revoked }
         if phoneStatus == 403 {
             let inner = (try? JSONSerialization.jsonObject(with: body)) as? [String: Any]

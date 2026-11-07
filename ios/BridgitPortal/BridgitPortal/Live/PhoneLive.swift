@@ -359,7 +359,7 @@ final class PhoneLive: ObservableObject {
             // The phone's friendly name (set on the phone); a pairing keeps the name it had when paired otherwise.
             if let name = (d["name"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty, name != device.name {
                 device.name = name
-                if let p = device.pairing, p.name != name { model.relays.rename(p, to: name) }
+                if let p = device.pairing, p.name != name { model.relays.rename(p, to: name); model.links.rename(relayDevice: p.deviceId, to: name) }
             }
         }
         if let b = h["battery"] as? [String: Any] {

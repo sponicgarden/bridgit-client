@@ -17,6 +17,9 @@ struct Pairing: Codable, Identifiable, Hashable {
     /// True for a single-use link (`claim=1`): `token` is then a one-time claim token that must be swapped
     /// for a token made on this device (PairingClaim) before anything is saved. Never true once saved.
     var needsClaim: Bool?
+    /// The link (`lnk_…`) this pairing carries, for one claimed with a name and code. Nil for a Portal
+    /// pairing made before links (LinkStore migrates it to a `view` link).
+    var linkId: String?
 
     var id: String { deviceId }
 
@@ -71,9 +74,12 @@ struct Pairing: Codable, Identifiable, Hashable {
 final class RelayStore: ObservableObject {
     @Published private(set) var pairings: [Pairing] = []
     private static let key = "relay-pairings"
+    /// False in tests: nothing is read from or written to the Keychain.
+    private let persist: Bool
 
-    init() {
-        if let s = Keychain.get(Self.key), let list = try? JSONDecoder().decode([Pairing].self, from: Data(s.utf8)) {
+    init(persist: Bool = true) {
+        self.persist = persist
+        if persist, let s = Keychain.get(Self.key), let list = try? JSONDecoder().decode([Pairing].self, from: Data(s.utf8)) {
             pairings = list
         }
     }
@@ -101,6 +107,7 @@ final class RelayStore: ObservableObject {
     func replaceAllForSample(_ list: [Pairing]) { pairings = list }
 
     private func save() {
+        guard persist else { return }
         let data = try? JSONEncoder().encode(pairings)
         Keychain.set(data.flatMap { String(data: $0, encoding: .utf8) }, for: Self.key)
     }

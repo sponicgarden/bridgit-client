@@ -15,30 +15,10 @@ struct DecisionInstall {
     }
     init(key: P256.Signing.PrivateKey) { self.key = key }
 
-    var id: String {
-        let alphabet = Array("abcdefghijklmnopqrstuvwxyz234567")
-        var pending = 0, bits = 0, result = "bgi_"
-        for byte in SHA256.hash(data:key.publicKey.derRepresentation).prefix(15) {
-            pending = (pending << 8) | Int(byte)
-            bits += 8
-            while bits >= 5 {
-                bits -= 5
-                result.append(alphabet[(pending >> bits) & 31])
-            }
-            pending &= (1 << bits) - 1
-        }
-        return result
-    }
+    var id: String { InstallSigning.installId(spki: key.publicKey.derRepresentation) }
 
     func sign(_ request: inout URLRequest, at: Int64, nonce: String) throws {
-        guard let url = request.url else { throw AppletRuntimeError.invalid("Missing service URL") }
-        let digest = SHA256.hash(data:request.httpBody ?? Data()).map { String(format:"%02x",$0) }.joined()
-        let path = url.path + (url.query.map { "?" + $0 } ?? "")
-        let text = ["bridgit-install-v1",id,request.httpMethod ?? "POST",path,String(at),nonce,digest].joined(separator:"\n")
-        let signature = try key.signature(for:Data(text.utf8)).rawRepresentation.base64EncodedString()
-        request.setValue(nil, forHTTPHeaderField:"Authorization")
-        request.setValue(id, forHTTPHeaderField:"X-Bridgit-Install")
-        request.setValue("at=\(at),nonce=\(nonce),sig=\(signature)", forHTTPHeaderField:"X-Bridgit-Signature")
+        try InstallSigning.sign(&request, key: key, id: id, at: at, nonce: nonce)
     }
 
     static func limits(_ budget: JSONValue?) throws -> [JSONValue] {

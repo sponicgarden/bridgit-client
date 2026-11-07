@@ -17,6 +17,8 @@ struct BridgitPortalApp: App {
                 .id(model.librarySessionGeneration)
                 .environmentObject(model)
                 .environmentObject(model.relays)
+                .environmentObject(model.links)
+                .environmentObject(model.names)
                 .tint(B.primary)
                 .onOpenURL { model.handle(url: $0) }
                 .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
@@ -45,15 +47,19 @@ enum Tab: String, CaseIterable, Identifiable {
 struct RootView: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var relays: RelayStore
+    @EnvironmentObject var links: LinkStore
+    @EnvironmentObject var names: DeviceNameStore
+    @Environment(\.scenePhase) private var phase
     @Environment(\.horizontalSizeClass) private var size
     /// `-tab devices` (launch argument) opens on that tab, for screenshots.
     @State private var tab: Tab = UserDefaults.standard.string(forKey: "tab").flatMap(Tab.init(rawValue:)) ?? .home
     /// `-device cloud:<install id>` (launch argument) opens on that phone, for screenshots.
     @StateObject private var settingsWeb = PortalWeb()
     @State private var selectedDevice: String? = UserDefaults.standard.string(forKey: "device")
+    @State private var claimFromLink = false
 
     var devices: [PortalDevice] {
-        PortalDevice.list(phones: model.phones, pairings: model.isSample ? SampleData.pairings : relays.pairings)
+        PortalDevice.list(phones: model.phones, pairings: links.usable(model.isSample ? SampleData.pairings : relays.pairings))
     }
 
     var current: PortalDevice? {
@@ -85,6 +91,17 @@ struct RootView: View {
             }
         }
         .task { await model.refresh() }
+        .onChange(of: phase, initial: true) { _, p in
+            if p == .active {
+                if !model.isSample { names.startHeartbeat() }
+                links.commitDue()
+                Task { await links.flush() }
+            } else if p == .background {
+                names.stopHeartbeat()
+            }
+        }
+        .onChange(of: model.pendingLinkOffer) { _, o in if o != nil { claimFromLink = true } }
+        .sheet(isPresented: $claimFromLink) { ClaimLinkView() }
         .alert(item: $model.notice) { n in Alert(title: Text(n.title), message: Text(n.message)) }
         .confirmationDialog("Add this phone?", isPresented: Binding(get: { model.pendingPairing != nil }, set: { if !$0 { model.pendingPairing = nil } }),
                             titleVisibility: .visible, presenting: model.pendingPairing) { p in

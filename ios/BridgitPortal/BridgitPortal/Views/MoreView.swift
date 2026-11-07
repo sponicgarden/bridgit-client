@@ -9,6 +9,8 @@ struct MoreView: View {
     @State private var showPair = false
     @State private var showLink = false
     @State private var showInstall = false
+    /// `-open linked` (or `-open link:<id>`, `claim`, `name`, `log`) opens Linked devices, for screenshots.
+    @State private var openLinked = UserDefaults.standard.string(forKey: "open").map { ["linked", "claim", "name", "log"].contains($0) || $0.hasPrefix("link:") } ?? false
 
     var body: some View {
         ScrollView {
@@ -26,22 +28,8 @@ struct MoreView: View {
                     NavRow(icon: "info.circle", title: "About this phone") { PhoneInfoView(live: live) }
                 }
                 SectionLabel(text: "Access to phones")
+                NavRow(icon: "app.connected.to.app.below.fill", title: "Linked devices") { LinkedDevicesView() }
                 ActionRow(icon: "qrcode.viewfinder", title: "Pair with a phone") { showPair = true }
-                ForEach(model.isSample ? SampleData.pairings : relays.pairings) { p in
-                    HStack(spacing: 18) {
-                        Image(systemName: "checkmark.shield.fill").frame(width: 28).foregroundStyle(B.onSurfaceVariant)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(p.name).foregroundStyle(B.onSurface)
-                            Text("Paired " + p.addedAt.formatted(date: .abbreviated, time: .omitted) + " · relay").frostText(.supporting).foregroundStyle(B.onSurfaceVariant)
-                        }
-                        Spacer()
-                        if !model.isSample {
-                            Button("Remove", role: .destructive) { model.removePairing(p) }.frostText(.supporting)
-                        }
-                    }
-                    .padding(.vertical, 14)
-                    Divider().overlay(B.outlineVariant)
-                }
                 SectionLabel(text: "Account")
                 switch model.mode {
                 case .signedIn:
@@ -71,6 +59,7 @@ struct MoreView: View {
         .background(B.surface)
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $openLinked) { LinkedDevicesView() }
         .sheet(isPresented: $showPair) { PairView() }
         .sheet(isPresented: $showLink) { LinkCodeView() }
         .sheet(isPresented: $showInstall) { InstallAndroidView().presentationDetents([.large]) }
@@ -274,6 +263,11 @@ enum QRCode {
 /// (a new version means another Apple review), so the build time is what tells updates apart.
 /// The build number is the UTC time the build was made, as yymmddHHMM (see publish-testflight.sh).
 enum AppVersion {
+    /// "ios-0.1.0(42)", for the backend's app_version field.
+    static var short: String {
+        let info = Bundle.main.infoDictionary ?? [:]
+        return "ios-" + (info["CFBundleShortVersionString"] as? String ?? "?") + "(" + (info["CFBundleVersion"] as? String ?? "") + ")"
+    }
     static var label: String {
         let info = Bundle.main.infoDictionary ?? [:]
         let version = info["CFBundleShortVersionString"] as? String ?? "?"

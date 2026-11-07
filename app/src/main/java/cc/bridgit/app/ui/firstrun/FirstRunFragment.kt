@@ -204,6 +204,7 @@ class FirstRunFragment : Fragment() {
         val night = (ctx.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
         fun hex(attr: Int) = String.format("#%06X", ctx.themeColor(attr) and 0xFFFFFF)
         val headline = TextUtils.htmlEncode(getString(R.string.firstrun_p1_headline))
+            .replace("\n", "<br>")
             .replace("super-human", "<span class=\"accent\">super-human</span>")
         val ideas = resources.getStringArray(R.array.firstrun_ideas).joinToString("") { "<li><span class=\"q\">“</span>${TextUtils.htmlEncode(it)}<span class=\"q\">”</span></li>" }
         val html = ctx.assets.open("firstrun/intro.html").bufferedReader().use { it.readText() }

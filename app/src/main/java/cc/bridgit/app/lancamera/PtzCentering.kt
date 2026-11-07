@@ -64,7 +64,7 @@ data class PetBox(val left: Double, val top: Double, val right: Double, val bott
  * [TOLERANCE] of the frame middle on both axes. If a move made an axis worse, that axis's direction
  * is flipped for the next move (a camera mounted upside down).
  */
-class PtzCentering(private val space: PtzSpace, private val damping: Double = .85) {
+class PtzCentering(private val space: PtzSpace, private val damping: Double = .85, private val tolerance: Double = TOLERANCE) {
     companion object { const val TOLERANCE = .10; const val MAX_MOVES = 3 }
     var panSign = 1.0; private set
     var tiltSign = 1.0; private set
@@ -72,7 +72,7 @@ class PtzCentering(private val space: PtzSpace, private val damping: Double = .8
     private var last: Pair<Double, Double>? = null
     private var lastMoved: Pair<Boolean, Boolean>? = null
 
-    fun centered(box: PetBox) = abs(box.cx - .5) <= TOLERANCE && abs(box.cy - .5) <= TOLERANCE
+    fun centered(box: PetBox) = abs(box.cx - .5) <= tolerance && abs(box.cy - .5) <= tolerance
 
     /** The next aim from [from], or null when centred or no useful move is left. */
     fun next(from: PtzPoint, box: PetBox): PtzPoint? {
@@ -85,8 +85,8 @@ class PtzCentering(private val space: PtzSpace, private val damping: Double = .8
         last = ex to ey
         if (centered(box)) { lastMoved = false to false; return null }
         // +pan shifts the picture right, so a pet right of centre (ex>0) needs -pan; likewise for tilt.
-        var dx = if (abs(ex) > TOLERANCE) -ex * TapoPtz.FRAME_PAN * damping * panSign else 0.0
-        var dy = if (abs(ey) > TOLERANCE) -ey * TapoPtz.FRAME_TILT * damping * tiltSign else 0.0
+        var dx = if (abs(ex) > tolerance) -ex * TapoPtz.FRAME_PAN * damping * panSign else 0.0
+        var dy = if (abs(ey) > tolerance) -ey * TapoPtz.FRAME_TILT * damping * tiltSign else 0.0
         if (abs(dx) < TapoPtz.MIN_STEP) dx = 0.0
         if (abs(dy) < TapoPtz.MIN_STEP) dy = 0.0
         val x = (from.x + dx).coerceIn(space.xMin, space.xMax)

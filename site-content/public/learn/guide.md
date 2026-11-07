@@ -213,7 +213,7 @@ Example: `GET /v1/applets`
 
 ### `GET /v1/applets/dog-monitor`
 Pet monitor status, models, camera, today's totals and recent readings.
-Returns: running, models, camera, cameras, camera_search_delays (effective seconds per camera), camera_search_delay_default_s=20, sampling {all_s, default_s=20, min_s, max_s, cameras (effective seconds), overrides (cameras with their own value), photo_interval_s}, feeding (saved food-view and sampled eating-sound response; setup on device), pan_search, searching, scanning, error code, today totals, recent verdicts; does not take a photo.
+Returns: running, models, camera, cameras, camera_search_delays (effective seconds per camera), camera_search_delay_default_s=20, sampling {all_s, default_s=20, min_s, max_s, cameras (effective seconds), overrides (cameras with their own value), photo_interval_s}, feeding (saved food-view and sampled eating-sound response; setup on device), pan_search, searching, autocenter {enabled, status (off|ready|centering|centered|lost|limit|cap|budget|failed|needs_jev), centering, dead_zone, max_steps, hourly_steps, steps_left_this_hour, recent corrections [{at, camera, step, offset_x, offset_y, pan, tilt, after_x, after_y, result}]}, scanning, error code, today totals, recent verdicts; does not take a photo.
 Example: `GET /v1/applets/dog-monitor`
 
 ### `GET /v1/applets/dog-monitor/history`

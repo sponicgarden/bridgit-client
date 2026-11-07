@@ -74,6 +74,13 @@ data class DogStatus(
     val panSearchEnabled: Boolean = false,
     val searching: Boolean = false,
     val searchStatus: String = "Pan search off",
+    /** Auto-centring a pan/tilt camera on the pet (owner, 7 Nov 2026; on by default). */
+    val autoCenterEnabled: Boolean = true,
+    /** Fixed code: off, ready, centering, centered, lost, limit, cap, budget, failed, needs_jev. */
+    val autoCenterStatus: String = "ready",
+    val centering: Boolean = false,
+    /** The latest corrections (offset, step, result), newest last. */
+    val autoCenterSteps: List<cc.bridgit.app.lancamera.AutoCenterRun.Step> = emptyList(),
     /** Auto and no dog seen: roughly when the other camera is tried again (0 = not planned). */
     val nextScanAt: Long = 0,
     /** When monitoring last stopped (0 = not since the app started) and why, as a fixed code for the web portal:
@@ -118,6 +125,9 @@ class DogMonitor(private val app: BridgeApp) {
         private const val KEY_CAMERAS = "cameras"
         /** Monitoring should be on. Set by start, cleared only by a deliberate stop, so an update or restart resumes it. */
         private const val KEY_WANTED = "monitor_wanted"
+        private const val KEY_AUTOCENTER = "autocenter"
+        /** Corrections kept for the owner API and the portal. */
+        const val AUTOCENTER_RECENT = 20
         val BARK_SOUNDS = setOf("barking", "growling")
         /** The Pet monitor's [cc.bridgit.app.sound.LoudSounds] subscription. */
         const val LOUD_ID = "pet_monitor"
@@ -154,7 +164,7 @@ class DogMonitor(private val app: BridgeApp) {
             ?: listOf(if (prefs.getBoolean(KEY_FRONT, false)) DogCamera.FRONT else DogCamera.REAR)
         val inUse = if (mode == DogCamera.AUTO) cams else if (mode == DogCamera.MANUAL) prefs.getString("manual_cameras", null)?.split(",")?.filter(DogCamera::isCamera)?.takeIf { it.isNotEmpty() } ?: cams else listOf(mode)
         _state.value = DogStatus(frontCamera = inUse.first() == DogCamera.FRONT, cameraMode = mode, cameras = inUse,
-            panSearchEnabled=prefs.getBoolean("pan_search",false), microphones=prefs.getStringSet("microphones",emptySet())!!.filter(DogAudio::valid).sorted(), models = DogModels.restore(prefs.getStringSet(KEY_MODELS, null), prefs.getString(KEY_MODEL, null)), day = tracker.day(System.currentTimeMillis()),
+            panSearchEnabled=prefs.getBoolean("pan_search",false), autoCenterEnabled=prefs.getBoolean(KEY_AUTOCENTER,true), autoCenterStatus=if(prefs.getBoolean(KEY_AUTOCENTER,true)) "ready" else "off", microphones=prefs.getStringSet("microphones",emptySet())!!.filter(DogAudio::valid).sorted(), models = DogModels.restore(prefs.getStringSet(KEY_MODELS, null), prefs.getString(KEY_MODEL, null)), day = tracker.day(System.currentTimeMillis()),
             stopCode = if (prefs.getBoolean(KEY_WANTED, false)) "app_restarted" else null, bark = barks.day(System.currentTimeMillis()))
     }
 
@@ -444,6 +454,7 @@ class DogMonitor(private val app: BridgeApp) {
         val wake = app.getSystemService(PowerManager::class.java)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "bridgit:dog_monitor")
             .apply { setReferenceCounted(false) }
+        wakeLock = wake
         var next = System.currentTimeMillis()
         var n = 0
         try {
@@ -470,6 +481,8 @@ class DogMonitor(private val app: BridgeApp) {
         }
     }
 
+    /** The loop's wake lock, renewed by long auto-centring runs. */
+    @Volatile private var wakeLock: PowerManager.WakeLock? = null
     @Volatile private var checks = DogChecks(CHANGE)
     private val classifiers by lazy {
         // Restore only the durable installed definition. Never keep a second private copy in monitor preferences.
@@ -544,6 +557,8 @@ class DogMonitor(private val app: BridgeApp) {
                              deliver:suspend (String,Pair<ByteArray,Reading>?,String?,JSONObject?)->Unit) {
         for ((camera,keys) in targets.groupBy { it.substringBefore('|') }) {
             authorized()
+            // The owner's portal check comes first: a running auto-centring correction on this camera steps aside.
+            if(centeringCamera==camera) centerJob?.let { it.cancel(); it.join() }
             val context=kotlin.coroutines.coroutineContext
             val completed=mutableSetOf<String>()
             val token="portal-"+UUID.randomUUID()
@@ -653,15 +668,19 @@ class DogMonitor(private val app: BridgeApp) {
         val at = System.currentTimeMillis()
         change { it.copy(frame = bytes, frameAt = at, frameCamera=camera, photos = it.photos + 1) }
         val grid = Grids.fromJpeg(bytes)
-        val result = check(bytes, at, camera, grid, s.models)
+        var box: cc.bridgit.app.lancamera.PetBox? = null
+        val result = check(bytes, at, camera, grid, s.models, withBox = wantsBox(camera, s)) { box = it }
         record(result, camera)
+        result.readings.firstOrNull { it.model == "jev" && !it.reused }?.let { autoCenter(n, camera, it, box) }
         maybeSearch(result.tracked, n)
     }
 
-    private suspend fun check(bytes: ByteArray, at: Long, camera: String, grid: IntArray?, models: List<String>, force: Boolean = false): DogChecks.Result {
+    private suspend fun check(bytes: ByteArray, at: Long, camera: String, grid: IntArray?, models: List<String>, force: Boolean = false,
+                              withBox: Boolean = false, box: (cc.bridgit.app.lancamera.PetBox?) -> Unit = {}): DogChecks.Result {
         val selection = checks
         val result = selection.check(camera, grid, at, models, force, verifySelection = { requireCurrentClassifier(selection) }) { model ->
-            ask(bytes, at, model, camera, false, selection).first
+            val boxed = withBox && model == "jev"
+            ask(bytes, at, model, camera, boxed, selection).also { if (boxed) box(it.second) }.first
         }
         requireCurrentClassifier(selection)
         if (result.readings.isEmpty()) throw ModelsFailed(result)
@@ -891,6 +910,159 @@ class DogMonitor(private val app: BridgeApp) {
             searchJob=task
             try { task.join() } finally { if(searchJob===task)searchJob=null }
         }
+    }
+
+    // ---- Auto-centring (owner, 7 Nov 2026; lancamera/PtzAutoCenter.kt) ----
+    private data class Ptz(val enrollment: cc.bridgit.app.lancamera.LanCamera, val profile: String, val space: cc.bridgit.app.lancamera.PtzSpace?, val at: Long)
+    private val ptzCache = java.util.concurrent.ConcurrentHashMap<String, Ptz>()
+    private val stepBudget = cc.bridgit.app.lancamera.StepBudget()
+    private val centerGate = cc.bridgit.app.lancamera.AutoCenterGate()
+    @Volatile private var centerJob: Job? = null
+    /** The camera an auto-centring run is turning, so a portal check of it can take over at once. */
+    @Volatile private var centeringCamera: String? = null
+
+    /** On: after a photo where Jev sees the pet well off the middle of a pan/tilt camera, steer toward it and re-shoot at once. */
+    fun setAutoCenter(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_AUTOCENTER, enabled).apply()
+        if (!enabled) centerJob?.cancel()
+        centerGate.clear()
+        change { it.copy(autoCenterEnabled = enabled, autoCenterStatus = if (enabled) "ready" else "off") }
+        app.log.system("audit", "setting", "Pet monitor auto-centring ${if (enabled) "on" else "off"}")
+    }
+
+    /** For the owner API and the portal: the switch, what the last run did, and the latest corrections. */
+    fun autoCenterJson(): JSONObject = _state.value.let { s ->
+        JSONObject().put("enabled", s.autoCenterEnabled).put("status", s.autoCenterStatus).put("centering", s.centering)
+            .put("dead_zone", cc.bridgit.app.lancamera.AutoCenter.DEAD_ZONE).put("max_steps", cc.bridgit.app.lancamera.AutoCenter.MAX_STEPS)
+            .put("hourly_steps", cc.bridgit.app.lancamera.AutoCenter.HOURLY_STEPS).put("steps_left_this_hour", stepBudget.left(System.currentTimeMillis()))
+            .put("recent", org.json.JSONArray(s.autoCenterSteps.takeLast(10).map { it.json() }))
+    }
+
+    /** Ask Jev for the pet's box with this photo (one extra question in the same call): only for a pan/tilt camera being auto-centred. */
+    private fun wantsBox(camera: String, s: DogStatus): Boolean {
+        if (!s.autoCenterEnabled || !camera.startsWith("lan:") || (feeding.enabled && feeding.camera == camera)) return false
+        if ("jev" !in s.models) { if (s.autoCenterStatus != "needs_jev") change { it.copy(autoCenterStatus = "needs_jev") }; return false }
+        if (s.autoCenterStatus == "needs_jev") change { it.copy(autoCenterStatus = "ready") }
+        val known = ptzCache[camera]
+        return known == null || known.space != null || System.currentTimeMillis() - known.at > PTZ_RECHECK_MS
+    }
+
+    private val PTZ_RECHECK_MS = 10 * 60_000L
+
+    /** The camera's pan/tilt space, or null for a fixed camera (checked again every [PTZ_RECHECK_MS]). */
+    private suspend fun ptz(camera: String): Ptz? {
+        val enrolled = app.lanCameras.get(camera)
+        val now = System.currentTimeMillis()
+        ptzCache[camera]?.let { c ->
+            val same = c.enrollment.host == enrolled.host && c.enrollment.username == enrolled.username && c.enrollment.password == enrolled.password
+            if (same && (c.space != null || now - c.at < PTZ_RECHECK_MS)) return c.takeIf { it.space != null }
+        }
+        val found = try {
+            withContext(Dispatchers.IO) {
+                val client = cc.bridgit.app.lancamera.Onvif(enrolled, app)
+                val profile = client.info().profile
+                Ptz(enrolled, profile, client.controls(profile).positionSpace, now)
+            }
+        } catch (e: CancellationException) { throw e } catch (_: Exception) { Ptz(enrolled, "", null, now) }
+        ptzCache[camera] = found
+        return found.takeIf { it.space != null }
+    }
+
+    private fun outOfBudget(e: Exception) = e is Jev.Failure && e.reason in setOf("spend_cap", "applet_budget", "rate_limited", "clef_quota")
+
+    /**
+     * [reading] is a fresh Jev answer for a monitor photo from [camera] and [box] where it saw the pet. When the pet is
+     * outside the dead zone, steer toward it and photograph again at once until it is centred or a stop applies
+     * ([cc.bridgit.app.lancamera.AutoCenterRun]). Each correction photo is a normal reading (it counts in the day).
+     */
+    private suspend fun autoCenter(n: Int, camera: String, reading: Reading, box: cc.bridgit.app.lancamera.PetBox?) {
+        val s = _state.value
+        if (!s.autoCenterEnabled || !camera.startsWith("lan:") || reading.dark || (feeding.enabled && feeding.camera == camera)) return
+        if (!cc.bridgit.app.lancamera.AutoCenter.needs(reading.dogP, box)) {
+            if (box != null && reading.dogP >= cc.bridgit.app.lancamera.AutoCenter.PET_MIN && ptzCache[camera]?.space != null && s.autoCenterStatus != "centered") change { it.copy(autoCenterStatus = "centered") }
+            return
+        }
+        val started = System.currentTimeMillis()
+        if (!centerGate.mayStart(camera, started)) return
+        if (stepBudget.left(started) <= 0) { if (s.autoCenterStatus != "budget") change { it.copy(autoCenterStatus = "budget") }; return }
+        val ptz = ptz(camera) ?: return
+        val space = ptz.space!!
+        val enrolled = ptz.enrollment
+        val token = "pet-center-" + UUID.randomUUID()
+        val target = camera
+        val epoch = cameraSelectionEpoch
+        var outcome: cc.bridgit.app.lancamera.AutoCenterRun.Outcome? = null
+        var leased = false
+        supervisorScope {
+            val task = launch {
+                val ctx = currentCoroutineContext()
+                fun allowed() {
+                    ctx.ensureActive()
+                    check(_state.value.running && _state.value.autoCenterEnabled && cameraSelectionEpoch == epoch && app.remoteView.dogBackend && !app.remoteView.dogPaused &&
+                        app.settings.isOn("lan_camera") && app.captureNotificationsOn() && app.appDevices.allows(cc.bridgit.app.appdevices.AppDeviceAccess.DOG, camera) &&
+                        (camera in _state.value.cameras || _state.value.cameraMode == DogCamera.AUTO)) { "Auto-centring permission changed" }
+                    val live = app.lanCameras.get(camera)
+                    check(live.host == enrolled.host && live.username == enrolled.username && live.password == enrolled.password) { "Camera enrollment changed" }
+                }
+                if (!cc.bridgit.app.lancamera.CameraMotion.acquire(listOf(camera), token) { ctx[Job]?.cancel() }) return@launch
+                leased = true; centeringCamera = camera
+                change { it.copy(centering = true, autoCenterStatus = "centering") }
+                // The camera turned since its last photo was compared: that baseline no longer matches the view.
+                var movedSinceShot = false
+                try {
+                    val client = cc.bridgit.app.lancamera.Onvif(enrolled, app, token, ::allowed)
+                    outcome = cc.bridgit.app.lancamera.AutoCenterRun(space, object : cc.bridgit.app.lancamera.AutoCenterRun.Driver {
+                        override val camera = target
+                        override suspend fun authorize() = allowed()
+                        override suspend fun position() = withContext(Dispatchers.IO) { client.searchPosition(ptz.profile) }
+                        override suspend fun move(point: cc.bridgit.app.lancamera.PtzPoint) { movedSinceShot = true; withContext(Dispatchers.IO) { client.moveTo(ptz.profile, space, point) } }
+                        override suspend fun settle(ms: Long) = delay(ms)
+                        override suspend fun shoot(): cc.bridgit.app.lancamera.AutoCenterRun.Shot? {
+                            allowed(); wakeLock?.acquire(120_000L)
+                            val bytes = photo(n, camera, token)
+                            val at = System.currentTimeMillis()
+                            change { it.copy(frame = bytes, frameAt = at, frameCamera = camera, photos = it.photos + 1) }
+                            checks.forgetCamera(camera)
+                            var seen: cc.bridgit.app.lancamera.PetBox? = null
+                            // Only Jev gives the box, so a correction photo asks only Jev: no extra Clef call per step.
+                            val result = try { check(bytes, at, camera, Grids.fromJpeg(bytes), listOf("jev"), force = true, withBox = true) { seen = it } }
+                                catch (e: ModelsFailed) { if (e.result.failures.values.any(::outOfBudget)) throw cc.bridgit.app.lancamera.AutoCenterRun.OutOfBudget(); throw e }
+                            movedSinceShot = false
+                            allowed(); record(result, camera)
+                            if (result.readings.any { it.dark }) return cc.bridgit.app.lancamera.AutoCenterRun.Shot(0.0, null) // too dark to see: lost
+                            val jev = result.readings.firstOrNull { it.model == "jev" }
+                                ?: if (result.failures["jev"]?.let(::outOfBudget) == true) throw cc.bridgit.app.lancamera.AutoCenterRun.OutOfBudget() else return null
+                            return cc.bridgit.app.lancamera.AutoCenterRun.Shot(if (jev.dark) 0.0 else jev.dogP, seen)
+                        }
+                        override suspend fun logged(step: cc.bridgit.app.lancamera.AutoCenterRun.Step) {
+                            change { it.copy(autoCenterSteps = (it.autoCenterSteps + step).takeLast(AUTOCENTER_RECENT)) }
+                            app.log.system("diagnostic", "lancamera", "Pet monitor auto-centre ($camera) ${step.line()}")
+                        }
+                    }, stepBudget).run(cc.bridgit.app.lancamera.AutoCenterRun.Shot(reading.dogP, box))
+                } catch (e: CancellationException) { throw e } catch (e: Exception) {
+                    outcome = cc.bridgit.app.lancamera.AutoCenterRun.Outcome("failed", 0, false)
+                    android.util.Log.w("BridgitDog", "Auto-centring on $camera stopped: ${e.javaClass.simpleName}")
+                } finally {
+                    withContext(kotlinx.coroutines.NonCancellable + Dispatchers.IO) { runCatching { cc.bridgit.app.lancamera.Onvif(enrolled, app, token).stop(ptz.profile) } }
+                    if (movedSinceShot) checks.forgetCamera(camera)
+                    centeringCamera = null
+                    cc.bridgit.app.lancamera.CameraMotion.release(token)
+                    change { it.copy(centering = false, autoCenterStatus = if (outcome != null) it.autoCenterStatus else if (it.autoCenterEnabled) "ready" else "off") }
+                }
+            }
+            centerJob = task
+            try { task.join() } finally { if (centerJob === task) centerJob = null }
+        }
+        if (!leased) return
+        val o = outcome ?: run {
+            // Stopped by another camera operation (a portal check) or the switch: try again after a short wait.
+            centerGate.finished(camera, "lost", System.currentTimeMillis())
+            app.log.system("diagnostic", "lancamera", "Pet monitor auto-centre ($camera): stopped for another camera operation")
+            return
+        }
+        centerGate.finished(camera, o.result, System.currentTimeMillis())
+        change { it.copy(autoCenterStatus = if (it.autoCenterEnabled) o.result else "off") }
+        app.log.system("diagnostic", "lancamera", "Pet monitor auto-centre ($camera): ${o.result} after ${o.steps} step${if (o.steps == 1) "" else "s"}${if (o.limited) " (camera limit)" else ""}")
     }
 
     /** The camera is in use (an agent's photo, an armed camera): this slot is skipped. */

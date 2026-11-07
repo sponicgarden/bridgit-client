@@ -66,6 +66,7 @@
       "/v1/templates/practice-review",
       "/v1/templates/schema",
       "/v1/watch/applet",
+      "/v1/watch/applet/autocenter",
       "/v1/watch/applet/avatar",
       "/v1/watch/applet/budget",
       "/v1/watch/applet/capture",

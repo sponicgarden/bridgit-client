@@ -39,6 +39,8 @@ class DogChecks(private val settings: ChangeSettings) {
     /** When each camera's current run of too-dark photos began, so the gallery groups a dark night as one moment. */
     private val darkSince = HashMap<String, Long>()
     fun clear() { gates.clear(); last.clear(); darkSince.clear() }
+    /** The camera turned (auto-centring): its next photo starts a new change baseline instead of marking the whole picture as noise. */
+    fun forgetCamera(camera: String) { gates.keys.removeAll { it.first == camera } }
 
     suspend fun check(camera: String, grid: IntArray?, at: Long, models: List<String>, force: Boolean = false,
                       verifySelection: () -> Unit = {}, ask: suspend (String) -> Reading): Result {

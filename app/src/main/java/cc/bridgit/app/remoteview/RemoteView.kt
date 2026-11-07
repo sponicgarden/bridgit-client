@@ -102,7 +102,7 @@ class RemoteView(private val app: BridgeApp) {
         if (on == dogBackend) return
         if (on) {
             if (dogPendingDelete) { _backendStatus.value = "Finish deleting the previous backend before enabling it again."; return }
-            prefs.edit().remove("dog_web_paused").remove("dog_control_generation").remove("dog_control_revision").remove("dog_sampling_generation").remove("dog_sampling_revision").putBoolean("backend_dog", true).putLong("backend_dog_since", System.currentTimeMillis()).commit()
+            prefs.edit().remove("dog_web_paused").remove("dog_control_generation").remove("dog_control_revision").remove("dog_sampling_generation").remove("dog_sampling_revision").remove("dog_autocenter_generation").remove("dog_autocenter_revision").putBoolean("backend_dog", true).putLong("backend_dog_since", System.currentTimeMillis()).commit()
             app.dog.resetBackendHistory()
             dogServerReady = false; photoSentFrameAt = 0L; dogSentRunning = null
             _backendStatus.value = "Link your Google account to start the personal backend."
@@ -133,6 +133,7 @@ class RemoteView(private val app: BridgeApp) {
         prefs.edit().putBoolean("dog_web_paused", paused).putString("dog_control_generation", generation)
             .putLong("dog_control_revision", revision).commit()
         applySampling(RemoteViewDog.samplingCommand(control.optJSONObject("sampling")), generation)
+        applyAutoCenter(RemoteViewDog.autoCenterCommand(control.optJSONObject("autocenter")), generation)
         if (revision == 0L) return // a new portal starts unpaused but never starts monitoring by itself
         if (paused == wasPaused) return
         if (paused) {
@@ -151,6 +152,16 @@ class RemoteView(private val app: BridgeApp) {
         command.cameras.forEach { (id, seconds) -> runCatching { app.dog.setCameraSearchDelay(id, seconds) } } // a camera removed since is skipped
         app.log.system("audit", "setting", "You set Pet monitor's sampling interval from the web portal: all cameras and microphones ${command.allS ?: "${cc.bridgit.app.appdevices.SensorSearchDelays.DEFAULT_SECONDS} (default)"} s" +
             if (command.cameras.isEmpty()) "" else "; " + command.cameras.entries.joinToString { "${it.key} ${it.value?.let { v -> "$v s" } ?: "follows all"}" })
+        scope.launch { runCatching { pushDog(force = true) } }
+    }
+
+    /** The portal's auto-centring switch: applied once per revision, so a later change on the device isn't undone. */
+    private fun applyAutoCenter(command: RemoteViewDog.AutoCenterCommand?, generation: String) {
+        if (command == null) return
+        if (!RemoteViewDog.newControl(generation, command.revision, prefs.getString("dog_autocenter_generation", null), prefs.getLong("dog_autocenter_revision", -1))) return
+        prefs.edit().putString("dog_autocenter_generation", generation).putLong("dog_autocenter_revision", command.revision).commit()
+        if (app.dog.state.value.autoCenterEnabled != command.enabled) app.dog.setAutoCenter(command.enabled)
+        app.log.system("audit", "setting", "You turned Pet monitor auto-centring ${if (command.enabled) "on" else "off"} from the web portal")
         scope.launch { runCatching { pushDog(force = true) } }
     }
 
@@ -326,7 +337,7 @@ class RemoteView(private val app: BridgeApp) {
         val recent = app.dog.backendTracker.recent().filter { it.at >= dogSince }
         if (RemoteViewDog.awaitingReading(s, recent, dogSince, photoOn)) return@withLock
         val l = app.listener.value
-        val body = JSONObject().put("dog", RemoteViewDog.summary(s.copy(startedAt = maxOf(s.startedAt, dogSince)), day, recent, photoOn, app.dog.sampling())
+        val body = JSONObject().put("dog", RemoteViewDog.summary(s.copy(startedAt = maxOf(s.startedAt, dogSince)), day, recent, photoOn, app.dog.sampling(), app.dog.autoCenterJson())
                 // After a background restart Android keeps the device's own cameras closed until Bridgit is opened once.
                 .put("builtin_camera_blocked", s.running && l.running && l.startedInBackground))
             .put("timezone", java.util.TimeZone.getDefault().id)
@@ -567,7 +578,7 @@ class RemoteView(private val app: BridgeApp) {
         if (dogBackend && path in setOf("/v1/watch/events", "/v1/watch/dog")) {
             outgoing?.put("dog_listen",JSONObject().put("builtin",RemoteViewDog.builtinMic(app.settings.isOn("mic"),
                 app.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)==android.content.pm.PackageManager.PERMISSION_GRANTED)))
-            outgoing?.put("dog_capture_version",4)?.put("dog_capture_supported", true)?.put("dog_control_supported", true)?.put("dog_sampling_supported", true)?.put("dog_control_ack", JSONObject()
+            outgoing?.put("dog_capture_version",4)?.put("dog_capture_supported", true)?.put("dog_control_supported", true)?.put("dog_sampling_supported", true)?.put("dog_autocenter_supported", true)?.put("dog_control_ack", JSONObject()
                 .put("generation", prefs.getString("dog_control_generation", ""))
                 .put("revision", prefs.getLong("dog_control_revision", 0)))
         }

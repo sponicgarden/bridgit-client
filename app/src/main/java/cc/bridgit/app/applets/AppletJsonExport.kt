@@ -28,7 +28,7 @@ object AppletJsonExport {
         val state = dog.state.value
         val settings = JSONObject().put("camera_mode", state.cameraMode).put("cameras", JSONArray(state.cameras))
             .put("models", JSONArray(state.models)).put("microphones", JSONArray(state.microphones))
-            .put("pan_search", state.panSearchEnabled).put("sampling", dog.sampling()).put("feeding", dog.feeding.status())
+            .put("pan_search", state.panSearchEnabled).put("autocenter", state.autoCenterEnabled).put("sampling", dog.sampling()).put("feeding", dog.feeding.status())
         val clipResults = state.audioReadings.map { reading ->
             JSONObject().put("at", reading.at).put("source", reading.source).put("sound", reading.sound)
                 .put("confidence", reading.confidence).put("on_device", reading.onDevice)

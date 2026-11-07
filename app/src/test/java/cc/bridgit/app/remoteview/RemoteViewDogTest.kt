@@ -23,6 +23,17 @@ class RemoteViewDogTest {
         assertFalse(RemoteViewDog.newControl("consent-a", -1, null, 0))
     }
 
+    @Test fun autoCenterCommandsNeedARevisionAndABoolean() {
+        fun cmd(json: String) = RemoteViewDog.autoCenterCommand(org.json.JSONObject(json))
+        assertEquals(RemoteViewDog.AutoCenterCommand(3, false), cmd("{revision:3,enabled:false}"))
+        assertEquals(RemoteViewDog.AutoCenterCommand(0, true), cmd("{revision:0,enabled:true}"))
+        assertEquals(null, cmd("{revision:3,enabled:'true'}"))
+        assertEquals(null, cmd("{revision:-1,enabled:true}"))
+        assertEquals(null, cmd("{enabled:true}"))
+        assertEquals(null, cmd("{revision:2.5,enabled:true}"))
+        assertEquals(null, RemoteViewDog.autoCenterCommand(null))
+    }
+
     @Test fun samplingCommandsAreBoundedAndAllOrNothing() {
         fun cmd(json: String) = RemoteViewDog.samplingCommand(org.json.JSONObject(json))
         val c = cmd("{revision:3,all_s:20,cameras:{rear:45,'lan:Bowl-1':null}}")!!

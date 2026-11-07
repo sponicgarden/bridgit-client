@@ -42,6 +42,17 @@ object RemoteViewDog {
         return SamplingCommand(revision, all, cams)
     }
 
+    /** The portal's auto-centring switch, carried in dog_control.autocenter: {revision, enabled}. */
+    data class AutoCenterCommand(val revision: Long, val enabled: Boolean)
+
+    /** Null when missing or malformed: a bad command changes nothing. */
+    fun autoCenterCommand(o: JSONObject?): AutoCenterCommand? {
+        if (o == null) return null
+        val revision = when (val v = o.opt("revision")) { is Int -> v.toLong(); is Long -> v; else -> return null }.takeIf { it >= 0 } ?: return null
+        val enabled = o.opt("enabled") as? Boolean ?: return null
+        return AutoCenterCommand(revision, enabled)
+    }
+
     /** At most one summary per 30 s while the monitor runs; Start and Stop go at once. */
     const val EVERY_MS = 30_000L
     const val PHOTO_EVERY_MS = 30_000L
@@ -91,7 +102,7 @@ object RemoteViewDog {
 
     const val MAX_SCAN_CAMERAS = 8
 
-    fun summary(s: DogStatus, day: DogDay?, recent: List<Reading>, photoOn: Boolean, sampling: JSONObject? = null): JSONObject {
+    fun summary(s: DogStatus, day: DogDay?, recent: List<Reading>, photoOn: Boolean, sampling: JSONObject? = null, autocenter: JSONObject? = null): JSONObject {
         val o = JSONObject().put("running", s.running).put("searching",s.searching).put("model", s.model)
             .put("started_at", if (s.startedAt > 0) s.startedAt else JSONObject.NULL)
             .put("error", s.errorCode ?: JSONObject.NULL).put("photo_on", photoOn)
@@ -106,6 +117,8 @@ object RemoteViewDog {
             .put("barking_now", s.running && s.bark.now)
         // The sampling interval (default 20 s): {all_s, default_s, min_s, max_s, cameras, overrides, photo_interval_s}.
         if (sampling != null) o.put("sampling", sampling)
+        // Auto-centring (7 Nov 2026): {enabled, status, centering, recent corrections}; the backend keeps the same bounded shape.
+        if (autocenter != null) o.put("autocenter", autocenter)
         if (day != null) {
             // The portal knows no "dark" tally; there, a too-dark photo counts as no dog in view (as its reading says).
             val views = JSONObject(); day.views.forEach { (k, v) -> val key = if (k == "dark") "no_dog" else k; views.put(key, views.optInt(key) + v) }

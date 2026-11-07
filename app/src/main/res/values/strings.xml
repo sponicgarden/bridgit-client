@@ -306,9 +306,6 @@
     <string name="network_devices_title">Network devices</string>
     <string name="network_find">Run Level 2 Network Device Diagnostics</string>
     <string name="network_explanation">Cameras, speakers, TVs and more — discover what’s on your Wi-Fi or Ethernet network. Device types are suggestions. Pairing and control agent access stay in your control.</string>
-    <string name="network_consent_title">Allow a network scan?</string>
-    <string name="network_consent">Bridgit will look for advertised devices on your current local network for up to 20 seconds. Device names, addresses and last-seen times are saved privately on this device. Missing devices stay listed as unconnected; refresh to check again. This does not pair devices or give control agents access.</string>
-    <string name="network_allow">Allow scan</string>
     <string name="network_stop">Stop scan</string>
     <string name="network_scanning">Looking for devices…</string>
     <string name="network_ready">Ready to discover · Wi-Fi or Ethernet required</string>

@@ -63,7 +63,6 @@ class NetworkDevicesFragment : Fragment() {
         (app.lanCameras.all().map { it.host } + app.lanDevices.all().map { it.host }).toSet()
     }.getOrDefault(emptySet())
     private var scan: Job? = null
-    private var consent: androidx.appcompat.app.AlertDialog? = null
     private var details: androidx.appcompat.app.AlertDialog? = null
     private lateinit var find: MaterialButton
     private lateinit var stop: MaterialButton
@@ -342,12 +341,13 @@ class NetworkDevicesFragment : Fragment() {
         details = MaterialAlertDialogBuilder(context).setView(panel).create().also { it.show() }
     }
 
-    /** Asks once per tap (the consent dialog), then scans. Also used by the Devices Map's Run button. */
+    /**
+     * The owner's tap starts the scan; no "Allow a network scan?" step in between (owner, 7 Nov 2026).
+     * Also used by the Devices Map's L2 button. Stop scan ends it early.
+     */
     fun requestScan() {
         if (view == null || scan?.isActive == true) return
-        consent = MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.network_consent_title)
-            .setMessage(R.string.network_consent).setNegativeButton(android.R.string.cancel, null)
-            .setPositiveButton(R.string.network_allow) { _, _ -> startScan() }.show()
+        startScan()
     }
 
     val scanning get() = scan?.isActive == true
@@ -731,7 +731,6 @@ class NetworkDevicesFragment : Fragment() {
     override fun onStop() {
         expiry?.cancel(); expiry = null
         stopScan()
-        consent?.dismiss(); consent = null
         details?.dismiss(); details = null
         super.onStop()
     }

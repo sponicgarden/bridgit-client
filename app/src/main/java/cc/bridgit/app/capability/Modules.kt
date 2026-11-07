@@ -129,6 +129,7 @@ class StatusModule(app: BridgeApp) : Capability(app) {
                 .put("charging", (bat?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0)
                 .put("bind_address", s.boundTo.firstOrNull() ?: JSONObject.NULL).put("port", api.port)
                 .put("base_url", app.address().baseUrl)
+                .put("bridgit_name", cc.bridgit.app.feedback.DeviceNames.hint(app, agent?.id))
                 .put("owner_email", ownerEmailJson())
                 .put("api_revision", cc.bridgit.app.api.ApiChanges.CURRENT)
                 .put("whats_new", cc.bridgit.app.api.ApiChanges.whatsNew(agent?.let { app.agents.get(it.id) }?.knownApiRevision ?: 0))

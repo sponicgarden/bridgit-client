@@ -1,6 +1,6 @@
 {
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Stop a body tracking session early and free the camera; its frames stay readable for 15 minutes",

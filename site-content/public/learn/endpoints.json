@@ -1726,6 +1726,96 @@
    "requires": null
   },
   {
+   "summary": "Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_name_get",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/name",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/name",
+   "capability": "owner_features",
+   "returns": "status unregistered|registered,name,label,visible,advice,how",
+   "errors": [],
+   "requires": null
+  },
+  {
+   "summary": "Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_name_post",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "name",
+     "description": "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "label",
+     "description": "Up to 60 characters shown on public lookup; null clears",
+     "type": [
+      "string",
+      "null"
+     ],
+     "required": false
+    },
+    {
+     "name": "visible",
+     "description": "Public lookup shows label and online; default true; false hides",
+     "type": "boolean",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/owner/configuration/name {\"name\":\"kitchen-tab\"}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/name",
+   "capability": "owner_features",
+   "returns": "status,name,label,visible; 409 name_taken (lookup) means suggest another; 409 already_named means the name is fixed",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "not_found",
+    "conflict",
+    "upstream_failed"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's; explicit owner.configuration grant required; no per-change phone approval",
+   "method": "DELETE",
+   "auth": true,
+   "mcp_tool": "owner_configuration_name_delete",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "DELETE /v1/owner/configuration/name ",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/name",
+   "capability": "owner_features",
+   "returns": "status,name,label=null,visible=false",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "not_found",
+    "conflict",
+    "upstream_failed"
+   ],
+   "requires": null
+  },
+  {
    "summary": "Read saved Pet monitor food-view and eating-sound response configuration",
    "method": "GET",
    "auth": true,
@@ -10502,7 +10592,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 127,
- "count": 318,
+ "api_revision": 128,
+ "count": 321,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

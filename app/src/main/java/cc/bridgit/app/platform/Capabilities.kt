@@ -70,7 +70,7 @@ object Capabilities {
     fun describe(app: BridgeApp, agent: Policy.Agent): JSONObject {
         val grants = app.platform.store.grants(agent.id)
         return JSONObject().put("device_id",app.platform.store.deviceId)
-        .put("device_name",app.platform.store.setting("device_name",Build.MODEL)).put("android_api",Build.VERSION.SDK_INT)
+        .put("device_name",app.platform.store.setting("device_name",Build.MODEL)).put("bridgit_name",cc.bridgit.app.feedback.DeviceNames.hint(app,agent.id)).put("android_api",Build.VERSION.SDK_INT)
         .put("app_version",BuildConfigInfo.versionName(app)).put("mode",if (BuildConfig.PRIVATE_CONTROL) "private" else "play")
         .put("grant_mode", if (app.agents.get(agent.id)?.maximumControl == true) "maximum" else "limited")
         .put("services",cc.bridgit.app.judgment.ServiceCatalog.links()).put("epoch",app.platform.epoch).put("capabilities",JSONArray(all.map { cap ->

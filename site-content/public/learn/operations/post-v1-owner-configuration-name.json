@@ -1,0 +1,77 @@
+{
+ "documentation_revision": 105,
+ "api_revision": 128,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_name_post",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "name",
+    "description": "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "label",
+    "description": "Up to 60 characters shown on public lookup; null clears",
+    "type": [
+     "string",
+     "null"
+    ],
+    "required": false
+   },
+   {
+    "name": "visible",
+    "description": "Public lookup shows label and online; default true; false hides",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/name {\"name\":\"kitchen-tab\"}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/name",
+  "capability": "owner_features",
+  "returns": "status,name,label,visible; 409 name_taken (lookup) means suggest another; 409 already_named means the name is fixed",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "visible": {
+     "description": "Public lookup shows label and online; default true; false hides",
+     "type": "boolean"
+    },
+    "name": {
+     "description": "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "label": {
+     "description": "Up to 60 characters shown on public lookup; null clears",
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

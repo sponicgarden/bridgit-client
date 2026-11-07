@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 105,
+ "api_revision": 128,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_name_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/name",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/name",
+  "capability": "owner_features",
+  "returns": "status unregistered|registered,name,label,visible,advice,how",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -249,6 +249,22 @@ class UnattendedConfigurationTest {
         assertEquals(0, service.notifications(caller.id).getJSONArray("packages").length())
     }
 
+    @Test fun bridgitNameValidatesLocallyAndKeepsTheFirstName() = runBlocking {
+        val service = ConfigurationResources(app, caller)
+        assertEquals("kitchen-tab", cc.bridgit.app.feedback.DeviceNames.parse(" Kitchen-Tab "))
+        for (bad in listOf("ab", "porch/cam", "-cam", "two--hyphens", "x".repeat(31), "has space")) assertNull(bad, cc.bridgit.app.feedback.DeviceNames.parse(bad))
+        assertEquals("unregistered", cc.bridgit.app.feedback.DeviceNames.hint(app).getString("status"))
+        assertTrue(cc.bridgit.app.feedback.DeviceNames.hint(app).getString("how").contains(cc.bridgit.app.feedback.DeviceNames.OPERATION))
+        for (body in listOf("""{"name":"a/b"}""", """{"name":7}""", """{"nick":"x"}""", """{}""", """{"label":5}""", """{"visible":"yes"}""", """{"label":"${"x".repeat(61)}"}"""))
+            try { service.name(o(body)); fail(body) } catch (e: ApiError) { assertEquals(body, "invalid_parameter", e.code) }
+        app.platform.store.setting("bridgit_name", """{"name":"porch-cam","label":null,"visible":true,"heartbeat_every_s":300}""", true)
+        assertEquals("porch-cam", cc.bridgit.app.feedback.DeviceNames.hint(app).getString("name"))
+        try { service.name(o("""{"name":"kitchen-tab"}""")); fail() } catch (e: ApiError) { assertEquals("already_named", e.code); assertEquals("porch-cam", e.extra["name"]) }
+        assertTrue(ConfigurationEndpoints.ALL.containsAll(listOf(ConfigurationEndpoints.NAME, ConfigurationEndpoints.NAME_SET, ConfigurationEndpoints.NAME_DELETE)))
+        val types = McpTools.inputSchema(ConfigurationEndpoints.NAME_SET).getJSONObject("properties").getJSONObject("label").getJSONArray("type")
+        assertTrue((0 until types.length()).map(types::getString).contains("null"))
+    }
+
     @Test fun newSchemasExposeScopeStringArraysAndNullableClears() {
         for (spec in listOf(ConfigurationEndpoints.KEY_SET, ConfigurationEndpoints.NOTIFICATIONS_SET, ConfigurationEndpoints.MODES_SET)) {
             val field = when (spec) { ConfigurationEndpoints.KEY_SET -> "credentials"; ConfigurationEndpoints.NOTIFICATIONS_SET -> "packages"; else -> "custom" }

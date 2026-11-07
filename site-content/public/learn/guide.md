@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 127). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 128). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,11 +14,11 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 127 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 128 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 127
-- Owner-authorized agents can bring Bridgit itself forward with an audit reason and a device-wide cooldown; the result confirms visibility or an Open Bridgit notification fallback (`/v1/app/foreground`)
+## New in revision 128
+- Bridgit names: the first control call registers this Bridgit's Device Domain Name (bridgit_name in health and capabilities); label and visibility are configurable and a visible name sends a heartbeat (`/v1/owner/configuration/name`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -421,6 +421,24 @@ Body (JSON): `email` (required) Valid email; null removes after server confirmat
 Returns: email,state,human_verification_required,delivery; pending/failed delivery does not imply verification.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/owner/configuration/email {"email":"owner@example.com"}`
+
+### `GET /v1/owner/configuration/name`
+Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend.
+Returns: status unregistered|registered,name,label,visible,advice,how.
+Example: `GET /v1/owner/configuration/name`
+
+### `POST /v1/owner/configuration/name`
+Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval.
+Body (JSON): `name` Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served; `label` Up to 60 characters shown on public lookup; null clears; `visible` Public lookup shows label and online; default true; false hides.
+Returns: status,name,label,visible; 409 name_taken (lookup) means suggest another; 409 already_named means the name is fixed.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/name {"name":"kitchen-tab"}`
+
+### `DELETE /v1/owner/configuration/name`
+Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's; explicit owner.configuration grant required; no per-change phone approval.
+Returns: status,name,label=null,visible=false.
+Accepts `Idempotency-Key`.
+Example: `DELETE /v1/owner/configuration/name `
 
 ### `GET /v1/owner/configuration/feeding`
 Read saved Pet monitor food-view and eating-sound response configuration.
@@ -2126,6 +2144,8 @@ All endpoints use the paired agent's Authorization bearer key over the existing 
 | 403 | `forbidden` | Not allowed for this agent (`reason`, for example `fixer_mode_off` or `super_powers_off`: the owner hasn't given you Bridgit Fixer Mode or Agent Super Powers; `agent_paused`: the owner paused you) | Don't retry; for `agent_paused`, wait until the owner resumes you |
 | 409 | `in_progress` | Same `Idempotency-Key` still running | Wait, then retry with the same key |
 | 409 | `conflict` | The interaction isn't in a state for this (for example a text panel that's closed or finished) | Read it with GET /v1/interactions/{id}; start a new one if needed |
+| 409 | `name_taken` | That Device Domain Name belongs to another Bridgit (`lookup`) | Suggest another name; don't retry unchanged |
+| 409 | `already_named` | This Bridgit already has its Device Domain Name for good (`name`) | Use that name; change only label or visible |
 | 409 | `idempotency_expired` | Same `Idempotency-Key` already done, but its media result is no longer replayed (15 min) | Don't repeat; use a new key only if you really want a new capture |
 | 429 | `quota_exceeded` | Daily data, file storage or relay job quota used up (`limit`) | Remove old transfers or wait for retention |
 | 429 | `too_many_waits` | Too many open `wait` requests | Close some waits |

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Add a table row, checked against its columns. Owner control agents can act on any applet; applet principals need installer sharing",

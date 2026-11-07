@@ -1,6 +1,6 @@
 {
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "source": "Commands + ToolSchemas + PlatformApi.openApi",
  "operation": {
   "path": "/v2/call",
@@ -46,6 +46,8 @@
        "DELETE /v1/owner/configuration/callbacks/{agent}",
        "POST /v1/owner/configuration/notifications/{agent}",
        "POST /v1/owner/configuration/email",
+       "POST /v1/owner/configuration/name",
+       "DELETE /v1/owner/configuration/name",
        "POST /v1/owner/configuration/feeding",
        "POST /v1/owner/configuration/modes",
        "POST /v1/owner/configuration/listening"
@@ -94,6 +96,8 @@
          "DELETE /v1/owner/configuration/callbacks/{agent}",
          "POST /v1/owner/configuration/notifications/{agent}",
          "POST /v1/owner/configuration/email",
+         "POST /v1/owner/configuration/name",
+         "DELETE /v1/owner/configuration/name",
          "POST /v1/owner/configuration/feeding",
          "POST /v1/owner/configuration/modes",
          "POST /v1/owner/configuration/listening"
@@ -146,6 +150,8 @@
       "DELETE /v1/owner/configuration/callbacks/{agent}",
       "POST /v1/owner/configuration/notifications/{agent}",
       "POST /v1/owner/configuration/email",
+      "POST /v1/owner/configuration/name",
+      "DELETE /v1/owner/configuration/name",
       "POST /v1/owner/configuration/feeding",
       "POST /v1/owner/configuration/modes",
       "POST /v1/owner/configuration/listening"

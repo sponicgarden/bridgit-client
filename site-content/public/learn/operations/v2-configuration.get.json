@@ -1,6 +1,6 @@
 {
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "source": "Commands + ToolSchemas + PlatformApi.openApi",
  "operation": {
   "path": "/v2/call",
@@ -37,6 +37,7 @@
        "GET /v1/owner/configuration/callbacks",
        "GET /v1/owner/configuration/notifications/{agent}",
        "GET /v1/owner/configuration/email",
+       "GET /v1/owner/configuration/name",
        "GET /v1/owner/configuration/feeding",
        "GET /v1/owner/configuration/modes",
        "GET /v1/owner/configuration/listening"
@@ -76,6 +77,7 @@
          "GET /v1/owner/configuration/callbacks",
          "GET /v1/owner/configuration/notifications/{agent}",
          "GET /v1/owner/configuration/email",
+         "GET /v1/owner/configuration/name",
          "GET /v1/owner/configuration/feeding",
          "GET /v1/owner/configuration/modes",
          "GET /v1/owner/configuration/listening"
@@ -118,6 +120,7 @@
       "GET /v1/owner/configuration/callbacks",
       "GET /v1/owner/configuration/notifications/{agent}",
       "GET /v1/owner/configuration/email",
+      "GET /v1/owner/configuration/name",
       "GET /v1/owner/configuration/feeding",
       "GET /v1/owner/configuration/modes",
       "GET /v1/owner/configuration/listening"

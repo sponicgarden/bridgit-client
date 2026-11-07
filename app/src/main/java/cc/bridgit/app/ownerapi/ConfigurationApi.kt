@@ -49,6 +49,12 @@ object ConfigurationEndpoints {
     val EMAIL = read("/email", "Read alert-address enrollment status; verification remains a real email step", "email,state,human_verification_required")
     val EMAIL_SET = write("POST", "/email", "Set/replace/clear alert address using native enrollment; this never fabricates confirmation",
         listOf(Param("email", "string|null", "Valid email; null removes after server confirmation", true)), "{\"email\":\"owner@example.com\"}", "email,state,human_verification_required,delivery; pending/failed delivery does not imply verification")
+    val NAME = read("/name", "Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend", "status unregistered|registered,name,label,visible,advice,how")
+    val NAME_SET = write("POST", "/name", "Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good",
+        listOf(Param("name", "string", "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served"),
+            Param("label", "string|null", "Up to 60 characters shown on public lookup; null clears"), Param("visible", "boolean", "Public lookup shows label and online; default true; false hides")),
+        "{\"name\":\"kitchen-tab\"}", "status,name,label,visible; 409 name_taken (lookup) means suggest another; 409 already_named means the name is fixed")
+    val NAME_DELETE = write("DELETE", "/name", "Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's", emptyList(), "", "status,name,label=null,visible=false")
     val FEEDING = read("/feeding", "Read saved Pet monitor food-view and eating-sound response configuration", "enabled,camera,position{x,y},view_saved,status; no camera/network access or capture is triggered by the read")
     val FEEDING_SET = write("POST", "/feeding", "Save current enrolled Pet monitor camera position, enable/disable eating-sound response or clear saved view; existing camera/audio grants and motion lease checks apply",
         listOf(Param("save_current_camera", "string", "Enrolled lan:<id> in Pet monitor; reads its current ONVIF position, never moves it"), Param("enabled", "boolean", "Needs a saved food view"), Param("clear", "boolean", "true clears position and disables response; incompatible with save/enable")),
@@ -79,7 +85,7 @@ object ConfigurationEndpoints {
             Param("fixer_mode", "boolean", "Delegate/revoke Fixer Mode"), Param("maximum_control", "boolean", "Preserves the separate Superpowers role. true alone grants native maximum capabilities/roles/scopes; false stops future maximum inheritance")),
         example = "POST /v1/owner/configuration/access/agents/example {\"expected_generation\":\"<generation from discovery>\",\"control_scopes\":[\"owner.configuration\"]}", returns = "sanitized control-agent access,approval_required=false; no key creation or Android consent bypass")
     val ALL = listOf(ACCESS, ACCESS_FEATURES, ACCESS_AGENT, APPROVALS, APPROVAL, APPROVAL_DECIDE, INDEX, SETTINGS, ACTION, KEYS, KEY_SET, KEY_DELETE, CONNECTIONS, CONNECTION_CREATE, CONNECTION_UPDATE, CONNECTION_DELETE, CONNECTION_ROTATE,
-        CALLBACKS, CALLBACK_SET, CALLBACK_DELETE, NOTIFICATIONS, NOTIFICATIONS_SET, EMAIL, EMAIL_SET, FEEDING, FEEDING_SET, MODES, MODES_SET, LISTENING, LISTENING_SET)
+        CALLBACKS, CALLBACK_SET, CALLBACK_DELETE, NOTIFICATIONS, NOTIFICATIONS_SET, EMAIL, EMAIL_SET, NAME, NAME_SET, NAME_DELETE, FEEDING, FEEDING_SET, MODES, MODES_SET, LISTENING, LISTENING_SET)
 }
 
 fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
@@ -90,7 +96,7 @@ fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
             .put("actions_url", "/v1/owner/configuration/actions").put("keys_url", "/v1/owner/configuration/keys")
             .put("connections_url", "/v1/owner/configuration/connections").put("callbacks_url", "/v1/owner/configuration/callbacks")
             .put("notifications_url", "/v1/owner/configuration/notifications/{agent}").put("feeding_url", "/v1/owner/configuration/feeding")
-            .put("email_url", "/v1/owner/configuration/email").put("modes_url", "/v1/owner/configuration/modes")
+            .put("email_url", "/v1/owner/configuration/email").put("name_url", "/v1/owner/configuration/name").put("modes_url", "/v1/owner/configuration/modes")
             .put("listening_url", "/v1/owner/configuration/listening").put("human_authority", JSONArray(listOf("first Super Powers authority and initial key pairing", "OS consent", "account sign-in/verification", "biometric/security controls"))))
     }
     endpoint(ConfigurationEndpoints.ACCESS) { Reply.Json(SuperAgentAccess(app, agent!!).get()) }
@@ -120,6 +126,9 @@ fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
     endpoint(ConfigurationEndpoints.NOTIFICATIONS_SET) { Reply.Json(ConfigurationResources(app, agent!!).notifications(path("agent") ?: "", body)) }
     endpoint(ConfigurationEndpoints.EMAIL) { Reply.Json(ConfigurationResources(app, agent!!).email()) }
     endpoint(ConfigurationEndpoints.EMAIL_SET) { Reply.Json(ConfigurationResources(app, agent!!).email(body)) }
+    endpoint(ConfigurationEndpoints.NAME) { Reply.Json(ConfigurationResources(app, agent!!).name()) }
+    endpoint(ConfigurationEndpoints.NAME_SET) { Reply.Json(ConfigurationResources(app, agent!!).name(body)) }
+    endpoint(ConfigurationEndpoints.NAME_DELETE) { Reply.Json(ConfigurationResources(app, agent!!).hideName()) }
     endpoint(ConfigurationEndpoints.FEEDING) { Reply.Json(ConfigurationResources(app, agent!!).feeding()) }
     endpoint(ConfigurationEndpoints.FEEDING_SET) { Reply.Json(ConfigurationResources(app, agent!!).feeding(body)) }
     endpoint(ConfigurationEndpoints.MODES) { Reply.Json(ConfigurationResources(app, agent!!).modes()) }

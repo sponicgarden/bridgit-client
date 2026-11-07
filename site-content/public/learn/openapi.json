@@ -62,6 +62,8 @@
        "forbidden",
        "in_progress",
        "conflict",
+       "name_taken",
+       "already_named",
        "idempotency_expired",
        "quota_exceeded",
        "too_many_waits",
@@ -811,6 +813,117 @@
    }],
    "tags": ["outbound"]
   }},
+  "/v1/owner/configuration/name": {
+   "post": {
+    "summary": "Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
+    "x-bridgit-control-scope": "owner.configuration",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {
+      "visible": {
+       "description": "Public lookup shows label and online; default true; false hides",
+       "type": "boolean"
+      },
+      "name": {
+       "description": "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served",
+       "type": "string"
+      },
+      "label": {
+       "description": "Up to 60 characters shown on public lookup; null clears",
+       "type": [
+        "string",
+        "null"
+       ]
+      }
+     },
+     "required": []
+    }}}},
+    "operationId": "postOwnerConfigurationName",
+    "responses": {
+     "200": {"description": "status,name,label,visible; 409 name_taken (lookup) means suggest another; 409 already_named means the name is fixed"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "403": {
+      "description": "forbidden, agent_not_allowed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "502": {
+      "description": "upstream_failed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   },
+   "get": {
+    "summary": "Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "getOwnerConfigurationName",
+    "responses": {
+     "200": {"description": "status unregistered|registered,name,label,visible,advice,how"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"}
+    },
+    "tags": ["owner_features"]
+   },
+   "delete": {
+    "summary": "Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's; explicit owner.configuration grant required; no per-change phone approval",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "deleteOwnerConfigurationName",
+    "responses": {
+     "200": {"description": "status,name,label=null,visible=false"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "403": {
+      "description": "forbidden, agent_not_allowed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "502": {
+      "description": "upstream_failed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   }
+  },
   "/v1/applet/tables/{table}/rows": {
    "post": {
     "summary": "Save a row in this applet principal's own declared table. Use typed columns or a json column with a description; no undeclared keys or blobs",
@@ -10988,7 +11101,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 127,
+  "x-api-revision": 128,
   "title": "Bridgit",
   "version": "1.8.0"
  }

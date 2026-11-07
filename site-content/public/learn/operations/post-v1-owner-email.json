@@ -1,6 +1,6 @@
 {
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Give the owner's email address: bridgit.cc emails them a link, and tapping it verifies the address (the same address gets email alerts). Works during and after the 24 hours; not once an address is verified (the owner changes it on the phone)",

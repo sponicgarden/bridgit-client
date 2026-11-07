@@ -1,6 +1,6 @@
 {
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Cancel your resource job; SDK-managed transfers may continue after the waiter is cancelled",

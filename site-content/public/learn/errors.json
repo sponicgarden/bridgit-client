@@ -1,6 +1,6 @@
 {
  "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
- "api_revision": 127,
+ "api_revision": 128,
  "errors": [
   {
    "code": "model_unavailable",
@@ -342,6 +342,20 @@
    "code": "conflict",
    "you_should": "Read it with GET /v1/interactions/{id}; start a new one if needed",
    "meaning": "The interaction isn't in a state for this (for example a text panel that's closed or finished)",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "name_taken",
+   "you_should": "Suggest another name; don't retry unchanged",
+   "meaning": "That Device Domain Name belongs to another Bridgit (`lookup`)",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "already_named",
+   "you_should": "Use that name; change only label or visible",
+   "meaning": "This Bridgit already has its Device Domain Name for good (`name`)",
    "http": 409,
    "returned_today": true
   },

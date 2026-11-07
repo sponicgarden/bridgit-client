@@ -2870,6 +2870,36 @@
      "tool": "owner_configuration_email_post"
     },
     {
+     "summary": "Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend",
+     "path": "/v1/owner/configuration/name",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-name.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-name.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_name_get"
+    },
+    {
+     "summary": "Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/name",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-name.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-name.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_name_post"
+    },
+    {
+     "summary": "Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/name",
+     "method": "DELETE",
+     "documentation": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-name.json",
+     "operation_url": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-name.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_name_delete"
+    },
+    {
      "summary": "Read saved Pet monitor food-view and eating-sound response configuration",
      "path": "/v1/owner/configuration/feeding",
      "method": "GET",
@@ -7281,8 +7311,8 @@
   "kind": "source_generated",
   "released": "Check public updater manifest; source documentation is not release evidence."
  },
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "installed_api_revision": null,
  "categories": [
   "sense",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Your own key for the Bridgit team's feedback backend: file reports, check their status and verify fixes there directly. Agent reporting always goes directly to the servers",

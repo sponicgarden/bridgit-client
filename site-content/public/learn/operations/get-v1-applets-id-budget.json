@@ -1,6 +1,6 @@
 {
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "An installed applet's budget on all the owner's phones: limits with used, forecast and reset, state (ok, warning, out), the owner's ceiling, whether agents may change it, its actions with intervals and projections, and the last changes. For the applet you asked for, or any applet when you have Budgets",

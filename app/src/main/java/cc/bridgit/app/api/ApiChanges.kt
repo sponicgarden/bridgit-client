@@ -583,6 +583,9 @@ object ApiChanges {
         Revision(127, "1.8.0", "2026-11-07", listOf(
             Item("Owner-authorized agents can bring Bridgit itself forward with an audit reason and a device-wide cooldown; the result confirms visibility or an Open Bridgit notification fallback", "/v1/app/foreground"),
         )),
+        Revision(128, "1.8.0", "2026-11-07", listOf(
+            Item("Bridgit names: the first control call registers this Bridgit's Device Domain Name (bridgit_name in health and capabilities); label and visibility are configurable and a visible name sends a heartbeat", "/v1/owner/configuration/name"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

@@ -1,0 +1,38 @@
+{
+ "documentation_revision": 105,
+ "api_revision": 128,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "owner_configuration_name_delete",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/owner/configuration/name ",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/name",
+  "capability": "owner_features",
+  "returns": "status,name,label=null,visible=false",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"idempotency_key": {
+    "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+    "type": "string"
+   }},
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

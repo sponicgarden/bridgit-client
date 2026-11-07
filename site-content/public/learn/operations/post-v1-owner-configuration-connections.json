@@ -1,6 +1,6 @@
 {
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Create a connection with native URL/header validation; request UUID/digest durably prevents duplicate creation after process restart; explicit owner.configuration grant required; no per-change phone approval",

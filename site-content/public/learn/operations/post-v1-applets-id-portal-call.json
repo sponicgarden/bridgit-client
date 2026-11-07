@@ -1,6 +1,6 @@
 {
- "documentation_revision": 104,
- "api_revision": 127,
+ "documentation_revision": 105,
+ "api_revision": 128,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Call one function an open portal's page exposes (GET \u2026/portal lists them) and wait for its answer. The page decides what it does and what the screen shows",

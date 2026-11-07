@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 127. Full index: https://bridgit.cc/learn/index.json.
+API revision 128. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -78,6 +78,9 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `owner_configuration_notifications_post` | `POST /v1/owner/configuration/notifications/{agent}` | Replace an agent's notification-app selection; [] clears; native removal also pauses affected workflows; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_email_get` | `GET /v1/owner/configuration/email` | Read alert-address enrollment status; verification remains a real email step |
 | `owner_configuration_email_post` | `POST /v1/owner/configuration/email` | Set/replace/clear alert address using native enrollment; this never fabricates confirmation; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_name_get` | `GET /v1/owner/configuration/name` | Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend |
+| `owner_configuration_name_post` | `POST /v1/owner/configuration/name` | Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_name_delete` | `DELETE /v1/owner/configuration/name` | Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_feeding_get` | `GET /v1/owner/configuration/feeding` | Read saved Pet monitor food-view and eating-sound response configuration |
 | `owner_configuration_feeding_post` | `POST /v1/owner/configuration/feeding` | Save current enrolled Pet monitor camera position, enable/disable eating-sound response or clear saved view; existing camera/audio grants and motion lease checks apply; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_modes_get` | `GET /v1/owner/configuration/modes` | Read built-in, custom and current mode definitions |

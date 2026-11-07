@@ -29,13 +29,13 @@ object SetupPrompt {
     fun firstCalls(): String {
         val sb = StringBuilder()
         sb.appendLine("FIRST CALLS, IN ORDER")
-        sb.appendLine("1. GET /v1/health: check agent, base_url, api_revision and owner_email.status. Not \"verified\"? Ask the owner for their email and send it with POST /v1/owner/email {\"email\":\"...\"}; 24 hours after the first call Bridgit stops answering until the owner verifies it.")
-        sb.appendLine("2. POST /v1/me {\"model\":\"<model id>\",\"harness\":\"<harness>\"}; repeat whenever your model changes.")
-        sb.appendLine("3. GET /v1/capabilities: require agent_allowed, enabled and ready. For a needed blocked feature, ask once and name blocked_reason. GET /v2/capabilities lists private-build control tools; each session needs owner approval.")
+        sb.appendLine("1. GET /v1/health: do bridgit_name.how first; check agent, base_url, api_revision and owner_email.status. Not \"verified\"? Ask the owner for their email and POST /v1/owner/email {\"email\":\"...\"}; 24 hours after the first call Bridgit stops answering until it's verified.")
+        sb.appendLine("2. POST /v1/me {\"model\":\"<model id>\",\"harness\":\"<harness>\"}; repeat when your model changes.")
+        sb.appendLine("3. GET /v1/capabilities: require agent_allowed, enabled and ready. For a needed blocked feature, ask once naming blocked_reason. GET /v2/capabilities lists private-build control tools; each session needs owner approval.")
         sb.appendLine("4. GET /v1/limits before you plan anything paid: paid services (Jev, Clef, GLM), limits and budgets.")
         sb.appendLine("5. Read ${CapabilityCatalog.START_URL} (no web? GET /v1/start): applet-building stages. GET /v1/discover?q=<owner's idea> returns a recipe, owner_must, first_calls and done_when.")
-        sb.appendLine("Existing data: GET /v1/applets/installed, then data_url for schemas, rows/photos and export. Control keys with applet_install cover all installed applets. Paginate next using cursor_parameter. Do not reinstall, rerun recognition or capture replacements to read data.")
-        sb.appendLine("Agent guide and documentation directory: ${Learn.AGENT_GUIDE_URL}")
+        sb.appendLine("Existing data: GET /v1/applets/installed, then data_url for schemas, rows/photos and export. Control keys with applet_install cover all installed applets. Paginate next using cursor_parameter. Don't reinstall, rerun recognition or capture replacements to read data.")
+        sb.appendLine("Agent guide: ${Learn.AGENT_GUIDE_URL}")
         sb.appendLine("Only when needed: ${CapabilityCatalog.INDEX_URL} (capability index), GET /v1/discover?id=<id>&detail=full (exact operations), ${Learn.PLAYBOOK_URL} (${Playbook.USE_CASES} use cases). GET /v1/guide is the full reference: use it only when needed.")
         return sb.toString()
     }

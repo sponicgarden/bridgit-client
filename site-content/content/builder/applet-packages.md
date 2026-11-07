@@ -150,7 +150,7 @@ Watch rules and schedule actions say what to do with one `do` (card buttons have
 
 ## Card pieces
 
-The card is a list of pieces. The phone draws them in Bridgit's own style, with no HTML, CSS or script.
+The card is usually a list of pieces. The phone draws them in Bridgit's own style, with no HTML, CSS or script; custom HTML (below) is only for what pieces can't draw.
 
 ```json
 "card": {
@@ -177,7 +177,7 @@ For a portable transcript button, declare `mic` and `interactions`, request 1–
 
 Each recipe's `applet.json` illustrates its declared actions on a supported host, and `GET /v1/samples?id=pieces-status` is a complete pieces card you can post on its own (`POST /v1/interactions` with `kind: "pieces"`).
 
-**Custom HTML is the escape hatch.** Instead of `pieces`, a card may name an HTML asset: `"card": {"asset": "card.html", "title": "…", "data": {"resource_id": {"$watch": "main"}}}` with `"assets": {"card.html": {"media_type": "text/html", "text": "<!doctype html>…", "sha256": "…"}}`. The asset is at most 16 KB, runs in the card sandbox, and reaches the phone through `Bridgit.act`. A card is pieces or HTML, not both.
+**Custom HTML is the escape hatch.** Instead of `pieces`, a card may name an HTML asset: `"card": {"asset": "card.html", "title": "…", "data": {"resource_id": {"$watch": "main"}}}` with `"assets": {"card.html": {"media_type": "text/html", "text": "<!doctype html>…", "sha256": "…"}}`. The asset is at most 48 KB (the whole package at most 128 KB), runs in the card sandbox, and reaches the phone through `Bridgit.act`. A card is pieces or HTML, not both. This is a different limit from an HTML card an agent posts directly with `POST /v1/interactions` (`kind: "html"`), which can be up to 256 KB.
 
 ## Tables
 
@@ -214,7 +214,7 @@ Rules the phone enforces:
 - **Permissions are worked out from the parts.** The phone derives them from the watch data (camera → `camera`), rule and schedule calls, the card (`interactions`), and the workflow's scopes. If the file uses something it didn't declare, it is refused. The card's call sources and API buttons count too (a `GET /v1/weather` source adds `weather`). A card's calls run as the applet, so a call it didn't declare is refused.
 - **Watches stay alive.** They get the longest lifetime the rules allow (24 hours, or 90 days with a tally) and are renewed while the applet is active. The card (7 days) is re-posted when it expires, unless the owner dismissed it.
 - **Each part passes its own rules first.** Every part is checked by the same rules as the matching API call, before Approve is offered (`POST /v1/watches`, `POST /v1/interactions`, `POST /v1/schedule`, `workflow.validate`).
-- **Paid calls have one cap per applet.** `"budget": {"day_usd": 0.5, "month_usd": 5}` (top level, 0.01-100 each) caps every paid cloud call the applet makes: watch Jev/Clef checks, `ask_model`, find, locate, appraise. Without it the phone uses $1 a day and $10 a month. Over the cap, paid calls fail with `budget_reached`; free on-phone checks go on. The owner sees the cap on the review and can change it in Installed applets.
+- **Paid calls have one cap per applet.** `"budget": {"day_usd": 0.5, "month_usd": 5}` (top level, 0.01-100 each) caps every paid cloud call the applet makes: watch Jev/Clef checks, `ask_model`, find, locate, appraise. Without it the phone uses $1 a day and $10 a month. This is separate from the phone's own monthly model budget (`model_usd_per_month` in `GET /v1/limits`, default $1.50, see decisions.md): every paid call must fit both, and the phone budget is checked first, so at the defaults it is the one an applet reaches first. Over the applet cap, paid calls fail with `budget_reached`; free on-phone checks go on. The owner sees the cap on the review and can change it in Installed applets.
 - **Validate warns about known traps.** `POST /v1/applets/validate` returns `warnings` (code, where, says, fix) that never block an install: photo bytes sent from a card (a card's request is at most 16 KB), replies over a card's 64 KB, form submits and browser storage in a card, declared permissions nothing uses, a data_policy that says no remote models while the applet asks one, and paid calls without a `budget`.
 - **Workflows need their Agent permissions feature on.** Workflow scopes are granted only for that workflow. Its feature (for example Local workflows) must be on in Agent permissions, or the review lists it as blocked.
 - **Sources are limited.** The phone downloads only from https://bridgit.cc and Bridgit's template registry. An Import link may carry `sha256` of the file, and the phone refuses a file that doesn't match.

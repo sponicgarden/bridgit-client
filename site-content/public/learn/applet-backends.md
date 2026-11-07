@@ -14,7 +14,7 @@ Return the resulting `link_url` to the user. The device link code can be claimed
 
 ## Installed package applets on the portal
 
-An installed package applet (`bridgit-template/1`, adapter `android.package.v1`) that has a counting watch (`tally`) can get its own portal tab, for example the kitchen cleanliness monitor. Its applet id on the server is `pkg.<package id>` (`pkg.kitchen-cleanliness`), one per package per device. It follows the Pet monitor's rules: off by default, owner approval on the device, private to the signed-in owner and accepted viewers, 30-day retention, the same photo limits and storage allowance, rename and share from the portal, and portal deletion.
+An installed package applet (`bridgit-template/1`, adapter `bridgit.package.v1`, or its legacy name `android.package.v1`) that has a counting watch (`tally`) can get its own portal tab, for example the kitchen cleanliness monitor. Its applet id on the server is `pkg.<package id>` (`pkg.kitchen-cleanliness`), one per package per device. It follows the Pet monitor's rules: off by default, owner approval on the device, private to the signed-in owner and accepted viewers, 30-day retention, the same photo limits and storage allowance, rename and share from the portal, and portal deletion.
 
 Ask the user first (portal email, alias, photo sharing), then request:
 

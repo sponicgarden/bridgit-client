@@ -25,7 +25,7 @@ Use a chat model instead for other open-ended summaries, replies and explanation
 | You want to | Call | Model | Media | What runs |
 |---|---|---|---|---|
 | Decide once about text or a sound, and have the phone act | `POST /v1/judgment` on the phone | GLM Flash (`model: "glm"`), Jev, or Clef with an `audio_clip_id` from a sound or wake-word event | a heard sound clip | The phone runs the matching notice, speak or log actions as you |
-| Be called back when the phone's readings or camera match | `POST /v1/watches` on the phone | Clef (default with a photo), Jev (default without), GLM Flash (`model: "glm"`), or `none` (local only, free) | sensors and a camera photo | The phone checks every 30 s to 1 h, skips unchanged photos for free, can count (`tally`) and act (`rules`) with you offline, and calls your `callback_url` |
+| Be called back when the phone's readings or camera match | `POST /v1/watches` on the phone | Clef (default with a photo), Jev (default without), GLM Flash (`model: "glm"`), or `none` (local only, free) | sensors and a camera photo | The phone checks every 30 s to 1 h (every 10 s for a camera tally with the free change check), skips unchanged photos for free, can count (`tally`) and act (`rules`) with you offline, and calls your `callback_url` |
 | General GLM Flash decisions from anywhere | `POST {base_url}/v1/glm` with your phone-issued team key | GLM 5.3 Flash | up to 2 images | Typed answers and matching actions |
 | Decide about text or a photo from anywhere | `POST {base_url}/v1/jev` with your team key | Jev | up to 2 images | Matching actions come back as a list for you to run |
 | Decide about photos, screenshots, sound or video | `POST {base_url}/v1/clef` with your team key | Clef-omni | 4 images, 4 audio clips, 2 videos | Matching actions come back as a list for you to run |
@@ -190,7 +190,9 @@ when it `resets_at`. The numbers below are only today's defaults, to give a sens
 
 - **Per phone (its agents share it):** `model_calls_per_hour`, Jev and Clef calls together (default 400; 60 on a
   phone the team couldn't verify, which includes test builds), and `model_usd_per_month`, the monthly budget
-  (default $1.50, or $3 on a phone with the Pet monitor's web portal on; calendar month, UTC). Each call holds a little of the budget until its real cost is known. Over a
+  (default $1.50, or $3 on a phone with the Pet monitor's web portal on; calendar month, UTC). It is separate from each applet's own
+  budget (`budget.day_usd`/`month_usd`, default $1 a day and $10 a month, see applet-packages.md): a paid call must fit
+  both, and this phone budget is checked first, so at the defaults it is the one you reach first. Each call holds a little of the budget until its real cost is known. Over a
   limit: 429 `rate_limited` or `spend_cap`. Size anything frequent from these values: at the default budget, a paid
   photo every 10 s would last about 2.5 days on Jev. Skip unchanged pictures (watches do it with `local`) and check on
   events instead of a timer.

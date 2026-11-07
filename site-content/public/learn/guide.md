@@ -30,7 +30,7 @@ replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/change
 4. Tell the owner your model: add `X-Bridgit-Model: <model id>` (and `X-Bridgit-Harness: <harness>`) to the headers you send with every call, or `POST /v1/me {"model","harness"}` on each change. The rest of this guide is reference: read the section you need.
 Right after pairing, ask the owner once: "Want a 5-minute demo on your phone?" If they pasted only the setup prompt, ask in that first reply; if they gave a task, finish it first. `GET /v1/demo` only reads the script: run it only after they say yes. Ask discovery questions only if they want suggestions. Declining onboarding does not cancel their existing task.
 Keep credentials per agent, e.g. `~/.config/bridgit/agents/<agent>/header` with mode 600; never overwrite another agent's key. The optional helper reads an env file instead of that header: its download explains `BRIDGIT_ENV` for selecting a separate config. A public-docs 403 may depend on the HTTP client: try curl before concluding the docs are unavailable.
-5. The owner's email: Bridgit works for 24 hours from the first agent call, then every endpoint except status, feedback and `/v1/owner/email` answers `email_required` until the owner verifies an address. `GET /v1/owner/email` says where it stands; send their address with `POST /v1/owner/email {"email":"..."}` (if you don't know it, ask them: on a card during the 24 hours, in your chat after), and they tap the link in the email from bridgit.cc.
+5. The owner's email: Bridgit works for 24 hours from the first agent call, then only the status, feedback and portal endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/feedback` and the owner's read-only Bridgit Portal), the control tools `capabilities`, `events`, `operation.get` and `feedback.create` (`events` still needs `events.read`), and the routes that are not tool calls (`/v2/capabilities`, `/v2/tools`, `/v2/guide`, operation cancel) keep working; everything else answers `email_required` until the owner verifies an address (the full list is under "Owner email" in https://bridgit.cc/learn/control.md). `GET /v1/owner/email` says where it stands; send their address with `POST /v1/owner/email {"email":"..."}` (if you don't know it, ask them: on a card during the 24 hours, in your chat after), and they tap the link in the email from bridgit.cc.
 6. Once the owner's first request is done (or after the demo), offer useful suggestions. Only if they are interested, ask two or three questions about their routines, then suggest one small thing to try. https://bridgit.cc/learn/playbook.md has the questions and 40 use cases. "Not now" stops onboarding; continue any existing task.
 
 - Opening a card clears its notification. To remind the owner explicitly, POST /v1/interactions/{id}/renotify {} (MCP interactions_renotify) with an Idempotency-Key. Only your pending/seen cards; no automatic screen takeover or speech.
@@ -1975,13 +1975,14 @@ Agents are Bridgit's best testers, and the team reads every report. File every b
 
 Control agents always file bugs, issues and feature requests directly with Bridgit's team backend, even when the phone works. The phone is not an intermediary for agent reporting.
 Reuse your existing team key (bgk_...). If you don't have one, register directly below; no phone or phone key is required. Keep the team key secret and separate from your phone key.
-Limits: a few registrations per address an hour and 10 reports an hour, so register once and keep the key. The backend explains itself at `GET https://bridgit-feedback.bridgit-app.workers.dev/v1/agent`.
+Limits: a few registrations per address an hour and 50 reports an hour per registered agent (an agent with no key can file one report, ever), so register once and keep the key. (The phone's own `POST /v1/feedback`, for reports an owner sends from the phone, has its own limit of 50 an hour per agent.) The backend explains itself at `GET https://bridgit-feedback.bridgit-app.workers.dev/v1/agent`.
 
 ```
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {"name":"<your agent name>","model":"<your model id>","harness":"<e.g. Claude Code>"}
   -> 201 with key (bgk_...). Keep it secret.
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports  (Authorization: Bearer <bgk_ key>)
   {"kind":"bug"|"feature","description","agent_info"?,"context"?,"log"?,"images"?,"client_report_id"?}
+  client_report_id: your own positive integer (a number, not a string); sending the same one again returns the first report with duplicate: true instead of filing twice.
 GET  https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports?waiting=true   (or /v1/agent/reports/{id})
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports/{id}/verify {"verdict":"works"|"still_broken"|"unverified","tested_version","note"}
 ```

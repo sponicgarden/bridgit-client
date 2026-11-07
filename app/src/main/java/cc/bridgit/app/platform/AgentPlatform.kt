@@ -33,7 +33,8 @@ class AgentPlatform(val app: BridgeApp) {
 
     init {
         app.policy.agents().forEach { credentialEpochs[it.id]=it.hash }
-        // Preserve only existing authority; new capabilities and newly paired agents start denied.
+        // One-time migration for agents paired before grants existed. New pairings get maximum grants
+        // (PowerAccess.grantAll); limited agents start denied on new scopes.
         if (store.setting("legacy_migrated") != "true") {
             app.policy.agents().filter { app.agents.get(it.id)?.connection!=cc.bridgit.app.core.Connection.RELAY }.forEach { a -> listOf("camera.snapshot","microphone.clip","gallery.read","audit.read").forEach { store.grant(a.id,it,Long.MAX_VALUE) } }
             store.setting("legacy_migrated","true",true)

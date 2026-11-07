@@ -47,6 +47,15 @@ object EmailGate {
     /** v2 platform tools agents keep while blocked (read-only discovery). */
     val EXEMPT_TOOLS = setOf("capabilities", "events", "operation.get", "feedback.create")
 
+    /** The one description of what keeps working after the deadline, built from the two lists above.
+     *  Every agent doc that mentions the deadline uses it, so they can't disagree. */
+    val DOC_SUMMARY get() = "the " + words(EXEMPT_CAPABILITIES.toList()) +
+        " endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/feedback` and the owner's read-only Bridgit Portal), " +
+        "the control tools " + words(EXEMPT_TOOLS.map { "`$it`" }) + " (`events` still needs `events.read`), " +
+        "and the routes that are not tool calls (`/v2/capabilities`, `/v2/tools`, `/v2/guide`, operation cancel)"
+
+    private fun words(xs: List<String>) = if (xs.size < 2) xs.joinToString() else xs.dropLast(1).joinToString(", ") + " and " + xs.last()
+
     /** The agent-facing message for a blocked call. */
     fun message(v: View): String = when (v.state) {
         Alerts.STATE_PENDING -> "Bridgit's first 24 hours are over and the owner hasn't confirmed their email yet. " +

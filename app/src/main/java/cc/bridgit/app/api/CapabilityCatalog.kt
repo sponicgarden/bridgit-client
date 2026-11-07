@@ -409,7 +409,7 @@ object CapabilityCatalog {
     fun start(): String = """
         # Start here: build a Bridgit applet
 
-        Bridgit turns the owner's Android phone into a device you program: it sees, hears, decides, shows cards and acts, and keeps running after you set it up. An applet is one file (a package) that the owner approves once; the phone then builds and runs every part itself. Your job is to choose what to sense, how to decide and what to do. The phone draws the card in its own style, so you write no HTML or CSS. Build one in four stages. Reading these pages needs no phone or key; a phone also serves this page as GET /v1/start, no key needed.
+        Bridgit turns the owner's Android phone into a device you program: it sees, hears, decides, shows cards and acts, and keeps running after you set it up. An applet is one file (a package) that the owner approves once; the phone then builds and runs every part itself. Your job is to choose what to sense, how to decide and what to do. The phone draws the card in its own style, so you usually write no HTML or CSS. Build one in four stages. Reading these pages needs no phone or key; a phone also serves this page as GET /v1/start.
 
         **Reviewing or exporting existing applet data?** Start with `GET /v1/applets/installed`, then follow its `data_url`. Your paired control key with `applet_install` already authorizes all installed applets; no new approval or installer sharing flag is needed. The standard data contract gives schemas, paginated rows, saved photos, processing status and JSON/ZIP export. Do not run, reinstall or modify an applet to read its saved data.
 
@@ -461,9 +461,9 @@ object CapabilityCatalog {
 
         ## Applets: the parts
 
-        A package (`bridgit-template/1`, adapter `android.package.v1`) holds typed **blanks** the owner fills (`${'$'}input`) and up to these parts:
+        A package (`bridgit-template/1`, adapter `bridgit.package.v1`, legacy `android.package.v1`) holds typed **blanks** the owner fills (`${'$'}input`) and up to these parts:
 
-        - **Watches** (up to 5): camera or sensor checks every 30 s to 1 h on the phone, a free change check, Clef for photos and sound, Jev for text, a `tally` that counts answers and `rules` ("fewer than 1 meal by 18:00").
+        - **Watches** (up to 5): camera or sensor checks every ${cc.bridgit.app.watch.WatchRules.MIN_INTERVAL_S} s to 1 h (camera tally: ${cc.bridgit.app.watch.WatchRules.MIN_INTERVAL_TALLY_S} s) on the phone, a free change check, Clef for photos and sound, Jev for text, a `tally` that counts answers and `rules` ("fewer than 1 meal by 18:00").
         - **A schedule**: actions at set times.
         - **Flows**: a trigger (button, interval, charging, a place, a watch match or a rule) and steps from a fixed menu: `photo`, `ask_model` (GLM 5.3 Flash, Jev or Clef), `ask_owner` (wait for an answer), `notice`, `speak`, `ring`, `alert`, `record` (a table row), `wait`, `stop`. Later steps use earlier results (`${'$'}step`), any step can have `only_if` and `on_error`, and every run is logged.
         - **Tables** (up to 3): rows kept on the phone, such as receipts, notes and meals, with kept photos.

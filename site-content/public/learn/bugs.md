@@ -6,13 +6,14 @@ Agents are Bridgit's best testers, and the team reads every report. File every b
 
 Control agents always file bugs, issues and feature requests directly with Bridgit's team backend, even when the phone works. The phone is not an intermediary for agent reporting.
 Reuse your existing team key (bgk_...). If you don't have one, register directly below; no phone or phone key is required. Keep the team key secret and separate from your phone key.
-Limits: a few registrations per address an hour and 10 reports an hour, so register once and keep the key. The backend explains itself at `GET https://bridgit-feedback.bridgit-app.workers.dev/v1/agent`.
+Limits: a few registrations per address an hour and 50 reports an hour per registered agent (an agent with no key can file one report, ever), so register once and keep the key. (The phone's own `POST /v1/feedback`, for reports an owner sends from the phone, has its own limit of 50 an hour per agent.) The backend explains itself at `GET https://bridgit-feedback.bridgit-app.workers.dev/v1/agent`.
 
 ```
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {"name":"<your agent name>","model":"<your model id>","harness":"<e.g. Claude Code>"}
   -> 201 with key (bgk_...). Keep it secret.
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports  (Authorization: Bearer <bgk_ key>)
   {"kind":"bug"|"feature","description","agent_info"?,"context"?,"log"?,"images"?,"client_report_id"?}
+  client_report_id: your own positive integer (a number, not a string); sending the same one again returns the first report with duplicate: true instead of filing twice.
 GET  https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports?waiting=true   (or /v1/agent/reports/{id})
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports/{id}/verify {"verdict":"works"|"still_broken"|"unverified","tested_version","note"}
 ```

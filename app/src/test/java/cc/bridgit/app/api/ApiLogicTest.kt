@@ -178,6 +178,13 @@ class ApiLogicTest {
         assertTrue(calls.toString(), calls.none { it < 0 }); assertEquals(calls.sorted(), calls)
     }
 
+    @Test fun setupPromptAsksForAFriendlyNameFirstAndLinksTheAgentPage() {
+        val first = SetupPrompt.firstCalls().lineSequence().first { it.startsWith("1. GET /v1/health:") }
+        assertTrue(first, first.indexOf("register a name") in 0 until first.indexOf("owner_email"))
+        assertTrue(first, first.contains("about 10 characters, friendly and cute to people") && first.contains("says if it's free"))
+        assertTrue(first, first.contains(Learn.NAMES_URL)); assertEquals("https://bridgit.cc/agents/names/", Learn.NAMES_URL)
+    }
+
     @Test fun startPageServedFromThePhone() {
         val e = Endpoints.all.single { it.fullPath == "/v1/start" }
         assertEquals("GET", e.method); assertFalse("no key, like the public page", e.auth)

@@ -55,9 +55,9 @@ object DeviceNames {
         val own = cached(app)
         return if (own == null) JSONObject().put("status", "unregistered").put("advice", ADVICE)
             .put("how", "Register a name first: $OPERATION {\"name\":\"kitchen-tab\"} (control MCP: configuration.set with that operation). Taken? Suggest another.")
-            .put("about", "https://bridgit.cc/names/")
+            .put("about", cc.bridgit.app.api.Learn.NAMES_URL)
         else JSONObject().put("status", "registered").put("name", own.getString("name")).put("label", own.opt("label") ?: JSONObject.NULL)
-            .put("visible", own.optBoolean("visible")).put("how", "Registered. Change label or visible with $OPERATION.").put("about", "https://bridgit.cc/names/")
+            .put("visible", own.optBoolean("visible")).put("how", "Registered. Change label or visible with $OPERATION.").put("about", cc.bridgit.app.api.Learn.NAMES_URL)
     }
 
     /** GET /v1/names/me: the backend's answer, cached; unregistered when the backend has none. */

@@ -38,6 +38,9 @@ object Learn {
     const val DECISIONS_URL = "$BASE/decisions.md"
     const val EVALUATION_URL = "$BASE/evaluate.md"
     const val AGENT_GUIDE_URL = "https://bridgit.cc/agentguide/"
+    /** Device Domain Names: the agent copy (register first, how to read the answer) and the page for people. */
+    const val NAMES_URL = "https://bridgit.cc/agents/names/"
+    const val NAMES_PAGE_URL = "https://bridgit.cc/names/"
     const val INTRODUCTION_URL = "$BASE/introduction.txt"
     const val DIRECT_PROMPT_URL = "$BASE/pairing-direct.txt"
     const val USERSPACE_PROMPT_URL = "$BASE/pairing-userspace.txt"

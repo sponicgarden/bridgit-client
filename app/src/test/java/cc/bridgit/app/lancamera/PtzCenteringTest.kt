@@ -44,6 +44,8 @@ class PtzCenteringTest {
     private class Fake(val pet: PtzPoint?) : PtzCenterSearch.Driver {
         var current = PtzPoint(-.07, -.69); val delivered = mutableListOf<Pair<String, PtzCenterSearch.Centering?>>(); val steps = mutableListOf<String>()
         var stops = 0; var notFound = 0; var shots = 0; var revoked = false; var revokeAfterShot = false
+        /** The pet leaves after this many photos (null: it stays). */
+        var leavesAfter: Int? = null
         override suspend fun authorize() { if (revoked) throw CancellationException() }
         override suspend fun position() = current
         override suspend fun move(point: PtzPoint) { current = point }
@@ -51,6 +53,7 @@ class PtzCenteringTest {
         override suspend fun progress(view: String, step: String, index: Int?, of: Int?, move: Int?, moves: Int?) { steps.add("$view:$step") }
         override suspend fun shoot(view: String): PtzCenterSearch.Shot? {
             shots++; if (revokeAfterShot) revoked = true
+            if (leavesAfter?.let { shots > it } == true) return PtzCenterSearch.Shot(.04, null)
             val p = pet ?: return PtzCenterSearch.Shot(.02, null)
             // Where the pet appears: +pan shifts the picture right, +tilt shifts it down.
             val cx = .5 + (current.x - p.x) / TapoPtz.FRAME_PAN; val cy = .5 + (current.y - p.y) / TapoPtz.FRAME_TILT
@@ -72,6 +75,18 @@ class PtzCenteringTest {
         assertEquals(1, f.stops); assertFalse(f.steps.contains("center:returning"))
         assertTrue(f.shots <= PtzRing.VIEWS.size + PtzCentering.MAX_MOVES)
         assertEquals(listOf("center:moving", "center:photo", "right:moving"), f.steps.take(3))
+    }
+
+    @Test fun aPetLostWhileCentringLeavesTheCameraWhereItWasLastSeen() = runBlocking {
+        // Found in the "right" ring view, off-centre; it leaves before the first centring photo.
+        val f = Fake(PtzPoint(-.45, -.55)).apply { leavesAfter = PtzRing.VIEWS.size }
+        val original = f.current
+        PtzCenterSearch(space, f).run(PtzRing.VIEWS + PtzRing.CENTERED)
+        val right = PtzRing.target(original, "right")
+        assertEquals("back at the view whose photo showed the pet", right, f.current)
+        val centring = f.delivered.last().second!!
+        assertEquals("right", centring.from); assertEquals(1, centring.moves); assertFalse(f.steps.contains("center:returning"))
+        assertEquals(1, f.stops)
     }
 
     @Test fun noPetReturnsToTheStartAndSaysSo() = runBlocking {

@@ -102,7 +102,9 @@ class PtzCentering(private val space: PtzSpace, private val damping: Double = .8
 /**
  * Portal PTZ search, version 4: photograph the ring, then aim at the most likely pet and re-shoot until it
  * sits near the middle (at most [PtzCentering.MAX_MOVES] moves). Every pose is verified before its photo.
- * The camera stays on the pet when one was found; otherwise it goes back to where it started.
+ * The camera stays on the pet when one was found; otherwise it goes back to where it started. If the pet is
+ * lost during centring, the camera goes back to the last pose whose photo showed it (7 Nov 2026: it used to
+ * stay where the pet had just been missed, pointing the monitor away from it).
  */
 class PtzCenterSearch(private val space: PtzSpace, private val driver: Driver) {
     /** One photo and Jev's answer about it; [payload] is the driver's own (photo and reading). */
@@ -160,7 +162,7 @@ class PtzCenterSearch(private val space: PtzSpace, private val driver: Driver) {
             if (found == null) { driver.notFound(); return }
             val (from, start, first) = found
             val logic = PtzCentering(space)
-            var at = start; var shot = first; var moves = 0
+            var at = start; var seenAt = start; var shot = first; var moves = 0
             driver.progress(PtzRing.CENTERED, "centering", null, null, 0, PtzCentering.MAX_MOVES)
             go(start); keep = true
             while (moves < PtzCentering.MAX_MOVES) {
@@ -168,10 +170,11 @@ class PtzCenterSearch(private val space: PtzSpace, private val driver: Driver) {
                 moves++
                 driver.progress(PtzRing.CENTERED, "centering", null, null, moves, PtzCentering.MAX_MOVES)
                 go(next); at = next
-                val again = driver.shoot(PtzRing.CENTERED) ?: break
-                // The pet walked off or Jev lost it: keep the last photo that showed it.
-                if (again.dogP < PET_MIN || again.box == null) break
-                shot = again
+                val again = driver.shoot(PtzRing.CENTERED)
+                // The pet walked off, Jev lost it or the photo failed: keep the last photo that showed it, and
+                // aim where that photo was taken so the monitor keeps watching the pet.
+                if (again == null || again.dogP < PET_MIN || again.box == null) { go(seenAt); at = seenAt; break }
+                shot = again; seenAt = next
             }
             driver.deliver(PtzRing.CENTERED, shot, Centering(moves, logic.centered(shot.box!!), from, logic.limited))
         } finally {

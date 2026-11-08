@@ -9,6 +9,8 @@ import android.provider.Settings
 import android.util.Base64
 import android.view.Display
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityManager
+import android.accessibilityservice.AccessibilityServiceInfo
 import io.ktor.server.routing.Route
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -73,6 +75,22 @@ class ScreenshotService : AccessibilityService() {
             val list = Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: return false
             return list.split(':').any { ComponentName.unflattenFromString(it) == me }
         }
+
+        /**
+         * A0068: the service is switched on but hasn't connected. While a UI-test tool holds
+         * UiAutomation (Maestro, uiautomator, Appium over adb), Android suspends every
+         * accessibility service and reports none running; retrying can't help until it stops.
+         */
+        fun notStartedError(ctx: Context) =
+            if (ctx.getSystemService(AccessibilityManager::class.java)
+                    ?.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK).isNullOrEmpty())
+                ErrorCatalog.error("service_start_blocked",
+                    "Android has paused every accessibility service on this phone, Bridgit's screenshot service included. " +
+                        "That usually means a UI-test tool (Maestro, uiautomator, Appium) is connected over adb. " +
+                        "Retrying won't help: ask the owner to stop that tool.")
+            else ErrorCatalog.error("service_start_blocked",
+                "The screenshot service is on but Android hasn't started it yet. Retry in a few seconds; if it keeps failing, " +
+                    "ask the owner to turn Bridgit screenshots off and on again in Android's Accessibility settings.")
     }
 }
 
@@ -120,8 +138,7 @@ class ScreenModule(app: BridgeApp) : Capability(app) {
                 "Bridgit's screenshot service is off. Ask the owner to open Bridgit > More > Hardware access > Screenshots and turn it on.",
                 mapOf("setting" to "accessibility_screenshot"))
             requireUsable()
-            val svc = ScreenshotService.instance ?: throw ErrorCatalog.error("service_start_blocked",
-                "The screenshot service is on but Android hasn't started it yet. Retry in a few seconds.")
+            val svc = ScreenshotService.instance ?: throw ScreenshotService.notStartedError(app)
             if (app.getSystemService(KeyguardManager::class.java)?.isKeyguardLocked == true)
                 throw ErrorCatalog.error("device_locked", "The phone is locked, so there's nothing to see. Ask the owner to unlock it.")
             cc.bridgit.app.capture.CapturesModule.checkStore(app, this, "screen")

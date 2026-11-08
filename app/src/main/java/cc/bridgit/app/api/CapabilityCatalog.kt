@@ -9,7 +9,7 @@ import java.util.Locale
 
 /** A derived search index, never a second endpoint registry or a device inventory. */
 object CapabilityCatalog {
-    const val DOCUMENTATION_REVISION = 113
+    const val DOCUMENTATION_REVISION = 114
     const val URL = "https://bridgit.cc/learn/catalog.json"
     const val INDEX_URL = "https://bridgit.cc/learn/catalog-index.json"
     const val START_URL = "https://bridgit.cc/learn/start.md"

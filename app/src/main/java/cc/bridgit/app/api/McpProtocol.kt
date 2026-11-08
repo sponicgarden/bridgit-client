@@ -112,6 +112,8 @@ object McpTools {
         "GET /lan-cameras/framing/{id}" to "lan_cameras_framing_status",
         "GET /resource-jobs" to "resource_jobs_list", "GET /resource-jobs/{id}" to "resource_jobs_get", "DELETE /resource-jobs/{id}" to "resource_jobs_cancel",
         "DELETE /owner/configuration/links/codes/{id}" to "owner_configuration_links_code_cancel",
+        "GET /owner/configuration/approvals" to "owner_configuration_approvals_list", "GET /owner/configuration/approvals/{kind}/{id}" to "owner_configuration_approvals_get",
+        "POST /owner/configuration/approvals/{kind}/{id}" to "owner_configuration_approvals_post",
                 "GET /log" to "log_read", "POST /log" to "log_note", "GET /log/{id}" to "log_entry",
         "GET /issues" to "issues_list", "POST /issues" to "issues_file", "GET /issues/{id}" to "issues_get",
         "POST /issues/{id}/followup" to "issues_followup",

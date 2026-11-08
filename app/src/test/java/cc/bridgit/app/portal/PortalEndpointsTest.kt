@@ -190,7 +190,7 @@ class PortalEndpointsTest {
 
         val (ts, theme) = get("/v1/portal/theme")
         assertEquals(200, ts)
-        assertEquals("#1F5BD6", theme.getJSONObject("colors").getJSONObject("light").getString("b_primary"))
+        assertEquals("#6D587E", theme.getJSONObject("colors").getJSONObject("light").getString("b_primary"))
         assertTrue(theme.getJSONObject("colors").getJSONObject("dark").getString("b_surface").matches(Regex("#[0-9A-F]{6}")))
         assertTrue(theme.getJSONObject("motion").getJSONObject("core_breathe").getInt("duration_ms") == 4000)
         assertTrue(theme.getJSONArray("animations").length() >= 3)

@@ -143,6 +143,9 @@ android {
         unitTests.isIncludeAndroidResources = true
         // ApiDocsTest writes build/apidocs/api.html for this version (tools/publish-apk.sh passes the APK's).
         unitTests.all {
+            // Robolectric keeps each SDK it loads (34, 30, 29...) for the whole run; the 512 MB default runs out of heap
+            // when a later class first loads another SDK (SecretViewsTest's API 30 cases).
+            it.maxHeapSize = "2g"
             it.systemProperty("bridgit.applet.output", bridgitProperty("AppletOutputDir") ?: "build/applet-authoring")
             it.systemProperty("bridgit.applet.file", bridgitProperty("AppletPackageFile") ?: "")
             it.systemProperty("bridgit.version", bridgitProperty("DocsVersion") ?: defaultConfig.versionName!!)

@@ -107,7 +107,7 @@ class PortalDataTest {
 
     @Test fun `scene tokens give light and dark colours and fonts`() {
         val t = PortalData.sceneTokens(scene)
-        assertEquals("#070b14", t["dark"]!!["void"]); assertEquals("#f8f9ff", t["light"]!!["void"])
+        assertEquals("#24212A", t["dark"]!!["void"]); assertEquals("#FDFCFE", t["light"]!!["void"])
         assertEquals("#5cc8ff", t["dark"]!!["senses"]); assertTrue(t["light"]!!.containsKey("senses"))
         assertTrue(t["dark"]!!["mono"]!!.contains("IBM Plex Mono"))
     }

@@ -205,7 +205,7 @@
    "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-approvals.json",
    "control_scope": "owner.configuration",
    "requires_power": null,
-   "tool": "owner_configuration_approvals_get"
+   "tool": "owner_configuration_approvals_list"
   },
   {
    "summary": "Inspect one exact pending applet, schedule, workflow, operation or control-session request",
@@ -598,7 +598,7 @@
    "tool": "owner_configuration_links_log"
   }
  ],
- "documentation_revision": 113,
+ "documentation_revision": 114,
  "api_revision": 135,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,

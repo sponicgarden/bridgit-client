@@ -6,7 +6,7 @@
   "learn/pairing-userspace.txt": "d190c2664686d9dc2e16359aaac28198c3f7dd3f82921546edfa9eb9dbf6031d"
  },
  "inputs": {
-  "app/build.gradle.kts": "5048388a817ac17fbae199a824b684ed3b26659079f909e6bf9117b7cad7e005",
+  "app/build.gradle.kts": "8491bc0fb5598429e5043007dc2dd4014a46413f723f53964eb431b5a43787a4",
   "tools/bridgit": "51cdb509b66428a147926f5d1a92aa6498d2a7514b45cdc04e7331243640333a",
   "app/src/main/java/cc/bridgit/app/api/SelfDescription.kt": "15cd8bf9b273b1fb62bdbefea5cdc24863dcaeaeab1580112df3a9a1a2393208",
   "app/src/main/java/cc/bridgit/app/adb/AdbSetupHelp.kt": "abc90047e9d71b9cc918a16de6790eae11558b91e4cd475174b4600749557a7e",

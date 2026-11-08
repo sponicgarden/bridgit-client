@@ -132,9 +132,9 @@ class InstalledAppletsScreenTest {
         for (raw in listOf("\\bmain\\b", "\\bl1\\b", "\\bl2\\b", "\\bowner\\b", "\\bpackage\\b", Regex.escape(watchId), "(?i)phone")) {
             assertFalse("raw \"$raw\" shown in:\n$joined", Regex(raw).containsMatchIn(joined))
         }
-        // The controls come right after the name and state, before the sections (no floating button rows).
+        // The controls close the card, after the expanded sections, with Open at the bottom right.
         val order = all.filter { it in setOf("Pet activity monitor", "Pause", "Activity", "Budget") }.distinct()
-        assertEquals(listOf("Pet activity monitor", "Pause", "Activity", "Budget"), order)
+        assertEquals(listOf("Pet activity monitor", "Activity", "Budget", "Pause"), order)
         descendants(activity.window.decorView).filterIsInstance<MaterialButton>().single { it.text == "Hide details" }.performClick()
         assertFalse(texts(activity.window.decorView).contains("Activity"))
     }

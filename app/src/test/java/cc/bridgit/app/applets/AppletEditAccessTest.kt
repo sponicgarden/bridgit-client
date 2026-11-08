@@ -44,6 +44,8 @@ class AppletEditAccessTest {
         val editor = app.agents.add("Claude", Connection.DIRECT).first
         app.agents.update(editor.id) { it.copy(caps = setOf("applet_install")) }
         val definition = JSONObject(File("../site-content/public/recipes/room-change-watcher/applet.json").readText())
+        // Agent-proposed installs and updates carry the practice review record (AppletPractices).
+        definition.getJSONObject("ui").put("practices", JSONObject("""{"contract":"bridgit-practices/1","catalog":"1.0.0","review":{"decision":"no-new-practice","reason":"Test delegated edit access with the unchanged recipe.","practice_ids":["GOV-001"]}}"""))
         val pending = app.applets.propose(AppletPackage.check(definition), null, JSONObject().put("kind", "test"), installer, notify = false)
         val record = app.applets.approve(pending.getString("id"), null)
         val id = record.getString("id")
@@ -62,7 +64,10 @@ class AppletEditAccessTest {
             val change = JSONObject().put("expected_revision", JSONObject(String(read.bytes)).getLong("revision"))
                 .put("intent", "Change the package version").put("acceptance", org.json.JSONArray().put("Requested version is installed"))
                 .put("evidence", "Validated the package and existing behavior in this isolated test")
-            val update = call(AppletEndpoints.UPDATE, JSONObject().put("package", definition).put("change", change))
+            // The editor reports its practice review of the candidate before the owner sees it.
+            val review = JSONObject().put("model", "z-ai/glm-5.3-flash").put("source_sha256", AppletPackage.digest(definition))
+                .put("disposition", "No practice changes; version bump only")
+            val update = call(AppletEndpoints.UPDATE, JSONObject().put("package", definition).put("change", change).put("practice_review", review))
             assertEquals(String(update.bytes), 200, update.status)
             val proposed = JSONObject(String(update.bytes))
             assertEquals("awaiting_owner", proposed.getString("status"))
@@ -82,7 +87,14 @@ class AppletEditAccessTest {
             assertNotNull("Share target registered", send.resolveActivity(app.packageManager))
             val controller = Robolectric.buildActivity(androidx.fragment.app.FragmentActivity::class.java).setup()
             try {
+                // Only a provisioned agent (one that has used its key) is offered; the owner picks it from the list.
+                app.agents.update(editor.id) { it.copy(lastUsedAt = System.currentTimeMillis()) }
                 cc.bridgit.app.ui.interactions.AppletAgentHandoff.open(controller.get(), app, id) { fail("Expected the configured Claude app") }
+                org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+                val chooser = org.robolectric.shadows.ShadowDialog.getLatestDialog() as androidx.appcompat.app.AlertDialog
+                assertEquals(2, chooser.listView.adapter.count) // Claude, then Add control agent
+                chooser.listView.performItemClick(chooser.listView.adapter.getView(0, null, chooser.listView), 0, 0)
+                org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
                 val sent = org.robolectric.Shadows.shadowOf(controller.get()).nextStartedActivity
                 assertEquals("com.anthropic.claude", sent.`package`)
                 assertTrue(sent.getStringExtra(android.content.Intent.EXTRA_TEXT)!!.contains(id))

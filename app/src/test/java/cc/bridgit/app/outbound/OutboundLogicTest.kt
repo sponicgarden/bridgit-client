@@ -288,16 +288,18 @@ class OutboundLogicTest {
      */
     @Test fun everyNetworkPrimitiveIsRecorded() {
         val root = File("src/main/java/cc/bridgit/app")
-        val recordedRaw = setOf("ssh/SshClient.kt", "lancamera/CameraRtsp.kt", "lancamera/TapoTalk.kt", "lan/LanDiscovery.kt", "core/SafeHttp.kt", "update/UpdateInstaller.kt", "update/TailscaleInstaller.kt", "listen/WakeModel.kt", "platform/DeliveryManager.kt", "vision/FaceEmbedder.kt", "vision/OnDeviceModels.kt", "satellite/HubLinks.kt")
+        val recordedRaw = setOf("ssh/SshClient.kt", "lancamera/CameraRtsp.kt", "lancamera/TapoTalk.kt", "lan/LanDiscovery.kt", "core/SafeHttp.kt", "update/UpdateInstaller.kt", "update/TailscaleInstaller.kt", "listen/WakeModel.kt", "platform/DeliveryManager.kt", "vision/FaceEmbedder.kt", "vision/OnDeviceModels.kt", "satellite/HubLinks.kt", "lan/packs/LanPackNet.kt")
         // Never leave the phone: the add-agent check connects to the phone's own listener; api/engine is the server; adb/ talks to this device.
         val notOffPhone = setOf("ui/addagent/AddAgentViewModel.kt")
+        // Socket factories handed to recorded callers (CameraRtsp, TapoTalk, LanDiscovery, SafeHttp): those callers record each connection.
+        val factoryForRecorded = setOf("lan/LanSockets.kt")
         val problems = ArrayList<String>()
         root.walkTopDown().filter { it.isFile && it.name.endsWith(".kt") }.forEach { f ->
             val rel = f.relativeTo(root).path
             val src = f.readText()
             Regex("OkHttpClient\\.Builder\\(\\)(?!\\.addInterceptor\\(cc\\.bridgit\\.app\\.outbound\\.OutboundInterceptor\\))").findAll(src)
                 .forEach { problems += "$rel: OkHttpClient without OutboundInterceptor" }
-            if (Regex("openConnection\\(|\\bSocket\\(\\)|HttpsURLConnection\\b|DatagramSocket\\(").containsMatchIn(src) && rel !in recordedRaw && rel !in notOffPhone && !rel.startsWith("api/engine/") && !rel.startsWith("adb/"))
+            if (Regex("openConnection\\(|\\bSocket\\(\\)|HttpsURLConnection\\b|DatagramSocket\\(").containsMatchIn(src) && rel !in recordedRaw && rel !in notOffPhone && rel !in factoryForRecorded && !rel.startsWith("api/engine/") && !rel.startsWith("adb/"))
                 problems += "$rel: raw connection not covered by the outbound log"
             if (rel in recordedRaw && !src.contains("Outbound.")) problems += "$rel: listed as recorded but has no Outbound call"
         }

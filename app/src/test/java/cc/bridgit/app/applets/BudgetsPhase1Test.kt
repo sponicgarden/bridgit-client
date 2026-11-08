@@ -46,6 +46,8 @@ class BudgetsPhase1Test {
     }
 
     private fun install(d: JSONObject, by: cc.bridgit.app.core.Agent? = null): JSONObject = runBlocking {
+        // An agent's proposal carries the practice review record (AppletPractices); the owner's link does not need one.
+        if (by != null) d.getJSONObject("ui").put("practices", JSONObject("""{"contract":"bridgit-practices/1","catalog":"1.0.0","review":{"decision":"no-new-practice","reason":"Test budgets with the unchanged Pet monitor package.","practice_ids":["GOV-001"]}}"""))
         val pend = app.applets.propose(AppletPackage.check(d), null, link, by, notify = false)
         app.applets.approve(pend.getString("id"), null)
     }

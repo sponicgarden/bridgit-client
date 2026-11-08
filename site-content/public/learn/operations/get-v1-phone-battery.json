@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Full battery report: percent, status, plug type, health, temperature, voltage, cycles, current, time to full, estimated_runtime (time to empty at recent usage while unplugged; status, remaining/lower/upper seconds, observation window and drain rate; learning until 10 minutes and 2% drain), battery saver, which power settings agents may change, and the battery.* events",

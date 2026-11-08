@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Prefer a native question for simple choices, normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
@@ -130,13 +130,29 @@
     "description": "kind=html with stack: {\"left\": label, \"right\": label} (1-20 characters each). While the card waits, a swipe answers it and moves on: answer.data = {\"swipe\": \"left\"|\"right\", \"label\": ...}. Bridgit shows both labels under the card",
     "type": "object",
     "required": false
+   },
+   {
+    "name": "presentation",
+    "description": "standard (default: inside Bridgit's bordered card box, with the toolbar and the status/Dismiss strip) or full_screen (kind html only: edge to edge, system bars, toolbar and strip hidden; a tap on the screen edge or Back shows Dismiss and Exit full screen for a few seconds). A full-screen page without width=device-width in its viewport meta is scaled down to fit whole, letterboxed in black, never cropped. Compose full-screen pictures to display.viewport (or GET /v1/device/display full_screen_card; static specs are also at GET <team backend>/v1/names/{name}/specs) and show them with object-fit: contain. Other values: invalid_parameter",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "standard",
+     "full_screen"
+    ]
+   },
+   {
+    "name": "content_aspect",
+    "description": "kind=html: the page's fixed shape as width:height, e.g. \"16:9\" or \"1280x720\". When it differs from the canvas by more than 10 %, the reply's display.aspect_mismatch says so (also checked from width/height in the page's viewport meta)",
+    "type": "string",
+    "required": false
    }
   ],
   "example": "POST /v1/interactions {\"kind\":\"question\",\"title\":\"Pay this invoice?\",\"controls\":[{\"type\":\"button\",\"id\":\"yes\",\"label\":\"Pay\",\"style\":\"primary\"},{\"type\":\"button\",\"id\":\"no\",\"label\":\"Not now\"}]}",
   "idempotent": true,
   "path": "/v1/interactions",
   "capability": "interactions",
-  "returns": "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen, missing?: [open_on_arrival, display_over_other_apps], fix?}. When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix",
+  "returns": "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen (the screen was taken over), missing?: [open_on_arrival, display_over_other_apps], fix?, presentation (standard|full_screen), viewport {width_px, height_px, width_dp, height_dp, density} (the exact canvas the card's page gets in that presentation), aspect_mismatch? {content, viewport, advice} (the page's declared shape differs from the canvas by more than 10 %)}. When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix",
   "mcp_input_schema": {
    "type": "object",
    "properties": {
@@ -188,6 +204,10 @@
       "urgent"
      ]
     },
+    "content_aspect": {
+     "description": "kind=html: the page's fixed shape as width:height, e.g. \"16:9\" or \"1280x720\". When it differs from the canvas by more than 10 %, the reply's display.aspect_mismatch says so (also checked from width/height in the page's viewport meta)",
+     "type": "string"
+    },
     "states": {
      "description": "kind=pieces: your own words for the card states empty, loading, stale, paused, error",
      "type": "object"
@@ -200,6 +220,14 @@
      "description": "kind=pieces: 1-24 pieces (header, status, text, note, metrics, table, timeline, gallery, video, people, devices, draft, buttons), values as {\"$source\":\"<source>.<path>\"}. See https://bridgit.cc/learn/builder/applet-packages.md",
      "type": "array",
      "items": {"type": "object"}
+    },
+    "presentation": {
+     "description": "standard (default: inside Bridgit's bordered card box, with the toolbar and the status/Dismiss strip) or full_screen (kind html only: edge to edge, system bars, toolbar and strip hidden; a tap on the screen edge or Back shows Dismiss and Exit full screen for a few seconds). A full-screen page without width=device-width in its viewport meta is scaled down to fit whole, letterboxed in black, never cropped. Compose full-screen pictures to display.viewport (or GET /v1/device/display full_screen_card; static specs are also at GET <team backend>/v1/names/{name}/specs) and show them with object-fit: contain. Other values: invalid_parameter",
+     "type": "string",
+     "enum": [
+      "standard",
+      "full_screen"
+     ]
     },
     "expires_in_seconds": {
      "description": "60 to 604800, default 86400. After it, waits return expired and you get interaction.expired, but a question stays on the owner's phone and they can still answer it late (interaction.answered with late=true)",

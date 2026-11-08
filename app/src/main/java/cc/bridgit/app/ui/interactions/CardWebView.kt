@@ -40,7 +40,8 @@ import java.io.ByteArrayInputStream
  * - No new windows (setSupportMultipleWindows(false), onCreateWindow false); every navigation blocked;
  *   every request answered with an empty 403 (the card itself comes from loadDataWithBaseURL, so it is never
  *   fetched); Bridgit's forced CSP is the first thing in the page ([CardRules.prepare]).
- * - No JavaScript dialogs, no fullscreen, no file chooser, no downloads, no autofill, no console logging
+ * - No JavaScript dialogs, no WebView fullscreen API (Bridgit's own full-screen presentation, A0074, is drawn by the
+ *   card screen around this view), no file chooser, no downloads, no autofill, no console logging
  *   (LOG-02): nothing the page does can draw over Bridgit's own chrome around the card.
  * - Two @JavascriptInterface methods: Bridgit.respond(json), accepted once ([RespondGate]), the answer
  *   handed to [onRespond] on the main thread; and Bridgit.act(json) (feature #0007), which calls one of the
@@ -129,9 +130,39 @@ class CardWebView(context: Context, private val onRespond: (Any) -> Unit, privat
      * with the CSP also sent as a response header. Every other request still gets the empty 403.
      * (A data: URL load is itself intercepted on current WebViews, which showed every card blank.)
      */
-    fun load(html: String) {
-        page = CardRules.prepare(html, portal = portal != null).toByteArray(Charsets.UTF_8)
+    fun load(html: String, fullScreen: Boolean = false) {
+        source = html
+        fitOn = CardRules.fitToViewport(html, fullScreen)
+        fitInPage = fitOn
+        page = CardRules.prepare(html, portal = portal != null, fit = fitOn).toByteArray(Charsets.UTF_8)
         loadUrl(CARD_URL)
+    }
+
+    private var source: String? = null
+    /** A0076: whether the page should be scaled to fit, and whether the loaded document already is. */
+    private var fitOn = false
+    private var fitInPage = false
+
+    private fun applyFit() {
+        if (released || fitInPage == fitOn) return
+        fitInPage = fitOn
+        evaluateJavascript(if (fitOn) "${CardRules.FIT_SCRIPT};window.__bridgitFit(true)" else "window.__bridgitFit&&window.__bridgitFit(false)", null)
+    }
+
+    /**
+     * A0076: the owner switched this card in or out of full screen. A fixed-size page is scaled to fit whole while full
+     * screen ([CardRules.fitToViewport]) and restored to its own layout after. Bridgit's script only, never the page's.
+     */
+    fun setFullScreen(on: Boolean) {
+        if (released) return
+        fitOn = CardRules.fitToViewport(source, on)
+        val html = source ?: return
+        val unserved = synchronized(this) { page != null }
+        if (unserved) {
+            // Not fetched yet: the document itself carries the choice.
+            synchronized(this) { page = CardRules.prepare(html, portal = portal != null, fit = fitOn).toByteArray(Charsets.UTF_8) }
+            fitInPage = fitOn
+        } else if (pageReady) applyFit() // otherwise onPageFinished applies it
     }
 
     /** The one response the card's WebView ever gets: the page, for its own main-frame load, the first time. */
@@ -270,6 +301,7 @@ class CardWebView(context: Context, private val onRespond: (Any) -> Unit, privat
             view.evaluateJavascript(context.assets.open("applet-ui.js").bufferedReader().use { it.readText() }, null)
             view.evaluateJavascript(context.assets.open("table-sort.js").bufferedReader().use { it.readText() }, null)
             pageReady = true
+            applyFit()
             portal?.loaded()
             confirmation?.let { showConfirmation(it.answer, it.title, it.message, it.delay, it.answered) }
         }

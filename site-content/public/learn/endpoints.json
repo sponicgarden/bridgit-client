@@ -1822,6 +1822,62 @@
    "requires": null
   },
   {
+   "summary": "Read whether this Bridgit stores its static spec sheet with Bridgit (default on), the sheet it sends and the copy the team backend holds",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_specs_get",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/specs",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/specs",
+   "capability": "owner_features",
+   "returns": "share, name, specs (the current sheet), stored {available, specs, specs_updated_at} or {available:false, reason}, uploaded_at, delete_pending, lookup (the public GET agents use)",
+   "errors": [],
+   "requires": null
+  },
+  {
+   "summary": "Switch storing the static spec sheet with Bridgit on or off (off deletes the stored copy) or store the current sheet now; same logic as Settings \u203a Team; explicit owner.configuration grant required; no per-change phone approval",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_specs_post",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "share",
+     "description": "true stores the current sheet now and keeps it up to date; false deletes the stored sheet (retried later while the backend can't be reached) and stops sharing",
+     "type": "boolean",
+     "required": false
+    },
+    {
+     "name": "refresh",
+     "description": "true stores the current sheet now; needs sharing on",
+     "type": "boolean",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/owner/configuration/specs {\"share\":false}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/specs",
+   "capability": "owner_features",
+   "returns": "the same as GET plus backend: uploaded|unchanged|deleted|pending|not_named|failed",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "not_found",
+    "conflict",
+    "upstream_failed"
+   ],
+   "requires": null
+  },
+  {
    "summary": "Read saved Pet monitor food-view and eating-sound response configuration",
    "method": "GET",
    "auth": true,
@@ -3392,7 +3448,25 @@
    "idempotent": false,
    "path": "/v1/health",
    "capability": "status",
-   "returns": "status, app, app_version, mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more)",
+   "returns": "status, app, app_version, mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}",
+   "errors": [],
+   "requires": null
+  },
+  {
+   "summary": "This phone's display right now and the canvas a card's page gets: full screen (presentation full_screen) per orientation and the standard card frame. Static specs (screen size, cameras) are also stored with Bridgit: ask GET <team backend>/v1/names/{name}/specs first when the phone may be busy or offline",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "device_display",
+   "query": [],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/device/display",
+   "idempotent": false,
+   "path": "/v1/device/display",
+   "capability": "status",
+   "returns": "width_px, height_px (the full display in its current rotation), density_dpi, density, aspect_ratio (long:short, e.g. 20:9), rotation (0, 90, 180 or 270), orientation (portrait or landscape), refresh_hz, full_screen_card {portrait {width_px, height_px}, landscape {width_px, height_px}} (the whole display less the camera cutout; compose full-screen images to this size), standard_card {width_px, height_px, measured} (the bordered card frame; measured false = estimated from the window)",
    "errors": [],
    "requires": null
   },
@@ -5432,13 +5506,29 @@
      "description": "kind=html with stack: {\"left\": label, \"right\": label} (1-20 characters each). While the card waits, a swipe answers it and moves on: answer.data = {\"swipe\": \"left\"|\"right\", \"label\": ...}. Bridgit shows both labels under the card",
      "type": "object",
      "required": false
+    },
+    {
+     "name": "presentation",
+     "description": "standard (default: inside Bridgit's bordered card box, with the toolbar and the status/Dismiss strip) or full_screen (kind html only: edge to edge, system bars, toolbar and strip hidden; a tap on the screen edge or Back shows Dismiss and Exit full screen for a few seconds). A full-screen page without width=device-width in its viewport meta is scaled down to fit whole, letterboxed in black, never cropped. Compose full-screen pictures to display.viewport (or GET /v1/device/display full_screen_card; static specs are also at GET <team backend>/v1/names/{name}/specs) and show them with object-fit: contain. Other values: invalid_parameter",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "standard",
+      "full_screen"
+     ]
+    },
+    {
+     "name": "content_aspect",
+     "description": "kind=html: the page's fixed shape as width:height, e.g. \"16:9\" or \"1280x720\". When it differs from the canvas by more than 10 %, the reply's display.aspect_mismatch says so (also checked from width/height in the page's viewport meta)",
+     "type": "string",
+     "required": false
     }
    ],
    "example": "POST /v1/interactions {\"kind\":\"question\",\"title\":\"Pay this invoice?\",\"controls\":[{\"type\":\"button\",\"id\":\"yes\",\"label\":\"Pay\",\"style\":\"primary\"},{\"type\":\"button\",\"id\":\"no\",\"label\":\"Not now\"}]}",
    "idempotent": true,
    "path": "/v1/interactions",
    "capability": "interactions",
-   "returns": "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen, missing?: [open_on_arrival, display_over_other_apps], fix?}. When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix",
+   "returns": "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen (the screen was taken over), missing?: [open_on_arrival, display_over_other_apps], fix?, presentation (standard|full_screen), viewport {width_px, height_px, width_dp, height_dp, density} (the exact canvas the card's page gets in that presentation), aspect_mismatch? {content, viewport, advice} (the page's declared shape differs from the canvas by more than 10 %)}. When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix",
    "errors": [
     "capability_disabled",
     "notifications_required",
@@ -11559,7 +11649,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 134,
- "count": 345,
+ "api_revision": 135,
+ "count": 348,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

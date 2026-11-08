@@ -60,6 +60,21 @@ class InteractionModule(app: BridgeApp) : Capability(app) {
             if (s.missing.isNotEmpty()) put("missing", JSONArray(s.missing)).put("fix", NotifRules.fix(s.missing))
         }
 
+    /**
+     * A0076: the canvas the card's page gets in the presentation used (the whole display less the cutout for full screen,
+     * the card frame for standard), and `aspect_mismatch` when the page's declared shape differs by more than 10 %.
+     */
+    private fun canvas(o: JSONObject, d: Draft) {
+        val g = runCatching { DisplayInfo.read(app) }.getOrNull() ?: return
+        val px = if (d.presentation == Presentation.FULL_SCREEN) CardViewport.fullScreenNow(g) else DisplayInfo.standardOrEstimate(g)
+        o.put("presentation", d.presentation.id).put("viewport", CardViewport.viewportJson(px, g.density))
+        if (d.kind != IKind.HTML) return
+        val declared = d.html?.let { CardViewport.declaredSize(it) }
+        val content = d.contentAspect ?: declared?.ratio
+        val label = d.contentAspectLabel ?: declared?.let { "${it.w}x${it.h}" }
+        CardViewport.mismatchJson(content, label, px, d.presentation)?.let { o.put("aspect_mismatch", it) }
+    }
+
     /** Questions and html cards wait for an answer or close; notices and text panels for being seen. */
     private fun answerable(k: IKind) = k == IKind.QUESTION || k == IKind.HTML
 
@@ -116,7 +131,7 @@ class InteractionModule(app: BridgeApp) : Capability(app) {
             data = JSONObject().put("interaction_id", i.id).put("kind", d.kind.id)
             d.stack?.let { params.put("stack", it).put("stack_index", i.stackIndex); data?.put("stack", it) }
             Reply.Json(JSONObject().put("interaction_id", i.id).put("status", i.status.id).put("expires_at", isoAt(i.expiresAt))
-                .put("display", displayJson(shown)).apply {
+                .put("display", displayJson(shown).also { canvas(it, d) }).apply {
                     if (i.stack != null) put("stack", i.stack).put("stack_index", i.stackIndex).put("stack_size", i.stackSize)
                     withNext(this, i)
                 }, status = 201)

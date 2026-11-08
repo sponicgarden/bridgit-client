@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Change settings (agents with Agent Super Powers, once the owner turns on App settings); every change is checked first, so one bad change changes nothing",

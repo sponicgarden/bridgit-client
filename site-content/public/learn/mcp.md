@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 134. Full index: https://bridgit.cc/learn/index.json.
+API revision 135. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -81,6 +81,8 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `owner_configuration_name_get` | `GET /v1/owner/configuration/name` | Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend |
 | `owner_configuration_name_post` | `POST /v1/owner/configuration/name` | Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_name_delete` | `DELETE /v1/owner/configuration/name` | Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_specs_get` | `GET /v1/owner/configuration/specs` | Read whether this Bridgit stores its static spec sheet with Bridgit (default on), the sheet it sends and the copy the team backend holds |
+| `owner_configuration_specs_post` | `POST /v1/owner/configuration/specs` | Switch storing the static spec sheet with Bridgit on or off (off deletes the stored copy) or store the current sheet now; same logic as Settings › Team; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_feeding_get` | `GET /v1/owner/configuration/feeding` | Read saved Pet monitor food-view and eating-sound response configuration |
 | `owner_configuration_feeding_post` | `POST /v1/owner/configuration/feeding` | Save current enrolled Pet monitor camera position, enable/disable eating-sound response or clear saved view; existing camera/audio grants and motion lease checks apply; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_modes_get` | `GET /v1/owner/configuration/modes` | Read built-in, custom and current mode definitions |
@@ -129,6 +131,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `speech_models` | `GET /v1/speech/models` | Speech selection and local readiness |
 | `services` | `GET /v1/services` | Discover general decision and location-context services for any applet: Azure image generation, models, nearby places, air quality, pollen, time zones, maps and weather; call formats, grants and budgets; no paid call |
 | `health` | `GET /v1/health` | Is Bridgit up, and which agent you are |
+| `device_display` | `GET /v1/device/display` | This phone's display right now and the canvas a card's page gets: full screen (presentation full_screen) per orientation and the standard card frame. Static specs (screen size, cameras) are also stored with Bridgit: ask GET <team backend>/v1/names/{name}/specs first when the phone may be busy or offline |
 | `devices` | `GET /v1/devices` | Host and owner-configured external devices, supported actions and access status |
 | `capabilities` | `GET /v1/capabilities` | What's switched on and ready, and why not |
 | `limits` | `GET /v1/limits` | Your account's limits right now, and what is used: Jev and Clef calls an hour, the monthly model budget, paid watch checks, and the limits this phone enforces itself. Limits differ per account and can change: read them here, never assume documented numbers |

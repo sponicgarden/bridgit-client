@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",

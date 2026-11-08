@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Interaction detail (UI-16): Play aloud, Close. -->
+<!-- Interaction detail (UI-16): Play aloud, Full screen, Close. -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/interactions_play" android:icon="@drawable/interactions_ic_play"
         android:title="@string/interactions_play" app:showAsAction="ifRoom" />
+    <!-- A0074: HTML cards only; shows the card edge to edge. -->
+    <item android:id="@+id/interactions_full_screen" android:icon="@drawable/interactions_ic_full_screen"
+        android:title="@string/interactions_full_screen" android:visible="false" app:showAsAction="ifRoom" />
     <item android:id="@+id/interactions_close" android:title="@string/interactions_close" app:showAsAction="never" />
 </menu>

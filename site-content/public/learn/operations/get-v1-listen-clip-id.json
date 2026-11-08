@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "The audio after a wake word, when the owner set that wake word to send it (kept in memory 10 minutes unless you chose longer with POST /v1/captures/storage; also GET /v1/captures/{id})",

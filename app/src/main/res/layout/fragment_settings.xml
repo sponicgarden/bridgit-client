@@ -64,6 +64,7 @@
                     <include android:id="@+id/usageTallies" layout="@layout/settings_switch_row" />
                     <include android:id="@+id/usageWhat" layout="@layout/settings_row" />
                     <include android:id="@+id/feedbackUpload" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/deviceSpecs" layout="@layout/settings_switch_row" />
                 </LinearLayout>
 
                 <LinearLayout style="@style/Widget.Bridgit.SettingsSection">

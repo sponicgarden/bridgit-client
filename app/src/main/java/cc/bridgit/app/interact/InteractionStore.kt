@@ -58,6 +58,7 @@ class InteractionStore(context: Context, private val clock: () -> Long = System:
                 put("controls_json", JSONArray(d.controls.map { it.toJson() }).toString()); put("html", d.html)
                 put("no_takeover", if (d.noTakeover) 1 else 0)
                 put("follow_up", if (d.followUp) 1 else 0)
+                put("presentation", d.presentation.id)
                 put("priority", d.priority); put("speak", if (d.speak) 1 else 0); put("status", IStatus.PENDING.id)
                 put("created_at", now); put("expires_at", now + d.expiresInS * 1000)
                 if (d.kind == IKind.TEXT) { put("stream_text", TextPanelRules.keepTail(d.text ?: "")); put("stream_done", 0) }
@@ -418,7 +419,8 @@ class InteractionStore(context: Context, private val clock: () -> Long = System:
             (0 until ctr.length()).map { Control.fromJson(ctr.getJSONObject(it)) }, s("html"), s("priority") ?: "normal", l("speak") == 1L,
             IStatus.of(s("status"))!!, s("answer_json")?.let { JSONObject(it) }, l("created_at")!!, l("expires_at")!!,
             l("seen_at"), l("answered_at"), l("closed_at"), s("stream_text") ?: "", l("stream_done") == 1L,
-            stack, (l("stack_index") ?: 0L).toInt(), size, SwipeAnswer.fromJson(s("swipe_json")), answered, l("no_takeover") == 1L, l("follow_up") == 1L)
+            stack, (l("stack_index") ?: 0L).toInt(), size, SwipeAnswer.fromJson(s("swipe_json")), answered, l("no_takeover") == 1L, l("follow_up") == 1L,
+            Presentation.of(s("presentation")) ?: Presentation.STANDARD)
     }
 
     companion object {
@@ -428,14 +430,14 @@ class InteractionStore(context: Context, private val clock: () -> Long = System:
         const val WAITING_QUESTION = "kind IN ('question','html') AND status IN ('pending','seen','expired')"
     }
 
-    /** Version 4 adds follow_up; version 3 added the per-call no_takeover flag; version 2 added stack fields. Internal so the migration is unit-tested. */
-    internal class Helper(ctx: Context, name: String? = "interactions.db") : SQLiteOpenHelper(ctx, name, null, 4) {
+    /** Version 5 adds presentation (A0074); version 4 added follow_up; version 3 added the per-call no_takeover flag; version 2 added stack fields. Internal so the migration is unit-tested. */
+    internal class Helper(ctx: Context, name: String? = "interactions.db") : SQLiteOpenHelper(ctx, name, null, 5) {
         override fun onCreate(db: SQLiteDatabase) {
             db.execSQL("""CREATE TABLE interactions (id INTEGER PRIMARY KEY AUTOINCREMENT, agent_id TEXT NOT NULL, agent TEXT, kind TEXT NOT NULL,
                 title TEXT NOT NULL, text TEXT, image TEXT, controls_json TEXT, html TEXT, priority TEXT, speak INTEGER, status TEXT NOT NULL,
                 answer_json TEXT, created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, seen_at INTEGER, answered_at INTEGER, closed_at INTEGER,
                 stream_text TEXT, stream_done INTEGER, stack TEXT, stack_index INTEGER, swipe_json TEXT, no_takeover INTEGER NOT NULL DEFAULT 0,
-                follow_up INTEGER NOT NULL DEFAULT 0)""")
+                follow_up INTEGER NOT NULL DEFAULT 0, presentation TEXT NOT NULL DEFAULT 'standard')""")
             db.execSQL(STACK_INDEX)
             db.execSQL("CREATE INDEX interactions_agent ON interactions(agent_id, id)")
             db.execSQL("CREATE INDEX interactions_status ON interactions(status, expires_at)")
@@ -443,6 +445,7 @@ class InteractionStore(context: Context, private val clock: () -> Long = System:
             db.execSQL("CREATE INDEX events_agent ON events(agent_id, id)")
         }
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+            if (oldVersion < 5) db.execSQL("ALTER TABLE interactions ADD COLUMN presentation TEXT NOT NULL DEFAULT 'standard'")
             if (oldVersion < 4) db.execSQL("ALTER TABLE interactions ADD COLUMN follow_up INTEGER NOT NULL DEFAULT 0")
             if (oldVersion < 3) db.execSQL("ALTER TABLE interactions ADD COLUMN no_takeover INTEGER NOT NULL DEFAULT 0")
             if (oldVersion < 2) {

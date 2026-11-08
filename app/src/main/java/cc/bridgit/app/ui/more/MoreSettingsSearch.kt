@@ -22,6 +22,7 @@ object MoreSettingsSearch {
         Entry(R.id.usageTallies, R.string.settings_usage_tallies),
         Entry(R.id.usageWhat, R.string.settings_usage_what),
         Entry(R.id.feedbackUpload, R.string.settings_feedback_upload),
+        Entry(R.id.deviceSpecs, R.string.settings_device_specs),
         Entry(R.id.securityDeviceLock, R.string.settings_security_device_lock),
         Entry(R.id.securityAlerts, R.string.settings_security_alerts),
         Entry(R.id.securityBiometric, R.string.settings_security_biometric),

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Update connection fields; omitted fields preserve existing values; null headers/extra clear them; explicit owner.configuration grant required; no per-change phone approval",

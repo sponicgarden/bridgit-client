@@ -55,9 +55,10 @@ object DeviceNames {
         val own = cached(app)
         return if (own == null) JSONObject().put("status", "unregistered").put("advice", ADVICE)
             .put("how", "Register a name first: $OPERATION {\"name\":\"kitchen-tab\"} (control MCP: configuration.set with that operation). Taken? Suggest another.")
-            .put("about", cc.bridgit.app.api.Learn.NAMES_URL)
+            .put("about", cc.bridgit.app.api.Learn.NAMES_URL).put("specs", DeviceSpecs.hint(null, DeviceSpecs.shared(app)))
         else JSONObject().put("status", "registered").put("name", own.getString("name")).put("label", own.opt("label") ?: JSONObject.NULL)
             .put("visible", own.optBoolean("visible")).put("how", "Registered. Change label or visible with $OPERATION.").put("about", cc.bridgit.app.api.Learn.NAMES_URL)
+            .put("specs", DeviceSpecs.hint(own.getString("name"), DeviceSpecs.shared(app)))
     }
 
     /** GET /v1/names/me: the backend's answer, cached; unregistered when the backend has none. */
@@ -77,6 +78,7 @@ object DeviceNames {
             if (code == 409 && json.optString("error") == "already_named") return refresh(app).also { throw ErrorCatalog.error("already_named", json.optString("message"), mapOf("name" to json.opt("name"))) }
             check(app, code, json)
             save(app, json); lastHeartbeatAt = System.currentTimeMillis()
+            DeviceSpecs.afterRegistration(app) // A0077: the spec sheet goes to Bridgit with the new name
             return hint(app).put("registered", true).put("created", code == 201)
         }
         if (held == null) {

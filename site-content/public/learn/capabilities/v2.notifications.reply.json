@@ -20,8 +20,8 @@
   ],
   "tool": "notification.reply"
  }],
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "boundaries": "Private build only; owner grants and session/transport requirements apply. See control guide.",
  "examples_url": null,
  "id": "v2.notifications.reply",

@@ -618,6 +618,12 @@ object ApiChanges {
             Item("Team backend: file and follow issues at /v1/agent/issues (client_issue_id)", "/v1/issues/team-key"),
             Item("links.issues is the issue list; links.feedback is deprecated", null),
         )),
+        Revision(135, "1.8.0", "2026-11-08", listOf(
+            Item("Full-screen cards: presentation \"full_screen\" on an html card shows it edge to edge with every bar hidden; a fixed-size page is scaled to fit whole, never cropped. Stored and returned with the interaction; unknown values are invalid_parameter", "/v1/interactions"),
+            Item("The post reply's display block says the exact canvas the page gets (viewport {width_px, height_px, width_dp, height_dp, density}) and flags aspect_mismatch when content_aspect or the page's viewport meta differs by more than 10 %", "/v1/interactions"),
+            Item("Display geometry: size, density, aspect ratio, rotation and the full-screen and standard card canvases; health carries a short display block", "/v1/device/display"),
+            Item("Device specs: a named Bridgit stores its static spec sheet (display, full-screen card size, cameras, CPU, memory, storage, sensors, model, OS) with Bridgit, on by default; ask GET <team backend>/v1/names/{name}/specs first for static specs, the phone only for live state. Read, switch off (which deletes the stored sheet) or refresh it", "/v1/owner/configuration/specs"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

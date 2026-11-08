@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 113,
+ "api_revision": 135,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "This phone's display right now and the canvas a card's page gets: full screen (presentation full_screen) per orientation and the standard card frame. Static specs (screen size, cameras) are also stored with Bridgit: ask GET <team backend>/v1/names/{name}/specs first when the phone may be busy or offline",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "device_display",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/device/display",
+  "idempotent": false,
+  "path": "/v1/device/display",
+  "capability": "status",
+  "returns": "width_px, height_px (the full display in its current rotation), density_dpi, density, aspect_ratio (long:short, e.g. 20:9), rotation (0, 90, 180 or 270), orientation (portrait or landscape), refresh_hz, full_screen_card {portrait {width_px, height_px}, landscape {width_px, height_px}} (the whole display less the camera cutout; compose full-screen images to this size), standard_card {width_px, height_px, measured} (the bordered card frame; measured false = estimated from the window)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

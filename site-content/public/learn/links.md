@@ -8,6 +8,8 @@ The person's only step is to tell you the other Bridgit's **Device Domain Name**
 
 `GET /v1/health` shows `bridgit_name`. If it says `unregistered`, register one first (see https://bridgit.cc/agents/names/): `POST /v1/owner/configuration/name {"name":"kitchen-tab"}`. Without a name, the link calls answer `409 name_required`.
 
+A named Bridgit also stores its static spec sheet with Bridgit (on by default; the owner can switch it off): display size, the full-screen card size in each orientation, cameras, CPU, memory, storage, sensors, model and OS. For static specs (screen size, aspect ratio, cameras), ask Bridgit first with `GET https://<team backend>/v1/names/{name}/specs` (the exact URL is `bridgit_name.specs` in health): it answers while the phone is busy or offline. Query the phone only for live state. Its `full_screen_image` is the size to compose a full-screen picture for; post it in an html card with `presentation: "full_screen"`. The owner configuration operation `GET`/`POST /v1/owner/configuration/specs` (`{"share":false}`, `{"share":true}` or `{"refresh":true}`) reads and changes sharing.
+
 ## 2. On the Bridgit that will be used: make a code
 
 ```

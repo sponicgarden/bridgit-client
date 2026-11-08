@@ -73,6 +73,10 @@
     <string name="interactions_card_open">Open card</string>
     <string name="interactions_card_crashed">This card stopped working. Dismiss it, or ask %1$s to send it again.</string>
     <string name="interactions_card_dismiss_desc">Dismiss the card from %1$s</string>
+    <!-- A0074: true full screen for cards and pictures. -->
+    <string name="interactions_full_screen">Full screen</string>
+    <string name="interactions_full_screen_exit">Exit full screen</string>
+    <string name="interactions_full_screen_image_close">Close picture</string>
 
     <!-- Live text panel (D26). -->
     <string name="interactions_text_headline">%1$s is streaming: %2$s</string>

@@ -1,5 +1,5 @@
 {
- "api_revision": 134,
+ "api_revision": 135,
  "changes": [
   {
    "date": "2026-10-27",
@@ -2230,6 +2230,29 @@
     }
    ],
    "revision": 134
+  },
+  {
+   "date": "2026-11-08",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/interactions",
+     "what": "Full-screen cards: presentation \"full_screen\" on an html card shows it edge to edge with every bar hidden; a fixed-size page is scaled to fit whole, never cropped. Stored and returned with the interaction; unknown values are invalid_parameter"
+    },
+    {
+     "endpoint": "/v1/interactions",
+     "what": "The post reply's display block says the exact canvas the page gets (viewport {width_px, height_px, width_dp, height_dp, density}) and flags aspect_mismatch when content_aspect or the page's viewport meta differs by more than 10 %"
+    },
+    {
+     "endpoint": "/v1/device/display",
+     "what": "Display geometry: size, density, aspect ratio, rotation and the full-screen and standard card canvases; health carries a short display block"
+    },
+    {
+     "endpoint": "/v1/owner/configuration/specs",
+     "what": "Device specs: a named Bridgit stores its static spec sheet (display, full-screen card size, cameras, CPU, memory, storage, sensors, model, OS) with Bridgit, on by default; ask GET <team backend>/v1/names/{name}/specs first for static specs, the phone only for live state. Read, switch off (which deletes the stored sheet) or refresh it"
+    }
+   ],
+   "revision": 135
   }
  ],
  "links": {

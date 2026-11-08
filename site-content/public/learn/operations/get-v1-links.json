@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "The linked Bridgits (the owner's other Bridgits) you may use through this one, with what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further.",

@@ -107,6 +107,7 @@ class SettingsFragment : Fragment() {
             { app.settings.outboundLog }) { app.settings.setOutboundLog(it, "owner") }
         usageSwitch()
         feedbackUploadSwitch()
+        deviceSpecsSwitch()
         remoteViewRows()
         row(b.usageWhat, R.string.settings_usage_what) { showUsage() }
         b.usageWhat.value.setText(R.string.settings_usage_what_desc)
@@ -476,6 +477,27 @@ class SettingsFragment : Fragment() {
             cc.bridgit.app.capability.SettingsController(app).setCrashReports(on)
             r.toggle.isChecked = on
             audit(getString(R.string.settings_changed_crash_reports, getString(if (on) R.string.home_on else R.string.home_off)))
+        }
+    }
+
+    /**
+     * A0077: store the static spec sheet with Bridgit (on by default). The same [cc.bridgit.app.feedback.DeviceSpecs.setShare]
+     * as POST /v1/owner/configuration/specs; off deletes the stored sheet.
+     */
+    private fun deviceSpecsSwitch() {
+        val r = b.deviceSpecs
+        if (!cc.bridgit.app.feedback.FeedbackUploader.configured) { r.root.visibility = View.GONE; return }
+        r.title.setText(R.string.settings_device_specs)
+        r.value.visibility = View.GONE
+        r.root.contentDescription = getString(R.string.settings_device_specs)
+        r.toggle.isChecked = cc.bridgit.app.feedback.DeviceSpecs.shared(app)
+        UiActions.asSwitch(r.root) { cc.bridgit.app.feedback.DeviceSpecs.shared(app) }
+        r.root.setOnClickListener {
+            val on = !cc.bridgit.app.feedback.DeviceSpecs.shared(app)
+            r.toggle.isChecked = on
+            val bridge = app
+            viewLifecycleOwner.lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) { runCatching { cc.bridgit.app.feedback.DeviceSpecs.setShare(bridge, on) } }
+            audit(getString(R.string.settings_changed_device_specs, getString(if (on) R.string.home_on else R.string.home_off)))
         }
     }
 

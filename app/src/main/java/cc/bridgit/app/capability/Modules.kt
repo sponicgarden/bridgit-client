@@ -69,7 +69,7 @@ class StatusModule(app: BridgeApp) : Capability(app) {
     override val titleRes = R.string.cap_status
     override val descriptionRes = R.string.cap_status_desc
     override val group = "status"
-    override val endpoints = listOf(Endpoints.SERVICES, Endpoints.SPEECH_MODELS, Endpoints.HEALTH, Endpoints.DEVICES, Endpoints.CAPABILITIES, Endpoints.LIMITS, Endpoints.DISCOVER, Endpoints.DISCOVERY_REPORT, Endpoints.GUIDE, Endpoints.START, Endpoints.DEMO, Endpoints.SAMPLES, Endpoints.OPENAPI, Endpoints.CHANGES, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.PAIR, Endpoints.MCP, Endpoints.ME, Endpoints.OWNER_EMAIL, Endpoints.OWNER_EMAIL_SET) + cc.bridgit.app.satellite.SatelliteEndpoints.ALL
+    override val endpoints = listOf(Endpoints.SERVICES, Endpoints.SPEECH_MODELS, Endpoints.HEALTH, Endpoints.DEVICE_DISPLAY, Endpoints.DEVICES, Endpoints.CAPABILITIES, Endpoints.LIMITS, Endpoints.DISCOVER, Endpoints.DISCOVERY_REPORT, Endpoints.GUIDE, Endpoints.START, Endpoints.DEMO, Endpoints.SAMPLES, Endpoints.OPENAPI, Endpoints.CHANGES, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.PAIR, Endpoints.MCP, Endpoints.ME, Endpoints.OWNER_EMAIL, Endpoints.OWNER_EMAIL_SET) + cc.bridgit.app.satellite.SatelliteEndpoints.ALL
 
     /** GET /v1/owner/email and the health block: where the owner's email verification stands. */
     private fun ownerEmailJson(): JSONObject {
@@ -113,6 +113,10 @@ class StatusModule(app: BridgeApp) : Capability(app) {
                 inventory.getJSONArray("devices").put(cc.bridgit.app.satellite.SatelliteEndpoints.publicJson(it).put("connection", "satellite")) } }
             Reply.Json(inventory)
         }
+        endpoint(Endpoints.DEVICE_DISPLAY) {
+            val g = cc.bridgit.app.interact.DisplayInfo.read(app)
+            Reply.Json(cc.bridgit.app.interact.CardViewport.displayJson(g, cc.bridgit.app.interact.DisplayInfo.standard(g)))
+        }
         endpoint(Endpoints.SERVICES) {
             Reply.Json(cc.bridgit.app.judgment.ServiceCatalog.json(cc.bridgit.app.feedback.FeedbackUploader.configured, app.settings.externalCallsPaused))
         }
@@ -133,7 +137,8 @@ class StatusModule(app: BridgeApp) : Capability(app) {
                 .put("owner_email", ownerEmailJson())
                 .put("api_revision", cc.bridgit.app.api.ApiChanges.CURRENT)
                 .put("whats_new", cc.bridgit.app.api.ApiChanges.whatsNew(agent?.let { app.agents.get(it.id) }?.knownApiRevision ?: 0))
-                .put("links", cc.bridgit.app.api.ApiChanges.links()))
+                .put("links", cc.bridgit.app.api.ApiChanges.links())
+                .put("display", runCatching { cc.bridgit.app.interact.CardViewport.healthJson(cc.bridgit.app.interact.DisplayInfo.read(app)) }.getOrDefault(JSONObject.NULL)))
         }
         endpoint(Endpoints.ME) {
             val model = body.optString("model", "").trim()

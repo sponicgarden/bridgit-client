@@ -16,8 +16,8 @@
   "requires_power": null,
   "tool": "usage"
  }],
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.usage",

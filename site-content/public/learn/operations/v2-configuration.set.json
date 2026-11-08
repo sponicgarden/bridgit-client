@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Commands + ToolSchemas + PlatformApi.openApi",
  "operation": {
   "path": "/v2/call",
@@ -48,6 +48,7 @@
        "POST /v1/owner/configuration/email",
        "POST /v1/owner/configuration/name",
        "DELETE /v1/owner/configuration/name",
+       "POST /v1/owner/configuration/specs",
        "POST /v1/owner/configuration/feeding",
        "POST /v1/owner/configuration/modes",
        "POST /v1/owner/configuration/listening",
@@ -106,6 +107,7 @@
          "POST /v1/owner/configuration/email",
          "POST /v1/owner/configuration/name",
          "DELETE /v1/owner/configuration/name",
+         "POST /v1/owner/configuration/specs",
          "POST /v1/owner/configuration/feeding",
          "POST /v1/owner/configuration/modes",
          "POST /v1/owner/configuration/listening",
@@ -168,6 +170,7 @@
       "POST /v1/owner/configuration/email",
       "POST /v1/owner/configuration/name",
       "DELETE /v1/owner/configuration/name",
+      "POST /v1/owner/configuration/specs",
       "POST /v1/owner/configuration/feeding",
       "POST /v1/owner/configuration/modes",
       "POST /v1/owner/configuration/listening",

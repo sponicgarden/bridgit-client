@@ -438,6 +438,26 @@
    "tool": "owner_configuration_name_delete"
   },
   {
+   "summary": "Read whether this Bridgit stores its static spec sheet with Bridgit (default on), the sheet it sends and the copy the team backend holds",
+   "path": "/v1/owner/configuration/specs",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-specs.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-specs.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_specs_get"
+  },
+  {
+   "summary": "Switch storing the static spec sheet with Bridgit on or off (off deletes the stored copy) or store the current sheet now; same logic as Settings \u203a Team; explicit owner.configuration grant required; no per-change phone approval",
+   "path": "/v1/owner/configuration/specs",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-specs.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-specs.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_specs_post"
+  },
+  {
    "summary": "Read saved Pet monitor food-view and eating-sound response configuration",
    "path": "/v1/owner/configuration/feeding",
    "method": "GET",
@@ -578,8 +598,8 @@
    "tool": "owner_configuration_links_log"
   }
  ],
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.owner_features",

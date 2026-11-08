@@ -1,0 +1,61 @@
+{
+ "documentation_revision": 113,
+ "api_revision": 135,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Switch storing the static spec sheet with Bridgit on or off (off deletes the stored copy) or store the current sheet now; same logic as Settings \u203a Team; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_specs_post",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "share",
+    "description": "true stores the current sheet now and keeps it up to date; false deletes the stored sheet (retried later while the backend can't be reached) and stops sharing",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "refresh",
+    "description": "true stores the current sheet now; needs sharing on",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/specs {\"share\":false}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/specs",
+  "capability": "owner_features",
+  "returns": "the same as GET plus backend: uploaded|unchanged|deleted|pending|not_named|failed",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "refresh": {
+     "description": "true stores the current sheet now; needs sharing on",
+     "type": "boolean"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "share": {
+     "description": "true stores the current sheet now and keeps it up to date; false deletes the stored sheet (retried later while the backend can't be reached) and stops sharing",
+     "type": "boolean"
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

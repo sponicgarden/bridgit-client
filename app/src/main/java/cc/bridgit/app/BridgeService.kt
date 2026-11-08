@@ -148,7 +148,7 @@ class BridgeService : LifecycleService() {
             val wait = if (boundTo.isEmpty() && reconnect.attempts > 0) reconnect.waitMs(System.currentTimeMillis()).coerceIn(1_000L, RECHECK_MS) else RECHECK_MS
             val why = withTimeoutOrNull(wait) { recheck.receive() } ?: "periodic"
             server?.maintenance()
-            lifecycleScope.launch(Dispatchers.IO) { runCatching { app.usage.flushIfDue() }; runCatching { cc.bridgit.app.satellite.SatelliteHub.refreshAllIfDue(app) }; runCatching { app.hubLinks.checkHubsIfDue() }; runCatching { app.links.checkIfDue() }; runCatching { cc.bridgit.app.feedback.DeviceNames.heartbeatIfDue(app) } }
+            lifecycleScope.launch(Dispatchers.IO) { runCatching { app.usage.flushIfDue() }; runCatching { cc.bridgit.app.satellite.SatelliteHub.refreshAllIfDue(app) }; runCatching { app.hubLinks.checkHubsIfDue() }; runCatching { app.links.checkIfDue() }; runCatching { cc.bridgit.app.feedback.DeviceNames.heartbeatIfDue(app) }; runCatching { cc.bridgit.app.feedback.DeviceSpecs.syncIfDue(app) } }
             if (why != "start" && why != "periodic") delay(1500) // let the VPN settle after a change
             val addrs = tailscaleAddresses()
             val port = app.settings.port

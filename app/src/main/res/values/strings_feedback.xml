@@ -70,6 +70,9 @@
     <string name="settings_install_unverified">not verified: %1$s</string>
     <string name="settings_install_id_copied">Install ID copied</string>
     <string name="settings_changed_feedback_upload">You turned sending bug reports to the Bridgit team %1$s</string>
+    <!-- A0077: the static spec sheet (screen, cameras, model) stored with Bridgit; on by default. -->
+    <string name="settings_device_specs">Share device specs with Bridgit</string>
+    <string name="settings_changed_device_specs">You turned sharing device specs with Bridgit %1$s</string>
     <string name="feedback_view_report">View report</string>
     <string name="feedback_filed_log_bug">You filed a bug report</string>
     <string name="feedback_filed_log_feature">You filed a feature request</string>

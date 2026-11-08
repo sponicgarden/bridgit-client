@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Track a person's body for up to 2 minutes: the phone finds 33 body points in every camera frame (ML Kit, offline and free; no picture leaves the phone). Read the frames as they come with GET /v1/camera/pose/{id}",

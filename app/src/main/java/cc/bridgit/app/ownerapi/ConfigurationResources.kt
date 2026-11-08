@@ -105,6 +105,26 @@ class ConfigurationResources(private val app: BridgeApp, private val caller: Age
         }
     }
     suspend fun hideName(): JSONObject { access.require(); return withContext(Dispatchers.IO) { cc.bridgit.app.feedback.DeviceNames.hide(app).also { access.audit("bridgit name") } } }
+    /** A0078: the device spec sheet stored with Bridgit; read with the backend's copy. */
+    suspend fun specs(): JSONObject { access.require(); return withContext(Dispatchers.IO) { cc.bridgit.app.feedback.DeviceSpecs.status(app, remote = true) } }
+    /** A0078: share on/off (off deletes the stored sheet) or refresh now; the same [cc.bridgit.app.feedback.DeviceSpecs.setShare] as Settings. */
+    suspend fun specs(body: JSONObject): JSONObject {
+        access.require(); ConfigurationAccess.only(body, "share", "refresh")
+        val share = if (body.has("share")) body.opt("share") as? Boolean ?: throw ErrorCatalog.error("invalid_parameter", "share must be true or false") else null
+        val refresh = if (body.has("refresh")) body.opt("refresh") as? Boolean ?: throw ErrorCatalog.error("invalid_parameter", "refresh must be true or false") else null
+        if (share == null && refresh == null) throw ErrorCatalog.error("invalid_parameter", "Send share (true or false) or refresh: true")
+        if (refresh == false && share == null) throw ErrorCatalog.error("invalid_parameter", "refresh can only be true")
+        if (share == false && refresh == true) throw ErrorCatalog.error("invalid_parameter", "refresh needs sharing on")
+        return withContext(Dispatchers.IO) {
+            val specs = cc.bridgit.app.feedback.DeviceSpecs
+            val outcome = when {
+                share != null -> specs.setShare(app, share)
+                else -> specs.refresh(app)
+            }
+            access.audit("device specs")
+            specs.status(app, remote = false).put("backend", outcome)
+        }
+    }
     fun modes(): JSONObject { access.require(); return app.platform.modes.json().put("custom", JSONArray(app.platform.modes.custom())) }
     suspend fun modes(body: JSONObject): JSONObject {
         access.require()

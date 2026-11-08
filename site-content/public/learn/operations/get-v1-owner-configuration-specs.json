@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 113,
+ "api_revision": 135,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read whether this Bridgit stores its static spec sheet with Bridgit (default on), the sheet it sends and the copy the team backend holds",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_specs_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/specs",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/specs",
+  "capability": "owner_features",
+  "returns": "share, name, specs (the current sheet), stored {available, specs, specs_updated_at} or {available:false, reason}, uploaded_at, delete_pending, lookup (the public GET agents use)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

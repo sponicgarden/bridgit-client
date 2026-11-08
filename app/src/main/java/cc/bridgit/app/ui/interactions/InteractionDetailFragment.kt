@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -16,7 +18,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +33,7 @@ import cc.bridgit.app.interact.IStatus
 import cc.bridgit.app.interact.NotifRules
 import cc.bridgit.app.interact.Interaction
 import cc.bridgit.app.interact.InteractionNotifier
+import cc.bridgit.app.interact.Presentation
 import cc.bridgit.app.ui.common.Fmt
 import cc.bridgit.app.ui.common.dp
 import cc.bridgit.app.ui.feedback.decodeFileThumb
@@ -43,6 +45,11 @@ import cc.bridgit.app.ui.feedback.decodeFileThumb
  * HTML cards (CAP-34) are shown in a [CardStackView]. A card posted with a `stack` id brings its siblings (#0005): the
  * owner swipes through them, sees "n of m" and the next card peeking, and every card's page stays alive while this
  * screen is open. A single card is the same view with one slot: no dots, no counter, no drag (#0008).
+ *
+ * A0074: a card posted with `presentation: "full_screen"` (or switched by the owner from the toolbar) is shown edge to
+ * edge: system bars hidden (a swipe brings them back for a moment), no toolbar, border, stack bar or strip. A tap on the
+ * thin edge strips, or Back, shows Bridgit's controls (Dismiss, Exit full screen) for about 3 s; Back with the controls
+ * up leaves full screen. Back never dismisses the card. Swiping a stack keeps working.
  */
 class InteractionDetailFragment : Fragment() {
     private var _b: FragmentInteractionDetailBinding? = null
@@ -74,6 +81,12 @@ class InteractionDetailFragment : Fragment() {
     private var editingAnswer = false
     private var localAnswerInFlight = false
     private var closeAfterSend: kotlinx.coroutines.Job? = null
+    /** A0074: the owner's own choice (toolbar or Exit full screen); null follows the focused card's presentation. */
+    private var fullScreenChoice: Boolean? = null
+    private var fullScreenOn = false
+    private var surfaceBackground: android.graphics.drawable.Drawable? = null
+    private var boxBackground: android.graphics.drawable.Drawable? = null
+    private val hideFullScreenControls = Runnable { _b?.fullScreenControls?.isVisible = false }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, s: Bundle?): View {
         _b = FragmentInteractionDetailBinding.inflate(inflater, container, false)
@@ -89,12 +102,38 @@ class InteractionDetailFragment : Fragment() {
         }
         // The card's border runs to the bottom edge: the inset is a margin, so nothing sits outside the border.
         val cardMargin = (b.cardBox.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
+        val sideMargin = (b.cardBox.layoutParams as ViewGroup.MarginLayoutParams).leftMargin
+        val border = b.cardBox.paddingLeft
+        surfaceBackground = b.root.background
+        boxBackground = b.cardBox.background
         b.cardBox.clipToOutline = true // the page is clipped to the rounded border
         ViewCompat.setOnApplyWindowInsetsListener(b.cardBox) { v, insets ->
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                bottomMargin = cardMargin + insets.getInsets(WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.ime()).bottom
+            if (fullScreenOn) {
+                // A0074: edge to edge, but the page stays off the camera cutout (that band is black) and above the keyboard.
+                val cut = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
+                val ime = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+                v.updateLayoutParams<ViewGroup.MarginLayoutParams> { leftMargin = 0; rightMargin = 0; bottomMargin = 0 }
+                v.setPadding(cut.left, cut.top, cut.right, maxOf(cut.bottom, ime))
+            } else {
+                v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    leftMargin = sideMargin; rightMargin = sideMargin
+                    bottomMargin = cardMargin + insets.getInsets(WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.ime()).bottom
+                }
+                v.setPadding(border, border, border, border)
             }; insets
         }
+        // The measured standard card frame tells agents the canvas a standard card really gets (display.viewport).
+        b.cardFrame.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+            if (!fullScreenOn && stack.size == 1 && v.width > 0 && v.height > 0)
+                cc.bridgit.app.interact.DisplayInfo.recordStandard(resources.configuration.orientation != android.content.res.Configuration.ORIENTATION_LANDSCAPE,
+                    cc.bridgit.app.interact.Px(v.width - v.paddingLeft - v.paddingRight, v.height - v.paddingTop - v.paddingBottom))
+        }
+        fullScreenChoice = savedInstanceState?.takeIf { it.containsKey("fullScreenChoice") }?.getBoolean("fullScreenChoice")
+        fullScreenOn = false
+        listOf(b.fullScreenEdgeTop, b.fullScreenEdgeBottom).forEach { it.setOnClickListener { showFullScreenControls() } }
+        b.fullScreenExit.setOnClickListener { fullScreenChoice = false; applyFullScreen(false); renderChrome() }
+        b.fullScreenDismiss.setOnClickListener { hideFullScreenControls.run(); current?.let { close(it) } }
+        b.fullScreenBackToQuestions.setOnClickListener { hideFullScreenControls.run(); b.cardBackToQuestions.performClick() }
         historyOnly = savedInstanceState?.takeIf { it.containsKey("historyOnly") }?.getBoolean("historyOnly")
         leaving = false
         editingAnswer = false
@@ -105,13 +144,22 @@ class InteractionDetailFragment : Fragment() {
 
         b.toolbar.setNavigationOnClickListener { navigateBack() }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() = navigateBack()
+            override fun handleOnBackPressed() {
+                // A0074: Back in full screen shows the controls, and with them up leaves full screen; it never dismisses.
+                val bb = _b
+                if (fullScreenOn && bb != null) {
+                    if (bb.fullScreenControls.isVisible) { fullScreenChoice = false; applyFullScreen(false); renderChrome() } else showFullScreenControls()
+                    return
+                }
+                navigateBack()
+            }
         })
         b.toolbar.setOnMenuItemClickListener { item ->
             val i = current ?: return@setOnMenuItemClickListener false
             when (item.itemId) {
                 R.id.interactions_play -> { SpeakHook.speak?.invoke(requireContext().applicationContext, InteractionUi.agentName(i), i.title, i.text); true }
                 R.id.interactions_close -> { close(i); true }
+                R.id.interactions_full_screen -> { fullScreenChoice = true; applyFullScreen(true); renderChrome(); true }
                 else -> false
             }
         }
@@ -154,6 +202,7 @@ class InteractionDetailFragment : Fragment() {
         outState.putBoolean("editingAnswer", editingAnswer)
         outState.putLongArray("cardEditing", cardEditing.toLongArray())
         outState.putLong("focusId", focusId)
+        fullScreenChoice?.let { outState.putBoolean("fullScreenChoice", it) }
         super.onSaveInstanceState(outState)
     }
 
@@ -166,6 +215,57 @@ class InteractionDetailFragment : Fragment() {
         bb.toolbar.menu.findItem(R.id.interactions_play)?.isVisible = i != null && SpeakHook.speak != null
         // An HTML card has Dismiss inside its border, so the toolbar keeps only app controls.
         bb.toolbar.menu.findItem(R.id.interactions_close)?.isVisible = i != null && InteractionUi.waiting(i) && i.kind != IKind.HTML
+        bb.toolbar.menu.findItem(R.id.interactions_full_screen)?.isVisible = i?.kind == IKind.HTML && !fullScreenOn && i.id !in crashed
+    }
+
+    /** The card on top asks for full screen, unless the owner chose otherwise on this screen. */
+    private fun wantsFullScreen(i: Interaction) = i.kind == IKind.HTML && i.id !in crashed && (fullScreenChoice ?: (i.presentation == Presentation.FULL_SCREEN))
+
+    /**
+     * A0074: switches Bridgit's full-screen presentation on or off: system bars (transient by swipe), toolbar, border,
+     * stack bar and strip; the pages scale fixed-size content to fit while on ([CardWebView.setFullScreen]).
+     */
+    private fun applyFullScreen(on: Boolean) {
+        val bb = _b ?: return
+        if (on == fullScreenOn) return
+        fullScreenOn = on
+        activity?.window?.let { w ->
+            val ctl = WindowCompat.getInsetsController(w, w.decorView)
+            if (on) {
+                ctl.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                ctl.hide(WindowInsetsCompat.Type.systemBars())
+            } else ctl.show(WindowInsetsCompat.Type.systemBars())
+        }
+        bb.toolbar.isVisible = !on
+        bb.cardBar.isVisible = !on
+        if (on) bb.stackBar.isVisible = false
+        bb.root.background = if (on) android.graphics.drawable.ColorDrawable(android.graphics.Color.BLACK) else surfaceBackground
+        bb.cardBox.background = if (on) null else boxBackground
+        bb.cardBox.clipToOutline = !on
+        bb.fullScreenEdgeTop.isVisible = on
+        bb.fullScreenEdgeBottom.isVisible = on
+        bb.fullScreenControls.removeCallbacks(hideFullScreenControls)
+        bb.fullScreenControls.isVisible = false
+        if (stack.size > 1) (if (on) 0 else requireContext().dp(8)).let { p -> bb.cardFrame.setPadding(p, p, p, p) }
+        cards.values.forEach { it.setFullScreen(on) }
+        renderMenu()
+        ViewCompat.requestApplyInsets(bb.cardBox)
+    }
+
+    /** A0074: Bridgit's controls over a full-screen card, hidden again after about 3 s (longer when accessibility asks). */
+    private fun showFullScreenControls() {
+        val bb = _b ?: return
+        if (!fullScreenOn) return
+        val i = current
+        bb.fullScreenDismiss.isVisible = i != null && InteractionUi.waiting(i)
+        i?.let { bb.fullScreenDismiss.contentDescription = getString(R.string.interactions_card_dismiss_desc, InteractionUi.agentName(it)) }
+        bb.fullScreenBackToQuestions.isVisible = bb.cardBackToQuestions.isVisible
+        bb.fullScreenControls.isVisible = true
+        bb.fullScreenControls.removeCallbacks(hideFullScreenControls)
+        val am = requireContext().getSystemService(android.view.accessibility.AccessibilityManager::class.java)
+        val ms = am?.getRecommendedTimeoutMillis(FULL_SCREEN_CONTROLS_MS.toInt(),
+            android.view.accessibility.AccessibilityManager.FLAG_CONTENT_CONTROLS or android.view.accessibility.AccessibilityManager.FLAG_CONTENT_TEXT)?.toLong() ?: FULL_SCREEN_CONTROLS_MS
+        bb.fullScreenControls.postDelayed(hideFullScreenControls, ms)
     }
 
     private fun render(i: Interaction?) {
@@ -177,6 +277,7 @@ class InteractionDetailFragment : Fragment() {
             InteractionUi.isQuestion(i) && closeAfterSend == null) finishSoon(NATIVE_CLOSE_DELAY_MS)
         bb.backToQuestions.isVisible = false
         bb.cardBackToQuestions.isVisible = false
+        if (i?.kind != IKind.HTML) applyFullScreen(false)
         renderMenu()
         if (i == null) {
             bb.header.isVisible = false
@@ -267,7 +368,8 @@ class InteractionDetailFragment : Fragment() {
         bb.scroll.isVisible = false
         bb.cardBox.isVisible = true
         val sv = stackView ?: CardStackView(ctx).also { v ->
-            bb.cardFrame.addView(v, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+            // Under Bridgit's full-screen edge strips and controls (A0074).
+            bb.cardFrame.addView(v, 0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
             v.onMoved = { pos -> onStackMoved(pos) }
             v.answersBySwipe = { pos -> stack.getOrNull(pos)?.let { swipeAnswers(it) } == true }
             v.onSwipeAnswer = { pos, dir -> stack.getOrNull(pos)?.let { swipeAnswer(it, dir) } }
@@ -276,11 +378,11 @@ class InteractionDetailFragment : Fragment() {
         stack = cardsInOrder
         // Inside the border, a stack gives each card its own edge (so the peeking card shows) with a little room around it.
         val stacked = cardsInOrder.size > 1
-        (if (stacked) ctx.dp(8) else 0).let { p -> bb.cardFrame.setPadding(p, p, p, p) }
         sv.setIds(cardsInOrder.map { it.id }, focus = focus.id).forEach { gone ->
             cards.remove(gone)?.let { runCatching { it.release() } }
         }
-        cardsInOrder.getOrNull(sv.position)?.let { focusId = it.id }
+        cardsInOrder.getOrNull(sv.position)?.let { focusId = it.id; applyFullScreen(wantsFullScreen(it)) }
+        (if (stacked && !fullScreenOn) ctx.dp(8) else 0).let { p -> bb.cardFrame.setPadding(p, p, p, p) }
         ensureVisibleCards()
         cardsInOrder.forEach(::updateCard)
         renderChrome()
@@ -310,7 +412,7 @@ class InteractionDetailFragment : Fragment() {
         val v = CardWebView(ctx, onRespond = { data -> answerCard(id, data) }, onCrash = { cardCrashed(id) }, interactionId = id)
         v.contentDescription = getString(R.string.interactions_card_desc, InteractionUi.agentName(i))
         slot.addView(v, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-        v.load(html)
+        v.load(html, fullScreen = fullScreenOn)
         cards[id] = v
         updateCard(i)
     }
@@ -342,6 +444,7 @@ class InteractionDetailFragment : Fragment() {
         val i = stack.getOrNull(sv.position) ?: return
         val ctx = requireContext()
         current = i
+        applyFullScreen(wantsFullScreen(i))
         // CAP-56: the agent took the card back while it was on screen: show why for a moment, then move on.
         if (arrival && i.status == IStatus.CANCELLED && stack.none { InteractionUi.waiting(it) } && closeAfterSend == null) finishSoon(NATIVE_CLOSE_DELAY_MS)
         val agent = InteractionUi.agentName(i)
@@ -353,7 +456,7 @@ class InteractionDetailFragment : Fragment() {
         InteractionUi.styleStatus(bb.cardStatus, i.status)
 
         val n = stack.size
-        bb.stackBar.isVisible = n > 1
+        bb.stackBar.isVisible = n > 1 && !fullScreenOn
         if (n > 1) {
             bb.stackPosition.text = getString(R.string.interactions_stack_position, sv.position + 1, n)
             bb.stackPosition.contentDescription = getString(R.string.interactions_stack_position_a11y, sv.position + 1, n)
@@ -517,20 +620,46 @@ class InteractionDetailFragment : Fragment() {
         }
     }
 
-    /** Tap the picture to see it bigger. */
+    /**
+     * Tap the picture to see it bigger: A0074, true full screen, the whole picture fitted to the display (never cropped),
+     * system bars hidden, black around it and off the camera cutout. A tap or Back closes it.
+     */
     private fun showBig(name: String, agent: String) {
         val store = app.interactions
-        val edge = maxOf(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels)
+        val metrics = cc.bridgit.app.interact.DisplayInfo.read(requireContext())
+        val edge = maxOf(metrics.widthPx, metrics.heightPx)
         viewLifecycleOwner.lifecycleScope.launch {
             val bmp = withContext(Dispatchers.IO) { store.imageFile(name)?.let { runCatching { decodeFileThumb(it.path, edge) }.getOrNull() } } ?: return@launch
             if (_b == null) return@launch
+            val dialog = android.app.Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen)
             val iv = ImageView(requireContext()).apply {
-                adjustViewBounds = true
                 scaleType = ImageView.ScaleType.FIT_CENTER
+                setBackgroundColor(android.graphics.Color.BLACK)
                 setImageBitmap(bmp)
                 contentDescription = getString(R.string.interactions_image, agent)
+                ViewCompat.setAccessibilityDelegate(this, object : androidx.core.view.AccessibilityDelegateCompat() {
+                    override fun onInitializeAccessibilityNodeInfo(host: View, info: androidx.core.view.accessibility.AccessibilityNodeInfoCompat) {
+                        super.onInitializeAccessibilityNodeInfo(host, info)
+                        info.addAction(androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                            android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK, getString(R.string.interactions_full_screen_image_close)))
+                    }
+                })
+                setOnClickListener { dialog.dismiss() }
+                ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+                    val cut = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
+                    v.setPadding(cut.left, cut.top, cut.right, cut.bottom); insets
+                }
             }
-            MaterialAlertDialogBuilder(requireContext()).setView(iv).setPositiveButton(R.string.interactions_ok, null).show()
+            dialog.setContentView(iv, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+            dialog.window?.let { w ->
+                w.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                WindowCompat.setDecorFitsSystemWindows(w, false)
+                WindowCompat.getInsetsController(w, w.decorView).apply {
+                    systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    hide(WindowInsetsCompat.Type.systemBars())
+                }
+            }
+            dialog.show()
         }
     }
 
@@ -626,9 +755,15 @@ class InteractionDetailFragment : Fragment() {
         /** A closed card's "Closed" panel stays this long before the flow moves on (shorter than an answer's). */
         const val DISMISS_DELAY_MS = 2500L
         const val HOLD_POLL_MS = 500L
+        /** A0074: how long Bridgit's controls stay over a full-screen card. */
+        const val FULL_SCREEN_CONTROLS_MS = 3000L
     }
 
     override fun onDestroyView() {
+        // A0074: the system bars come back when the card screen goes.
+        if (fullScreenOn) activity?.window?.let { w -> WindowCompat.getInsetsController(w, w.decorView).show(WindowInsetsCompat.Type.systemBars()) }
+        _b?.fullScreenControls?.removeCallbacks(hideFullScreenControls)
+        fullScreenOn = false
         localAnswerInFlight = false
         closeAfterSend?.cancel(); closeAfterSend = null
         cards.values.forEach { runCatching { it.release() } }

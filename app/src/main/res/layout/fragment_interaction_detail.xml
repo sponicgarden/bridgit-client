@@ -218,12 +218,79 @@
                 app:tint="?attr/colorOnSurfaceVariant" />
         </LinearLayout>
 
-        <!-- The agent's page lives only inside this frame (never fullscreen). -->
+        <!-- The agent's page lives only inside this frame (never the WebView fullscreen API). In Bridgit's full-screen
+             presentation (A0074) the frame is the whole display; the thin edge strips and the controls below are Bridgit's
+             own layer over the page: a tap on an edge strip (or Back) shows the controls, which hide again after ~3 s. -->
         <FrameLayout
             android:id="@+id/card_frame"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1">
+
+            <View
+                android:id="@+id/full_screen_edge_top"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:layout_gravity="top"
+                android:importantForAccessibility="no"
+                android:visibility="gone" />
+
+            <View
+                android:id="@+id/full_screen_edge_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:layout_gravity="bottom"
+                android:importantForAccessibility="no"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/full_screen_controls"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/interactions_bg_full_screen_controls"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:visibility="gone">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/full_screen_back_to_questions"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:minHeight="48dp"
+                    android:text="@string/interactions_back_to_questions"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/full_screen_dismiss"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:minHeight="48dp"
+                    android:text="@string/interactions_card_dismiss"
+                    android:textColor="@android:color/white"
+                    app:icon="@drawable/ic_close"
+                    app:iconTint="@android:color/white" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/full_screen_exit"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:minHeight="48dp"
+                    android:text="@string/interactions_full_screen_exit"
+                    android:textColor="@android:color/white"
+                    app:icon="@drawable/interactions_ic_full_screen_exit"
+                    app:iconTint="@android:color/white" />
+            </LinearLayout>
+        </FrameLayout>
 
         <!-- Bridgit's strip inside the border: status, answer note, interaction actions. -->
         <LinearLayout

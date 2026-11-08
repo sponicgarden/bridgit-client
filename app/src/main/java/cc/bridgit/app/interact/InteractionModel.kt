@@ -56,6 +56,10 @@ data class Draft(
     val noTakeover: Boolean = false,
     /** The agent will post another card once the owner answers or closes this one: the screen waits for it. */
     val followUp: Boolean = false,
+    /** A0074: standard (inside Bridgit's box) or full_screen (edge to edge, bars hidden). */
+    val presentation: Presentation = Presentation.STANDARD,
+    /** A0076: the page's width/height ratio the agent declared (`content_aspect`), and the text it sent. */
+    val contentAspect: Double? = null, val contentAspectLabel: String? = null,
 )
 
 /** #0005: a stacked card that a sideways swipe answers while it waits. [left]/[right] are the labels Bridgit shows. */
@@ -81,10 +85,11 @@ data class Interaction(
     val stackAnswered: Int = 0,
     val noTakeover: Boolean = false,
     val followUp: Boolean = false,
+    val presentation: Presentation = Presentation.STANDARD,
 ) {
     fun toJson(iso: (Long) -> String): JSONObject = JSONObject()
         .put("interaction_id", id).put("kind", kind.id).put("status", status.id).put("title", title)
-        .put("priority", priority).put("no_takeover", noTakeover).put("follow_up", followUp).put("created_at", iso(createdAt)).put("expires_at", iso(expiresAt))
+        .put("priority", priority).put("no_takeover", noTakeover).put("follow_up", followUp).put("presentation", presentation.id).put("created_at", iso(createdAt)).put("expires_at", iso(expiresAt))
         .put("seen_at", seenAt?.let(iso) ?: JSONObject.NULL)
         .put("answer", answer ?: JSONObject.NULL).put("answered_at", answeredAt?.let(iso) ?: JSONObject.NULL)
         .put("closed_at", closedAt?.let(iso) ?: JSONObject.NULL)
@@ -178,7 +183,31 @@ object InteractionRules {
         val followUp = if (b.has("follow_up")) (b.opt("follow_up") as? Boolean)
             ?: bad("follow_up must be true or false.") else false
         if (followUp && kind == IKind.TEXT) bad("follow_up is for questions, notices and html cards.")
-        return Draft(kind, title, text, controls, priority, speak, exp, galleryId, b64, html, stack, stackIndex, swipe, noTakeover, followUp)
+        val presentation = presentation(b, kind)
+        val (aspect, aspectLabel) = contentAspect(b, kind)
+        return Draft(kind, title, text, controls, priority, speak, exp, galleryId, b64, html, stack, stackIndex, swipe, noTakeover, followUp,
+            presentation, aspect, aspectLabel)
+    }
+
+    /**
+     * A0074: optional `presentation`, "standard" (default) or "full_screen". Full screen is for html cards: a picture
+     * goes in the page as a data: image URL (fit it with object-fit: contain).
+     */
+    fun presentation(b: JSONObject, kind: IKind): Presentation {
+        if (!b.has("presentation") || b.isNull("presentation")) return Presentation.STANDARD
+        val p = Presentation.of(b.opt("presentation") as? String) ?: bad("presentation must be ${Presentation.IDS.joinToString(" or ")}.")
+        if (p == Presentation.FULL_SCREEN && kind != IKind.HTML)
+            bad("presentation full_screen is for kind html; put a picture in the page as data:image/* with object-fit: contain.")
+        return p
+    }
+
+    /** A0076: optional `content_aspect` ("16:9", "1280x720"): the page's fixed shape, checked against the canvas. html only. */
+    private fun contentAspect(b: JSONObject, kind: IKind): Pair<Double?, String?> {
+        if (!b.has("content_aspect") || b.isNull("content_aspect")) return null to null
+        if (kind != IKind.HTML) bad("content_aspect is only for kind html.")
+        val text = b.opt("content_aspect") as? String ?: bad("content_aspect must be text like \"16:9\" or \"1280x720\".")
+        val r = CardViewport.parseAspect(text) ?: bad("content_aspect must be width:height like \"16:9\" or \"1280x720\".")
+        return r to text.trim()
     }
 
     /** Who may be named by an agent's own pieces card when the caller gives no scope: watch ids only by shape. */

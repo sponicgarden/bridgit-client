@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "One issue with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new issue seen)",

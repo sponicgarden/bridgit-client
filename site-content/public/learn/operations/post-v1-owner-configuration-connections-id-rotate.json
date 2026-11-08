@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Rotate the Standard Webhooks signing key to a receiver-provisioned value; previous key remains for 24 hours; same-value retries do not rotate again; explicit owner.configuration grant required; no per-change phone approval",

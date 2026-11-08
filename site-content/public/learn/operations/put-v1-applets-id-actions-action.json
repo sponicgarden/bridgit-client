@@ -1,6 +1,6 @@
 {
- "documentation_revision": 112,
- "api_revision": 134,
+ "documentation_revision": 113,
+ "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Change how often one action of an installed applet runs (every_s within the action's min_s..max_s), on every phone; the running watches change in place and keep their counts. dry_run returns the new projection without saving",

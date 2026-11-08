@@ -107,7 +107,7 @@ object CardRules {
      * `http-equiv` attribute renamed so no meta in the page can set a policy, refresh or redirect. Attribute
      * names can't be escaped in HTML, so renaming every case-insensitive occurrence catches all of them.
      */
-    fun prepare(html: String, portal: Boolean = false): String {
+    fun prepare(html: String, portal: Boolean = false, fit: Boolean = false): String {
         val neutral = html.replace(Regex("http-equiv", RegexOption.IGNORE_CASE), "data-blocked-equiv")
         return "<!DOCTYPE html><html><head>" +
             "<meta http-equiv=\"Content-Security-Policy\" content=\"$CSP\">" +
@@ -116,8 +116,45 @@ object CardRules {
             "<script>$RESPOND_SHIM</script>" +
             // Applet portals (docs/spec-portals-and-cards.md): Bridgit.portal, live in a portal, a no-op elsewhere.
             "<script>${if (portal) cc.bridgit.app.applets.PortalRules.SHIM else cc.bridgit.app.applets.PortalRules.STUB}</script>" +
+            // A0076: full-screen cards with a fixed page size are scaled to fit, whole; standard cards get nothing extra.
+            (if (fit) "<script>$FIT_SCRIPT;window.__bridgitFit(true)</script>" else "") +
             "</head>" + neutral
     }
+
+    /**
+     * A0076: whether a card's page is scaled to fit the screen whole. Only full-screen cards, and only pages that don't lay
+     * themselves out to the screen (no `width=device-width` in their own viewport meta), so a fixed 1280x720 page is
+     * shown whole, letterboxed in black along one axis, never cropped. Responsive pages and standard cards are unchanged.
+     */
+    fun fitToViewport(html: String?, fullScreen: Boolean): Boolean =
+        fullScreen && html != null && !CardViewport.responsive(html)
+
+    /**
+     * A0076: `window.__bridgitFit(on)`. While on, scales the page's body down (never up) so its whole natural size fits
+     * the window, centred, with the root painted black around it; refits on resize and load. Off restores the page's
+     * own styles. Display only: no network, storage or bridge; the CSP and guards are unchanged.
+     */
+    const val FIT_SCRIPT = "(function(){var w=window,d=document,on=false,saved=null,t=0;" +
+        "function keep(e,k){return e.style.getPropertyValue(k)}" +
+        "function restore(){if(!saved)return;var r=d.documentElement,b=d.body;" +
+        "['background','overflow','height'].forEach(function(k){r.style.setProperty(k,saved.r[k])});" +
+        "if(b)['transform','transform-origin','background-color'].forEach(function(k){b.style.setProperty(k,saved.b[k])});saved=null}" +
+        "function fit(){var r=d.documentElement,b=d.body;if(!b)return;restore();if(!on)return;" +
+        "var cw=Math.max(r.scrollWidth,b.scrollWidth),ch=Math.max(r.scrollHeight,b.scrollHeight),vw=w.innerWidth,vh=w.innerHeight;" +
+        "if(!cw||!ch||!vw||!vh)return;var s=Math.min(vw/cw,vh/ch);if(!(s<0.999))return;" +
+        "var cs=w.getComputedStyle(b),rs=w.getComputedStyle(r),ml=parseFloat(cs.marginLeft)||0,mt=parseFloat(cs.marginTop)||0;" +
+        "var bg=cs.backgroundColor,clear=function(c){return !c||c==='transparent'||/rgba\\([^)]*,\\s*0\\)/.test(c)};" +
+        "if(clear(bg))bg=clear(rs.backgroundColor)?'#fff':rs.backgroundColor;" +
+        "saved={r:{background:keep(r,'background'),overflow:keep(r,'overflow'),height:keep(r,'height')}," +
+        "b:{transform:keep(b,'transform'),'transform-origin':keep(b,'transform-origin'),'background-color':keep(b,'background-color')}};" +
+        "var x=(vw-cw*s)/2+s*ml-ml,y=(vh-ch*s)/2+s*mt-mt;" +
+        "r.style.setProperty('background','#000');r.style.setProperty('overflow','hidden');r.style.setProperty('height','100%');" +
+        "b.style.setProperty('background-color',bg);b.style.setProperty('transform-origin','0 0');" +
+        "b.style.setProperty('transform','translate('+x+'px,'+y+'px) scale('+s+')')}" +
+        "function later(){clearTimeout(t);t=setTimeout(fit,120)}" +
+        "w.addEventListener('resize',later);w.addEventListener('load',fit);d.addEventListener('DOMContentLoaded',fit);" +
+        "try{Object.defineProperty(w,'__bridgitFit',{value:function(v){on=!!v;fit();setTimeout(fit,300)},writable:false,configurable:false})}" +
+        "catch(e){}})()"
 
     /**
      * Parses one Bridgit.respond(json) argument: at most 16 KB, strict JSON (object, array, string, number,

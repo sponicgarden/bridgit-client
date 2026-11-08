@@ -3241,6 +3241,10 @@
         "urgent"
        ]
       },
+      "content_aspect": {
+       "description": "kind=html: the page's fixed shape as width:height, e.g. \"16:9\" or \"1280x720\". When it differs from the canvas by more than 10 %, the reply's display.aspect_mismatch says so (also checked from width/height in the page's viewport meta)",
+       "type": "string"
+      },
       "states": {
        "description": "kind=pieces: your own words for the card states empty, loading, stale, paused, error",
        "type": "object"
@@ -3253,6 +3257,14 @@
        "description": "kind=pieces: 1-24 pieces (header, status, text, note, metrics, table, timeline, gallery, video, people, devices, draft, buttons), values as {\"$source\":\"<source>.<path>\"}. See https://bridgit.cc/learn/builder/applet-packages.md",
        "type": "array",
        "items": {"type": "object"}
+      },
+      "presentation": {
+       "description": "standard (default: inside Bridgit's bordered card box, with the toolbar and the status/Dismiss strip) or full_screen (kind html only: edge to edge, system bars, toolbar and strip hidden; a tap on the screen edge or Back shows Dismiss and Exit full screen for a few seconds). A full-screen page without width=device-width in its viewport meta is scaled down to fit whole, letterboxed in black, never cropped. Compose full-screen pictures to display.viewport (or GET /v1/device/display full_screen_card; static specs are also at GET <team backend>/v1/names/{name}/specs) and show them with object-fit: contain. Other values: invalid_parameter",
+       "type": "string",
+       "enum": [
+        "standard",
+        "full_screen"
+       ]
       },
       "expires_in_seconds": {
        "description": "60 to 604800, default 86400. After it, waits return expired and you get interaction.expired, but a question stays on the owner's phone and they can still answer it late (interaction.answered with late=true)",
@@ -3286,7 +3298,7 @@
     }}}},
     "operationId": "postInteractions",
     "responses": {
-     "200": {"description": "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen, missing?: [open_on_arrival, display_over_other_apps], fix?}. When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix"},
+     "200": {"description": "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen (the screen was taken over), missing?: [open_on_arrival, display_over_other_apps], fix?, presentation (standard|full_screen), viewport {width_px, height_px, width_dp, height_dp, density} (the exact canvas the card's page gets in that presentation), aspect_mismatch? {content, viewport, advice} (the page's declared shape differs from the canvas by more than 10 %)}. When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix"},
      "422": {
       "description": "invalid_parameter",
       "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -4763,6 +4775,73 @@
      "401": {"description": "unauthorized"}
     },
     "tags": ["settings"]
+   }
+  },
+  "/v1/owner/configuration/specs": {
+   "post": {
+    "summary": "Switch storing the static spec sheet with Bridgit on or off (off deletes the stored copy) or store the current sheet now; same logic as Settings \u203a Team; explicit owner.configuration grant required; no per-change phone approval",
+    "x-bridgit-control-scope": "owner.configuration",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {
+      "refresh": {
+       "description": "true stores the current sheet now; needs sharing on",
+       "type": "boolean"
+      },
+      "share": {
+       "description": "true stores the current sheet now and keeps it up to date; false deletes the stored sheet (retried later while the backend can't be reached) and stops sharing",
+       "type": "boolean"
+      }
+     },
+     "required": []
+    }}}},
+    "operationId": "postOwnerConfigurationSpecs",
+    "responses": {
+     "200": {"description": "the same as GET plus backend: uploaded|unchanged|deleted|pending|not_named|failed"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "403": {
+      "description": "forbidden, agent_not_allowed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "502": {
+      "description": "upstream_failed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   },
+   "get": {
+    "summary": "Read whether this Bridgit stores its static spec sheet with Bridgit (default on), the sheet it sends and the copy the team backend holds",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "getOwnerConfigurationSpecs",
+    "responses": {
+     "200": {"description": "share, name, specs (the current sheet), stored {available, specs, specs_updated_at} or {available:false, reason}, uploaded_at, delete_pending, lookup (the public GET agents use)"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"}
+    },
+    "tags": ["owner_features"]
    }
   },
   "/v1/story": {"post": {
@@ -8272,6 +8351,19 @@
    }],
    "tags": ["speaker"]
   }},
+  "/v1/device/display": {"get": {
+   "summary": "This phone's display right now and the canvas a card's page gets: full screen (presentation full_screen) per orientation and the standard card frame. Static specs (screen size, cameras) are also stored with Bridgit: ask GET <team backend>/v1/names/{name}/specs first when the phone may be busy or offline",
+   "operationId": "getDeviceDisplay",
+   "responses": {
+    "200": {"description": "width_px, height_px (the full display in its current rotation), density_dpi, density, aspect_ratio (long:short, e.g. 20:9), rotation (0, 90, 180 or 270), orientation (portrait or landscape), refresh_hz, full_screen_card {portrait {width_px, height_px}, landscape {width_px, height_px}} (the whole display less the camera cutout; compose full-screen images to this size), standard_card {width_px, height_px, measured} (the bordered card frame; measured false = estimated from the window)"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "tags": ["status"]
+  }},
   "/v1/applets/installed/{id}/template-upgrade": {"post": {
    "summary": "Fetch the same template origin. An unchanged applet gets an owner update review; a customized applet gets a local three-way upgrade task. Nothing applies automatically or calls a model. Read development first",
    "requestBody": {"content": {"application/json": {"schema": {
@@ -10486,7 +10578,7 @@
    "summary": "Is Bridgit up, and which agent you are",
    "operationId": "getHealth",
    "responses": {
-    "200": {"description": "status, app, app_version, mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more)"},
+    "200": {"description": "status, app, app_version, mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}"},
     "422": {
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -12218,7 +12310,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 134,
+  "x-api-revision": 135,
   "title": "Bridgit",
   "version": "1.8.0"
  }

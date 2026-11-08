@@ -1,6 +1,6 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each",

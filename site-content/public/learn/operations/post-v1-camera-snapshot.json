@@ -1,9 +1,9 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
-  "summary": "Take a photo now",
+  "summary": "Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise)",
   "method": "POST",
   "auth": true,
   "mcp_tool": "camera_snapshot",
@@ -190,6 +190,7 @@
    "permission_denied",
    "notifications_required",
    "device_locked",
+   "approval_declined",
    "sensor_busy",
    "capture_cancelled",
    "viewfinder_required",

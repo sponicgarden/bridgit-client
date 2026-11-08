@@ -1,6 +1,6 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Saved table rows, oldest first after since. Owner control agents can read every applet table without approval or share_with_installer; applet principals remain restricted. Discover tables at /applets/installed/{id}/data",

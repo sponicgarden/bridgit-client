@@ -1,6 +1,6 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Tell the owner which model you are and what runs you; shown on your agent card",

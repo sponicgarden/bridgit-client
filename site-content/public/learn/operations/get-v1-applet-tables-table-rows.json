@@ -1,6 +1,6 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read this applet principal's own declared table, oldest first. No instance id or installer sharing needed; other applets are inaccessible",

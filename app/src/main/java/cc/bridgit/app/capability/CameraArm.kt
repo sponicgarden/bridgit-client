@@ -89,7 +89,9 @@ class CameraArm(private val lock: Mutex) {
             if (token == null) token = service.captureStarted(note)
             val reuse = prev != null && prev.rear == rear
             val binding = if (reuse) prev!!.binding
-                else { prev?.let { service.camera.release(it.binding) }; service.camera.warmUp(rear, armed = true) }
+                // Arming works while locked like the agent's photo it prepares; it returns no picture, so the owner's
+                // locked-phone approval (captures.locked_camera_approval) is asked by that snapshot.
+                else { prev?.let { service.camera.release(it.binding) }; service.camera.warmUp(rear, armed = true, allowLocked = true) }
             val g = slot.put(agentId, rear, binding, token!!, if (reuse) prev!!.openedAt else System.currentTimeMillis())
             val until = System.currentTimeMillis() + seconds * 1000L
             scope.launch {

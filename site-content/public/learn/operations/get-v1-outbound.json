@@ -1,6 +1,6 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Every call this phone made to a server off the device: destination, purpose, which agent caused it, the data categories sent, bytes, status, time, and a redacted preview of what was sent and received",

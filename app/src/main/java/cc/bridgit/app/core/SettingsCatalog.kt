@@ -80,6 +80,7 @@ object SettingsCatalog {
         i("captures.max_keep_minutes", "The longest an agent may keep a capture in memory, minutes", 1, cc.bridgit.app.capture.CaptureRules.MAX_KEEP_MINUTES),
         b("captures.any_agent_can_fetch", "Any agent with the capability may fetch any agent's captures (off: each agent only its own)"),
         b("captures.owner_files", "The owner's copy: every capture also goes to Downloads/Bridgit"),
+        b("captures.locked_camera_approval", "Agents' camera photos while the phone is locked first wait for the owner's Allow on the lock screen (off, the default: taken without asking). Owner-only; owner configuration agents set it with POST /v1/owner/configuration/settings", SettingLock.OWNER),
         b("security.device_lock", "Each direct agent's key works only from the Tailscale device(s) it is locked to (bridgit.cc/security)", SettingLock.OWNER),
         b("security.new_place_alerts", "The owner is notified when an agent's key is used from a new device or network", SettingLock.OWNER),
         b("security.biometric", "Super Powers, approvals and allowing a new device need the owner's fingerprint, face or screen lock", SettingLock.OWNER),

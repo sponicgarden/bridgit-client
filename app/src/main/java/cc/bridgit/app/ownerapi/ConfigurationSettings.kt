@@ -23,7 +23,7 @@ class ConfigurationSettings(private val app: BridgeApp, caller: Agent) {
     companion object {
     private val appOwned = setOf("listener.enabled", "listener.port", "listener.allow_internet_callbacks",
         "privacy.pause_external_calls", "captures.agent_files", "captures.agent_upload", "captures.max_keep_minutes",
-        "captures.any_agent_can_fetch", "captures.owner_files", "captures.owner_upload_url")
+        "captures.any_agent_can_fetch", "captures.owner_files", "captures.owner_upload_url", "captures.locked_camera_approval")
 
     fun supported(def: SettingDef) = def.writable || def.key in appOwned || def.section == "features"
     fun pathFor(def: SettingDef): String? = when {
@@ -88,6 +88,7 @@ class ConfigurationSettings(private val app: BridgeApp, caller: Agent) {
                     "captures.max_keep_minutes" -> app.settings.capturesMaxKeepMinutes = value as Int
                     "captures.any_agent_can_fetch" -> app.settings.capturesShareAll = value as Boolean
                     "captures.owner_files" -> app.settings.capturesOwnerFiles = value as Boolean
+                    "captures.locked_camera_approval" -> app.settings.capturesLockedCameraApproval = value as Boolean
                     "captures.owner_upload_url" -> app.settings.capturesOwnerUploadUrl = (value as String).ifEmpty { null }
                     else -> controller.apply(key, value, live.name)
                 }

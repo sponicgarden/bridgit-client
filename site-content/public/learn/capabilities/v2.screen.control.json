@@ -95,8 +95,8 @@
    "tool": "ui.sequence"
   }
  ],
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "boundaries": "Private build only; owner grants and session/transport requirements apply. See control guide.",
  "examples_url": null,
  "id": "v2.screen.control",

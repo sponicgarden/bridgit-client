@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 132. Full index: https://bridgit.cc/learn/index.json.
+API revision 133. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -139,7 +139,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `demo` | `GET /v1/demo` | The demo to offer right after pairing: a five-minute first-run tour run from cards on the phone, then a menu of more demos picked by a few questions (Markdown) |
 | `samples` | `GET /v1/samples` | Complete interaction samples for every kind (notice, question, html, text): the POST /v1/interactions body, the reply and the answer it produces (JSON). For cards that decide or watch (Jev, Clef, the free camera change check), read https://bridgit.cc/learn/decisions.md |
 | `changes` | `GET /v1/changes` | What's new in the API since a revision you know |
-| `camera_snapshot` | `POST /v1/camera/snapshot` | Take a photo now |
+| `camera_snapshot` | `POST /v1/camera/snapshot` | Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise) |
 | `camera_arm` | `POST /v1/camera/arm` | Open the camera ahead of a photo, so your next snapshot fires in about 0.3 s |
 | `camera_pose_start` | `POST /v1/camera/pose/start` | Track a person's body for up to 2 minutes: the phone finds 33 body points in every camera frame (ML Kit, offline and free; no picture leaves the phone). Read the frames as they come with GET /v1/camera/pose/{id} |
 | `camera_pose` | `GET /v1/camera/pose/{id}` | Read a body tracking session: its state and the frames since an index (each frame is the 33 points as [x, y, v, ...]: x and y fractions of the upright picture, v how sure the point is in view), plus the latest preview picture |

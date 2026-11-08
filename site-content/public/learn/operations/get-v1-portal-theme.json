@@ -1,6 +1,6 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "The APK's design tokens, read from its own resources and Home scene, so the portal looks the same. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",

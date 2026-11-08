@@ -23,6 +23,15 @@
     <string name="notif_last_request">%1$s · %2$s</string>
     <string name="notif_capture_sub">Logged in Bridgit\'s activity</string>
     <string name="notif_taking_photo">%1$s is taking a photo</string>
+    <string name="locked_photo_title">%1$s wants to take a photo</string>
+    <string name="locked_photo_allow">Allow</string>
+    <string name="locked_photo_deny">Deny</string>
+    <string name="locked_photo_log_asked">%1$s asked to take a photo while the phone was locked</string>
+    <string name="locked_photo_log_allowed">You allowed %1$s\'s photo while the phone was locked</string>
+    <string name="locked_photo_log_denied">You denied %1$s\'s photo while the phone was locked</string>
+    <string name="locked_photo_log_no_answer">No answer to %1$s\'s photo request while the phone was locked</string>
+    <string name="settings_captures_locked_approval">Ask before photos while locked</string>
+    <string name="settings_captures_locked_approval_desc">Agents\' photos wait for your Allow on the lock screen</string>
     <string name="notif_camera_armed">%1$s has the camera on for a photo</string>
     <string name="notif_pose_tracking">%1$s is tracking your movement with the camera</string>
     <string name="notif_recording">%1$s is recording audio (%2$d s)</string>

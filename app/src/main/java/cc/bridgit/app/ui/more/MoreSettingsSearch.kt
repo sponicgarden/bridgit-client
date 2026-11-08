@@ -32,6 +32,7 @@ object MoreSettingsSearch {
         Entry(R.id.capturesKeep, R.string.settings_captures_keep),
         Entry(R.id.capturesShareAll, R.string.settings_captures_share_all),
         Entry(R.id.capturesOwnerFiles, R.string.settings_captures_owner_files),
+        Entry(R.id.capturesLockedApproval, R.string.settings_captures_locked_approval),
         Entry(R.id.capturesOwnerUpload, R.string.settings_captures_owner_upload),
         Entry(R.id.keep, R.string.settings_keep),
         Entry(R.id.export, R.string.settings_export),

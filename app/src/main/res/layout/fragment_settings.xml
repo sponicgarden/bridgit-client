@@ -82,6 +82,7 @@
                     <include android:id="@+id/capturesKeep" layout="@layout/settings_row" />
                     <include android:id="@+id/capturesShareAll" layout="@layout/settings_switch_row" />
                     <include android:id="@+id/capturesOwnerFiles" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/capturesLockedApproval" layout="@layout/settings_switch_row" />
                     <include android:id="@+id/capturesOwnerUpload" layout="@layout/settings_row" />
                 </LinearLayout>
 

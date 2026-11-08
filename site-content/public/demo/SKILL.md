@@ -930,6 +930,7 @@ buttons, a form and a photo, the four html cards above, a checklist mini app, an
 | `agent_not_allowed` | The owner hasn't allowed you that capability | "You can allow me <x> on my agent page in Bridgit." |
 | `notifications_required` | Bridgit's notification is off; captures need it | Ask them to allow Bridgit's notifications. |
 | `device_locked` | Photos need the phone unlocked | "Unlock your phone and I'll try again." Wait about 10 s, retry once. |
+| `approval_declined` | The phone was locked and the owner didn't Allow this photo (they turned on approval for locked photos) | Don't retry; say so and move on. |
 | `sensor_busy` | Another app has the camera | Ask them to close the camera app; try once more. |
 | `rate_limited` | Too many calls | Wait `retry_after_s`, then carry on. |
 | `email_required` | The 24 hours are up and the owner hasn't verified an email | `state: "none"`: cards are paused too, so ask for their address in chat and `POST /owner/email`. `state: "pending"`: "Tap the link in the email from bridgit.cc (check spam)." |

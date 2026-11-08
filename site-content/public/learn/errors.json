@@ -1,6 +1,6 @@
 {
  "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
- "api_revision": 132,
+ "api_revision": 133,
  "errors": [
   {
    "code": "model_unavailable",
@@ -426,6 +426,13 @@
    "code": "capture_cancelled",
    "you_should": "Wait for a new deliberate capture; do not retry automatically",
    "meaning": "The owner cancelled, deleted or closed the capture review",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "approval_declined",
+   "you_should": "Don't retry automatically; ask the owner",
+   "meaning": "The phone was locked and the owner denied, or didn't answer within 30 s, the Allow prompt for this photo (`reason`: declined or no_answer)",
    "http": 409,
    "returned_today": true
   },

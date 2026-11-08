@@ -83,6 +83,7 @@ object ErrorCatalog {
         Entry(503, "model_not_ready", "An on-phone engine you named isn't downloaded yet (`engine`, `state`: downloading, waiting_for_wifi or failed, `size_mb`, `retry_after_s`); the request started the download", "Retry after retry_after_s; GET /v1/images/engines shows progress"),
         Entry(503, "team_unavailable", "The Bridgit team backend can't be reached", "Retry later, or register at the backend directly"),
         Entry(409, "capture_cancelled", "The owner cancelled, deleted or closed the capture review", "Wait for a new deliberate capture; do not retry automatically"),
+        Entry(409, "approval_declined", "The phone was locked and the owner denied, or didn't answer within 30 s, the Allow prompt for this photo (`reason`: declined or no_answer)", "Don't retry automatically; ask the owner"),
         Entry(409, "viewfinder_required", "The visible camera viewfinder is required but cannot be shown for this action", "Open Bridgit and use the visible capture/review flow; do not fall back to hidden capture"),
         Entry(504, "capture_timeout", "Sensor didn't answer in time", "Retry once"),
         Entry(404, "unknown_target", "No linked Bridgit or satellite with that name or id (`target`); GET /v1/links lists them", "Fix the target, or leave it out to use this phone"),

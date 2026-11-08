@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 132). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 133). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,11 +14,12 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 132 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 133 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 132
-- Device Diagnostics and Network Diagnostics replace Level 1 and Level 2; foreground screen device_diagnostics replays Device Diagnostics on Home (same as Rerun) and network_diagnostics opens Network Diagnostics (`/v1/app/foreground`)
+## New in revision 133
+- Camera photos and arm work while the phone is locked; with the owner-only captures.locked_camera_approval on, a locked photo first waits up to 30 s for the owner's Allow on the lock screen (approval_declined, reason declined or no_answer) (`/v1/camera/snapshot`)
+- captures.locked_camera_approval: read in GET /v1/settings, set by owner configuration agents with POST /v1/owner/configuration/settings (`/v1/owner/configuration/settings`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -801,7 +802,7 @@ Returns: key, agent, base_url (once per pairing window).
 Example: `POST /v1/pair {"code":"482913"}`
 
 ### `POST /v1/camera/snapshot`
-Take a photo now.
+Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise).
 Body (JSON): `viewfinder` Optional visible capture/review; native card, portal and MCP-App captures always require it; `group_photo` Offer a spoken GO shutter using approved on-device microphone access; `instructions` Short framing instructions above the live preview, up to 240 characters; `countdown_seconds` 0–10 seconds after the visible shutter is tapped; `camera` rear (default) or front; `return_image` false returns capture metadata only; requires store:[memory] or another enabled retention destination; default true; `flash` Fire the flash (default false); `zoom` Zoom ratio, e.g. 0.5 (ultra-wide), 1, 2, 5 (telephoto); the range is in /v1/capabilities after the first photo; `max_width_px` Width limit, 64-20000, or null for full size (default 2048 unless size is given); `store` Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or "none" = only return it. Default: your POST /v1/captures/storage choice, else only returned; `size` Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original; `max_edge_px` Long edge limit, 64-20000; overrides the preset; `quality` JPEG quality 40-100; `raw` 1 = return the image bytes, details in X-Bridgit-* headers.
 Returns: captured_at, width_px, height_px, format, size_bytes, data_base64 (or JPEG bytes with raw=1); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1).
 Accepts `Idempotency-Key`.
@@ -2266,6 +2267,7 @@ All endpoints use the paired agent's Authorization bearer key over the existing 
 | 503 | `model_not_ready` | An on-phone engine you named isn't downloaded yet (`engine`, `state`: downloading, waiting_for_wifi or failed, `size_mb`, `retry_after_s`); the request started the download | Retry after retry_after_s; GET /v1/images/engines shows progress |
 | 503 | `team_unavailable` | The Bridgit team backend can't be reached | Retry later, or register at the backend directly |
 | 409 | `capture_cancelled` | The owner cancelled, deleted or closed the capture review | Wait for a new deliberate capture; do not retry automatically |
+| 409 | `approval_declined` | The phone was locked and the owner denied, or didn't answer within 30 s, the Allow prompt for this photo (`reason`: declined or no_answer) | Don't retry automatically; ask the owner |
 | 409 | `viewfinder_required` | The visible camera viewfinder is required but cannot be shown for this action | Open Bridgit and use the visible capture/review flow; do not fall back to hidden capture |
 | 504 | `capture_timeout` | Sensor didn't answer in time | Retry once |
 | 404 | `unknown_target` | No linked Bridgit or satellite with that name or id (`target`); GET /v1/links lists them | Fix the target, or leave it out to use this phone |

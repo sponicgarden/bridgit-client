@@ -114,7 +114,7 @@ object Endpoints {
         example = "POST /v1/pair {\"code\":\"482913\"}", returns = "key, agent, base_url (once per pairing window)",
         errors = listOf("pairing_closed", "unauthorized", "rate_limited"))
 
-    val SNAPSHOT = EndpointSpec("POST", "/camera/snapshot", "camera", "Take a photo now",
+    val SNAPSHOT = EndpointSpec("POST", "/camera/snapshot", "camera", "Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise)",
         capture = true, idempotent = true, media = true,
         body = listOf(
             Param("viewfinder","boolean","Optional visible capture/review; native card, portal and MCP-App captures always require it"), Param("group_photo","boolean","Offer a spoken GO shutter using approved on-device microphone access"), Param("instructions","string","Short framing instructions above the live preview, up to 240 characters"), Param("countdown_seconds","integer","0–10 seconds after the visible shutter is tapped"), Param("camera", "string", "rear (default) or front", enum = listOf("rear", "front")),
@@ -126,7 +126,7 @@ object Endpoints {
         ) + sizing.filter { it.name != "max_width_px" },
         example = "POST /v1/camera/snapshot {\"camera\":\"rear\",\"zoom\":2}",
         returns = "captured_at, width_px, height_px, format, size_bytes, data_base64 (or JPEG bytes with raw=1); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1)",
-        errors = listOf("capability_disabled", "permission_denied", "notifications_required", "device_locked", "sensor_busy", "capture_cancelled", "viewfinder_required", "capture_timeout", "service_start_blocked", "payload_too_large"))
+        errors = listOf("capability_disabled", "permission_denied", "notifications_required", "device_locked", "approval_declined", "sensor_busy", "capture_cancelled", "viewfinder_required", "capture_timeout", "service_start_blocked", "payload_too_large"))
     // Not a capture for the SEC-07 rate limit: it returns nothing, and the snapshot that follows counts.
     val CAMERA_ARM = EndpointSpec("POST", "/camera/arm", "camera", "Open the camera ahead of a photo, so your next snapshot fires in about 0.3 s",
         body = listOf(

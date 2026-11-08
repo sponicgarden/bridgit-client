@@ -136,6 +136,9 @@ class SettingsFragment : Fragment() {
             { app.settings.capturesShareAll }) { app.settings.capturesShareAll = it }
         boolSwitch(b.capturesOwnerFiles, R.string.settings_captures_owner_files, R.string.settings_captures_owner_files_desc,
             { app.settings.capturesOwnerFiles }) { app.settings.capturesOwnerFiles = it }
+        // A0049: off lets agents' photos go ahead while the phone is locked, so switching it off is guarded like security.
+        guardedSwitch(b.capturesLockedApproval, R.string.settings_captures_locked_approval, R.string.settings_captures_locked_approval_desc,
+            { app.settings.capturesLockedCameraApproval }) { app.settings.capturesLockedCameraApproval = it }
         row(b.capturesOwnerUpload, R.string.settings_captures_owner_upload) { askCaptureUpload() }
 
         // Log
@@ -353,6 +356,7 @@ class SettingsFragment : Fragment() {
         b.capturesAgentUpload.toggle.isChecked = st.capturesAgentUpload
         b.capturesShareAll.toggle.isChecked = st.capturesShareAll
         b.capturesOwnerFiles.toggle.isChecked = st.capturesOwnerFiles
+        b.capturesLockedApproval.toggle.isChecked = st.capturesLockedCameraApproval
         b.securityDeviceLock.toggle.isChecked = st.securityDeviceLock
         b.securityAlerts.toggle.isChecked = st.securityPlaceAlerts
         b.securityBiometric.toggle.isChecked = st.securityBiometric

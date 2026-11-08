@@ -1,6 +1,6 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Analysis of what left the phone, in one call: a plain-language headline, totals, trends by hour or day, the biggest destinations, agents and calls, destinations first seen in the window, failures, and for each destination the data categories, purposes and agents it received",

@@ -1,5 +1,5 @@
 {
- "api_revision": 132,
+ "api_revision": 133,
  "changes": [
   {
    "date": "2026-10-27",
@@ -2196,6 +2196,21 @@
     "what": "Device Diagnostics and Network Diagnostics replace Level 1 and Level 2; foreground screen device_diagnostics replays Device Diagnostics on Home (same as Rerun) and network_diagnostics opens Network Diagnostics"
    }],
    "revision": 132
+  },
+  {
+   "date": "2026-11-08",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/camera/snapshot",
+     "what": "Camera photos and arm work while the phone is locked; with the owner-only captures.locked_camera_approval on, a locked photo first waits up to 30 s for the owner's Allow on the lock screen (approval_declined, reason declined or no_answer)"
+    },
+    {
+     "endpoint": "/v1/owner/configuration/settings",
+     "what": "captures.locked_camera_approval: read in GET /v1/settings, set by owner configuration agents with POST /v1/owner/configuration/settings"
+    }
+   ],
+   "revision": 133
   }
  ],
  "links": {

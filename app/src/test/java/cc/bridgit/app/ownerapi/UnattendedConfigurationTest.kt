@@ -159,6 +159,39 @@ class UnattendedConfigurationTest {
         assertFalse(caller.superPowers) // explicit configuration scope, no need to grant itself Super Powers
     }
 
+    /** A0049: the locked-phone photo approval is owner-only for agents but round-trips through owner configuration. */
+    @Test fun lockedPhotoApprovalRoundTripsThroughOwnerConfigurationOnly() {
+        app.settings.capturesLockedCameraApproval = false
+        val api = api()
+        val status = JSONObject(String(specCall(api, ConfigurationEndpoints.INDEX).bytes))
+        fun listed(o: Any?): JSONObject? = when (o) {
+            is JSONObject -> if (o.optString("key") == "captures.locked_camera_approval") o else o.keys().asSequence().firstNotNullOfOrNull { listed(o.opt(it)) }
+            is JSONArray -> (0 until o.length()).firstNotNullOfOrNull { listed(o.opt(it)) }
+            else -> null
+        }
+        val row = listed(status) ?: error("captures.locked_camera_approval missing from discovery: $status")
+        assertEquals(false, row.get("value"))
+        assertTrue(row.getBoolean("writable"))
+        val on = specCall(api, ConfigurationEndpoints.SETTINGS, o("""{"changes":{"captures.locked_camera_approval":true}}"""))
+        assertEquals(String(on.bytes), 200, on.status)
+        assertTrue(app.settings.capturesLockedCameraApproval)
+        val bad = specCall(api, ConfigurationEndpoints.SETTINGS, o("""{"changes":{"captures.locked_camera_approval":"yes"}}"""))
+        assertEquals(422, bad.status)
+        assertTrue(app.settings.capturesLockedCameraApproval)
+        val retry = UUID.randomUUID().toString()
+        assertEquals(200, specCall(api, ConfigurationEndpoints.SETTINGS, o("""{"changes":{"captures.locked_camera_approval":false}}"""), retry).status)
+        assertEquals(200, specCall(api, ConfigurationEndpoints.SETTINGS, o("""{"changes":{"captures.locked_camera_approval":false}}"""), retry).status)
+        assertFalse(app.settings.capturesLockedCameraApproval)
+        // Without the owner's configuration grant, nothing changes.
+        app.platform.revoke(caller.id, "owner.configuration")
+        assertEquals(403, specCall(api, ConfigurationEndpoints.SETTINGS, o("""{"changes":{"captures.locked_camera_approval":true}}"""), UUID.randomUUID().toString()).status)
+        assertFalse(app.settings.capturesLockedCameraApproval)
+        // Ordinary agents (even with Super Powers) read it but can't change it.
+        val def = cc.bridgit.app.capability.SettingsController(app).def("captures.locked_camera_approval")!!
+        assertEquals(cc.bridgit.app.core.SettingLock.OWNER, def.lock)
+        assertFalse(def.writable)
+    }
+
     @Test fun replayAfterConfigurationRevocationIsRefusedAndMissingKeyIsRefused() {
         val api = api()
         val body = o("""{"changes":{"device.name":"Kitchen"}}""")

@@ -12,7 +12,7 @@
  ],
  "operations": [
   {
-   "summary": "Take a photo now",
+   "summary": "Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise)",
    "path": "/v1/camera/snapshot",
    "method": "POST",
    "documentation": "https://bridgit.cc/learn/operations/post-v1-camera-snapshot.json",
@@ -72,8 +72,8 @@
    "tool": "camera_pose_stop"
   }
  ],
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.camera",

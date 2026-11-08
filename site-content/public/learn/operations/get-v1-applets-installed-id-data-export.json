@@ -1,6 +1,6 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Export all accessible saved rows, schemas, status and photo references as JSON, or ZIP with manifest.json and original JPEGs. Read-only; no model calls, captures or Android share sheet. Same control-key authorization as data",

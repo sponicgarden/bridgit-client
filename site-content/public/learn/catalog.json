@@ -648,7 +648,7 @@
    ],
    "operations": [
     {
-     "summary": "Take a photo now",
+     "summary": "Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise)",
      "path": "/v1/camera/snapshot",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-camera-snapshot.json",
@@ -6120,7 +6120,7 @@
    ],
    "operations": [
     {
-     "summary": "Take a photo now",
+     "summary": "Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise)",
      "path": "/v1/camera/snapshot",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-camera-snapshot.json",
@@ -6655,7 +6655,7 @@
    ],
    "operations": [
     {
-     "summary": "Take a photo now",
+     "summary": "Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise)",
      "path": "/v1/camera/snapshot",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-camera-snapshot.json",
@@ -7250,7 +7250,7 @@
    ],
    "operations": [
     {
-     "summary": "Take a photo now",
+     "summary": "Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise)",
      "path": "/v1/camera/snapshot",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-camera-snapshot.json",
@@ -7491,8 +7491,8 @@
   "kind": "source_generated",
   "released": "Check public updater manifest; source documentation is not release evidence."
  },
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "installed_api_revision": null,
  "categories": [
   "sense",

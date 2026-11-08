@@ -315,6 +315,14 @@ class CameraModule(app: BridgeApp, private val registry: Registry) : Capability(
             cc.bridgit.app.capture.CapturesModule.checkStore(app, this, "camera")
             // A camera this agent armed is already running: take it over (it is released after the photo).
             val visible=cc.bridgit.app.capture.CapturePresentationRules.requiresViewfinder(invocation,body.optBoolean("viewfinder"))
+            // A0049: an agent's photo works while the phone is locked; with captures.locked_camera_approval on, the
+            // owner Allows each locked photo first (before the camera is taken, so other captures aren't held up).
+            // lockedOk false (approval on, phone unlocked now): the camera still refuses if the phone locks meanwhile.
+            val lockedOk = if(visible) false else try { LockedCameraApproval.require(app, agentName) } catch (e: cc.bridgit.app.api.ApiError) {
+                // Declined: don't leave this agent's armed camera running until its timer ends.
+                agent?.let { a -> registry.cameraArm.takeFor(a.id)?.let { registry.cameraArm.finish(api.service, it) } }
+                throw e
+            }
             if(visible) registry.cameraArm.takeFor(agent!!.id)?.let { registry.cameraArm.finish(api.service,it) }
             val armed = if(visible)null else agent?.let { registry.cameraArm.takeFor(it.id) }
             val img = if(visible) {
@@ -325,11 +333,11 @@ class CameraModule(app: BridgeApp, private val registry: Registry) : Capability(
             } else if (armed != null) {
                 try {
                     if (armed.rear == (which == "rear")) delay(ArmSlot.settleWaitMs(armed, System.currentTimeMillis()))
-                    api.service.camera.snapshot(which == "rear", flash, spec, zoom, warm = armed.binding)
+                    api.service.camera.snapshot(which == "rear", flash, spec, zoom, warm = armed.binding, allowLocked = lockedOk)
                 }
                 finally { registry.cameraArm.finish(api.service, armed) }
             } else api.withSensor(registry.cameraLock, app.getString(R.string.notif_taking_photo, agentName)) {
-                api.service.camera.snapshot(which == "rear", flash, spec, zoom)
+                api.service.camera.snapshot(which == "rear", flash, spec, zoom, allowLocked = lockedOk)
             }
             val warm = armed != null && armed.rear == (which == "rear")
             data = JSONObject().put("camera", which).put("width_px", img.width).put("height_px", img.height).put("zoom", zoom ?: 1f).put("warm", warm)

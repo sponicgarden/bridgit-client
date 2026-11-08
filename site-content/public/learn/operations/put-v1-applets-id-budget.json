@@ -1,6 +1,6 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Set an installed applet's money limits (all the owner's phones share them): each {id?, usd 0.01-100, per hour|day|week|month, check_at?}; within the owner's ceiling",

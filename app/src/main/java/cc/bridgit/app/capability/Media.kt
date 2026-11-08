@@ -123,10 +123,12 @@ class CameraCapture(private val context: Context, private val owner: LifecycleOw
      * Opens and binds the camera without taking a photo. The caller must [release] it. [armed]: an arm, which
      * uses the low-latency capture mode. Exposure has already settled by the time the photo is asked for, so
      * the max-quality mode's own pre-capture exposure search (most of the delay) is skipped.
+     * [allowLocked]: an agent's photo, which works while the phone is locked (owner decision 7 Nov 2026, A0049;
+     * the caller has already asked [LockedCameraApproval] when the owner wants that). Other callers keep refusing.
      */
-    suspend fun warmUp(rear: Boolean, armed: Boolean = false): Warm {
+    suspend fun warmUp(rear: Boolean, armed: Boolean = false, allowLocked: Boolean = false): Warm {
         val km = context.getSystemService(KeyguardManager::class.java)
-        if (km.isDeviceLocked) throw ApiError(409, "device_locked", "Phone is locked. Unlock it, then retry.")
+        if (!allowLocked && km.isDeviceLocked) throw ApiError(409, "device_locked", "Phone is locked. Unlock it, then retry.")
         val provider = withContext(Dispatchers.Main) { ProcessCameraProvider.getInstance(context).await() }
         val selector = if (rear) CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA
         if (!withContext(Dispatchers.Main) { provider.hasCamera(selector) })
@@ -157,15 +159,16 @@ class CameraCapture(private val context: Context, private val owner: LifecycleOw
      * [zoom] (CAP-05): null = the camera's default (1x). Below 1 uses the ultra-wide lens and
      * above about 5 the telephoto on phones whose camera switches lenses by zoom (Pixel).
      * [warm]: a camera already bound by [warmUp]; this call takes it over and releases it. One for the
-     * other camera is released and the photo starts cold.
+     * other camera is released and the photo starts cold. [allowLocked]: see [warmUp].
      */
-    suspend fun snapshot(rear: Boolean, flash: Boolean, spec: Sizing.Spec, zoom: Float? = null, warm: Warm? = null): Encoded {
+    suspend fun snapshot(rear: Boolean, flash: Boolean, spec: Sizing.Spec, zoom: Float? = null, warm: Warm? = null,
+                         allowLocked: Boolean = false): Encoded {
         val file = File(context.cacheDir, "snap-${System.nanoTime()}.jpg")
         try {
-            val w = warm?.takeIf { it.rear == rear } ?: run { warm?.let { release(it) }; warmUp(rear) }
-            android.util.Log.i(TAG, "snapshot ${if (rear) "rear" else "front"} warm=${w === warm}")
+            val w = warm?.takeIf { it.rear == rear } ?: run { warm?.let { release(it) }; warmUp(rear, allowLocked = allowLocked) }
+            android.util.Log.i(TAG, "snapshot ${if (rear) "rear" else "front"} warm=${w === warm} locked_ok=$allowLocked")
             try {
-                if (warm != null && w === warm) {
+                if (!allowLocked && warm != null && w === warm) {
                     val km = context.getSystemService(KeyguardManager::class.java)
                     if (km.isDeviceLocked) throw ApiError(409, "device_locked", "Phone is locked. Unlock it, then retry.")
                 }

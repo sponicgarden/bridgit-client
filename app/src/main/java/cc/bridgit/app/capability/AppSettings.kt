@@ -104,6 +104,7 @@ class SettingsController(private val app: BridgeApp) {
                 "captures.max_keep_minutes" -> s.capturesMaxKeepMinutes
                 "captures.any_agent_can_fetch" -> s.capturesShareAll
                 "captures.owner_files" -> s.capturesOwnerFiles
+                "captures.locked_camera_approval" -> s.capturesLockedCameraApproval
                 "security.device_lock" -> s.securityDeviceLock
                 "security.new_place_alerts" -> s.securityPlaceAlerts
                 "security.biometric" -> s.securityBiometric
@@ -191,6 +192,7 @@ class SettingsController(private val app: BridgeApp) {
             key == "captures.max_keep_minutes" -> s.capturesMaxKeepMinutes = value as Int
             key == "captures.any_agent_can_fetch" -> s.capturesShareAll = value as Boolean
             key == "captures.owner_files" -> s.capturesOwnerFiles = value as Boolean
+            key == "captures.locked_camera_approval" -> s.capturesLockedCameraApproval = value as Boolean
             key == "device.name" -> cc.bridgit.app.platform.DeviceName.set(app, value as String)
             key == "privacy.log_visibility" -> s.logVisibility = value as String
             key == "privacy.outbound_log" -> s.setOutboundLog(value as Boolean, by)

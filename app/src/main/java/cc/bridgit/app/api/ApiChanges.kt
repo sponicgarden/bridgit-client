@@ -609,6 +609,10 @@ object ApiChanges {
         Revision(132, "1.8.0", "2026-11-08", listOf(
             Item("Device Diagnostics and Network Diagnostics replace Level 1 and Level 2; foreground screen device_diagnostics replays Device Diagnostics on Home (same as Rerun) and network_diagnostics opens Network Diagnostics", "/v1/app/foreground"),
         )),
+        Revision(133, "1.8.0", "2026-11-08", listOf(
+            Item("Camera photos and arm work while the phone is locked; with the owner-only captures.locked_camera_approval on, a locked photo first waits up to 30 s for the owner's Allow on the lock screen (approval_declined, reason declined or no_answer)", "/v1/camera/snapshot"),
+            Item("captures.locked_camera_approval: read in GET /v1/settings, set by owner configuration agents with POST /v1/owner/configuration/settings", "/v1/owner/configuration/settings"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

@@ -74,6 +74,7 @@
        "model_not_ready",
        "team_unavailable",
        "capture_cancelled",
+       "approval_declined",
        "viewfinder_required",
        "capture_timeout",
        "unknown_target",
@@ -3462,7 +3463,7 @@
    }
   },
   "/v1/camera/snapshot": {"post": {
-   "summary": "Take a photo now",
+   "summary": "Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise)",
    "requestBody": {"content": {"application/json": {"schema": {
     "type": "object",
     "properties": {
@@ -3557,7 +3558,7 @@
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
     },
     "409": {
-     "description": "device_locked, sensor_busy, capture_cancelled, viewfinder_required",
+     "description": "device_locked, approval_declined, sensor_busy, capture_cancelled, viewfinder_required",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
     }
    },
@@ -11893,7 +11894,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 132,
+  "x-api-revision": 133,
   "title": "Bridgit",
   "version": "1.8.0"
  }

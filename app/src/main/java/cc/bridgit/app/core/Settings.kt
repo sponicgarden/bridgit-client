@@ -167,6 +167,14 @@ class Settings(context: Context) {
         get() = prefs.getBoolean("captures_owner_files", false)
         set(v) { prefs.edit().putBoolean("captures_owner_files", v).apply(); changed() }
 
+    /**
+     * Owner decision, 7 Nov 2026 (report A0049): agents' camera photos work while the phone is locked. On: each such
+     * photo first waits for the owner's Allow on the lock screen. Off by default.
+     */
+    var capturesLockedCameraApproval: Boolean
+        get() = prefs.getBoolean("captures_locked_camera_approval", false)
+        set(v) { prefs.edit().putBoolean("captures_locked_camera_approval", v).apply(); changed() }
+
     /** The owner's own upload URL for every capture, or null. */
     var capturesOwnerUploadUrl: String?
         get() = prefs.getString("captures_owner_upload_url", null)?.takeIf { it.isNotBlank() }

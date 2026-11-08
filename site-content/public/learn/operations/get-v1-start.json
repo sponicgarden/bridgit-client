@@ -1,6 +1,6 @@
 {
- "documentation_revision": 110,
- "api_revision": 132,
+ "documentation_revision": 111,
+ "api_revision": 133,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "The starter (https://bridgit.cc/learn/start.md) served from the phone, so an agent without web access reads it too: the four stages of building an applet (Markdown, no key needed)",

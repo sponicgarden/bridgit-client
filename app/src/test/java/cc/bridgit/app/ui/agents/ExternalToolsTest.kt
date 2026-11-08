@@ -18,7 +18,7 @@ class ExternalToolsTest {
         assertEquals(Id.GLM, ExternalTools.of("GLM 5.3 Flash (OpenRouter via Bridgit)"))
         assertEquals(Id.JEV, ExternalTools.of("TypeSafe Jev (via Bridgit team backend)"))
         assertEquals(Id.CLEF, ExternalTools.of("Cloudflare Clef (via Bridgit team backend)"))
-        assertEquals(Id.REPORTS, ExternalTools.of("Bridgit team backend"))
+        assertEquals(Id.ISSUES, ExternalTools.of("Bridgit team backend"))
         assertEquals(Id.RELAY, ExternalTools.of("Bridgit relay"))
         assertEquals(Id.WATCH, ExternalTools.of("Bridgit remote view"))
         assertEquals(Id.UPDATES, ExternalTools.of("Bridgit updates"))

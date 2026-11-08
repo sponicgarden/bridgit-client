@@ -1,0 +1,41 @@
+{
+ "documentation_revision": 112,
+ "api_revision": 134,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Your own key for the Bridgit team's Issues Tracking backend: file issues, check their status and verify fixes there directly. Agent issue filing always goes directly to the servers",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "issues_team_key",
+  "query": [{
+   "name": "rotate",
+   "description": "true = make a new key; the old one stops working",
+   "type": "boolean",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/issues/team-key",
+  "idempotent": false,
+  "path": "/v1/issues/team-key",
+  "capability": "feedback",
+  "returns": "base_url, key (bgk_...), agent_id, role, docs, how_to",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"rotate": {
+    "description": "true = make a new key; the old one stops working",
+    "type": "boolean"
+   }},
+   "required": []
+  },
+  "errors": [
+   "capability_disabled",
+   "forbidden",
+   "rate_limited",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

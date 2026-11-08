@@ -7,7 +7,7 @@ import cc.bridgit.app.outbound.OutboundEntry
  * behalf, with its state and last call. The outbound log's service names say which tool a call belongs to.
  */
 object ExternalTools {
-    enum class Id { JEV, CLEF, GLM, LOCATE, APPRAISE, CHEF, SPEECH, REPORTS, RELAY, WATCH, UPDATES }
+    enum class Id { JEV, CLEF, GLM, LOCATE, APPRAISE, CHEF, SPEECH, ISSUES, RELAY, WATCH, UPDATES }
     enum class State { READY, ON, OFF, PAUSED, MISSING }
 
     /** What the phone knows about one tool. [ownKeys]: labels of the owner's own keys that can stand in. */
@@ -24,7 +24,7 @@ object ExternalTools {
         service.contains("GLM") -> Id.GLM
         service.contains("Jev") -> Id.JEV
         service.contains("Clef") -> Id.CLEF
-        service == "Bridgit team backend" -> Id.REPORTS
+        service == "Bridgit team backend" -> Id.ISSUES
         service == "Bridgit relay" -> Id.RELAY
         service == "Bridgit remote view" -> Id.WATCH
         service == "Bridgit updates" -> Id.UPDATES

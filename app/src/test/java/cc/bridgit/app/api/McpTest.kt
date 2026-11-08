@@ -64,10 +64,10 @@ class McpTest {
 
     @Test fun excludedEndpointsAreNotTools() {
         listOf(Endpoints.MCP, Endpoints.PAIR, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.OPENAPI,
-            cc.bridgit.app.satellite.SatelliteEndpoints.CLAIM, cc.bridgit.app.satellite.SatelliteEndpoints.MANIFEST, cc.bridgit.app.link.LinkEndpoints.CLAIM).forEach { e ->
+            cc.bridgit.app.satellite.SatelliteEndpoints.CLAIM, cc.bridgit.app.satellite.SatelliteEndpoints.MANIFEST, cc.bridgit.app.link.LinkEndpoints.CLAIM).plus(Endpoints.FEEDBACK_LEGACY).forEach { e ->
             assertFalse(e.fullPath, McpTools.specs.any { it === e })
         }
-        assertEquals(Endpoints.all.size - 8, McpTools.specs.size)
+        assertEquals(Endpoints.all.size - 8 - Endpoints.FEEDBACK_LEGACY.size, McpTools.specs.size)
     }
 
     @Test fun schemasHaveEveryParamAndRequired() {

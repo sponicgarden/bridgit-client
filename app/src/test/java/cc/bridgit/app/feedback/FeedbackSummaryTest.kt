@@ -15,20 +15,20 @@ import org.robolectric.annotation.Config
 class FeedbackSummaryTest {
     @Test fun totalsAreSeparatedByKindAndOnlyCurrentFixesCount() {
         val store = FeedbackStore(RuntimeEnvironment.getApplication(), uploadEnabled = { false })
-        fun create(kind: ReportKind) = store.create(kind, "Summary test", false, emptyList(), JSONArray(), JSONObject(), "form")
-        val fixed = create(ReportKind.BUG)
-        val reopened = create(ReportKind.BUG)
-        val feature = create(ReportKind.FEATURE)
+        fun create(kind: IssueKind) = store.create(kind, "Summary test", false, emptyList(), JSONArray(), JSONObject(), "form")
+        val fixed = create(IssueKind.BUG)
+        val reopened = create(IssueKind.BUG)
+        val feature = create(IssueKind.FEATURE)
         for (r in listOf(fixed, reopened, feature)) {
-            store.move(r.id, ReportStatus.IN_PROGRESS, Actor.TEAM, "team", null)
-            store.move(r.id, ReportStatus.FIXED, Actor.TEAM, "team", null)
+            store.move(r.id, IssueStatus.IN_PROGRESS, Actor.TEAM, "team", null)
+            store.move(r.id, IssueStatus.FIXED, Actor.TEAM, "team", null)
         }
-        store.move(fixed.id, ReportStatus.CONFIRMED, Actor.OWNER, "owner", null)
-        store.move(reopened.id, ReportStatus.REOPENED, Actor.OWNER, "owner", null)
-        val declined = create(ReportKind.BUG)
-        store.move(declined.id, ReportStatus.WONT_FIX, Actor.TEAM, "team", null)
-        store.move(declined.id, ReportStatus.CONFIRMED, Actor.OWNER, "owner", null)
-        assertEquals(3 to 1, store.summary(ReportKind.BUG))
-        assertEquals(1 to 1, store.summary(ReportKind.FEATURE))
+        store.move(fixed.id, IssueStatus.CONFIRMED, Actor.OWNER, "owner", null)
+        store.move(reopened.id, IssueStatus.REOPENED, Actor.OWNER, "owner", null)
+        val declined = create(IssueKind.BUG)
+        store.move(declined.id, IssueStatus.WONT_FIX, Actor.TEAM, "team", null)
+        store.move(declined.id, IssueStatus.CONFIRMED, Actor.OWNER, "owner", null)
+        assertEquals(3 to 1, store.summary(IssueKind.BUG))
+        assertEquals(1 to 1, store.summary(IssueKind.FEATURE))
     }
 }

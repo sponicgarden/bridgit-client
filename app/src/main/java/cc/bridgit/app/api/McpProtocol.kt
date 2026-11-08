@@ -99,9 +99,11 @@ object McpProtocol {
 
 /** API-15: tool names, schemas, argument routing and results, generated from [Endpoints.all]. */
 object McpTools {
-    /** Endpoints that make no sense as tools: MCP itself, pairing (no key), the helper download, the OpenAPI file. */
+    /** Endpoints that make no sense as tools: MCP itself, pairing (no key), the helper download, the OpenAPI file, deprecated aliases. */
     val EXCLUDED: Set<String> = setOf(Endpoints.MCP, Endpoints.PAIR, cc.bridgit.app.satellite.SatelliteEndpoints.CLAIM, cc.bridgit.app.satellite.SatelliteEndpoints.MANIFEST,
-        cc.bridgit.app.link.LinkEndpoints.CLAIM, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.OPENAPI).map { key(it) }.toSet()
+        cc.bridgit.app.link.LinkEndpoints.CLAIM, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.OPENAPI).map { key(it) }.toSet() +
+        // The pre-rename /v1/feedback aliases: their tools are the issues_* ones.
+        Endpoints.FEEDBACK_LEGACY.map { key(it) }
 
     /** Names fixed by hand where several endpoints share a path; keeps names stable as endpoints are added. */
     private val OVERRIDES = mapOf(
@@ -111,8 +113,8 @@ object McpTools {
         "GET /resource-jobs" to "resource_jobs_list", "GET /resource-jobs/{id}" to "resource_jobs_get", "DELETE /resource-jobs/{id}" to "resource_jobs_cancel",
         "DELETE /owner/configuration/links/codes/{id}" to "owner_configuration_links_code_cancel",
                 "GET /log" to "log_read", "POST /log" to "log_note", "GET /log/{id}" to "log_entry",
-        "GET /feedback" to "feedback_list", "POST /feedback" to "feedback_file", "GET /feedback/{id}" to "feedback_get",
-        "POST /feedback/{id}/followup" to "feedback_followup",
+        "GET /issues" to "issues_list", "POST /issues" to "issues_file", "GET /issues/{id}" to "issues_get",
+        "POST /issues/{id}/followup" to "issues_followup",
         "POST /interactions" to "interactions_send", "GET /interactions" to "interactions_list",
         "GET /interactions/{id}" to "interactions_get", "DELETE /interactions/{id}" to "interactions_cancel",
         "POST /interactions/{id}/renotify" to "interactions_renotify",

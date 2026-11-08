@@ -74,8 +74,8 @@
     <string name="feedback_filed_log_bug">You filed a bug report</string>
     <string name="feedback_filed_log_feature">You filed a feature request</string>
 
-    <!-- My reports (FBK-09, ui-spec 5.12) -->
-    <string name="feedback_my_reports">My reports</string>
+    <!-- My issues (FBK-09, ui-spec 5.12) -->
+    <string name="feedback_my_issues">My issues</string>
     <string name="feedback_back">Back</string>
     <string name="feedback_filter_all">All</string>
     <string name="feedback_filter_bugs">Bugs</string>

@@ -479,12 +479,12 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    /** FBK-14: reports go to the Bridgit team unless turned off. Off keeps anything not yet sent on the phone. */
+    /** FBK-14: issues go to the Bridgit team unless turned off. Off keeps anything not yet sent on the phone. */
     private fun feedbackUploadSwitch() {
         val r = b.feedbackUpload
         if (!cc.bridgit.app.feedback.FeedbackUploader.configured) { r.root.visibility = View.GONE; return }
         r.title.setText(R.string.settings_feedback_upload)
-        // CID-02: the install ID the team sees on its reports, and whether this build proved it's genuine.
+        // CID-02: the install ID the team sees on its issues, and whether this build proved it's genuine.
         val install = runCatching { cc.bridgit.app.feedback.InstallIdentity.status(requireContext()) }.getOrNull()
         val desc = getString(R.string.settings_feedback_upload_desc) + (install?.let {
             "\n\n" + getString(R.string.settings_install_id, it.installId,

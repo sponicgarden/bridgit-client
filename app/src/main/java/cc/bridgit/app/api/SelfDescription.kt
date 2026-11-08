@@ -313,7 +313,7 @@ object Guide {
             "Pages run offline: inline CSS and JS, `data:image/*` pictures, no forms. A single card can't be swiped, so progress is text (\"Step 2 of 5\"), not Stories-style segment bars.")
         sb.appendLine("A page can also call `Bridgit.act({method, path, query?, body?})`: it runs one of your own `/v1` endpoints right away, as you, with your grants and the owner's switches. Tie each one to a clearly labelled button and show its result; don't fire surprising actions when the page loads.")
         sb.appendLine()
-        sb.appendLine(Learn.bugs().replaceFirst("# Report bugs, ask for features", "## Report bugs, ask for features"))
+        sb.appendLine(Learn.bugs().replaceFirst("# Issues Tracking: report bugs, ask for features", "## Issues Tracking: report bugs, ask for features"))
         sb.appendLine()
         sb.appendLine("## Hearing from the phone")
         sb.appendLine("Events queue on the phone, and `GET /v1/events?since=<next_cursor>&wait=55` (60 s client timeout) returns them as they arrive; a reply can hold several. " +

@@ -4763,14 +4763,14 @@
    "requires": null
   },
   {
-   "summary": "Bug reports and feature requests: the ones you filed, or every report for agents in Bridgit Fixer Mode",
+   "summary": "Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
    "method": "GET",
    "auth": true,
-   "mcp_tool": "feedback_list",
+   "mcp_tool": "issues_list",
    "query": [
     {
      "name": "mine",
-     "description": "Fixer Mode agents: true = only reports you filed (other agents always get only their own)",
+     "description": "Fixer Mode agents: true = only issues you filed (other agents always get only their own)",
      "type": "boolean",
      "required": false
     },
@@ -4792,13 +4792,284 @@
     },
     {
      "name": "since",
-     "description": "ISO time: only reports updated after it",
+     "description": "ISO time: only issues updated after it",
      "type": "string",
      "required": false
     },
     {
      "name": "wait",
-     "description": "With since: hold up to this many seconds (max 55) for a new or changed report",
+     "description": "With since: hold up to this many seconds (max 55) for a new or changed issue",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "limit",
+     "description": "1-100, default 50",
+     "type": "integer",
+     "required": false
+    }
+   ],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/issues?status=fixed",
+   "idempotent": false,
+   "path": "/v1/issues",
+   "capability": "feedback",
+   "returns": "issues[id (this phone's id, used in URLs), ref (the team-wide number, e.g. M0042 from the owner, A0042 from an agent; null until sent to the Bridgit team), number (same as ref), team_id, kind, status, first_line, created_at, updated_at, no_autofix, image_count, filed_by, sent_to_team]",
+   "errors": [
+    "forbidden",
+    "invalid_parameter",
+    "too_many_waits"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Your own key for the Bridgit team's Issues Tracking backend: file issues, check their status and verify fixes there directly. Agent issue filing always goes directly to the servers",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "issues_team_key",
+   "query": [{
+    "name": "rotate",
+    "description": "true = make a new key; the old one stops working",
+    "type": "boolean",
+    "required": false
+   }],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/issues/team-key",
+   "idempotent": false,
+   "path": "/v1/issues/team-key",
+   "capability": "feedback",
+   "returns": "base_url, key (bgk_...), agent_id, role, docs, how_to",
+   "errors": [
+    "capability_disabled",
+    "forbidden",
+    "rate_limited",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "One issue with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new issue seen)",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "issues_get",
+   "query": [
+    {
+     "name": "size",
+     "description": "Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "agent",
+      "thumb",
+      "large",
+      "original"
+     ]
+    },
+    {
+     "name": "max_edge_px",
+     "description": "Long edge limit, 64-20000; overrides the preset",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "max_width_px",
+     "description": "Width limit, 64-20000",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "quality",
+     "description": "JPEG quality 40-100",
+     "type": "integer",
+     "required": false
+    }
+   ],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/issues/7",
+   "idempotent": false,
+   "path": "/v1/issues/{id}",
+   "capability": "feedback",
+   "returns": "issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
+   "errors": ["not_found"],
+   "requires": null
+  },
+  {
+   "summary": "Move an issue: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode)",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "issues_status",
+   "query": [],
+   "control_scope": null,
+   "developer_only": true,
+   "capture": false,
+   "body": [
+    {
+     "name": "status",
+     "description": "in_progress, fixed, wont_fix or duplicate",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "note",
+     "description": "Short note shown to the owner, e.g. \"Fix in PR #412\" (500 chars)",
+     "type": "string",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/issues/7/status {\"status\":\"in_progress\",\"note\":\"Looking at it\"}",
+   "idempotent": true,
+   "path": "/v1/issues/{id}/status",
+   "capability": "feedback",
+   "returns": "the issue summary",
+   "errors": [
+    "forbidden",
+    "not_found",
+    "invalid_parameter"
+   ],
+   "requires": "fixer_mode"
+  },
+  {
+   "summary": "Follow up on an issue you filed: a note (\"still happens on 1.7.2\"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it)",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "issues_followup",
+   "query": [],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "note",
+     "description": "What you see now (500 chars); needed when there's no outcome",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "outcome",
+     "description": "works or still_broken: the owner's Confirm / Still broken, allowed once the issue is fixed, wont_fix or duplicate",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "works",
+      "still_broken"
+     ]
+    }
+   ],
+   "example": "POST /v1/issues/7/followup {\"outcome\":\"still_broken\",\"note\":\"Still returns 500 on 1.7.2\"}",
+   "idempotent": true,
+   "path": "/v1/issues/{id}/followup",
+   "capability": "feedback",
+   "returns": "the issue summary",
+   "errors": [
+    "not_found",
+    "invalid_parameter",
+    "rate_limited"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Legacy phone-local issue filing (any agent; images only in Bridgit Fixer Mode). Control agents should file issues directly with Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "issues_file",
+   "query": [],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "kind",
+     "description": "bug or feature",
+     "type": "string",
+     "required": true,
+     "enum": [
+      "bug",
+      "feature"
+     ]
+    },
+    {
+     "name": "description",
+     "description": "What happened, up to 10,000 characters",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "no_autofix",
+     "description": "true = leave it for a person",
+     "type": "boolean",
+     "required": false
+    },
+    {
+     "name": "images",
+     "description": "Fixer Mode only: up to 5 {\"data_base64\"} images",
+     "type": "array",
+     "required": false
+    },
+    {
+     "name": "agent_info",
+     "description": "About you, sent with the issue to the Bridgit team: e.g. {\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"} (up to 20 short string, number or boolean fields)",
+     "type": "object",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/issues {\"kind\":\"bug\",\"description\":\"image/last returned 500 twice\",\"agent_info\":{\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"}}",
+   "idempotent": true,
+   "path": "/v1/issues",
+   "capability": "feedback",
+   "returns": "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}",
+   "errors": [
+    "forbidden",
+    "invalid_parameter",
+    "rate_limited"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Deprecated: the old address of GET /v1/issues, same behaviour (list key reports)",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": null,
+   "query": [
+    {
+     "name": "mine",
+     "description": "Fixer Mode agents: true = only issues you filed (other agents always get only their own)",
+     "type": "boolean",
+     "required": false
+    },
+    {
+     "name": "status",
+     "description": "new, seen, in_progress, fixed, wont_fix, duplicate, confirmed, reopened",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "kind",
+     "description": "bug or feature",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "bug",
+      "feature"
+     ]
+    },
+    {
+     "name": "since",
+     "description": "ISO time: only issues updated after it",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "wait",
+     "description": "With since: hold up to this many seconds (max 55) for a new or changed issue",
      "type": "integer",
      "required": false
     },
@@ -4826,10 +5097,10 @@
    "requires": null
   },
   {
-   "summary": "Your own key for the Bridgit team's feedback backend: file reports, check their status and verify fixes there directly. Agent reporting always goes directly to the servers",
+   "summary": "Deprecated: the old address of GET /v1/issues/team-key, same behaviour",
    "method": "GET",
    "auth": true,
-   "mcp_tool": "feedback_team_key",
+   "mcp_tool": null,
    "query": [{
     "name": "rotate",
     "description": "true = make a new key; the old one stops working",
@@ -4854,10 +5125,10 @@
    "requires": null
   },
   {
-   "summary": "One report with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new report seen)",
+   "summary": "Deprecated: the old address of GET /v1/issues/{id}, same behaviour",
    "method": "GET",
    "auth": true,
-   "mcp_tool": "feedback_get",
+   "mcp_tool": null,
    "query": [
     {
      "name": "size",
@@ -4898,15 +5169,15 @@
    "idempotent": false,
    "path": "/v1/feedback/{id}",
    "capability": "feedback",
-   "returns": "report: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
+   "returns": "issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
    "errors": ["not_found"],
    "requires": null
   },
   {
-   "summary": "Move a report: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode)",
+   "summary": "Deprecated: the old address of POST /v1/issues/{id}/status, same behaviour",
    "method": "POST",
    "auth": true,
-   "mcp_tool": "feedback_status",
+   "mcp_tool": null,
    "query": [],
    "control_scope": null,
    "developer_only": true,
@@ -4929,7 +5200,7 @@
    "idempotent": true,
    "path": "/v1/feedback/{id}/status",
    "capability": "feedback",
-   "returns": "the report summary",
+   "returns": "the issue summary",
    "errors": [
     "forbidden",
     "not_found",
@@ -4938,10 +5209,10 @@
    "requires": "fixer_mode"
   },
   {
-   "summary": "Follow up on a report you filed: a note (\"still happens on 1.7.2\"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it)",
+   "summary": "Deprecated: the old address of POST /v1/issues/{id}/followup, same behaviour",
    "method": "POST",
    "auth": true,
-   "mcp_tool": "feedback_followup",
+   "mcp_tool": null,
    "query": [],
    "control_scope": null,
    "developer_only": false,
@@ -4955,7 +5226,7 @@
     },
     {
      "name": "outcome",
-     "description": "works or still_broken: the owner's Confirm / Still broken, allowed once the report is fixed, wont_fix or duplicate",
+     "description": "works or still_broken: the owner's Confirm / Still broken, allowed once the issue is fixed, wont_fix or duplicate",
      "type": "string",
      "required": false,
      "enum": [
@@ -4968,7 +5239,7 @@
    "idempotent": true,
    "path": "/v1/feedback/{id}/followup",
    "capability": "feedback",
-   "returns": "the report summary",
+   "returns": "the issue summary",
    "errors": [
     "not_found",
     "invalid_parameter",
@@ -4977,10 +5248,10 @@
    "requires": null
   },
   {
-   "summary": "Legacy phone-local reporting (any agent; images only in Bridgit Fixer Mode). Control agents should report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",
+   "summary": "Deprecated: the old address of POST /v1/issues, same behaviour",
    "method": "POST",
    "auth": true,
-   "mcp_tool": "feedback_file",
+   "mcp_tool": null,
    "query": [],
    "control_scope": null,
    "developer_only": false,
@@ -5016,7 +5287,7 @@
     },
     {
      "name": "agent_info",
-     "description": "About you, sent with the report to the Bridgit team: e.g. {\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"} (up to 20 short string, number or boolean fields)",
+     "description": "About you, sent with the issue to the Bridgit team: e.g. {\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"} (up to 20 short string, number or boolean fields)",
      "type": "object",
      "required": false
     }
@@ -11288,7 +11559,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 133,
- "count": 339,
+ "api_revision": 134,
+ "count": 345,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

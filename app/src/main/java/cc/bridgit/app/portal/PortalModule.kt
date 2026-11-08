@@ -303,7 +303,7 @@ class PortalModule(app: BridgeApp) : Capability(app) {
         add("settings", R.string.more_settings, "settings", "more")
         add("report_bug", R.string.more_report_bug, "bug_report", "more")
         add("request_feature", R.string.more_request_feature, "lightbulb", "more")
-        add("my_reports", R.string.more_my_reports, "history", "more")
+        add("my_reports", R.string.more_my_issues, "history", "more")
         add("about", R.string.more_about, "info", "more")
         add("what_can", R.string.more_what_can, "lightbulb", "more")
         return out

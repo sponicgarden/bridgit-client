@@ -14,8 +14,8 @@ enum class Connection(val id: String, val label: String) {
 
 /**
  * The two kinds of extra trust the owner can give one agent (AGT-15, replaces the single Developer switch).
- * [FIXER]: Bridgit Fixer Mode, for agents that work on Bridgit: every bug report with its screenshots,
- * context and log, moving reports, attaching images. [SUPER]: Agent Super Powers, full control of the phone:
+ * [FIXER]: Bridgit Fixer Mode, for agents that work on Bridgit: every issue with its screenshots,
+ * context and log, moving issues, attaching images. [SUPER]: Agent Super Powers, full control of the phone:
  * ADB shell and grants, changing settings, and reading every agent's log.
  */
 enum class Power(val id: String, val label: String, val reason: String) {
@@ -79,7 +79,7 @@ data class Agent(
         .put("paused", paused).put("bound_ips", JSONArray(boundIps)).put("known_places", JSONArray(knownPlaces))
 
     companion object {
-        /** Capabilities no grant list can take away: the status check, and filing and following bug reports. */
+        /** Capabilities no grant list can take away: the status check, and filing and following issues. */
         val ALWAYS_ALLOWED = setOf("status", "feedback", "captures", "outbound")
 
         fun fromJson(o: JSONObject) = Agent(

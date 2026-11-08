@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 133. Full index: https://bridgit.cc/learn/index.json.
+API revision 134. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -158,12 +158,12 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `log_exits` | `GET /v1/log/exits` | Android 11+ Bridgit process exits, crashes and ANRs; Fixer Mode; Android-managed history (Bridgit Fixer Mode) |
 | `log_note` | `POST /v1/log` | Write a note to the agent channel |
 | `audit` | `GET /v1/audit` | Deprecated alias of /v1/log?channel=audit (removed in v3) |
-| `feedback_list` | `GET /v1/feedback` | Bug reports and feature requests: the ones you filed, or every report for agents in Bridgit Fixer Mode |
-| `feedback_team_key` | `GET /v1/feedback/team-key` | Your own key for the Bridgit team's feedback backend: file reports, check their status and verify fixes there directly. Agent reporting always goes directly to the servers |
-| `feedback_get` | `GET /v1/feedback/{id}` | One report with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new report seen) |
-| `feedback_status` | `POST /v1/feedback/{id}/status` | Move a report: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode) (Bridgit Fixer Mode) |
-| `feedback_followup` | `POST /v1/feedback/{id}/followup` | Follow up on a report you filed: a note ("still happens on 1.7.2"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it) |
-| `feedback_file` | `POST /v1/feedback` | Legacy phone-local reporting (any agent; images only in Bridgit Fixer Mode). Control agents should report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one |
+| `issues_list` | `GET /v1/issues` | Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode |
+| `issues_team_key` | `GET /v1/issues/team-key` | Your own key for the Bridgit team's Issues Tracking backend: file issues, check their status and verify fixes there directly. Agent issue filing always goes directly to the servers |
+| `issues_get` | `GET /v1/issues/{id}` | One issue with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new issue seen) |
+| `issues_status` | `POST /v1/issues/{id}/status` | Move an issue: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode) (Bridgit Fixer Mode) |
+| `issues_followup` | `POST /v1/issues/{id}/followup` | Follow up on an issue you filed: a note ("still happens on 1.7.2"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it) |
+| `issues_file` | `POST /v1/issues` | Legacy phone-local issue filing (any agent; images only in Bridgit Fixer Mode). Control agents should file issues directly with Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one |
 | `interactions_send` | `POST /v1/interactions` | Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Prefer a native question for simple choices, normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several) |
 | `interactions_list` | `GET /v1/interactions` | Your interactions, newest first |
 | `interactions_get` | `GET /v1/interactions/{id}` | One of your interactions; with wait, holds until the owner answers or closes it |

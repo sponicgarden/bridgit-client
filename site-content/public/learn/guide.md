@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 133). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 134). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,12 +14,13 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 133 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 134 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 133
-- Camera photos and arm work while the phone is locked; with the owner-only captures.locked_camera_approval on, a locked photo first waits up to 30 s for the owner's Allow on the lock screen (approval_declined, reason declined or no_answer) (`/v1/camera/snapshot`)
-- captures.locked_camera_approval: read in GET /v1/settings, set by owner configuration agents with POST /v1/owner/configuration/settings (`/v1/owner/configuration/settings`)
+## New in revision 134
+- Bug reports are now Issues Tracking: /v1/issues, /v1/issues/{id}, /v1/issues/{id}/status, /v1/issues/{id}/followup and /v1/issues/team-key (MCP issues_list, issues_get, issues_status, issues_followup, issues_file, issues_team_key); the list key is issues. /v1/feedback… still answers as a deprecated alias with the old keys (`/v1/issues`)
+- Team backend: file and follow issues at /v1/agent/issues (client_issue_id) (`/v1/issues/team-key`)
+- links.issues is the issue list; links.feedback is deprecated
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -31,7 +32,7 @@ replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/change
 4. Tell the owner your model: add `X-Bridgit-Model: <model id>` (and `X-Bridgit-Harness: <harness>`) to the headers you send with every call, or `POST /v1/me {"model","harness"}` on each change. The rest of this guide is reference: read the section you need.
 Right after pairing, ask the owner once: "Want a 5-minute demo on your phone?" If they pasted only the setup prompt, ask in that first reply; if they gave a task, finish it first. `GET /v1/demo` only reads the script: run it only after they say yes. Ask discovery questions only if they want suggestions. Declining onboarding does not cancel their existing task.
 Keep credentials per agent, e.g. `~/.config/bridgit/agents/<agent>/header` with mode 600; never overwrite another agent's key. The optional helper reads an env file instead of that header: its download explains `BRIDGIT_ENV` for selecting a separate config. A public-docs 403 may depend on the HTTP client: try curl before concluding the docs are unavailable.
-5. The owner's email: Bridgit works for 24 hours from the first agent call, then only the status, feedback and portal endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/feedback` and the owner's read-only Bridgit Portal), the control tools `capabilities`, `events`, `operation.get` and `feedback.create` (`events` still needs `events.read`), and the routes that are not tool calls (`/v2/capabilities`, `/v2/tools`, `/v2/guide`, operation cancel) keep working; everything else answers `email_required` until the owner verifies an address (the full list is under "Owner email" in https://bridgit.cc/learn/control.md). `GET /v1/owner/email` says where it stands; send their address with `POST /v1/owner/email {"email":"..."}` (if you don't know it, ask them: on a card during the 24 hours, in your chat after), and they tap the link in the email from bridgit.cc.
+5. The owner's email: Bridgit works for 24 hours from the first agent call, then only the status, feedback and portal endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/issues` and the owner's read-only Bridgit Portal), the control tools `capabilities`, `events`, `operation.get` and `feedback.create` (`events` still needs `events.read`), and the routes that are not tool calls (`/v2/capabilities`, `/v2/tools`, `/v2/guide`, operation cancel) keep working; everything else answers `email_required` until the owner verifies an address (the full list is under "Owner email" in https://bridgit.cc/learn/control.md). `GET /v1/owner/email` says where it stands; send their address with `POST /v1/owner/email {"email":"..."}` (if you don't know it, ask them: on a card during the 24 hours, in your chat after), and they tap the link in the email from bridgit.cc.
 6. Once the owner's first request is done (or after the demo), offer useful suggestions. Only if they are interested, ask two or three questions about their routines, then suggest one small thing to try. https://bridgit.cc/learn/playbook.md has the questions and 40 use cases. "Not now" stops onboarding; continue any existing task.
 
 - Opening a card clears its notification. To remind the owner explicitly, POST /v1/interactions/{id}/renotify {} (MCP interactions_renotify) with an Idempotency-Key. Only your pending/seen cards; no automatic screen takeover or speech.
@@ -918,41 +919,80 @@ Query: `limit` 1-500, default 50.
 Returns: entries[] (same shape as /v1/log).
 Example: `GET /v1/audit?limit=50`
 
+### `GET /v1/issues`
+Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode.
+Query: `mine` Fixer Mode agents: true = only issues you filed (other agents always get only their own); `status` new, seen, in_progress, fixed, wont_fix, duplicate, confirmed, reopened; `kind` bug or feature; `since` ISO time: only issues updated after it; `wait` With since: hold up to this many seconds (max 55) for a new or changed issue; `limit` 1-100, default 50.
+Returns: issues[id (this phone's id, used in URLs), ref (the team-wide number, e.g. M0042 from the owner, A0042 from an agent; null until sent to the Bridgit team), number (same as ref), team_id, kind, status, first_line, created_at, updated_at, no_autofix, image_count, filed_by, sent_to_team].
+Example: `GET /v1/issues?status=fixed`
+
+### `GET /v1/issues/team-key`
+Your own key for the Bridgit team's Issues Tracking backend: file issues, check their status and verify fixes there directly. Agent issue filing always goes directly to the servers.
+Query: `rotate` true = make a new key; the old one stops working.
+Returns: base_url, key (bgk_...), agent_id, role, docs, how_to.
+Example: `GET /v1/issues/team-key`
+
+### `GET /v1/issues/{id}`
+One issue with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new issue seen).
+Query: `size` Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original; `max_edge_px` Long edge limit, 64-20000; overrides the preset; `max_width_px` Width limit, 64-20000; `quality` JPEG quality 40-100.
+Returns: issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next.
+Example: `GET /v1/issues/7`
+
+### `POST /v1/issues/{id}/status`
+Move an issue: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode).
+Body (JSON): `status` (required) in_progress, fixed, wont_fix or duplicate; `note` Short note shown to the owner, e.g. "Fix in PR #412" (500 chars).
+Returns: the issue summary.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/issues/7/status {"status":"in_progress","note":"Looking at it"}`
+
+### `POST /v1/issues/{id}/followup`
+Follow up on an issue you filed: a note ("still happens on 1.7.2"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it).
+Body (JSON): `note` What you see now (500 chars); needed when there's no outcome; `outcome` works or still_broken: the owner's Confirm / Still broken, allowed once the issue is fixed, wont_fix or duplicate.
+Returns: the issue summary.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/issues/7/followup {"outcome":"still_broken","note":"Still returns 500 on 1.7.2"}`
+
+### `POST /v1/issues`
+Legacy phone-local issue filing (any agent; images only in Bridgit Fixer Mode). Control agents should file issues directly with Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one.
+Body (JSON): `kind` (required) bug or feature; `description` (required) What happened, up to 10,000 characters; `no_autofix` true = leave it for a person; `images` Fixer Mode only: up to 5 {"data_base64"} images; `agent_info` About you, sent with the issue to the Bridgit team: e.g. {"harness":"Claude Code","harness_version":"2.3.1","model":"Claude Opus 5.5"} (up to 20 short string, number or boolean fields).
+Returns: id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/issues {"kind":"bug","description":"image/last returned 500 twice","agent_info":{"harness":"Claude Code","harness_version":"2.3.1","model":"Claude Opus 5.5"}}`
+
 ### `GET /v1/feedback`
-Bug reports and feature requests: the ones you filed, or every report for agents in Bridgit Fixer Mode.
-Query: `mine` Fixer Mode agents: true = only reports you filed (other agents always get only their own); `status` new, seen, in_progress, fixed, wont_fix, duplicate, confirmed, reopened; `kind` bug or feature; `since` ISO time: only reports updated after it; `wait` With since: hold up to this many seconds (max 55) for a new or changed report; `limit` 1-100, default 50.
+Deprecated: the old address of GET /v1/issues, same behaviour (list key reports).
+Query: `mine` Fixer Mode agents: true = only issues you filed (other agents always get only their own); `status` new, seen, in_progress, fixed, wont_fix, duplicate, confirmed, reopened; `kind` bug or feature; `since` ISO time: only issues updated after it; `wait` With since: hold up to this many seconds (max 55) for a new or changed issue; `limit` 1-100, default 50.
 Returns: reports[id (this phone's id, used in URLs), ref (the team-wide number, e.g. M0042 from the owner, A0042 from an agent; null until sent to the Bridgit team), number (same as ref), team_id, kind, status, first_line, created_at, updated_at, no_autofix, image_count, filed_by, sent_to_team].
 Example: `GET /v1/feedback?status=fixed`
 
 ### `GET /v1/feedback/team-key`
-Your own key for the Bridgit team's feedback backend: file reports, check their status and verify fixes there directly. Agent reporting always goes directly to the servers.
+Deprecated: the old address of GET /v1/issues/team-key, same behaviour.
 Query: `rotate` true = make a new key; the old one stops working.
 Returns: base_url, key (bgk_...), agent_id, role, docs, how_to.
 Example: `GET /v1/feedback/team-key`
 
 ### `GET /v1/feedback/{id}`
-One report with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new report seen).
+Deprecated: the old address of GET /v1/issues/{id}, same behaviour.
 Query: `size` Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original; `max_edge_px` Long edge limit, 64-20000; overrides the preset; `max_width_px` Width limit, 64-20000; `quality` JPEG quality 40-100.
-Returns: report: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next.
+Returns: issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next.
 Example: `GET /v1/feedback/7`
 
 ### `POST /v1/feedback/{id}/status`
-Move a report: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode).
+Deprecated: the old address of POST /v1/issues/{id}/status, same behaviour.
 Body (JSON): `status` (required) in_progress, fixed, wont_fix or duplicate; `note` Short note shown to the owner, e.g. "Fix in PR #412" (500 chars).
-Returns: the report summary.
+Returns: the issue summary.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/feedback/7/status {"status":"in_progress","note":"Looking at it"}`
 
 ### `POST /v1/feedback/{id}/followup`
-Follow up on a report you filed: a note ("still happens on 1.7.2"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it).
-Body (JSON): `note` What you see now (500 chars); needed when there's no outcome; `outcome` works or still_broken: the owner's Confirm / Still broken, allowed once the report is fixed, wont_fix or duplicate.
-Returns: the report summary.
+Deprecated: the old address of POST /v1/issues/{id}/followup, same behaviour.
+Body (JSON): `note` What you see now (500 chars); needed when there's no outcome; `outcome` works or still_broken: the owner's Confirm / Still broken, allowed once the issue is fixed, wont_fix or duplicate.
+Returns: the issue summary.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/feedback/7/followup {"outcome":"still_broken","note":"Still returns 500 on 1.7.2"}`
 
 ### `POST /v1/feedback`
-Legacy phone-local reporting (any agent; images only in Bridgit Fixer Mode). Control agents should report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one.
-Body (JSON): `kind` (required) bug or feature; `description` (required) What happened, up to 10,000 characters; `no_autofix` true = leave it for a person; `images` Fixer Mode only: up to 5 {"data_base64"} images; `agent_info` About you, sent with the report to the Bridgit team: e.g. {"harness":"Claude Code","harness_version":"2.3.1","model":"Claude Opus 5.5"} (up to 20 short string, number or boolean fields).
+Deprecated: the old address of POST /v1/issues, same behaviour.
+Body (JSON): `kind` (required) bug or feature; `description` (required) What happened, up to 10,000 characters; `no_autofix` true = leave it for a person; `images` Fixer Mode only: up to 5 {"data_base64"} images; `agent_info` About you, sent with the issue to the Bridgit team: e.g. {"harness":"Claude Code","harness_version":"2.3.1","model":"Claude Opus 5.5"} (up to 20 short string, number or boolean fields).
 Returns: id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/feedback {"kind":"bug","description":"image/last returned 500 twice","agent_info":{"harness":"Claude Code","harness_version":"2.3.1","model":"Claude Opus 5.5"}}`
@@ -2095,32 +2135,32 @@ More ideas, 34 everyday cards (approvals, bookings, checklists, a lease to sign,
 HTML cards: the page calls `Bridgit.respond(JSON.stringify(value))` once (a JSON string works on every build; newer builds also take a plain object). On Bridgit 1.6.269 and older the object is only `window.Bridget`, so pages use `window.Bridgit || window.Bridget`. When the answer is saved Bridgit fires `bridgit:answered` on `document` (cancelable, `detail` = `{answer, close_after_ms}`); `preventDefault()` lets the page show its own confirmation, and the card closes about 5 s later. Pages run offline: inline CSS and JS, `data:image/*` pictures, no forms. A single card can't be swiped, so progress is text ("Step 2 of 5"), not Stories-style segment bars.
 A page can also call `Bridgit.act({method, path, query?, body?})`: it runs one of your own `/v1` endpoints right away, as you, with your grants and the owner's switches. Tie each one to a clearly labelled button and show its result; don't fire surprising actions when the page loads.
 
-## Report bugs, ask for features
+## Issues Tracking: report bugs, ask for features
 
-Agents are Bridgit's best testers, and the team reads every report. File every bug and every feature request, however small, and whether or not you think we can or will do it: we'd rather triage too many than miss one. A call that fails in a way https://bridgit.cc/learn/errors.json doesn't explain, a confusing reply, wrong docs, or an endpoint that should exist: each is worth a report. Reports never carry your Bridgit key or the owner's data (photos, recordings, messages, anything private) unless the owner has agreed to share it.
+Agents are Bridgit's best testers, and the team reads every bug report and feature request. File every bug and every feature request, however small, and whether or not you think we can or will do it: we'd rather triage too many than miss one. A call that fails in a way https://bridgit.cc/learn/errors.json doesn't explain, a confusing reply, wrong docs, or an endpoint that should exist: each is worth a bug report. Issues never carry your Bridgit key or the owner's data (photos, recordings, messages, anything private) unless the owner has agreed to share it.
 
 ## Report directly to Bridgit's servers
 
 Control agents always file bugs, issues and feature requests directly with Bridgit's team backend, even when the phone works. The phone is not an intermediary for agent reporting.
 Reuse your existing team key (bgk_...). If you don't have one, register directly below; no phone or phone key is required. Keep the team key secret and separate from your phone key.
-Limits: a few registrations per address an hour and 50 reports an hour per registered agent (an agent with no key can file one report, ever), so register once and keep the key. (The phone's own `POST /v1/feedback`, for reports an owner sends from the phone, has its own limit of 50 an hour per agent.) The backend explains itself at `GET https://bridgit-feedback.bridgit-app.workers.dev/v1/agent`.
+Limits: a few registrations per address an hour and 50 issues an hour per registered agent (an agent with no key can file one issue, ever), so register once and keep the key. (The phone's own `POST /v1/issues`, for issues an owner sends from the phone, has its own limit of 50 an hour per agent.) The backend explains itself at `GET https://bridgit-feedback.bridgit-app.workers.dev/v1/agent`.
 
 ```
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {"name":"<your agent name>","model":"<your model id>","harness":"<e.g. Claude Code>"}
   -> 201 with key (bgk_...). Keep it secret.
-POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports  (Authorization: Bearer <bgk_ key>)
-  {"kind":"bug"|"feature","description","agent_info"?,"context"?,"log"?,"images"?,"client_report_id"?,"request_autofix"?,"no_autofix"?}
-  client_report_id: your own positive integer (a number, not a string); sending the same one again returns the first report with duplicate: true instead of filing twice.
-GET  https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports?waiting=true   (or /v1/agent/reports/{id})
-POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports/{id}/verify {"verdict":"works"|"still_broken"|"unverified","tested_version","note"}
-POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports/{id}/request-autofix {"note"?}
+POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues  (Authorization: Bearer <bgk_ key>)
+  {"kind":"bug"|"feature","description","agent_info"?,"context"?,"log"?,"images"?,"client_issue_id"?,"request_autofix"?,"no_autofix"?}
+  client_issue_id: your own positive integer (a number, not a string); sending the same one again returns the first issue with duplicate: true instead of filing twice.
+GET  https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues?waiting=true   (or /v1/agent/issues/{id})
+POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/verify {"verdict":"works"|"still_broken"|"unverified","tested_version","note"}
+POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/request-autofix {"note"?}
 ```
 
 ## Rules
 
-- One report per problem; include the `request_id` of the failing call. Add `"no_autofix":true` when it needs a person, or `"request_autofix":true` (or `POST .../request-autofix` later) to ask for an automatic fix. That is a request, not a promise: the team's switches, review, tests and budget decide.
-- When a report is `waiting_for_retest`, install `fixed_in` or later, re-run the repro, then verify. Never tell anyone something is fixed until a re-test says `works`. `unverified` means you couldn't test it, not a guess at `still_broken`.
-- Reports never carry your Bridgit key, or anything private the owner hasn't agreed to share.
+- One bug report per problem; include the `request_id` of the failing call. Add `"no_autofix":true` when it needs a person, or `"request_autofix":true` (or `POST .../request-autofix` later) to ask for an automatic fix. That is a request, not a promise: the team's switches, review, tests and budget decide.
+- When an issue is `waiting_for_retest`, install `fixed_in` or later, re-run the repro, then verify. Never tell anyone something is fixed until a re-test says `works`. `unverified` means you couldn't test it, not a guess at `still_broken`.
+- Issues never carry your Bridgit key, or anything private the owner hasn't agreed to share.
 
 
 ## Hearing from the phone
@@ -2262,7 +2302,7 @@ All endpoints use the paired agent's Authorization bearer key over the existing 
 | 429 | `too_many_waits` | Too many open `wait` requests | Close some waits |
 | 502 | `upstream_failed` | A service Bridgit asks on your behalf (MET Norway for weather) failed and nothing was cached (`service`, `upstream_status` or `reason`) | Retry in a few minutes |
 | 502 | `callback_failed` | Your callback URL didn't accept the test event (`http_status` or `reason` field) | Check the receiver; the owner sees the host in Activity |
-| 500 | `internal_error` | Bridgit bug | Report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md |
+| 500 | `internal_error` | Bridgit bug | File a bug report directly with Bridgit servers (Issues Tracking): https://bridgit.cc/learn/bugs.md |
 | 503 | `service_start_blocked` | Android hasn't given the service this sensor | Ask the owner to open Bridgit once |
 | 503 | `model_not_ready` | An on-phone engine you named isn't downloaded yet (`engine`, `state`: downloading, waiting_for_wifi or failed, `size_mb`, `retry_after_s`); the request started the download | Retry after retry_after_s; GET /v1/images/engines shows progress |
 | 503 | `team_unavailable` | The Bridgit team backend can't be reached | Retry later, or register at the backend directly |

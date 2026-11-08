@@ -1,12 +1,12 @@
 {
- "documentation_revision": 111,
- "api_revision": 133,
+ "documentation_revision": 112,
+ "api_revision": 134,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
-  "summary": "One report with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new report seen)",
+  "summary": "Deprecated: the old address of GET /v1/issues/{id}, same behaviour",
   "method": "GET",
   "auth": true,
-  "mcp_tool": "feedback_get",
+  "mcp_tool": null,
   "query": [
    {
     "name": "size",
@@ -47,39 +47,7 @@
   "idempotent": false,
   "path": "/v1/feedback/{id}",
   "capability": "feedback",
-  "returns": "report: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
-  "mcp_input_schema": {
-   "type": "object",
-   "properties": {
-    "max_edge_px": {
-     "description": "Long edge limit, 64-20000; overrides the preset",
-     "type": "integer"
-    },
-    "max_width_px": {
-     "description": "Width limit, 64-20000",
-     "type": "integer"
-    },
-    "size": {
-     "description": "Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original",
-     "type": "string",
-     "enum": [
-      "agent",
-      "thumb",
-      "large",
-      "original"
-     ]
-    },
-    "id": {
-     "description": "The id in /v1/feedback/{id}",
-     "type": "string"
-    },
-    "quality": {
-     "description": "JPEG quality 40-100",
-     "type": "integer"
-    }
-   },
-   "required": ["id"]
-  },
+  "returns": "issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
   "errors": ["not_found"],
   "requires": null
  }

@@ -237,7 +237,7 @@ object Categories {
     const val DEVICE_INFO = "device_info"
     const val APP_VERSION = "app_version"
     const val AGENT_INFO = "agent_info"
-    const val REPORT_TEXT = "report_text"
+    const val ISSUE_TEXT = "issue_text"
     const val TEXT = "text"
     const val IMAGE = "image"
     const val AUDIO = "audio"
@@ -258,7 +258,7 @@ object Categories {
     const val OWNER_ANSWER = "owner_answer"
     const val API_RESULT = "api_result"
     const val ENCRYPTED = "encrypted"
-    const val REPORT_STATUS = "report_status"
+    const val ISSUE_STATUS = "issue_status"
     const val NONE = "no_payload"
 }
 
@@ -287,9 +287,9 @@ object Classifier {
                 path == "/v1/watch/events" -> Rule("Bridgit remote view", "Remote view (bridgit.cc/watch): one short line per agent action (time, agent, part of the phone, status) and which parts are on; never content", listOf(LOG_ENTRIES, AGENT_INFO, INSTALL_ID, APP_VERSION))
                 path == "/v1/watch/link-code" -> Rule("Bridgit remote view", "Get a one-time code to link this phone to the owner's Google account", listOf(INSTALL_ID, DEVICE_INFO))
                 path == "/v1/watch/unlink" -> Rule("Bridgit remote view", "Turn remote view off: delete the link and everything stored for this phone", listOf(INSTALL_ID))
-                path == "/v1/reports" && m == "POST" -> Rule("Bridgit team backend", "Upload a bug report or feature request", listOf(REPORT_TEXT, INSTALL_ID, APP_VERSION, DEVICE_INFO))
-                path.startsWith("/v1/reports/updates") -> Rule("Bridgit team backend", "Check for status changes on filed reports", listOf(INSTALL_ID))
-                path.endsWith("/history") -> Rule("Bridgit team backend", "Send a report's status history (verify loop)", listOf(REPORT_STATUS, INSTALL_ID))
+                path == "/v1/issues" && m == "POST" -> Rule("Bridgit team backend", "Upload a bug report or feature request", listOf(ISSUE_TEXT, INSTALL_ID, APP_VERSION, DEVICE_INFO))
+                path.startsWith("/v1/issues/updates") -> Rule("Bridgit team backend", "Check for status changes on filed reports", listOf(INSTALL_ID))
+                path.endsWith("/history") -> Rule("Bridgit team backend", "Send a report's status history (verify loop)", listOf(ISSUE_STATUS, INSTALL_ID))
                 path.startsWith("/v1/agent-keys/revoke") -> Rule("Bridgit team backend", "Revoke an agent's team key", listOf(AGENT_INFO, INSTALL_ID))
                 path.startsWith("/v1/agent-keys") -> Rule("Bridgit team backend", "Mint an agent's team key", listOf(AGENT_INFO, INSTALL_ID))
                 path.startsWith("/v1/install/challenge") -> Rule("Bridgit team backend", "Ask for a one-time challenge before registering this install", listOf(INSTALL_ID))
@@ -331,7 +331,7 @@ object Detect {
         Regex("(?i)^(battery.*|charging|plugged)$") to BATTERY,
         Regex("(?i)^(state)$") to AGENT_STATE,
         Regex("(?i)^(questions)$") to QUESTIONS,
-        Regex("(?i)^(description|title|report|kind)$") to REPORT_TEXT,
+        Regex("(?i)^(description|title|issue|report|kind)$") to ISSUE_TEXT,
         Regex("(?i)^(text|message|note|caption|body)$") to TEXT,
         Regex("(?i)^(e-?mail|email_?address|to)$") to EMAIL,
         Regex("(?i)^(push_?token|fcm_?token)$") to PUSH_TOKEN,

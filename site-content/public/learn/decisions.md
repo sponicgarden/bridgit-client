@@ -30,7 +30,7 @@ Use a chat model instead for other open-ended summaries, replies and explanation
 | Decide about text or a photo from anywhere | `POST {base_url}/v1/jev` with your team key | Jev | up to 2 images | Matching actions come back as a list for you to run |
 | Decide about photos, screenshots, sound or video | `POST {base_url}/v1/clef` with your team key | Clef-omni | 4 images, 4 audio clips, 2 videos | Matching actions come back as a list for you to run |
 
-Get `base_url` and your team key (`bgk_...`) from `GET /v1/feedback/team-key` on the phone. Self-registered keys
+Get `base_url` and your team key (`bgk_...`) from `GET /v1/issues/team-key` on the phone. Self-registered keys
 can't use these paid services. All decision routes take the same `actions` rules as `/v1/judgment` (bridgit-actions/1).
 
 Service budgets are account-wide and apply alongside applet limits, including own-key calls. Read `GET /v1/services/budgets`; propose changes with `/v1/owner/configure` action `service.budget.set` (exact owner approval required). Check the selected call's grants, switches and prerequisites before using it; a service listing never authorizes a call.

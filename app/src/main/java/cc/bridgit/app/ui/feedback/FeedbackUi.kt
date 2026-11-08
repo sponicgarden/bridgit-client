@@ -22,8 +22,8 @@ import cc.bridgit.app.BridgeApp
 import cc.bridgit.app.R
 import cc.bridgit.app.databinding.FeedbackSheetLogBinding
 import cc.bridgit.app.feedback.FeedbackLimits
-import cc.bridgit.app.feedback.ReportKind
-import cc.bridgit.app.feedback.ReportStatus
+import cc.bridgit.app.feedback.IssueKind
+import cc.bridgit.app.feedback.IssueStatus
 import cc.bridgit.app.log.LogEntry
 import cc.bridgit.app.log.LogQuery
 import cc.bridgit.app.ui.common.LogRowAdapter
@@ -35,8 +35,8 @@ import com.google.android.material.R as M
 /** FBK-01: handles the two overflow items from res/menu/feedback_overflow.xml. Returns false for other items. */
 fun Fragment.handleFeedbackMenu(item: MenuItem, screen: String, screenContext: () -> String? = { null }): Boolean {
     val kind = when (item.itemId) {
-        R.id.feedback_report_bug -> ReportKind.BUG
-        R.id.feedback_request_feature -> ReportKind.FEATURE
+        R.id.feedback_report_bug -> IssueKind.BUG
+        R.id.feedback_request_feature -> IssueKind.FEATURE
         else -> return false
     }
     openReport(this, kind, screen, screenContext())
@@ -50,28 +50,28 @@ fun Fragment.handleFeedbackMenu(item: MenuItem, screen: String, screenContext: (
 class FeedbackDrafts(context: Context) {
     private val prefs = context.getSharedPreferences("feedback_drafts", Context.MODE_PRIVATE)
 
-    fun description(kind: ReportKind): String = prefs.getString("${kind.id}.description", "") ?: ""
-    fun noAutofix(kind: ReportKind): Boolean = prefs.getBoolean("${kind.id}.no_autofix", false)
+    fun description(kind: IssueKind): String = prefs.getString("${kind.id}.description", "") ?: ""
+    fun noAutofix(kind: IssueKind): Boolean = prefs.getBoolean("${kind.id}.no_autofix", false)
 
-    fun save(kind: ReportKind, description: String, noAutofix: Boolean) {
+    fun save(kind: IssueKind, description: String, noAutofix: Boolean) {
         prefs.edit().putString("${kind.id}.description", description).putBoolean("${kind.id}.no_autofix", noAutofix).apply()
     }
 
-    fun clear(kind: ReportKind) {
+    fun clear(kind: IssueKind) {
         prefs.edit().remove("${kind.id}.description").remove("${kind.id}.no_autofix").apply()
     }
 }
 
 /** Status chip look (ui-spec 5.12). The label is always shown: colour is never the only signal. */
 object StatusChip {
-    fun style(v: TextView, s: ReportStatus) {
+    fun style(v: TextView, s: IssueStatus) {
         val ctx = v.context
         val (bg, fg) = when (s) {
-            ReportStatus.SEEN -> M.attr.colorPrimaryContainer to M.attr.colorOnPrimaryContainer
-            ReportStatus.IN_PROGRESS -> M.attr.colorSecondaryContainer to M.attr.colorOnSecondaryContainer
-            ReportStatus.FIXED -> R.attr.colorSuccessContainer to R.attr.colorOnSuccessContainer
-            ReportStatus.REOPENED -> M.attr.colorErrorContainer to M.attr.colorOnErrorContainer
-            ReportStatus.CONFIRMED -> 0 to M.attr.colorOnSurfaceVariant
+            IssueStatus.SEEN -> M.attr.colorPrimaryContainer to M.attr.colorOnPrimaryContainer
+            IssueStatus.IN_PROGRESS -> M.attr.colorSecondaryContainer to M.attr.colorOnSecondaryContainer
+            IssueStatus.FIXED -> R.attr.colorSuccessContainer to R.attr.colorOnSuccessContainer
+            IssueStatus.REOPENED -> M.attr.colorErrorContainer to M.attr.colorOnErrorContainer
+            IssueStatus.CONFIRMED -> 0 to M.attr.colorOnSurfaceVariant
             else -> M.attr.colorSurfaceContainerHigh to M.attr.colorOnSurfaceVariant
         }
         v.background = GradientDrawable().apply {
@@ -86,7 +86,7 @@ object StatusChip {
     }
 }
 
-/** The log entries a report carries are stored as LOG-01 JSON; this turns them back into rows. */
+/** The log entries an issue carries are stored as LOG-01 JSON; this turns them back into rows. */
 object LogJson {
     fun entry(o: JSONObject): LogEntry {
         fun s(k: String) = if (o.isNull(k)) null else o.optString(k).takeIf { it.isNotEmpty() }
@@ -126,7 +126,7 @@ fun decodeFileThumb(path: String, edgePx: Int): Bitmap? {
 }
 
 /**
- * "Preview" from the form (FBK-04 item 7): the redacted entries the report would carry,
+ * "Preview" from the form (FBK-04 item 7): the redacted entries the issue would carry,
  * as Activity rows (shared LogRowAdapter), plus the entry the owner picked, if any.
  */
 class LogPreviewSheet : BottomSheetDialogFragment() {

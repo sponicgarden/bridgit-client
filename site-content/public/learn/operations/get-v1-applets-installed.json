@@ -1,6 +1,6 @@
 {
- "documentation_revision": 111,
- "api_revision": 133,
+ "documentation_revision": 112,
+ "api_revision": 134,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Discover installed applets and their data_url. Owner control agents see all applets, including owner-installed ones; no installer ownership or new approval required",

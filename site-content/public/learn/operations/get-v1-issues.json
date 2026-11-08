@@ -1,0 +1,102 @@
+{
+ "documentation_revision": 112,
+ "api_revision": 134,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "issues_list",
+  "query": [
+   {
+    "name": "mine",
+    "description": "Fixer Mode agents: true = only issues you filed (other agents always get only their own)",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "status",
+    "description": "new, seen, in_progress, fixed, wont_fix, duplicate, confirmed, reopened",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "kind",
+    "description": "bug or feature",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "bug",
+     "feature"
+    ]
+   },
+   {
+    "name": "since",
+    "description": "ISO time: only issues updated after it",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "wait",
+    "description": "With since: hold up to this many seconds (max 55) for a new or changed issue",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "1-100, default 50",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/issues?status=fixed",
+  "idempotent": false,
+  "path": "/v1/issues",
+  "capability": "feedback",
+  "returns": "issues[id (this phone's id, used in URLs), ref (the team-wide number, e.g. M0042 from the owner, A0042 from an agent; null until sent to the Bridgit team), number (same as ref), team_id, kind, status, first_line, created_at, updated_at, no_autofix, image_count, filed_by, sent_to_team]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "mine": {
+     "description": "Fixer Mode agents: true = only issues you filed (other agents always get only their own)",
+     "type": "boolean"
+    },
+    "wait": {
+     "description": "With since: hold up to this many seconds (max 55) for a new or changed issue",
+     "type": "integer"
+    },
+    "kind": {
+     "description": "bug or feature",
+     "type": "string",
+     "enum": [
+      "bug",
+      "feature"
+     ]
+    },
+    "limit": {
+     "description": "1-100, default 50",
+     "type": "integer"
+    },
+    "status": {
+     "description": "new, seen, in_progress, fixed, wont_fix, duplicate, confirmed, reopened",
+     "type": "string"
+    },
+    "since": {
+     "description": "ISO time: only issues updated after it",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "forbidden",
+   "invalid_parameter",
+   "too_many_waits"
+  ],
+  "requires": null
+ }
+}

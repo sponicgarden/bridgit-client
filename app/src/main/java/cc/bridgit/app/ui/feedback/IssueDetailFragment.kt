@@ -26,13 +26,13 @@ import kotlinx.coroutines.withContext
 import cc.bridgit.app.BridgeApp
 import cc.bridgit.app.R
 import cc.bridgit.app.databinding.FeedbackHistoryRowBinding
-import cc.bridgit.app.databinding.FragmentReportDetailBinding
+import cc.bridgit.app.databinding.FragmentIssueDetailBinding
 import cc.bridgit.app.feedback.Actor
 import cc.bridgit.app.feedback.HistoryKind
-import cc.bridgit.app.feedback.Report
+import cc.bridgit.app.feedback.Issue
 import cc.bridgit.app.feedback.UploadState
-import cc.bridgit.app.feedback.ReportKind
-import cc.bridgit.app.feedback.ReportStatus
+import cc.bridgit.app.feedback.IssueKind
+import cc.bridgit.app.feedback.IssueStatus
 import cc.bridgit.app.feedback.StatusMachine
 import cc.bridgit.app.log.LogEntry
 import cc.bridgit.app.ui.common.Fmt
@@ -42,12 +42,12 @@ import cc.bridgit.app.ui.common.themeColor
 import com.google.android.material.R as M
 
 /**
- * Report detail (UI-20, FBK-11, ui-spec 5.12): the text, screenshots (tap to view
+ * Issue detail (UI-20, FBK-11, ui-spec 5.12): the text, screenshots (tap to view
  * bigger), Don't auto-fix flag, the attached log (collapsed), a context summary and
  * the status history. Fixed / won't fix / duplicate get Still broken · Confirm.
  */
-class ReportDetailFragment : Fragment() {
-    private var _b: FragmentReportDetailBinding? = null
+class IssueDetailFragment : Fragment() {
+    private var _b: FragmentIssueDetailBinding? = null
     private val b get() = _b!!
     private val app get() = requireActivity().application as BridgeApp
     private var id = -1L
@@ -57,12 +57,12 @@ class ReportDetailFragment : Fragment() {
     private lateinit var logAdapter: LogRowAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, s: Bundle?): View {
-        _b = FragmentReportDetailBinding.inflate(inflater, container, false)
+        _b = FragmentIssueDetailBinding.inflate(inflater, container, false)
         return b.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        id = arguments?.getLong("reportId", -1L) ?: -1L
+        id = arguments?.getLong("issueId", -1L) ?: -1L
         logExpanded = savedInstanceState?.getBoolean(K_LOG) ?: false
         ViewCompat.setOnApplyWindowInsetsListener(b.root) { _, insets ->
             val nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
@@ -75,8 +75,8 @@ class ReportDetailFragment : Fragment() {
         logAdapter = LogRowAdapter(app.agents) { }
         b.logList.adapter = logAdapter
         b.logToggle.setOnClickListener { logExpanded = !logExpanded; renderLog() }
-        b.confirm.setOnClickListener { move(ReportStatus.CONFIRMED) }
-        b.stillBroken.setOnClickListener { move(ReportStatus.REOPENED) }
+        b.confirm.setOnClickListener { move(IssueStatus.CONFIRMED) }
+        b.stillBroken.setOnClickListener { move(IssueStatus.REOPENED) }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -97,12 +97,12 @@ class ReportDetailFragment : Fragment() {
         val bb = _b ?: return
         bb.missing.isVisible = r == null
         bb.content.isVisible = r != null
-        if (r == null) { bb.verifyBar.isVisible = false; bb.toolbar.title = getString(R.string.feedback_my_reports); return }
+        if (r == null) { bb.verifyBar.isVisible = false; bb.toolbar.title = getString(R.string.feedback_my_issues); return }
         bind(r)
     }
 
-    /** FBK-14: where the report stands with the Bridgit team. */
-    private fun uploadLine(r: Report): String = when (r.upload) {
+    /** FBK-14: where the issue stands with the Bridgit team. */
+    private fun uploadLine(r: Issue): String = when (r.upload) {
         UploadState.SENT -> getString(R.string.feedback_upload_sent, Fmt.dateTime(r.uploadedAt))
         UploadState.PENDING -> getString(R.string.feedback_upload_pending)
         UploadState.FAILED -> getString(R.string.feedback_upload_failed, r.uploadError ?: "")
@@ -110,8 +110,8 @@ class ReportDetailFragment : Fragment() {
         else -> getString(R.string.feedback_upload_skipped)
     }
 
-    private fun bind(r: Report) {
-        val bug = r.kind == ReportKind.BUG
+    private fun bind(r: Issue) {
+        val bug = r.kind == IssueKind.BUG
         val kindName = getString(if (bug) R.string.feedback_kind_bug else R.string.feedback_kind_feature)
         b.toolbar.title = r.ref?.let { getString(R.string.feedback_detail_title, kindName, it) }
             ?: getString(R.string.feedback_detail_title_unsent, kindName)
@@ -129,7 +129,7 @@ class ReportDetailFragment : Fragment() {
         bindContext(r)
         bindHistory(r)
 
-        val verify = r.status == ReportStatus.FIXED || r.status == ReportStatus.WONT_FIX || r.status == ReportStatus.DUPLICATE
+        val verify = r.status == IssueStatus.FIXED || r.status == IssueStatus.WONT_FIX || r.status == IssueStatus.DUPLICATE
         b.verifyBar.isVisible = verify
         if (verify) b.verifyHint.text = getString(
             if (r.lastBy == cc.bridgit.app.feedback.FeedbackStatusSync.BY) R.string.feedback_verify_hint_team else R.string.feedback_verify_hint,
@@ -137,7 +137,7 @@ class ReportDetailFragment : Fragment() {
         ViewCompat.requestApplyInsets(b.root)
     }
 
-    private fun bindImages(r: Report) {
+    private fun bindImages(r: Issue) {
         b.imagesSection.isVisible = r.images.isNotEmpty()
         if (r.images == shownImages) return
         shownImages = r.images
@@ -194,7 +194,7 @@ class ReportDetailFragment : Fragment() {
         if (logExpanded) logAdapter.submitList(logEntries)
     }
 
-    private fun bindContext(r: Report) {
+    private fun bindContext(r: Issue) {
         val c = r.context
         fun s(k: String) = if (c.isNull(k)) null else c.optString(k).takeIf { it.isNotEmpty() }
         val version = listOfNotNull(
@@ -240,7 +240,7 @@ class ReportDetailFragment : Fragment() {
     }
 
     /** Vertical timeline, oldest first (ui-spec 5.12). */
-    private fun bindHistory(r: Report) {
+    private fun bindHistory(r: Issue) {
         val parent = b.history
         parent.removeAllViews()
         val ctx = requireContext()
@@ -264,16 +264,16 @@ class ReportDetailFragment : Fragment() {
     }
 
     /** FBK-11a: the owner confirms or reopens; mirrors the notification actions. */
-    private fun move(to: ReportStatus) {
+    private fun move(to: IssueStatus) {
         b.confirm.isEnabled = false; b.stillBroken.isEnabled = false
         val app = app
-        val logRes = if (to == ReportStatus.CONFIRMED) R.string.feedback_confirmed_log else R.string.feedback_reopened_log
+        val logRes = if (to == IssueStatus.CONFIRMED) R.string.feedback_confirmed_log else R.string.feedback_reopened_log
         viewLifecycleOwner.lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) {
                 runCatching {
                     val r = app.feedback.move(id, to, Actor.OWNER, "owner", null)
                     app.log.system("audit", "feedback", app.getString(logRes, r.number))
-                    // The notification for this report is out of date now (same id as FeedbackNotifier).
+                    // The notification for this issue is out of date now (same id as FeedbackNotifier).
                     app.getSystemService(android.app.NotificationManager::class.java)?.cancel(5000 + id.toInt())
                     r
                 }

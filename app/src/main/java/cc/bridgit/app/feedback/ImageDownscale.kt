@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream
 
 /*
  * Ported from the Spotka app (sponic repo, apps/mobile/.../util/ImageDownscale.kt), FBK-07:
- * images in reports are at most 1600 px on the long edge and JPEG <= 1 MB.
+ * images in issues are at most 1600 px on the long edge and JPEG <= 1 MB.
  */
 
 /**

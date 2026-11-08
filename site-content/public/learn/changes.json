@@ -1,5 +1,5 @@
 {
- "api_revision": 133,
+ "api_revision": 134,
  "changes": [
   {
    "date": "2026-10-27",
@@ -2211,6 +2211,25 @@
     }
    ],
    "revision": 133
+  },
+  {
+   "date": "2026-11-08",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/issues",
+     "what": "Bug reports are now Issues Tracking: /v1/issues, /v1/issues/{id}, /v1/issues/{id}/status, /v1/issues/{id}/followup and /v1/issues/team-key (MCP issues_list, issues_get, issues_status, issues_followup, issues_file, issues_team_key); the list key is issues. /v1/feedback\u2026 still answers as a deprecated alias with the old keys"
+    },
+    {
+     "endpoint": "/v1/issues/team-key",
+     "what": "Team backend: file and follow issues at /v1/agent/issues (client_issue_id)"
+    },
+    {
+     "endpoint": null,
+     "what": "links.issues is the issue list; links.feedback is deprecated"
+    }
+   ],
+   "revision": 134
   }
  ],
  "links": {
@@ -2228,6 +2247,7 @@
   "resources": "/v1/resources",
   "services": "/v1/services",
   "demo": "/v1/demo",
+  "issues": "/v1/issues",
   "samples": "/v1/samples",
   "feedback": "/v1/feedback",
   "applet_practices": "/v1/applets/practices",

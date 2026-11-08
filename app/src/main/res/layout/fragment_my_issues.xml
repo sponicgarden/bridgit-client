@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- My reports (FBK-09, UI-20, ui-spec 5.12). -->
+<!-- My issues (FBK-09, UI-20, ui-spec 5.12). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
@@ -15,7 +15,7 @@
         android:minHeight="?attr/actionBarSize"
         app:navigationContentDescription="@string/feedback_back"
         app:navigationIcon="@drawable/ic_back"
-        app:title="@string/feedback_my_reports" />
+        app:title="@string/feedback_my_issues" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/new_report"

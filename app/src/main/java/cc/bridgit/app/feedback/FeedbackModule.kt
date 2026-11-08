@@ -22,10 +22,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Section 11.5: the feedback API. Any agent may file a report (FBK-12), list and read the
- * reports it filed, and follow up on them (FBK-12a). Reading everyone's reports, their
+ * Section 11.5: the Issues Tracking API. Any agent may file an issue (FBK-12), list and read the
+ * issues it filed, and follow up on them (FBK-12a). Reading everyone's issues, their
  * screenshots, context and log, and moving them needs the agent's Developer switch (AGT-15),
- * because reports carry screenshots of the owner's phone. Always on: there is no master switch.
+ * because issues carry screenshots of the owner's phone. Always on: there is no master switch.
  */
 class FeedbackModule(app: BridgeApp) : Capability(app) {
     override val id = "feedback"
@@ -33,8 +33,9 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
     override val descriptionRes = R.string.cap_feedback_desc
     override val group = "status"
     // team-key before {id}: path matchers (relay, card actions) take the first spec that fits.
-    override val endpoints = listOf(Endpoints.FEEDBACK_LIST, Endpoints.FEEDBACK_TEAM_KEY, Endpoints.FEEDBACK_GET, Endpoints.FEEDBACK_STATUS,
-        Endpoints.FEEDBACK_FOLLOWUP, Endpoints.FEEDBACK_POST)
+    // /v1/feedback… are the deprecated pre-rename aliases (old JSON keys), kept until the old names are removed.
+    override val endpoints = listOf(Endpoints.ISSUES_LIST, Endpoints.ISSUES_TEAM_KEY, Endpoints.ISSUES_GET, Endpoints.ISSUES_STATUS,
+        Endpoints.ISSUES_FOLLOWUP, Endpoints.ISSUES_POST) + Endpoints.FEEDBACK_LEGACY
 
     private fun Req.isDeveloper() = agent?.let { app.agents.get(it.id) }?.fixer == true
 
@@ -46,10 +47,10 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
     }
 
     private fun mapError(e: FeedbackError): Nothing = when (e.code) {
-        "not_found" -> throw ErrorCatalog.error("not_found", e.message ?: "No such report.")
-        "rate_limited" -> throw ErrorCatalog.error("rate_limited", e.message ?: "Too many reports.", mapOf("retry_after_s" to 3600))
-        "internal" -> throw ErrorCatalog.error("internal_error", e.message ?: "The report couldn't be saved.")
-        else -> throw ErrorCatalog.error("invalid_parameter", e.message ?: "Bad report.")
+        "not_found" -> throw ErrorCatalog.error("not_found", e.message ?: "No such issue.")
+        "rate_limited" -> throw ErrorCatalog.error("rate_limited", e.message ?: "Too many issues.", mapOf("retry_after_s" to 3600))
+        "internal" -> throw ErrorCatalog.error("internal_error", e.message ?: "The issue couldn't be saved.")
+        else -> throw ErrorCatalog.error("invalid_parameter", e.message ?: "Bad issue.")
     }
 
     /** FBK-15: why there's no team key, as a catalog error with the no-phone fallback in the message. */
@@ -65,24 +66,32 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
         }
     }
 
-    /** Links an agent uses to check back on report [id]. */
-    private fun links(id: Long) = JSONObject().put("url", "/v1/feedback/$id").put("followup_url", "/v1/feedback/$id/followup")
+    /** Links an agent uses to check back on issue [id]. */
+    private fun links(id: Long, base: String) = JSONObject().put("url", "$base/$id").put("followup_url", "$base/$id/followup")
 
-    private fun Req.reportId(): Long = path("id")?.toLongOrNull()
-        ?: throw ErrorCatalog.error("invalid_parameter", "id must be a report number, e.g. 7.")
+    private fun Req.issueId(): Long = path("id")?.toLongOrNull()
+        ?: throw ErrorCatalog.error("invalid_parameter", "id must be an issue number, e.g. 7.")
 
-    override fun Route.install(api: ApiServer) = with(api) {
-        endpoint(Endpoints.FEEDBACK_LIST) {
-            // Developer agents see every report (or theirs with mine=true); other agents only the ones they filed.
+    override fun Route.install(api: ApiServer) {
+        installIssues(api, legacy = false)
+        installIssues(api, legacy = true)
+    }
+
+    /** [legacy]: the pre-rename /v1/feedback… aliases, which still answer with the old keys (`reports`). */
+    private fun Route.installIssues(api: ApiServer, legacy: Boolean) = with(api) {
+        val base = if (legacy) "/v1/feedback" else "/v1/issues"
+        fun spec(new: cc.bridgit.app.api.EndpointSpec, old: cc.bridgit.app.api.EndpointSpec) = if (legacy) old else new
+        endpoint(spec(Endpoints.ISSUES_LIST, Endpoints.FEEDBACK_LIST)) {
+            // Developer agents see every issue (or theirs with mine=true); other agents only the ones they filed.
             val mine = query("mine")?.let { it == "1" || it.equals("true", ignoreCase = true) } ?: false
             val onlyFor = if (mine || !isDeveloper()) agent!!.id else null
-            val status = query("status")?.let { ReportStatus.of(it) ?: throw ErrorCatalog.error("invalid_parameter", "Unknown status \"$it\".") }
-            val kind = query("kind")?.let { ReportKind.of(it) ?: throw ErrorCatalog.error("invalid_parameter", "kind must be bug or feature.") }
+            val status = query("status")?.let { IssueStatus.of(it) ?: throw ErrorCatalog.error("invalid_parameter", "Unknown status \"$it\".") }
+            val kind = query("kind")?.let { IssueKind.of(it) ?: throw ErrorCatalog.error("invalid_parameter", "kind must be bug or feature.") }
             val since = query("since")?.let { LogQuery.iso(it) ?: throw ErrorCatalog.error("invalid_parameter", "since must be an ISO time.") }
             val limit = query("limit")?.let { it.toIntOrNull()?.takeIf { n -> n in 1..100 } ?: throw ErrorCatalog.error("invalid_parameter", "limit must be 1 to 100.") } ?: 50
             val wait = query("wait")?.let { it.toIntOrNull()?.takeIf { n -> n in 0..55 } ?: throw ErrorCatalog.error("invalid_parameter", "wait must be 0 to 55.") } ?: 0
             if (wait > 0 && since == null) throw ErrorCatalog.error("invalid_parameter", "wait needs since (an ISO time).")
-            // Read the change counter before querying, so a report filed in between is never missed.
+            // Read the change counter before querying, so an issue filed in between is never missed.
             freshen()
             var seen = app.feedback.changed.value
             var list = app.feedback.list(status, kind, since, limit, onlyFor)
@@ -102,27 +111,27 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
                 else if (app.agents.get(agent!!.id) == null) throw ErrorCatalog.error("unauthorized", "$agentName was removed from Bridgit.")
             }
             params.put("returned", list.size)
-            Reply.Json(JSONObject().put("reports", JSONArray(list.map { it.summaryJson(::isoAt) })))
+            Reply.Json(JSONObject().put(if (legacy) "reports" else "issues", JSONArray(list.map { it.summaryJson(::isoAt) })))
         }
 
-        endpoint(Endpoints.FEEDBACK_GET) {
-            val id = reportId()
+        endpoint(spec(Endpoints.ISSUES_GET, Endpoints.FEEDBACK_GET)) {
+            val id = issueId()
             val dev = isDeveloper()
-            app.feedback.get(id)?.takeIf { dev || it.filedBy(agent!!.id) } ?: throw ErrorCatalog.error("not_found", "No report $id.")
+            app.feedback.get(id)?.takeIf { dev || it.filedBy(agent!!.id) } ?: throw ErrorCatalog.error("not_found", "No issue $id.")
             freshen()
-            var r = app.feedback.get(id) ?: throw ErrorCatalog.error("not_found", "No report $id.")
+            var r = app.feedback.get(id) ?: throw ErrorCatalog.error("not_found", "No issue $id.")
             val own = r.filedBy(agent!!.id)
             val history = JSONArray(r.history.map { it.toJson(::isoAt) })
             if (!dev) {
-                // The filing agent gets its report's text, status and history; never the owner's screenshots, context or log.
-                data = JSONObject().put("report", r.number)
+                // The filing agent gets its issue's text, status and history; never the owner's screenshots, context or log.
+                data = JSONObject().put("issue", r.number)
                 return@endpoint Reply.Json(r.summaryJson(::isoAt).put("description", r.description)
                     .put("team_note", r.teamNote ?: JSONObject.NULL).put("history", history)
-                    .put("followup_outcomes", JSONArray(StatusMachine.outcomesForReporter(r.status))).put("links", links(r.id)))
+                    .put("followup_outcomes", JSONArray(StatusMachine.outcomesForReporter(r.status))).put("links", links(r.id, base)))
             }
-            // FBK-11a: the first developer read moves a new (or reopened) report to seen.
-            if (r.status == ReportStatus.NEW || r.status == ReportStatus.REOPENED)
-                r = runCatching { app.feedback.move(id, ReportStatus.SEEN, Actor.AUTO, agentName, null) }.getOrDefault(r)
+            // FBK-11a: the first developer read moves a new (or reopened) issue to seen.
+            if (r.status == IssueStatus.NEW || r.status == IssueStatus.REOPENED)
+                r = runCatching { app.feedback.move(id, IssueStatus.SEEN, Actor.AUTO, agentName, null) }.getOrDefault(r)
             val spec = Sizing.resolve({ arg(it) }, "agent")
             var total = 0L
             val images = JSONArray()
@@ -135,23 +144,23 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
             }
             if (total * 4 / 3 > ApiServer.MAX_PAYLOAD) throw ErrorCatalog.error("payload_too_large", "The images are over 12 MB. Ask with size=thumb.")
             bytesOut = total
-            data = JSONObject().put("report", r.number)
+            data = JSONObject().put("issue", r.number)
             Reply.Json(r.summaryJson(::isoAt).put("description", r.description).put("context", r.context)
                 .put("images", images).put("log", r.log)
                 .put("team_note", r.teamNote ?: JSONObject.NULL)
                 .put("history", JSONArray(r.history.map { it.toJson(::isoAt) }))
                 .put("allowed_next", JSONArray(StatusMachine.nextForDeveloper(r.status).map { it.id }))
                 .put("followup_outcomes", JSONArray(if (own) StatusMachine.outcomesForReporter(r.status) else emptyList()))
-                .put("links", links(r.id)))
+                .put("links", links(r.id, base)))
         }
 
-        endpoint(Endpoints.FEEDBACK_FOLLOWUP) {
+        endpoint(spec(Endpoints.ISSUES_FOLLOWUP, Endpoints.FEEDBACK_FOLLOWUP)) {
             val a = agent!!
-            val id = reportId()
+            val id = issueId()
             val existing = app.feedback.get(id)
             if (existing != null && !existing.filedBy(a.id) && isDeveloper()) throw ErrorCatalog.error("forbidden",
-                "Only the agent that filed report ${existing.number} can follow up on it. Agents in Fixer Mode move reports with POST /v1/feedback/$id/status.",
-                mapOf("reason" to "not_your_report"))
+                "Only the agent that filed issue ${existing.number} can follow up on it. Agents in Fixer Mode move issues with POST $base/$id/status.",
+                mapOf("reason" to if (legacy) "not_your_report" else "not_your_issue"))
             val outcome = body.optString("outcome", "").ifBlank { null }
             val note = body.optString("note", "").ifBlank { null }
             val r = try { app.feedback.followUp(id, a.id, a.name, note, outcome) } catch (e: FeedbackError) { mapError(e) }
@@ -161,25 +170,25 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
                 "still_broken" -> "${a.name} says report ${r.number} is still broken"
                 else -> "${a.name} followed up on report ${r.number}"
             }
-            data = JSONObject().put("report", r.number).put("status", r.status.id)
-            Reply.Json(r.summaryJson(::isoAt).put("links", links(r.id)))
+            data = JSONObject().put("issue", r.number).put("status", r.status.id)
+            Reply.Json(r.summaryJson(::isoAt).put("links", links(r.id, base)))
         }
 
-        endpoint(Endpoints.FEEDBACK_STATUS) {
+        endpoint(spec(Endpoints.ISSUES_STATUS, Endpoints.FEEDBACK_STATUS)) {
             requireDeveloper()
-            val id = reportId()
-            val to = ReportStatus.of(body.optString("status")) ?: throw ErrorCatalog.error("invalid_parameter",
+            val id = issueId()
+            val to = IssueStatus.of(body.optString("status")) ?: throw ErrorCatalog.error("invalid_parameter",
                 "status must be in_progress, fixed, wont_fix or duplicate.")
             val note = body.optString("note", "").ifBlank { null }
             val r = try { app.feedback.move(id, to, Actor.DEVELOPER, agentName, note) } catch (e: FeedbackError) { mapError(e) }
             message = "$agentName moved report ${r.number} to ${to.id}"
-            data = JSONObject().put("report", r.number).put("status", to.id)
+            data = JSONObject().put("issue", r.number).put("status", to.id)
             Reply.Json(r.summaryJson(::isoAt))
         }
 
-        endpoint(Endpoints.FEEDBACK_POST) {
+        endpoint(spec(Endpoints.ISSUES_POST, Endpoints.FEEDBACK_POST)) {
             val a = agent!!
-            val kind = ReportKind.of(body.optString("kind")) ?: throw ErrorCatalog.error("invalid_parameter", "kind must be bug or feature.")
+            val kind = IssueKind.of(body.optString("kind")) ?: throw ErrorCatalog.error("invalid_parameter", "kind must be bug or feature.")
             val description = body.optString("description", "")
             val imgs = body.optJSONArray("images")
             if (imgs != null && imgs.length() > 0)
@@ -199,19 +208,19 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
                     ctx, "agent", a.id, a.name)
             } catch (e: FeedbackError) { mapError(e) }
             params.put("description", "[${description.length} chars]")
-            message = "${a.name} filed ${if (kind == ReportKind.BUG) "a bug report" else "a feature request"} ${r.number}"
-            data = JSONObject().put("report", r.number)
-            // ref (the team number, e.g. A0042) is null until the phone has sent the report; GET url shows it then.
+            message = "${a.name} filed ${if (kind == IssueKind.BUG) "a bug report" else "a feature request"} ${r.number}"
+            data = JSONObject().put("issue", r.number)
+            // ref (the team number, e.g. A0042) is null until the phone has sent the issue; GET url shows it then.
             val reply = JSONObject().put("id", r.id).put("ref", r.ref ?: JSONObject.NULL).put("number", r.ref ?: JSONObject.NULL).put("status", r.status.id).put("no_autofix", r.noAutofix)
-                .put("sent_to_team", r.upload).put("url", "/v1/feedback/${r.id}").put("followup_url", "/v1/feedback/${r.id}/followup")
-                .put("check_back", "GET /v1/feedback/${r.id} shows its status, the Bridgit team's note and history; GET /v1/feedback lists your reports. " +
-                    "Once it's marked fixed, POST /v1/feedback/${r.id}/followup {\"outcome\":\"works\"} or {\"outcome\":\"still_broken\",\"note\":\"…\"}.")
-            // FBK-15: where to follow this report and re-test the fix without the phone.
+                .put("sent_to_team", r.upload).put("url", "$base/${r.id}").put("followup_url", "$base/${r.id}/followup")
+                .put("check_back", "GET $base/${r.id} shows its status, the Bridgit team's note and history; GET $base lists your issues. " +
+                    "Once it's marked fixed, POST $base/${r.id}/followup {\"outcome\":\"works\"} or {\"outcome\":\"still_broken\",\"note\":\"…\"}.")
+            // FBK-15: where to follow this issue and re-test the fix without the phone.
             if (FeedbackUploader.configured) reply.put("team_api", TeamKeys.teamApi())
             Reply.Json(reply, status = 201)
         }
 
-        endpoint(Endpoints.FEEDBACK_TEAM_KEY) {
+        endpoint(spec(Endpoints.ISSUES_TEAM_KEY, Endpoints.FEEDBACK_TEAM_KEY)) {
             val a = app.agents.get(agent!!.id) ?: throw ErrorCatalog.error("unauthorized", "This agent was removed.")
             val rotate = query("rotate")?.let { it == "true" || it == "1" } ?: false
             val k = try {

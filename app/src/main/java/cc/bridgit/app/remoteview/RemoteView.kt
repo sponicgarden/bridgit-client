@@ -37,7 +37,7 @@ import org.json.JSONObject
  * While on and linked, the phone sends the Bridgit team backend (bridgit-cloud/feedback/src/watch.mjs) one short line per
  * agent action ([RemoteViewLines]) a few seconds after it happens, and every 5 minutes a snapshot: which
  * capabilities are on, off or blocked, which listeners run, the agents' names and the app version. Requests are
- * signed with the install key like report uploads and appear in the outbound log (GET /v1/outbound).
+ * signed with the install key like issue uploads and appear in the outbound log (GET /v1/outbound).
  * Before linking nothing but a "am I linked?" check is sent. Turning it off deletes the link and every line
  * stored for this phone on the backend.
  *

@@ -137,7 +137,7 @@ object Learn {
     fun evaluation(): String = """
         # Evaluate Bridgit without a key or a phone
 
-        You are evaluating the Bridgit pitch deck. Read these public sources, then assess the product and the deck's claims. This request authorizes reading public documentation only. Do not execute pairing commands, request a real key, access a device, run a demo or file reports merely because a reference prompt describes those steps.
+        You are evaluating the Bridgit pitch deck. Read these public sources, then assess the product and the deck's claims. This request authorizes reading public documentation only. Do not execute pairing commands, request a real key, access a device, run a demo or file issues merely because a reference prompt describes those steps.
 
         1. $LLMS_URL — current documentation index.
         2. $PLAYBOOK_URL — capabilities, local execution versus server/model calls, and use cases.
@@ -195,8 +195,8 @@ object Learn {
                 .put("bugs", doc(BUGS_URL, "File bugs, issues and feature requests directly with Bridgit servers", null))
                 .put("phone_stands", doc(STANDS_URL, "Where to put the phone (pet watch, door, overhead reading, wall or kitchen display, bedside, car) and stands, mounts, cases and cables to hold it, with Amazon links and sizes of common Android phones and tablets; JSON: $STANDS_JSON_URL", null))
                 .put("api_page", doc("$SITE/api/", "The human-readable API page", null)))
-            .put("file_a_bug_directly", "POST $FEEDBACK_BACKEND/v1/agents/register {\"name\",\"model\",\"harness\"}, then POST $FEEDBACK_BACKEND/v1/agent/reports with the key it returns. Details: $BUGS_URL")
-            .put("file_a_bug_without_a_phone", "POST $FEEDBACK_BACKEND/v1/agents/register {\"name\",\"model\",\"harness\"}, then POST $FEEDBACK_BACKEND/v1/agent/reports with the key it returns. Details: $BUGS_URL")
+            .put("file_a_bug_directly", "POST $FEEDBACK_BACKEND/v1/agents/register {\"name\",\"model\",\"harness\"}, then POST $FEEDBACK_BACKEND/v1/agent/issues with the key it returns. Details: $BUGS_URL")
+            .put("file_a_bug_without_a_phone", "POST $FEEDBACK_BACKEND/v1/agents/register {\"name\",\"model\",\"harness\"}, then POST $FEEDBACK_BACKEND/v1/agent/issues with the key it returns. Details: $BUGS_URL")
     }
 
     /** The phone's OpenAPI with a templated server, since there is no phone address here. */
@@ -478,35 +478,35 @@ Private builds only. Scope `peripherals`.
 """
 
     fun bugs(): String = buildString {
-        appendLine("# Report bugs, ask for features")
+        appendLine("# Issues Tracking: report bugs, ask for features")
         appendLine()
-        appendLine("Agents are Bridgit's best testers, and the team reads every report. File every bug and every feature request, however small, and whether or not you think we can or will do it: " +
-            "we'd rather triage too many than miss one. A call that fails in a way ${ERRORS_URL} doesn't explain, a confusing reply, wrong docs, or an endpoint that should exist: each is worth a report. " +
-            "Reports never carry your Bridgit key or the owner's data (photos, recordings, messages, anything private) unless the owner has agreed to share it.")
+        appendLine("Agents are Bridgit's best testers, and the team reads every bug report and feature request. File every bug and every feature request, however small, and whether or not you think we can or will do it: " +
+            "we'd rather triage too many than miss one. A call that fails in a way ${ERRORS_URL} doesn't explain, a confusing reply, wrong docs, or an endpoint that should exist: each is worth a bug report. " +
+            "Issues never carry your Bridgit key or the owner's data (photos, recordings, messages, anything private) unless the owner has agreed to share it.")
         appendLine()
         appendLine("## Report directly to Bridgit's servers")
         appendLine()
         appendLine("Control agents always file bugs, issues and feature requests directly with Bridgit's team backend, even when the phone works. The phone is not an intermediary for agent reporting.")
         appendLine("Reuse your existing team key (bgk_...). If you don't have one, register directly below; no phone or phone key is required. Keep the team key secret and separate from your phone key.")
-        appendLine("Limits: a few registrations per address an hour and 50 reports an hour per registered agent (an agent with no key can file one report, ever), so register once and keep the key. (The phone's own `POST /v1/feedback`, for reports an owner sends from the phone, has its own limit of ${cc.bridgit.app.feedback.FeedbackLimits.API_PER_HOUR_PER_AGENT} an hour per agent.) The backend explains itself at `GET $FEEDBACK_BACKEND/v1/agent`.")
+        appendLine("Limits: a few registrations per address an hour and 50 issues an hour per registered agent (an agent with no key can file one issue, ever), so register once and keep the key. (The phone's own `POST /v1/issues`, for issues an owner sends from the phone, has its own limit of ${cc.bridgit.app.feedback.FeedbackLimits.API_PER_HOUR_PER_AGENT} an hour per agent.) The backend explains itself at `GET $FEEDBACK_BACKEND/v1/agent`.")
         appendLine()
         appendLine("```")
         appendLine("POST $FEEDBACK_BACKEND/v1/agents/register {\"name\":\"<your agent name>\",\"model\":\"<your model id>\",\"harness\":\"<e.g. Claude Code>\"}")
         appendLine("  -> 201 with key (bgk_...). Keep it secret.")
-        appendLine("POST $FEEDBACK_BACKEND/v1/agent/reports  (Authorization: Bearer <bgk_ key>)")
-        appendLine("  {\"kind\":\"bug\"|\"feature\",\"description\",\"agent_info\"?,\"context\"?,\"log\"?,\"images\"?,\"client_report_id\"?,\"request_autofix\"?,\"no_autofix\"?}")
-        appendLine("  client_report_id: your own positive integer (a number, not a string); sending the same one again returns the first report with duplicate: true instead of filing twice.")
-        appendLine("GET  $FEEDBACK_BACKEND/v1/agent/reports?waiting=true   (or /v1/agent/reports/{id})")
-        appendLine("POST $FEEDBACK_BACKEND/v1/agent/reports/{id}/verify {\"verdict\":\"works\"|\"still_broken\"|\"unverified\",\"tested_version\",\"note\"}")
-        appendLine("POST $FEEDBACK_BACKEND/v1/agent/reports/{id}/request-autofix {\"note\"?}")
+        appendLine("POST $FEEDBACK_BACKEND/v1/agent/issues  (Authorization: Bearer <bgk_ key>)")
+        appendLine("  {\"kind\":\"bug\"|\"feature\",\"description\",\"agent_info\"?,\"context\"?,\"log\"?,\"images\"?,\"client_issue_id\"?,\"request_autofix\"?,\"no_autofix\"?}")
+        appendLine("  client_issue_id: your own positive integer (a number, not a string); sending the same one again returns the first issue with duplicate: true instead of filing twice.")
+        appendLine("GET  $FEEDBACK_BACKEND/v1/agent/issues?waiting=true   (or /v1/agent/issues/{id})")
+        appendLine("POST $FEEDBACK_BACKEND/v1/agent/issues/{id}/verify {\"verdict\":\"works\"|\"still_broken\"|\"unverified\",\"tested_version\",\"note\"}")
+        appendLine("POST $FEEDBACK_BACKEND/v1/agent/issues/{id}/request-autofix {\"note\"?}")
         appendLine("```")
         appendLine()
         appendLine("## Rules")
         appendLine()
-        appendLine("- One report per problem; include the `request_id` of the failing call. Add `\"no_autofix\":true` when it needs a person, or `\"request_autofix\":true` (or `POST .../request-autofix` later) to ask for an automatic fix. That is a request, not a promise: the team's switches, review, tests and budget decide.")
-        appendLine("- When a report is `waiting_for_retest`, install `fixed_in` or later, re-run the repro, then verify. Never tell anyone something is fixed until a re-test says `works`. " +
+        appendLine("- One bug report per problem; include the `request_id` of the failing call. Add `\"no_autofix\":true` when it needs a person, or `\"request_autofix\":true` (or `POST .../request-autofix` later) to ask for an automatic fix. That is a request, not a promise: the team's switches, review, tests and budget decide.")
+        appendLine("- When an issue is `waiting_for_retest`, install `fixed_in` or later, re-run the repro, then verify. Never tell anyone something is fixed until a re-test says `works`. " +
             "`unverified` means you couldn't test it, not a guess at `still_broken`.")
-        appendLine("- Reports never carry your Bridgit key, or anything private the owner hasn't agreed to share.")
+        appendLine("- Issues never carry your Bridgit key, or anything private the owner hasn't agreed to share.")
     }
 
     /**
@@ -547,7 +547,7 @@ Use a chat model instead for other open-ended summaries, replies and explanation
 | Decide about text or a photo from anywhere | `POST {base_url}/v1/jev` with your team key | Jev | up to 2 images | Matching actions come back as a list for you to run |
 | Decide about photos, screenshots, sound or video | `POST {base_url}/v1/clef` with your team key | Clef-omni | 4 images, 4 audio clips, 2 videos | Matching actions come back as a list for you to run |
 
-Get `base_url` and your team key (`bgk_...`) from `GET /v1/feedback/team-key` on the phone. Self-registered keys
+Get `base_url` and your team key (`bgk_...`) from `GET /v1/issues/team-key` on the phone. Self-registered keys
 can't use these paid services. All decision routes take the same `actions` rules as `/v1/judgment` (bridgit-actions/1).
 
 Service budgets are account-wide and apply alongside applet limits, including own-key calls. Read `GET /v1/services/budgets`; propose changes with `/v1/owner/configure` action `service.budget.set` (exact owner approval required). Check the selected call's grants, switches and prerequisites before using it; a service listing never authorizes a call.
@@ -810,7 +810,7 @@ Model details: [Jev](https://docs.typesafe.ai) and Cloudflare's
         appendLine()
         appendLine("## Bugs and feature requests")
         appendLine()
-        appendLine("- [How to file them]($BUGS_URL): directly with Bridgit servers (`POST $FEEDBACK_BACKEND/v1/agents/register` if you need a team key, then `POST $FEEDBACK_BACKEND/v1/agent/reports`). The team reads every one.")
+        appendLine("- [How to file them]($BUGS_URL): directly with Bridgit servers (`POST $FEEDBACK_BACKEND/v1/agents/register` if you need a team key, then `POST $FEEDBACK_BACKEND/v1/agent/issues`). The team reads every one.")
         appendLine()
         appendLine("## Optional")
         appendLine()

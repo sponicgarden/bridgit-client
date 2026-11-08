@@ -28,13 +28,13 @@ import java.util.concurrent.TimeUnit
 
 /**
  * FBK-15: each paired agent's own key for the Bridgit team's feedback backend (`bgk_...`), so it can
- * file reports, follow them and verify fixes there directly, even when this phone is down. The phone
+ * file issues, follow them and verify fixes there directly, even when this phone is down. The phone
  * mints it with its install identity (POST /v1/agent-keys, no owner work) and keeps it in private prefs
  * (no backup) per phone agent id. Minting again replaces the key on the backend, so it only mints when it
  * has none or the agent asks to rotate. Removing an agent or rotating its phone key revokes it.
  */
 object TeamKeys {
-    const val KEY_ENDPOINT = "/v1/feedback/team-key"
+    const val KEY_ENDPOINT = "/v1/issues/team-key"
     private val JSON = "application/json; charset=utf-8".toMediaType()
     private fun pref(agentId: String) = "team_key:$agentId"
 
@@ -47,8 +47,8 @@ object TeamKeys {
     val publicBase: String get() = base.ifBlank { "https://bridgit-feedback.bridgit-app.workers.dev" }
 
     /** One line any agent can act on when the phone itself is the problem: no phone, no key, no owner needed. */
-    fun noPhoneReport(): String = "Report bugs, issues and feature requests directly to Bridgit servers: " +
-        "POST $publicBase/v1/agents/register {\"name\",\"model\",\"harness\"} for a key, then POST $publicBase/v1/agent/reports. How: ${cc.bridgit.app.api.Learn.BUGS_URL}"
+    fun noPhoneReport(): String = "File bug reports and feature requests directly with Bridgit servers (Issues Tracking): " +
+        "POST $publicBase/v1/agents/register {\"name\",\"model\",\"harness\"} for a key, then POST $publicBase/v1/agent/issues. How: ${cc.bridgit.app.api.Learn.BUGS_URL}"
 
     /** The no-phone fallback agents can use when this phone can't mint (FBK-15). */
     fun fallbackHint(): String = if (FeedbackUploader.configured)
@@ -63,9 +63,9 @@ object TeamKeys {
         val b = baseUrl.ifBlank { base }
         return listOf(
             "Send Authorization: Bearer <key> to $b. Keep the key secret: out of output, logs and command lines.",
-            "File every bug and every feature request, however small, even if you doubt we can or will do it: POST $b/v1/agent/reports {kind, description}. We'd rather triage too many than miss one.",
-            "Follow your reports: GET $b/v1/agent/reports (status=, waiting=true, since=) and GET $b/v1/agent/reports/{id}.",
-            "When waiting_for_retest is true, install fixed_in or later, re-run the repro, then POST $b/v1/agent/reports/{id}/verify {verdict: works|still_broken|unverified, tested_version, note}.",
+            "File every bug and every feature request, however small, even if you doubt we can or will do it: POST $b/v1/agent/issues {kind, description}. We'd rather triage too many than miss one.",
+            "Follow your issues: GET $b/v1/agent/issues (status=, waiting=true, since=) and GET $b/v1/agent/issues/{id}.",
+            "When waiting_for_retest is true, install fixed_in or later, re-run the repro, then POST $b/v1/agent/issues/{id}/verify {verdict: works|still_broken|unverified, tested_version, note}.",
             "Never tell anyone something is fixed until a re-test says works. unverified means you couldn't test it, not a guess at still_broken.",
             "GET $b/v1/agent explains everything else.",
         )
@@ -84,7 +84,7 @@ object TeamKeys {
 
     /** What the phone sends to mint: who the agent is on this phone. Pure, unit-tested. */
     fun mintBody(a: Agent): JSONObject = JSONObject().put("phone_agent_id", a.id).put("name", a.name)
-        .put("model", a.model ?: JSONObject.NULL).put("harness", a.harness ?: JSONObject.NULL).put("developer", a.fixer) // the backend reads this as "may read this phone's reports": Fixer Mode
+        .put("model", a.model ?: JSONObject.NULL).put("harness", a.harness ?: JSONObject.NULL).put("developer", a.fixer) // the backend reads this as "may read this phone's issues": Fixer Mode
 
     /** The cached key, or a new one from the backend (blocking network; call off the main thread). */
     @Throws(Failure::class)

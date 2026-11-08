@@ -216,10 +216,10 @@
    "tags": ["ssh"]
   }},
   "/v1/feedback/{id}": {"get": {
-   "summary": "One report with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new report seen)",
+   "summary": "Deprecated: the old address of GET /v1/issues/{id}, same behaviour",
    "operationId": "getFeedbackId",
    "responses": {
-    "200": {"description": "report: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next"},
+    "200": {"description": "issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next"},
     "401": {"description": "unauthorized"},
     "404": {
      "description": "not_found",
@@ -1728,7 +1728,7 @@
    "tags": ["applet_install"]
   }},
   "/v1/feedback/{id}/status": {"post": {
-   "summary": "Move a report: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode)",
+   "summary": "Deprecated: the old address of POST /v1/issues/{id}/status, same behaviour",
    "requestBody": {"content": {"application/json": {"schema": {
     "type": "object",
     "properties": {
@@ -1745,7 +1745,7 @@
    }}}},
    "operationId": "postFeedbackIdStatus",
    "responses": {
-    "200": {"description": "the report summary"},
+    "200": {"description": "the issue summary"},
     "422": {
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -2261,7 +2261,7 @@
    "tags": ["video"]
   }},
   "/v1/feedback/{id}/followup": {"post": {
-   "summary": "Follow up on a report you filed: a note (\"still happens on 1.7.2\"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it)",
+   "summary": "Deprecated: the old address of POST /v1/issues/{id}/followup, same behaviour",
    "requestBody": {"content": {"application/json": {"schema": {
     "type": "object",
     "properties": {
@@ -2270,7 +2270,7 @@
       "type": "string"
      },
      "outcome": {
-      "description": "works or still_broken: the owner's Confirm / Still broken, allowed once the report is fixed, wont_fix or duplicate",
+      "description": "works or still_broken: the owner's Confirm / Still broken, allowed once the issue is fixed, wont_fix or duplicate",
       "type": "string",
       "enum": [
        "works",
@@ -2282,7 +2282,7 @@
    }}}},
    "operationId": "postFeedbackIdFollowup",
    "responses": {
-    "200": {"description": "the report summary"},
+    "200": {"description": "the issue summary"},
     "422": {
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -2545,6 +2545,141 @@
    },
    "tags": ["owner_features"]
   }},
+  "/v1/issues": {
+   "post": {
+    "summary": "Legacy phone-local issue filing (any agent; images only in Bridgit Fixer Mode). Control agents should file issues directly with Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {
+      "images": {
+       "description": "Fixer Mode only: up to 5 {\"data_base64\"} images",
+       "type": "array",
+       "items": {"type": "object"}
+      },
+      "kind": {
+       "description": "bug or feature",
+       "type": "string",
+       "enum": [
+        "bug",
+        "feature"
+       ]
+      },
+      "agent_info": {
+       "description": "About you, sent with the issue to the Bridgit team: e.g. {\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"} (up to 20 short string, number or boolean fields)",
+       "type": "object"
+      },
+      "description": {
+       "description": "What happened, up to 10,000 characters",
+       "type": "string"
+      },
+      "no_autofix": {
+       "description": "true = leave it for a person",
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "kind",
+      "description"
+     ]
+    }}}},
+    "operationId": "postIssues",
+    "responses": {
+     "200": {"description": "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "403": {
+      "description": "forbidden",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "429": {
+      "description": "rate_limited",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": false
+    }],
+    "tags": ["feedback"]
+   },
+   "get": {
+    "summary": "Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
+    "operationId": "getIssues",
+    "responses": {
+     "200": {"description": "issues[id (this phone's id, used in URLs), ref (the team-wide number, e.g. M0042 from the owner, A0042 from an agent; null until sent to the Bridgit team), number (same as ref), team_id, kind, status, first_line, created_at, updated_at, no_autofix, image_count, filed_by, sent_to_team]"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "403": {
+      "description": "forbidden",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "429": {
+      "description": "too_many_waits",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [
+     {
+      "schema": {"type": "boolean"},
+      "in": "query",
+      "name": "mine",
+      "description": "Fixer Mode agents: true = only issues you filed (other agents always get only their own)",
+      "required": false
+     },
+     {
+      "schema": {"type": "string"},
+      "in": "query",
+      "name": "status",
+      "description": "new, seen, in_progress, fixed, wont_fix, duplicate, confirmed, reopened",
+      "required": false
+     },
+     {
+      "schema": {
+       "type": "string",
+       "enum": [
+        "bug",
+        "feature"
+       ]
+      },
+      "in": "query",
+      "name": "kind",
+      "description": "bug or feature",
+      "required": false
+     },
+     {
+      "schema": {"type": "string"},
+      "in": "query",
+      "name": "since",
+      "description": "ISO time: only issues updated after it",
+      "required": false
+     },
+     {
+      "schema": {"type": "integer"},
+      "in": "query",
+      "name": "wait",
+      "description": "With since: hold up to this many seconds (max 55) for a new or changed issue",
+      "required": false
+     },
+     {
+      "schema": {"type": "integer"},
+      "in": "query",
+      "name": "limit",
+      "description": "1-100, default 50",
+      "required": false
+     }
+    ],
+    "tags": ["feedback"]
+   }
+  },
   "/v1/satellite/claim": {"post": {
    "summary": "Phone to phone: a hub trades a satellite pairing link's one-time code for its key. Not for agents.",
    "security": [],
@@ -2920,7 +3055,7 @@
    "tags": ["judgment"]
   }},
   "/v1/feedback/team-key": {"get": {
-   "summary": "Your own key for the Bridgit team's feedback backend: file reports, check their status and verify fixes there directly. Agent reporting always goes directly to the servers",
+   "summary": "Deprecated: the old address of GET /v1/issues/team-key, same behaviour",
    "operationId": "getFeedbackTeamKey",
    "responses": {
     "200": {"description": "base_url, key (bgk_...), agent_id, role, docs, how_to"},
@@ -6086,6 +6221,56 @@
    ],
    "tags": ["log"]
   }},
+  "/v1/issues/{id}/status": {"post": {
+   "summary": "Move an issue: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode)",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "note": {
+      "description": "Short note shown to the owner, e.g. \"Fix in PR #412\" (500 chars)",
+      "type": "string"
+     },
+     "status": {
+      "description": "in_progress, fixed, wont_fix or duplicate",
+      "type": "string"
+     }
+    },
+    "required": ["status"]
+   }}}},
+   "operationId": "postIssuesIdStatus",
+   "responses": {
+    "200": {"description": "the issue summary"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "forbidden",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": false
+    }
+   ],
+   "tags": ["feedback"]
+  }},
   "/v1/phone/battery": {"get": {
    "summary": "Full battery report: percent, status, plug type, health, temperature, voltage, cycles, current, time to full, estimated_runtime (time to empty at recent usage while unplugged; status, remaining/lower/upper seconds, observation window and drain rate; learning until 10 minutes and 2% drain), battery saver, which power settings agents may change, and the battery.* events",
    "operationId": "getPhoneBattery",
@@ -7210,7 +7395,7 @@
   }},
   "/v1/feedback": {
    "post": {
-    "summary": "Legacy phone-local reporting (any agent; images only in Bridgit Fixer Mode). Control agents should report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",
+    "summary": "Deprecated: the old address of POST /v1/issues, same behaviour",
     "requestBody": {"content": {"application/json": {"schema": {
      "type": "object",
      "properties": {
@@ -7228,7 +7413,7 @@
        ]
       },
       "agent_info": {
-       "description": "About you, sent with the report to the Bridgit team: e.g. {\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"} (up to 20 short string, number or boolean fields)",
+       "description": "About you, sent with the issue to the Bridgit team: e.g. {\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"} (up to 20 short string, number or boolean fields)",
        "type": "object"
       },
       "description": {
@@ -7272,7 +7457,7 @@
     "tags": ["feedback"]
    },
    "get": {
-    "summary": "Bug reports and feature requests: the ones you filed, or every report for agents in Bridgit Fixer Mode",
+    "summary": "Deprecated: the old address of GET /v1/issues, same behaviour (list key reports)",
     "operationId": "getFeedback",
     "responses": {
      "200": {"description": "reports[id (this phone's id, used in URLs), ref (the team-wide number, e.g. M0042 from the owner, A0042 from an agent; null until sent to the Bridgit team), number (same as ref), team_id, kind, status, first_line, created_at, updated_at, no_autofix, image_count, filed_by, sent_to_team]"},
@@ -7295,7 +7480,7 @@
       "schema": {"type": "boolean"},
       "in": "query",
       "name": "mine",
-      "description": "Fixer Mode agents: true = only reports you filed (other agents always get only their own)",
+      "description": "Fixer Mode agents: true = only issues you filed (other agents always get only their own)",
       "required": false
      },
      {
@@ -7322,14 +7507,14 @@
       "schema": {"type": "string"},
       "in": "query",
       "name": "since",
-      "description": "ISO time: only reports updated after it",
+      "description": "ISO time: only issues updated after it",
       "required": false
      },
      {
       "schema": {"type": "integer"},
       "in": "query",
       "name": "wait",
-      "description": "With since: hold up to this many seconds (max 55) for a new or changed report",
+      "description": "With since: hold up to this many seconds (max 55) for a new or changed issue",
       "required": false
      },
      {
@@ -8354,6 +8539,60 @@
    }],
    "tags": ["ssh"]
   }},
+  "/v1/issues/{id}/followup": {"post": {
+   "summary": "Follow up on an issue you filed: a note (\"still happens on 1.7.2\"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it)",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "note": {
+      "description": "What you see now (500 chars); needed when there's no outcome",
+      "type": "string"
+     },
+     "outcome": {
+      "description": "works or still_broken: the owner's Confirm / Still broken, allowed once the issue is fixed, wont_fix or duplicate",
+      "type": "string",
+      "enum": [
+       "works",
+       "still_broken"
+      ]
+     }
+    },
+    "required": []
+   }}}},
+   "operationId": "postIssuesIdFollowup",
+   "responses": {
+    "200": {"description": "the issue summary"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "429": {
+     "description": "rate_limited",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": false
+    }
+   ],
+   "tags": ["feedback"]
+  }},
   "/v1/resource-jobs/{id}": {
    "get": {
     "summary": "One of your resource jobs",
@@ -9225,6 +9464,63 @@
     "required": true
    }],
    "tags": ["ssh"]
+  }},
+  "/v1/issues/{id}": {"get": {
+   "summary": "One issue with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new issue seen)",
+   "operationId": "getIssuesId",
+   "responses": {
+    "200": {"description": "issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next"},
+    "401": {"description": "unauthorized"},
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {
+      "type": "string",
+      "enum": [
+       "agent",
+       "thumb",
+       "large",
+       "original"
+      ]
+     },
+     "in": "query",
+     "name": "size",
+     "description": "Preset: agent (1568 px, q85), thumb (512, q75), large (2560, q90), original",
+     "required": false
+    },
+    {
+     "schema": {"type": "integer"},
+     "in": "query",
+     "name": "max_edge_px",
+     "description": "Long edge limit, 64-20000; overrides the preset",
+     "required": false
+    },
+    {
+     "schema": {"type": "integer"},
+     "in": "query",
+     "name": "max_width_px",
+     "description": "Width limit, 64-20000",
+     "required": false
+    },
+    {
+     "schema": {"type": "integer"},
+     "in": "query",
+     "name": "quality",
+     "description": "JPEG quality 40-100",
+     "required": false
+    }
+   ],
+   "tags": ["feedback"]
   }},
   "/v1/adb/logcat": {"get": {
    "summary": "System-wide Android logcat snapshot; requires Agent Super Powers, adb grant, private build and the owner's ADB switch",
@@ -10258,6 +10554,34 @@
     "required": false
    }],
    "tags": ["owner_features"]
+  }},
+  "/v1/issues/team-key": {"get": {
+   "summary": "Your own key for the Bridgit team's Issues Tracking backend: file issues, check their status and verify fixes there directly. Agent issue filing always goes directly to the servers",
+   "operationId": "getIssuesTeamKey",
+   "responses": {
+    "200": {"description": "base_url, key (bgk_...), agent_id, role, docs, how_to"},
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "capability_disabled, forbidden",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "429": {
+     "description": "rate_limited",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [{
+    "schema": {"type": "boolean"},
+    "in": "query",
+    "name": "rotate",
+    "description": "true = make a new key; the old one stops working",
+    "required": false
+   }],
+   "tags": ["feedback"]
   }},
   "/v1/delivery": {"get": {
    "summary": "Your alert/callback delivery status and permitted destination ids",
@@ -11894,7 +12218,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 133,
+  "x-api-revision": 134,
   "title": "Bridgit",
   "version": "1.8.0"
  }

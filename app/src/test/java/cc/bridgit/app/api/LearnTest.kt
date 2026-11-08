@@ -103,7 +103,7 @@ class LearnTest {
         val changes = JSONObject(files.getValue("learn/changes.json")).getJSONArray("changes")
         assertEquals(ApiChanges.revisions.map { it.revision }, (0 until changes.length()).map { changes.getJSONObject(it).getInt("revision") })
         assertTrue(guide.contains("API revision ${ApiChanges.CURRENT}"))
-        assertTrue(files.getValue("learn/mcp.md").contains(McpTools.name(Endpoints.FEEDBACK_POST)))
+        assertTrue(files.getValue("learn/mcp.md").contains(McpTools.name(Endpoints.ISSUES_POST)))
         assertTrue(files.getValue("learn/bugs.md").contains("${Learn.FEEDBACK_BACKEND}/v1/agents/register"))
         McpTools.specs.forEach { assertTrue(it.fullPath, files.getValue("learn/mcp.md").contains("`${McpTools.name(it)}`")) }
         Demos.all.forEach { assertTrue(it.title, files.getValue("learn/demo.md").contains("### ${it.title}\n")) }
@@ -114,9 +114,9 @@ class LearnTest {
             val text = files.getValue(path)
             assertTrue(path, text.contains("directly"))
             assertFalse(path, text.contains("Phone down?"))
-            if (path != "learn/guide.md") assertFalse(path, text.contains("POST /v1/feedback {"))
+            if (path != "learn/guide.md") assertFalse(path, text.contains("POST /v1/issues {") || text.contains("POST /v1/feedback {"))
         }
-        assertTrue(files.getValue("learn/bugs.md").contains("${Learn.FEEDBACK_BACKEND}/v1/agent/reports"))
+        assertTrue(files.getValue("learn/bugs.md").contains("${Learn.FEEDBACK_BACKEND}/v1/agent/issues"))
     }
 
     @Test fun noPhoneStateOrSecrets() {

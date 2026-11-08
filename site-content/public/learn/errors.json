@@ -1,6 +1,6 @@
 {
  "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
- "api_revision": 133,
+ "api_revision": 134,
  "errors": [
   {
    "code": "model_unavailable",
@@ -396,7 +396,7 @@
   },
   {
    "code": "internal_error",
-   "you_should": "Report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md",
+   "you_should": "File a bug report directly with Bridgit servers (Issues Tracking): https://bridgit.cc/learn/bugs.md",
    "meaning": "Bridgit bug",
    "http": 500,
    "returned_today": true

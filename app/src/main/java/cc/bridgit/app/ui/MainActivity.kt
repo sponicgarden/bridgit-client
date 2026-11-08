@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
             navInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
             v.updatePadding(bottom = navInset); applyPanelInset(); insets
         }
-        if (savedInstanceState == null) { route(); openReportFrom(intent); val arrival = wakeFor(intent); openInteractionFrom(intent, arrival); openTourFrom(intent); openDogFrom(intent); openOwnerSetupFrom(intent); openAgentFrom(intent); openPortalFrom(intent); openForegroundScreen(intent) }
+        if (savedInstanceState == null) { route(); openIssueFrom(intent); val arrival = wakeFor(intent); openInteractionFrom(intent, arrival); openTourFrom(intent); openDogFrom(intent); openOwnerSetupFrom(intent); openAgentFrom(intent); openPortalFrom(intent); openForegroundScreen(intent) }
         watchInteractionsBadge()
         watchTextPanel()
         if (launchBranding && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) showLaunchBranding()
@@ -192,7 +192,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** The feedback notification (FBK-11) opens its report. */
+    /** The feedback notification (FBK-11) opens its issue. */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -201,7 +201,7 @@ class MainActivity : AppCompatActivity() {
             nav.navigate(R.id.interactions, null, androidx.navigation.NavOptions.Builder()
                 .setPopUpTo(R.id.interactions, inclusive = true).build())
         }
-        openReportFrom(intent)
+        openIssueFrom(intent)
         val arrival = wakeFor(intent)
         openInteractionFrom(intent, arrival)
         openTourFrom(intent)
@@ -314,13 +314,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openReportFrom(intent: Intent?) {
-        val id = intent?.getLongExtra(EXTRA_REPORT_ID, -1L) ?: -1L
+    private fun openIssueFrom(intent: Intent?) {
+        // A notification posted before the Issues Tracking rename still carries the old extra.
+        if (intent == null) return
+        val id = intent.getLongExtra(EXTRA_ISSUE_ID, intent.getLongExtra(LEGACY_EXTRA_REPORT_ID, -1L))
         if (id < 0) return
-        intent?.removeExtra(EXTRA_REPORT_ID)
+        intent.removeExtra(EXTRA_ISSUE_ID); intent.removeExtra(LEGACY_EXTRA_REPORT_ID)
         // Not over an unfinished setup prompt or first run: those must finish first.
         if (nav.currentDestination?.id in setOf(R.id.addAgent, R.id.pairCode, R.id.firstRun)) return
-        nav.navigate(R.id.reportDetail, Bundle().apply { putLong("reportId", id) })
+        nav.navigate(R.id.issueDetail, Bundle().apply { putLong("issueId", id) })
     }
 
     /** First run, or back to an unfinished setup prompt after a crash (AGT-05a). */
@@ -384,8 +386,9 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val CLIP_LABEL = "Bridgit setup prompt"
         const val CLIP_LABEL_SECRET = "Bridgit callback secret"
-        /** Long extra: open this report (from the feedback notification). */
-        const val EXTRA_REPORT_ID = "report_id"
+        /** Long extra: open this issue (from the feedback notification). */
+        const val EXTRA_ISSUE_ID = "issue_id"
+        private const val LEGACY_EXTRA_REPORT_ID = "report_id"
         const val EXTRA_OPEN_AGENT = "open_agent"
         /** Applets › Portals with this portal open ("pkg.<package id>"): Installed applets › Open for a portal-first applet. */
         const val EXTRA_OPEN_PORTAL = "open_portal"

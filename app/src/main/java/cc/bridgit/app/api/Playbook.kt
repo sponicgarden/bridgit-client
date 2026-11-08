@@ -146,7 +146,7 @@ weeks) and `rules` act on those counts while you are offline. Full guide: ${Lear
 | A decision about a photo, screenshot, sound or video | `POST {team_base_url}/v1/clef` (Clef-omni) | Server: Cloudflare |
 | A decision about text plus up to 2 small images, from anywhere | `POST {team_base_url}/v1/jev` | Server: TypeSafe |
 
-`team_base_url` and your team key come from `GET /v1/feedback/team-key`; keep that key apart from your phone key.
+`team_base_url` and your team key come from `GET /v1/issues/team-key`; keep that key apart from your phone key.
 Watches read location, motion, steps, light, pressure, proximity, battery, phone context or a camera photo (not the mic).
 With a photo, a free change check on the phone skips the paid call while the picture stays the same: worked example
 in ${Learn.DECISIONS_URL} ("Free first").

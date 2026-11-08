@@ -22,31 +22,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import cc.bridgit.app.BridgeApp
 import cc.bridgit.app.R
-import cc.bridgit.app.databinding.FeedbackReportRowBinding
-import cc.bridgit.app.databinding.FragmentMyReportsBinding
+import cc.bridgit.app.databinding.FeedbackIssueRowBinding
+import cc.bridgit.app.databinding.FragmentMyIssuesBinding
 import cc.bridgit.app.feedback.FeedbackStatusSync
-import cc.bridgit.app.feedback.Report
-import cc.bridgit.app.feedback.ReportKind
-import cc.bridgit.app.feedback.ReportStatus
+import cc.bridgit.app.feedback.Issue
+import cc.bridgit.app.feedback.IssueKind
+import cc.bridgit.app.feedback.IssueStatus
 import cc.bridgit.app.feedback.StatusMachine
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 /**
- * My reports (FBK-09, UI-20, ui-spec 5.12): every report, newest first, with kind,
+ * My issues (FBK-09, UI-20, ui-spec 5.12): every issue, newest first, with kind,
  * first line, date, who last updated it and a status chip. Filters All · Bugs ·
  * Features · Open ("Open" = anything not yet confirmed closed).
  */
-class MyReportsFragment : Fragment() {
-    private var _b: FragmentMyReportsBinding? = null
+class MyIssuesFragment : Fragment() {
+    private var _b: FragmentMyIssuesBinding? = null
     private val b get() = _b!!
     private val app get() = requireActivity().application as BridgeApp
-    private val adapter = Adapter { r -> findNavController().navigate(R.id.reportDetail, bundleOf("reportId" to r.id)) }
-    private var all: List<Report> = emptyList()
+    private val adapter = Adapter { r -> findNavController().navigate(R.id.issueDetail, bundleOf("issueId" to r.id)) }
+    private var all: List<Issue> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, s: Bundle?): View {
-        _b = FragmentMyReportsBinding.inflate(inflater, container, false)
+        _b = FragmentMyIssuesBinding.inflate(inflater, container, false)
         return b.root
     }
 
@@ -59,8 +59,8 @@ class MyReportsFragment : Fragment() {
         b.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         b.list.adapter = adapter
         b.filters.setOnCheckedStateChangeListener { _, _ -> show() }
-        if (savedInstanceState == null) b.filters.check(if (arguments?.getString("reportKind") == ReportKind.FEATURE.id) R.id.filter_features else R.id.filter_bugs)
-        b.newReport.setOnClickListener { openReport(this, if (b.filters.checkedChipId == R.id.filter_features) ReportKind.FEATURE else ReportKind.BUG, "My reports") }
+        if (savedInstanceState == null) b.filters.check(if (arguments?.getString("issueKind") == IssueKind.FEATURE.id) R.id.filter_features else R.id.filter_bugs)
+        b.newReport.setOnClickListener { openReport(this, if (b.filters.checkedChipId == R.id.filter_features) IssueKind.FEATURE else IssueKind.BUG, "My issues") }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 app.feedback.changed.collect { load() }
@@ -81,9 +81,9 @@ class MyReportsFragment : Fragment() {
         val bb = _b ?: return
         bb.newReport.setText(if (bb.filters.checkedChipId == R.id.filter_features) R.string.feedback_menu_request_feature else R.string.feedback_menu_report_bug)
         val shown = when (bb.filters.checkedChipId) {
-            R.id.filter_bugs -> all.filter { it.kind == ReportKind.BUG }
-            R.id.filter_features -> all.filter { it.kind == ReportKind.FEATURE }
-            R.id.filter_open -> all.filter { it.status != ReportStatus.CONFIRMED }
+            R.id.filter_bugs -> all.filter { it.kind == IssueKind.BUG }
+            R.id.filter_features -> all.filter { it.kind == IssueKind.FEATURE }
+            R.id.filter_open -> all.filter { it.status != IssueStatus.CONFIRMED }
             else -> all
         }
         adapter.submitList(shown)
@@ -92,16 +92,16 @@ class MyReportsFragment : Fragment() {
         bb.list.isVisible = shown.isNotEmpty()
     }
 
-    private class Adapter(private val onClick: (Report) -> Unit) : ListAdapter<Report, Adapter.Holder>(DIFF) {
-        class Holder(val b: FeedbackReportRowBinding) : RecyclerView.ViewHolder(b.root)
+    private class Adapter(private val onClick: (Issue) -> Unit) : ListAdapter<Issue, Adapter.Holder>(DIFF) {
+        class Holder(val b: FeedbackIssueRowBinding) : RecyclerView.ViewHolder(b.root)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-            Holder(FeedbackReportRowBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            Holder(FeedbackIssueRowBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
         override fun onBindViewHolder(h: Holder, position: Int) {
             val r = getItem(position)
             val ctx = h.b.root.context
-            val bug = r.kind == ReportKind.BUG
+            val bug = r.kind == IssueKind.BUG
             h.b.icon.setImageResource(if (bug) R.drawable.feedback_ic_bug else R.drawable.feedback_ic_lightbulb)
             h.b.firstLine.text = r.firstLine
             val date = SimpleDateFormat("d MMM", Locale.getDefault()).format(Date(r.createdAt))
@@ -117,9 +117,9 @@ class MyReportsFragment : Fragment() {
         }
 
         companion object {
-            val DIFF = object : DiffUtil.ItemCallback<Report>() {
-                override fun areItemsTheSame(a: Report, b: Report) = a.id == b.id
-                override fun areContentsTheSame(a: Report, b: Report) =
+            val DIFF = object : DiffUtil.ItemCallback<Issue>() {
+                override fun areItemsTheSame(a: Issue, b: Issue) = a.id == b.id
+                override fun areContentsTheSame(a: Issue, b: Issue) =
                     a.status == b.status && a.updatedAt == b.updatedAt && a.description == b.description && a.lastBy == b.lastBy &&
                         a.remoteId == b.remoteId && a.upload == b.upload
             }

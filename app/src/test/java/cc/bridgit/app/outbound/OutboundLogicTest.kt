@@ -63,7 +63,7 @@ class OutboundLogicTest {
     @Test fun secretPathSegmentsAreHidden() {
         val e = build("https://hooks.example.com/services/T0123ABCD/B0456EFGH/abcdEFGHijklMNOP1234qrst")
         assertEquals("/services/T0123ABCD/B0456EFGH/[token]", e.path)
-        assertEquals("/v1/reports/42/history", build("https://bridgit-feedback.bridgit-app.workers.dev/v1/reports/42/history").path)
+        assertEquals("/v1/issues/42/history", build("https://bridgit-feedback.bridgit-app.workers.dev/v1/issues/42/history").path)
         assertEquals("/weatherapi/locationforecast/2.0/compact", build("https://api.met.no/weatherapi/locationforecast/2.0/compact").path)
     }
 
@@ -85,7 +85,7 @@ class OutboundLogicTest {
     @Test fun previewsAreCappedAndMediaSummarised() {
         val big = JSONObject().put("images", JSONArray().put(JSONObject().put("data_base64", "A".repeat(200_000))))
             .put("description", "x".repeat(5000)).put("rows", JSONArray((1..500).map { "row $it ".repeat(20) })).toString()
-        val e = build("https://bridgit-feedback.bridgit-app.workers.dev/v1/reports", body = big)
+        val e = build("https://bridgit-feedback.bridgit-app.workers.dev/v1/issues", body = big)
         assertTrue(e.requestPreview!!.length <= Redact.MAX_REQUEST_PREVIEW)
         assertTrue(e.requestPreview!!.contains("[200000 chars base64]"))
         assertEquals(big.length.toLong(), e.bytesSent)
@@ -134,9 +134,9 @@ class OutboundLogicTest {
         assertTrue(jev.service.contains("Jev"))
         for (c in listOf(Categories.AGENT_STATE, Categories.QUESTIONS, Categories.INSTALL_ID, Categories.BATTERY)) assertTrue(c, c in jev.categories)
         assertEquals("Claude", jev.agent); assertEquals("a1", jev.agentId)
-        val rep = build("https://bridgit-feedback.bridgit-app.workers.dev/v1/reports",
+        val rep = build("https://bridgit-feedback.bridgit-app.workers.dev/v1/issues",
             body = JSONObject().put("description", "broken").put("log", JSONArray()).put("images", JSONArray()).toString())
-        for (c in listOf(Categories.REPORT_TEXT, Categories.LOG_ENTRIES, Categories.IMAGE)) assertTrue(c, c in rep.categories)
+        for (c in listOf(Categories.ISSUE_TEXT, Categories.LOG_ENTRIES, Categories.IMAGE)) assertTrue(c, c in rep.categories)
     }
 
     @Test fun installRegistrationIsLabelled() {

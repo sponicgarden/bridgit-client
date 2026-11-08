@@ -78,7 +78,7 @@ object ErrorCatalog {
         Entry(429, "too_many_waits", "Too many open `wait` requests", "Close some waits"),
         Entry(502, "upstream_failed", "A service Bridgit asks on your behalf (MET Norway for weather) failed and nothing was cached (`service`, `upstream_status` or `reason`)", "Retry in a few minutes"),
         Entry(502, "callback_failed", "Your callback URL didn't accept the test event (`http_status` or `reason` field)", "Check the receiver; the owner sees the host in Activity"),
-        Entry(500, "internal_error", "Bridgit bug", "Report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md"),
+        Entry(500, "internal_error", "Bridgit bug", "File a bug report directly with Bridgit servers (Issues Tracking): https://bridgit.cc/learn/bugs.md"),
         Entry(503, "service_start_blocked", "Android hasn't given the service this sensor", "Ask the owner to open Bridgit once"),
         Entry(503, "model_not_ready", "An on-phone engine you named isn't downloaded yet (`engine`, `state`: downloading, waiting_for_wifi or failed, `size_mb`, `retry_after_s`); the request started the download", "Retry after retry_after_s; GET /v1/images/engines shows progress"),
         Entry(503, "team_unavailable", "The Bridgit team backend can't be reached", "Retry later, or register at the backend directly"),

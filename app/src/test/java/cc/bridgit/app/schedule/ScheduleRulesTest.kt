@@ -86,7 +86,7 @@ class ScheduleRulesTest {
         assertTrue(invalid("""{"actions":[{"id":"a","when":{"at":"2026-11-03T07:00"},"do":{"play":"s"},"bogus":1}]}""").contains("Unknown field"))
         assertTrue(invalid("""{"actions":[{"id":"a","when":{"at":"2026-11-03T07:00"},"do":{"call":"POST /v1/camera/snapshot"},"send_to":{"url":"https://e.com","headers":{"Host":"x"}}}]}""").contains("isn't allowed"))
         assertTrue(invalid("""{"actions":[{"id":"a","when":{"at":"2026-11-03T07:00"},"do":{"play":"s"}},{"id":"a","when":{"at":"2026-11-03T07:00"},"do":{"play":"s"}}]}""").contains("unique"))
-        val blocked = try { parse("""{"actions":[{"id":"a","when":{"at":"2026-11-03T07:00"},"do":{"call":"GET /v1/feedback"}}]}""") { _, _ -> "Not schedulable." }; null } catch (e: ScheduleRules.Invalid) { e.message }
+        val blocked = try { parse("""{"actions":[{"id":"a","when":{"at":"2026-11-03T07:00"},"do":{"call":"GET /v1/issues"}}]}""") { _, _ -> "Not schedulable." }; null } catch (e: ScheduleRules.Invalid) { e.message }
         assertTrue(blocked!!.contains("Not schedulable."))
     }
 

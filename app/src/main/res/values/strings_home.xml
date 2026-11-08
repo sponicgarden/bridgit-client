@@ -136,7 +136,7 @@
     <string name="more_about">About</string>
     <string name="more_report_bug">Report a bug</string>
     <string name="more_request_feature">Request a feature</string>
-    <string name="more_my_reports">My reports</string>
+    <string name="more_my_issues">My issues</string>
     <string name="more_check_updates">Check for updates</string>
     <string name="more_about_title">Bridgit: Agentic Android Device Bridge</string>
     <string name="more_about_body">Version %1$s (%2$s)\nCommit %3$s\n\nSource code: github.com/sponicgarden/bridgit-client</string>
@@ -266,6 +266,6 @@
     <string name="home_status_named">%1$s · %2$s</string>
     <string name="home_status_position">%1$s of %2$s</string>
     <string name="more_linked_metrics">Linked devices · %1$d enabled · %2$d disabled</string>
-    <string name="more_report_metrics">%1$d filed · %2$d fixed</string>
-    <string name="more_report_metrics_cd">%1$s: %2$d filed, %3$d fixed. View reports.</string>
+    <string name="more_issue_metrics">%1$d filed · %2$d fixed</string>
+    <string name="more_issue_metrics_cd">%1$s: %2$d filed, %3$d fixed. View reports.</string>
 </resources>

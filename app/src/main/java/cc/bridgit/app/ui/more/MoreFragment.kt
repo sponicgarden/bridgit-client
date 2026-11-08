@@ -31,7 +31,7 @@ import cc.bridgit.app.ui.home.UiActions
 import cc.bridgit.app.capability.appVersion
 import cc.bridgit.app.databinding.FragmentMoreBinding
 import cc.bridgit.app.databinding.MoreRowBinding
-import cc.bridgit.app.feedback.ReportKind
+import cc.bridgit.app.feedback.IssueKind
 import cc.bridgit.app.ui.feedback.openReport
 import cc.bridgit.app.update.UpdateDialog
 
@@ -74,10 +74,10 @@ class MoreFragment : Fragment() {
         else b.linkWebView.root.isVisible = false
         row(b.settings, R.drawable.ic_settings, R.string.more_settings) { findNavController().navigate(R.id.settings) }
         row(b.reportBug, R.drawable.feedback_ic_bug, R.string.more_report_bug) {
-            openReport(this, ReportKind.BUG, "More")
+            openReport(this, IssueKind.BUG, "More")
         }
         row(b.requestFeature, R.drawable.feedback_ic_lightbulb, R.string.more_request_feature) {
-            openReport(this, ReportKind.FEATURE, "More")
+            openReport(this, IssueKind.FEATURE, "More")
         }
         row(b.checkUpdates, R.drawable.ic_download, R.string.more_check_updates) {
             UpdateDialog.checkForUpdates(requireActivity(), manual = true)
@@ -86,9 +86,9 @@ class MoreFragment : Fragment() {
         b.checkUpdates.title.text = withVersion(getString(R.string.more_check_updates))
         row(b.automatedContext, R.drawable.ic_mode_custom, R.string.automated_context) { startActivity(android.content.Intent(requireContext(), cc.bridgit.app.context.ContextActivity::class.java)) }
         row(b.about, R.drawable.ic_info, R.string.more_about) { showAbout() }
-        for ((row, kind) in listOf(b.reportBug to ReportKind.BUG, b.requestFeature to ReportKind.FEATURE)) {
+        for ((row, kind) in listOf(b.reportBug to IssueKind.BUG, b.requestFeature to IssueKind.FEATURE)) {
             row.metrics.isVisible = true
-            row.metrics.setOnClickListener { findNavController().navigate(R.id.myReports, androidx.core.os.bundleOf("reportKind" to kind.id)) }
+            row.metrics.setOnClickListener { findNavController().navigate(R.id.myIssues, androidx.core.os.bundleOf("issueKind" to kind.id)) }
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -171,11 +171,11 @@ class MoreFragment : Fragment() {
 
     private suspend fun refreshSummaries() {
         val app = requireActivity().application as BridgeApp
-        val summaries = withContext(Dispatchers.IO) { listOf(ReportKind.BUG, ReportKind.FEATURE).map { app.feedback.summary(it) } }
+        val summaries = withContext(Dispatchers.IO) { listOf(IssueKind.BUG, IssueKind.FEATURE).map { app.feedback.summary(it) } }
         val bb = _b ?: return
         for ((row, counts) in listOf(bb.reportBug to summaries[0], bb.requestFeature to summaries[1])) {
-            row.metrics.text = getString(R.string.more_report_metrics, counts.first, counts.second)
-            row.metrics.contentDescription = getString(R.string.more_report_metrics_cd, row.title.text, counts.first, counts.second)
+            row.metrics.text = getString(R.string.more_issue_metrics, counts.first, counts.second)
+            row.metrics.contentDescription = getString(R.string.more_issue_metrics_cd, row.title.text, counts.first, counts.second)
         }
         val hubInfo = app.hubLinks.hubs().associateBy { it.linkId }
         val counts = LinkedDeviceCounts.count(

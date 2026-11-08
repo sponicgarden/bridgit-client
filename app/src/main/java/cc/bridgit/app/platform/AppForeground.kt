@@ -58,7 +58,7 @@ class AppForeground(private val app: BridgeApp) {
 
     private fun target(agent: String, args: JSONObject): Pair<String,String> {
         val t=args.optJSONObject("target") ?: return "app" to ""
-        val type=t.getString("type"); val id=t.getString("id")
+        val type=t.getString("type"); val id=t.getString("id").let { if(type=="screen") LEGACY_SCREENS[it] ?: it else it }
         if(type=="screen") {
             if(id !in SCREENS) throw ApiError(404,"not_found","Unknown screen; read app.foreground.targets")
         } else if(type=="card") {
@@ -165,8 +165,10 @@ class AppForeground(private val app: BridgeApp) {
         val SCREENS = linkedMapOf("home" to R.id.home, "inbox" to R.id.interactions, "agents" to R.id.agents,
             "activity" to R.id.activity, "more" to R.id.more, "settings" to R.id.settings,
             "features" to R.id.features, "network_devices" to R.id.networkDevices,
-            "cameras" to R.id.cameras, "reports" to R.id.myReports, "pet_monitor" to R.id.dogMonitor, "city_tour" to R.id.tour,
+            "cameras" to R.id.cameras, "issues" to R.id.myIssues, "pet_monitor" to R.id.dogMonitor, "city_tour" to R.id.tour,
             DEVICE_DIAGNOSTICS to R.id.home, NETWORK_DIAGNOSTICS to R.id.networkDevices)
+        /** Screen ids from before a rename, still accepted: "reports" is My issues (Issues Tracking, 8 Nov 2026). */
+        val LEGACY_SCREENS = mapOf("reports" to "issues")
         const val DEVICE_DIAGNOSTICS = "device_diagnostics"
         const val NETWORK_DIAGNOSTICS = "network_diagnostics"
         /** User, 7 Nov 2026: "Device Diagnostics" and "Network Diagnostics" (were Level 1 and Level 2) in the app and APIs. */

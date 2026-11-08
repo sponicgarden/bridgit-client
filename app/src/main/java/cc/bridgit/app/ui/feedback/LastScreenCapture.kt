@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import cc.bridgit.app.R
-import cc.bridgit.app.feedback.ReportKind
+import cc.bridgit.app.feedback.IssueKind
 import cc.bridgit.app.feedback.bitmapToDownscaledJpeg
 import kotlin.coroutines.resume
 import kotlin.math.max
@@ -159,7 +159,7 @@ private var launching = false
  */
 fun openReport(
     fragment: Fragment,
-    kind: ReportKind,
+    kind: IssueKind,
     screen: String,
     screenContext: String? = null,
     logEntryId: Long = -1,

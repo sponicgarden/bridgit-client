@@ -176,8 +176,8 @@
     <string name="tools_jev_detail">Yes/no and pick-one decisions, via Bridgit</string>
     <string name="tools_clef">Clef by Cloudflare</string>
     <string name="tools_clef_detail">Workers AI decisions on photos, sound and video, via Bridgit</string>
-    <string name="tools_reports">Bug reports</string>
-    <string name="tools_reports_detail">Sends reports to the Bridgit team</string>
+    <string name="tools_issues">Bug reports</string>
+    <string name="tools_issues_detail">Sends reports to the Bridgit team</string>
     <string name="tools_relay">Relay</string>
     <string name="tools_relay_detail">Reaches control agents off Tailscale</string>
     <string name="tools_watch">Remote view</string>

@@ -9,7 +9,7 @@ import java.util.Locale
 
 /** A derived search index, never a second endpoint registry or a device inventory. */
 object CapabilityCatalog {
-    const val DOCUMENTATION_REVISION = 111
+    const val DOCUMENTATION_REVISION = 112
     const val URL = "https://bridgit.cc/learn/catalog.json"
     const val INDEX_URL = "https://bridgit.cc/learn/catalog-index.json"
     const val START_URL = "https://bridgit.cc/learn/start.md"
@@ -55,7 +55,7 @@ object CapabilityCatalog {
         "v1.context" to ("Read saved facts and temporary place, night and time zone" to "context home work retail vacation night timezone"),
         "v1.controls" to ("Do Not Disturb, volume, brightness and battery saver, with undo" to "dnd volume brightness quiet"),
         "v1.downloads" to ("Read and delete files the owner downloaded for you" to "downloads files transfer"),
-        "v1.feedback" to ("File bug reports and feature requests with the Bridgit team" to "bug report feature request"),
+        "v1.feedback" to ("Issues Tracking: file bug reports and feature requests with the Bridgit team" to "issue bug report feature request"),
         "v1.files" to ("Send files to the phone and read files sent to you" to "files transfer upload send"),
         "v1.find_crop" to ("Find things in a photo, outline them, crop or zoom to them, or inventory and price them" to "find crop zoom box locate detect face dog object outline polygon mask cutout segment on-device offline engine florence mobilesam appraise inventory insurance price value brand"),
         "v1.flashlight" to ("Turn the torch on with an automatic off timer" to "flashlight torch light signal"),

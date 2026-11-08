@@ -1,6 +1,6 @@
 {
- "documentation_revision": 111,
- "api_revision": 133,
+ "documentation_revision": 112,
+ "api_revision": 134,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read an existing applet JPEG using a photo URL from data; never captures a new photo. Control agents can read all saved applet photos; other principals only photos linked in accessible tables",

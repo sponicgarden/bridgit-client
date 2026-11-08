@@ -149,7 +149,7 @@ object WhatCanData {
         "Control agent notes" to listOf("POST /v1/log"),
         "The API explains itself" to listOf("GET /v1/guide", "GET /v1/openapi.json", "GET /v1/capabilities"),
         "Control agents learn what's new" to listOf("GET /v1/changes"),
-        "Report a bug or ask for a feature" to listOf("GET /v1/feedback", "GET /v1/feedback/{id}", "POST /v1/feedback/{id}/status", "POST /v1/feedback", "GET /v1/feedback/team-key"),
+        "Report a bug or ask for a feature" to listOf("GET /v1/issues", "GET /v1/issues/{id}", "POST /v1/issues/{id}/status", "POST /v1/issues", "GET /v1/issues/team-key"),
         "You stay in control" to listOf("GET /v1/capabilities"),
         "Questions and notices to you" to listOf("POST /v1/interactions", "GET /v1/interactions", "GET /v1/interactions/{id}", "DELETE /v1/interactions/{id}", "POST /v1/interactions/{id}/renotify", "GET /v1/events"),
         "Events and callbacks" to listOf("GET /v1/events", "POST /v1/callback/test"),

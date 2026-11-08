@@ -19,7 +19,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
 
-/** What a report carries automatically (FBK-06, FBK-04 item 7). */
+/** What an issue carries automatically (FBK-06, FBK-04 item 7). */
 object FeedbackContext {
     /**
      * [screen] is the screen the owner was on ("Activity"), [screenContext] a short hint
@@ -96,14 +96,14 @@ object FeedbackContext {
     }
 
     /**
-     * Who filed an agent report (FBK-14, owner request 2 Nov 2026): the agent record, what it reported
+     * Who filed an agent issue (FBK-14, owner request 2 Nov 2026): the agent record, what it reported
      * through POST /v1/me (AGT-16), its User-Agent, and anything it adds in `agent_info`. All but the
      * record is the agent's own word, unverified.
      */
     fun agentInfo(app: BridgeApp, agentId: String, userAgent: String?, extra: JSONObject?): JSONObject {
         val a = app.agents.get(agentId)
         val o = JSONObject()
-            .put("id", agentId) // FBK-15: the phone agent id links the report to the agent's team key exactly
+            .put("id", agentId) // FBK-15: the phone agent id links the issue to the agent's team key exactly
             .put("name", a?.name ?: JSONObject.NULL).put("connection", a?.connection?.id ?: JSONObject.NULL)
             .put("developer", a?.fixer ?: false) // the backend's name for Fixer Mode
             .put("fixer_mode", a?.fixer ?: false).put("super_powers", a?.superPowers ?: false)
@@ -136,7 +136,7 @@ object FeedbackContext {
 }
 
 /**
- * Tells the owner when a developer agent marks a report fixed / won't fix / duplicate
+ * Tells the owner when a developer agent marks an issue fixed / won't fix / duplicate
  * (FBK-11), with Confirm and Still broken actions (Spotka's verify step).
  */
 object FeedbackNotifier {
@@ -149,15 +149,15 @@ object FeedbackNotifier {
                 .apply { description = ctx.getString(R.string.channel_feedback_desc) })
     }
 
-    fun statusChanged(ctx: Context, r: Report) {
+    fun statusChanged(ctx: Context, r: Issue) {
         val nm = ctx.getSystemService(NotificationManager::class.java)
         val notifId = 5000 + r.id.toInt()
         if (!StatusMachine.notifiesOwner(r.status)) { nm.cancel(notifId); return }
-        fun action(to: ReportStatus, code: Int) = PendingIntent.getBroadcast(ctx, notifId * 10 + code,
+        fun action(to: IssueStatus, code: Int) = PendingIntent.getBroadcast(ctx, notifId * 10 + code,
             Intent(ctx, FeedbackActionReceiver::class.java).setAction(ACTION).putExtra("id", r.id).putExtra("to", to.id),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val open = PendingIntent.getActivity(ctx, notifId, Intent(ctx, MainActivity::class.java)
-            .putExtra(MainActivity.EXTRA_REPORT_ID, r.id).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            .putExtra(MainActivity.EXTRA_ISSUE_ID, r.id).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val title = ctx.getString(R.string.feedback_notif_title, r.number, StatusMachine.label(r.status).substringBefore(" —").lowercase())
         nm.notify(notifId, NotificationCompat.Builder(ctx, CHANNEL)
@@ -165,8 +165,8 @@ object FeedbackNotifier {
             .setContentTitle(title)
             .setContentText(r.history.lastOrNull()?.note ?: r.firstLine)
             .setContentIntent(open).setAutoCancel(true)
-            .addAction(0, ctx.getString(R.string.feedback_confirm), action(ReportStatus.CONFIRMED, 1))
-            .addAction(0, ctx.getString(R.string.feedback_still_broken), action(ReportStatus.REOPENED, 2))
+            .addAction(0, ctx.getString(R.string.feedback_confirm), action(IssueStatus.CONFIRMED, 1))
+            .addAction(0, ctx.getString(R.string.feedback_still_broken), action(IssueStatus.REOPENED, 2))
             .build())
     }
 }
@@ -177,10 +177,10 @@ class FeedbackActionReceiver : BroadcastReceiver() {
         if (intent.action != FeedbackNotifier.ACTION) return
         val app = context.applicationContext as BridgeApp
         val id = intent.getLongExtra("id", -1)
-        val to = ReportStatus.of(intent.getStringExtra("to")) ?: return
+        val to = IssueStatus.of(intent.getStringExtra("to")) ?: return
         runCatching {
             val r = app.feedback.move(id, to, Actor.OWNER, "owner", null)
-            app.log.system("audit", "feedback", "You marked report ${r.number} ${if (to == ReportStatus.CONFIRMED) "confirmed" else "still broken"}")
+            app.log.system("audit", "feedback", "You marked report ${r.number} ${if (to == IssueStatus.CONFIRMED) "confirmed" else "still broken"}")
         }
         context.getSystemService(NotificationManager::class.java).cancel(5000 + id.toInt())
     }

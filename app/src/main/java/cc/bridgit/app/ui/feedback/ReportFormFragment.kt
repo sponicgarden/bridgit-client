@@ -35,7 +35,7 @@ import cc.bridgit.app.R
 import cc.bridgit.app.databinding.FeedbackThumbBinding
 import cc.bridgit.app.databinding.FragmentReportFormBinding
 import cc.bridgit.app.feedback.FeedbackLimits
-import cc.bridgit.app.feedback.ReportKind
+import cc.bridgit.app.feedback.IssueKind
 import cc.bridgit.app.feedback.loadDownscaledJpeg
 import cc.bridgit.app.ui.common.dp
 
@@ -70,7 +70,7 @@ class ReportFormFragment : Fragment() {
         if (!vm.initialized) {
             vm.initialized = true
             // After process death the restored text belongs to the kind that was showing, not the arg's.
-            vm.kind = ReportKind.of(savedInstanceState?.getString(K_KIND) ?: arguments?.getString("kind")) ?: ReportKind.BUG
+            vm.kind = IssueKind.of(savedInstanceState?.getString(K_KIND) ?: arguments?.getString("kind")) ?: IssueKind.BUG
             vm.lastScreen = ReportCaptureHolder.take()
             vm.includeLastScreen = vm.lastScreen != null
         }
@@ -130,7 +130,7 @@ class ReportFormFragment : Fragment() {
         }
         b.type.addOnButtonCheckedListener { _, id, checked ->
             if (binding || !checked) return@addOnButtonCheckedListener
-            val k = if (id == R.id.type_feature) ReportKind.FEATURE else ReportKind.BUG
+            val k = if (id == R.id.type_feature) IssueKind.FEATURE else IssueKind.BUG
             if (k == vm.kind) return@addOnButtonCheckedListener
             saveDraft()          // keep this kind's draft …
             vm.kind = k
@@ -197,7 +197,7 @@ class ReportFormFragment : Fragment() {
     private fun render() {
         val bb = _b ?: return
         binding = true
-        val bug = vm.kind == ReportKind.BUG
+        val bug = vm.kind == IssueKind.BUG
         val submitting = vm.submitting.value
         bb.toolbar.title = getString(if (bug) R.string.feedback_title_bug else R.string.feedback_title_feature)
         bb.intro.setText(if (bug) R.string.feedback_intro_bug else R.string.feedback_intro_feature)
@@ -314,7 +314,7 @@ class ReportFormFragment : Fragment() {
         vm.error = null
         requireContext().getSystemService(InputMethodManager::class.java)?.hideSoftInputFromWindow(b.description.windowToken, 0)
         b.description.clearFocus()
-        vm.submit(app, vm.kind, text, vm.kind == ReportKind.BUG && !b.noAutofix.isChecked, screen, screenContext, logEntryId)
+        vm.submit(app, vm.kind, text, vm.kind == IssueKind.BUG && !b.noAutofix.isChecked, screen, screenContext, logEntryId)
     }
 
     private fun onOutcome(o: ReportFormViewModel.Outcome) {
@@ -322,8 +322,8 @@ class ReportFormFragment : Fragment() {
             is ReportFormViewModel.Outcome.Failed -> { vm.consumeOutcome(); showError(o.message) }
             is ReportFormViewModel.Outcome.Saved -> {
                 val message = when {
-                    o.report.ref != null -> getString(R.string.feedback_saved_body_sent, o.report.ref)
-                    o.report.upload == cc.bridgit.app.feedback.UploadState.PENDING -> getString(R.string.feedback_saved_body)
+                    o.issue.ref != null -> getString(R.string.feedback_saved_body_sent, o.issue.ref)
+                    o.issue.upload == cc.bridgit.app.feedback.UploadState.PENDING -> getString(R.string.feedback_saved_body)
                     else -> getString(R.string.feedback_saved_body_local)
                 }
                 // The team number arrives a few seconds after the save: update the open dialog.
@@ -338,7 +338,7 @@ class ReportFormFragment : Fragment() {
                     .setPositiveButton(R.string.ok) { _, _ -> vm.consumeOutcome(); findNavController().popBackStack() }
                 if (BuildConfig.DEBUG) builder.setNeutralButton(R.string.feedback_view_report) { _, _ ->
                     vm.consumeOutcome()
-                    findNavController().navigate(R.id.reportDetail, bundleOf("reportId" to o.report.id),
+                    findNavController().navigate(R.id.issueDetail, bundleOf("issueId" to o.issue.id),
                         NavOptions.Builder().setPopUpTo(R.id.reportForm, true).build())
                 }
                 dialog = builder.show()

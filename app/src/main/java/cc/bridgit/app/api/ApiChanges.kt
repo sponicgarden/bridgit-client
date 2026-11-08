@@ -613,6 +613,11 @@ object ApiChanges {
             Item("Camera photos and arm work while the phone is locked; with the owner-only captures.locked_camera_approval on, a locked photo first waits up to 30 s for the owner's Allow on the lock screen (approval_declined, reason declined or no_answer)", "/v1/camera/snapshot"),
             Item("captures.locked_camera_approval: read in GET /v1/settings, set by owner configuration agents with POST /v1/owner/configuration/settings", "/v1/owner/configuration/settings"),
         )),
+        Revision(134, "1.8.0", "2026-11-08", listOf(
+            Item("Bug reports are now Issues Tracking: /v1/issues, /v1/issues/{id}, /v1/issues/{id}/status, /v1/issues/{id}/followup and /v1/issues/team-key (MCP issues_list, issues_get, issues_status, issues_followup, issues_file, issues_team_key); the list key is issues. /v1/feedback… still answers as a deprecated alias with the old keys", "/v1/issues"),
+            Item("Team backend: file and follow issues at /v1/agent/issues (client_issue_id)", "/v1/issues/team-key"),
+            Item("links.issues is the issue list; links.feedback is deprecated", null),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }
@@ -630,7 +635,7 @@ object ApiChanges {
 
     /** Where an agent learns the current API (API-09). */
     fun links(): JSONObject = JSONObject().put("guide", "/v1/guide").put("demo", "/v1/demo").put("openapi", "/v1/openapi.json")
-        .put("services", "/v1/services").put("discover", "/v1/discover").put("start", "/v1/start").put("starter", CapabilityCatalog.START_URL).put("catalog", CapabilityCatalog.INDEX_URL).put("catalog_bulk_export", CapabilityCatalog.URL).put("capabilities", "/v1/capabilities").put("changes", "/v1/changes").put("samples", "/v1/samples").put("feedback", "/v1/feedback")
+        .put("services", "/v1/services").put("discover", "/v1/discover").put("start", "/v1/start").put("starter", CapabilityCatalog.START_URL).put("catalog", CapabilityCatalog.INDEX_URL).put("catalog_bulk_export", CapabilityCatalog.URL).put("capabilities", "/v1/capabilities").put("changes", "/v1/changes").put("samples", "/v1/samples").put("issues", "/v1/issues").put("feedback", "/v1/feedback")
         .put("applet_practices", "/v1/applets/practices").put("owner_features", "/v1/owner/features").put("resources", "/v1/resources").put("control_capabilities", "/v2/capabilities").put("learn", Learn.INDEX_URL).put("llms_txt", Learn.LLMS_URL)
 
     /** health's "whats_new": null when the agent is up to date. */

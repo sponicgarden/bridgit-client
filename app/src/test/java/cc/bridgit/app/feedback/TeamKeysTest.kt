@@ -29,26 +29,40 @@ class TeamKeysTest {
             .put("docs", "https://b.example/v1/agent").put("role", "reporter").toString()).commit()
 
     @Test fun endpointIsListedForAnyAgentAndIsAnMcpTool() {
-        val e = Endpoints.FEEDBACK_TEAM_KEY
+        val e = Endpoints.ISSUES_TEAM_KEY
         assertTrue(e in Endpoints.all)
         assertFalse(e.privileged)
-        assertEquals("/v1/feedback/team-key", e.fullPath)
-        assertEquals("feedback_team_key", McpTools.name(e))
+        assertEquals("/v1/issues/team-key", e.fullPath)
+        assertEquals("issues_team_key", McpTools.name(e))
         assertTrue(FeedbackModule(app).endpoints.contains(e))
     }
 
+    /** Issues Tracking rename: the old /v1/feedback addresses still answer, but only the issues_* names are MCP tools. */
+    @Test fun preRenameFeedbackAddressesStayAsAliasesWithoutTools() {
+        assertEquals("/v1/feedback/team-key", Endpoints.FEEDBACK_TEAM_KEY.fullPath)
+        for (old in Endpoints.FEEDBACK_LEGACY) {
+            assertTrue(old.fullPath, old in Endpoints.all && FeedbackModule(app).endpoints.contains(old))
+            assertTrue(old.fullPath, old.summary.startsWith("Deprecated"))
+            assertFalse(old.fullPath, old in McpTools.specs)
+        }
+        assertEquals(listOf("issues_file", "issues_followup", "issues_get", "issues_list", "issues_status", "issues_team_key"),
+            McpTools.specs.filter { it.capability == "feedback" }.map { McpTools.name(it) }.sorted())
+    }
+
     @Test fun firstMatchRoutersPickTeamKeyNotReportId() {
-        val call = cc.bridgit.app.interact.CardActions.parse("""{"path":"/v1/feedback/team-key"}""")
-        assertEquals(Endpoints.FEEDBACK_TEAM_KEY, cc.bridgit.app.interact.CardActions.match(Endpoints.all, call).first)
-        assertEquals(Endpoints.FEEDBACK_TEAM_KEY, cc.bridgit.app.interact.CardActions.match(FeedbackModule(app).endpoints, call).first)
+        val call = cc.bridgit.app.interact.CardActions.parse("""{"path":"/v1/issues/team-key"}""")
+        assertEquals(Endpoints.ISSUES_TEAM_KEY, cc.bridgit.app.interact.CardActions.match(Endpoints.all, call).first)
+        assertEquals(Endpoints.ISSUES_TEAM_KEY, cc.bridgit.app.interact.CardActions.match(FeedbackModule(app).endpoints, call).first)
+        val old = cc.bridgit.app.interact.CardActions.parse("""{"path":"/v1/feedback/team-key"}""")
+        assertEquals(Endpoints.FEEDBACK_TEAM_KEY, cc.bridgit.app.interact.CardActions.match(Endpoints.all, old).first)
     }
 
     @Test fun revisionAndPostDescriptionAskForEveryReport() {
-        val latest = ApiChanges.revisions.first { r -> r.items.any { it.endpoint == TeamKeys.KEY_ENDPOINT } }
+        val latest = ApiChanges.revisions.first { r -> r.items.any { it.endpoint == Endpoints.FEEDBACK_TEAM_KEY.fullPath } }
         assertEquals(26, latest.revision) // its own revision; later ones may follow
         assertTrue(latest.items.any { it.what.contains("every bug and every feature request") })
-        assertTrue(Endpoints.FEEDBACK_POST.summary.contains("every bug and every feature request"))
-        assertTrue(Endpoints.FEEDBACK_POST.returns.contains("team_api"))
+        assertTrue(Endpoints.ISSUES_POST.summary.contains("every bug and every feature request"))
+        assertTrue(Endpoints.ISSUES_POST.returns.contains("team_api"))
     }
 
     @Test fun mintBodyCarriesWhoTheAgentIs() {
@@ -94,7 +108,7 @@ class TeamKeysTest {
 
     @Test fun teamApiPointsAtTheKeyEndpointAndDocs() {
         val t = TeamKeys.teamApi()
-        assertEquals("/v1/feedback/team-key", t.getString("key_endpoint"))
+        assertEquals("/v1/issues/team-key", t.getString("key_endpoint"))
         assertTrue(t.getString("docs").endsWith("/v1/agent"))
         assertTrue(TeamKeys.howTo("https://b.example").any { it.contains("/verify") })
     }

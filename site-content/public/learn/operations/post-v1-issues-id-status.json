@@ -1,0 +1,65 @@
+{
+ "documentation_revision": 112,
+ "api_revision": 134,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Move an issue: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "issues_status",
+  "query": [],
+  "control_scope": null,
+  "developer_only": true,
+  "capture": false,
+  "body": [
+   {
+    "name": "status",
+    "description": "in_progress, fixed, wont_fix or duplicate",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "note",
+    "description": "Short note shown to the owner, e.g. \"Fix in PR #412\" (500 chars)",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/issues/7/status {\"status\":\"in_progress\",\"note\":\"Looking at it\"}",
+  "idempotent": true,
+  "path": "/v1/issues/{id}/status",
+  "capability": "feedback",
+  "returns": "the issue summary",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "note": {
+     "description": "Short note shown to the owner, e.g. \"Fix in PR #412\" (500 chars)",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/issues/{id}/status",
+     "type": "string"
+    },
+    "status": {
+     "description": "in_progress, fixed, wont_fix or duplicate",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "status"
+   ]
+  },
+  "errors": [
+   "forbidden",
+   "not_found",
+   "invalid_parameter"
+  ],
+  "requires": "fixer_mode"
+ }
+}

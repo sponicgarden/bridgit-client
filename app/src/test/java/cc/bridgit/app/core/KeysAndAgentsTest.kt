@@ -168,10 +168,11 @@ class KeysAndAgentsTest {
 
     @Test fun eachPrivilegedEndpointAsksForTheRightPower() {
         val needs = cc.bridgit.app.api.Endpoints.all.filter { it.privileged }.associate { "${it.method} ${it.path}" to it.power }
-        assertEquals(Power.FIXER, needs["POST /feedback/{id}/status"])
-        // Reading your own reports and following up need nothing.
-        assertNull(cc.bridgit.app.api.Endpoints.FEEDBACK_LIST.power)
-        assertNull(cc.bridgit.app.api.Endpoints.FEEDBACK_FOLLOWUP.power)
+        assertEquals(Power.FIXER, needs["POST /issues/{id}/status"])
+        assertEquals(Power.FIXER, needs["POST /feedback/{id}/status"]) // the pre-rename alias
+        // Reading your own issues and following up need nothing.
+        assertNull(cc.bridgit.app.api.Endpoints.ISSUES_LIST.power)
+        assertNull(cc.bridgit.app.api.Endpoints.ISSUES_FOLLOWUP.power)
         assertEquals(Power.SUPER, cc.bridgit.app.adb.AdbModule.SHELL.power)
         assertEquals(Power.SUPER, cc.bridgit.app.adb.AdbModule.GRANT.power)
         assertEquals(setOf("fixer_mode_off", "super_powers_off"), Power.values().map { it.reason }.toSet())

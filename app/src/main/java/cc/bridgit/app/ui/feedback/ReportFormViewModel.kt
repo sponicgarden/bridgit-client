@@ -18,8 +18,8 @@ import cc.bridgit.app.capability.isoAt
 import cc.bridgit.app.feedback.FeedbackContext
 import cc.bridgit.app.feedback.FeedbackError
 import cc.bridgit.app.feedback.FeedbackLimits
-import cc.bridgit.app.feedback.Report
-import cc.bridgit.app.feedback.ReportKind
+import cc.bridgit.app.feedback.Issue
+import cc.bridgit.app.feedback.IssueKind
 import cc.bridgit.app.feedback.UploadState
 import cc.bridgit.app.feedback.loadDownscaledJpeg
 import org.json.JSONArray
@@ -32,12 +32,12 @@ class ReportFormViewModel : ViewModel() {
     class Picked(val id: Long, val jpeg: ByteArray, val thumb: Bitmap?)
 
     sealed class Outcome {
-        data class Saved(val report: Report) : Outcome()
+        data class Saved(val issue: Issue) : Outcome()
         data class Failed(val message: String) : Outcome()
     }
 
     var initialized = false
-    lateinit var kind: ReportKind
+    lateinit var kind: IssueKind
     var lastScreen: ByteArray? = null
     var lastScreenThumb: Bitmap? = null
     var includeLastScreen = false
@@ -57,7 +57,7 @@ class ReportFormViewModel : ViewModel() {
     fun consumeOutcome() { _outcome.value = null }
 
     /**
-     * The upload worker usually sends a new report within seconds. Until it does, the Report saved
+     * The upload worker usually sends a new issue within seconds. Until it does, the Issue saved
      * dialog says "not sent yet"; once the Bridgit team has it, the dialog shows its number (M0042).
      */
     private suspend fun awaitTeamNumber(app: BridgeApp, id: Long) {
@@ -66,7 +66,7 @@ class ReportFormViewModel : ViewModel() {
             withContext(Dispatchers.IO) { app.feedback.get(id) }
         } ?: return
         val shown = _outcome.value
-        if (shown is Outcome.Saved && shown.report.id == id) _outcome.value = Outcome.Saved(sent)
+        if (shown is Outcome.Saved && shown.issue.id == id) _outcome.value = Outcome.Saved(sent)
     }
 
     private companion object { const val AWAIT_TEAM_MS = 30_000L }
@@ -111,16 +111,16 @@ class ReportFormViewModel : ViewModel() {
 
     fun attachedCount() = (picked.size + if (includeLastScreen && lastScreen != null) 1 else 0).coerceAtMost(FeedbackLimits.MAX_IMAGES)
 
-    fun submit(app: BridgeApp, kind: ReportKind, text: String, noAutofix: Boolean, screen: String?, screenContext: String?, logEntryId: Long) {
+    fun submit(app: BridgeApp, kind: IssueKind, text: String, noAutofix: Boolean, screen: String?, screenContext: String?, logEntryId: Long) {
         if (_submitting.value) return
         _submitting.value = true
         // Snapshot before the suspend so a toggle mid-save can't change what is sent.
         val images = images()
         val withLog = includeLog
         viewModelScope.launch {
-            var saved: Report? = null
+            var saved: Issue? = null
             try {
-                val report = withContext(Dispatchers.IO) {
+                val issue = withContext(Dispatchers.IO) {
                     val ctx = FeedbackContext.build(app, screen, screenContext, "form")
                     if (logEntryId >= 0) ctx.put("log_entry_id", logEntryId)
                     val log = if (!withLog) JSONArray() else {
@@ -134,14 +134,14 @@ class ReportFormViewModel : ViewModel() {
                     }
                     app.feedback.create(kind, text, noAutofix, images, log, ctx, "form").also {
                         app.log.system("audit", "feedback", app.getString(
-                            if (kind == ReportKind.BUG) R.string.feedback_filed_log_bug else R.string.feedback_filed_log_feature))
+                            if (kind == IssueKind.BUG) R.string.feedback_filed_log_bug else R.string.feedback_filed_log_feature))
                         FeedbackDrafts(app).clear(kind)
                     }
                 }
                 picked.clear()
                 error = null
-                _outcome.value = Outcome.Saved(report)
-                saved = report
+                _outcome.value = Outcome.Saved(issue)
+                saved = issue
             } catch (e: FeedbackError) {
                 _outcome.value = Outcome.Failed(
                     if (e.code == "rate_limited") app.getString(R.string.feedback_rate_limited)

@@ -89,7 +89,7 @@ object ActivityRows {
             ep.endsWith("/pair") || e.kind == "pairing" -> Kind.PAIR
             ep.contains("/speaker") || ep.contains("/ring") -> Kind.SPEAKER
             ep.contains("/flashlight") || ep.contains("/torch") -> Kind.LIGHT
-            ep.contains("/feedback") -> Kind.FEEDBACK
+            ep.contains("/feedback") || ep.startsWith("/v1/issues") -> Kind.FEEDBACK
             isPoll(e) -> Kind.WAIT
             else -> Kind.OTHER
         }

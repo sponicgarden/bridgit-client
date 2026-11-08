@@ -23,9 +23,9 @@ class InstallAuthTest {
     }
 
     @Test fun signingTextIsFixedLayout() {
-        val text = InstallAuth.signingText("bgi_x", "post", "/v1/reports/updates?since=5", 1700000000000, "n-1", "{}".toByteArray())
+        val text = InstallAuth.signingText("bgi_x", "post", "/v1/issues/updates?since=5", 1700000000000, "n-1", "{}".toByteArray())
         assertEquals(
-            "bridgit-install-v1\nbgi_x\nPOST\n/v1/reports/updates?since=5\n1700000000000\nn-1\n" +
+            "bridgit-install-v1\nbgi_x\nPOST\n/v1/issues/updates?since=5\n1700000000000\nn-1\n" +
                 "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
             text,
         )

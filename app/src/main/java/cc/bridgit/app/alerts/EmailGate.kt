@@ -50,7 +50,7 @@ object EmailGate {
     /** The one description of what keeps working after the deadline, built from the two lists above.
      *  Every agent doc that mentions the deadline uses it, so they can't disagree. */
     val DOC_SUMMARY get() = "the " + words(EXEMPT_CAPABILITIES.toList()) +
-        " endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/feedback` and the owner's read-only Bridgit Portal), " +
+        " endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/issues` and the owner's read-only Bridgit Portal), " +
         "the control tools " + words(EXEMPT_TOOLS.map { "`$it`" }) + " (`events` still needs `events.read`), " +
         "and the routes that are not tool calls (`/v2/capabilities`, `/v2/tools`, `/v2/guide`, operation cancel)"
 

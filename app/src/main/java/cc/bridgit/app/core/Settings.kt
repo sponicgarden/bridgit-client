@@ -74,7 +74,7 @@ class Settings(context: Context) {
         get() = prefs.getInt("speaker_ceiling", 70)
         set(v) { prefs.edit().putInt("speaker_ceiling", v.coerceIn(10, 100)).apply(); changed() }
 
-    /** FBK-14: send each new report to the Bridgit team's backend. On unless turned off (owner request 2 Nov 2026). */
+    /** FBK-14: send each new issue to the Bridgit team's backend. On unless turned off (owner request 2 Nov 2026). */
     var feedbackUpload: Boolean
         get() = !prefs.getBoolean("feedback_upload_off", false)
         set(v) { prefs.edit().putBoolean("feedback_upload_off", !v).apply(); changed() }

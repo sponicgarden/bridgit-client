@@ -24,7 +24,7 @@ data class EndpointSpec(
     val errors: List<String> = emptyList(),
     /** AGT-15: only agents the owner gave this power; checked before anything else, including replays. */
     val power: cc.bridgit.app.core.Power? = null,
-    /** Body fields never copied into the log, only their length (report text, notes, images). */
+    /** Body fields never copied into the log, only their length (issue text, notes, images). */
     val privateFields: Set<String> = emptySet(),
     /** Largest request body (API-11): 2 MB unless the endpoint takes media. Non-JSON bodies on such endpoints are streamed to a temp file (Req.takeRawFile); JSON stays at 2 MB. */
     val maxBody: Int = 2 * 1024 * 1024,
@@ -246,47 +246,60 @@ object Endpoints {
         query = listOf(Param("limit", "integer", "1-500, default 50")),
         example = "GET /v1/audit?limit=50", returns = "entries[] (same shape as /v1/log)")
 
-    val FEEDBACK_LIST = EndpointSpec("GET", "/feedback", "feedback", "Bug reports and feature requests: the ones you filed, or every report for agents in Bridgit Fixer Mode",
+    // Issues Tracking (renamed from "reports" / /v1/feedback, 8 Nov 2026).
+    val ISSUES_LIST = EndpointSpec("GET", "/issues", "feedback", "Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
         query = listOf(
-            Param("mine", "boolean", "Fixer Mode agents: true = only reports you filed (other agents always get only their own)"),
+            Param("mine", "boolean", "Fixer Mode agents: true = only issues you filed (other agents always get only their own)"),
             Param("status", "string", "new, seen, in_progress, fixed, wont_fix, duplicate, confirmed, reopened"),
             Param("kind", "string", "bug or feature", enum = listOf("bug", "feature")),
-            Param("since", "string", "ISO time: only reports updated after it"),
-            Param("wait", "integer", "With since: hold up to this many seconds (max 55) for a new or changed report"),
+            Param("since", "string", "ISO time: only issues updated after it"),
+            Param("wait", "integer", "With since: hold up to this many seconds (max 55) for a new or changed issue"),
             Param("limit", "integer", "1-100, default 50"),
         ),
-        example = "GET /v1/feedback?status=fixed", returns = "reports[id (this phone's id, used in URLs), ref (the team-wide number, e.g. M0042 from the owner, A0042 from an agent; null until sent to the Bridgit team), number (same as ref), team_id, kind, status, first_line, created_at, updated_at, no_autofix, image_count, filed_by, sent_to_team]",
+        example = "GET /v1/issues?status=fixed", returns = "issues[id (this phone's id, used in URLs), ref (the team-wide number, e.g. M0042 from the owner, A0042 from an agent; null until sent to the Bridgit team), number (same as ref), team_id, kind, status, first_line, created_at, updated_at, no_autofix, image_count, filed_by, sent_to_team]",
         errors = listOf("forbidden", "invalid_parameter", "too_many_waits"))
-    val FEEDBACK_GET = EndpointSpec("GET", "/feedback/{id}", "feedback", "One report with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new report seen)",
+    val ISSUES_GET = EndpointSpec("GET", "/issues/{id}", "feedback", "One issue with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new issue seen)",
         media = true, query = sizing.filter { it.name != "raw" },
-        example = "GET /v1/feedback/7", returns = "report: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
+        example = "GET /v1/issues/7", returns = "issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
         errors = listOf("not_found"))
-    val FEEDBACK_STATUS = EndpointSpec("POST", "/feedback/{id}/status", "feedback", "Move a report: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode)",
+    val ISSUES_STATUS = EndpointSpec("POST", "/issues/{id}/status", "feedback", "Move an issue: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode)",
         idempotent = true, power = cc.bridgit.app.core.Power.FIXER, privateFields = setOf("note"),
         body = listOf(Param("status", "string", "in_progress, fixed, wont_fix or duplicate", required = true),
             Param("note", "string", "Short note shown to the owner, e.g. \"Fix in PR #412\" (500 chars)")),
-        example = "POST /v1/feedback/7/status {\"status\":\"in_progress\",\"note\":\"Looking at it\"}", returns = "the report summary",
+        example = "POST /v1/issues/7/status {\"status\":\"in_progress\",\"note\":\"Looking at it\"}", returns = "the issue summary",
         errors = listOf("forbidden", "not_found", "invalid_parameter"))
-    val FEEDBACK_FOLLOWUP = EndpointSpec("POST", "/feedback/{id}/followup", "feedback", "Follow up on a report you filed: a note (\"still happens on 1.7.2\"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it)",
+    val ISSUES_FOLLOWUP = EndpointSpec("POST", "/issues/{id}/followup", "feedback", "Follow up on an issue you filed: a note (\"still happens on 1.7.2\"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it)",
         idempotent = true, privateFields = setOf("note"),
         body = listOf(Param("note", "string", "What you see now (500 chars); needed when there's no outcome"),
-            Param("outcome", "string", "works or still_broken: the owner's Confirm / Still broken, allowed once the report is fixed, wont_fix or duplicate", enum = listOf("works", "still_broken"))),
-        example = "POST /v1/feedback/7/followup {\"outcome\":\"still_broken\",\"note\":\"Still returns 500 on 1.7.2\"}", returns = "the report summary",
+            Param("outcome", "string", "works or still_broken: the owner's Confirm / Still broken, allowed once the issue is fixed, wont_fix or duplicate", enum = listOf("works", "still_broken"))),
+        example = "POST /v1/issues/7/followup {\"outcome\":\"still_broken\",\"note\":\"Still returns 500 on 1.7.2\"}", returns = "the issue summary",
         errors = listOf("not_found", "invalid_parameter", "rate_limited"))
-    val FEEDBACK_POST = EndpointSpec("POST", "/feedback", "feedback", "Legacy phone-local reporting (any agent; images only in Bridgit Fixer Mode). Control agents should report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",
+    val ISSUES_POST = EndpointSpec("POST", "/issues", "feedback", "Legacy phone-local issue filing (any agent; images only in Bridgit Fixer Mode). Control agents should file issues directly with Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",
         idempotent = true, privateFields = setOf("description", "images"),
         body = listOf(Param("kind", "string", "bug or feature", required = true, enum = listOf("bug", "feature")),
             Param("description", "string", "What happened, up to 10,000 characters", required = true),
             Param("no_autofix", "boolean", "true = leave it for a person"),
             Param("images", "array", "Fixer Mode only: up to 5 {\"data_base64\"} images"),
-            Param("agent_info", "object", "About you, sent with the report to the Bridgit team: e.g. {\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"} (up to 20 short string, number or boolean fields)")),
-        example = "POST /v1/feedback {\"kind\":\"bug\",\"description\":\"image/last returned 500 twice\",\"agent_info\":{\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"}}", returns = "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}",
+            Param("agent_info", "object", "About you, sent with the issue to the Bridgit team: e.g. {\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"} (up to 20 short string, number or boolean fields)")),
+        example = "POST /v1/issues {\"kind\":\"bug\",\"description\":\"image/last returned 500 twice\",\"agent_info\":{\"harness\":\"Claude Code\",\"harness_version\":\"2.3.1\",\"model\":\"Claude Opus 5.5\"}}", returns = "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}",
         errors = listOf("forbidden", "invalid_parameter", "rate_limited"))
-    /** FBK-15: this agent's own key for the Bridgit team's backend, so it can file, follow and re-test reports without the phone. */
-    val FEEDBACK_TEAM_KEY = EndpointSpec("GET", "/feedback/team-key", "feedback", "Your own key for the Bridgit team's feedback backend: file reports, check their status and verify fixes there directly. Agent reporting always goes directly to the servers",
+    /** FBK-15: this agent's own key for the Bridgit team's backend, so it can file, follow and re-test issues without the phone. */
+    val ISSUES_TEAM_KEY = EndpointSpec("GET", "/issues/team-key", "feedback", "Your own key for the Bridgit team's Issues Tracking backend: file issues, check their status and verify fixes there directly. Agent issue filing always goes directly to the servers",
         query = listOf(Param("rotate", "boolean", "true = make a new key; the old one stops working")),
-        example = "GET /v1/feedback/team-key", returns = "base_url, key (bgk_...), agent_id, role, docs, how_to",
+        example = "GET /v1/issues/team-key", returns = "base_url, key (bgk_...), agent_id, role, docs, how_to",
         errors = listOf("capability_disabled", "forbidden", "rate_limited", "team_unavailable"))
+
+    /** Deprecated pre-rename aliases of the ISSUES_ endpoints (API revision 134): same behaviour, old JSON keys (`reports`), no MCP tools. Removed with the old names. */
+    private fun legacy(of: EndpointSpec, old: String, returns: String = of.returns) = of.copy(path = old,
+        summary = "Deprecated: the old address of ${of.method} /v1${of.path}, same behaviour" + (if (returns != of.returns) " (list key reports)" else ""),
+        example = of.example.replace("/v1/issues", "/v1/feedback"), returns = returns)
+    val FEEDBACK_LIST = legacy(ISSUES_LIST, "/feedback", returns = ISSUES_LIST.returns.replaceFirst("issues[", "reports["))
+    val FEEDBACK_GET = legacy(ISSUES_GET, "/feedback/{id}")
+    val FEEDBACK_STATUS = legacy(ISSUES_STATUS, "/feedback/{id}/status")
+    val FEEDBACK_FOLLOWUP = legacy(ISSUES_FOLLOWUP, "/feedback/{id}/followup")
+    val FEEDBACK_POST = legacy(ISSUES_POST, "/feedback")
+    val FEEDBACK_TEAM_KEY = legacy(ISSUES_TEAM_KEY, "/feedback/team-key")
+    val FEEDBACK_LEGACY = listOf(FEEDBACK_LIST, FEEDBACK_TEAM_KEY, FEEDBACK_GET, FEEDBACK_STATUS, FEEDBACK_FOLLOWUP, FEEDBACK_POST)
 
     val INTERACTION_CREATE = EndpointSpec("POST", "/interactions", "interactions", "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Prefer a native question for simple choices, normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
         idempotent = true, privateFields = setOf("text", "image", "html"),
@@ -452,7 +465,7 @@ object Endpoints {
         errors = listOf("capability_disabled", "forbidden", "setting_locked", "access_needed", "invalid_parameter"))
 
     val all = cc.bridgit.app.ssh.SshModule.ALL + cc.bridgit.app.lancamera.CameraAudioModule.ALL + cc.bridgit.app.ownerapi.OwnerFeatureEndpoints.ALL + cc.bridgit.app.appdevices.AppDeviceModule.ALL + cc.bridgit.app.lan.LanModule.ALL + cc.bridgit.app.lancamera.LanCameraModule.ALL + listOf(SPEECH_HEAR, SPEECH_SPEAK, SPEECH_MODELS, SERVICES, HEALTH, DEVICES, CAPABILITIES, LIMITS, DISCOVER, DISCOVERY_REPORT, GUIDE, START, DEMO, SAMPLES, OPENAPI, CHANGES, HELPER, HELPER_LEGACY, PAIR, SNAPSHOT, CAMERA_ARM, POSE_START, POSE_READ, POSE_FRAME, POSE_STOP, MIC, GALLERY_RECENT, GALLERY_PHOTO,
-        IMAGE_LAST, SCREEN_CAPTURE, LOG, LOG_ENTRY, LOG_STATS, LOG_EXPORT, DEVICE_LOG, DEVICE_EXITS, LOG_NOTE, AUDIT, FEEDBACK_LIST, FEEDBACK_TEAM_KEY, FEEDBACK_GET, FEEDBACK_STATUS, FEEDBACK_FOLLOWUP, FEEDBACK_POST,
+        IMAGE_LAST, SCREEN_CAPTURE, LOG, LOG_ENTRY, LOG_STATS, LOG_EXPORT, DEVICE_LOG, DEVICE_EXITS, LOG_NOTE, AUDIT, ISSUES_LIST, ISSUES_TEAM_KEY, ISSUES_GET, ISSUES_STATUS, ISSUES_FOLLOWUP, ISSUES_POST, FEEDBACK_LIST, FEEDBACK_TEAM_KEY, FEEDBACK_GET, FEEDBACK_STATUS, FEEDBACK_FOLLOWUP, FEEDBACK_POST,
         INTERACTION_CREATE, INTERACTION_LIST, INTERACTION_GET, INTERACTION_CANCEL, INTERACTION_RENOTIFY, EVENTS, TEXT_STREAM, CALLBACK_TEST, MCP,
         LOCATION, SPEAKER_PLAY, SPEAKER_SAY, SPEAKER_STATUS, SPEAKER_STOP, TOUR_GET, TOUR_PHOTO, TOUR_END, ME, OWNER_EMAIL, OWNER_EMAIL_SET, LISTEN, LISTEN_CLIP, SOUNDS, SOUNDS_CLIP, CAPTURES_STORAGE_GET, CAPTURES_STORAGE_SET, CAPTURES_LIST, CAPTURES_GET, CAPTURES_DELETE, SETTINGS_GET, SETTINGS_SET) + cc.bridgit.app.capability.SettingsConfigurationApi.ALL + cc.bridgit.app.planned.PlannedEndpoints.all + cc.bridgit.app.schedule.ScheduleEndpoints.all + cc.bridgit.app.weather.WeatherEndpoints.WEATHER + cc.bridgit.app.adb.AdbModule.ENDPOINTS + listOf(cc.bridgit.app.judgment.JudgmentModule.JUDGMENT, cc.bridgit.app.judgment.JudgmentModule.IMAGE_GENERATE, cc.bridgit.app.judgment.JudgmentModule.IMAGE_USAGE) + cc.bridgit.app.judgment.ContextServices.ALL + cc.bridgit.app.watch.WatchModule.ALL + cc.bridgit.app.outbound.OutboundModule.ALL + cc.bridgit.app.portal.PortalEndpoints.ALL + cc.bridgit.app.satellite.SatelliteEndpoints.ALL + cc.bridgit.app.applets.AppletEndpoints.ALL + cc.bridgit.app.applets.BudgetEndpoints.ALL + cc.bridgit.app.applets.AppletPortalEndpoints.ALL + cc.bridgit.app.applets.AppletData.ALL + cc.bridgit.app.platform.ConnectionsApi.ALL + cc.bridgit.app.context.ContextApi.ALL + cc.bridgit.app.platform.ModesApi.ALL + cc.bridgit.app.vision.FindCropModule.ALL
 }

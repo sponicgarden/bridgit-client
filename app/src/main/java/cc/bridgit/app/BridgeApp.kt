@@ -209,7 +209,7 @@ class BridgeApp : Application() {
             if (!speaker.inCall()) speaker.speakText("owner", agent, cc.bridgit.app.interact.NotifRules.utterance(agent, title, text), allowInQuiet = true)
         }
         feedback.onStatusChange { FeedbackNotifier.statusChanged(this, it) }
-        // FBK-14: send new reports to the Bridgit team; also picks up anything left from before a restart.
+        // FBK-14: send new issues to the Bridgit team; also picks up anything left from before a restart.
         feedback.onCreated { cc.bridgit.app.feedback.FeedbackUploadWorker.enqueue(this) }
         feedback.onHistoryQueued { cc.bridgit.app.feedback.FeedbackUploadWorker.enqueue(this) } // follow-ups, Confirm, moves
         cc.bridgit.app.feedback.FeedbackUploadWorker.enqueue(this)

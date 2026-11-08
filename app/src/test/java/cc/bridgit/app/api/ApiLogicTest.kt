@@ -353,7 +353,8 @@ class ApiLogicTest {
         assertTrue(Demos.build("Grok", caps) { true }.contains(Demos.SKILL_URL))
         assertTrue(Guide.build("Grok", "1.6.0", addr, caps, "own", superPowers = false).contains("`GET /v1/demo`"))
         val g = Guide.build("Grok", "1.6.0", addr, caps, "own", superPowers = false)
-        assertTrue(g.contains("## Report bugs, ask for features"))
+        assertTrue(g.contains("## Issues Tracking: report bugs, ask for features"))
+        assertEquals("/v1/issues", ApiChanges.links().getString("issues"))
         assertEquals("/v1/feedback", ApiChanges.links().getString("feedback"))
         assertEquals("/v1/samples", ApiChanges.links().getString("samples"))
         assertTrue(McpProtocol.instructions("Grok").contains(McpTools.name(Endpoints.SAMPLES)))
@@ -362,9 +363,9 @@ class ApiLogicTest {
     /** FBK-15: the guide asks for every report and explains the team key and the verify loop. */
     @Test fun guideExplainsReportingAndTheVerifyLoop() {
         val g = Guide.build("Grok", "1.6.0", addr, caps("camera"), "own", superPowers = false)
-        assertTrue(g.contains("## Report bugs, ask for features"))
+        assertTrue(g.contains("## Issues Tracking: report bugs, ask for features"))
         assertTrue(g.contains("every bug and every feature request"))
-        assertTrue(g.contains("`GET /v1/feedback/team-key`"))
+        assertTrue(g.contains("`GET /v1/issues/team-key`"))
         assertTrue(g.contains("waiting_for_retest") && g.contains("/verify"))
         assertTrue(g.contains("`unverified` means you couldn't test it"))
     }

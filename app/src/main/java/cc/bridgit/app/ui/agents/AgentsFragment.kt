@@ -263,7 +263,7 @@ class AgentsFragment : Fragment() {
             T(ExternalTools.Id.APPRAISE, R.string.tools_appraise, R.string.tools_glm_detail, ExternalTools.Facts(team, ownKeys = keys("openrouter"))),
             T(ExternalTools.Id.CHEF, R.string.tools_chef, R.string.tools_glm_detail, ExternalTools.Facts(team, ownKeys = keys("openrouter"))),
             T(ExternalTools.Id.SPEECH, R.string.tools_speech, R.string.tools_speech_detail, ExternalTools.Facts(team)),
-            T(ExternalTools.Id.REPORTS, R.string.tools_reports, R.string.tools_reports_detail, ExternalTools.Facts(team, on = app.settings.feedbackUpload)),
+            T(ExternalTools.Id.ISSUES, R.string.tools_issues, R.string.tools_issues_detail, ExternalTools.Facts(team, on = app.settings.feedbackUpload)),
             T(ExternalTools.Id.RELAY, R.string.tools_relay, R.string.tools_relay_detail,
                 ExternalTools.Facts(cc.bridgit.app.BuildConfig.RELAY_URL.isNotEmpty() || RelayStore(app).enabled, on = RelayStore(app).enabled)),
             T(ExternalTools.Id.WATCH, R.string.tools_watch, R.string.tools_watch_detail, ExternalTools.Facts(team, on = app.remoteView.enabled)),

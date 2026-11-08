@@ -1,39 +1,39 @@
 package cc.bridgit.app.feedback
 
-import cc.bridgit.app.feedback.ReportStatus.CONFIRMED
-import cc.bridgit.app.feedback.ReportStatus.DUPLICATE
-import cc.bridgit.app.feedback.ReportStatus.FIXED
-import cc.bridgit.app.feedback.ReportStatus.IN_PROGRESS
-import cc.bridgit.app.feedback.ReportStatus.NEW
-import cc.bridgit.app.feedback.ReportStatus.REOPENED
-import cc.bridgit.app.feedback.ReportStatus.SEEN
-import cc.bridgit.app.feedback.ReportStatus.WONT_FIX
+import cc.bridgit.app.feedback.IssueStatus.CONFIRMED
+import cc.bridgit.app.feedback.IssueStatus.DUPLICATE
+import cc.bridgit.app.feedback.IssueStatus.FIXED
+import cc.bridgit.app.feedback.IssueStatus.IN_PROGRESS
+import cc.bridgit.app.feedback.IssueStatus.NEW
+import cc.bridgit.app.feedback.IssueStatus.REOPENED
+import cc.bridgit.app.feedback.IssueStatus.SEEN
+import cc.bridgit.app.feedback.IssueStatus.WONT_FIX
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
  * Ways the FBK-11a status machine can fail:
- * a developer agent closes a report (confirmed) or reopens it; the owner's Confirm works on a report nobody
- * fixed; a fixed report jumps back to in_progress; `reopened` doesn't behave as `new`; the automatic
- * first-read move fires on a report already in progress; a disallowed move is silently accepted.
+ * a developer agent closes an issue (confirmed) or reopens it; the owner's Confirm works on an issue nobody
+ * fixed; a fixed issue jumps back to in_progress; `reopened` doesn't behave as `new`; the automatic
+ * first-read move fires on an issue already in progress; a disallowed move is silently accepted.
  * The test enumerates every (from, to, actor) triple against the spec table.
  */
 class StatusMachineTest {
-    private val expected: Set<Triple<ReportStatus, ReportStatus, Actor>> = buildSet {
+    private val expected: Set<Triple<IssueStatus, IssueStatus, Actor>> = buildSet {
         add(Triple(NEW, SEEN, Actor.AUTO)); add(Triple(REOPENED, SEEN, Actor.AUTO))
         for (f in listOf(NEW, SEEN, REOPENED)) for (t in listOf(IN_PROGRESS, DUPLICATE, WONT_FIX)) add(Triple(f, t, Actor.DEVELOPER))
         for (t in listOf(FIXED, WONT_FIX)) add(Triple(IN_PROGRESS, t, Actor.DEVELOPER))
         for (f in listOf(FIXED, WONT_FIX, DUPLICATE)) for (t in listOf(CONFIRMED, REOPENED)) add(Triple(f, t, Actor.OWNER))
-        // FBK-12a: the agent that filed a report has the owner's Confirm / Still broken on it, nothing more.
+        // FBK-12a: the agent that filed an issue has the owner's Confirm / Still broken on it, nothing more.
         for (f in listOf(FIXED, WONT_FIX, DUPLICATE)) for (t in listOf(CONFIRMED, REOPENED)) add(Triple(f, t, Actor.REPORTER))
         // FBK-14: the team moves anything the owner hasn't closed; seen only from new.
         add(Triple(NEW, SEEN, Actor.TEAM)); add(Triple(REOPENED, SEEN, Actor.TEAM))
-        for (f in ReportStatus.values()) if (f != CONFIRMED) for (t in listOf(IN_PROGRESS, FIXED, WONT_FIX, DUPLICATE)) if (f != t) add(Triple(f, t, Actor.TEAM))
+        for (f in IssueStatus.values()) if (f != CONFIRMED) for (t in listOf(IN_PROGRESS, FIXED, WONT_FIX, DUPLICATE)) if (f != t) add(Triple(f, t, Actor.TEAM))
     }
 
     @Test fun everyTransitionMatchesTheSpecTable() {
         var checked = 0
-        for (f in ReportStatus.values()) for (t in ReportStatus.values()) for (a in Actor.values()) {
+        for (f in IssueStatus.values()) for (t in IssueStatus.values()) for (a in Actor.values()) {
             assertEquals("$f -> $t by $a", Triple(f, t, a) in expected, StatusMachine.allowed(f, t, a))
             checked++
         }
@@ -46,7 +46,7 @@ class StatusMachineTest {
         assertEquals(IN_PROGRESS, StatusMachine.fromTeam(REOPENED, "in_progress"))
         assertEquals(IN_PROGRESS, StatusMachine.fromTeam(FIXED, "in_progress")) // the team takes a fix back
         assertEquals(SEEN, StatusMachine.fromTeam(NEW, "seen"))
-        assertEquals(null, StatusMachine.fromTeam(IN_PROGRESS, "seen"))   // never moves a report backwards to seen
+        assertEquals(null, StatusMachine.fromTeam(IN_PROGRESS, "seen"))   // never moves an issue backwards to seen
         assertEquals(null, StatusMachine.fromTeam(FIXED, "fixed"))        // already there
         assertEquals(null, StatusMachine.fromTeam(CONFIRMED, "wont_fix")) // the owner closed it
         assertEquals(null, StatusMachine.fromTeam(SEEN, "new"))
@@ -55,7 +55,7 @@ class StatusMachineTest {
     }
 
     @Test fun ownerIsToldOnlyWhenThereIsSomethingToCheck() {
-        assertEquals(setOf(FIXED, WONT_FIX, DUPLICATE), ReportStatus.values().filter { StatusMachine.notifiesOwner(it) }.toSet())
+        assertEquals(setOf(FIXED, WONT_FIX, DUPLICATE), IssueStatus.values().filter { StatusMachine.notifiesOwner(it) }.toSet())
         assertEquals(listOf(IN_PROGRESS, WONT_FIX, DUPLICATE), StatusMachine.nextForDeveloper(REOPENED))
     }
 

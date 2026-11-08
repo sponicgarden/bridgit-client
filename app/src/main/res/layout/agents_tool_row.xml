@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One external tool on the Agents tab (Jev, Clef, bug reports, relay...): its name and state, then what it does
+<!-- One external tool on the Agents tab (Jev, Clef, issues, relay...): its name and state, then what it does
      and when the phone last called it. Read-only: the pause for all of them is the switch above. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

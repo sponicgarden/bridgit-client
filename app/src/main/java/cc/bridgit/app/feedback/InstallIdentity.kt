@@ -26,7 +26,7 @@ import java.util.UUID
  * A P-256 key made in the Android Keystore (never exportable) is the credential, and its hash is
  * the install ID (`bgi_…`). The key is made with key attestation, so the backend can check it
  * came from a genuine Bridgit build on real hardware. Every request is signed; no bearer secret
- * travels. Installs that uploaded with the older random key move their reports over once.
+ * travels. Installs that uploaded with the older random key move their issues over once.
  */
 object InstallIdentity {
     private const val ALIAS = "bridgit-install-v1"
@@ -145,7 +145,7 @@ object InstallIdentity {
         val body = JSONObject().put("public_key", Base64.getEncoder().encodeToString(spki))
             .put("attestation_chain", JSONArray(chain())).put("challenge", challenge)
             .put("app_version", BuildConfig.VERSION_NAME)
-        // Reports sent with the older random key move to this install (and that key stops working).
+        // Issues sent with the older random key move to this install (and that key stops working).
         FeedbackUploader.existingIdentity(ctx)?.let { (legacyId, key) -> body.put("legacy", JSONObject().put("install_id", legacyId).put("key", key)) }
         val bytes = body.toString().toByteArray()
         val path = "/v1/install/register"

@@ -8,68 +8,128 @@
  "combinations": [],
  "operations": [
   {
-   "summary": "Bug reports and feature requests: the ones you filed, or every report for agents in Bridgit Fixer Mode",
+   "summary": "Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
+   "path": "/v1/issues",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-issues.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-issues.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "issues_list"
+  },
+  {
+   "summary": "Your own key for the Bridgit team's Issues Tracking backend: file issues, check their status and verify fixes there directly. Agent issue filing always goes directly to the servers",
+   "path": "/v1/issues/team-key",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-issues-team-key.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-issues-team-key.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "issues_team_key"
+  },
+  {
+   "summary": "One issue with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new issue seen)",
+   "path": "/v1/issues/{id}",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-issues-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-issues-id.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "issues_get"
+  },
+  {
+   "summary": "Move an issue: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode)",
+   "path": "/v1/issues/{id}/status",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-issues-id-status.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-issues-id-status.json",
+   "control_scope": null,
+   "requires_power": "FIXER",
+   "tool": "issues_status"
+  },
+  {
+   "summary": "Follow up on an issue you filed: a note (\"still happens on 1.7.2\"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it)",
+   "path": "/v1/issues/{id}/followup",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-issues-id-followup.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-issues-id-followup.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "issues_followup"
+  },
+  {
+   "summary": "Legacy phone-local issue filing (any agent; images only in Bridgit Fixer Mode). Control agents should file issues directly with Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",
+   "path": "/v1/issues",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-issues.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-issues.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "issues_file"
+  },
+  {
+   "summary": "Deprecated: the old address of GET /v1/issues, same behaviour (list key reports)",
    "path": "/v1/feedback",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-feedback.json",
    "operation_url": "https://bridgit.cc/learn/operations/get-v1-feedback.json",
    "control_scope": null,
    "requires_power": null,
-   "tool": "feedback_list"
+   "tool": null
   },
   {
-   "summary": "Your own key for the Bridgit team's feedback backend: file reports, check their status and verify fixes there directly. Agent reporting always goes directly to the servers",
+   "summary": "Deprecated: the old address of GET /v1/issues/team-key, same behaviour",
    "path": "/v1/feedback/team-key",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-feedback-team-key.json",
    "operation_url": "https://bridgit.cc/learn/operations/get-v1-feedback-team-key.json",
    "control_scope": null,
    "requires_power": null,
-   "tool": "feedback_team_key"
+   "tool": null
   },
   {
-   "summary": "One report with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new report seen)",
+   "summary": "Deprecated: the old address of GET /v1/issues/{id}, same behaviour",
    "path": "/v1/feedback/{id}",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-feedback-id.json",
    "operation_url": "https://bridgit.cc/learn/operations/get-v1-feedback-id.json",
    "control_scope": null,
    "requires_power": null,
-   "tool": "feedback_get"
+   "tool": null
   },
   {
-   "summary": "Move a report: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode)",
+   "summary": "Deprecated: the old address of POST /v1/issues/{id}/status, same behaviour",
    "path": "/v1/feedback/{id}/status",
    "method": "POST",
    "documentation": "https://bridgit.cc/learn/operations/post-v1-feedback-id-status.json",
    "operation_url": "https://bridgit.cc/learn/operations/post-v1-feedback-id-status.json",
    "control_scope": null,
    "requires_power": "FIXER",
-   "tool": "feedback_status"
+   "tool": null
   },
   {
-   "summary": "Follow up on a report you filed: a note (\"still happens on 1.7.2\"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it)",
+   "summary": "Deprecated: the old address of POST /v1/issues/{id}/followup, same behaviour",
    "path": "/v1/feedback/{id}/followup",
    "method": "POST",
    "documentation": "https://bridgit.cc/learn/operations/post-v1-feedback-id-followup.json",
    "operation_url": "https://bridgit.cc/learn/operations/post-v1-feedback-id-followup.json",
    "control_scope": null,
    "requires_power": null,
-   "tool": "feedback_followup"
+   "tool": null
   },
   {
-   "summary": "Legacy phone-local reporting (any agent; images only in Bridgit Fixer Mode). Control agents should report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",
+   "summary": "Deprecated: the old address of POST /v1/issues, same behaviour",
    "path": "/v1/feedback",
    "method": "POST",
    "documentation": "https://bridgit.cc/learn/operations/post-v1-feedback.json",
    "operation_url": "https://bridgit.cc/learn/operations/post-v1-feedback.json",
    "control_scope": null,
    "requires_power": null,
-   "tool": "feedback_file"
+   "tool": null
   }
  ],
- "documentation_revision": 111,
- "api_revision": 133,
+ "documentation_revision": 112,
+ "api_revision": 134,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.feedback",

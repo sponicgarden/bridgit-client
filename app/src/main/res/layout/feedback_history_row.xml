@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One status change in the report's history: dot + line, status, who, time, note in mono. -->
+<!-- One status change in the issue's history: dot + line, status, who, time, note in mono. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

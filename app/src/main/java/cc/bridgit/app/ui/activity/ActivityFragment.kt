@@ -38,7 +38,7 @@ import cc.bridgit.app.log.LogQuery
 import cc.bridgit.app.ui.common.themeColor
 import cc.bridgit.app.ui.common.Fmt
 import cc.bridgit.app.ui.common.LogRowAdapter
-import cc.bridgit.app.feedback.ReportKind
+import cc.bridgit.app.feedback.IssueKind
 import cc.bridgit.app.ui.feedback.handleFeedbackMenu
 import cc.bridgit.app.ui.feedback.openReport
 import java.text.NumberFormat
@@ -402,7 +402,7 @@ class ActivityFragment : Fragment() {
     }
 
     /** "Report a bug about this" from the entry sheet: attaches that entry (FBK-01). */
-    fun reportAbout(entryId: Long) = openReport(this, ReportKind.BUG, "Activity", feedbackContext(), entryId)
+    fun reportAbout(entryId: Long) = openReport(this, IssueKind.BUG, "Activity", feedbackContext(), entryId)
 
     fun filterToAgent(agentId: String) {
         if (_b == null) return

@@ -609,7 +609,7 @@ class Schedules(private val app: BridgeApp) {
         const val SWITCH = "schedule"
         const val WORK = "schedule-tick"
         private const val NOTIF_BASE = 0x5c00_0000
-        /** The schedule can't schedule itself; bug reports stay with live agents. */
+        /** The schedule can't schedule itself; issues stay with live agents. */
         val NOT_SCHEDULABLE = setOf("schedule", "feedback")
     }
 }

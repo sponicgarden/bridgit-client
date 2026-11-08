@@ -311,7 +311,7 @@ class DebugSetupReceiver : BroadcastReceiver() {
                 "latest=${app.dog.tracker.latest()?.json()} day=${app.dog.tracker.day(System.currentTimeMillis())} episodes=${app.dog.tracker.episodes()} " +
                 "mics=${s.microphones} mic_status=\"${s.microphoneStatus}\" bark=${s.bark} listener=${app.wake.running?.loud} subs=${app.wake.loud.all().map { it.id + it.sources }} cams=${s.microphones.filter { it.startsWith("lan:") }.associateWith { app.cameraMics.status(it) }} audio=${s.audioReadings.takeLast(3)}")
         }
-        // feedback_upload=false keeps test reports (acceptance F01-F05) off the team's backend.
+        // feedback_upload=false keeps test issues (acceptance F01-F05) off the team's backend.
         if (intent.hasExtra("feedback_upload")) {
             val on = intent.getBooleanExtra("feedback_upload", true)
             app.settings.feedbackUpload = on

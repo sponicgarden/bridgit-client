@@ -31,8 +31,8 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 /**
- * FBK-14: sends each report to the Bridgit team's backend (the `bridgit-feedback` Worker,
- * source in /feedback). Reports are saved on the phone first; this only copies them.
+ * FBK-14: sends each issue to the Bridgit team's backend (the `bridgit-feedback` Worker,
+ * source in /feedback). Issues are saved on the phone first; this only copies them.
  *
  * The install signs each request with its Keystore key (InstallIdentity, docs/spec-client-identity.md).
  * Until it has registered, or with a backend that predates registration, it falls back to the older
@@ -102,12 +102,12 @@ object FeedbackUploader {
     }
 
     /** What goes over the wire. The agent block lives in the context on the phone and travels separately. */
-    fun payload(r: Report, images: List<ByteArray>): JSONObject {
+    fun payload(r: Issue, images: List<ByteArray>): JSONObject {
         val ctx = JSONObject(r.context.toString())
         val agent = ctx.opt("agent") as? JSONObject
         ctx.remove("agent")
         return JSONObject()
-            .put("phone_report_id", r.id).put("kind", r.kind.id).put("description", r.description)
+            .put("phone_issue_id", r.id).put("kind", r.kind.id).put("description", r.description)
             .put("no_autofix", r.noAutofix).put("status", r.status.id).put("created_at", r.createdAt)
             .put("capture_source", r.captureSource).put("context", ctx).put("agent", agent ?: JSONObject.NULL)
             .put("log", r.log)
@@ -119,12 +119,12 @@ object FeedbackUploader {
         .put("phone_history_id", h.id).put("at", h.at).put("kind", h.kind).put("status", h.status.id)
         .put("actor", (h.actor ?: Actor.OWNER).id).put("by", h.by).put("note", h.note ?: JSONObject.NULL)
 
-    /** Sends one history entry of a report the backend already has ([remoteId]). The store is updated here. */
+    /** Sends one history entry of an issue the backend already has ([remoteId]). The store is updated here. */
     fun sendHistory(app: BridgeApp, remoteId: Long, h: HistoryItem): Outcome {
         val bytes = historyPayload(h).toString().toByteArray()
-        val url = "$base/v1/reports/$remoteId/history".toHttpUrl()
+        val url = "$base/v1/issues/$remoteId/history".toHttpUrl()
         return try {
-            // The report went up, so this install already has its identity; never make a new one here.
+            // The issue went up, so this install already has its identity; never make a new one here.
             val headers = auth(app, "POST", url, bytes, register = false) ?: return Outcome.LATER
             val req = Request.Builder().url(url).apply { headers.forEach { (k, v) -> header(k, v) } }
                 .header("User-Agent", UpdateLogic.userAgent(app.appVersion(), Build.VERSION.RELEASE))
@@ -143,14 +143,14 @@ object FeedbackUploader {
         } catch (e: IOException) { Outcome.RETRY }
     }
 
-    /** Sends one report. Returns what to do next; the store is updated here. */
-    fun send(app: BridgeApp, r: Report): Outcome = Outbound.on(
+    /** Sends one issue. Returns what to do next; the store is updated here. */
+    fun send(app: BridgeApp, r: Issue): Outcome = Outbound.on(
         r.agentId?.let { Outbound.Actor.agent(it, r.agent ?: it) } ?: Outbound.Actor.OWNER) { sendNow(app, r) }
 
-    private fun sendNow(app: BridgeApp, r: Report): Outcome {
+    private fun sendNow(app: BridgeApp, r: Issue): Outcome {
         val images = r.images.mapNotNull { app.feedback.imageFile(it)?.readBytes() }
         val bytes = payload(r, images).toString().toByteArray()
-        val url = "$base/v1/reports".toHttpUrl()
+        val url = "$base/v1/issues".toHttpUrl()
         return try {
             val headers = auth(app, "POST", url, bytes, register = true) ?: error("no install identity")
             val req = Request.Builder().url(url).apply { headers.forEach { (k, v) -> header(k, v) } }
@@ -186,7 +186,7 @@ class FeedbackUploadWorker(context: Context, params: WorkerParameters) : Corouti
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val app = applicationContext as BridgeApp
         if (!FeedbackUploader.configured || !app.settings.feedbackUpload) return@withContext Result.success()
-        repeat(10) { // at most 200 reports per run; a new report queues another run
+        repeat(10) { // at most 200 issues per run; a new issue queues another run
             val batch = app.feedback.pendingUploads()
             if (batch.isEmpty()) return@repeat
             for (r in batch) {
@@ -194,16 +194,16 @@ class FeedbackUploadWorker(context: Context, params: WorkerParameters) : Corouti
                 if (FeedbackUploader.send(app, r) == FeedbackUploader.Outcome.RETRY) return@withContext Result.retry()
             }
         }
-        // Then what happened to uploaded reports since (FBK-14 history upload), oldest first.
+        // Then what happened to uploaded issues since (FBK-14 history upload), oldest first.
         repeat(10) {
             val batch = app.feedback.pendingHistory()
             if (batch.isEmpty()) return@withContext Result.success()
             for (p in batch) {
                 if (!app.settings.feedbackUpload) return@withContext Result.success()
                 when {
-                    p.reportUpload == UploadState.PENDING -> return@withContext Result.retry() // its report goes first
-                    p.reportUpload != UploadState.SENT || p.remoteId == null || p.remoteId < 1 ->
-                        app.feedback.markHistory(p.item.id, UploadState.SKIPPED) // its report never reached the team
+                    p.issueUpload == UploadState.PENDING -> return@withContext Result.retry() // its issue goes first
+                    p.issueUpload != UploadState.SENT || p.remoteId == null || p.remoteId < 1 ->
+                        app.feedback.markHistory(p.item.id, UploadState.SKIPPED) // its issue never reached the team
                     else -> when (FeedbackUploader.sendHistory(app, p.remoteId, p.item)) {
                         FeedbackUploader.Outcome.RETRY -> return@withContext Result.retry()
                         FeedbackUploader.Outcome.LATER -> return@withContext Result.success()
@@ -230,14 +230,14 @@ class FeedbackUploadWorker(context: Context, params: WorkerParameters) : Corouti
 }
 
 /**
- * FBK-14 status sync: asks the backend what the Bridgit team changed on this install's reports since
+ * FBK-14 status sync: asks the backend what the Bridgit team changed on this install's issues since
  * the last cursor, and moves them on the phone (Actor.TEAM, by "Bridgit team", with the team's note).
  * A move to fixed / won't fix / duplicate notifies the owner like a developer agent's would (FBK-11).
  */
 object FeedbackStatusSync {
     const val BY = TEAM_BY
     private const val CURSOR = "team_cursor"
-    private const val CURSOR_ID = "team_cursor_id" // the last report id at the cursor time, so ties aren't skipped
+    private const val CURSOR_ID = "team_cursor_id" // the last issue id at the cursor time, so ties aren't skipped
 
     enum class Outcome { DONE, RETRY }
 
@@ -250,8 +250,8 @@ object FeedbackStatusSync {
     private val lock = java.util.concurrent.locks.ReentrantLock()
 
     /**
-     * Runs the sync now, at most once a minute, when an agent lists or reads its reports or the owner
-     * opens My reports, so a status check is fresh. Blocking; call it off the main thread.
+     * Runs the sync now, at most once a minute, when an agent lists or reads its issues or the owner
+     * opens My issues, so a status check is fresh. Blocking; call it off the main thread.
      */
     fun freshen(app: BridgeApp) {
         if (!FeedbackUploader.configured || !app.settings.feedbackUpload) return
@@ -272,7 +272,7 @@ object FeedbackStatusSync {
         repeat(maxPages) { // the backend returns up to 200 changes per call
             val since = prefs.getLong(CURSOR, 0L)
             val sinceId = prefs.getLong(CURSOR_ID, -1L).takeIf { it >= 0 }?.let { "&since_id=$it" }.orEmpty()
-            val url = (BuildConfig.FEEDBACK_URL.trimEnd('/') + "/v1/reports/updates?since=$since$sinceId").toHttpUrl()
+            val url = (BuildConfig.FEEDBACK_URL.trimEnd('/') + "/v1/issues/updates?since=$since$sinceId").toHttpUrl()
             val body = try {
                 // Only an install that has uploaded before has anything to ask about.
                 val headers = FeedbackUploader.auth(app, "GET", url, ByteArray(0), register = false) ?: return Outcome.DONE
@@ -299,7 +299,7 @@ object FeedbackStatusSync {
     }
 
     private fun apply(app: BridgeApp, u: JSONObject) {
-        val r = app.feedback.get(u.optLong("phone_report_id", -1)) ?: return
+        val r = app.feedback.get(u.optLong("phone_issue_id", -1)) ?: return
         val to = StatusMachine.fromTeam(r.status, u.optString("status")) ?: return
         val note = u.optString("team_note", "").takeIf { it.isNotBlank() && !u.isNull("team_note") }
         runCatching { app.feedback.move(r.id, to, Actor.TEAM, BY, note) }

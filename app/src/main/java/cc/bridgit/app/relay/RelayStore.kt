@@ -83,6 +83,22 @@ class RelayStore(private val app:BridgeApp) {
         expired.forEach { remove(it);app.agents.remove(it) }
         return expired.size
     }
+    /**
+     * A relay agent whose token the other side made ([tokenHash] = SHA-256 hex): a link code's claim-only agent, or the
+     * link agent of a Bridgit that claimed over the relay (docs/spec-linked-bridgits.md §4.1). [claimUntil] 0 = no expiry.
+     */
+    @Synchronized fun addAgentHash(id:String,routes:Set<String>,tokenHash:String,claimUntil:Long=0) {
+        val a=app.agents.get(id) ?: error("No such agent");require(a.caps!=null) { "Relay agents need explicit capability grants" }
+        require(Regex("[a-f0-9]{64}").matches(tokenHash))
+        val config=JSONObject().put("id",id).put("generation",a.keyHash).put("mode","connector").put("token_hash",tokenHash).put("peer","").put("routes",JSONArray(routes.sorted())).put("tools",JSONArray())
+        if(claimUntil>0)config.put("claim_until",claimUntil)
+        check(prefs.edit().putString("agents",JSONArray(storedAgents().filter { it.optString("id")!=id }+config).toString()).commit())
+    }
+    /** Replaces a relay agent's route allowlist in place (same token and generation). */
+    @Synchronized fun setRoutes(id:String,routes:Set<String>) {
+        val all=storedAgents(); if(all.none { it.optString("id")==id }) return
+        check(prefs.edit().putString("agents",JSONArray(all.map { if(it.optString("id")==id) JSONObject(it.toString()).put("routes",JSONArray(routes.sorted())) else it }).toString()).commit())
+    }
     @Synchronized fun addAgent(id:String,mode:String,peer:String?,routes:Set<String>,tools:Set<String>,claimMs:Long=0):String {
         val a=app.agents.get(id) ?: error("No such agent");require(mode in setOf("sealed","connector"));require(a.caps!=null) { "Relay agents need explicit capability grants" }
         if(mode=="sealed")Sealed.validatePublic(peer ?: "")

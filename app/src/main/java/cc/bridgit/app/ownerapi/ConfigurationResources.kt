@@ -14,7 +14,7 @@ import org.json.JSONObject
 class ConfigurationResources(private val app: BridgeApp, private val caller: Agent) {
     private val access = ConfigurationAccess(app, caller)
     companion object {
-        val ACTIONS = setOf("service.model.set","service.budget.set", "dog.configure", "applet.configure", "wake.configure", "sounds.configure", "remote.configure", "delivery.subscribe", "updates.offers")
+        val ACTIONS = setOf("service.model.set","service.budget.set", "dog.configure", "applet.configure", "wake.configure", "sounds.configure", "remote.configure", "delivery.subscribe", "updates.offers", "updates.auto", "portal.update_prompts")
     }
     suspend fun action(body: JSONObject): JSONObject {
         access.require()

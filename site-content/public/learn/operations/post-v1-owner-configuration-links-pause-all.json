@@ -1,0 +1,69 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Pause or resume links by role, as the Linked devices pills do; each pauses both directions of those links; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_links_pause_all",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "satellites",
+    "description": "true pauses every link where the other Bridgit is this one's satellite (Satellites pill)",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "hubs",
+    "description": "true pauses every link where the other Bridgit is this one's hub (Hubs pill)",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/links/pause-all {\"hubs\":true}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/links/pause-all",
+  "capability": "owner_features",
+  "returns": "paused_all{satellites, hubs}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "satellites": {
+     "description": "true pauses every link where the other Bridgit is this one's satellite (Satellites pill)",
+     "type": "boolean"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "hubs": {
+     "description": "true pauses every link where the other Bridgit is this one's hub (Hubs pill)",
+     "type": "boolean"
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed",
+   "name_required",
+   "code_invalid",
+   "code_expired",
+   "code_used_up",
+   "link_revoked",
+   "link_waiting",
+   "target_offline",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

@@ -62,14 +62,42 @@ class HubLinks(private val app: BridgeApp) {
         val given = cc.bridgit.app.relay.RelayStore.hash(token)
         if (!java.security.MessageDigest.isEqual(given.toByteArray(), hash.toByteArray())) return null
         cancelPending()
-        val agentName = (1..50).map { linkName(hubName, it) }.firstOrNull { app.agents.checkName(it) == null }
-            ?: throw IllegalStateException(app.agents.checkName(linkName(hubName, 1)) ?: "No free name for the hub link.")
-        val (a, key) = app.agents.add(agentName, Connection.DIRECT)
-        app.agents.update(a.id) { it.copy(caps = SatellitePolicy.PHASE1_CAPS, fixer = false, superPowers = false,
-            boundIps = listOf(Net.normalise(source)), notes = "Hub link (Bridgit Satellite). Remove it to unlink.") }
-        check(prefs.edit().putStringSet("ids", (prefs.getStringSet("ids", emptySet()) ?: emptySet()) + a.id).commit())
+        val (id, key, name) = newLinkAgent(source, hubName, SatellitePolicy.PHASE1_CAPS)
         claims.value = ClaimEvent(now, hubName?.filterNot { it.isISOControl() }?.trim()?.take(60)?.ifBlank { null })
-        return Claimed(a.id, agentName, key)
+        return Claimed(id, name, key)
+    }
+
+    /**
+     * A link agent for a device that claimed a link code (docs/spec-linked-bridgits.md, LNK-11): grants = [caps] (the
+     * direction's service list, possibly none), key locked to [source]. Returns (agent id, key, agent name).
+     */
+    @Synchronized fun claimLink(source: String, hubName: String?, caps: Set<String>): Triple<String, String, String> {
+        val r = newLinkAgent(source, hubName, caps)
+        claims.value = ClaimEvent(System.currentTimeMillis(), hubName?.filterNot { it.isISOControl() }?.trim()?.take(60)?.ifBlank { null })
+        return r
+    }
+
+    /** A link agent for a Bridgit that claimed over the relay: a relay agent with the token it made (no Tailscale lock). */
+    @Synchronized fun claimRelayLink(hubName: String?, caps: Set<String>, routes: Set<String>, tokenHash: String): Pair<String, String> {
+        val agentName = (1..50).map { linkName(hubName, it) }.firstOrNull { app.agents.checkName(it, exceptId = "-") == null }
+            ?: throw IllegalStateException("No free name for the link agent.")
+        val (a, _) = app.agents.add(agentName, Connection.RELAY, limited = false)
+        app.agents.update(a.id) { it.copy(caps = caps, fixer = false, superPowers = false, notes = "Link agent (Linked Bridgits, over the relay). Disconnect the link to remove it.") }
+        cc.bridgit.app.relay.RelayStore(app).addAgentHash(a.id, routes, tokenHash)
+        check(prefs.edit().putStringSet("ids", (prefs.getStringSet("ids", emptySet()) ?: emptySet()) + a.id).commit())
+        claims.value = ClaimEvent(System.currentTimeMillis(), hubName?.filterNot { it.isISOControl() }?.trim()?.take(60)?.ifBlank { null })
+        return a.id to agentName
+    }
+
+    private fun newLinkAgent(source: String, hubName: String?, caps: Set<String>): Triple<String, String, String> {
+        val agentName = (1..50).map { linkName(hubName, it) }.firstOrNull { app.agents.checkName(it, exceptId = "-") == null }
+            ?: throw IllegalStateException(app.agents.checkName(linkName(hubName, 1), exceptId = "-") ?: "No free name for the hub link.")
+        // Link agents don't use one of the owner's agent slots (as a satellite's return link on its hub).
+        val (a, key) = app.agents.add(agentName, Connection.DIRECT, limited = false)
+        app.agents.update(a.id) { it.copy(caps = caps, fixer = false, superPowers = false,
+            boundIps = listOf(Net.normalise(source)), notes = "Link agent (Linked Bridgits). Disconnect the link to remove it.") }
+        check(prefs.edit().putStringSet("ids", (prefs.getStringSet("ids", emptySet()) ?: emptySet()) + a.id).commit())
+        return Triple(a.id, key, agentName)
     }
 
     /** A hub that didn't send its name when claiming names its link agent on a later manifest call. */
@@ -90,6 +118,7 @@ class HubLinks(private val app: BridgeApp) {
         if (!isHub(agentId)) return
         val info = if (tellHub) hubs().firstOrNull { it.linkId == agentId } else null
         app.agents.remove(agentId)
+        runCatching { cc.bridgit.app.relay.RelayStore(app).remove(agentId) }
         prefs.edit().putStringSet("ids", (prefs.getStringSet("ids", emptySet()) ?: emptySet()) - agentId).remove(INFO + agentId).commit()
         cc.bridgit.app.portal.PortalLinks(app).let { if (it.selected.value == cc.bridgit.app.portal.PortalLinks.HUB + agentId) it.select(null) }
         changes.value = changes.value + 1

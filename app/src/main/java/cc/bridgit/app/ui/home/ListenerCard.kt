@@ -21,7 +21,7 @@ import cc.bridgit.app.ui.common.themeColor
 
 /**
  * The listener card (UI-09): is Bridgit listening, over Tailscale, for how long, at which address,
- * with Pause / Resume. It was Home's hero card; since Home became Level 1 Diagnostics it sits
+ * with Pause / Resume. It was Home's hero card; since Home became Device Diagnostics it sits
  * at the top of the Agents tab. The owner calls [render] on listener, agent or settings changes
  * and [tick] once a second.
  */

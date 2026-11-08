@@ -1,0 +1,71 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Device to device: the other Bridgit of a link sends its grants-log events and its halves of both directions (link agents only). Not for agents.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "link_events",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "link_id",
+    "description": "The link",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "events",
+    "description": "Its log entries since the last contact",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "state",
+    "description": "{in:{opted_in, paused, services}, out:{opted_in, paused}} from its side",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "bridgit_name",
+    "description": "Its Device Domain Name",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/link/events {\"link_id\":\"lnk_\u2026\",\"events\":[],\"state\":{}}",
+  "idempotent": false,
+  "path": "/v1/link/events",
+  "capability": "status",
+  "returns": "ok, link_id, state (this device's halves)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "bridgit_name": {
+     "description": "Its Device Domain Name",
+     "type": "string"
+    },
+    "state": {
+     "description": "{in:{opted_in, paused, services}, out:{opted_in, paused}} from its side",
+     "type": "object"
+    },
+    "link_id": {
+     "description": "The link",
+     "type": "string"
+    },
+    "events": {
+     "description": "Its log entries since the last contact",
+     "type": "array",
+     "items": {"type": "object"}
+    }
+   },
+   "required": ["link_id"]
+  },
+  "errors": [],
+  "requires": null
+ }
+}

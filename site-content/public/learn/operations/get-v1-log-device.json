@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Snapshot of Android logcat visible to Bridgit's app UID; requires Fixer Mode",

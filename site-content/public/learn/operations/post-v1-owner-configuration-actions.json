@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Apply an allowlisted app-owned configuration action with existing feature/capture grants; explicit owner.configuration grant required; no per-change phone approval",
@@ -21,10 +21,12 @@
      "applet.configure",
      "delivery.subscribe",
      "dog.configure",
+     "portal.update_prompts",
      "remote.configure",
      "service.budget.set",
      "service.model.set",
      "sounds.configure",
+     "updates.auto",
      "updates.offers",
      "wake.configure"
     ]
@@ -55,10 +57,12 @@
       "applet.configure",
       "delivery.subscribe",
       "dog.configure",
+      "portal.update_prompts",
       "remote.configure",
       "service.budget.set",
       "service.model.set",
       "sounds.configure",
+      "updates.auto",
       "updates.offers",
       "wake.configure"
      ]

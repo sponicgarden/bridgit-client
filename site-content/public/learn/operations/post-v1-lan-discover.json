@@ -1,9 +1,9 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
-  "summary": "Bounded discovery on the Android host's direct local network",
+  "summary": "Network Diagnostics: bounded discovery on the Android host's direct local network",
   "method": "POST",
   "auth": true,
   "mcp_tool": "lan_discover",

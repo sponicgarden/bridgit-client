@@ -100,7 +100,8 @@ object McpProtocol {
 /** API-15: tool names, schemas, argument routing and results, generated from [Endpoints.all]. */
 object McpTools {
     /** Endpoints that make no sense as tools: MCP itself, pairing (no key), the helper download, the OpenAPI file. */
-    val EXCLUDED: Set<String> = setOf(Endpoints.MCP, Endpoints.PAIR, cc.bridgit.app.satellite.SatelliteEndpoints.CLAIM, cc.bridgit.app.satellite.SatelliteEndpoints.MANIFEST, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.OPENAPI).map { key(it) }.toSet()
+    val EXCLUDED: Set<String> = setOf(Endpoints.MCP, Endpoints.PAIR, cc.bridgit.app.satellite.SatelliteEndpoints.CLAIM, cc.bridgit.app.satellite.SatelliteEndpoints.MANIFEST,
+        cc.bridgit.app.link.LinkEndpoints.CLAIM, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.OPENAPI).map { key(it) }.toSet()
 
     /** Names fixed by hand where several endpoints share a path; keeps names stable as endpoints are added. */
     private val OVERRIDES = mapOf(
@@ -108,7 +109,8 @@ object McpTools {
         "GET /services/models/{applet_id}/{task_key}" to "services_models_effective",
         "GET /lan-cameras/framing/{id}" to "lan_cameras_framing_status",
         "GET /resource-jobs" to "resource_jobs_list", "GET /resource-jobs/{id}" to "resource_jobs_get", "DELETE /resource-jobs/{id}" to "resource_jobs_cancel",
-        "GET /log" to "log_read", "POST /log" to "log_note", "GET /log/{id}" to "log_entry",
+        "DELETE /owner/configuration/links/codes/{id}" to "owner_configuration_links_code_cancel",
+                "GET /log" to "log_read", "POST /log" to "log_note", "GET /log/{id}" to "log_entry",
         "GET /feedback" to "feedback_list", "POST /feedback" to "feedback_file", "GET /feedback/{id}" to "feedback_get",
         "POST /feedback/{id}/followup" to "feedback_followup",
         "POST /interactions" to "interactions_send", "GET /interactions" to "interactions_list",
@@ -132,7 +134,7 @@ object McpTools {
     /** Transport-only query params that tools don't take (images come back as MCP image content anyway). */
     private val HIDDEN_PARAMS = setOf("raw")
     /** Array params that hold plain words, not objects. */
-    private val STRING_ARRAYS = setOf("store", "kinds", "only", "hosts", "applets", "data", "custom", "credentials", "packages", "fields")
+    private val STRING_ARRAYS = setOf("store", "kinds", "only", "hosts", "applets", "data", "custom", "credentials", "packages", "fields", "services", "directions", "agents", "reverse_services")
     fun arrayItemType(name: String) = if (name in STRING_ARRAYS) "string" else "object"
     const val IDEMPOTENCY_ARG = "idempotency_key"
 

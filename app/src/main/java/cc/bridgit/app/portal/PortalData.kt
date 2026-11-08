@@ -23,11 +23,13 @@ object PortalData {
         "GET /v1/portal/snapshot", "GET /v1/portal/home", "GET /v1/portal/devices", "GET /v1/portal/brands/{id}/logo",
         "GET /v1/portal/logs", "GET /v1/portal/agents", "GET /v1/portal/applets", "GET /v1/portal/theme",
         "GET /v1/lan/brands/{id}/logo",
-        // Level 2 network diagnostics from the portal: a bounded scan under the owner's Local network discovery switch.
+        // Network Diagnostics from the portal: a bounded scan under the owner's Local network discovery switch.
         "POST /v1/lan/discover",
         // The Portal's Camera (5 Nov 2026): who checks photos, and send one.
         "GET /v1/portal/applets/inventory", "GET /v1/portal/applets/watches",
         "GET /v1/portal/photo/targets", "POST /v1/portal/photo",
+        // Update prompts (A0050, 7 Nov 2026): the Portal reports its build and applies agents' requests.
+        "POST /v1/portal/updates",
     )
     /** Capability grants of a portal agent: the portal endpoints, and lan_discovery for the existing logo route. */
     val GRANTS: Set<String> = setOf("portal", "lan_discovery")
@@ -272,7 +274,7 @@ object PortalData {
         .put(JSONObject().put("id", "pairing_pulse").put("where", "Add agent: waiting for the agent's first call")
             .put("describe", "A ring scales 1 → 1.35 while its opacity falls 0.3 → 0 over 2.4 s, accelerate-decelerate, repeating.")
             .put("motion", "pair_pulse"))
-        .put(JSONObject().put("id", "diagnostics_run").put("where", "Home: the full Level 1 Diagnostics run (Rerun)")
+        .put(JSONObject().put("id", "diagnostics_run").put("where", "Home: the full Device Diagnostics run (Rerun)")
             .put("describe", "Nodes are tested one by one in phases (Device basics, Media and access, Recognition and alerts, Controls and interaction); each prints check lines in the test bay, then lights in its group colour or goes grey (off) / amber (blocked). Tap skips.")
             .put("phases", JSONArray(listOf("Device basics", "Media and access", "Recognition and alerts", "Controls and interaction"))))
 }

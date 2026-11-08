@@ -43,6 +43,11 @@ object SafeHttp {
         /** Fixed adapter paths, literal directly connected LAN targets, private payloads. */
         LOCAL_DEVICE,
         /**
+         * Device-pack requests (lan/packs/PackEngine): plain http to a literal private IPv4 on port 80 or 1024-65535,
+         * no credentials in the URL; the engine has already pinned the host to the enrolled device. Private payloads.
+         */
+        LOCAL_PACK,
+        /**
          * An owner-approved connection "on my private network" (docs/applet-reach.md A2): any port; https to a
          * public or private address, plain http only when every resolved address is private (10/8, 172.16/12,
          * 192.168/16, 100.64/10, fc00::/7). Checked again on each send against the pinned address.
@@ -77,7 +82,7 @@ object SafeHttp {
             Policy.PUBLIC -> isPublic(a)
             Policy.TAILNET -> isTailnet(a)
             Policy.LOCAL_CAMERA -> a is Inet4Address && cc.bridgit.app.lancamera.LanCamera.localHost(a.hostAddress.orEmpty())
-            Policy.LOCAL_DEVICE -> a is Inet4Address && cc.bridgit.app.lan.LanRules.ipv4(a.hostAddress.orEmpty()) != null
+            Policy.LOCAL_DEVICE, Policy.LOCAL_PACK -> a is Inet4Address && cc.bridgit.app.lan.LanRules.ipv4(a.hostAddress.orEmpty()) != null
             Policy.OWNER_NETWORK -> isPublic(a) || isPrivate(a)
         }
     }
@@ -158,6 +163,9 @@ object SafeHttp {
             (u.rawPath in listOf("/shelly", "/status", "/ubus") && u.rawQuery == null ||
              u.rawPath.matches(Regex("/relay/[0-3]")) && u.rawQuery in listOf("turn=on", "turn=off"))) null
             else "only fixed LAN adapter operations are allowed"
+        if (policy == Policy.LOCAL_PACK) return if (scheme == "http" && u.rawUserInfo == null && u.rawFragment == null &&
+            effectivePort(u).let { it == 80 || it in 1024..65535 } && cc.bridgit.app.lan.LanRules.ipv4(u.host.orEmpty()) != null &&
+            u.rawPath.orEmpty().startsWith("/") && url.length <= 512) null else "only an enrolled device's own UPnP address is allowed"
         if (policy == Policy.LOCAL_CAMERA) return if (scheme == "http" && u.port == 2020 &&
             u.rawPath == "/onvif/service" && u.rawQuery == null && u.rawFragment == null && u.rawUserInfo == null &&
             cc.bridgit.app.lancamera.LanCamera.localHost(u.host.orEmpty())) null else "only an enrolled camera ONVIF address is allowed"
@@ -219,6 +227,10 @@ object SafeHttp {
         exchange("${if (https) "https" else "http"}://$host$path", Policy.LOCAL_DEVICE,
             if (body == null) "GET" else "POST", headers, body, Deadline(4000), 128 * 1024, null, null, sockets)
 
+    /** One device-pack request ([Policy.LOCAL_PACK]); GET when [body] is null. No redirects, no payload logging. */
+    fun localPack(url: String, headers: Map<String, String>, body: ByteArray?, sockets: javax.net.SocketFactory): Result =
+        exchange(url, Policy.LOCAL_PACK, if (body == null) "GET" else "POST", headers, body, Deadline(4000), 256 * 1024, null, null, sockets)
+
     /** POST [body] to [url]; never follows redirects. Returns the HTTP status. Throws [Failure]. */
     fun post(url: String, policy: Policy, headers: Map<String, String>, body: ByteArray, deadlineMs: Long, extraPort: Int? = null): Int =
         exchange(url, policy, "POST", headers, body, Deadline(deadlineMs), 64 * 1024, extraPort, null).status
@@ -268,12 +280,12 @@ object SafeHttp {
         catch (e: Outbound.Paused) { throw Failure(Reason.PAUSED, Outbound.Paused.MESSAGE, e) }
         val started = System.currentTimeMillis()
         val r = try { exchangeRaw(url, policy, method, headers, body, deadline, maxBytes, extraPort, out, sockets, beforeWrite) } catch (e: Failure) {
-            Outbound.record(logUrl, method, if (url.startsWith("http:")) "http" else "https", if (policy == Policy.LOCAL_DEVICE) emptyMap() else headers, if (policy == Policy.LOCAL_CAMERA || policy == Policy.LOCAL_DEVICE) null else body, sentBytes = body?.size?.toLong() ?: 0L, status = 0,
+            Outbound.record(logUrl, method, if (url.startsWith("http:")) "http" else "https", if (policy == Policy.LOCAL_DEVICE || policy == Policy.LOCAL_PACK) emptyMap() else headers, if (policy == Policy.LOCAL_CAMERA || policy == Policy.LOCAL_DEVICE || policy == Policy.LOCAL_PACK) null else body, sentBytes = body?.size?.toLong() ?: 0L, status = 0,
                 error = "${e.reason}: ${e.message}", startedAt = started)
             throw e
         }
-        Outbound.record(logUrl, method, if (url.startsWith("http:")) "http" else "https", if (policy == Policy.LOCAL_DEVICE) emptyMap() else headers, if (policy == Policy.LOCAL_CAMERA || policy == Policy.LOCAL_DEVICE) null else body, sentBytes = body?.size?.toLong() ?: 0L, status = r.status,
-            receivedBytes = r.length, received = (if (policy == Policy.LOCAL_CAMERA || policy == Policy.LOCAL_DEVICE) null else r.bytes)?.let { if (it.size > 4096) it.copyOf(4096) else it },
+        Outbound.record(logUrl, method, if (url.startsWith("http:")) "http" else "https", if (policy == Policy.LOCAL_DEVICE || policy == Policy.LOCAL_PACK) emptyMap() else headers, if (policy == Policy.LOCAL_CAMERA || policy == Policy.LOCAL_DEVICE || policy == Policy.LOCAL_PACK) null else body, sentBytes = body?.size?.toLong() ?: 0L, status = r.status,
+            receivedBytes = r.length, received = (if (policy == Policy.LOCAL_CAMERA || policy == Policy.LOCAL_DEVICE || policy == Policy.LOCAL_PACK) null else r.bytes)?.let { if (it.size > 4096) it.copyOf(4096) else it },
             receivedType = r.header("content-type"), startedAt = started)
         return r
     }

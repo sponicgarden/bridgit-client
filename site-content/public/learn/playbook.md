@@ -1,7 +1,7 @@
 
 # Bridgit playbook
 
-Built for API revision 128.
+Built for API revision 132.
 
 Read this once after pairing. It tells you what Bridgit lets you do for the owner, which tool fits which job, and
 40 worked use cases to suggest or build on. It also shows how to help the owner find what's worth doing: most

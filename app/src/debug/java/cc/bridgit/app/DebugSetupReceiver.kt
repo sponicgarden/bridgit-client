@@ -134,6 +134,19 @@ class DebugSetupReceiver : BroadcastReceiver() {
             }
         }
         intent.getStringExtra("satellite_remove")?.let { id -> cc.bridgit.app.satellite.SatelliteHub.remove(app, id) }
+        // Linked Bridgits: link_resolve=<name>|<code> asks the names backend for that name's address with a proof of the
+        // code (spec-linked-bridgits §14.4) and logs "link_resolve ok <host>:<port>" or "link_resolve failed <error>".
+        intent.getStringExtra("link_resolve")?.let { spec ->
+            val (n, c) = spec.split('|', limit = 2).let { it[0] to it.getOrElse(1) { "" } }
+            Thread {
+                runCatching {
+                    val own = cc.bridgit.app.feedback.InstallIdentity.status(app)?.installId ?: error("no install id")
+                    val code = cc.bridgit.app.link.LinkCode.normalise(c) ?: error("not a code")
+                    cc.bridgit.app.link.LinkResolver.resolve(app, n, cc.bridgit.app.link.LinkCode.keys(code, n).proof(n, own))
+                }.onSuccess { android.util.Log.i("BridgitDebug", "link_resolve ok ${it.first}:${it.second}") }
+                    .onFailure { android.util.Log.w("BridgitDebug", "link_resolve failed ${(it as? cc.bridgit.app.api.ApiError)?.code ?: it.javaClass.simpleName} ${it.message}") }
+            }.start()
+        }
         if (intent.hasExtra("hub_list")) app.hubLinks.agents().forEach { a ->
             val info = app.hubLinks.hubs().firstOrNull { it.linkId == a.id }
             android.util.Log.i("BridgitDebug", "hub_link ${a.id} ${a.name} info=${info?.name}@${info?.host}:${info?.port}")

@@ -52,6 +52,21 @@ class SatelliteStore(context: Context) {
         } }
     }
 
+    /** What Linked Bridgits needs on every request, without decrypting any key. */
+    data class Meta(val id: String, val name: String, val install: String?, val addedAt: Long, val manifest: JSONObject?,
+                    val agents: Set<String>, val returnAgent: String?)
+
+    fun metas(): List<Meta> {
+        val arr = runCatching { JSONArray(prefs.getString("satellites", "[]")) }.getOrDefault(JSONArray())
+        return (0 until arr.length()).mapNotNull { i -> arr.optJSONObject(i)?.let { o -> runCatching {
+            Meta(o.getString("id"), o.optString("name"), o.optString("install").takeIf { it.startsWith("bgi_") }, o.optLong("added_at"),
+                o.optJSONObject("manifest"), o.optJSONArray("agents")?.let { a -> (0 until a.length()).map { a.getString(it) }.toSet() } ?: emptySet(),
+                o.optString("return_agent").takeIf { it.isNotEmpty() && !o.isNull("return_agent") })
+        }.getOrNull() } }
+    }
+
+    fun meta(id: String): Meta? = metas().firstOrNull { it.id == id }
+
     fun get(id: String): Satellite? = all().firstOrNull { it.id == id }
     fun count(): Int = runCatching { JSONArray(prefs.getString("satellites", "[]")).length() }.getOrDefault(0)
 

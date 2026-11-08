@@ -586,6 +586,29 @@ object ApiChanges {
         Revision(128, "1.8.0", "2026-11-07", listOf(
             Item("Bridgit names: the first control call registers this Bridgit's Device Domain Name (bridgit_name in health and capabilities); label and visibility are configurable and a visible name sends a heartbeat", "/v1/owner/configuration/name"),
         )),
+        Revision(129, "1.8.0", "2026-11-07", listOf(
+            Item("Linked Bridgits: two-way links between the owner's Bridgits with a double opt-in per direction. Lists the ones you may use; target any call by the linked Bridgit's Device Domain Name (X-Bridgit-Target or target=); sat: ids keep working; GET /v1/satellites is the same list", "/v1/links"),
+            Item("Link with a name and a one-time code: make a code on the Bridgit to be used, claim it on the other; both logs name who did it", "/v1/owner/configuration/links/claims"),
+            Item("Change this Bridgit's half of a direction: the service list (in) or the agents that may use the other Bridgit (out), or pause it", "/v1/owner/configuration/links/{id}/directions/{direction}"),
+            Item("Any control agent may disconnect or pause a link at once (Undo for 10 seconds); an offline other side gets link_revoked on its next call", "/v1/owner/configuration/links/{id}/disconnect"),
+            Item("The grants log of both Bridgits: every link event with its granter (person, agent or migrated)", "/v1/owner/configuration/links/log"),
+            Item("New errors: link_revoked, link_paused, link_waiting, not_on_target, target_offline, code_invalid, code_expired, code_used_up, name_required. A call is passed on once: a call that came over a link can't name another target", null),
+            Item("Device to device (not for agents): a Bridgit claims a link code with the claim token derived from it", "/v1/link/claim"),
+            Item("Device to device: grants-log events and each side's halves of the link", "/v1/link/events"),
+            Item("Device to device: a Bridgit's other links, names and directions only", "/v1/link/peers"),
+            Item("Device to device: the other Bridgit disconnected, so this one marks it off too", "/v1/link/disconnect"),
+        )),
+        Revision(130, "1.8.0", "2026-11-07", listOf(
+            Item("Device packs: device-family support Bridgit downloads on first use and keeps updated (signed, versioned, never downgraded); list and check them", "/v1/lan/packs"),
+            Item("Speakers (UPnP/DLNA: WiiM, Denon Home and others) enroll as adapter upnp_av with no credentials; actions status, play {url, title}, pause, resume, stop, volume_get, volume_set {level}, mute_set {muted} take params", "/v1/lan/devices/action"),
+        )),
+        Revision(131, "1.8.0", "2026-11-07", listOf(
+            Item("Bridgit Portal update prompts (iPhone, iPad, Mac): read each paired Portal's prompt switch, build and newest TestFlight build in GET /v1/owner/settings portal_updates; change the switch with owner configuration action portal.update_prompts {portal_id, enabled} or ask it to prompt now with portal.update_now {portal_id}. The Portal applies a request when it next syncs", "/v1/owner/settings"),
+            Item("Portal to phone (not for agents): the snapshot carries a pending update request and the Portal reports its update state", "/v1/portal/updates"),
+        )),
+        Revision(132, "1.8.0", "2026-11-08", listOf(
+            Item("Device Diagnostics and Network Diagnostics replace Level 1 and Level 2; foreground screen device_diagnostics replays Device Diagnostics on Home (same as Rerun) and network_diagnostics opens Network Diagnostics", "/v1/app/foreground"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

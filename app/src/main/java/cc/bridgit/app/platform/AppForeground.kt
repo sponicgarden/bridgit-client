@@ -45,7 +45,7 @@ class AppForeground(private val app: BridgeApp) {
     fun targets(agent: String): JSONObject {
         authorize(agent)
         val canPortals = app.agents.get(agent)?.allows("applet_portals") == true && app.settings.isOn("applet_portals")
-        return JSONObject().put("screens", JSONArray(SCREENS.keys.map { JSONObject().put("type","screen").put("id",it) }))
+        return JSONObject().put("screens", JSONArray(SCREENS.keys.map { id -> JSONObject().put("type","screen").put("id",id).apply { SCREEN_NOTES[id]?.let { put("description",it) } } }))
             .put("applets", if (canPortals) JSONArray(app.applets.all().filter { app.appletPortals.kind(it) != null || it.optString("native") == "dog" }.map {
                 JSONObject().put("type","applet").put("id",it.getString("id")).put("name",it.optString("name")) }) else JSONArray())
             .put("portals", if (canPortals) JSONArray(AppletPortalsFragment.list(app).map { JSONObject().put("type","portal").put("id",it.id).put("name",it.name) }) else JSONArray())
@@ -144,6 +144,9 @@ class AppForeground(private val app: BridgeApp) {
             } else if (foreground) manager.cancel(NOTIFICATION_ID)
             val outcome = if (foreground) "foreground" else if (posted) "notification_posted" else "blocked"
             app.log.system("audit", "app.foreground", "$identity: $outcome")
+            // Home replays Device Diagnostics now if it is showing, else when the owner opens it from the
+            // notification (expires after 5 minutes). A refused switch leaves nothing to replay later.
+            if(type=="screen" && id==DEVICE_DIAGNOSTICS && (foreground || posted)) cc.bridgit.app.ui.home.DiagnosticsRerun.request()
             if(!foreground && !posted) throw ApiError(409, if(locked) "device_locked" else "foreground_not_confirmed",
                 if(locked) "Unlock this device and open Bridgit" else "Android did not confirm the requested target and no notification could be posted",
                 mapOf("foreground" to false,"platform" to "android","user_action_required" to true,"target" to JSONObject().put("type",type).put("id",id)))
@@ -162,7 +165,14 @@ class AppForeground(private val app: BridgeApp) {
         val SCREENS = linkedMapOf("home" to R.id.home, "inbox" to R.id.interactions, "agents" to R.id.agents,
             "activity" to R.id.activity, "more" to R.id.more, "settings" to R.id.settings,
             "features" to R.id.features, "network_devices" to R.id.networkDevices,
-            "cameras" to R.id.cameras, "reports" to R.id.myReports, "pet_monitor" to R.id.dogMonitor, "city_tour" to R.id.tour)
+            "cameras" to R.id.cameras, "reports" to R.id.myReports, "pet_monitor" to R.id.dogMonitor, "city_tour" to R.id.tour,
+            DEVICE_DIAGNOSTICS to R.id.home, NETWORK_DIAGNOSTICS to R.id.networkDevices)
+        const val DEVICE_DIAGNOSTICS = "device_diagnostics"
+        const val NETWORK_DIAGNOSTICS = "network_diagnostics"
+        /** User, 7 Nov 2026: "Device Diagnostics" and "Network Diagnostics" (were Level 1 and Level 2) in the app and APIs. */
+        val SCREEN_NOTES = mapOf(
+            DEVICE_DIAGNOSTICS to "Home, replaying Device Diagnostics: the visual check of every phone capability, same as Rerun. Read the results with the diagnostics tool.",
+            NETWORK_DIAGNOSTICS to "Network devices, where Network Diagnostics runs. Run it with POST /v1/lan/discover (lan_discovery).")
         private const val NOTIFICATION_ID = 0x425246
         fun validate(args: JSONObject): String {
             args.only("reason","target")

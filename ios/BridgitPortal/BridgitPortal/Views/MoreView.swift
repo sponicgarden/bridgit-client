@@ -5,6 +5,7 @@ import SwiftUI
 struct MoreView: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var relays: RelayStore
+    @EnvironmentObject var updates: UpdatePrompts
     var live: PhoneLive?
     @State private var showPair = false
     @State private var showLink = false
@@ -18,6 +19,8 @@ struct MoreView: View {
                 Text("More").font(.system(size: 34)).foregroundStyle(B.onSurface).padding(.bottom, 4)
                 // Same first rows as the APK's More: Check for updates, then (portal only) the Android app.
                 ActionRow(icon: "arrow.down.circle", title: "Check for updates") { checkForUpdates() }
+                // A0050: ask to update when a new TestFlight build is ready; on by default.
+                ToggleRow(icon: "bell.badge", title: "Update prompts", isOn: Binding(get: { updates.enabled }, set: { updates.setEnabled($0) }))
                 ActionRow(icon: "qrcode", title: "Install Android App") { showInstall = true }
                 if let live {
                     SectionLabel(text: live.device.name)
@@ -89,7 +92,9 @@ private struct RowBody: View {
             Spacer()
             if chevron { Image(systemName: "chevron.right").foregroundStyle(B.onSurfaceVariant) }
         }
-        .padding(.vertical, 16)
+        // Design pass (A0050): one row geometry for action, link and switch rows: 32 pt content + 12 pt each side.
+        .frame(minHeight: 32)
+        .padding(.vertical, 12)
         .contentShape(Rectangle())
     }
 }
@@ -110,6 +115,25 @@ struct ActionRow: View {
     var action: () -> Void
     var body: some View {
         Button(action: action) { RowBody(icon: icon, title: title, chevron: false) }.buttonStyle(.plain)
+        Divider().overlay(B.outlineVariant)
+    }
+}
+
+struct ToggleRow: View {
+    var icon: String
+    var title: String
+    @Binding var isOn: Bool
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            HStack(spacing: 18) {
+                Image(systemName: icon).frostText(.section, weight: .semibold).frame(width: 28).foregroundStyle(B.onSurfaceVariant)
+                    .accessibilityHidden(true)
+                Text(title).frostText(.section, weight: .semibold).foregroundStyle(B.onSurface)
+            }
+        }
+        .tint(B.primary)
+        .frame(minHeight: 32)
+        .padding(.vertical, 12)
         Divider().overlay(B.outlineVariant)
     }
 }

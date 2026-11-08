@@ -41,4 +41,16 @@ class AppForegroundTest {
         assertTrue(Capabilities.all.any { it.id == "app.foreground" })
         assertTrue(ToolSchemas.forTool("app.foreground").toString().contains("reason"))
     }
+
+    @Test fun diagnosticsTargetsUseTheNewNames() {
+        assertEquals(cc.bridgit.app.R.id.home, AppForeground.SCREENS["device_diagnostics"])
+        assertEquals(cc.bridgit.app.R.id.networkDevices, AppForeground.SCREENS["network_diagnostics"])
+        // Existing ids keep working for agents that already use them.
+        assertEquals(cc.bridgit.app.R.id.home, AppForeground.SCREENS["home"])
+        assertEquals(cc.bridgit.app.R.id.networkDevices, AppForeground.SCREENS["network_devices"])
+        assertTrue(AppForeground.SCREEN_NOTES.keys.all { it in AppForeground.SCREENS })
+        assertTrue(AppForeground.SCREEN_NOTES.getValue("device_diagnostics").contains("Device Diagnostics"))
+        assertTrue(AppForeground.SCREEN_NOTES.getValue("network_diagnostics").contains("/v1/lan/discover"))
+        AppForeground.validate(JSONObject().put("reason","Owner asked").put("target",JSONObject().put("type","screen").put("id","device_diagnostics")))
+    }
 }

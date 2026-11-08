@@ -207,16 +207,16 @@ final class PhoneLive: ObservableObject {
 
     @Published var scanning = false
     @Published var scanNote: String?
-    /// Ids of the devices the latest Level 2 scan saw (seen within two minutes); nil when it failed.
+    /// Ids of the devices the latest Network Diagnostics scan saw (seen within two minutes); nil when it failed.
     /// The Devices map flies these in one by one, as the APK's map does while its own scan runs.
     @Published var scanFound: [String]?
     /// Cameras and smart devices added to Bridgit on the phone (the APK lists them first, "Added to Bridgit").
     /// GET /v1/portal/devices carries them as `added`; older phones leave it out, so it stays empty then.
     @Published var added: [AddedDevice] = []
 
-    /// Level 2 Network Device Diagnostics: a bounded scan on the phone's own network (POST /v1/lan/discover,
+    /// Network Diagnostics: a bounded scan on the phone's own network (POST /v1/lan/discover,
     /// up to about 20 seconds), with the same grouping and counts as the APK's Network devices screen.
-    func runLevel2() async {
+    func runNetworkDiagnostics() async {
         if model.isSample {
             guard !scanning else { return }
             scanning = true; scanNote = "Looking for devices…"; scanFound = nil
@@ -326,6 +326,7 @@ final class PhoneLive: ObservableObject {
         merge(Self.entries(logsObj))
         if let next = (logsObj as? [String: Any])?["next_since"] as? Int { latestLogId = max(latestLogId ?? 0, next) }
         hasOlder = (logsObj as? [String: Any])?["has_older"] as? Bool ?? false
+        await syncUpdates(request: s["updates"] as? [String: Any])
         // The phone states this pairing's relay allowance (1.8.1833+); older phones don't, so stay slow then.
         if let jobs = s["relay_daily_jobs"] as? Int {
             portalAllowance = jobs >= 5000
@@ -333,6 +334,21 @@ final class PhoneLive: ObservableObject {
             portalAllowance = list.contains { ($0["portal"] as? Bool) == true && ($0["transport"] as? String) == "relay" } && device.pairing?.portal == true
         }
     }
+
+    /// Update prompts (A0050): apply an agent's request this phone holds, then report this device's state to it
+    /// (only when it changed or a request is acknowledged). A phone without the route just doesn't get reports.
+    private func syncUpdates(request: [String: Any]?) async {
+        guard let relay, !updatesRouteMissing else { return }
+        let ack = await model.updates.apply(request)
+        guard let body = model.updates.report(for: device.id, ack: ack) else { return }
+        do {
+            let r = try await relay.call(method: "POST", path: "/v1/portal/updates", query: ["client": Self.client], body: body, wait: 25)
+            if r.status >= 300 { model.updates.forgetReport(for: device.id) }
+        } catch let e as RelayError where Self.isMissingRoute(e) {
+            updatesRouteMissing = true  // an older phone: don't spend relay calls on it again this session
+        } catch { model.updates.forgetReport(for: device.id) }
+    }
+    private var updatesRouteMissing = false
 
     private func loadLiveHome() async throws {
         guard let relay else { return }

@@ -208,9 +208,9 @@ class AgentRegistry(private val storage: AgentStorage, private val clock: () -> 
     }
 
     @Synchronized
-    fun remove(id: String): Agent? {
+    fun remove(id: String, reason: String = "agent_removed"): Agent? {
         val old = get(id) ?: return null
-        tombstones = tombstones + Tombstone(old.id, old.name, old.keyHash, old.keySalt, "agent_removed", clock())
+        tombstones = tombstones + Tombstone(old.id, old.name, old.keyHash, old.keySalt, reason, clock())
         agents = agents.filterNot { it.id == id }
         persist(); changed()
         runCatching { onKeyRetired?.invoke(id) }

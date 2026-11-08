@@ -5,7 +5,7 @@ import WebKit
 // The Devices tab, as on the APK (lancamera/LanCamerasFragment.kt): the network icon and a Map | List switch on the
 // top line. Map is the APK's own page (assets/diagnostics/devices.html, fed like lancamera/DevicesScene.kt);
 // List is the APK's Network devices list (lan/NetworkDevicesFragment.kt, embedded). The portal only views:
-// no owner actions, but Level 2 can run when the phone allows this pairing to scan.
+// no owner actions, but Network Diagnostics can run when the phone allows this pairing to scan.
 
 /// Network devices (tab: Devices; More › Network devices): Map and List of what the phone found on its network.
 struct NetworkDevicesView: View {
@@ -43,13 +43,13 @@ private struct DevicesHost: View {
             ZStack {
                 DevicesMapView(live: live, visible: tab == "map", replay: replay) { id in
                     switch id {
-                    case "find": Task { await live.runLevel2() }
+                    case "find": Task { await live.runNetworkDiagnostics() }
                     case "list": tab = "list"
                     default: picked = MapPick(id: id)
                     }
                 }
                 .opacity(tab == "map" ? 1 : 0).allowsHitTesting(tab == "map").accessibilityHidden(tab != "map")
-                DevicesList(live: live) { tab = "map"; Task { await live.runLevel2() } }
+                DevicesList(live: live) { tab = "map"; Task { await live.runNetworkDiagnostics() } }
                     .opacity(tab == "list" ? 1 : 0).allowsHitTesting(tab == "list").accessibilityHidden(tab != "list")
             }
         }
@@ -204,7 +204,7 @@ enum DevicesMapOptions {
                                              ("SMART", "Smart home"), ("MOBILE", "Phones & tablets"), ("OTHER", "Other devices")]
     static let maxDevices = 200
 
-    /// `found`: during Level 2, the devices this scan saw (each drawn as seen, with its address).
+    /// `found`: during Network Diagnostics, the devices this scan saw (each drawn as seen, with its address).
     static func build(categories: [LanCategory], added: [AddedDevice], found: [String]? = nil, core: String? = nil, catalog: BrandCatalog = .shared,
                       now: Date = Date()) -> [String: Any] {
         struct Entry { var json: [String: Any]; var state: String; var online: Bool }
@@ -368,12 +368,12 @@ private struct DevicesMapView: UIViewRepresentable {
             }
         }
 
-        /// Sends the phone's devices to the page: the opening animation, quiet redraws, or a Level 2 run.
+        /// Sends the phone's devices to the page: the opening animation, quiet redraws, or a Network Diagnostics run.
         func push() {
             guard ready, let live, web != nil else { return }
             if live.scanning {
                 if !scanShown {
-                    // Level 2 started: the map clears to the added devices and the phone starts its sweep.
+                    // Network Diagnostics started: the map clears to the added devices and the phone starts its sweep.
                     scanShown = true; drawn = true
                     js("BridgitDevices.scanStart(\(json(DevicesMapOptions.build(categories: live.categories, added: live.added, found: [], core: live.device.name))))")
                 }
@@ -462,7 +462,7 @@ private enum ListMode: String, CaseIterable { case all, groups, connected, uncon
 
 private struct DevicesList: View {
     @ObservedObject var live: PhoneLive
-    var onLevel2: () -> Void
+    var onNetworkDiagnostics: () -> Void
     @State private var mode: ListMode = .all
     /// Groups opened or closed by hand; the rest follow the tab (Groups folds them all).
     @State private var open: [String: Bool] = [:]
@@ -493,9 +493,9 @@ private struct DevicesList: View {
                     Text("On this network").font(.system(size: 16, weight: .bold)).foregroundStyle(B.onSurface)
                     Spacer(minLength: 8)
                     if live.device.isLive || live.source == .sample {
-                        Button(action: onLevel2) {
+                        Button(action: onNetworkDiagnostics) {
                             HStack(spacing: 6) {
-                                Text("Level 2 Diagnostic").font(.system(size: 14, weight: .medium))
+                                Text("Network Diagnostics").font(.system(size: 14, weight: .medium))
                                 Image(systemName: "arrow.clockwise").font(.system(size: 15, weight: .semibold))
                             }
                             .foregroundStyle(B.primary)
@@ -503,7 +503,7 @@ private struct DevicesList: View {
                             .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(B.primary, lineWidth: 1))
                         }
                         .buttonStyle(.plain).disabled(live.scanning).opacity(live.scanning ? 0.5 : 1)
-                        .accessibilityLabel("Run Level 2 Diagnostic: look around this network")
+                        .accessibilityLabel("Run Network Diagnostics: look around this network")
                     }
                 }
                 .padding(.leading, 4).padding(.vertical, 6)

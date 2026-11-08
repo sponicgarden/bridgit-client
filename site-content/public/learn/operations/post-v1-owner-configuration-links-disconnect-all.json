@@ -1,0 +1,36 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Disconnect every link of this Bridgit at once (Undo per link for 10 seconds); any control agent of this device (taking access away needs no owner.configuration grant)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_links_disconnect_all",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/owner/configuration/links/disconnect-all ",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/links/disconnect-all",
+  "capability": "status",
+  "returns": "disconnected (count), undo_until",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"idempotency_key": {
+    "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+    "type": "string"
+   }},
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "not_found",
+   "conflict"
+  ],
+  "requires": null
+ }
+}

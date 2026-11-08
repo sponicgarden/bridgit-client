@@ -209,6 +209,8 @@
         <!-- 8.25: Ask, Pause/Resume and End from the City tour notification. -->
         <receiver android:name="cc.bridgit.app.tour.TourActionReceiver" android:exported="false" />
         <receiver android:name="cc.bridgit.app.security.SecurityActionReceiver" android:exported="false" />
+        <!-- Linked Bridgits: Disconnect and Undo from the "Used by" notification. -->
+        <receiver android:name="cc.bridgit.app.link.LinkNotifier$LinkActionReceiver" android:exported="false" />
         <!-- Pet monitor applet: Stop from its notification. -->
         <receiver android:name="cc.bridgit.app.dog.DogStopReceiver" android:exported="false" />
 

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Counts, errors and p50/p95 time per agent and endpoint",

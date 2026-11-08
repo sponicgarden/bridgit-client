@@ -77,8 +77,8 @@ class PortalDataTest {
     }
 
     @Test fun `portal allowlist is read-only and recognised`() {
-        // Read-only, except the Level 2 network scan (owner's discovery switch, 20 s bound) and the Portal camera's photos.
-        assertEquals(listOf("POST /v1/lan/discover", "POST /v1/portal/photo"), PortalData.ROUTES.filterNot { it.startsWith("GET ") })
+        // Read-only, except the Network Diagnostics scan (owner's discovery switch, 20 s bound), the Portal camera's photos and the Portal's update reports.
+        assertEquals(listOf("POST /v1/lan/discover", "POST /v1/portal/photo", "POST /v1/portal/updates"), PortalData.ROUTES.filterNot { it.startsWith("GET ") })
         // Pairings from 1.8.1731/1742 (portal GETs only) are recognised for the in-place upgrade.
         val old = PortalData.ROUTES.filter { it.startsWith("GET ") }.toSet()
         assertTrue(PortalData.isLegacyPortalConfig(old, emptySet()))

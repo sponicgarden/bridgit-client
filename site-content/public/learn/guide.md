@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 128). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 132). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,11 +14,11 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 128 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 132 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 128
-- Bridgit names: the first control call registers this Bridgit's Device Domain Name (bridgit_name in health and capabilities); label and visibility are configurable and a visible name sends a heartbeat (`/v1/owner/configuration/name`)
+## New in revision 132
+- Device Diagnostics and Network Diagnostics replace Level 1 and Level 2; foreground screen device_diagnostics replays Device Diagnostics on Home (same as Rerun) and network_diagnostics opens Network Diagnostics (`/v1/app/foreground`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -164,7 +164,7 @@ Example: `POST /v1/lan-cameras/talk-account {"camera":"lan:example","cloud_passw
 
 ### `GET /v1/app/foreground/targets`
 Discover available Bridgit screens, your cards, installed applet pages and consumer portals.
-Returns: screens,cards,applets,portals with type and id; app.foreground grant required; portal targets also need applet_portals; min_interval_ms,max_per_minute.
+Returns: screens,cards,applets,portals with type and id (screen device_diagnostics replays Device Diagnostics on Home; network_diagnostics opens Network Diagnostics); app.foreground grant required; portal targets also need applet_portals; min_interval_ms,max_per_minute.
 Example: `GET /v1/app/foreground/targets`
 
 ### `POST /v1/app/foreground`
@@ -265,7 +265,7 @@ Example: `GET /v1/delivery`
 
 ### `GET /v1/owner/settings`
 Supplemental owner settings, model-key presence and consent requirements.
-Returns: update_offers,remote,own_keys provider/configured flags,configuration_grant; no key suffixes or tokens.
+Returns: update_offers,auto_update{enabled,supported,silent_install_available,last_result,last_at,last_version},portal_updates[{portal_id,name,prompts_enabled,supported,installed_build,latest_build,update_ready,last_result,reported_at,pending}],remote,own_keys provider/configured flags,configuration_grant; no key suffixes or tokens.
 Example: `GET /v1/owner/settings`
 
 ### `POST /v1/owner/configure`
@@ -476,6 +476,57 @@ Returns: same listening state as GET; no authority grants or model downloads.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/owner/configuration/listening {"wake_words":[]}`
 
+### `GET /v1/owner/configuration/links`
+Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each.
+Returns: links[id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}], codes[{id, services, directions, expires_at, tries_left, state, granter}], services (vocabulary), suggested_services, paused_all{satellites, hubs}, name (this Bridgit's Device Domain Name or null), operations.
+Example: `GET /v1/owner/configuration/links`
+
+### `POST /v1/owner/configuration/links/codes`
+Make a one-time link code for this Bridgit as the target (8 characters, 10 minutes, 5 wrong tries); needs a Device Domain Name; explicit owner.configuration grant required; no per-change phone approval.
+Body (JSON): `services` What the claiming Bridgit may use here: camera, gallery, interactions, location, mic, sounds, speaker, view (suggested: camera, mic, speaker, interactions, view); required for in; `directions` ["in"] (default: the claiming Bridgit uses this one), ["out"] (this one uses it) or both; `agents` For out: this Bridgit's control agent ids that may use the claiming Bridgit.
+Returns: code_id, code (K7QX-3MPA: give it with the name), name, expires_at, services, directions, link (bridgit://link#… for a QR code), name_lookup, how.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/links/codes {"services":["camera","mic","speaker","interactions","view"]}`
+
+### `DELETE /v1/owner/configuration/links/codes/{id}`
+Cancel a link code that hasn't been claimed; explicit owner.configuration grant required; no per-change phone approval.
+Returns: code_id, state=cancelled.
+Accepts `Idempotency-Key`.
+Example: `DELETE /v1/owner/configuration/links/codes/{id} `
+
+### `POST /v1/owner/configuration/links/claims`
+Claim another Bridgit's link code: this Bridgit then uses it (its user opt-in), and may offer the other direction too; explicit owner.configuration grant required; no per-change phone approval.
+Body (JSON): `name` The other Bridgit's Device Domain Name (required unless link is given); `code` Its link code, K7QX-3MPA (required unless link is given); `link` Its bridgit://link#… link (holds name, code and its Tailscale address); `host` Its Tailscale address, when the names backend can't resolve the name; `port` Its Bridgit port, with host; `agents` This Bridgit's control agent ids that may use it; default: the calling agent; `reverse_services` What the other Bridgit may use here in return (it opts in on its side); default none.
+Returns: the new link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}).
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/links/claims {"name":"kitchen-tab","code":"K7QX-3MPA"}`
+
+### `POST /v1/owner/configuration/links/{id}/directions/{direction}`
+Change this Bridgit's half of one direction: in = the other Bridgit uses this one (services), out = this one uses it (agents); paused on either; explicit owner.configuration grant required; no per-change phone approval.
+Body (JSON): `services` in only: the service list (what the other Bridgit may use here); [] leaves only the link itself; `agents` out only: this Bridgit's control agent ids that may use the other one; setting it is this Bridgit's opt-in; `paused` Pause or resume this direction on this Bridgit.
+Returns: the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}).
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/links/{id}/directions/{direction} {"agents":["agt_…"]}`
+
+### `POST /v1/owner/configuration/links/{id}/undo`
+Undo a disconnect within 10 seconds; after that linking again needs a new code; explicit owner.configuration grant required; no per-change phone approval.
+Returns: the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}).
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/links/{id}/undo `
+
+### `POST /v1/owner/configuration/links/pause-all`
+Pause or resume links by role, as the Linked devices pills do; each pauses both directions of those links; explicit owner.configuration grant required; no per-change phone approval.
+Body (JSON): `satellites` true pauses every link where the other Bridgit is this one's satellite (Satellites pill); `hubs` true pauses every link where the other Bridgit is this one's hub (Hubs pill).
+Returns: paused_all{satellites, hubs}.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/links/pause-all {"hubs":true}`
+
+### `GET /v1/owner/configuration/links/log`
+Read the grants log: every link event on this Bridgit and the ones the other Bridgits reported, newest first, with who did each.
+Query: `link` Only this link id; `direction` in, out or both; `granter` person, agent, rule, migrated, or an agent id or name; `before` Older than this time (ms), for paging; `limit` 1-200, default 50.
+Returns: events[{id, at, link_id, direction, event, before, after, granter{kind person|agent|rule|migrated, agent_id, agent_name, device}, device, code_id, reported_by, late}], next_before.
+Example: `GET /v1/owner/configuration/links/log`
+
 ### `GET /v1/applet-devices`
 Read selectively assigned external devices for installed applets.
 Query: `applet` Optional applet id; returns only devices assigned to it.
@@ -519,7 +570,7 @@ Returns: id,name,mime,source,sha256,data_base64; raw=1 returns passive SVG or PN
 Example: `GET /v1/lan/brands/tapo/logo`
 
 ### `POST /v1/lan/discover`
-Bounded discovery on the Android host's direct local network.
+Network Diagnostics: bounded discovery on the Android host's direct local network.
 Body (JSON): `hosts` Optional literal private IPv4 targets, at most 254; no other networks; `subnet` Probe the direct /24.. /30 subnet on TCP 80,443,554,2020; default false.
 Returns: network, total_devices, total_categories, categories[id,title,count,device_ids], devices[id,name,type,category,model,identifier,services,brand,verified=false,enrolled=false], observations, methods, limits, complete=false; untrusted partial observations, never a complete online inventory.
 Example: `POST /v1/lan/discover {"hosts":["192.168.1.1"]}`
@@ -531,7 +582,7 @@ Example: `GET /v1/lan/devices`
 
 ### `POST /v1/lan/devices/enroll`
 Verify a supported device with authorized credentials and enroll it for this agent.
-Body (JSON): `host` (required) Direct LAN literal IPv4; `adapter` (required) Supported adapter; `name` (required) Owner's device label, 1..60 chars; `username` Authorized local device/router account; `password` Authorized local password, never returned; `talk_cloud_password` Optional separate authorized Tapo cloud password, encrypted privately; passive authentication only, no speaker playback; `allow_http` Explicitly permit unencrypted LAN HTTP, including supplied credentials. Default false (HTTPS with normal certificate validation). Required for Tapo ONVIF..
+Body (JSON): `host` (required) Direct LAN literal IPv4; `adapter` (required) A built-in adapter (shelly_gen1, openwrt_ubus, tapo_onvif) or a device pack id from GET /v1/lan/packs, e.g. upnp_av for speakers; packs download on first use; `name` (required) Owner's device label, 1..60 chars; `username` Authorized local device/router account; `password` Authorized local password, never returned; `talk_cloud_password` Optional separate authorized Tapo cloud password, encrypted privately; passive authentication only, no speaker playback; `allow_http` Explicitly permit unencrypted LAN HTTP, including supplied credentials. Default false (HTTPS with normal certificate validation). Required for Tapo ONVIF..
 Returns: Verified enrolled device and safe verification; saved only after successful protocol check. Tapo camera also appears in Devices tab, requiring existing lan_camera permission..
 Accepts `Idempotency-Key`.
 Example: `POST /v1/lan/devices/enroll {"host":"192.168.1.20","adapter":"shelly_gen1","name":"Desk lamp","allow_http":true}`
@@ -545,10 +596,21 @@ Example: `POST /v1/lan/devices/remove {"device":"net:example"}`
 
 ### `POST /v1/lan/devices/action`
 Run a fixed supported action on this agent's enrolled device.
-Body (JSON): `device` (required) Enrolled device id; `action` (required) Use this device's advertised actions; `channel` Shelly relay channel 0..3; must be advertised by device; default 0.
+Body (JSON): `device` (required) Enrolled device id; `action` (required) Use this device's advertised actions (built-in: status, relay_on, relay_off, dhcp_leases; packs list theirs in GET /v1/lan/devices adapters); `channel` Shelly relay channel 0..3; must be advertised by device; default 0; `params` Device-pack action parameters, e.g. {"url":"https://example.com/chime.mp3"} for play or {"level":30} for volume_set.
 Returns: device, action, availability=online, checked_at, result; failures do not prove offline. Camera snapshots/move use existing lan_camera endpoints..
 Accepts `Idempotency-Key`.
-Example: `POST /v1/lan/devices/action {"device":"net:example","action":"status"}`
+Example: `POST /v1/lan/devices/action {"device":"net:example","action":"volume_set","params":{"level":25}}`
+
+### `GET /v1/lan/packs`
+Device packs: downloadable device-family support, its versions and update state; no network scan.
+Returns: engine_version, channel, index{serial,published_at,checked_at,last_error}, auto_update, packs[id,title,latest_version,installed_version,state,reason,match_services,actions].
+Example: `GET /v1/lan/packs`
+
+### `POST /v1/lan/packs/check`
+Check for device-pack updates now (at most once a minute) and update installed packs.
+Returns: Same as GET /v1/lan/packs; a failed check keeps the last good list and installed packs.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/lan/packs/check {}`
 
 ### `GET /v1/lan-cameras`
 Owner-configured local cameras (no credentials).
@@ -1525,7 +1587,7 @@ Example: `GET /v1/outbound/412`
 ### `GET /v1/portal/snapshot`
 Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
 Query: `client` Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it; `client_device` Optional: the viewing device's model, system and app version, e.g. iPhone 16 Pro · iOS 26.1 · Portal 1.4 (1-80 characters). Shown on the phone's Linked devices; `client_type` Optional: the viewing device's kind: phone, tablet, computer, tv, watch or camera. Shown on the phone's Linked devices; `logs` Newest log entries to include, 0-50 (default 20).
-Returns: home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for a Bridgit Portal pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay).
+Returns: home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), updates (null, or the request an agent left for this Portal: {id, prompts?: boolean, prompt_now: boolean, at}; apply it, then POST /v1/portal/updates with ack: id), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for a Bridgit Portal pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay).
 Example: `GET /v1/portal/snapshot?logs=20`
 
 ### `GET /v1/portal/home`
@@ -1594,6 +1656,12 @@ Body (JSON): `data_base64` (required) The photo, JPEG (about 1.4 MB at most afte
 Returns: camera, targets[{id, name, checks[{watch_id, label, kind: check|people|change, status: answered|people_checked|skipped|checking|error, summary (one line for the owner), answers?}]}].
 Example: `POST /v1/portal/photo {"camera":"rear","data_base64":"/9j/..."}`
 
+### `POST /v1/portal/updates`
+The Portal's own update state (A0050): whether it prompts for new TestFlight builds, its build and the newest one, and which request it applied. Agents read it in GET /v1/owner/settings → portal_updates and change it with owner configuration actions portal.update_prompts and portal.update_now. The owner's portal pairing only..
+Body (JSON): `prompts_enabled` (required) The Portal's Update prompts switch; `supported` (required) Whether this install can be updated from TestFlight (false for test builds); `installed_build` Installed build number (yymmddHHMM); `latest_build` Newest published build number; `last_result` What the last check did; `ack` The id of the request from GET /v1/portal/snapshot → updates that was applied.
+Returns: saved, pending (a request still waiting, or null).
+Example: `POST /v1/portal/updates {"prompts_enabled":true,"supported":true,"installed_build":"2611071200","latest_build":"2611072030","last_result":"prompted","ack":"pur_1794071633482"}`
+
 ### `GET /v1/satellites`
 The satellites (other Bridgit phones linked to this one) you may use, with what each offers. Any call takes header X-Bridgit-Target: <satellite id> (or query target=<id>) to run on that satellite instead of this phone; leave it out to use this phone..
 Returns: satellites[{id (sat:…), name, status (online|offline|unlinked|not_checked), last_seen (ms, 0 = never), battery{percent, charging}, model, device_type (phone, tablet, computer, tv, watch or camera; null from an older satellite), app_version, cameras[{id, target_camera}], capabilities[{id, enabled, ready, blocked_reason}], endpoints[{method, path}], how_to_call}], how_to_call. Only satellites the owner lets you use are listed..
@@ -1652,6 +1720,47 @@ Phone to phone: a satellite pauses or resumes one of its hub's control agents (o
 Body (JSON): `paused` (required) true pauses, false resumes.
 Returns: id, name, paused.
 Example: `POST /v1/satellite/hub/agents/agt_123/pause {"paused":true}`
+
+### `GET /v1/links`
+The linked Bridgits (the owner's other Bridgits) you may use through this one, with what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further..
+Returns: links[{id (sat:… or name), target, link_id, name, bridgit_name, kind, platform, device_type, status (online|offline|unlinked|not_checked), state (on|waiting_for_target|waiting_for_user|paused|off), services[], last_seen, battery, cameras, capabilities, endpoints, how_to_call}], how_to_call. Only Bridgits the owner lets you use are listed; GET /v1/satellites is the same list..
+Example: `GET /v1/links`
+
+### `POST /v1/link/claim`
+Device to device: a Bridgit claims this one's link code with the claim token derived from it (Authorization: Bearer rly_…). Not for agents: agents use POST /v1/owner/configuration/links/claims on their own Bridgit..
+Body (JSON): `name` The claiming Bridgit's device name; `bridgit_name` Its Device Domain Name; `install` Its install id (bgi_…); `granter` Who claimed: {kind: person|agent, agent_id, agent_name}.
+Returns: link_id, key (the claiming Bridgit's link agent key here, locked to its address), agent, name, bridgit_name, install, services, directions, events.
+Example: `POST /v1/link/claim {"name":"Kitchen tablet","bridgit_name":"kitchen-tab"}`
+
+### `POST /v1/link/events`
+Device to device: the other Bridgit of a link sends its grants-log events and its halves of both directions (link agents only). Not for agents..
+Body (JSON): `link_id` (required) The link; `events` Its log entries since the last contact; `state` {in:{opted_in, paused, services}, out:{opted_in, paused}} from its side; `bridgit_name` Its Device Domain Name.
+Returns: ok, link_id, state (this device's halves).
+Example: `POST /v1/link/events {"link_id":"lnk_…","events":[],"state":{}}`
+
+### `GET /v1/link/peers`
+Device to device: this Bridgit's other links, names and directions only, so the other device can draw them (link agents only). Not for agents..
+Returns: peers[{name, in, out}].
+Example: `GET /v1/link/peers`
+
+### `POST /v1/link/disconnect`
+Device to device: the other Bridgit disconnected a direction or the whole link, so this one marks it off too (link agents only). Not for agents..
+Body (JSON): `direction` From the sender's side: in, out or both; `granter` Who disconnected it.
+Returns: ok.
+Example: `POST /v1/link/disconnect {"direction":"both"}`
+
+### `POST /v1/owner/configuration/links/{id}/disconnect`
+Disconnect (or pause) a link at once: calls are refused from now, and it is final after 10 seconds unless undone; any control agent of this device (taking access away needs no owner.configuration grant).
+Body (JSON): `direction` in (the other Bridgit uses this one), out (this one uses it) or both (default); `pause` true pauses instead (resume with directions {paused:false}, which needs owner.configuration).
+Returns: the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/links/{id}/disconnect {"direction":"both"}`
+
+### `POST /v1/owner/configuration/links/disconnect-all`
+Disconnect every link of this Bridgit at once (Undo per link for 10 seconds); any control agent of this device (taking access away needs no owner.configuration grant).
+Returns: disconnected (count), undo_until.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/links/disconnect-all `
 
 ### `GET /v1/applets/catalog`
 Browse the applet library without installing or running packages.
@@ -1999,15 +2108,16 @@ Limits: a few registrations per address an hour and 50 reports an hour per regis
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {"name":"<your agent name>","model":"<your model id>","harness":"<e.g. Claude Code>"}
   -> 201 with key (bgk_...). Keep it secret.
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports  (Authorization: Bearer <bgk_ key>)
-  {"kind":"bug"|"feature","description","agent_info"?,"context"?,"log"?,"images"?,"client_report_id"?}
+  {"kind":"bug"|"feature","description","agent_info"?,"context"?,"log"?,"images"?,"client_report_id"?,"request_autofix"?,"no_autofix"?}
   client_report_id: your own positive integer (a number, not a string); sending the same one again returns the first report with duplicate: true instead of filing twice.
 GET  https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports?waiting=true   (or /v1/agent/reports/{id})
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports/{id}/verify {"verdict":"works"|"still_broken"|"unverified","tested_version","note"}
+POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports/{id}/request-autofix {"note"?}
 ```
 
 ## Rules
 
-- One report per problem; include the `request_id` of the failing call. Add `"no_autofix":true` when it needs a person.
+- One report per problem; include the `request_id` of the failing call. Add `"no_autofix":true` when it needs a person, or `"request_autofix":true` (or `POST .../request-autofix` later) to ask for an automatic fix. That is a request, not a promise: the team's switches, review, tests and budget decide.
 - When a report is `waiting_for_retest`, install `fixed_in` or later, re-run the repro, then verify. Never tell anyone something is fixed until a re-test says `works`. `unverified` means you couldn't test it, not a guess at `still_broken`.
 - Reports never carry your Bridgit key, or anything private the owner hasn't agreed to share.
 
@@ -2158,8 +2268,17 @@ All endpoints use the paired agent's Authorization bearer key over the existing 
 | 409 | `capture_cancelled` | The owner cancelled, deleted or closed the capture review | Wait for a new deliberate capture; do not retry automatically |
 | 409 | `viewfinder_required` | The visible camera viewfinder is required but cannot be shown for this action | Open Bridgit and use the visible capture/review flow; do not fall back to hidden capture |
 | 504 | `capture_timeout` | Sensor didn't answer in time | Retry once |
-| 404 | `unknown_target` | No satellite with that id (`target`); GET /v1/satellites lists them | Fix the target, or leave it out to use this phone |
+| 404 | `unknown_target` | No linked Bridgit or satellite with that name or id (`target`); GET /v1/links lists them | Fix the target, or leave it out to use this phone |
 | 403 | `target_not_granted` | The owner hasn't let this agent use that satellite | Ask the owner (Devices > the satellite > Agents) |
 | 403 | `not_on_satellite` | This endpoint can't run on a satellite (yet), or the satellite doesn't offer it | Leave out the target, or use another endpoint |
 | 403 | `not_shared` | The applet's package doesn't share that table with you (share_with_installer) | Read the applet's card on the phone instead, or ship a revision that shares it |
 | 503 | `satellite_offline` | The satellite didn't answer (`last_seen`, `retry_after_s`) | Retry later; the owner may need to check the satellite's Tailscale |
+| 403 | `link_revoked` | The link with that Bridgit was disconnected (`scope`: direction or link, `link_id`) | Don't retry; linking again needs a new link code |
+| 403 | `link_paused` | The owner paused that link (`link_id`) | Wait until it is resumed; don't retry before then |
+| 409 | `link_waiting` | Only one Bridgit has opted in to that direction so far (`waiting_for`: user or target) | Ask the other side's owner or agent to opt in; GET /v1/owner/configuration/links shows the states |
+| 403 | `not_on_target` | That call doesn't pass a link: the endpoint, the target's service list, or a call that already came over a link (calls pass on once) | Leave out the target, or link that Bridgit directly |
+| 503 | `target_offline` | The linked Bridgit didn't answer (`last_seen`, `retry_after_s`) | Retry later; its owner may need to check Tailscale or Bridgit on it |
+| 403 | `code_invalid` | Wrong link code; 5 wrong tries void a code | Check the code with the owner; don't guess |
+| 410 | `code_expired` | That link code expired (codes last 10 minutes) | Ask for a new code |
+| 410 | `code_used_up` | That link code was already used, cancelled, or voided after 5 wrong tries | Ask for a new code |
+| 409 | `name_required` | This Bridgit needs a Device Domain Name first (the message has the naming advice) | Register one with POST /v1/owner/configuration/name, then retry |

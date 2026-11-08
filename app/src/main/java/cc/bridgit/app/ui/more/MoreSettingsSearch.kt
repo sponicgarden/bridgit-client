@@ -49,6 +49,7 @@ object MoreSettingsSearch {
         Entry(R.id.theme, R.string.settings_theme),
         Entry(R.id.version, R.string.settings_version),
         Entry(R.id.checkUpdates, R.string.update_check),
+        Entry(R.id.autoUpdateInstall, R.string.update_auto_install),
         Entry(R.id.autoUpdateOffers, R.string.update_auto_offers),
         Entry(R.id.commit, R.string.settings_commit),
         Entry(R.id.cert, R.string.settings_cert),

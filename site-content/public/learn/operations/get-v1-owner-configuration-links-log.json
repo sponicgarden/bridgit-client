@@ -1,0 +1,90 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read the grants log: every link event on this Bridgit and the ones the other Bridgits reported, newest first, with who did each",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_links_log",
+  "query": [
+   {
+    "name": "link",
+    "description": "Only this link id",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "direction",
+    "description": "in, out or both",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "in",
+     "out",
+     "both"
+    ]
+   },
+   {
+    "name": "granter",
+    "description": "person, agent, rule, migrated, or an agent id or name",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "before",
+    "description": "Older than this time (ms), for paging",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "1-200, default 50",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/links/log",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/links/log",
+  "capability": "owner_features",
+  "returns": "events[{id, at, link_id, direction, event, before, after, granter{kind person|agent|rule|migrated, agent_id, agent_name, device}, device, code_id, reported_by, late}], next_before",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "before": {
+     "description": "Older than this time (ms), for paging",
+     "type": "integer"
+    },
+    "link": {
+     "description": "Only this link id",
+     "type": "string"
+    },
+    "limit": {
+     "description": "1-200, default 50",
+     "type": "integer"
+    },
+    "granter": {
+     "description": "person, agent, rule, migrated, or an agent id or name",
+     "type": "string"
+    },
+    "direction": {
+     "description": "in, out or both",
+     "type": "string",
+     "enum": [
+      "in",
+      "out",
+      "both"
+     ]
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

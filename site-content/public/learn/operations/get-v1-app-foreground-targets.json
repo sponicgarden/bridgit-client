@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Discover available Bridgit screens, your cards, installed applet pages and consumer portals",
@@ -16,7 +16,7 @@
   "idempotent": false,
   "path": "/v1/app/foreground/targets",
   "capability": "owner_features",
-  "returns": "screens,cards,applets,portals with type and id; app.foreground grant required; portal targets also need applet_portals; min_interval_ms,max_per_minute",
+  "returns": "screens,cards,applets,portals with type and id (screen device_diagnostics replays Device Diagnostics on Home; network_diagnostics opens Network Diagnostics); app.foreground grant required; portal targets also need applet_portals; min_interval_ms,max_per_minute",
   "mcp_input_schema": {
    "type": "object",
    "properties": {},

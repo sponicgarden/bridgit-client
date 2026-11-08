@@ -1,0 +1,60 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Device to device: the other Bridgit disconnected a direction or the whole link, so this one marks it off too (link agents only). Not for agents.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "link_disconnect",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "direction",
+    "description": "From the sender's side: in, out or both",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "in",
+     "out",
+     "both"
+    ]
+   },
+   {
+    "name": "granter",
+    "description": "Who disconnected it",
+    "type": "object",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/link/disconnect {\"direction\":\"both\"}",
+  "idempotent": false,
+  "path": "/v1/link/disconnect",
+  "capability": "status",
+  "returns": "ok",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "granter": {
+     "description": "Who disconnected it",
+     "type": "object"
+    },
+    "direction": {
+     "description": "From the sender's side: in, out or both",
+     "type": "string",
+     "enum": [
+      "in",
+      "out",
+      "both"
+     ]
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

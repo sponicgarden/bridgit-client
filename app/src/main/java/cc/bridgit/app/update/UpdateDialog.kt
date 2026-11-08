@@ -102,9 +102,17 @@ object UpdateDialog {
 
     /** At most once a day when the app is opened; silent unless a newer version exists. */
     fun autoCheckIfDue(activity: FragmentActivity) {
-        if (playUpdates || isDebugBuild || active != null || !autoOffersOn(activity)) return
+        if (playUpdates || isDebugBuild || active != null) return
         val last = prefs(activity).getLong(KEY_LAST_CHECK, 0L)
         if (!UpdateLogic.isAutoCheckDue(System.currentTimeMillis(), last)) return
+        // Automatic updates install without a tap when the phone allows it; otherwise offer as before.
+        val app = activity.application as BridgeApp
+        if (AutoUpdate.enabled(app) && AutoUpdate.canInstallSilently(app)) {
+            prefs(activity).edit().putLong(KEY_LAST_CHECK, System.currentTimeMillis()).apply()
+            AutoUpdate.runInBackground(app, "app opened")
+            return
+        }
+        if (!autoOffersOn(activity)) return
         checkForUpdates(activity, manual = false)
     }
 

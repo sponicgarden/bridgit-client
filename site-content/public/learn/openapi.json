@@ -81,6 +81,15 @@
        "not_on_satellite",
        "not_shared",
        "satellite_offline",
+       "link_revoked",
+       "link_paused",
+       "link_waiting",
+       "not_on_target",
+       "target_offline",
+       "code_invalid",
+       "code_expired",
+       "code_used_up",
+       "name_required",
        "phone_unreachable"
       ]
      },
@@ -753,14 +762,12 @@
       "type": "integer"
      },
      "action": {
-      "description": "Use this device's advertised actions",
-      "type": "string",
-      "enum": [
-       "status",
-       "relay_on",
-       "relay_off",
-       "dhcp_leases"
-      ]
+      "description": "Use this device's advertised actions (built-in: status, relay_on, relay_off, dhcp_leases; packs list theirs in GET /v1/lan/devices adapters)",
+      "type": "string"
+     },
+     "params": {
+      "description": "Device-pack action parameters, e.g. {\"url\":\"https://example.com/chime.mp3\"} for play or {\"level\":30} for volume_set",
+      "type": "object"
      },
      "device": {
       "description": "Enrolled device id",
@@ -1150,6 +1157,38 @@
    },
    "tags": ["status"]
   }},
+  "/v1/owner/configuration/links/disconnect-all": {"post": {
+   "summary": "Disconnect every link of this Bridgit at once (Undo per link for 10 seconds); any control agent of this device (taking access away needs no owner.configuration grant)",
+   "operationId": "postOwnerConfigurationLinksDisconnectAll",
+   "responses": {
+    "200": {"description": "disconnected (count), undo_until"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "forbidden",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [{
+    "schema": {"type": "string"},
+    "in": "header",
+    "name": "Idempotency-Key",
+    "description": "Any UUID; a repeat within 24 h returns the first result",
+    "required": true
+   }],
+   "tags": ["status"]
+  }},
   "/v1/schedule/run/{id}": {"post": {
    "summary": "Run one approved action now, outside its timetable (its 'after' chain doesn't follow)",
    "operationId": "postScheduleRunId",
@@ -1399,7 +1438,7 @@
    "summary": "Discover available Bridgit screens, your cards, installed applet pages and consumer portals",
    "operationId": "getAppForegroundTargets",
    "responses": {
-    "200": {"description": "screens,cards,applets,portals with type and id; app.foreground grant required; portal targets also need applet_portals; min_interval_ms,max_per_minute"},
+    "200": {"description": "screens,cards,applets,portals with type and id (screen device_diagnostics replays Device Diagnostics on Home; network_diagnostics opens Network Diagnostics); app.foreground grant required; portal targets also need applet_portals; min_interval_ms,max_per_minute"},
     "422": {
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -1532,6 +1571,87 @@
     "required": true
    }],
    "tags": ["lan_camera"]
+  }},
+  "/v1/owner/configuration/links/claims": {"post": {
+   "summary": "Claim another Bridgit's link code: this Bridgit then uses it (its user opt-in), and may offer the other direction too; explicit owner.configuration grant required; no per-change phone approval",
+   "x-bridgit-control-scope": "owner.configuration",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "code": {
+      "description": "Its link code, K7QX-3MPA (required unless link is given)",
+      "type": "string"
+     },
+     "port": {
+      "description": "Its Bridgit port, with host",
+      "type": "integer"
+     },
+     "reverse_services": {
+      "description": "What the other Bridgit may use here in return (it opts in on its side); default none",
+      "type": "array",
+      "items": {"type": "string"}
+     },
+     "name": {
+      "description": "The other Bridgit's Device Domain Name (required unless link is given)",
+      "type": "string"
+     },
+     "link": {
+      "description": "Its bridgit://link#\u2026 link (holds name, code and its Tailscale address)",
+      "type": "string"
+     },
+     "host": {
+      "description": "Its Tailscale address, when the names backend can't resolve the name",
+      "type": "string"
+     },
+     "agents": {
+      "description": "This Bridgit's control agent ids that may use it; default: the calling agent",
+      "type": "array",
+      "items": {"type": "string"}
+     }
+    },
+    "required": []
+   }}}},
+   "operationId": "postOwnerConfigurationLinksClaims",
+   "responses": {
+    "200": {"description": "the new link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})"},
+    "410": {
+     "description": "code_expired, code_used_up",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "forbidden, agent_not_allowed, code_invalid, link_revoked",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "502": {
+     "description": "upstream_failed",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "target_offline, team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict, name_required, link_waiting",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [{
+    "schema": {"type": "string"},
+    "in": "header",
+    "name": "Idempotency-Key",
+    "description": "Any UUID; a repeat within 24 h returns the first result",
+    "required": true
+   }],
+   "tags": ["owner_features"]
   }},
   "/v1/portal/applets/inventory": {"get": {
    "summary": "Enrolled devices for one approved applet card on this phone. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
@@ -2003,6 +2123,65 @@
    }],
    "tags": ["judgment"]
   }},
+  "/v1/owner/configuration/links/{id}/disconnect": {"post": {
+   "summary": "Disconnect (or pause) a link at once: calls are refused from now, and it is final after 10 seconds unless undone; any control agent of this device (taking access away needs no owner.configuration grant)",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "pause": {
+      "description": "true pauses instead (resume with directions {paused:false}, which needs owner.configuration)",
+      "type": "boolean"
+     },
+     "direction": {
+      "description": "in (the other Bridgit uses this one), out (this one uses it) or both (default)",
+      "type": "string",
+      "enum": [
+       "in",
+       "out",
+       "both"
+      ]
+     }
+    },
+    "required": []
+   }}}},
+   "operationId": "postOwnerConfigurationLinksIdDisconnect",
+   "responses": {
+    "200": {"description": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "forbidden",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }
+   ],
+   "tags": ["status"]
+  }},
   "/v1/applets/installed/{id}/template-policy": {"post": {
    "summary": "Track, pause template updates, or detach and repurpose your applet; never pauses execution or deletes data. Detached copies cannot silently reattach",
    "requestBody": {"content": {"application/json": {"schema": {
@@ -2430,10 +2609,12 @@
        "applet.configure",
        "delivery.subscribe",
        "dog.configure",
+       "portal.update_prompts",
        "remote.configure",
        "service.budget.set",
        "service.model.set",
        "sounds.configure",
+       "updates.auto",
        "updates.offers",
        "wake.configure"
       ]
@@ -2791,6 +2972,85 @@
    },
    "tags": ["notifications"]
   }},
+  "/v1/owner/configuration/links/{id}/directions/{direction}": {"post": {
+   "summary": "Change this Bridgit's half of one direction: in = the other Bridgit uses this one (services), out = this one uses it (agents); paused on either; explicit owner.configuration grant required; no per-change phone approval",
+   "x-bridgit-control-scope": "owner.configuration",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "paused": {
+      "description": "Pause or resume this direction on this Bridgit",
+      "type": "boolean"
+     },
+     "services": {
+      "description": "in only: the service list (what the other Bridgit may use here); [] leaves only the link itself",
+      "type": "array",
+      "items": {"type": "string"}
+     },
+     "agents": {
+      "description": "out only: this Bridgit's control agent ids that may use the other one; setting it is this Bridgit's opt-in",
+      "type": "array",
+      "items": {"type": "string"}
+     }
+    },
+    "required": []
+   }}}},
+   "operationId": "postOwnerConfigurationLinksIdDirectionsDirection",
+   "responses": {
+    "200": {"description": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})"},
+    "410": {
+     "description": "code_expired, code_used_up",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "forbidden, agent_not_allowed, code_invalid, link_revoked",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "502": {
+     "description": "upstream_failed",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "target_offline, team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict, name_required, link_waiting",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "direction",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }
+   ],
+   "tags": ["owner_features"]
+  }},
   "/v1/interactions": {
    "post": {
     "summary": "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Prefer a native question for simple choices, normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
@@ -3046,6 +3306,20 @@
     "description": "Any UUID; a repeat within 24 h returns the first result",
     "required": true
    }],
+   "tags": ["owner_features"]
+  }},
+  "/v1/owner/configuration/links": {"get": {
+   "summary": "Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each",
+   "x-bridgit-control-scope": "owner.configuration",
+   "operationId": "getOwnerConfigurationLinks",
+   "responses": {
+    "200": {"description": "links[id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}], codes[{id, services, directions, expires_at, tries_left, state, granter}], services (vocabulary), suggested_services, paused_all{satellites, hubs}, name (this Bridgit's Device Domain Name or null), operations"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
    "tags": ["owner_features"]
   }},
   "/v1/discover": {"get": {
@@ -3766,6 +4040,19 @@
    }],
    "tags": ["controls"]
   }},
+  "/v1/links": {"get": {
+   "summary": "The linked Bridgits (the owner's other Bridgits) you may use through this one, with what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further.",
+   "operationId": "getLinks",
+   "responses": {
+    "200": {"description": "links[{id (sat:\u2026 or name), target, link_id, name, bridgit_name, kind, platform, device_type, status (online|offline|unlinked|not_checked), state (on|waiting_for_target|waiting_for_user|paused|off), services[], last_seen, battery, cameras, capabilities, endpoints, how_to_call}], how_to_call. Only Bridgits the owner lets you use are listed; GET /v1/satellites is the same list."},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "tags": ["status"]
+  }},
   "/v1/lan/discovered": {"get": {
    "summary": "Remembered devices on the current LAN; no scan",
    "operationId": "getLanDiscovered",
@@ -4022,6 +4309,59 @@
     "401": {"description": "unauthorized"}
    },
    "tags": ["applet_data"]
+  }},
+  "/v1/owner/configuration/links/{id}/undo": {"post": {
+   "summary": "Undo a disconnect within 10 seconds; after that linking again needs a new code; explicit owner.configuration grant required; no per-change phone approval",
+   "x-bridgit-control-scope": "owner.configuration",
+   "operationId": "postOwnerConfigurationLinksIdUndo",
+   "responses": {
+    "200": {"description": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})"},
+    "410": {
+     "description": "code_expired, code_used_up",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "forbidden, agent_not_allowed, code_invalid, link_revoked",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "502": {
+     "description": "upstream_failed",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "target_offline, team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict, name_required, link_waiting",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }
+   ],
+   "tags": ["owner_features"]
   }},
   "/v1/story/stop": {"post": {
    "summary": "Stop this caller's story presentation; discard late model results and stop its audio and video",
@@ -4693,7 +5033,7 @@
    "tags": ["ssh"]
   }},
   "/v1/lan/discover": {"post": {
-   "summary": "Bounded discovery on the Android host's direct local network",
+   "summary": "Network Diagnostics: bounded discovery on the Android host's direct local network",
    "requestBody": {"content": {"application/json": {"schema": {
     "type": "object",
     "properties": {
@@ -4877,6 +5217,53 @@
     "401": {"description": "unauthorized"}
    },
    "tags": ["owner_features"]
+  }},
+  "/v1/link/claim": {"post": {
+   "summary": "Device to device: a Bridgit claims this one's link code with the claim token derived from it (Authorization: Bearer rly_\u2026). Not for agents: agents use POST /v1/owner/configuration/links/claims on their own Bridgit.",
+   "security": [],
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "install": {
+      "description": "Its install id (bgi_\u2026)",
+      "type": "string"
+     },
+     "name": {
+      "description": "The claiming Bridgit's device name",
+      "type": "string"
+     },
+     "bridgit_name": {
+      "description": "Its Device Domain Name",
+      "type": "string"
+     },
+     "granter": {
+      "description": "Who claimed: {kind: person|agent, agent_id, agent_name}",
+      "type": "object"
+     }
+    },
+    "required": []
+   }}}},
+   "operationId": "postLinkClaim",
+   "responses": {
+    "200": {"description": "link_id, key (the claiming Bridgit's link agent key here, locked to its address), agent, name, bridgit_name, install, services, directions, events"},
+    "410": {
+     "description": "code_expired, code_used_up",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "403": {
+     "description": "code_invalid, forbidden",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "429": {
+     "description": "rate_limited",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "tags": ["status"]
   }},
   "/v1/portal/photo": {"post": {
    "summary": "A photo the owner took with the Portal's camera: every photo watch of the chosen targets checks it right away, as if it had taken it (the Camera tab's path). Answers that take longer than about 25 s finish on the phone and show in the applet. The owner's portal pairing only; this is the portal's one write.",
@@ -5276,6 +5663,19 @@
     "required": false
    }],
    "tags": ["speaker"]
+  }},
+  "/v1/link/peers": {"get": {
+   "summary": "Device to device: this Bridgit's other links, names and directions only, so the other device can draw them (link agents only). Not for agents.",
+   "operationId": "getLinkPeers",
+   "responses": {
+    "200": {"description": "peers[{name, in, out}]"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "tags": ["status"]
   }},
   "/v1/outbound/summary": {"get": {
    "summary": "Analysis of what left the phone, in one call: a plain-language headline, totals, trends by hour or day, the biggest destinations, agents and calls, destinations first seen in the window, failures, and for each destination the data categories, purposes and agents it received",
@@ -5832,6 +6232,62 @@
    },
    "tags": ["interactions"]
   }},
+  "/v1/portal/updates": {"post": {
+   "summary": "The Portal's own update state (A0050): whether it prompts for new TestFlight builds, its build and the newest one, and which request it applied. Agents read it in GET /v1/owner/settings → portal_updates and change it with owner configuration actions portal.update_prompts and portal.update_now. The owner's portal pairing only.",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "latest_build": {
+      "description": "Newest published build number",
+      "type": "string"
+     },
+     "last_result": {
+      "description": "What the last check did",
+      "type": "string",
+      "enum": [
+       "check_failed",
+       "later",
+       "off",
+       "opened_testflight",
+       "prompted",
+       "unsupported",
+       "up_to_date",
+       "update_ready"
+      ]
+     },
+     "ack": {
+      "description": "The id of the request from GET /v1/portal/snapshot → updates that was applied",
+      "type": "string"
+     },
+     "prompts_enabled": {
+      "description": "The Portal's Update prompts switch",
+      "type": "boolean"
+     },
+     "supported": {
+      "description": "Whether this install can be updated from TestFlight (false for test builds)",
+      "type": "boolean"
+     },
+     "installed_build": {
+      "description": "Installed build number (yymmddHHMM)",
+      "type": "string"
+     }
+    },
+    "required": [
+     "prompts_enabled",
+     "supported"
+    ]
+   }}}},
+   "operationId": "postPortalUpdates",
+   "responses": {
+    "200": {"description": "saved, pending (a request still waiting, or null)"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "tags": ["portal"]
+  }},
   "/v1/connections/{id}/rotate": {"post": {
    "summary": "Rotate a connection signing key; configuration authority required; the generated key remains owner-only",
    "operationId": "postConnectionsIdRotate",
@@ -5905,6 +6361,72 @@
    }],
    "tags": ["find_crop"]
   }},
+  "/v1/owner/configuration/links/codes": {"post": {
+   "summary": "Make a one-time link code for this Bridgit as the target (8 characters, 10 minutes, 5 wrong tries); needs a Device Domain Name; explicit owner.configuration grant required; no per-change phone approval",
+   "x-bridgit-control-scope": "owner.configuration",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "directions": {
+      "description": "[\"in\"] (default: the claiming Bridgit uses this one), [\"out\"] (this one uses it) or both",
+      "type": "array",
+      "items": {"type": "string"}
+     },
+     "services": {
+      "description": "What the claiming Bridgit may use here: camera, gallery, interactions, location, mic, sounds, speaker, view (suggested: camera, mic, speaker, interactions, view); required for in",
+      "type": "array",
+      "items": {"type": "string"}
+     },
+     "agents": {
+      "description": "For out: this Bridgit's control agent ids that may use the claiming Bridgit",
+      "type": "array",
+      "items": {"type": "string"}
+     }
+    },
+    "required": []
+   }}}},
+   "operationId": "postOwnerConfigurationLinksCodes",
+   "responses": {
+    "200": {"description": "code_id, code (K7QX-3MPA: give it with the name), name, expires_at, services, directions, link (bridgit://link#\u2026 for a QR code), name_lookup, how"},
+    "410": {
+     "description": "code_expired, code_used_up",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "forbidden, agent_not_allowed, code_invalid, link_revoked",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "502": {
+     "description": "upstream_failed",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "target_offline, team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict, name_required, link_waiting",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [{
+    "schema": {"type": "string"},
+    "in": "header",
+    "name": "Idempotency-Key",
+    "description": "Any UUID; a repeat within 24 h returns the first result",
+    "required": true
+   }],
+   "tags": ["owner_features"]
+  }},
   "/v1/schedule/pause": {"post": {
    "summary": "Pause or resume your approved actions",
    "requestBody": {"content": {"application/json": {"schema": {
@@ -5929,6 +6451,65 @@
     }
    },
    "tags": ["schedule"]
+  }},
+  "/v1/owner/configuration/links/pause-all": {"post": {
+   "summary": "Pause or resume links by role, as the Linked devices pills do; each pauses both directions of those links; explicit owner.configuration grant required; no per-change phone approval",
+   "x-bridgit-control-scope": "owner.configuration",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "satellites": {
+      "description": "true pauses every link where the other Bridgit is this one's satellite (Satellites pill)",
+      "type": "boolean"
+     },
+     "hubs": {
+      "description": "true pauses every link where the other Bridgit is this one's hub (Hubs pill)",
+      "type": "boolean"
+     }
+    },
+    "required": []
+   }}}},
+   "operationId": "postOwnerConfigurationLinksPauseAll",
+   "responses": {
+    "200": {"description": "paused_all{satellites, hubs}"},
+    "410": {
+     "description": "code_expired, code_used_up",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "forbidden, agent_not_allowed, code_invalid, link_revoked",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "502": {
+     "description": "upstream_failed",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "target_offline, team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict, name_required, link_waiting",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [{
+    "schema": {"type": "string"},
+    "in": "header",
+    "name": "Idempotency-Key",
+    "description": "Any UUID; a repeat within 24 h returns the first result",
+    "required": true
+   }],
+   "tags": ["owner_features"]
   }},
   "/v1/guide": {"get": {
    "summary": "This guide, generated live (Markdown)",
@@ -6493,6 +7074,38 @@
    ],
    "tags": ["portal"]
   }},
+  "/v1/link/disconnect": {"post": {
+   "summary": "Device to device: the other Bridgit disconnected a direction or the whole link, so this one marks it off too (link agents only). Not for agents.",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "granter": {
+      "description": "Who disconnected it",
+      "type": "object"
+     },
+     "direction": {
+      "description": "From the sender's side: in, out or both",
+      "type": "string",
+      "enum": [
+       "in",
+       "out",
+       "both"
+      ]
+     }
+    },
+    "required": []
+   }}}},
+   "operationId": "postLinkDisconnect",
+   "responses": {
+    "200": {"description": "ok"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "tags": ["status"]
+  }},
   "/v1/lan/devices/enroll": {"post": {
    "summary": "Verify a supported device with authorized credentials and enroll it for this agent",
    "requestBody": {"content": {"application/json": {"schema": {
@@ -6503,13 +7116,8 @@
       "type": "string"
      },
      "adapter": {
-      "description": "Supported adapter",
-      "type": "string",
-      "enum": [
-       "shelly_gen1",
-       "openwrt_ubus",
-       "tapo_onvif"
-      ]
+      "description": "A built-in adapter (shelly_gen1, openwrt_ubus, tapo_onvif) or a device pack id from GET /v1/lan/packs, e.g. upnp_av for speakers; packs download on first use",
+      "type": "string"
      },
      "host": {
       "description": "Direct LAN literal IPv4",
@@ -6997,6 +7605,19 @@
     "401": {"description": "unauthorized"}
    },
    "tags": ["judgment"]
+  }},
+  "/v1/lan/packs": {"get": {
+   "summary": "Device packs: downloadable device-family support, its versions and update state; no network scan",
+   "operationId": "getLanPacks",
+   "responses": {
+    "200": {"description": "engine_version, channel, index{serial,published_at,checked_at,last_error}, auto_update, packs[id,title,latest_version,installed_version,state,reason,match_services,actions]"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "tags": ["lan_discovery"]
   }},
   "/v1/owner/configuration/keys/{provider}": {
    "post": {
@@ -7926,7 +8547,7 @@
    "summary": "Supplemental owner settings, model-key presence and consent requirements",
    "operationId": "getOwnerSettings",
    "responses": {
-    "200": {"description": "update_offers,remote,own_keys provider/configured flags,configuration_grant; no key suffixes or tokens"},
+    "200": {"description": "update_offers,auto_update{enabled,supported,silent_install_available,last_result,last_at,last_version},portal_updates[{portal_id,name,prompts_enabled,supported,installed_build,latest_build,update_ready,last_result,reported_at,pending}],remote,own_keys provider/configured flags,configuration_grant; no key suffixes or tokens"},
     "422": {
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -7967,6 +8588,64 @@
     "401": {"description": "unauthorized"}
    },
    "tags": ["downloads"]
+  }},
+  "/v1/owner/configuration/links/log": {"get": {
+   "summary": "Read the grants log: every link event on this Bridgit and the ones the other Bridgits reported, newest first, with who did each",
+   "x-bridgit-control-scope": "owner.configuration",
+   "operationId": "getOwnerConfigurationLinksLog",
+   "responses": {
+    "200": {"description": "events[{id, at, link_id, direction, event, before, after, granter{kind person|agent|rule|migrated, agent_id, agent_name, device}, device, code_id, reported_by, late}], next_before"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "query",
+     "name": "link",
+     "description": "Only this link id",
+     "required": false
+    },
+    {
+     "schema": {
+      "type": "string",
+      "enum": [
+       "in",
+       "out",
+       "both"
+      ]
+     },
+     "in": "query",
+     "name": "direction",
+     "description": "in, out or both",
+     "required": false
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "query",
+     "name": "granter",
+     "description": "person, agent, rule, migrated, or an agent id or name",
+     "required": false
+    },
+    {
+     "schema": {"type": "integer"},
+     "in": "query",
+     "name": "before",
+     "description": "Older than this time (ms), for paging",
+     "required": false
+    },
+    {
+     "schema": {"type": "integer"},
+     "in": "query",
+     "name": "limit",
+     "description": "1-200, default 50",
+     "required": false
+    }
+   ],
+   "tags": ["owner_features"]
   }},
   "/v1/outbound": {"get": {
    "summary": "Every call this phone made to a server off the device: destination, purpose, which agent caused it, the data categories sent, bytes, status, time, and a redacted preview of what was sent and received",
@@ -8620,6 +9299,26 @@
    }],
    "tags": ["clipboard"]
   }},
+  "/v1/lan/packs/check": {"post": {
+   "summary": "Check for device-pack updates now (at most once a minute) and update installed packs",
+   "operationId": "postLanPacksCheck",
+   "responses": {
+    "200": {"description": "Same as GET /v1/lan/packs; a failed check keeps the last good list and installed packs"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "parameters": [{
+    "schema": {"type": "string"},
+    "in": "header",
+    "name": "Idempotency-Key",
+    "description": "Any UUID; a repeat within 24 h returns the first result",
+    "required": false
+   }],
+   "tags": ["lan_discovery"]
+  }},
   "/v1/samples": {"get": {
    "summary": "Complete interaction samples for every kind (notice, question, html, text): the POST /v1/interactions body, the reply and the answer it produces (JSON). For cards that decide or watch (Jev, Clef, the free camera change check), read https://bridgit.cc/learn/decisions.md",
    "operationId": "getSamples",
@@ -8693,6 +9392,42 @@
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
     }
+   },
+   "tags": ["status"]
+  }},
+  "/v1/link/events": {"post": {
+   "summary": "Device to device: the other Bridgit of a link sends its grants-log events and its halves of both directions (link agents only). Not for agents.",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "bridgit_name": {
+      "description": "Its Device Domain Name",
+      "type": "string"
+     },
+     "state": {
+      "description": "{in:{opted_in, paused, services}, out:{opted_in, paused}} from its side",
+      "type": "object"
+     },
+     "link_id": {
+      "description": "The link",
+      "type": "string"
+     },
+     "events": {
+      "description": "Its log entries since the last contact",
+      "type": "array",
+      "items": {"type": "object"}
+     }
+    },
+    "required": ["link_id"]
+   }}}},
+   "operationId": "postLinkEvents",
+   "responses": {
+    "200": {"description": "ok, link_id, state (this device's halves)"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
    },
    "tags": ["status"]
   }},
@@ -8999,6 +9734,59 @@
    }],
    "tags": ["applet_portals"]
   }},
+  "/v1/owner/configuration/links/codes/{id}": {"delete": {
+   "summary": "Cancel a link code that hasn't been claimed; explicit owner.configuration grant required; no per-change phone approval",
+   "x-bridgit-control-scope": "owner.configuration",
+   "operationId": "deleteOwnerConfigurationLinksCodesId",
+   "responses": {
+    "200": {"description": "code_id, state=cancelled"},
+    "410": {
+     "description": "code_expired, code_used_up",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "forbidden, agent_not_allowed, code_invalid, link_revoked",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "502": {
+     "description": "upstream_failed",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "target_offline, team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict, name_required, link_waiting",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }
+   ],
+   "tags": ["owner_features"]
+  }},
   "/v1/camera/arm": {"post": {
    "summary": "Open the camera ahead of a photo, so your next snapshot fires in about 0.3 s",
    "requestBody": {"content": {"application/json": {"schema": {
@@ -9225,7 +10013,11 @@
        "callback.configure",
        "delivery.subscribe",
        "updates.offers",
+       "updates.auto",
+       "updates.update_now",
        "updates.install",
+       "portal.update_prompts",
+       "portal.update_now",
        "android.setup"
       ]
      }
@@ -10121,7 +10913,7 @@
    "summary": "Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
    "operationId": "getPortalSnapshot",
    "responses": {
-    "200": {"description": "home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for a Bridgit Portal pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay)"},
+    "200": {"description": "home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), updates (null, or the request an agent left for this Portal: {id, prompts?: boolean, prompt_now: boolean, at}; apply it, then POST /v1/portal/updates with ack: id), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for a Bridgit Portal pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay)"},
     "422": {
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -11101,7 +11893,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 128,
+  "x-api-revision": 132,
   "title": "Bridgit",
   "version": "1.8.0"
  }

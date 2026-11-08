@@ -1,0 +1,82 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Make a one-time link code for this Bridgit as the target (8 characters, 10 minutes, 5 wrong tries); needs a Device Domain Name; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_links_codes",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "services",
+    "description": "What the claiming Bridgit may use here: camera, gallery, interactions, location, mic, sounds, speaker, view (suggested: camera, mic, speaker, interactions, view); required for in",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "directions",
+    "description": "[\"in\"] (default: the claiming Bridgit uses this one), [\"out\"] (this one uses it) or both",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "agents",
+    "description": "For out: this Bridgit's control agent ids that may use the claiming Bridgit",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/links/codes {\"services\":[\"camera\",\"mic\",\"speaker\",\"interactions\",\"view\"]}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/links/codes",
+  "capability": "owner_features",
+  "returns": "code_id, code (K7QX-3MPA: give it with the name), name, expires_at, services, directions, link (bridgit://link#\u2026 for a QR code), name_lookup, how",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "directions": {
+     "description": "[\"in\"] (default: the claiming Bridgit uses this one), [\"out\"] (this one uses it) or both",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "services": {
+     "description": "What the claiming Bridgit may use here: camera, gallery, interactions, location, mic, sounds, speaker, view (suggested: camera, mic, speaker, interactions, view); required for in",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "agents": {
+     "description": "For out: this Bridgit's control agent ids that may use the claiming Bridgit",
+     "type": "array",
+     "items": {"type": "string"}
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed",
+   "name_required",
+   "code_invalid",
+   "code_expired",
+   "code_used_up",
+   "link_revoked",
+   "link_waiting",
+   "target_offline",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

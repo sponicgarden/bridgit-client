@@ -1,0 +1,55 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Device to device: a Bridgit claims this one's link code with the claim token derived from it (Authorization: Bearer rly_\u2026). Not for agents: agents use POST /v1/owner/configuration/links/claims on their own Bridgit.",
+  "method": "POST",
+  "auth": false,
+  "mcp_tool": null,
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "name",
+    "description": "The claiming Bridgit's device name",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "bridgit_name",
+    "description": "Its Device Domain Name",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "install",
+    "description": "Its install id (bgi_\u2026)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "granter",
+    "description": "Who claimed: {kind: person|agent, agent_id, agent_name}",
+    "type": "object",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/link/claim {\"name\":\"Kitchen tablet\",\"bridgit_name\":\"kitchen-tab\"}",
+  "idempotent": false,
+  "path": "/v1/link/claim",
+  "capability": "status",
+  "returns": "link_id, key (the claiming Bridgit's link agent key here, locked to its address), agent, name, bridgit_name, install, services, directions, events",
+  "errors": [
+   "code_invalid",
+   "code_expired",
+   "code_used_up",
+   "conflict",
+   "forbidden",
+   "rate_limited"
+  ],
+  "requires": null
+ }
+}

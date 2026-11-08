@@ -44,7 +44,7 @@ data class LogEntry(
         val LEVELS = listOf("debug", "info", "warn", "error")
         val KINDS = listOf("request", "configuration", "setting", "agent", "grant", "pairing", "interaction", "share", "file",
             "service", "crash", "note", "feedback", "battery", "wakewords", "sounds", "schedule", "applets", "judgment",
-            "watch", "capture_stored", "capture_upload", "capture_storage", "security", "satellite", "people", "vision", "mode")
+            "watch", "capture_stored", "capture_upload", "capture_storage", "security", "satellite", "link", "people", "vision", "mode")
         fun levelRank(l: String) = LEVELS.indexOf(l).coerceAtLeast(0)
     }
 }

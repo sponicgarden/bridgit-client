@@ -1,7 +1,7 @@
 {
  "catalog_bulk_export": "https://bridgit.cc/learn/catalog.json",
  "app_version": "1.8.0",
- "endpoint_count": 321,
+ "endpoint_count": 339,
  "file_a_bug_directly": "POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {\"name\",\"model\",\"harness\"}, then POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/reports with the key it returns. Details: https://bridgit.cc/learn/bugs.md",
  "catalog": "https://bridgit.cc/learn/catalog-index.json",
  "read_first": [
@@ -132,8 +132,8 @@
    "url": "https://bridgit.cc/interactions/index.json"
   }
  },
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "sample_kinds": [
   "pieces",
   "notice",
@@ -141,6 +141,6 @@
   "html",
   "text"
  ],
- "error_codes": 69,
+ "error_codes": 78,
  "start_here": "https://bridgit.cc/learn/start.md"
 }

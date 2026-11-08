@@ -14,18 +14,22 @@ import org.json.JSONObject
 
 /** No secret-bearing toString. AES-GCM Android Keystore, app-private and excluded from backup. */
 class LanDevice(val id: String, val name: String, val host: String, val adapter: String, val agentId: String,
-    val username: String, val password: String, val http: Boolean, val verifiedAt: Long, val identity: String = "") {
-    fun publicJson() = JSONObject().put("id", id).put("name", name).put("host", host).put("adapter", adapter)
+    val username: String, val password: String, val http: Boolean, val verifiedAt: Long, val identity: String = "",
+    /** Adapter state that isn't a secret, e.g. a device pack's resolved UPnP addresses (lan/packs/PackEngine.Bound). */
+    val extra: JSONObject = JSONObject()) {
+    fun publicJson(actions: List<String> = LanRules.actions(adapter)) = JSONObject().put("id", id).put("name", name).put("host", host).put("adapter", adapter)
         .put("verified_at", verifiedAt).put("availability", "not_checked").put("enrolled", true)
-        .put("actions", JSONArray(LanRules.actions(adapter).map { action -> JSONObject().put("action", action)
+        .apply { extra.optString("pack_version").takeIf { it.isNotEmpty() }?.let { put("pack_version", it) } }
+        .put("actions", JSONArray(actions.map { action -> JSONObject().put("action", action)
             .put("method", "POST").put("path", "/v1/lan/devices/action")
             .put("body", JSONObject().put("device", id).put("action", action)) }))
     fun stored() = JSONObject().put("id", id).put("name", name).put("host", host).put("adapter", adapter).put("agent_id", agentId)
-        .put("username", username).put("password", password).put("allow_http", http).put("verified_at", verifiedAt).put("identity", identity)
+        .put("username", username).put("password", password).put("allow_http", http).put("verified_at", verifiedAt).put("identity", identity).put("extra", extra)
+    fun with(extra: JSONObject) = LanDevice(id, name, host, adapter, agentId, username, password, http, verifiedAt, identity, extra)
     override fun toString() = "LanDevice($id)"
     companion object {
         fun read(o: JSONObject) = LanDevice(o.getString("id"), o.getString("name"), o.getString("host"), o.getString("adapter"),
-            o.getString("agent_id"), o.getString("username"), o.getString("password"), o.getBoolean("allow_http"), o.getLong("verified_at"), o.optString("identity"))
+            o.getString("agent_id"), o.getString("username"), o.getString("password"), o.getBoolean("allow_http"), o.getLong("verified_at"), o.optString("identity"), o.optJSONObject("extra") ?: JSONObject())
     }
 }
 class LanStore(context: Context) {

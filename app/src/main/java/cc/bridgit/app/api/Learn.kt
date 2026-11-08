@@ -40,6 +40,8 @@ object Learn {
     const val AGENT_GUIDE_URL = "https://bridgit.cc/agentguide/"
     /** Device Domain Names: the agent copy (register first, how to read the answer) and the page for people. */
     const val NAMES_URL = "https://bridgit.cc/agents/names/"
+    /** "Link two Bridgits", end to end for an agent (site-content/public/learn/links.md). */
+    const val LINKS_URL = "https://bridgit.cc/learn/links.md"
     const val NAMES_PAGE_URL = "https://bridgit.cc/names/"
     const val INTRODUCTION_URL = "$BASE/introduction.txt"
     const val DIRECT_PROMPT_URL = "$BASE/pairing-direct.txt"
@@ -492,15 +494,16 @@ Private builds only. Scope `peripherals`.
         appendLine("POST $FEEDBACK_BACKEND/v1/agents/register {\"name\":\"<your agent name>\",\"model\":\"<your model id>\",\"harness\":\"<e.g. Claude Code>\"}")
         appendLine("  -> 201 with key (bgk_...). Keep it secret.")
         appendLine("POST $FEEDBACK_BACKEND/v1/agent/reports  (Authorization: Bearer <bgk_ key>)")
-        appendLine("  {\"kind\":\"bug\"|\"feature\",\"description\",\"agent_info\"?,\"context\"?,\"log\"?,\"images\"?,\"client_report_id\"?}")
+        appendLine("  {\"kind\":\"bug\"|\"feature\",\"description\",\"agent_info\"?,\"context\"?,\"log\"?,\"images\"?,\"client_report_id\"?,\"request_autofix\"?,\"no_autofix\"?}")
         appendLine("  client_report_id: your own positive integer (a number, not a string); sending the same one again returns the first report with duplicate: true instead of filing twice.")
         appendLine("GET  $FEEDBACK_BACKEND/v1/agent/reports?waiting=true   (or /v1/agent/reports/{id})")
         appendLine("POST $FEEDBACK_BACKEND/v1/agent/reports/{id}/verify {\"verdict\":\"works\"|\"still_broken\"|\"unverified\",\"tested_version\",\"note\"}")
+        appendLine("POST $FEEDBACK_BACKEND/v1/agent/reports/{id}/request-autofix {\"note\"?}")
         appendLine("```")
         appendLine()
         appendLine("## Rules")
         appendLine()
-        appendLine("- One report per problem; include the `request_id` of the failing call. Add `\"no_autofix\":true` when it needs a person.")
+        appendLine("- One report per problem; include the `request_id` of the failing call. Add `\"no_autofix\":true` when it needs a person, or `\"request_autofix\":true` (or `POST .../request-autofix` later) to ask for an automatic fix. That is a request, not a promise: the team's switches, review, tests and budget decide.")
         appendLine("- When a report is `waiting_for_retest`, install `fixed_in` or later, re-run the repro, then verify. Never tell anyone something is fixed until a re-test says `works`. " +
             "`unverified` means you couldn't test it, not a guess at `still_broken`.")
         appendLine("- Reports never carry your Bridgit key, or anything private the owner hasn't agreed to share.")

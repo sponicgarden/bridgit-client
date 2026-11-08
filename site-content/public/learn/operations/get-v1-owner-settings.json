@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Supplemental owner settings, model-key presence and consent requirements",
@@ -16,7 +16,7 @@
   "idempotent": false,
   "path": "/v1/owner/settings",
   "capability": "owner_features",
-  "returns": "update_offers,remote,own_keys provider/configured flags,configuration_grant; no key suffixes or tokens",
+  "returns": "update_offers,auto_update{enabled,supported,silent_install_available,last_result,last_at,last_version},portal_updates[{portal_id,name,prompts_enabled,supported,installed_build,latest_build,update_ready,last_result,reported_at,pending}],remote,own_keys provider/configured flags,configuration_grant; no key suffixes or tokens",
   "mcp_input_schema": {
    "type": "object",
    "properties": {},

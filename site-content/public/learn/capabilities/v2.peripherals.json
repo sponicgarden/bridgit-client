@@ -29,8 +29,8 @@
    "tool": "peripheral.list"
   }
  ],
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "boundaries": "Private build only; owner grants and session/transport requirements apply. See control guide.",
  "examples_url": null,
  "id": "v2.peripherals",

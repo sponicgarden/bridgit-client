@@ -57,6 +57,8 @@
       "/v1/spend/check",
       "/v1/story",
       "/v1/story/library",
+      "/v1/telemetry",
+      "/v1/telemetry/delivery",
       "/v1/templates",
       "/v1/templates/account",
       "/v1/templates/agent-keys",
@@ -133,6 +135,7 @@
     "regexes": [
       "^\\/v1\\/agent\\/reports\\/(?:[MCAmca])?(\\d+)$",
       "^\\/v1\\/agent\\/reports\\/(?:[MCAmca])?(\\d+)\\/images\\/(\\d+)$",
+      "^\\/v1\\/agent\\/reports\\/(?:[MCAmca])?(\\d+)\\/request-autofix$",
       "^\\/v1\\/agent\\/reports\\/(?:[MCAmca])?(\\d+)\\/verify$",
       "^\\/v1\\/agents\\/(bga_[a-z2-7]{20})$",
       "^\\/v1\\/budgets\\/([a-z0-9][a-z0-9-]{0,63})\\/actions\\/([A-Za-z0-9][A-Za-z0-9_.-]{0,63})$",

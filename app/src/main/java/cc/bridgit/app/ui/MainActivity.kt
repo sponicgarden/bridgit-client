@@ -217,6 +217,8 @@ class MainActivity : AppCompatActivity() {
         intent.removeExtra(cc.bridgit.app.platform.AppForeground.EXTRA_SCREEN)
         if (nav.currentDestination?.id in SETUP) return
         val destination = cc.bridgit.app.platform.AppForeground.SCREENS[screen] ?: return
+        // Already there (e.g. Home behind another app): keep it, so a Device Diagnostics replay plays on the shown scene.
+        if (nav.currentDestination?.id == destination) return
         nav.navigate(destination, null, androidx.navigation.NavOptions.Builder().setLaunchSingleTop(true)
             .setPopUpTo(nav.graph.startDestinationId, inclusive = false).build())
     }

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Verify a supported device with authorized credentials and enroll it for this agent",
@@ -20,14 +20,9 @@
    },
    {
     "name": "adapter",
-    "description": "Supported adapter",
+    "description": "A built-in adapter (shelly_gen1, openwrt_ubus, tapo_onvif) or a device pack id from GET /v1/lan/packs, e.g. upnp_av for speakers; packs download on first use",
     "type": "string",
-    "required": true,
-    "enum": [
-     "shelly_gen1",
-     "openwrt_ubus",
-     "tapo_onvif"
-    ]
+    "required": true
    },
    {
     "name": "name",
@@ -73,13 +68,8 @@
      "type": "string"
     },
     "adapter": {
-     "description": "Supported adapter",
-     "type": "string",
-     "enum": [
-      "shelly_gen1",
-      "openwrt_ubus",
-      "tapo_onvif"
-     ]
+     "description": "A built-in adapter (shelly_gen1, openwrt_ubus, tapo_onvif) or a device pack id from GET /v1/lan/packs, e.g. upnp_av for speakers; packs download on first use",
+     "type": "string"
     },
     "host": {
      "description": "Direct LAN literal IPv4",

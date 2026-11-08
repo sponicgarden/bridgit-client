@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Replace supplied listening configuration with native validation; wake_words=[] or sounds=null clears; existing recipient/capture and Android permission checks remain; explicit owner.configuration grant required; no per-change phone approval",

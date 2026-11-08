@@ -39,6 +39,8 @@ class BridgeApp : Application() {
     /** Bridgit Satellites (docs/spec-satellites.md): the satellites this phone uses as a hub, and its own hub links. */
     val satellites by lazy { cc.bridgit.app.satellite.SatelliteStore(this) }
     val hubLinks by lazy { cc.bridgit.app.satellite.HubLinks(this) }
+    /** Linked Bridgits (docs/spec-linked-bridgits.md): two-way links with double opt-in, over the two stores above. */
+    val links by lazy { cc.bridgit.app.link.Links(this) }
     /** The opt-in on-phone vision engines (any-word detector, outlines); idle until a caller names one. */
     val onDeviceVision by lazy {
         cc.bridgit.app.vision.OnDeviceVision(this, cc.bridgit.app.vision.OnDeviceModels(this, { runCatching { applets.engines() }.getOrDefault(emptySet()) }) { level, msg -> log.system("diagnostic", "vision", msg, level = level) })
@@ -156,6 +158,8 @@ class BridgeApp : Application() {
         log = LogStore(this) { settings.retention() }
         // The optional on-phone software's manifest, once a day; it only fetches while an engine is in use.
         runCatching { cc.bridgit.app.vision.SoftwareCheckWorker.schedule(this) }
+        // Automatic app updates (A0050), on unless the owner turned them off.
+        if (cc.bridgit.app.update.AutoUpdate.enabled(this)) runCatching { cc.bridgit.app.update.AutoUpdateWorker.schedule(this) }
         alerts = cc.bridgit.app.alerts.Alerts(this)
         log.onAppended = { e -> if (!cc.bridgit.app.remoteview.RemoteViewLines.isAppletDiagnostic(e)) alerts.onLog(e) }
         runCatching { alerts.poke() }
@@ -225,7 +229,7 @@ class BridgeApp : Application() {
             val gone = agentIds - now.keys
             agentIds = now
             if (gone.isNotEmpty()) closeRemoved(gone)
-            gone.keys.forEach { runCatching { satellites.forgetAgent(it) } }
+            gone.keys.forEach { runCatching { satellites.forgetAgent(it) }; runCatching { links.forgetAgent(it) } }
         }
         closeRemoved((interactions.agentsWithOpen() - agentIds.keys).associateWith { "a removed agent" })
         // UI-23: keep the Quick Settings tile in step when Home, the notification or the tile pauses or resumes.
@@ -275,6 +279,7 @@ class BridgeApp : Application() {
             getString(R.string.channel_notices), NotificationManager.IMPORTANCE_DEFAULT).apply { description = getString(R.string.channel_notices_desc) })
         FeedbackNotifier.createChannel(this)
         cc.bridgit.app.security.SecurityAlerts.createChannel(this)
+        cc.bridgit.app.link.LinkNotifier.createChannel(this)
         cc.bridgit.app.update.UpdateInstaller.cleanStale(this) // UPD-05: downloads older than an hour go
     }
 

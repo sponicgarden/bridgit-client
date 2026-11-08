@@ -50,6 +50,8 @@ class DeviceDetailSheet(
     val primaryCaption: String? = null,
     /** Check now: tonal, not filled. */
     val secondary: Action? = null,
+    /** Pause or Resume a linked Bridgit (docs/spec-linked-bridgits.md, LNK-27): tonal, after [secondary]. */
+    val pause: Action? = null,
     /** Unlink, Remove or Disconnect, with the confirmation it asks first. */
     val destructive: Destructive? = null,
 ) {
@@ -57,8 +59,10 @@ class DeviceDetailSheet(
     data class Connection(val title: String, val body: String, val live: Boolean)
     /** [connections]: label to state ("connected", "disconnected", …), in order. */
     data class Where(val address: String?, val connections: List<Pair<String, String>>)
-    data class Action(val label: String, val run: () -> Unit)
-    data class Destructive(val label: String, val confirm: String, val run: () -> Unit)
+    /** [spoken]: an accessible name when [label] alone is too short to say what it acts on. */
+    data class Action(val label: String, val spoken: String? = null, val run: () -> Unit)
+    /** [confirm] null: runs at once, and the caller offers Undo instead of a question (LNK-26). */
+    data class Destructive(val label: String, val confirm: String?, val run: () -> Unit)
 
     fun show(ctx: Context, closeLabel: String, connectedWord: String): BottomSheetDialog {
         val dialog = BottomSheetDialog(ctx)
@@ -163,16 +167,19 @@ class DeviceDetailSheet(
             primaryCaption?.let { section(text(ctx, it, cc.bridgit.app.R.style.TextAppearance_Bridgit_BodySmall, M.attr.colorOnSurfaceVariant).apply { gravity = Gravity.CENTER }, 4) }
         }
         secondary?.let { s -> section(MaterialButton(ctx, null, R.attr.bridgitPillTonalStyle).apply { text = s.label; setOnClickListener { s.run() } }, if (primary == null) 24 else 12) }
+        pause?.let { p -> section(MaterialButton(ctx, null, R.attr.bridgitPillTonalStyle).apply { text = p.label; p.spoken?.let { contentDescription = it }; setOnClickListener { dialog.dismiss(); p.run() } },
+            if (primary == null && secondary == null) 24 else 12) }
         destructive?.let { d ->
             val error = ctx.themeColor(M.attr.colorError)
             section(MaterialButton(ctx, null, R.attr.bridgitPillTextStyle).apply {
                 text = d.label; setTextColor(error); rippleColor = ColorStateList.valueOf(ColorUtils.setAlphaComponent(error, 0x1F))
                 setOnClickListener {
-                    MaterialAlertDialogBuilder(ctx).setMessage(d.confirm)
+                    if (d.confirm == null) { dialog.dismiss(); d.run() }
+                    else MaterialAlertDialogBuilder(ctx).setMessage(d.confirm)
                         .setPositiveButton(d.label) { _, _ -> dialog.dismiss(); d.run() }
                         .setNegativeButton(R.string.cancel, null).show()
                 }
-            }, if (primary == null && secondary == null) 24 else 8)
+            }, if (primary == null && secondary == null && pause == null) 24 else 8)
         }
 
         dialog.setContentView(root)

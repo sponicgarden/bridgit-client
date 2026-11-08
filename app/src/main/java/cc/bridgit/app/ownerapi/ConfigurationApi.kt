@@ -85,7 +85,8 @@ object ConfigurationEndpoints {
             Param("fixer_mode", "boolean", "Delegate/revoke Fixer Mode"), Param("maximum_control", "boolean", "Preserves the separate Superpowers role. true alone grants native maximum capabilities/roles/scopes; false stops future maximum inheritance")),
         example = "POST /v1/owner/configuration/access/agents/example {\"expected_generation\":\"<generation from discovery>\",\"control_scopes\":[\"owner.configuration\"]}", returns = "sanitized control-agent access,approval_required=false; no key creation or Android consent bypass")
     val ALL = listOf(ACCESS, ACCESS_FEATURES, ACCESS_AGENT, APPROVALS, APPROVAL, APPROVAL_DECIDE, INDEX, SETTINGS, ACTION, KEYS, KEY_SET, KEY_DELETE, CONNECTIONS, CONNECTION_CREATE, CONNECTION_UPDATE, CONNECTION_DELETE, CONNECTION_ROTATE,
-        CALLBACKS, CALLBACK_SET, CALLBACK_DELETE, NOTIFICATIONS, NOTIFICATIONS_SET, EMAIL, EMAIL_SET, NAME, NAME_SET, NAME_DELETE, FEEDING, FEEDING_SET, MODES, MODES_SET, LISTENING, LISTENING_SET)
+        CALLBACKS, CALLBACK_SET, CALLBACK_DELETE, NOTIFICATIONS, NOTIFICATIONS_SET, EMAIL, EMAIL_SET, NAME, NAME_SET, NAME_DELETE, FEEDING, FEEDING_SET, MODES, MODES_SET, LISTENING, LISTENING_SET) +
+        ConfigurationLinks.CONFIG
 }
 
 fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
@@ -96,7 +97,7 @@ fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
             .put("actions_url", "/v1/owner/configuration/actions").put("keys_url", "/v1/owner/configuration/keys")
             .put("connections_url", "/v1/owner/configuration/connections").put("callbacks_url", "/v1/owner/configuration/callbacks")
             .put("notifications_url", "/v1/owner/configuration/notifications/{agent}").put("feeding_url", "/v1/owner/configuration/feeding")
-            .put("email_url", "/v1/owner/configuration/email").put("name_url", "/v1/owner/configuration/name").put("modes_url", "/v1/owner/configuration/modes")
+            .put("email_url", "/v1/owner/configuration/email").put("name_url", "/v1/owner/configuration/name").put("links_url", "/v1/owner/configuration/links").put("modes_url", "/v1/owner/configuration/modes")
             .put("listening_url", "/v1/owner/configuration/listening").put("human_authority", JSONArray(listOf("first Super Powers authority and initial key pairing", "OS consent", "account sign-in/verification", "biometric/security controls"))))
     }
     endpoint(ConfigurationEndpoints.ACCESS) { Reply.Json(SuperAgentAccess(app, agent!!).get()) }
@@ -135,4 +136,5 @@ fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
     endpoint(ConfigurationEndpoints.MODES_SET) { Reply.Json(ConfigurationResources(app, agent!!).modes(body)) }
     endpoint(ConfigurationEndpoints.LISTENING) { Reply.Json(ConfigurationResources(app, agent!!).listening()) }
     endpoint(ConfigurationEndpoints.LISTENING_SET) { Reply.Json(ConfigurationResources(app, agent!!).listening(body)) }
+    ConfigurationLinks.install(this@installConfiguration, api, app)
 }

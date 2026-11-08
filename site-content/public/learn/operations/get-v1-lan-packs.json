@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Device packs: downloadable device-family support, its versions and update state; no network scan",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_packs",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan/packs",
+  "idempotent": false,
+  "path": "/v1/lan/packs",
+  "capability": "lan_discovery",
+  "returns": "engine_version, channel, index{serial,published_at,checked_at,last_error}, auto_update, packs[id,title,latest_version,installed_version,state,reason,match_services,actions]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

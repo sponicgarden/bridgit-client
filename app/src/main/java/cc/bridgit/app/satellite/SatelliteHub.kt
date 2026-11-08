@@ -58,15 +58,21 @@ object SatelliteHub {
                     ?: throw IllegalStateException("No free name for the return link")
                 // Doesn't use one of the owner's 16 agent slots: a full phone still shares with its satellites.
                 val (a, key) = app.agents.add(name, cc.bridgit.app.core.Connection.DIRECT, limited = false)
-                app.agents.update(a.id) { it.copy(caps = SatellitePolicy.RETURN_CAPS, fixer = false, superPowers = false,
+                app.agents.update(a.id) { it.copy(caps = app.links.returnCaps(id) ?: SatellitePolicy.RETURN_CAPS, fixer = false, superPowers = false,
                     boundIps = listOf(cc.bridgit.app.core.Net.normalise(s.host)),
                     notes = "Satellite ${s.name} calling back: uses this phone's photo applets, portals and Home. Remove the satellite to remove this.") }
                 s = app.satellites.update(id) { it.copy(returnAgent = a.id, returnKey = key) } ?: return
                 app.log.system("audit", "satellite", "Made a return link for satellite ${s.name}")
             }
-            // Links made before the Home reads keep working: widen their grant to the current one.
-            s.returnAgent?.let { rid -> if (app.agents.get(rid)?.caps != SatellitePolicy.RETURN_CAPS) app.agents.update(rid) { it.copy(caps = SatellitePolicy.RETURN_CAPS) } }
+            // The return agent's grants are the link's service list for "the satellite uses this hub" (LNK-11); a
+            // migrated link has view, which is what return links always had.
+            val want = app.links.returnCaps(id) ?: SatellitePolicy.RETURN_CAPS
+            s.returnAgent?.let { rid -> if (app.agents.get(rid)?.caps != want) app.agents.update(rid) { it.copy(caps = want) } }
+            val rec = app.links.all().firstOrNull { it.role == cc.bridgit.app.link.Links.Role.HUB && it.ref == id }
             val body = SatelliteEndpoints.hubInfo(app, hubName).put("port", app.listener.value.port).put("key", s.returnKey)
+                .put("bridgit_name", app.links.registeredName() ?: org.json.JSONObject.NULL)
+                .put("install", runCatching { cc.bridgit.app.feedback.InstallIdentity.status(app)?.installId }.getOrNull() ?: org.json.JSONObject.NULL)
+                .put("link", app.links.linkBlock(rec) ?: org.json.JSONObject.NULL)
             SatelliteClient.hubInfo(s.base, s.key, hubName, body)
             val wasFailing = s.shareError != null
             app.satellites.update(id) { it.copy(sharedAt = System.currentTimeMillis(), shareError = null) }
@@ -98,8 +104,12 @@ object SatelliteHub {
         return try {
             val m = SatelliteClient.manifest(s.base, s.key, cc.bridgit.app.platform.DeviceName.forLinks(app))
             app.satellites.update(id) { it.copy(manifest = m, lastSeen = System.currentTimeMillis(), lastError = null) }
-                .also { pushHubInfo(app, id) }
+                .also { runCatching { app.links.noteManifest(id, m) }; pushHubInfo(app, id) }
         } catch (e: SatelliteClient.Failure) {
+            if (e.code == "link_revoked") {
+                app.links.all().firstOrNull { it.role == cc.bridgit.app.link.Links.Role.HUB && it.ref == id }?.let { app.links.farRevoked(it, e.scope) }
+                return app.satellites.get(id)
+            }
             // The satellite no longer knows this hub's key: it was unlinked there. Drop it here too, so the two agree.
             if (SatelliteClient.isGone(e)) {
                 remove(app, id, tellSatellite = false)

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Home inventory from a photo: every belonging in it with a box, category, brand and model where they can be read, visible condition, estimated price new and used (US dollars), whether a home or renters policy would normally cover it, and how sure the model is. One cloud vision call (about half a cent; shares the Jev/Clef budget)",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Legacy phone-local reporting (any agent; images only in Bridgit Fixer Mode). Control agents should report directly to Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",

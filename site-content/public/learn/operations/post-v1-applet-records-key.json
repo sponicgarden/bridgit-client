@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Save a control agent record (replaces it). Applet execution principals must use declared processing.tables, including described json columns; this legacy store refuses applet writes",

@@ -122,7 +122,8 @@ object DeviceNames {
         throw ErrorCatalog.error("upstream_failed", message, mapOf("service" to "bridgit names", "upstream_status" to code))
     }
 
-    private fun call(app: BridgeApp, method: String, path: String, body: JSONObject?): Pair<Int, JSONObject> {
+    /** A signed call to the names backend (also used by link offers and resolve, LinkResolver). */
+    internal fun call(app: BridgeApp, method: String, path: String, body: JSONObject?): Pair<Int, JSONObject> {
         if (!FeedbackUploader.configured) throw ErrorCatalog.error("team_unavailable", "This build has no team backend.")
         try { InstallIdentity.ensure(app, TeamKeys.base) } catch (e: Exception) { null }
             ?: throw ErrorCatalog.error("team_unavailable", "The phone couldn't prove who it is to the team backend.")

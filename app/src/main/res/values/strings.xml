@@ -304,7 +304,7 @@
     <string name="network_category_count">%1$s, %2$d devices</string>
     <string name="network_coverage">Discovery coverage</string>
     <string name="network_devices_title">Network devices</string>
-    <string name="network_find">Run Level 2 Network Device Diagnostics</string>
+    <string name="network_find">Run Network Diagnostics</string>
     <string name="network_explanation">Cameras, speakers, TVs and more — discover what’s on your Wi-Fi or Ethernet network. Device types are suggestions. Pairing and control agent access stay in your control.</string>
     <string name="network_stop">Stop scan</string>
     <string name="network_scanning">Looking for devices…</string>
@@ -314,7 +314,7 @@
     <string name="network_partial">Some services could not be checked. This list may be incomplete.</string>
     <string name="network_unavailable">Discovery unavailable. Connect to one private Wi-Fi or Ethernet network and check Bridgit’s network access in Android app settings.</string>
     <string name="network_paused">External calls are paused. Resume them in Bridgit’s Control agents tab to scan this network.</string>
-    <string name="network_stopped">Scan stopped. Run Level 2 Network Device Diagnostics to try again.</string>
+    <string name="network_stopped">Scan stopped. Run Network Diagnostics to try again.</string>
 
     <string name="network_copy_address">Copy address</string>
     <string name="network_camera_setup">Set up camera</string>
@@ -372,6 +372,28 @@
     <string name="satellite_connected_hub">the hub phone</string>
     <string name="satellite_connected_text">On %1$s, open Linked devices and tap this phone to choose which control agents can use it.</string>
     <string name="satellite_unlink">Unlink</string>
+    <!-- Linked Bridgits (docs/spec-linked-bridgits.md) -->
+    <string name="channel_links">Linked Bridgits</string>
+    <string name="link_used_by">Used by %1$s</string>
+    <string name="link_disconnect">Disconnect</string>
+    <string name="link_disconnected">Disconnected %1$s</string>
+    <string name="link_undo">Undo</string>
+    <string name="link_pause">Pause</string>
+    <string name="link_resume">Resume</string>
+    <string name="link_pause_a11y">Pause link with %1$s</string>
+    <string name="link_resume_a11y">Resume link with %1$s</string>
+    <string name="link_this_uses">This %1$s uses: %2$s</string>
+    <string name="link_it_uses">It uses this %1$s: %2$s</string>
+    <string name="link_state_waiting">waiting</string>
+    <string name="link_state_paused">paused</string>
+    <string name="link_service_camera">camera</string>
+    <string name="link_service_mic">microphone</string>
+    <string name="link_service_speaker">speaker</string>
+    <string name="link_service_interactions">questions</string>
+    <string name="link_service_location">location</string>
+    <string name="link_service_gallery">photos</string>
+    <string name="link_service_sounds">sounds</string>
+    <string name="link_service_view">Home and applets</string>
     <string name="satellite_unlink_confirm">Unlink %1$s? Its key stops working at once.</string>
     <string name="satellite_devices_card">Satellites: %1$d</string>
     <string name="satellite_devices_open">Satellites</string>

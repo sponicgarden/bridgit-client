@@ -2050,7 +2050,7 @@
      "tool": "lan_brands_logo"
     },
     {
-     "summary": "Bounded discovery on the Android host's direct local network",
+     "summary": "Network Diagnostics: bounded discovery on the Android host's direct local network",
      "path": "/v1/lan/discover",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-discover.json",
@@ -2058,6 +2058,26 @@
      "control_scope": null,
      "requires_power": null,
      "tool": "lan_discover"
+    },
+    {
+     "summary": "Device packs: downloadable device-family support, its versions and update state; no network scan",
+     "path": "/v1/lan/packs",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-packs.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-packs.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "lan_packs"
+    },
+    {
+     "summary": "Check for device-pack updates now (at most once a minute) and update installed packs",
+     "path": "/v1/lan/packs/check",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-lan-packs-check.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-lan-packs-check.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "lan_packs_check"
     }
    ],
    "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
@@ -2958,6 +2978,86 @@
      "control_scope": "owner.configuration",
      "requires_power": null,
      "tool": "owner_configuration_listening_post"
+    },
+    {
+     "summary": "Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each",
+     "path": "/v1/owner/configuration/links",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-links.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-links.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_links"
+    },
+    {
+     "summary": "Make a one-time link code for this Bridgit as the target (8 characters, 10 minutes, 5 wrong tries); needs a Device Domain Name; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/links/codes",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-codes.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-codes.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_links_codes"
+    },
+    {
+     "summary": "Cancel a link code that hasn't been claimed; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/links/codes/{id}",
+     "method": "DELETE",
+     "documentation": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-links-codes-id.json",
+     "operation_url": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-links-codes-id.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_links_code_cancel"
+    },
+    {
+     "summary": "Claim another Bridgit's link code: this Bridgit then uses it (its user opt-in), and may offer the other direction too; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/links/claims",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-claims.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-claims.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_links_claims"
+    },
+    {
+     "summary": "Change this Bridgit's half of one direction: in = the other Bridgit uses this one (services), out = this one uses it (agents); paused on either; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/links/{id}/directions/{direction}",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-directions-direction.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-directions-direction.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_links_directions"
+    },
+    {
+     "summary": "Undo a disconnect within 10 seconds; after that linking again needs a new code; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/links/{id}/undo",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-undo.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-undo.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_links_undo"
+    },
+    {
+     "summary": "Pause or resume links by role, as the Linked devices pills do; each pauses both directions of those links; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/links/pause-all",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-pause-all.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-pause-all.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_links_pause_all"
+    },
+    {
+     "summary": "Read the grants log: every link event on this Bridgit and the ones the other Bridgits reported, newest first, with who did each",
+     "path": "/v1/owner/configuration/links/log",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-links-log.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-links-log.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_links_log"
     }
    ],
    "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
@@ -3156,6 +3256,16 @@
      "control_scope": null,
      "requires_power": null,
      "tool": "portal_photo"
+    },
+    {
+     "summary": "The Portal's own update state (A0050): whether it prompts for new TestFlight builds, its build and the newest one, and which request it applied. Agents read it in GET /v1/owner/settings → portal_updates and change it with owner configuration actions portal.update_prompts and portal.update_now. The owner's portal pairing only.",
+     "path": "/v1/portal/updates",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-portal-updates.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-portal-updates.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "portal_updates"
     }
    ],
    "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
@@ -4196,6 +4306,76 @@
      "control_scope": null,
      "requires_power": null,
      "tool": "satellite_hub_agents_pause"
+    },
+    {
+     "summary": "The linked Bridgits (the owner's other Bridgits) you may use through this one, with what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further.",
+     "path": "/v1/links",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-links.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-links.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "links"
+    },
+    {
+     "summary": "Device to device: a Bridgit claims this one's link code with the claim token derived from it (Authorization: Bearer rly_\u2026). Not for agents: agents use POST /v1/owner/configuration/links/claims on their own Bridgit.",
+     "path": "/v1/link/claim",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-link-claim.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-link-claim.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": null
+    },
+    {
+     "summary": "Device to device: the other Bridgit of a link sends its grants-log events and its halves of both directions (link agents only). Not for agents.",
+     "path": "/v1/link/events",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-link-events.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-link-events.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "link_events"
+    },
+    {
+     "summary": "Device to device: this Bridgit's other links, names and directions only, so the other device can draw them (link agents only). Not for agents.",
+     "path": "/v1/link/peers",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-link-peers.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-link-peers.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "link_peers"
+    },
+    {
+     "summary": "Device to device: the other Bridgit disconnected a direction or the whole link, so this one marks it off too (link agents only). Not for agents.",
+     "path": "/v1/link/disconnect",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-link-disconnect.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-link-disconnect.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "link_disconnect"
+    },
+    {
+     "summary": "Disconnect (or pause) a link at once: calls are refused from now, and it is final after 10 seconds unless undone; any control agent of this device (taking access away needs no owner.configuration grant)",
+     "path": "/v1/owner/configuration/links/{id}/disconnect",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-disconnect.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-disconnect.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "owner_configuration_links_disconnect"
+    },
+    {
+     "summary": "Disconnect every link of this Bridgit at once (Undo per link for 10 seconds); any control agent of this device (taking access away needs no owner.configuration grant)",
+     "path": "/v1/owner/configuration/links/disconnect-all",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-disconnect-all.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-disconnect-all.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "owner_configuration_links_disconnect_all"
     }
    ],
    "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
@@ -7311,8 +7491,8 @@
   "kind": "source_generated",
   "released": "Check public updater manifest; source documentation is not release evidence."
  },
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "installed_api_revision": null,
  "categories": [
   "sense",

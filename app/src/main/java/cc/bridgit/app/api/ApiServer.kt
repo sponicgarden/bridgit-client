@@ -193,6 +193,11 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                         // SEC-06: only requests without a valid key are blocked by the per-IP failure count.
                         // tryAcquire checks and records in one step, so concurrent bad keys can't slip past.
                         if (!limiter.tryAcquire("auth:$source", RateLimiter.AUTH_FAILS_PER_IP)) throw authBlockedError(source)
+                        if (r is AuthResult.Revoked && r.reason == cc.bridgit.app.link.Links.REVOKED_REASON) {
+                            // LNK-30: a link agent removed by a disconnect. The other device marks its side off.
+                            revokedReason = r.reason
+                            throw ErrorCatalog.error("link_revoked", "The link with this device was disconnected. Linking again needs a new link code.", mapOf("scope" to "link"))
+                        }
                         if (r is AuthResult.Revoked) {
                             revokedReason = r.reason
                             throw ErrorCatalog.error("unauthorized",
@@ -204,20 +209,9 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                     }
                 }
                 requireDevice(agent!!, source)
+                // A link agent (docs/spec-linked-bridgits.md, LNK-11): the other Bridgit of a link, using this one.
+                if (app.links.isLinkAgent(agent!!.id)) onBehalf = linkAgentCall(spec, agent!!) { call.request.headers[it] }
                 requireGrant(agent!!, spec)
-                // This phone as a satellite: its hub may only use what passes a link, and says which hub agent it calls for.
-                if (app.hubLinks.isHub(agent!!.id)) {
-                    if (cc.bridgit.app.satellite.LinkPause.hubsPaused)
-                        throw ErrorCatalog.error("forbidden", cc.bridgit.app.satellite.LinkPause.HUBS_MESSAGE, mapOf("reason" to "hubs_paused"))
-                    if (!cc.bridgit.app.satellite.SatellitePolicy.hubLinkMay(spec))
-                        throw ErrorCatalog.error("not_on_satellite", "This phone is a satellite; its hub can't use ${spec.fullPath} here.")
-                    onBehalf = cc.bridgit.app.satellite.SatellitePolicy.parseOnBehalfOf(call.request.headers[cc.bridgit.app.satellite.SatellitePolicy.ON_BEHALF_HEADER])
-                }
-                // This phone as a hub: a satellite's return link may only use this hub's photo applets and portals.
-                if (app.satellites.isReturnAgent(agent!!.id) && cc.bridgit.app.satellite.LinkPause.satellites)
-                    throw ErrorCatalog.error("forbidden", cc.bridgit.app.satellite.LinkPause.SATELLITES_MESSAGE, mapOf("reason" to "satellites_paused"))
-                if (app.satellites.isReturnAgent(agent!!.id) && spec.path !in cc.bridgit.app.satellite.SatellitePolicy.RETURN_PATHS)
-                    throw ErrorCatalog.error("agent_not_allowed", "This is a satellite's link back to its hub; it can't use ${spec.fullPath}.")
                 app.agents.recordUse(agent!!.id, source)
                 // Agents switch models: X-Bridgit-Model (and -Harness) on any call keeps the owner's card current.
                 call.request.headers["X-Bridgit-Model"]?.let { m ->
@@ -234,15 +228,17 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
             // Satellites (docs/spec-satellites.md, mode A): a target runs the call on a satellite instead of here.
             val target = cc.bridgit.app.satellite.SatellitePolicy.target(call.request.headers[cc.bridgit.app.satellite.SatellitePolicy.TARGET_HEADER],
                 call.request.queryParameters[cc.bridgit.app.satellite.SatellitePolicy.TARGET_QUERY])
-            if (target != null) {
+            if (target != null && !app.links.isSelf(target)) {
                 logParams.put("target", Redactor.string(target, 50))
-                val a = agent ?: throw ErrorCatalog.error("not_on_satellite", "${spec.fullPath} can't run on a satellite.")
+                val a = agent ?: throw ErrorCatalog.error("not_on_target", "${spec.fullPath} can't run on another device.")
+                // LNK-32: a call is passed on at most once; a link agent's key never forwards.
+                if (app.links.isLinkAgent(a.id)) throw ErrorCatalog.error("not_on_target", "A call that came over a link can't be passed on to another device. To use that device, link it directly.")
                 val f = forwardToSatellite(call, spec, a, source, target, rid)
                 http = f.status; result = f.result; ranOn = target; forwardedOut = f.bytesOut; bytesIn = f.bytesIn
                 return
             }
             // Pairing has no key, but wrong codes count as failed sign-ins (SEC-06).
-            if ((spec.path == "/pair" || spec.path == "/satellite/claim") && limiter.count("auth:$source") >= RateLimiter.AUTH_FAILS_PER_IP) throw authBlockedError(source)
+            if ((spec.path == "/pair" || spec.path == "/satellite/claim" || spec.path == "/link/claim") && limiter.count("auth:$source") >= RateLimiter.AUTH_FAILS_PER_IP) throw authBlockedError(source)
             // Before any body is read: the endpoint's own admission (switch, rate, queue). A request that will be
             // answered from the idempotency cache skips it, as it never runs the endpoint.
             if (admit != null) {
@@ -374,6 +370,38 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 mapOf("retry_after_s" to limiter.retryAfterS("cap-ip:$source")))
     }
 
+    /**
+     * A call made with a link agent's key (docs/spec-linked-bridgits.md, LNK-11/12): the other Bridgit of a link,
+     * using this one. Its grants are the direction's service list, so the grant check that follows is the target's
+     * opt-in; here, the shape of a link: the owner's pause pills, a direction being disconnected or paused, and only
+     * calls that pass a link. Returns the agent the other device calls for (its On-Behalf-Of), when it says.
+     */
+    private fun linkAgentCall(spec: EndpointSpec, agent: Agent, header: (String) -> String?): Pair<String, String>? {
+        val P = cc.bridgit.app.satellite.SatellitePolicy
+        val hub = app.hubLinks.isHub(agent.id)
+        // The owner's pills, by role as on Linked devices: Hubs pauses this device's hubs, Satellites its satellites, both ways.
+        if (hub && cc.bridgit.app.satellite.LinkPause.hubsPaused)
+            throw ErrorCatalog.error("forbidden", cc.bridgit.app.satellite.LinkPause.HUBS_MESSAGE, mapOf("reason" to "hubs_paused"))
+        if (!hub && cc.bridgit.app.satellite.LinkPause.satellites)
+            throw ErrorCatalog.error("forbidden", cc.bridgit.app.satellite.LinkPause.SATELLITES_MESSAGE, mapOf("reason" to "satellites_paused"))
+        val plumbing = cc.bridgit.app.link.LinkPolicy.isPlumbing(spec)
+        val rec = app.links.byInAgent(agent.id)
+        if (!plumbing) {
+            // While Undo can still run the other side is told "paused", so it doesn't mark its side off for good.
+            if (rec != null && !rec.inRevoked && rec.covers("in"))
+                throw ErrorCatalog.error("link_paused", "The owner is disconnecting this link here. Don't retry.", mapOf("reason" to "disconnecting", "link_id" to rec.id))
+            if (rec != null && rec.inRevoked)
+                throw ErrorCatalog.error("link_revoked", "This device no longer lets ${app.links.peerLabel(rec)} use it: the link was disconnected. Linking again needs a new link code.", mapOf("scope" to "direction", "link_id" to rec.id))
+            if (app.agents.get(agent.id)?.paused == true)
+                throw ErrorCatalog.error("link_paused", "The owner paused this link here. Wait until it is resumed; don't retry before then.", mapOf("link_id" to rec?.id))
+        }
+        val services = cc.bridgit.app.link.LinkModel.servicesOf(app.agents.get(agent.id)?.caps)
+        if (!cc.bridgit.app.link.LinkPolicy.mayCall(spec, services))
+            throw ErrorCatalog.error("not_on_target", "${spec.method} ${spec.fullPath} doesn't pass a link here (this device shares: ${cc.bridgit.app.link.LinkModel.words(services)}).")
+        if (!plumbing && rec != null) runCatching { cc.bridgit.app.link.LinkNotifier.used(app, rec) }
+        return if (hub) P.parseOnBehalfOf(header(P.ON_BEHALF_HEADER)) else null
+    }
+
     // ---- Satellites: forwarding a call to a satellite (docs/spec-satellites.md, mode A) -------
 
     class Forwarded(val status: Int, val result: String, val bytesIn: Long, val bytesOut: Long)
@@ -388,12 +416,10 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
     private suspend fun forwardToSatellite(call: ApplicationCall, spec: EndpointSpec, agent: Agent, source: String,
                                            target: String, rid: String): Forwarded {
         val P = cc.bridgit.app.satellite.SatellitePolicy
-        if (cc.bridgit.app.satellite.LinkPause.satellites)
-            throw ErrorCatalog.error("forbidden", cc.bridgit.app.satellite.LinkPause.SATELLITES_MESSAGE, mapOf("reason" to "satellites_paused"))
-        val sat = (if (cc.bridgit.app.satellite.SatelliteLink.ID_RE.matches(target)) app.satellites.get(target) else null)
-            ?: throw ErrorCatalog.error("unknown_target", "No satellite called $target. GET /v1/satellites lists the ones you may use; leave target out to use this phone.")
-        if (agent.id !in sat.agents) throw ErrorCatalog.error("target_not_granted", "The owner hasn't let ${agent.name} use ${sat.name}. Ask them to tick you under Devices > ${sat.name}.")
-        if (!P.forwardable(spec)) throw ErrorCatalog.error("not_on_satellite", "${spec.method} ${spec.fullPath} can't run on a satellite yet. Leave target out to run it on this phone.")
+        // sat: ids keep their satellite error codes (aliases, LNK-49); names use the link ones.
+        val old = cc.bridgit.app.satellite.SatelliteLink.ID_RE.matches(target)
+        val sat = app.links.reach(target, agent)
+        if (!P.forwardable(spec)) throw ErrorCatalog.error(if (old) "not_on_satellite" else "not_on_target", "${spec.method} ${spec.fullPath} can't run on a linked device yet. Leave target out to run it on this device.")
         if (!limiter.tryAcquire("sat-fwd:${agent.id}", RateLimiter.SATELLITE_CALLS_PER_AGENT))
             throw ErrorCatalog.error("rate_limited", "At most ${RateLimiter.SATELLITE_CALLS_PER_AGENT} satellite calls per minute per agent.",
                 mapOf("retry_after_s" to limiter.retryAfterS("sat-fwd:${agent.id}")))
@@ -419,7 +445,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 if (spec.idempotent) headers += "Idempotency-Key" to P.forwardedIdempotencyKey(agent.id, k)
             }
             val query = call.request.queryParameters.entries().filter { it.key != P.TARGET_QUERY }.flatMap { e -> e.value.map { e.key to it } }
-            val okCall = cc.bridgit.app.satellite.SatelliteClient.newCall(sat.base, sat.key, spec.method, call.request.path(), query, headers, body)
+            val okCall = cc.bridgit.app.satellite.SatelliteClient.newCall(sat.base, sat.key, spec.method, call.request.path(), query, headers, body, toHub = sat.toHub)
             // Stops the satellite's work when this agent may no longer do it (paused, removed, re-keyed, narrowed, untargeted).
             var revoked = false
             return coroutineScope {
@@ -427,7 +453,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                     while (isActive) {
                         delay(200)
                         val live = app.agents.get(agent.id)
-                        if (live == null || live.keyHash != agent.keyHash || live.paused || !live.allows(spec.capability) || !app.satellites.allows(sat.id, agent.id) || cc.bridgit.app.satellite.LinkPause.satellites) {
+                        if (live == null || live.keyHash != agent.keyHash || live.paused || !live.allows(spec.capability) || !sat.stillAllowed(agent.id)) {
                             revoked = true; okCall.cancel(); break
                         }
                     }
@@ -440,13 +466,12 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                     } catch (e: java.io.IOException) {
                         if (revoked) { requireGrant(agent, spec)
                             throw ErrorCatalog.error("conflict", "Authorization changed while this request was running. Start a new request if it is still wanted.") }
-                        app.satellites.update(sat.id) { it.copy(lastError = "offline") }
-                        throw ErrorCatalog.error("satellite_offline", "${sat.name} didn't answer. Retry later; the owner may need to check Tailscale or Bridgit on it.",
+                        sat.offline()
+                        throw ErrorCatalog.error(if (old) "satellite_offline" else "target_offline", "${sat.name} didn't answer. Retry later; the owner may need to check Tailscale or Bridgit on it.",
                             mapOf("last_seen" to (sat.lastSeen.takeIf { it > 0 }), "retry_after_s" to 30))
                     }
                     res.use { r ->
-                        app.satellites.update(sat.id) { it.copy(lastSeen = System.currentTimeMillis(),
-                            lastError = if (r.code == 401) "unlinked" else null) }
+                        sat.seen(r.code)
                         r.headers.forEach { (k, v) ->
                             val lk = k.lowercase()
                             when {
@@ -455,13 +480,16 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                                 else -> runCatching { call.response.header(k, v) }
                             }
                         }
-                        call.response.header(P.RAN_ON_HEADER, sat.id)
+                        call.response.header(P.RAN_ON_HEADER, if (old) sat.id else sat.rec.peerName ?: target)
                         val ct = r.body?.contentType()?.toString()?.let { runCatching { ContentType.parse(it) }.getOrNull() } ?: ContentType.Application.Json
                         // An error is small JSON: read it whole so the hub's log names the satellite's error code.
                         if (r.code !in 200..299 && ct.match(ContentType.Application.Json)) {
                             val bytes = withContext(Dispatchers.IO) { r.body?.source()?.let { src -> src.request(256 * 1024L); src.buffer.readByteArray() } ?: ByteArray(0) }
                             call.respondBytes(bytes, ct, HttpStatusCode.fromValue(r.code))
-                            val code = runCatching { JSONObject(String(bytes)).optString("error") }.getOrNull()?.takeIf { it.isNotEmpty() }
+                            val err = runCatching { JSONObject(String(bytes)) }.getOrNull()
+                            val code = err?.optString("error")?.takeIf { it.isNotEmpty() }
+                            // LNK-30: the other device disconnected while this one was offline: mark this side off too.
+                            if (code == "link_revoked") runCatching { app.links.farRevoked(sat.rec, err.optString("scope").ifEmpty { null }) }
                             return@coroutineScope Forwarded(r.code, code ?: "satellite_http_${r.code}", bytesIn, bytes.size.toLong())
                         }
                         var out = 0L
@@ -502,7 +530,9 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 val scopeRevoked = req.spec.controlScope?.let { scope ->
                     !app.platform.hasGrant(a.id, scope) || !cc.bridgit.app.platform.Capabilities.enabled(app, scope)
                 } ?: false
-                if (live == null || live.keyHash != a.keyHash || live.paused || !live.allows(req.spec.capability) || switchedOff || scopeRevoked) {
+                val linkStopped = !cc.bridgit.app.link.LinkPolicy.isPlumbing(req.spec) && app.links.isLinkAgent(a.id) && app.links.inBlocked(a.id)
+                val pausedNow = linkStopped || (live?.paused == true && !(cc.bridgit.app.link.LinkPolicy.isPlumbing(req.spec) && app.links.isLinkAgent(a.id)))
+                if (live == null || live.keyHash != a.keyHash || pausedNow || !live.allows(req.spec.capability) || switchedOff || scopeRevoked) {
                     work.cancel(); break
                 }
             }
@@ -541,7 +571,9 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
     private fun requireGrant(agent: Agent, spec: EndpointSpec, allowListenerPaused: Boolean = false) {
         val live = app.agents.get(agent.id) ?: throw ErrorCatalog.error("unauthorized", "Agent removed.")
         if (live.keyHash != agent.keyHash) throw ErrorCatalog.error("unauthorized", "Agent key was rotated during the request.")
-        if (live.paused) throw ErrorCatalog.error("forbidden", "The owner paused ${live.name} on this phone. Wait until they resume you; don't retry before then.",
+        // A paused link agent still makes the link's own calls (events, disconnect), so both sides stay in step.
+        if (live.paused && !(cc.bridgit.app.link.LinkPolicy.isPlumbing(spec) && app.links.isLinkAgent(live.id)))
+            throw ErrorCatalog.error("forbidden", "The owner paused ${live.name} on this phone. Wait until they resume you; don't retry before then.",
             mapOf("reason" to "agent_paused"))
         if (!live.allows(spec.capability)) throw ErrorCatalog.error("agent_not_allowed", "This agent does not have ${spec.capability} access. Ask the owner to update its permissions on the phone.")
         spec.controlScope?.let { scope ->
@@ -586,6 +618,8 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
         var result = "ok"
         var idemKey: String? = null
         try {
+            // A linked Bridgit over the relay gets the same link checks as over Tailscale.
+            if (app.links.isLinkAgent(agent.id)) linkAgentCall(spec, agent) { null }
             requireGrant(agent, spec)
             if(cc.bridgit.app.capture.CapturePresentationRules.requiresViewfinder(via) && spec.path in setOf("/camera/arm","/camera/pose/start","/lan-cameras/snapshot")) throw ApiError(409,"viewfinder_required","Person-started captures must use the visible camera capture and review flow")
             if (body.toString().toByteArray(Charsets.UTF_8).size > spec.maxBody) throw ErrorCatalog.error("payload_too_large", "Request exceeds this operation’s body limit")

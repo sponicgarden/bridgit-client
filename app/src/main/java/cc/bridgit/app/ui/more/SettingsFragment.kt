@@ -187,6 +187,7 @@ class SettingsFragment : Fragment() {
         // UPD-02, UPD-06: debug builds don't check; the row says how to update them.
         row(b.checkUpdates, R.string.update_check) { UpdateDialog.checkForUpdates(requireActivity(), manual = true) }
         b.checkUpdates.value.text = if (UpdateDialog.isDebugBuild) getString(R.string.update_debug) else app.appVersion()
+        autoUpdateInstallSwitch()
         autoUpdateOffersSwitch()
         row(b.commit, R.string.settings_commit, mono = true, onClick = null)
         b.commit.value.text = if (BuildConfig.DIRTY_BUILD) getString(R.string.more_dirty, BuildConfig.GIT_COMMIT) else BuildConfig.GIT_COMMIT
@@ -422,6 +423,22 @@ class SettingsFragment : Fragment() {
             }
             bind()
             audit(getString(R.string.settings_changed_open_on_arrival, getString(if (on) R.string.home_on else R.string.home_off)))
+        }
+    }
+
+    /** A0050: install updates without a tap when the phone allows it; on by default. */
+    private fun autoUpdateInstallSwitch() {
+        val r = b.autoUpdateInstall
+        if (!cc.bridgit.app.update.AutoUpdate.supported) { r.root.visibility = View.GONE; return }
+        r.title.setText(R.string.update_auto_install)
+        r.value.visibility = View.GONE
+        r.root.contentDescription = getString(R.string.update_auto_install)
+        UiActions.asSwitch(r.root) { cc.bridgit.app.update.AutoUpdate.enabled(requireContext()) }
+        r.toggle.isChecked = cc.bridgit.app.update.AutoUpdate.enabled(requireContext())
+        r.root.setOnClickListener {
+            val on = !cc.bridgit.app.update.AutoUpdate.enabled(requireContext())
+            cc.bridgit.app.update.AutoUpdate.setEnabled(requireContext(), on)
+            r.toggle.isChecked = on
         }
     }
 

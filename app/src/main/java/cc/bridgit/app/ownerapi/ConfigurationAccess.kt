@@ -14,7 +14,8 @@ class ConfigurationAccess(private val app: BridgeApp, private val caller: Agent)
         val live = app.agents.get(caller.id)?.takeUnless { it.paused }
             ?: throw ErrorCatalog.error("unauthorized", "Control agent is no longer active")
         if (live.keyHash != caller.keyHash) throw ErrorCatalog.error("unauthorized", "Control key changed")
-        if (live.connection == Connection.APPLET || app.applets.forAgent(live.id) != null ||
+        // Link agents never configure: each Bridgit's own agents change its links (LNK-48).
+        if (live.connection == Connection.APPLET || app.applets.forAgent(live.id) != null || app.links.isLinkAgent(live.id) ||
             PortalPairing.granted(app, RelayStore(app)).any { it.id == live.id })
             throw ErrorCatalog.error("forbidden", "Configuration authority belongs to control agents")
         if (!live.allows("owner_features")) throw ErrorCatalog.error("agent_not_allowed", "Owner feature access is required")

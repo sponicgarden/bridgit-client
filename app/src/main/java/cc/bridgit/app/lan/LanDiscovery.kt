@@ -57,6 +57,8 @@ class LanDiscovery(private val context: Context, private val lan: HostLan,
                     "<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" xmlns:n=\"http://www.onvif.org/ver10/network/wsdl\"><s:Header><a:MessageID>uuid:${UUID.randomUUID()}</a:MessageID><a:To>urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To><a:Action>http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe</a:Action></s:Header><s:Body><d:Probe><d:Types>n:NetworkVideoTransmitter</d:Types></d:Probe></s:Body></s:Envelope>", "onvif") } },
                 async { method("mdns") { mdns() } },
                 async(Dispatchers.IO) { method("tplink") { tplink() } },
+                // Keeps the device-pack list current so matching devices show as Bridgit interfaced; never fails discovery.
+                async(Dispatchers.IO) { runCatching { cc.bridgit.app.lan.packs.DevicePackStore.get(context).refreshIfStale() } },
                 async(Dispatchers.IO) { method("tcp_inventory") {
                     targets.distinct().chunked(16).forEach { batch ->
                         batch.map { host -> async(Dispatchers.IO) {

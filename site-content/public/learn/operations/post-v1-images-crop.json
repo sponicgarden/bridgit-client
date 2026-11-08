@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Zoom in on something in a photo: crop to what query finds (or to a box you give) with some margin. which=first (default), all (one crop around every match) or each (one crop per match, 10 at most)",

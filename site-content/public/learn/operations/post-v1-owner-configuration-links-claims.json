@@ -1,0 +1,121 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Claim another Bridgit's link code: this Bridgit then uses it (its user opt-in), and may offer the other direction too; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_links_claims",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "name",
+    "description": "The other Bridgit's Device Domain Name (required unless link is given)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "code",
+    "description": "Its link code, K7QX-3MPA (required unless link is given)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "link",
+    "description": "Its bridgit://link#\u2026 link (holds name, code and its Tailscale address)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "host",
+    "description": "Its Tailscale address, when the names backend can't resolve the name",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "port",
+    "description": "Its Bridgit port, with host",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "agents",
+    "description": "This Bridgit's control agent ids that may use it; default: the calling agent",
+    "type": "array",
+    "required": false
+   },
+   {
+    "name": "reverse_services",
+    "description": "What the other Bridgit may use here in return (it opts in on its side); default none",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/links/claims {\"name\":\"kitchen-tab\",\"code\":\"K7QX-3MPA\"}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/links/claims",
+  "capability": "owner_features",
+  "returns": "the new link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "code": {
+     "description": "Its link code, K7QX-3MPA (required unless link is given)",
+     "type": "string"
+    },
+    "port": {
+     "description": "Its Bridgit port, with host",
+     "type": "integer"
+    },
+    "reverse_services": {
+     "description": "What the other Bridgit may use here in return (it opts in on its side); default none",
+     "type": "array",
+     "items": {"type": "string"}
+    },
+    "name": {
+     "description": "The other Bridgit's Device Domain Name (required unless link is given)",
+     "type": "string"
+    },
+    "link": {
+     "description": "Its bridgit://link#\u2026 link (holds name, code and its Tailscale address)",
+     "type": "string"
+    },
+    "host": {
+     "description": "Its Tailscale address, when the names backend can't resolve the name",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "agents": {
+     "description": "This Bridgit's control agent ids that may use it; default: the calling agent",
+     "type": "array",
+     "items": {"type": "string"}
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed",
+   "name_required",
+   "code_invalid",
+   "code_expired",
+   "code_used_up",
+   "link_revoked",
+   "link_waiting",
+   "target_offline",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

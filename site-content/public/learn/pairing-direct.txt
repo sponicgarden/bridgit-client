@@ -27,6 +27,7 @@ FIRST CALLS, IN ORDER
 4. GET /v1/limits before you plan anything paid: paid services (Jev, Clef, GLM), limits and budgets.
 5. Read https://bridgit.cc/learn/start.md (no web? GET /v1/start): applet-building stages. GET /v1/discover?q=<owner's idea> returns a recipe, owner_must, first_calls and done_when.
 Existing data: GET /v1/applets/installed, then data_url for schemas, rows/photos and export. Control keys with applet_install cover all installed applets. Don't reinstall, rerun recognition or capture replacements to read data.
+Linked Bridgits: GET /v1/links, then target=<name> on any call.
 Agent guide: https://bridgit.cc/agentguide/
 If needed: https://bridgit.cc/learn/catalog-index.json (capability index), GET /v1/discover?id=<id>&detail=full (exact operations), https://bridgit.cc/learn/playbook.md (40 use cases). GET /v1/guide is the full reference: use it only when needed.
 

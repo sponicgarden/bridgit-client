@@ -78,6 +78,38 @@ class UnattendedConfigurationTest {
         } catch (e: ApiError) { assertEquals("unauthorized", e.code) }
     }
 
+    @Test fun automaticUpdatesToggleUnattendedButUpdateNowKeepsApproval() = runBlocking {
+        val service = ConfigurationResources(app, caller)
+        val off = service.action(o("""{"action":"updates.auto","options":{"enabled":false}}"""))
+        assertFalse(off.getJSONObject("auto_update").getBoolean("enabled"))
+        assertFalse(cc.bridgit.app.update.AutoUpdate.enabled(app))
+        assertTrue(service.action(o("""{"action":"updates.auto","options":{"enabled":true}}""")).getJSONObject("auto_update").getBoolean("enabled"))
+        rejected("invalid_parameter") { runBlocking { service.action(o("""{"action":"updates.update_now","options":{}}""")) } }
+        Unit
+    }
+
+    @Test fun portalUpdatePromptsAreUnattendedButPromptNowKeepsApproval() = runBlocking {
+        val store = cc.bridgit.app.relay.RelayStore(app)
+        store.base = "https://relay.example/d/${store.device}"; store.enabled = true
+        val portal = cc.bridgit.app.portal.PortalPairing.create(app, store, singleUse = false).agent.id
+        val service = ConfigurationResources(app, caller)
+        val listed = OwnerActions(app).settingsStatus().getJSONArray("portal_updates")
+        assertEquals(portal, (0 until listed.length()).map { listed.getJSONObject(it).getString("portal_id") }.single())
+        val off = service.action(o("""{"action":"portal.update_prompts","options":{"portal_id":"$portal","enabled":false}}"""))
+        assertEquals("requested", off.getString("status"))
+        assertFalse(off.getJSONObject("portal").getJSONObject("pending").getBoolean("prompts"))
+        assertEquals(false, cc.bridgit.app.portal.PortalUpdates.pending(app, portal)!!.prompts)
+        rejected("not_found") { runBlocking { service.action(o("""{"action":"portal.update_prompts","options":{"portal_id":"nope","enabled":true}}""")) } }
+        rejected("invalid_parameter") { runBlocking { service.action(o("""{"action":"portal.update_prompts","options":{"portal_id":"$portal"}}""")) } }
+        rejected("invalid_parameter") { runBlocking { service.action(o("""{"action":"portal.update_now","options":{"portal_id":"$portal"}}""")) } }
+        // The owner-approved path leaves a prompt request and keeps the earlier switch value.
+        val now = OwnerActions(app).execute(caller.id, o("""{"action":"portal.update_now","options":{"portal_id":"$portal"}}"""))
+        val pending = now.getJSONObject("portal").getJSONObject("pending")
+        assertTrue(pending.getBoolean("prompt_now")); assertFalse(pending.getBoolean("prompts"))
+        assertTrue(OwnerActions.description(o("""{"action":"portal.update_now","options":{"portal_id":"$portal"}}""")).contains("TestFlight"))
+        Unit
+    }
+
     @Test fun savedFoodViewCanBeInspectedAndClearedWhenCameraFeaturesAreOff() = runBlocking {
         app.settings.setOn("lan_camera", false)
         app.settings.setOn("lan_camera_audio", false)

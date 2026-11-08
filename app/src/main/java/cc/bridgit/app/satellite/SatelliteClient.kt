@@ -53,7 +53,8 @@ object SatelliteClient {
     }
     private val JSON = "application/json".toMediaType()
 
-    class Failure(val code: String, message: String, val status: Int = 0) : Exception(message)
+    /** [scope]: for link_revoked, "link" (the whole link is gone) or "direction". */
+    class Failure(val code: String, message: String, val status: Int = 0, val scope: String? = null) : Exception(message)
 
     /** A call to [path] (with /v1) on [base], with the satellite's [key]. Not started. */
     fun newCall(base: String, key: String, method: String, path: String, query: List<Pair<String, String>>,
@@ -91,7 +92,7 @@ object SatelliteClient {
     fun manifest(base: String, key: String, hubName: String): JSONObject {
         val (code, o) = exec(newCall(base, key, "GET", "/v1/satellite/manifest", emptyList(),
             listOf(SatellitePolicy.HUB_NAME_HEADER to hubName.filter { it.code in 0x20..0x7e }.take(40)), null))
-        if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code)
+        if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code, o.optString("scope").takeIf { it.isNotEmpty() })
         return o
     }
 
@@ -99,14 +100,41 @@ object SatelliteClient {
     fun hubInfo(base: String, key: String, hubName: String, body: JSONObject) {
         val (code, o) = exec(newCall(base, key, "POST", "/v1/satellite/hub-info", emptyList(),
             listOf(SatellitePolicy.HUB_NAME_HEADER to hubName.filter { it.code in 0x20..0x7e }.take(40)), body.toString().toRequestBody(JSON)))
-        if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code)
+        if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code, o.optString("scope").takeIf { it.isNotEmpty() })
     }
 
     /** Blocking. Tells the satellite this hub removed it (POST /v1/satellite/unlink), so it drops its hub link too. */
     fun unlink(base: String, key: String) {
         val (code, o) = exec(newCall(base, key, "POST", "/v1/satellite/unlink", emptyList(), emptyList(), null))
-        if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code)
+        if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code, o.optString("scope").takeIf { it.isNotEmpty() })
     }
+
+    /**
+     * Blocking. A JSON call over a link (docs/spec-linked-bridgits.md, LNK-47): [toHub] when the key is a return key
+     * (this device is the other one's satellite), so the owner's pause pills apply to the right side.
+     */
+    fun call(base: String, key: String, method: String, path: String, body: JSONObject?, toHub: Boolean, readS: Long = 15): JSONObject {
+        val c = http.newBuilder().readTimeout(readS, TimeUnit.SECONDS).callTimeout(readS + CONNECT_S + 5, TimeUnit.SECONDS).build()
+            .newCall(newCall(base, key, method, path, emptyList(), emptyList(), body?.toString()?.toRequestBody(JSON), toHub = toHub).request())
+        val (code, o) = exec(c)
+        if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code, o.optString("scope").takeIf { it.isNotEmpty() })
+        return o
+    }
+
+    /** Blocking. Claims a link code on the target (POST /v1/link/claim, no key). Errors keep the target's own code (code_invalid, …). */
+    fun linkClaim(base: String, claimToken: String, body: JSONObject): JSONObject {
+        paused(false)
+        val (code, o) = exec(http.newCall(Request.Builder().url("$base/v1/link/claim").header("Authorization", "Bearer $claimToken")
+            .post(body.toString().toRequestBody(JSON)).build()))
+        if (code !in 200..299) {
+            val err = o.optString("error", "http_$code")
+            throw cc.bridgit.app.api.ApiError(if (code in 400..599) code else 502,
+                if (err in LINK_CLAIM_ERRORS) err else "upstream_failed", o.optString("message").ifEmpty { "The other Bridgit said HTTP $code." },
+                if (err in LINK_CLAIM_ERRORS) emptyMap() else mapOf("upstream_error" to err))
+        }
+        return o
+    }
+    private val LINK_CLAIM_ERRORS = setOf("code_invalid", "code_expired", "code_used_up", "name_required", "conflict", "forbidden", "rate_limited", "invalid_parameter")
 
     /** A key the other phone no longer knows: it removed this link (or was reset). Only then is a link dropped. */
     fun isGone(e: Throwable): Boolean = e is Failure && e.status == 401 && e.code == "unauthorized"
@@ -120,7 +148,7 @@ object SatelliteClient {
         val c = http.newBuilder().readTimeout(readS, TimeUnit.SECONDS).callTimeout(readS + CONNECT_S + 5, TimeUnit.SECONDS).build()
             .newCall(newCall(base, key, method, path, query, emptyList(), body?.toString()?.toRequestBody(JSON), toHub = true).request())
         val (code, o) = exec(c)
-        if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code)
+        if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code, o.optString("scope").takeIf { it.isNotEmpty() })
         return o
     }
 

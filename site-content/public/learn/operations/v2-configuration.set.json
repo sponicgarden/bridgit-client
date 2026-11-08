@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Commands + ToolSchemas + PlatformApi.openApi",
  "operation": {
   "path": "/v2/call",
@@ -50,7 +50,15 @@
        "DELETE /v1/owner/configuration/name",
        "POST /v1/owner/configuration/feeding",
        "POST /v1/owner/configuration/modes",
-       "POST /v1/owner/configuration/listening"
+       "POST /v1/owner/configuration/listening",
+       "POST /v1/owner/configuration/links/codes",
+       "DELETE /v1/owner/configuration/links/codes/{id}",
+       "POST /v1/owner/configuration/links/claims",
+       "POST /v1/owner/configuration/links/{id}/directions/{direction}",
+       "POST /v1/owner/configuration/links/{id}/undo",
+       "POST /v1/owner/configuration/links/pause-all",
+       "POST /v1/owner/configuration/links/{id}/disconnect",
+       "POST /v1/owner/configuration/links/disconnect-all"
       ]
      },
      "parameters": {
@@ -100,7 +108,15 @@
          "DELETE /v1/owner/configuration/name",
          "POST /v1/owner/configuration/feeding",
          "POST /v1/owner/configuration/modes",
-         "POST /v1/owner/configuration/listening"
+         "POST /v1/owner/configuration/listening",
+         "POST /v1/owner/configuration/links/codes",
+         "DELETE /v1/owner/configuration/links/codes/{id}",
+         "POST /v1/owner/configuration/links/claims",
+         "POST /v1/owner/configuration/links/{id}/directions/{direction}",
+         "POST /v1/owner/configuration/links/{id}/undo",
+         "POST /v1/owner/configuration/links/pause-all",
+         "POST /v1/owner/configuration/links/{id}/disconnect",
+         "POST /v1/owner/configuration/links/disconnect-all"
         ]
        },
        "parameters": {
@@ -154,7 +170,15 @@
       "DELETE /v1/owner/configuration/name",
       "POST /v1/owner/configuration/feeding",
       "POST /v1/owner/configuration/modes",
-      "POST /v1/owner/configuration/listening"
+      "POST /v1/owner/configuration/listening",
+      "POST /v1/owner/configuration/links/codes",
+      "DELETE /v1/owner/configuration/links/codes/{id}",
+      "POST /v1/owner/configuration/links/claims",
+      "POST /v1/owner/configuration/links/{id}/directions/{direction}",
+      "POST /v1/owner/configuration/links/{id}/undo",
+      "POST /v1/owner/configuration/links/pause-all",
+      "POST /v1/owner/configuration/links/{id}/disconnect",
+      "POST /v1/owner/configuration/links/disconnect-all"
      ]
     },
     "parameters": {

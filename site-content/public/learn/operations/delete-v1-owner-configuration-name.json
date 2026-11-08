@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's; explicit owner.configuration grant required; no per-change phone approval",

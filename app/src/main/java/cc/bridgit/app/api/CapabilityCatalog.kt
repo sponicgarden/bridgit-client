@@ -9,7 +9,7 @@ import java.util.Locale
 
 /** A derived search index, never a second endpoint registry or a device inventory. */
 object CapabilityCatalog {
-    const val DOCUMENTATION_REVISION = 105
+    const val DOCUMENTATION_REVISION = 110
     const val URL = "https://bridgit.cc/learn/catalog.json"
     const val INDEX_URL = "https://bridgit.cc/learn/catalog-index.json"
     const val START_URL = "https://bridgit.cc/learn/start.md"
@@ -102,7 +102,7 @@ object CapabilityCatalog {
         "v1.wakewords" to ("Hear the owner's wake words and the speech after them" to "wake word voice command listen"),
         "v1.watches" to ("Phone-run watches that sample camera or data and call you back" to "watch monitor tally trigger change"),
         "v1.weather" to ("Current weather and forecast for the phone or any place" to "weather forecast rain temperature"),
-        "v2.app.foreground" to ("Show Bridgit cards, applet screens and consumer portals" to "foreground switch card applet portal screen"),
+        "v2.app.foreground" to ("Show Bridgit cards, applet screens and consumer portals; replay Device Diagnostics" to "foreground switch card applet portal screen diagnostics"),
         "v2.camera.snapshot" to ("Control-server photo through device.action" to "photo camera snapshot"),
         "v2.microphone.clip" to ("Control-server audio clip through device.action" to "audio microphone clip"),
         "v2.gallery.read" to ("Gallery read scope for control tools" to "gallery photos read"),

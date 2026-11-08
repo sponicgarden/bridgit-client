@@ -4,6 +4,7 @@ import android.content.Intent
 import cc.bridgit.app.BridgeApp
 import cc.bridgit.app.api.ErrorCatalog
 import cc.bridgit.app.appdevices.AppDeviceAccess
+import cc.bridgit.app.capability.appVersion
 import cc.bridgit.app.listen.*
 import cc.bridgit.app.platform.*
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,7 @@ class OwnerActions(private val app: BridgeApp) {
             action == "tour.start" -> listOf("tour","location","speaker","interactions").forEach { requireCap(agent,it) }
             action.startsWith("wake.") -> requireCap(agent,"wakewords")
             action == "sounds.configure" -> requireCap(agent,"sounds")
+            action.startsWith("portal.") -> portalName(options.getString("portal_id"))
         }
         val update=if(action=="updates.install") app.resourceDownloads.verifiedUpdate(agent,options.getString("job_id")).manifest else null
         // The review contains the exact safe options; passwords, tokens and arbitrary fields are rejected.
@@ -173,6 +175,22 @@ class OwnerActions(private val app: BridgeApp) {
                 JSONObject().put("status","awaiting_android_install_confirmation").put("installed",false).put("version",ready.manifest.versionName)
             }
             "updates.offers" -> { cc.bridgit.app.update.UpdateDialog.setAutoOffers(app,o.getBoolean("enabled")); settingsStatus() }
+            "portal.update_prompts","portal.update_now" -> {
+                // A0050 on Apple: the Portal applies this the next time it syncs with this phone (while Bridgit Portal is open).
+                val id=o.getString("portal_id")
+                val r=cc.bridgit.app.portal.PortalUpdates.request(app,id,if(action=="portal.update_prompts") o.getBoolean("enabled") else null,action=="portal.update_now")
+                JSONObject().put("status","requested").put("request_id",r.id).put("applies","next time the Portal syncs with this phone (while Bridgit Portal is open)")
+                    .put("portal",cc.bridgit.app.portal.PortalUpdates.status(app,id,portalName(id)))
+            }
+            "updates.auto" -> { cc.bridgit.app.update.AutoUpdate.setEnabled(app,o.getBoolean("enabled")); settingsStatus() }
+            "updates.update_now" -> {
+                // A0050: check, download, verify and install without anyone holding the phone. Bridgit restarts itself.
+                val au=cc.bridgit.app.update.AutoUpdate
+                if(!au.supported) throw ErrorCatalog.error("not_supported","This build is updated by its store or is a test build.")
+                if(!au.canInstallSilently(app)) throw ErrorCatalog.error("access_needed","Installing without a tap needs Install unknown apps (Android 12+) or Bridgit's ADB link. Use owner.configure action android.setup with target updates, or resource.download then updates.install.")
+                au.runInBackground(app,"agent $agent",force=true)
+                JSONObject().put("status","started").put("installed_version",app.appVersion()).put("status_url","/v1/owner/settings").put("auto_update",au.status(app))
+            }
             "android.setup" -> {
                 requireOwnerForeground()
                 withContext(Dispatchers.Main) { app.startActivity(Intent(app,OwnerSetupActivity::class.java).putExtra("target",o.getString("target")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
@@ -181,6 +199,14 @@ class OwnerActions(private val app: BridgeApp) {
             else -> throw ErrorCatalog.error("invalid_parameter","Unsupported owner action.")
         }
     }
+    /** The paired Bridgit Portal [id] names (an agent id from portal_updates), or not_found. */
+    private fun portalName(id:String):String {
+        val a=cc.bridgit.app.portal.PortalPairing.granted(app,cc.bridgit.app.relay.RelayStore(app)).firstOrNull { it.id==id }
+            ?: throw ErrorCatalog.error("not_found","No paired Bridgit Portal has that portal_id; read GET /v1/owner/settings → portal_updates.")
+        return cc.bridgit.app.portal.PortalClients.get(app,a.id)?.name ?: a.name
+    }
+    fun portalUpdates():JSONArray = JSONArray(runCatching { cc.bridgit.app.portal.PortalPairing.granted(app,cc.bridgit.app.relay.RelayStore(app)) }.getOrDefault(emptyList())
+        .map { cc.bridgit.app.portal.PortalUpdates.status(app,it.id,cc.bridgit.app.portal.PortalClients.get(app,it.id)?.name ?: it.name) })
     private fun requireOwnerForeground() {
         if(!cc.bridgit.app.platform.ControlCenterActivity.foreground) throw ErrorCatalog.error("access_needed","Keep Agent permissions open to finish this approved setup request.")
     }
@@ -209,12 +235,12 @@ class OwnerActions(private val app: BridgeApp) {
     }
     fun settingsStatus(): JSONObject {
         val keys=cc.bridgit.app.judgment.OwnKeys(app)
-        return JSONObject().put("update_offers",cc.bridgit.app.update.UpdateDialog.autoOffersOn(app)).put("remote",remoteStatus())
+        return JSONObject().put("update_offers",cc.bridgit.app.update.UpdateDialog.autoOffersOn(app)).put("auto_update",cc.bridgit.app.update.AutoUpdate.status(app)).put("portal_updates",portalUpdates()).put("remote",remoteStatus())
             .put("own_keys",JSONArray(cc.bridgit.app.judgment.OwnKeys.PROVIDERS.map { JSONObject().put("provider",it.id).put("configured",keys.has(it.id)).put("readable",false).put("write_url","/v1/settings/ai-keys") }))
             .put("configuration_grant","GET /v2/capabilities → owner.configuration").put("grants_owner_only",false).put("grant_authority","owner_or_existing_super_agent").put("access_url","/v1/owner/configuration/access").put("initial_super_grant_owner_only",true)
     }
     companion object {
-        val NAMES=listOf("service.model.set","service.budget.set","resource.download","resource.delete","resource.check","dog.configure","applet.configure","dog.start","dog.stop","dog.find_camera","dog.clear_history","tour.start","wake.configure","sounds.configure","remote.configure","callback.configure","delivery.subscribe","updates.offers","updates.install","android.setup")
+        val NAMES=listOf("service.model.set","service.budget.set","resource.download","resource.delete","resource.check","dog.configure","applet.configure","dog.start","dog.stop","dog.find_camera","dog.clear_history","tour.start","wake.configure","sounds.configure","remote.configure","callback.configure","delivery.subscribe","updates.offers","updates.auto","updates.update_now","updates.install","portal.update_prompts","portal.update_now","android.setup")
         val SETUP_TARGETS=listOf("speech","tts","remote_link","camera_enrollment","permissions","updates","own_keys")
         fun title(action:String):String = when(action) {
             "service.model.set" -> "Applet model preference"
@@ -225,7 +251,8 @@ class OwnerActions(private val app: BridgeApp) {
             "dog.find_camera" -> "Find the best Pet monitor camera"; "dog.clear_history" -> "Clear Pet monitor history"
             "tour.start" -> "Start a City tour"; "wake.configure" -> "Change this agent’s wake words"; "sounds.configure" -> "Change sound listening"
             "remote.configure" -> "Change remote viewing"; "callback.configure" -> "Change this agent’s callback"
-            "delivery.subscribe" -> "Change event delivery"; "updates.offers" -> "Change update reminders"; "updates.install" -> "Install the verified app update"
+            "delivery.subscribe" -> "Change event delivery"; "updates.offers" -> "Change update reminders"; "updates.auto" -> "Change automatic updates"; "updates.update_now" -> "Update Bridgit now"; "updates.install" -> "Install the verified app update"
+            "portal.update_prompts" -> "Change Bridgit Portal update prompts"; "portal.update_now" -> "Show the Bridgit Portal update prompt"
             else -> "Open owner setup"
         }
         fun description(args:JSONObject):String {
@@ -250,6 +277,10 @@ class OwnerActions(private val app: BridgeApp) {
                 "callback.configure" -> if(o.optBoolean("remove")) "Remove this agent’s callback." else "Send this agent’s events to:\n${o.getString("url")}\nThe signing secret will be replaced; share the refreshed setup prompt with your agent."
                 "delivery.subscribe" -> if(o.getString("destination").isEmpty()) "Stop this agent’s event delivery." else "Send this agent’s scoped events to approved destination ${o.getString("destination")}."
                 "updates.offers" -> if(o.getBoolean("enabled")) "Offer available app updates." else "Stop automatic update offers. Manual update checks still work."
+                "updates.auto" -> if(o.getBoolean("enabled")) "Install official app updates automatically when this phone allows it." else "Stop installing updates automatically. Update offers and manual checks still work."
+                "updates.update_now" -> "Check for the official app update and install it now if one is newer. Its checksum and app signature are verified. Bridgit restarts."
+                "portal.update_prompts" -> (if(o.getBoolean("enabled")) "Bridgit Portal on ${o.getString("portal_id")} asks you to update when a new TestFlight build is ready." else "Bridgit Portal on ${o.getString("portal_id")} stops asking you to update. TestFlight still works.")+"\nApplies the next time that device syncs with this phone."
+                "portal.update_now" -> "Bridgit Portal on ${o.getString("portal_id")} checks for a newer TestFlight build and, if there is one, asks you to update. You install it in TestFlight.\nApplies the next time that device syncs with this phone."
                 "updates.install" -> "Use verified download ${o.getString("job_id")}. Its original checksum and app signature are checked again. Android may ask you to confirm installation."
                 "android.setup" -> "Open ${o.getString("target").replace('_',' ')} setup. You still complete any Android permission or account sign-in prompts."
                 else -> "Stop the monitor; keep saved history."
@@ -314,7 +345,10 @@ class OwnerActions(private val app: BridgeApp) {
                 "callback.configure" -> { o.only("url","remove"); bool("remove"); if(!o.optBoolean("remove",false)) o.text("url",2048) }
                 "delivery.subscribe" -> { o.only("destination"); o.text("destination",128) }
                 "updates.install" -> { o.only("job_id"); o.text("job_id",80) }
-                "updates.offers" -> { o.only("enabled"); if(o.opt("enabled") !is Boolean) throw ErrorCatalog.error("invalid_parameter","enabled is required.") }
+                "updates.offers","updates.auto" -> { o.only("enabled"); if(o.opt("enabled") !is Boolean) throw ErrorCatalog.error("invalid_parameter","enabled is required.") }
+                "updates.update_now" -> o.only()
+                "portal.update_prompts" -> { o.only("portal_id","enabled"); o.text("portal_id",80); if(o.opt("enabled") !is Boolean) throw ErrorCatalog.error("invalid_parameter","enabled is required.") }
+                "portal.update_now" -> { o.only("portal_id"); o.text("portal_id",80) }
                 "android.setup" -> { o.only("target"); if(o.text("target") !in SETUP_TARGETS) throw ErrorCatalog.error("invalid_parameter","Unknown setup screen.") }
                 else -> throw ErrorCatalog.error("invalid_parameter","Unknown owner action.")
             }

@@ -21,7 +21,7 @@ import org.json.JSONObject
 import java.io.ByteArrayInputStream
 
 /**
- * Level 1 Diagnostics on Home: the scene from docs/animation/takeover.html, bundled as
+ * Device Diagnostics on Home: the scene from docs/animation/takeover.html, bundled as
  * assets/diagnostics/scene.html, fed with the phone's real state.
  *
  * - Node states come from the capability registry: a node's first known capability decides
@@ -148,7 +148,7 @@ class DiagnosticsScene(
         }
     }
 
-    /** Runs the full Level 1 Diagnostics animation (tap to skip). */
+    /** Runs the full Device Diagnostics animation (tap to skip). */
     fun play() {
         if (!ready || (remote != null && remoteHome == null)) { pendingPlay = true; return }
         pendingPlay = false

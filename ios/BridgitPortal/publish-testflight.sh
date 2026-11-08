@@ -109,6 +109,39 @@ if [[ "$SKIP_UPLOAD" -eq 1 ]]; then
   exit 0
 fi
 
+# Update prompts (A0050): Bridgit Portal reads bridget/portal-ios-latest.json, next to the APK's latest.json, and
+# asks the owner to update in TestFlight when its build is older. Written only once testers have the build. Uses
+# the APK publisher's R2 settings (tools/publish.env) and token; without them it is skipped, never fatal.
+publish_latest() {
+  # shellcheck source=/dev/null
+  [[ -f "$REPO/tools/publish.env" ]] && source "$REPO/tools/publish.env"
+  if [[ -z "${BRIDGIT_R2_ACCOUNT:-}" || -z "${BRIDGIT_R2_BUCKET:-}" || -z "${BRIDGIT_R2_TOKEN_ITEM:-}" ]]; then
+    echo "    No tools/publish.env R2 settings: update prompts won't see build $BUILD_NUMBER." >&2; return 0
+  fi
+  echo "==> Tell Bridgit Portal about build $BUILD_NUMBER (update prompts)"
+  local version manifest hdr resp
+  version="$(/usr/libexec/PlistBuddy -c 'Print ApplicationProperties:CFBundleShortVersionString' "$WORK/BridgitPortal.xcarchive/Info.plist" 2>/dev/null || echo "")"
+  manifest="$WORK/portal-ios-latest.json"; hdr="$WORK/r2.hdr"; resp="$WORK/r2.json"
+  python3 - "$BUNDLE_ID" "$version" "$BUILD_NUMBER" "$manifest" <<'PY'
+import datetime, json, sys
+bundle, version, build, out = sys.argv[1:5]
+json.dump({"bundle_id": bundle, "version": version, "build": build,
+           "published_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}, open(out, "w"))
+PY
+  ( umask 077; "$BW" bw get item "$BRIDGIT_R2_TOKEN_ITEM" | python3 -c '
+import json, sys
+d = json.loads(sys.stdin.read(), strict=False)
+tok = (d.get("login") or {}).get("password") or next((f.get("value") for f in d.get("fields") or [] if "token" in (f.get("name") or "").lower() and f.get("value")), "")
+if not tok: sys.exit("no token in the Bitwarden item")
+open(sys.argv[1], "w").write("Authorization: Bearer " + tok.strip() + "\n")' "$hdr" ) || { echo "    Could not read the R2 token; skipped." >&2; return 0; }
+  curl --retry 3 --retry-all-errors --retry-delay 2 -sS -X PUT \
+    "https://api.cloudflare.com/client/v4/accounts/$BRIDGIT_R2_ACCOUNT/r2/buckets/$BRIDGIT_R2_BUCKET/objects/bridget/portal-ios-latest.json" \
+    -H @"$hdr" -H "Content-Type: application/json" --data-binary "@$manifest" -o "$resp" || true
+  rm -f "$hdr"
+  python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); print("    bridget/portal-ios-latest.json:", "OK" if r.get("success") is True else "FAIL %s" % r.get("errors"))' "$resp" 2>/dev/null \
+    || echo "    bridget/portal-ios-latest.json: FAIL (no reply)" >&2
+}
+
 echo "==> Upload to App Store Connect and wait for processing"
 APP_ID="$(asc apps list --output json | python3 -c 'import sys,json
 for a in json.load(sys.stdin)["data"]:
@@ -123,7 +156,10 @@ echo "    build id: ${BUILD_ID:-unknown}"
 if [[ -n "$BUILD_ID" ]]; then
   echo "==> Give the build to \"$GROUP\""
   # External group: --submit sends the build to TestFlight beta review (needed once per version).
-  asc builds add-groups --build-id "$BUILD_ID" --group "$GROUP" --submit --confirm --output json >/dev/null \
-    || echo "    Could not add the build to \"$GROUP\"; check beta review details in App Store Connect." >&2
+  if asc builds add-groups --build-id "$BUILD_ID" --group "$GROUP" --submit --confirm --output json >/dev/null; then
+    publish_latest
+  else
+    echo "    Could not add the build to \"$GROUP\"; check beta review details in App Store Connect." >&2
+  fi
 fi
 echo "==> Done: build $BUILD_NUMBER"

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Device to device: this Bridgit's other links, names and directions only, so the other device can draw them (link agents only). Not for agents.",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "link_peers",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/link/peers",
+  "idempotent": false,
+  "path": "/v1/link/peers",
+  "capability": "status",
+  "returns": "peers[{name, in, out}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

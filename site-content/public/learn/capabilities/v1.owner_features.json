@@ -496,10 +496,90 @@
    "control_scope": "owner.configuration",
    "requires_power": null,
    "tool": "owner_configuration_listening_post"
+  },
+  {
+   "summary": "Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each",
+   "path": "/v1/owner/configuration/links",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-links.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-links.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_links"
+  },
+  {
+   "summary": "Make a one-time link code for this Bridgit as the target (8 characters, 10 minutes, 5 wrong tries); needs a Device Domain Name; explicit owner.configuration grant required; no per-change phone approval",
+   "path": "/v1/owner/configuration/links/codes",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-codes.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-codes.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_links_codes"
+  },
+  {
+   "summary": "Cancel a link code that hasn't been claimed; explicit owner.configuration grant required; no per-change phone approval",
+   "path": "/v1/owner/configuration/links/codes/{id}",
+   "method": "DELETE",
+   "documentation": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-links-codes-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-links-codes-id.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_links_code_cancel"
+  },
+  {
+   "summary": "Claim another Bridgit's link code: this Bridgit then uses it (its user opt-in), and may offer the other direction too; explicit owner.configuration grant required; no per-change phone approval",
+   "path": "/v1/owner/configuration/links/claims",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-claims.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-claims.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_links_claims"
+  },
+  {
+   "summary": "Change this Bridgit's half of one direction: in = the other Bridgit uses this one (services), out = this one uses it (agents); paused on either; explicit owner.configuration grant required; no per-change phone approval",
+   "path": "/v1/owner/configuration/links/{id}/directions/{direction}",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-directions-direction.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-directions-direction.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_links_directions"
+  },
+  {
+   "summary": "Undo a disconnect within 10 seconds; after that linking again needs a new code; explicit owner.configuration grant required; no per-change phone approval",
+   "path": "/v1/owner/configuration/links/{id}/undo",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-undo.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-undo.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_links_undo"
+  },
+  {
+   "summary": "Pause or resume links by role, as the Linked devices pills do; each pauses both directions of those links; explicit owner.configuration grant required; no per-change phone approval",
+   "path": "/v1/owner/configuration/links/pause-all",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-pause-all.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-pause-all.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_links_pause_all"
+  },
+  {
+   "summary": "Read the grants log: every link event on this Bridgit and the ones the other Bridgits reported, newest first, with who did each",
+   "path": "/v1/owner/configuration/links/log",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-links-log.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-links-log.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_links_log"
   }
  ],
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.owner_features",

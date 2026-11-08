@@ -40,7 +40,7 @@ import cc.bridgit.app.ui.common.themeColor
 import cc.bridgit.app.ui.interactions.InteractionUi
 
 /**
- * Home: Level 1 Diagnostics (2 Nov 2026). Banners that need the owner on top (UI-10), and under
+ * Home: Device Diagnostics (2 Nov 2026). Banners that need the owner on top (UI-10), and under
  * them the live scene of every part of the phone Bridgit can use ([DiagnosticsScene]).
  *
  * What the old Home showed moved: the listener card (state, address, Pause) to the top of Agents,
@@ -84,6 +84,8 @@ class HomeFragment : Fragment() {
                 launch { app.wake.state.collect { scene?.refresh() } }
                 launch { app.tours.state.collect { renderTourCard(); scene?.refresh() } }
                 launch { app.dog.state.collect { scene?.refresh() } }
+                // An agent asked for Device Diagnostics (foreground target device_diagnostics): play the full run.
+                launch { DiagnosticsRerun.requests.collect { if (scene != null && DiagnosticsRerun.take()) scene?.play() } }
                 launch { while (true) { scene?.refreshStatus(); delay(1_000) } }
                 launch { dirty.collect { render(); delay(300) } }
                 launch { watchEmailVerification() }
@@ -182,8 +184,10 @@ class HomeFragment : Fragment() {
         val s = DiagnosticsScene(requireContext(), app, onOpen = ::openFromScene, onPauseAsked = ::setPaused,
             remote = remote, onRemoteStatus = { at, error -> remote?.let { showPortalStatus(it, at, error) } })
         b.sceneFrame.addView(s, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-        // The full run plays once per app start; later visits open on the finished map (menu: run again).
-        s.load(play = !playedThisRun)
+        // The full run plays once per app start; later visits open on the finished map (Rerun, or an agent's
+        // device_diagnostics request, plays it again).
+        val rerun = DiagnosticsRerun.take()
+        s.load(play = !playedThisRun || rerun)
         playedThisRun = true
         scene = s
     }

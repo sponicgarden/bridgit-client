@@ -50,7 +50,7 @@ class DevicesScene(
     private var lastState = ""
     private var lastSeenLog = -1L
     private var pollingLog = false
-    /** True while a Level 2 scan streams devices onto the map; normal redraws wait for its end. */
+    /** True while a Network Diagnostics scan streams devices onto the map; normal redraws wait for its end. */
     var scanning = false
         private set
     private var lastPush = 0L
@@ -155,7 +155,7 @@ class DevicesScene(
         }
     }
 
-    /** Level 2 started: the map clears to the added devices and the phone starts its sweep. */
+    /** Network Diagnostics started: the map clears to the added devices and the phone starts its sweep. */
     fun scanStarted() {
         scanning = true; pendingPlay = false
         lastFound = emptyList(); knownHosts = emptySet()
@@ -187,7 +187,7 @@ class DevicesScene(
         js("BridgitDevices.scanUpdate($opts)")
     }
 
-    /** Level 2 finished: settle on everything remembered for this network. */
+    /** Network Diagnostics finished: settle on everything remembered for this network. */
     fun scanFinished() {
         if (!scanning) return
         main.removeCallbacks(flush); pendingFound = null

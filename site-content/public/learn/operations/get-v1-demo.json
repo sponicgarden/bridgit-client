@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "The demo to offer right after pairing: a five-minute first-run tour run from cards on the phone, then a menu of more demos picked by a few questions (Markdown)",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Replace custom modes using the native name/limit validation; [] clears; built-in and current modes protected; explicit owner.configuration grant required; no per-change phone approval",

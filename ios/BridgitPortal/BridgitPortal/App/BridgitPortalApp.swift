@@ -19,6 +19,8 @@ struct BridgitPortalApp: App {
                 .environmentObject(model.relays)
                 .environmentObject(model.links)
                 .environmentObject(model.names)
+                .environmentObject(model.updates)
+                .modifier(UpdatePromptAlert(updates: model.updates))
                 .tint(B.primary)
                 .onOpenURL { model.handle(url: $0) }
                 .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
@@ -96,6 +98,7 @@ struct RootView: View {
                 if !model.isSample { names.startHeartbeat() }
                 links.commitDue()
                 Task { await links.flush() }
+                Task { await model.updates.check() }
             } else if p == .background {
                 names.stopHeartbeat()
             }

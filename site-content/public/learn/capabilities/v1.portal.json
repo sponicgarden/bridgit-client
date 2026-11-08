@@ -126,10 +126,20 @@
    "control_scope": null,
    "requires_power": null,
    "tool": "portal_photo"
+  },
+  {
+   "summary": "The Portal's own update state (A0050): whether it prompts for new TestFlight builds, its build and the newest one, and which request it applied. Agents read it in GET /v1/owner/settings → portal_updates and change it with owner configuration actions portal.update_prompts and portal.update_now. The owner's portal pairing only.",
+   "path": "/v1/portal/updates",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-portal-updates.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-portal-updates.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "portal_updates"
   }
  ],
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.portal",

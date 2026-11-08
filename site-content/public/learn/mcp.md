@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 128. Full index: https://bridgit.cc/learn/index.json.
+API revision 132. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -87,6 +87,14 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `owner_configuration_modes_post` | `POST /v1/owner/configuration/modes` | Replace custom modes using the native name/limit validation; [] clears; built-in and current modes protected; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_listening_get` | `GET /v1/owner/configuration/listening` | Read complete wake-word definitions and sound-event recipient configuration |
 | `owner_configuration_listening_post` | `POST /v1/owner/configuration/listening` | Replace supplied listening configuration with native validation; wake_words=[] or sounds=null clears; existing recipient/capture and Android permission checks remain; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_links` | `GET /v1/owner/configuration/links` | Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each |
+| `owner_configuration_links_codes` | `POST /v1/owner/configuration/links/codes` | Make a one-time link code for this Bridgit as the target (8 characters, 10 minutes, 5 wrong tries); needs a Device Domain Name; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_links_code_cancel` | `DELETE /v1/owner/configuration/links/codes/{id}` | Cancel a link code that hasn't been claimed; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_links_claims` | `POST /v1/owner/configuration/links/claims` | Claim another Bridgit's link code: this Bridgit then uses it (its user opt-in), and may offer the other direction too; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_links_directions` | `POST /v1/owner/configuration/links/{id}/directions/{direction}` | Change this Bridgit's half of one direction: in = the other Bridgit uses this one (services), out = this one uses it (agents); paused on either; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_links_undo` | `POST /v1/owner/configuration/links/{id}/undo` | Undo a disconnect within 10 seconds; after that linking again needs a new code; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_links_pause_all` | `POST /v1/owner/configuration/links/pause-all` | Pause or resume links by role, as the Linked devices pills do; each pauses both directions of those links; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_links_log` | `GET /v1/owner/configuration/links/log` | Read the grants log: every link event on this Bridgit and the ones the other Bridgits reported, newest first, with who did each |
 | `applet_devices_get` | `GET /v1/applet-devices` | Read selectively assigned external devices for installed applets |
 | `applet_devices_post` | `POST /v1/applet-devices` | Replace one visible device's applet assignments; separate from enrollment |
 | `app_devices_get` | `GET /v1/app-devices` | Legacy alias of GET /v1/applet-devices |
@@ -94,11 +102,13 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `lan_discovered` | `GET /v1/lan/discovered` | Remembered devices on the current LAN; no scan |
 | `lan_catalog` | `GET /v1/lan/catalog` | Bundled discovery coverage, brand logos and control-agent instructions; no network scan |
 | `lan_brands_logo` | `GET /v1/lan/brands/{id}/logo` | A passive bundled manufacturer logo; never a remote lookup |
-| `lan_discover` | `POST /v1/lan/discover` | Bounded discovery on the Android host's direct local network |
+| `lan_discover` | `POST /v1/lan/discover` | Network Diagnostics: bounded discovery on the Android host's direct local network |
 | `lan_devices` | `GET /v1/lan/devices` | This agent's enrolled devices and adapter/action schemas |
 | `lan_devices_enroll` | `POST /v1/lan/devices/enroll` | Verify a supported device with authorized credentials and enroll it for this agent |
 | `lan_devices_remove` | `POST /v1/lan/devices/remove` | Forget this agent's enrollment and stored credentials |
 | `lan_devices_action` | `POST /v1/lan/devices/action` | Run a fixed supported action on this agent's enrolled device |
+| `lan_packs` | `GET /v1/lan/packs` | Device packs: downloadable device-family support, its versions and update state; no network scan |
+| `lan_packs_check` | `POST /v1/lan/packs/check` | Check for device-pack updates now (at most once a minute) and update installed packs |
 | `lan_cameras` | `GET /v1/lan-cameras` | Owner-configured local cameras (no credentials) |
 | `lan_cameras_snapshot` | `POST /v1/lan-cameras/snapshot` | Decode a fresh frame directly from a local camera |
 | `lan_cameras_move` | `POST /v1/lan-cameras/move` | Small relative pan / tilt, only if advertised by the camera |
@@ -274,6 +284,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `portal_theme` | `GET /v1/portal/theme` | The APK's design tokens, read from its own resources and Home scene, so the portal looks the same. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only. |
 | `portal_photo_targets` | `GET /v1/portal/photo/targets` | Who checks a photo sent with POST /v1/portal/photo: each agent (usually an installed applet) with a watch that checks photos, and the owner's last pick on the phone's Camera tab. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only. |
 | `portal_photo` | `POST /v1/portal/photo` | A photo the owner took with the Portal's camera: every photo watch of the chosen targets checks it right away, as if it had taken it (the Camera tab's path). Answers that take longer than about 25 s finish on the phone and show in the applet. The owner's portal pairing only; this is the portal's one write. |
+| `portal_updates` | `POST /v1/portal/updates` | The Portal's own update state (A0050): whether it prompts for new TestFlight builds, its build and the newest one, and which request it applied. Agents read it in GET /v1/owner/settings → portal_updates and change it with owner configuration actions portal.update_prompts and portal.update_now. The owner's portal pairing only. |
 | `satellites` | `GET /v1/satellites` | The satellites (other Bridgit phones linked to this one) you may use, with what each offers. Any call takes header X-Bridgit-Target: <satellite id> (or query target=<id>) to run on that satellite instead of this phone; leave it out to use this phone. |
 | `satellite_hub_info` | `POST /v1/satellite/hub-info` | Phone to phone: a hub tells its satellite which photo applets and portals it has, and how to call back (only for a hub link's key). Not for agents. |
 | `satellite_hub` | `GET /v1/satellite/hub` | Phone to phone: a satellite reads its hub's photo applets and portals (only for a satellite's return key). Not for agents. |
@@ -283,6 +294,12 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `satellite_hub_unlink` | `POST /v1/satellite/hub/unlink` | Phone to phone: a satellite unlinked this hub, so the hub removes it too (only for a satellite's return key). Not for agents. |
 | `satellite_hub_agents` | `GET /v1/satellite/hub/agents` | Phone to phone: the hub's control agents, so a satellite switched to its hub can see and pause them (only for a satellite's return key, while the hub hasn't paused that satellite). Not for agents. |
 | `satellite_hub_agents_pause` | `POST /v1/satellite/hub/agents/{id}/pause` | Phone to phone: a satellite pauses or resumes one of its hub's control agents (only for a satellite's return key). Not for agents. |
+| `links` | `GET /v1/links` | The linked Bridgits (the owner's other Bridgits) you may use through this one, with what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further. |
+| `link_events` | `POST /v1/link/events` | Device to device: the other Bridgit of a link sends its grants-log events and its halves of both directions (link agents only). Not for agents. |
+| `link_peers` | `GET /v1/link/peers` | Device to device: this Bridgit's other links, names and directions only, so the other device can draw them (link agents only). Not for agents. |
+| `link_disconnect` | `POST /v1/link/disconnect` | Device to device: the other Bridgit disconnected a direction or the whole link, so this one marks it off too (link agents only). Not for agents. |
+| `owner_configuration_links_disconnect` | `POST /v1/owner/configuration/links/{id}/disconnect` | Disconnect (or pause) a link at once: calls are refused from now, and it is final after 10 seconds unless undone; any control agent of this device (taking access away needs no owner.configuration grant) |
+| `owner_configuration_links_disconnect_all` | `POST /v1/owner/configuration/links/disconnect-all` | Disconnect every link of this Bridgit at once (Undo per link for 10 seconds); any control agent of this device (taking access away needs no owner.configuration grant) |
 | `applets_catalog` | `GET /v1/applets/catalog` | Browse the applet library without installing or running packages |
 | `applets_installed_development` | `GET /v1/applets/installed/{id}/development` | Read the exact personal package, template baseline, customization journal, revision and pending upgrade task. Owner control agents can inspect any installed applet; private, keep local unless the owner consents to model upload |
 | `applets_installed_template_policy` | `POST /v1/applets/installed/{id}/template-policy` | Track, pause template updates, or detach and repurpose your applet; never pauses execution or deletes data. Detached copies cannot silently reattach |

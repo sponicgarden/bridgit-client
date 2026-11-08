@@ -1,6 +1,6 @@
 {
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "source": "Commands + ToolSchemas + PlatformApi.openApi",
  "operation": {
   "path": "/v2/call",
@@ -51,7 +51,11 @@
        "callback.configure",
        "delivery.subscribe",
        "updates.offers",
+       "updates.auto",
+       "updates.update_now",
        "updates.install",
+       "portal.update_prompts",
+       "portal.update_now",
        "android.setup"
       ]
      }
@@ -98,7 +102,11 @@
          "callback.configure",
          "delivery.subscribe",
          "updates.offers",
+         "updates.auto",
+         "updates.update_now",
          "updates.install",
+         "portal.update_prompts",
+         "portal.update_now",
          "android.setup"
         ]
        }
@@ -145,7 +153,11 @@
       "callback.configure",
       "delivery.subscribe",
       "updates.offers",
+      "updates.auto",
+      "updates.update_now",
       "updates.install",
+      "portal.update_prompts",
+      "portal.update_now",
       "android.setup"
      ]
     },

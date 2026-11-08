@@ -35,6 +35,7 @@ object SetupPrompt {
         sb.appendLine("4. GET /v1/limits before you plan anything paid: paid services (Jev, Clef, GLM), limits and budgets.")
         sb.appendLine("5. Read ${CapabilityCatalog.START_URL} (no web? GET /v1/start): applet-building stages. GET /v1/discover?q=<owner's idea> returns a recipe, owner_must, first_calls and done_when.")
         sb.appendLine("Existing data: GET /v1/applets/installed, then data_url for schemas, rows/photos and export. Control keys with applet_install cover all installed applets. Don't reinstall, rerun recognition or capture replacements to read data.")
+        sb.appendLine("Linked Bridgits: GET /v1/links, then target=<name> on any call.")
         sb.appendLine("Agent guide: ${Learn.AGENT_GUIDE_URL}")
         sb.appendLine("If needed: ${CapabilityCatalog.INDEX_URL} (capability index), GET /v1/discover?id=<id>&detail=full (exact operations), ${Learn.PLAYBOOK_URL} (${Playbook.USE_CASES} use cases). GET /v1/guide is the full reference: use it only when needed.")
         return sb.toString()

@@ -1,0 +1,76 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Disconnect (or pause) a link at once: calls are refused from now, and it is final after 10 seconds unless undone; any control agent of this device (taking access away needs no owner.configuration grant)",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_links_disconnect",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "direction",
+    "description": "in (the other Bridgit uses this one), out (this one uses it) or both (default)",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "in",
+     "out",
+     "both"
+    ]
+   },
+   {
+    "name": "pause",
+    "description": "true pauses instead (resume with directions {paused:false}, which needs owner.configuration)",
+    "type": "boolean",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/links/{id}/disconnect {\"direction\":\"both\"}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/links/{id}/disconnect",
+  "capability": "status",
+  "returns": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/links/{id}/disconnect",
+     "type": "string"
+    },
+    "pause": {
+     "description": "true pauses instead (resume with directions {paused:false}, which needs owner.configuration)",
+     "type": "boolean"
+    },
+    "direction": {
+     "description": "in (the other Bridgit uses this one), out (this one uses it) or both (default)",
+     "type": "string",
+     "enum": [
+      "in",
+      "out",
+      "both"
+     ]
+    }
+   },
+   "required": [
+    "id",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "not_found",
+   "conflict"
+  ],
+  "requires": null
+ }
+}

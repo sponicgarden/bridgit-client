@@ -1,6 +1,6 @@
 {
  "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
- "api_revision": 128,
+ "api_revision": 132,
  "errors": [
   {
    "code": "model_unavailable",
@@ -446,7 +446,7 @@
   {
    "code": "unknown_target",
    "you_should": "Fix the target, or leave it out to use this phone",
-   "meaning": "No satellite with that id (`target`); GET /v1/satellites lists them",
+   "meaning": "No linked Bridgit or satellite with that name or id (`target`); GET /v1/links lists them",
    "http": 404,
    "returned_today": true
   },
@@ -476,6 +476,69 @@
    "you_should": "Retry later; the owner may need to check the satellite's Tailscale",
    "meaning": "The satellite didn't answer (`last_seen`, `retry_after_s`)",
    "http": 503,
+   "returned_today": true
+  },
+  {
+   "code": "link_revoked",
+   "you_should": "Don't retry; linking again needs a new link code",
+   "meaning": "The link with that Bridgit was disconnected (`scope`: direction or link, `link_id`)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "link_paused",
+   "you_should": "Wait until it is resumed; don't retry before then",
+   "meaning": "The owner paused that link (`link_id`)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "link_waiting",
+   "you_should": "Ask the other side's owner or agent to opt in; GET /v1/owner/configuration/links shows the states",
+   "meaning": "Only one Bridgit has opted in to that direction so far (`waiting_for`: user or target)",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "not_on_target",
+   "you_should": "Leave out the target, or link that Bridgit directly",
+   "meaning": "That call doesn't pass a link: the endpoint, the target's service list, or a call that already came over a link (calls pass on once)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "target_offline",
+   "you_should": "Retry later; its owner may need to check Tailscale or Bridgit on it",
+   "meaning": "The linked Bridgit didn't answer (`last_seen`, `retry_after_s`)",
+   "http": 503,
+   "returned_today": true
+  },
+  {
+   "code": "code_invalid",
+   "you_should": "Check the code with the owner; don't guess",
+   "meaning": "Wrong link code; 5 wrong tries void a code",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "code_expired",
+   "you_should": "Ask for a new code",
+   "meaning": "That link code expired (codes last 10 minutes)",
+   "http": 410,
+   "returned_today": true
+  },
+  {
+   "code": "code_used_up",
+   "you_should": "Ask for a new code",
+   "meaning": "That link code was already used, cancelled, or voided after 5 wrong tries",
+   "http": 410,
+   "returned_today": true
+  },
+  {
+   "code": "name_required",
+   "you_should": "Register one with POST /v1/owner/configuration/name, then retry",
+   "meaning": "This Bridgit needs a Device Domain Name first (the message has the naming advice)",
+   "http": 409,
    "returned_today": true
   },
   {

@@ -344,7 +344,7 @@ final class ParsingTests: XCTestCase {
         XCTAssertEqual(counts, ["total": 4, "added": 2, "unchecked": 1, "seen": 1, "offline": 1, "online": 2])
         XCTAssertEqual(o["more"] as? Int, 0)
 
-        // During Level 2: only what the scan saw, each drawn as seen with its address.
+        // During Network Diagnostics: only what the scan saw, each drawn as seen with its address.
         let scan = DevicesMapOptions.build(categories: cats, added: [], found: ["192.168.1.32"], now: now)
         let found = try XCTUnwrap(scan["devices"] as? [[String: Any]])
         XCTAssertEqual(found.map { $0["id"] as? String }, ["seen:192.168.1.32"])

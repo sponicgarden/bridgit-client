@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Home: Level 1 Diagnostics (2 Nov 2026). Banners that need the owner on top, the live scene below.
+<!-- Home: Device Diagnostics (2 Nov 2026). Banners that need the owner on top, the live scene below.
      The old Home moved: listener card to Agents, last 24 hours to Activity, quick switches and
      Max Agentic Control to Feature enablement. -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Level 1 Diagnostics</title>
+<title>Device Diagnostics</title>
 <!-- Built from docs/animation/takeover.html by the Home port (2 Nov 2026). Icon font: Material Symbols
      Outlined (Apache 2.0), subset to the icons the scene uses, bundled so it works offline. -->
 <script>
@@ -354,7 +354,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
 <div id="status">
   <div id="final" hidden></div>
 </div>
-<div id="stage"><svg id="scene" viewBox="0 46 360 590" preserveAspectRatio="xMidYMin meet" role="img" aria-label="Level 1 Diagnostics: every part of the phone Bridgit can use, grey when it is off or missing access, with live activity.">
+<div id="stage"><svg id="scene" viewBox="0 46 360 590" preserveAspectRatio="xMidYMin meet" role="img" aria-label="Device Diagnostics: every part of the phone Bridgit can use, grey when it is off or missing access, with live activity.">
           <defs>
             <linearGradient id="tunA" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#f2b544"/><stop offset="100%" stop-color="var(--core)"/>
@@ -952,7 +952,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     svg.classList.toggle("paused", paused && !!agentName);
     // No Control Agent: keep the Add action and the empty slot visible. Paused only means something once there is an agent.
     if (!playing) hdr.classList.remove("pulse");
-    if (!playing) hdr.textContent = !agentName ? "No Control Agent" : paused ? "Paused · No control agent access" : "Level 1 Diagnostics Complete";
+    if (!playing) hdr.textContent = !agentName ? "No Control Agent" : paused ? "Paused · No control agent access" : "Device Diagnostics Complete";
     $("addAgent").hidden = playing || !!agentName;
     setLive();
   }
@@ -992,12 +992,12 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     if (opts.externalDevices) showExternalDevices(opts.externalDevices);
     AGENT.t1.textContent = agentName || ""; agentLogo(); agentLook();
     try {
-      hdr.textContent = "Level 1 Diagnostics Running"; hdr.classList.add("pulse"); setCount(); runningCard();
+      hdr.textContent = "Device Diagnostics Running"; hdr.classList.add("pulse"); setCount(); runningCard();
       core.setAttribute("opacity", 1);
       if (!still()) core.animate([{ opacity: .3 }, { opacity: 1 }], { duration: 400 * PACE });
       bridge.setAttribute("opacity", 1);
       if (!quiet) { window.scrollTo(0, 0); if (gTerm.childNodes.length) print([[" ", ""]]); } // a blank line between runs
-      print([[stamp(), "dimt"], ["› Level 1 Diagnostics", ""]]);
+      print([[stamp(), "dimt"], ["› Device Diagnostics", ""]]);
       await wait(300, my);
       print([["  Bridgit Core", ""], [dots("Bridgit Core", 26), "dimt"], ["OK", "ok"]]);
       await wait(400, my);

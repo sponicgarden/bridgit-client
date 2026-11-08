@@ -168,6 +168,26 @@ class PortalEndpointsTest {
         val (aps, applets) = get("/v1/portal/applets")
         assertEquals(200, aps); assertEquals("dog", applets.getJSONArray("applets").getJSONObject(0).getString("id"))
 
+
+        suspend fun postUpdates(body: JSONObject): Pair<Int, JSONObject> {
+            val now = System.currentTimeMillis()
+            val r = d.dispatch(c, JSONObject().put("method", "POST").put("path", "/v1/portal/updates").put("body", body), now + 10_000, now, "job")
+            return r.getInt("status") to JSONObject(String(Sealed.un64(r.getString("body_base64"))))
+        }
+        // Update prompts (A0050): an agent's request rides on the snapshot; the Portal reports and acknowledges it.
+        assertTrue(get("/v1/portal/snapshot").second.isNull("updates"))
+        val req = PortalUpdates.request(app, p.agent.id, false, true)
+        val pending = get("/v1/portal/snapshot").second.getJSONObject("updates")
+        assertEquals(req.id, pending.getString("id")); assertFalse(pending.getBoolean("prompts")); assertTrue(pending.getBoolean("prompt_now"))
+        val report = JSONObject().put("prompts_enabled", false).put("supported", true).put("installed_build", "2611071200")
+            .put("latest_build", "2611072030").put("last_result", "prompted").put("ack", req.id)
+        val (us, ub) = postUpdates(report)
+        assertEquals(ub.toString(), 200, us); assertTrue(ub.isNull("pending"))
+        assertTrue(get("/v1/portal/snapshot").second.isNull("updates"))
+        val st = PortalUpdates.status(app, p.agent.id, "iPad")
+        assertFalse(st.getBoolean("prompts_enabled")); assertTrue(st.getBoolean("update_ready")); assertEquals("prompted", st.getString("last_result"))
+        assertEquals(422, postUpdates(JSONObject().put("prompts_enabled", true)).first)
+
         val (ts, theme) = get("/v1/portal/theme")
         assertEquals(200, ts)
         assertEquals("#1F5BD6", theme.getJSONObject("colors").getJSONObject("light").getString("b_primary"))
@@ -208,6 +228,7 @@ class PortalEndpointsTest {
             .compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, it) }.toByteArray()
         val (ps, pb) = post("/v1/portal/photo", JSONObject().put("camera", "front").put("data_base64", android.util.Base64.encodeToString(jpeg, android.util.Base64.NO_WRAP)))
         assertEquals(pb.toString(), 404, ps)
+
 
         // Only the portal's read-only routes.
         listOf("/v1/health", "/v1/log", "/v1/lan/discovered").forEach { path ->

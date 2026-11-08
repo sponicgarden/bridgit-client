@@ -53,7 +53,7 @@ class NetworkDevicesLayoutTest {
             val offline = texts.first { it.text.toString() == "5 min ago" && it.compoundDrawablesRelative[0] != null }
             val offlineInterface = texts.last { it.text.toString() == "Bridgit interfaced" }
             assertEquals(offline.currentTextColor, offlineInterface.currentTextColor)
-            val button = texts.first { it.text.toString() == "Run Level 2 Network Device Diagnostics" }
+            val button = texts.first { it.text.toString() == "Run Network Diagnostics" }
             assertTrue("No button text truncation at $width dp", (0 until button.layout.lineCount).all { button.layout.getEllipsisCount(it) == 0 })
             assertTrue(button.layout.height <= button.height - button.compoundPaddingTop - button.compoundPaddingBottom)
             val bar = views.filterIsInstance<LinearProgressIndicator>().first { !it.isIndeterminate }

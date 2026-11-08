@@ -129,6 +129,7 @@
                     <TextView style="@style/SettingsHeader" android:text="@string/settings_about" />
                     <include android:id="@+id/version" layout="@layout/settings_row" />
                     <include android:id="@+id/checkUpdates" layout="@layout/settings_row" />
+                    <include android:id="@+id/autoUpdateInstall" layout="@layout/settings_switch_row" />
                     <include android:id="@+id/autoUpdateOffers" layout="@layout/settings_switch_row" />
                     <include android:id="@+id/commit" layout="@layout/settings_row" />
                     <include android:id="@+id/cert" layout="@layout/settings_row" />

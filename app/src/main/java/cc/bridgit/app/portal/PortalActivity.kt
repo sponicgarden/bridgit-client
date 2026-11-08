@@ -395,13 +395,14 @@ class PortalActivity : AppCompatActivity() {
         val heard = maxOf(agent?.lastUsedAt ?: 0L, info?.at ?: 0L, seen?.at ?: 0L).takeIf { it > 0 }
         hubSheet(n.name, knownFromHome(seen?.home), seen?.at, n.online, LinkPause.hubsPaused, state, n.satLink != null, n.portalLink != null, heard,
             info?.let { it.targets.size to it.portals.size },
-            showHome = homeId?.let { { showHome(it, n.name) } }, pairAgain = { pairAgain(n.satLink!!) }, remove = { removeHub(n) })
+            showHome = homeId?.let { { showHome(it, n.name) } }, pairAgain = { pairAgain(n.satLink!!) }, remove = { removeHub(n) },
+            link = n.satLink?.let { id -> app.links.all().firstOrNull { it.role == cc.bridgit.app.link.Links.Role.SAT && it.ref == id } })
             .open()
     }
 
     private fun hubSheet(name: String, known: Known?, updatedAt: Long?, online: Boolean, paused: Boolean, state: HubLinks.LinkState?,
                          satellite: Boolean, portal: Boolean, heard: Long?, shared: Pair<Int, Int>?,
-                         showHome: (() -> Unit)?, pairAgain: () -> Unit, remove: () -> Unit): DeviceDetailSheet {
+                         showHome: (() -> Unit)?, pairAgain: () -> Unit, remove: () -> Unit, link: cc.bridgit.app.link.Links.Rec? = null): DeviceDetailSheet {
         val live = online && !paused
         val stale = satellite && state?.needsPairing == true
         val facts = buildList {
@@ -414,6 +415,7 @@ class PortalActivity : AppCompatActivity() {
                 state == HubLinks.LinkState.STALE -> add(getString(R.string.linked_hub_stale, noun))
                 satellite && shared == null -> add(getString(R.string.linked_hub_waiting))
             }
+            addAll(linkFacts(link))
             updatedAt?.takeIf { known != null }?.let { add(getString(R.string.linked_updated_ago, ago(it))) }
         }
         return DeviceDetailSheet(name, subtitle(known),
@@ -423,12 +425,14 @@ class PortalActivity : AppCompatActivity() {
               else conn(R.string.linked_conn_hub_off, getString(R.string.linked_conn_hub_off_body), false) },
             facts, where(known)?.copy(address = null), tiles(known), known?.services.orEmpty(),
             primary = when {
-                stale -> DeviceDetailSheet.Action(getString(R.string.linked_pair_again), pairAgain)
-                showHome != null -> DeviceDetailSheet.Action(getString(R.string.linked_view), showHome)
+                stale -> DeviceDetailSheet.Action(getString(R.string.linked_pair_again), run = pairAgain)
+                showHome != null -> DeviceDetailSheet.Action(getString(R.string.linked_view), run = showHome)
                 else -> null
             },
             primaryCaption = if (!stale && showHome != null) getString(R.string.linked_view_hub_caption) else null,
-            destructive = DeviceDetailSheet.Destructive(getString(if (satellite) R.string.satellite_unlink else R.string.portal_other_remove),
+            pause = link?.let { pauseAction(it, name) },
+            destructive = if (link != null && !portal) DeviceDetailSheet.Destructive(getString(R.string.link_disconnect), null) { disconnectWithUndo(link, name) }
+            else DeviceDetailSheet.Destructive(getString(if (satellite) R.string.satellite_unlink else R.string.portal_other_remove),
                 buildList {
                     if (satellite) add(getString(R.string.satellite_unlink_confirm, name))
                     if (portal) add(getString(R.string.portal_other_remove_body, name, noun))
@@ -471,7 +475,8 @@ class PortalActivity : AppCompatActivity() {
                 app.satellites.setAgent(s.id, a.id, on)
                 app.log.system("audit", "satellite", "${if (on) "Let" else "Stopped"} ${a.name} ${if (on) "use" else "using"} ${s.name}") } },
             check = { lifecycleScope.launch { withContext(Dispatchers.IO) { SatelliteHub.refresh(app, s.id) }; render() } },
-            remove = { SatelliteHub.remove(app, s.id); render() }).open()
+            remove = { SatelliteHub.remove(app, s.id); render() },
+            link = app.links.all().firstOrNull { it.role == cc.bridgit.app.link.Links.Role.HUB && it.ref == s.id }).open()
     }
 
     /**
@@ -480,7 +485,7 @@ class PortalActivity : AppCompatActivity() {
      */
     private fun satelliteSheet(name: String, known: Known?, status: () -> String, lastSeen: Long?, shareError: String?, sharedAt: Long?,
                                manage: Pair<Boolean, (Boolean) -> Unit>?, agents: List<Triple<String, Boolean, (Boolean) -> Unit>>,
-                               check: () -> Unit, remove: () -> Unit): DeviceDetailSheet {
+                               check: () -> Unit, remove: () -> Unit, link: cc.bridgit.app.link.Links.Rec? = null): DeviceDetailSheet {
         fun live() = !LinkPause.satellites && status() == "online"
         val variant = com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurfaceVariant, 0)
         return DeviceDetailSheet(name, subtitle(known),
@@ -491,7 +496,7 @@ class PortalActivity : AppCompatActivity() {
             { if (live()) conn(R.string.linked_conn_sat_live, getString(R.string.linked_conn_sat_live_body), true)
               else conn(R.string.linked_conn_sat_off, getString(if (status() == "unlinked") R.string.linked_fact_unlinked else R.string.linked_conn_sat_off_body), false) },
             listOfNotNull(lastSeen?.let { getString(R.string.linked_fact_last_seen, ago(it)) },
-                shareError?.let { getString(R.string.satellite_share_failed, it) } ?: sharedAt?.let { getString(R.string.linked_fact_shared, ago(it)) }),
+                shareError?.let { getString(R.string.satellite_share_failed, it) } ?: sharedAt?.let { getString(R.string.linked_fact_shared, ago(it)) }) + linkFacts(link),
             where(known), tiles(known),
             controls = { box ->
                 manage?.let { (on, flip) ->
@@ -523,8 +528,10 @@ class PortalActivity : AppCompatActivity() {
                         LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
                 }
             },
-            secondary = DeviceDetailSheet.Action(getString(R.string.satellite_check), check),
-            destructive = DeviceDetailSheet.Destructive(getString(R.string.satellite_remove), getString(R.string.satellite_remove_confirm, name), remove))
+            secondary = DeviceDetailSheet.Action(getString(R.string.satellite_check), run = check),
+            pause = link?.let { pauseAction(it, name) },
+            destructive = if (link != null) DeviceDetailSheet.Destructive(getString(R.string.link_disconnect), null) { disconnectWithUndo(link, name) }
+            else DeviceDetailSheet.Destructive(getString(R.string.satellite_remove), getString(R.string.satellite_remove_confirm, name), remove))
     }
 
     /** An iPhone, iPad or phone that views this one through Bridgit Portal: a view-only satellite. */
@@ -544,6 +551,57 @@ class PortalActivity : AppCompatActivity() {
               else conn(R.string.linked_conn_portal_off, getString(R.string.linked_viewer_body, noun), false) },
             destructive = DeviceDetailSheet.Destructive(getString(R.string.portal_disconnect),
                 getString(R.string.portal_disconnect_title, name) + "\n\n" + getString(R.string.portal_disconnect_body, name, noun), disconnect))
+
+    // ---- Linked Bridgits on the device sheet (docs/spec-linked-bridgits.md, LNK-26, LNK-27, LNK-42) ----
+
+    /** One line per direction that isn't off: "This tablet uses: camera, microphone", "It uses this tablet: Home and applets". */
+    private fun linkFacts(r: cc.bridgit.app.link.Links.Rec?): List<String> {
+        r ?: return emptyList()
+        val l = app.links
+        fun value(state: cc.bridgit.app.link.LinkModel.State, services: Set<String>) = when (state) {
+            cc.bridgit.app.link.LinkModel.State.ON -> serviceWords(services)
+            cc.bridgit.app.link.LinkModel.State.PAUSED -> getString(R.string.link_state_paused)
+            cc.bridgit.app.link.LinkModel.State.OFF -> null
+            else -> getString(R.string.link_state_waiting)
+        }
+        return listOfNotNull(
+            value(l.outState(r), r.farOut?.services ?: emptySet())?.let { getString(R.string.link_this_uses, noun, it) },
+            value(l.inState(r), r.inServices)?.let { getString(R.string.link_it_uses, noun, it) })
+    }
+
+    private fun serviceWords(services: Set<String>): String = cc.bridgit.app.link.LinkModel.SERVICES.filter { it in services }.map { getString(when (it) {
+        "camera" -> R.string.link_service_camera; "mic" -> R.string.link_service_mic; "speaker" -> R.string.link_service_speaker
+        "interactions" -> R.string.link_service_interactions; "location" -> R.string.link_service_location; "gallery" -> R.string.link_service_gallery
+        "sounds" -> R.string.link_service_sounds; else -> R.string.link_service_view }) }.joinToString(", ").ifEmpty { getString(R.string.link_state_waiting) }
+
+    /** Pause both directions, or Resume them: one tap each way (LNK-27). */
+    private fun pauseAction(r: cc.bridgit.app.link.Links.Rec, name: String): DeviceDetailSheet.Action {
+        val paused = app.links.inState(r) == cc.bridgit.app.link.LinkModel.State.PAUSED || app.links.outState(r) == cc.bridgit.app.link.LinkModel.State.PAUSED
+        return DeviceDetailSheet.Action(getString(if (paused) R.string.link_resume else R.string.link_pause),
+            getString(if (paused) R.string.link_resume_a11y else R.string.link_pause_a11y, name)) {
+            val person = cc.bridgit.app.link.Granter.person(app.links.selfName())
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) { runCatching {
+                    if (paused) { app.links.setDirection(r.id, "in", null, null, false, person); app.links.setDirection(r.id, "out", null, null, false, person) }
+                    else app.links.disconnect(r.id, "both", person, pause = true)
+                } }
+                render()
+            }
+        }
+    }
+
+    /** Disconnect at once, with Undo for 10 seconds instead of a question (LNK-26). [name]: as the sheet shows it. */
+    private fun disconnectWithUndo(r: cc.bridgit.app.link.Links.Rec, name: String) {
+        val person = cc.bridgit.app.link.Granter.person(app.links.selfName())
+        lifecycleScope.launch {
+            val ok = withContext(Dispatchers.IO) { runCatching { app.links.disconnect(r.id, "both", person) }.isSuccess }
+            render()
+            if (!ok) return@launch
+            com.google.android.material.snackbar.Snackbar.make(b.root, getString(R.string.link_disconnected, name), cc.bridgit.app.link.Links.UNDO_MS.toInt())
+                .setAction(R.string.link_undo) { lifecycleScope.launch { withContext(Dispatchers.IO) { runCatching { app.links.undo(r.id, person) } }; render() } }
+                .show()
+        }
+    }
 
     /** Debug builds: opens a sample (debug_sheet=this|viewer|viewer_live|satellite|satellite_off|hub|hub_stale|network|network_off). */
     private fun showSample(kind: String) {

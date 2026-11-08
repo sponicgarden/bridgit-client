@@ -39,7 +39,7 @@ object PortalEndpoints {
     val CLIENT_TYPE = Param("client_type", "string", "Optional: the viewing device's kind: phone, tablet, computer, tv, watch or camera. Shown on the phone's Linked devices")
     val SNAPSHOT = EndpointSpec("GET", "/portal/snapshot", "portal", "Home, agents, applets and the newest log entries in one call (saves relay quota). $WHO",
         query = listOf(CLIENT, CLIENT_DEVICE, CLIENT_TYPE, Param("logs", "integer", "Newest log entries to include, 0-50 (default 20)")),
-        example = "GET /v1/portal/snapshot?logs=20", returns = "home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for a Bridgit Portal pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay)",
+        example = "GET /v1/portal/snapshot?logs=20", returns = "home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), updates (null, or the request an agent left for this Portal: {id, prompts?: boolean, prompt_now: boolean, at}; apply it, then POST /v1/portal/updates with ack: id), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for a Bridgit Portal pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay)",
         errors = listOf("invalid_parameter"))
     val HOME = EndpointSpec("GET", "/portal/home", "portal", "The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. $WHO",
         query = listOf(CLIENT, CLIENT_DEVICE, CLIENT_TYPE),
@@ -87,7 +87,16 @@ object PortalEndpoints {
         returns = "camera, targets[{id, name, checks[{watch_id, label, kind: check|people|change, status: answered|people_checked|skipped|checking|error, summary (one line for the owner), answers?}]}]",
         errors = listOf("invalid_parameter", "not_found"), privateFields = setOf("data_base64"))
 
-    val ALL = listOf(SNAPSHOT, HOME, DEVICES, APPLET_INVENTORY, APPLET_WATCHES, BRAND_LOGO, LOGS, AGENTS, APPLETS, THEME, PHOTO_TARGETS, PHOTO)
+    val UPDATES = EndpointSpec("POST", "/portal/updates", "portal", "The Portal's own update state (A0050): whether it prompts for new TestFlight builds, its build and the newest one, and which request it applied. Agents read it in GET /v1/owner/settings → portal_updates and change it with owner configuration actions portal.update_prompts and portal.update_now. The owner's portal pairing only.",
+        body = listOf(Param("prompts_enabled", "boolean", "The Portal's Update prompts switch", true),
+            Param("supported", "boolean", "Whether this install can be updated from TestFlight (false for test builds)", true),
+            Param("installed_build", "string", "Installed build number (yymmddHHMM)"), Param("latest_build", "string", "Newest published build number"),
+            Param("last_result", "string", "What the last check did", enum = PortalUpdatesLogic.RESULTS.sorted()),
+            Param("ack", "string", "The id of the request from GET /v1/portal/snapshot → updates that was applied")),
+        example = "POST /v1/portal/updates {\"prompts_enabled\":true,\"supported\":true,\"installed_build\":\"2611071200\",\"latest_build\":\"2611072030\",\"last_result\":\"prompted\",\"ack\":\"pur_1794071633482\"}",
+        returns = "saved, pending (a request still waiting, or null)", errors = listOf("invalid_parameter"))
+
+    val ALL = listOf(SNAPSHOT, HOME, DEVICES, APPLET_INVENTORY, APPLET_WATCHES, BRAND_LOGO, LOGS, AGENTS, APPLETS, THEME, PHOTO_TARGETS, PHOTO, UPDATES)
 }
 
 /**
@@ -118,9 +127,14 @@ class PortalModule(app: BridgeApp) : Capability(app) {
         portal(PortalEndpoints.SNAPSHOT) {
             val n = query("logs")?.let { v -> v.toIntOrNull()?.takeIf { it in 0..50 } ?: throw ErrorCatalog.error("invalid_parameter", "logs must be 0 to 50.") } ?: 20
             Reply.Json(JSONObject().put("home", home()).put("agents", agents()).put("applets", applets()).put("logs", logs(null, n))
+                .put("updates", agent?.let { PortalUpdates.pending(app, it.id)?.json() } ?: JSONObject.NULL)
                 .apply { relayDailyJobs(agent)?.let { put("relay_daily_jobs", it) } })
         }
         portal(PortalEndpoints.HOME) { Reply.Json(home()) }
+        portal(PortalEndpoints.UPDATES) {
+            val id = agent?.id ?: throw ErrorCatalog.error("invalid_parameter", "Only a paired Portal reports its updates.")
+            Reply.Json(PortalUpdates.receive(app, id, body))
+        }
         portal(PortalEndpoints.DEVICES) {
             val added = runCatching { PortalData.addedDevices(app) }.getOrDefault(JSONArray())
             Reply.Json((PortalData.portalLogoUrls(cc.bridgit.app.lan.LanModule.rememberedForOwner(app)) as JSONObject).put("added", added))

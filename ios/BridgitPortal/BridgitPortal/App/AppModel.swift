@@ -122,6 +122,8 @@ final class AppModel: ObservableObject {
     let relays: RelayStore
     /// This device's Device Domain Name (bridgit.cc/names).
     let names = DeviceNameStore()
+    /// Update prompts for new TestFlight builds (A0050).
+    let updates = UpdatePrompts()
     /// Linked Bridgits (docs/spec-linked-bridgits.md, Apple user role).
     let links: LinkStore
     private let introductionDelegate = IntroductionNotificationDelegate()

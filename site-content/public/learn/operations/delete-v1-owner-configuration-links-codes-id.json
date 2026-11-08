@@ -1,0 +1,55 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Cancel a link code that hasn't been claimed; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "owner_configuration_links_code_cancel",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/owner/configuration/links/codes/{id} ",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/links/codes/{id}",
+  "capability": "owner_features",
+  "returns": "code_id, state=cancelled",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/links/codes/{id}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed",
+   "name_required",
+   "code_invalid",
+   "code_expired",
+   "code_used_up",
+   "link_revoked",
+   "link_waiting",
+   "target_offline",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

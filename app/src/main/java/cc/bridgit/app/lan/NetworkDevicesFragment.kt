@@ -101,6 +101,7 @@ class NetworkDevicesFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, state: Bundle?): View {
         val context = requireContext()
+        Thread { runCatching { cc.bridgit.app.lan.packs.DevicePackStore.get(context.applicationContext) } }.start()
         val root = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(color(R.color.b_surface)) }
         val toolbar = MaterialToolbar(context).apply {
             setTitle(R.string.network_devices_title)
@@ -156,9 +157,9 @@ class NetworkDevicesFragment : Fragment() {
         }
         if (embedded) {
             // Devices tab (owner, 4 Nov 2026): one slim line, like the Map's header, instead of a full-width button.
-            // Owner, 4 Nov 2026: the List spells it out, "Level 2 Diagnostic" and a refresh icon (the Map says "L2").
+            // Owner, 4 Nov 2026: the List spells it out with a refresh icon. User, 7 Nov 2026: "Network Diagnostics" everywhere (was Level 2).
             find.apply {
-                text = "Level 2 Diagnostic"; contentDescription = "Run Level 2 Diagnostic: look around this network"
+                text = "Network Diagnostics"; contentDescription = "Run Network Diagnostics: look around this network"
                 setIconResource(R.drawable.ic_refresh); iconGravity = MaterialButton.ICON_GRAVITY_TEXT_END
                 iconSize = dp(18); iconPadding = dp(6); iconTint = ColorStateList.valueOf(color(R.color.b_primary))
                 cornerRadius = dp(12); textSize = 14f; minHeight = dp(44)

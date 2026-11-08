@@ -181,7 +181,7 @@ svg#scene { width: 100%; height: 100%; display: block; background: var(--void); 
     <button class="tab" type="button" role="tab" data-tab="offline" aria-selected="false"><b>0</b><span>Offline</span></button>
     <button class="tab" type="button" role="tab" data-tab="groups" aria-selected="false"><b>0</b><span>Groups</span></button>
   </div>
-  <button id="find" class="hbtn run" type="button" aria-label="Run Level 2: look around this network"><span>L2</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4c-4.42,0 -7.99,3.58 -7.99,8s3.57,8 7.99,8c3.73,0 6.84,-2.55 7.73,-6h-2.08c-0.82,2.33 -3.04,4 -5.65,4 -3.31,0 -6,-2.69 -6,-6s2.69,-6 6,-6c1.66,0 3.14,0.69 4.22,1.78L13,11h7V4l-2.35,2.35z"/></svg></button>
+  <button id="find" class="hbtn run" type="button" aria-label="Run Network Diagnostics: look around this network"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4c-4.42,0 -7.99,3.58 -7.99,8s3.57,8 7.99,8c3.73,0 6.84,-2.55 7.73,-6h-2.08c-0.82,2.33 -3.04,4 -5.65,4 -3.31,0 -6,-2.69 -6,-6s2.69,-6 6,-6c1.66,0 3.14,0.69 4.22,1.78L13,11h7V4l-2.35,2.35z"/></svg></button>
 </div>
 <div class="hdrline"><span id="hdr" aria-live="polite"></span></div>
 <div id="stage"><svg id="scene" viewBox="0 40 360 560" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Devices map: this phone in the middle and its groups of devices around it.">
@@ -204,7 +204,7 @@ svg#scene { width: 100%; height: 100%; display: block; background: var(--void); 
   <g id="flash"><g id="flashLogos"></g><text id="flashT1" x="180" y="428"></text><text id="flashT2" x="180" y="442"></text></g>
   <g id="empty" display="none">
     <text class="t1" x="180" y="398">No devices yet</text>
-    <text x="180" y="418">Tap L2 ⟳ to run a Level 2 look around this network.</text>
+    <text x="180" y="418">Tap ⟳ to run Network Diagnostics.</text>
   </g>
 </svg></div>
 <div class="legendrow">
@@ -218,7 +218,7 @@ svg#scene { width: 100%; height: 100%; display: block; background: var(--void); 
   "use strict";
   // Groups map (owner, 4 Nov 2026): the overview shows one bubble per group (Computers, Routers & switches,
   // Cameras, Audio, …) with a dot per device. Tap a bubble to see its devices round the phone.
-  // Level 2: each device found flies from the phone into its group, its brand logo flashing as it lands;
+  // Network Diagnostics: each device found flies from the phone into its group, its brand logo flashing as it lands;
   // when the scan ends, the map walks the groups one by one.
   var NS = "http://www.w3.org/2000/svg";
   var CX = 180, CY = 320, RX = 124, RY = 200, R = 17, PR = 22, PRX = 120, PRY = 192, GROUP_CAP = 15, SAT_CAP = 16;
@@ -642,7 +642,7 @@ svg#scene { width: 100%; height: 100%; display: block; background: var(--void); 
     finish(o);
   }
 
-  // ---- Level 2, live
+  // ---- Network Diagnostics, live
   function scanStart(o) {
     clear(); mode = "scanning"; data = o; queued = null; finalData = null; skipWalk = false; filter = "all";
     landed = {}; arrivals = []; waiting = {};
@@ -652,7 +652,7 @@ svg#scene { width: 100%; height: 100%; display: block; background: var(--void); 
     svg.classList.remove("live"); showEmpty(false); gPods.style.display = "";
     core.setAttribute("opacity", 1);
     findBtn.disabled = true; findBtn.style.opacity = .45;
-    hdr.textContent = "Level 2 · Looking for computers, routers, switches, cameras, audio…"; hdr.classList.add("pulse");
+    hdr.textContent = "Network Diagnostics · Looking for computers, routers, switches, cameras, audio…"; hdr.classList.add("pulse");
     renderPods(o, landed, 400);
     if (sweep) clearInterval(sweep);
     ping(CX, CY, "var(--core)", 120, 1400);
@@ -690,7 +690,7 @@ svg#scene { width: 100%; height: 100%; display: block; background: var(--void); 
         })(p, d);
       }
       showFlash(d.logo ? [d.logo] : [], d.name, "→ " + title + (d.brand ? " · " + d.brand : ""));
-      hdr.textContent = "Level 2 · Found " + short(d.name, 22) + " → " + title;
+      hdr.textContent = "Network Diagnostics · Found " + short(d.name, 22) + " → " + title;
       // One at a time, slow enough to follow: about a quarter second each, slower when only a few are waiting.
       await wait(Math.max(260, Math.min(600, 4000 / (arrivals.length + 4))));
     }

@@ -1,0 +1,31 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Check for device-pack updates now (at most once a minute) and update installed packs",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "lan_packs_check",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "POST /v1/lan/packs/check {}",
+  "idempotent": true,
+  "path": "/v1/lan/packs/check",
+  "capability": "lan_discovery",
+  "returns": "Same as GET /v1/lan/packs; a failed check keeps the last good list and installed packs",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"idempotency_key": {
+    "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+    "type": "string"
+   }},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

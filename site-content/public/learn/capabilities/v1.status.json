@@ -346,10 +346,80 @@
    "control_scope": null,
    "requires_power": null,
    "tool": "satellite_hub_agents_pause"
+  },
+  {
+   "summary": "The linked Bridgits (the owner's other Bridgits) you may use through this one, with what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further.",
+   "path": "/v1/links",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-links.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-links.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "links"
+  },
+  {
+   "summary": "Device to device: a Bridgit claims this one's link code with the claim token derived from it (Authorization: Bearer rly_\u2026). Not for agents: agents use POST /v1/owner/configuration/links/claims on their own Bridgit.",
+   "path": "/v1/link/claim",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-link-claim.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-link-claim.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": null
+  },
+  {
+   "summary": "Device to device: the other Bridgit of a link sends its grants-log events and its halves of both directions (link agents only). Not for agents.",
+   "path": "/v1/link/events",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-link-events.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-link-events.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "link_events"
+  },
+  {
+   "summary": "Device to device: this Bridgit's other links, names and directions only, so the other device can draw them (link agents only). Not for agents.",
+   "path": "/v1/link/peers",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-link-peers.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-link-peers.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "link_peers"
+  },
+  {
+   "summary": "Device to device: the other Bridgit disconnected a direction or the whole link, so this one marks it off too (link agents only). Not for agents.",
+   "path": "/v1/link/disconnect",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-link-disconnect.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-link-disconnect.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "link_disconnect"
+  },
+  {
+   "summary": "Disconnect (or pause) a link at once: calls are refused from now, and it is final after 10 seconds unless undone; any control agent of this device (taking access away needs no owner.configuration grant)",
+   "path": "/v1/owner/configuration/links/{id}/disconnect",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-disconnect.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-disconnect.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "owner_configuration_links_disconnect"
+  },
+  {
+   "summary": "Disconnect every link of this Bridgit at once (Undo per link for 10 seconds); any control agent of this device (taking access away needs no owner.configuration grant)",
+   "path": "/v1/owner/configuration/links/disconnect-all",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-disconnect-all.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-disconnect-all.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "owner_configuration_links_disconnect_all"
   }
  ],
- "documentation_revision": 105,
- "api_revision": 128,
+ "documentation_revision": 110,
+ "api_revision": 132,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.status",

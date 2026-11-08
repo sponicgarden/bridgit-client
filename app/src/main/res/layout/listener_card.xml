@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Listener card (UI-09, ui-spec 5.2): Tailscale, state, uptime, Pause/Resume and the address.
-     Moved from Home to the Agents tab when Home became Level 1 Diagnostics (2 Nov 2026). -->
+     Moved from Home to the Agents tab when Home became Device Diagnostics (2 Nov 2026). -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/hero"

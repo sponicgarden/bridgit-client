@@ -3,8 +3,8 @@
 <resources>
     <!-- Home: hero card (UI-09) -->
     <string name="home_menu_settings">Settings</string>
-    <string name="home_menu_run_diagnostics">Run Level 1 Diagnostics</string>
-    <string name="home_scene_cd">Level 1 Diagnostics: every part of the phone Bridgit can use. Tap a part to open Feature enablement.</string>
+    <string name="home_menu_run_diagnostics">Run Device Diagnostics</string>
+    <string name="home_scene_cd">Device Diagnostics: every part of the phone Bridgit can use. Tap a part to open Feature enablement.</string>
     <string name="home_state_listening">Listening</string>
     <string name="home_state_paused">Paused</string>
     <string name="home_state_starting">Starting…</string>

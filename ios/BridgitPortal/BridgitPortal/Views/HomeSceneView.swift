@@ -1,7 +1,7 @@
 import SwiftUI
 import WebKit
 
-/// The APK's Home "Level 1 Diagnostics" scene: the very same page (app/src/main/assets/diagnostics/,
+/// The APK's Home "Device Diagnostics" scene: the very same page (app/src/main/assets/diagnostics/,
 /// copied into the app bundle at build time), with its animations, fed with the phone's state the way
 /// DiagnosticsScene.kt feeds it on Android. The page gets no network and no file access beyond its folder.
 struct HomeSceneView: UIViewRepresentable {

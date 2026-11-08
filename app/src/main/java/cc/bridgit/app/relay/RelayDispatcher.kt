@@ -19,10 +19,19 @@ class RelayDispatcher(private val app:BridgeApp,private val api:ApiServer) {
         if(!limiter.tryAcquire("relay:$id",300))throw ApiError(429,"rate_limited","At most 300 relay requests per minute")
         if(agent.caps==null)throw ApiError(403,"explicit_grants_required","Relay agents need explicit grants")
         if(deadline<=System.currentTimeMillis())throw ApiError(409,"deadline_expired","Job expired")
+        val method0=request.optString("method");val path0=request.optString("path")
+        // Linked Bridgits (§4.1): a link code's claim-only agent may only claim, once, before the code expires.
+        if(app.links.isClaimAgent(id)){
+            if(path0!="/v1/link/claim"||method0!="POST")throw ApiError(403,"relay_route_excluded","A link code's relay token only claims the link")
+            val r=app.links.relayClaim(id,request.optJSONObject("body") ?: JSONObject())
+            return JSONObject().put("status",r.first).put("content_type","application/json").put("body_base64",Sealed.b64(r.second.toString().toByteArray())).put("headers",JSONObject())
+        }
         val portal=PortalData.isPortalConfig(strings(config,"routes"),strings(config,"tools"))
         // Settings › Security › Relay: signed requests only. Sealed jobs are signed with the agent's own key (HPKE auth);
         // a connector token alone is a bearer secret. Read-only portals are exempt.
-        if(app.settings.securityRelaySignedOnly&&config.getString("mode")=="connector"&&!portal)
+        // A linked Bridgit's own calls (events, peers, disconnect) carry no control; its service calls follow the rule.
+        val linkPlumbing=app.links.isLinkAgent(id)&&path0 in cc.bridgit.app.link.LinkPolicy.PLUMBING.map { "/v1$it" }
+        if(app.settings.securityRelaySignedOnly&&config.getString("mode")=="connector"&&!portal&&!linkPlumbing)
             throw ApiError(403,"signed_requests_required","The owner allows only sealed (signed) relay requests for agents that can control this phone")
         val maximum = !portal && agent.maximumControl
         fun tools() = allowedTools(config, maximum)

@@ -76,14 +76,16 @@ object SatelliteEndpoints {
         example = "POST /v1/satellite/hub/agents/agt_123/pause {\"paused\":true}", returns = "id, name, paused",
         errors = listOf("not_found", "invalid_parameter"))
 
-    val ALL = listOf(SATELLITES, CLAIM, MANIFEST, HUB_INFO, HUB, HUB_PHOTO, HUB_PORTAL_LOGIN, UNLINK, HUB_UNLINK, HUB_AGENTS, HUB_AGENT_PAUSE)
+    val ALL = listOf(SATELLITES, CLAIM, MANIFEST, HUB_INFO, HUB, HUB_PHOTO, HUB_PORTAL_LOGIN, UNLINK, HUB_UNLINK, HUB_AGENTS, HUB_AGENT_PAUSE) +
+        cc.bridgit.app.link.LinkEndpoints.ALL
 
     fun install(route: Route, api: ApiServer, app: BridgeApp) = with(api) {
         with(route) {
+            // LNK-46: kept as an alias of GET /v1/links, with the same entries.
             endpoint(SATELLITES) {
                 val a = agent!!
-                val list = app.satellites.all().filter { a.id in it.agents }.map { publicJson(it) }
-                Reply.Json(JSONObject().put("satellites", JSONArray(list)).put("how_to_call", HOW))
+                val list = app.links.reachableBy(a).map { app.links.agentEntry(it, a) }
+                Reply.Json(JSONObject().put("satellites", JSONArray(list)).put("how_to_call", cc.bridgit.app.link.LinkEndpoints.HOW))
             }
             endpoint(CLAIM) {
                 if (LinkPause.hubsPaused) throw ErrorCatalog.error("forbidden", LinkPause.HUBS_MESSAGE, mapOf("reason" to "hubs_paused"))
@@ -109,6 +111,7 @@ object SatelliteEndpoints {
                 if (!key.startsWith("brg_") || port !in 1..65535) throw ErrorCatalog.error("invalid_parameter", "key and port are required.")
                 app.hubLinks.saveHubInfo(a.id, HubLinks.HubInfo.fromBody(a.id, source, port, key, body))
                 app.hubLinks.dropOlderLinksTo(a.id, source, port)
+                runCatching { app.links.noteHubInfo(a.id, body) }
                 Reply.Json(JSONObject().put("ok", true))
             }
             endpoint(UNLINK) {
@@ -163,6 +166,7 @@ object SatelliteEndpoints {
                 Reply.Json(JSONObject().put("code", app.remoteView.portalLoginCode() ?: JSONObject.NULL))
             }
         }
+        cc.bridgit.app.link.LinkEndpoints.install(route, api, app)
     }
 
     /**
@@ -208,6 +212,8 @@ object SatelliteEndpoints {
             .put("install", runCatching { cc.bridgit.app.feedback.InstallIdentity.status(app)?.installId }.getOrNull() ?: JSONObject.NULL)
             .put("battery", battery(app)).put("cameras", JSONArray(listOf("rear", "front")))
             .put("capabilities", caps).put("endpoints", eps)
+            .put("bridgit_name", app.links.registeredName() ?: JSONObject.NULL)
+            .put("link", app.links.linkBlock(app.links.byInAgent(a.id)) ?: JSONObject.NULL)
     }
 
     fun battery(app: BridgeApp): JSONObject {

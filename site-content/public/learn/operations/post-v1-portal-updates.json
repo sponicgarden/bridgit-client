@@ -1,0 +1,113 @@
+{
+ "documentation_revision": 110,
+ "api_revision": 132,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The Portal's own update state (A0050): whether it prompts for new TestFlight builds, its build and the newest one, and which request it applied. Agents read it in GET /v1/owner/settings → portal_updates and change it with owner configuration actions portal.update_prompts and portal.update_now. The owner's portal pairing only.",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "portal_updates",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "prompts_enabled",
+    "description": "The Portal's Update prompts switch",
+    "type": "boolean",
+    "required": true
+   },
+   {
+    "name": "supported",
+    "description": "Whether this install can be updated from TestFlight (false for test builds)",
+    "type": "boolean",
+    "required": true
+   },
+   {
+    "name": "installed_build",
+    "description": "Installed build number (yymmddHHMM)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "latest_build",
+    "description": "Newest published build number",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "last_result",
+    "description": "What the last check did",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "check_failed",
+     "later",
+     "off",
+     "opened_testflight",
+     "prompted",
+     "unsupported",
+     "up_to_date",
+     "update_ready"
+    ]
+   },
+   {
+    "name": "ack",
+    "description": "The id of the request from GET /v1/portal/snapshot → updates that was applied",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/portal/updates {\"prompts_enabled\":true,\"supported\":true,\"installed_build\":\"2611071200\",\"latest_build\":\"2611072030\",\"last_result\":\"prompted\",\"ack\":\"pur_1794071633482\"}",
+  "idempotent": false,
+  "path": "/v1/portal/updates",
+  "capability": "portal",
+  "returns": "saved, pending (a request still waiting, or null)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "latest_build": {
+     "description": "Newest published build number",
+     "type": "string"
+    },
+    "last_result": {
+     "description": "What the last check did",
+     "type": "string",
+     "enum": [
+      "check_failed",
+      "later",
+      "off",
+      "opened_testflight",
+      "prompted",
+      "unsupported",
+      "up_to_date",
+      "update_ready"
+     ]
+    },
+    "ack": {
+     "description": "The id of the request from GET /v1/portal/snapshot → updates that was applied",
+     "type": "string"
+    },
+    "prompts_enabled": {
+     "description": "The Portal's Update prompts switch",
+     "type": "boolean"
+    },
+    "supported": {
+     "description": "Whether this install can be updated from TestFlight (false for test builds)",
+     "type": "boolean"
+    },
+    "installed_build": {
+     "description": "Installed build number (yymmddHHMM)",
+     "type": "string"
+    }
+   },
+   "required": [
+    "prompts_enabled",
+    "supported"
+   ]
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

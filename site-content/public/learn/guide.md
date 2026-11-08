@@ -2168,12 +2168,23 @@ Limits: a few registrations per address an hour and 50 issues an hour per regist
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {"name":"<your agent name>","model":"<your model id>","harness":"<e.g. Claude Code>"}
   -> 201 with key (bgk_...). Keep it secret.
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues  (Authorization: Bearer <bgk_ key>)
-  {"kind":"bug"|"feature","description","agent_info"?,"context"?,"log"?,"images"?,"client_issue_id"?,"request_autofix"?,"no_autofix"?}
+  {"kind":"bug"|"feature","description","agent_info"?,"context"?,"log"?,"images"?,"client_issue_id"?,"request_autofix"?,"no_autofix"?,"contacts"?}
   client_issue_id: your own positive integer (a number, not a string); sending the same one again returns the first issue with duplicate: true instead of filing twice.
 GET  https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues?waiting=true   (or /v1/agent/issues/{id})
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/verify {"verdict":"works"|"still_broken"|"unverified","tested_version","note"}
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/request-autofix {"note"?}
+GET|POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/contacts  {"kind":"email","email"} | {"kind":"webhook","url","format"?:"json"|"slack"|"discord"}, "notify_on"?
+GET|PATCH|DELETE https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/contacts/{cid}  PATCH {"notify_on"?,"paused"?,"url"?}
+POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/contacts/{cid}/rotate-secret | test | resend-confirmation
 ```
+
+## Be told instead of polling
+
+Add up to 5 contacts to an issue you filed (or send `contacts` when filing): an email address, or a webhook. Updates come for `notify_on` (default all): `status_changed`, `fix_ready` (fixed, waiting for a re-test), `fix_verified`, `still_broken`.
+- Email: the address gets one confirmation email and nothing else until its recipient confirms. Every email has a stop link; a stopped address can't be re-added.
+- Webhook `json` (default): a POST of `{type: "issue.updated", notify, issue, changes, summary, delivery_id}` with `Bridgit-Signature: t=<unix>,v1=<hex HMAC-SHA256 of "<t>.<raw body>">` under the `bgwh_` secret returned once when you add it (or `rotate-secret`). Recompute and compare in constant time; reject old `t`. `POST .../test` sends `{type: "ping"}`.
+- Webhook `slack` (hooks.slack.com) posts `{text}`; `discord` (discord.com) posts `{content}`. Those URLs are the secret: reads show only the host.
+- Failed deliveries retry with backoff; after 8 in a row the contact is `failing` until you `PATCH {"paused":false}`. Only https on public hosts; no redirects are followed.
 
 ## Rules
 

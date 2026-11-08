@@ -119,6 +119,32 @@ class PackEngineTest {
         assertTrue(ok.calls.single().third.contains("<Channel>Master</Channel><DesiredVolume>30</DesiredVolume>"))
     }
 
+    /** Report A00102: the replies a WiiM Sound Lite (Linkplay firmware) actually gave on 8 Nov 2026 (track metadata shortened). */
+    @Test fun enrollsTheRealWiimSoundReplies() {
+        val description = requireNotNull(javaClass.getResourceAsStream("/upnp/wiim-sound-description.xml")).readBytes()
+        val envelope = { action: String, ns: String, fields: String -> PackEngine.Reply(200, ("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+            "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\r\n<u:${action}Response xmlns:u=\"$ns\">\r\n$fields</u:${action}Response>\r\n</s:Body> </s:Envelope>").toByteArray()) }
+        val net = FakeNet("http://192.168.1.64:49152/description.xml") { url, action, _ -> when {
+            url.endsWith("/description.xml") -> PackEngine.Reply(200, description)
+            action.endsWith("#GetTransportInfo\"") -> envelope("GetTransportInfo", av,
+                "<CurrentTransportState>STOPPED</CurrentTransportState>\r\n<CurrentTransportStatus>OK</CurrentTransportStatus>\r\n<CurrentSpeed>1</CurrentSpeed>\r\n")
+            action.endsWith("#GetVolume\"") -> envelope("GetVolume", rc, "<CurrentVolume>41</CurrentVolume>\r\n")
+            action.endsWith("#GetMute\"") -> envelope("GetMute", rc, "<CurrentMute>0</CurrentMute>\r\n")
+            action.endsWith("#GetPositionInfo\"") -> envelope("GetPositionInfo", av, "<Track>8</Track>\r\n<TrackDuration>00:05:40</TrackDuration>\r\n" +
+                "<TrackMetaData>&lt;?xml version=&quot;1.0&quot;?&gt;\r\n&lt;DIDL-Lite xmlns=&quot;urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/&quot;&gt;&lt;/DIDL-Lite&gt;\r\n</TrackMetaData>\r\n" +
+                "<RelTime>00:05:40</RelTime>\r\n<AbsTime>NOT_IMPLEMENTED</AbsTime>\r\n<RelCount>2147483647</RelCount>\r\n<AbsCount>2147483647</AbsCount>\r\n")
+            else -> PackEngine.Reply(500, ByteArray(0))
+        } }
+        val bound = PackEngine.bind(pack, "192.168.1.64", net)
+        assertEquals("uuid:FF98F52B-8609-CA40-8B6F-FFD1FF98F52B", bound.identity)
+        assertEquals("WiiM Sound Speaker", bound.model); assertEquals("Wiim Sponica", bound.name)
+        assertEquals("http://192.168.1.64:49152/upnp/control/rendertransport1", bound.controls["av"])
+        assertEquals("http://192.168.1.64:49152/upnp/control/rendercontrol1", bound.controls["rc"])
+        val out = PackEngine.run(pack, bound, "status", JSONObject(), net)
+        assertEquals("STOPPED", out.getString("state")); assertEquals(41L, out.getLong("volume")); assertFalse(out.getBoolean("muted"))
+        assertEquals("00:05:40", out.getString("position")); assertEquals("00:05:40", out.getString("duration"))
+    }
+
     @Test fun reportsUpnpFaults() {
         val net = FakeNet(null) { _, _, _ -> PackEngine.Reply(500, """<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><s:Fault><detail><UPnPError xmlns="urn:schemas-upnp-org:control-1-0"><errorCode>701</errorCode><errorDescription>Transition not available</errorDescription></UPnPError></detail></s:Fault></s:Body></s:Envelope>""".toByteArray()) }
         val e = assertThrows(PackEngine.PackError::class.java) { PackEngine.run(pack, bound, "pause", JSONObject(), net) }

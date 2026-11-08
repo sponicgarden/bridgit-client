@@ -17,10 +17,10 @@ object LanAdapters {
         authorized(); delegate.request(path, body, basic)
     }
     fun transport(lan: HostLan, d: LanDevice, authorized: () -> Unit): LanTransport = guarded(authorized, LanTransport { path, body, basic ->
-        lan.check(d.host)
+        val sockets = lan.sockets(d.host)
         val headers = mutableMapOf("Content-Type" to "application/json")
         if (basic && d.username.isNotEmpty()) headers["Authorization"] = "Basic " + Base64.getEncoder().encodeToString("${d.username}:${d.password}".toByteArray())
-        val r = SafeHttp.localDevice(d.host, path, !d.http, headers, body?.toString()?.toByteArray(), lan.network.socketFactory)
+        val r = SafeHttp.localDevice(d.host, path, !d.http, headers, body?.toString()?.toByteArray(), sockets)
         require(r.status == 200) { "Device refused the operation; check authorized credentials and adapter support." }
         JSONObject(String(requireNotNull(r.bytes), Charsets.UTF_8))
     })

@@ -57,6 +57,10 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
                 catch (e: CancellationException) { throw e }
                 catch (e: ApiError) { throw e }
                 catch (e: PackEngine.PackError) { throw ErrorCatalog.error(if (e.device) "upstream_failed" else "invalid_parameter", e.message ?: "Device pack refused the operation.") }
+                catch (e: LanUnreachable) { throw ErrorCatalog.error("upstream_failed", e.message ?: "The device can't be reached on this LAN.") }
+                catch (e: cc.bridgit.app.core.SafeHttp.Failure) {
+                    throw ErrorCatalog.error("upstream_failed", "The device didn't answer: ${e.message} The action's outcome may be unknown; check the device and network before retrying.")
+                }
                 catch (_: IllegalArgumentException) { throw ErrorCatalog.error("invalid_parameter", "Invalid LAN target, adapter, credentials, action or device response. Check the guide and direct LAN connection. No enrollment was saved on failed verification.") }
                 catch (_: Exception) { throw ErrorCatalog.error("upstream_failed", "LAN device unavailable or verification failed; action outcome may be unknown. Check the network and authorized credentials before retrying.") }
             } }

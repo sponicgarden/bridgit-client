@@ -48,15 +48,26 @@ class HostLan(context: Context) {
     fun bindDiscoverySocket(socket: DatagramSocket, destination: InetAddress) {
         try { network.bindSocket(socket) }
         catch (e: SocketException) {
-            val errno = (e.cause as? android.system.ErrnoException)?.errno
-            if (errno !in listOf(android.system.OsConstants.EPERM, android.system.OsConstants.EACCES)) throw e
-            val active = cm.activeNetwork ?: throw e
-            if (cm.getNetworkCapabilities(active)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) != true ||
-                !DiscoveryRouting.outsideVpn(cm.getLinkProperties(active)?.routes, destination)) throw e
+            if (!refusedByVpn(e) || !vpnLeaves(destination)) throw e
             // Match the existing camera connector: the kernel still enforces VPN policy.
             // The socket is subsequently source-bound to this directly connected LAN.
         }
     }
+    /** TCP sockets to [host] on this LAN; a [LanUnreachable] when a VPN that can't be bypassed routes it elsewhere. */
+    fun sockets(host: String): javax.net.SocketFactory {
+        val destination = address(host)
+        return LanSockets(host, { s -> try { network.bindSocket(s); true } catch (e: SocketException) { if (refusedByVpn(e)) false else throw e } },
+            { vpnLeaves(destination) })
+    }
+    /** A VPN apps can't bypass (Tailscale) makes Android refuse binding a socket to the Wi-Fi network (EPERM). */
+    private fun refusedByVpn(e: SocketException): Boolean {
+        val errno = (e.cause as? android.system.ErrnoException)?.errno
+        if (errno !in listOf(android.system.OsConstants.EPERM, android.system.OsConstants.EACCES)) return false
+        val active = cm.activeNetwork ?: return false
+        return cm.getNetworkCapabilities(active)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
+    }
+    private fun vpnLeaves(destination: InetAddress) =
+        DiscoveryRouting.outsideVpn(cm.activeNetwork?.let { cm.getLinkProperties(it) }?.routes, destination)
     fun check(host: String) { require(LanRules.onLink(host, local, prefix)) { "Target must be a literal private IPv4 host on the Android device's directly connected LAN." } }
     fun address(host: String): InetAddress { check(host); return InetAddress.getByName(host) }
     fun json() = JSONObject().put("address", local).put("prefix_length", prefix).put("gateways", JSONArray(gateways)).put("scope", "direct_wifi_or_ethernet_ipv4")

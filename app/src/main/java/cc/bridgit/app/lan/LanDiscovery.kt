@@ -67,7 +67,7 @@ class LanDiscovery(private val context: Context, private val lan: HostLan,
                                 val started = System.currentTimeMillis()
                                 Outbound.check("tcp://$host:$port", "CONNECT", "tcp")
                                 var connected = false
-                                try { lan.network.socketFactory.createSocket().use { s ->
+                                try { lan.sockets(host).createSocket().use { s ->
                                     s.connect(InetSocketAddress(lan.address(host), port), 180)
                                     connected = true
                                     add(host, "tcp", "tcp_open", port)

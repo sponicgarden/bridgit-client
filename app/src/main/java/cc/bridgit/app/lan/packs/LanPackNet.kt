@@ -41,8 +41,7 @@ class LanPackNet(private val lan: HostLan, private val authorized: () -> Unit) :
     override fun http(url: String, headers: Map<String, String>, body: ByteArray?): PackEngine.Reply {
         authorized()
         val host = URI(url).host ?: throw IllegalArgumentException()
-        lan.check(host)
-        val r = SafeHttp.localPack(url, headers, body, lan.network.socketFactory)
+        val r = SafeHttp.localPack(url, headers, body, lan.sockets(host))
         return PackEngine.Reply(r.status, r.bytes ?: ByteArray(0))
     }
 }

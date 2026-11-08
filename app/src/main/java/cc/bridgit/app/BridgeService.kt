@@ -52,6 +52,7 @@ class BridgeService : LifecycleService() {
     private var relayJob: Job? = null
     private var server: ApiServer? = null
     private var boundTo: List<String> = emptyList()
+    private val reconnect = cc.bridgit.app.core.TailscaleReconnect()
     private var watcher: Job? = null
     private val recheck = Channel<String>(Channel.CONFLATED)
     private var netCallback: ConnectivityManager.NetworkCallback? = null
@@ -143,7 +144,9 @@ class BridgeService : LifecycleService() {
     private suspend fun watchTailscale() {
         recheck.trySend("start")
         while (lifecycleScope.isActive) {
-            val why = withTimeoutOrNull(RECHECK_MS) { recheck.receive() } ?: "periodic"
+            // While off the tailnet, wake for the next reconnect try instead of waiting the full 5 minutes.
+            val wait = if (boundTo.isEmpty() && reconnect.attempts > 0) reconnect.waitMs(System.currentTimeMillis()).coerceIn(1_000L, RECHECK_MS) else RECHECK_MS
+            val why = withTimeoutOrNull(wait) { recheck.receive() } ?: "periodic"
             server?.maintenance()
             lifecycleScope.launch(Dispatchers.IO) { runCatching { app.usage.flushIfDue() }; runCatching { cc.bridgit.app.satellite.SatelliteHub.refreshAllIfDue(app) }; runCatching { app.hubLinks.checkHubsIfDue() }; runCatching { app.links.checkIfDue() }; runCatching { cc.bridgit.app.feedback.DeviceNames.heartbeatIfDue(app) } }
             if (why != "start" && why != "periodic") delay(1500) // let the VPN settle after a change
@@ -169,7 +172,16 @@ class BridgeService : LifecycleService() {
                 }
                 refreshNotification()
             }
+            if (addrs.isNotEmpty()) reconnect.reset() else askTailscaleToReconnect()
         }
+    }
+
+    /** Tailscale is installed but its VPN is down (e.g. stopped by a Play update, A0091): ask it to connect, with backoff. */
+    private fun askTailscaleToReconnect() {
+        if (!cc.bridgit.app.platform.TailscaleStatus.installed(this)) return
+        if (!reconnect.due(System.currentTimeMillis())) return
+        val sent = cc.bridgit.app.platform.TailscaleStatus.connect(this)
+        app.log.system("diagnostic", "service", "No Tailscale address; asked Tailscale to connect (try ${reconnect.attempts}${if (sent) "" else ", send failed"})", level = "warn")
     }
 
     private fun registerNetworkCallback() {

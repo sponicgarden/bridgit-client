@@ -315,7 +315,7 @@
    "tags": ["owner_features"]
   }},
   "/v1/story/reveal": {"post": {
-   "summary": "Allow prepared narration and illustration to appear",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Allow prepared narration and illustration to appear",
    "requestBody": {"content": {"application/json": {"schema": {
     "type": "object",
     "properties": {"presentation_token": {
@@ -428,7 +428,7 @@
    "tags": ["camera"]
   }},
   "/v1/story/presentation": {"post": {
-   "summary": "Start a new presentation token for replaying a saved story; invalidates older presentation work",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Start a new presentation token for replaying a saved story; invalidates older presentation work",
    "operationId": "postStoryPresentation",
    "responses": {
     "200": {"description": "presentation_token"},
@@ -4512,7 +4512,7 @@
    "tags": ["owner_features"]
   }},
   "/v1/story/stop": {"post": {
-   "summary": "Stop this caller's story presentation; discard late model results and stop its audio and video",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Stop this caller's story presentation; discard late model results and stop its audio and video",
    "operationId": "postStoryStop",
    "responses": {
     "200": {"description": "stopped"},
@@ -4845,7 +4845,7 @@
    }
   },
   "/v1/story": {"post": {
-   "summary": "Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
    "requestBody": {"content": {"application/json": {"schema": {
     "type": "object",
     "properties": {
@@ -7608,7 +7608,7 @@
    }
   },
   "/v1/story/image": {"post": {
-   "summary": "Generate a fairytale illustration through the Make Fairytale Image registry task and present it as a full-screen HTML interaction card; existing Azure account quota applies. Requires interactions access too. Stop suppresses late cards.",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Generate a fairytale illustration through the Make Fairytale Image registry task and present it as a full-screen HTML interaction card; existing Azure account quota applies. Requires interactions access too. Stop suppresses late cards.",
    "requestBody": {"content": {"application/json": {"schema": {
     "type": "object",
     "properties": {
@@ -7832,7 +7832,7 @@
    "tags": ["owner_features"]
   }},
   "/v1/story/generate": {"post": {
-   "summary": "Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
    "requestBody": {"content": {"application/json": {"schema": {
     "type": "object",
     "properties": {

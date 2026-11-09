@@ -551,8 +551,6 @@ Keys are write-only through `GET/POST /v1/settings/ai-keys` for `googlemaps`, `o
 
 Google content remains subject to Google attribution, caching, AI and text-to-speech reuse terms. Provider access is not permission for all downstream uses. Keep nearby mapped information separate from current camera observations. Air quality describes an area and does not establish a person's health or visible pollution.
 
-For the registry edition of **A Sorta Fairytale About Me**: record 20 seconds with `POST /v1/camera/video` and `extract_frames:6` to get six caller-accessible JPEG capture ids without returning large video bytes. Use `POST /v1/camera/snapshot` with `store:["memory"]` and `return_image:false` for a portrait capture id. Call `POST /v1/story/generate` with `frame_capture_ids`, `portrait_capture_id`, `mode:"kind"|"wild"`, and optional already-read context. GLM 5.3 Flash first inventories the frames, then writes a spoken story. The card saves title, narration and mode through `POST /v1/applet/tables/stories/rows`. A private fork writes to its own instance. `POST /v1/story/stop {}` discards late results and stops this caller's audio/video. Narration resolves the applet speech registry selection, requires Aura 1 and explicit cloud permission, and queues sentence-bounded chunks of at most 600 characters. The intro is https://bridgit.cc/assets/audio/a-sorta-fairytale-about-me-intro.mp3 (15 seconds, source 00:52–01:07). Video extraction, location lookup, context calls, writing and narration each require their normal grants; discovery creates none.
-
 Use a chat model instead for other open-ended summaries, replies and explanations.
 
 ## Pick the route
@@ -713,6 +711,17 @@ You pay for input only; answers are free. Jev is ${'$'}0.042 and Clef-omni ${'$'
 | Clef-omni, a 6 s sound clip | ~250 | ${'$'}0.000037 | ${'$'}0.32 | ${'$'}9.72 | ${'$'}1.62 | ${'$'}0.32 |
 | Clef-omni, a 10 s video | ~3,000 | ${'$'}0.00045 | ${'$'}3.89 | ${'$'}116.64 | ${'$'}19.44 | ${'$'}3.89 |
 
+**Is a Clef call billed, free or refused?** Every Clef call on the team key is billed: its `cost_usd` comes off the
+phone's `model_usd_per_month`, the applet's budget and the shared Bridgit totals, as in the table above. Separately,
+Clef runs on Cloudflare's free daily Workers AI allowance, one pool for all of Bridgit (about 970 screenshots or 220
+ten-second clips a day). The pool decides only whether Clef can answer, never what you pay: while it lasts, calls
+answer and are billed; once it is used up, calls fail with 429 `clef_quota` until the next day (UTC) and nothing is
+billed, unless the team has Cloudflare's paid plan on. If the owner saved their own Cloudflare key (provider
+`cloudflare` in `GET/POST /v1/settings/ai-keys`), the phone retries a team call refused with `clef_quota`, `spend_cap`
+or `rate_limited` on that key: it runs on that account's own allowance, no phone or shared Bridgit budget is charged,
+the applet budget still applies, and a second `clef_quota` means that account's allowance is used up too. Checks a watch answers on the phone
+(unchanged picture, `model: none`) never reach Clef and are free. `GET /v1/limits` shows each budget's `used`.
+
 Each reply has `usage.input_tokens` and `cost_usd`, so measure your own calls rather than trusting this table.
 Only check as often as the decision needs: trigger on an event (a loud sound, a screen change, motion) instead of
 polling, and check video only after a cheaper photo check says something is happening.
@@ -774,6 +783,13 @@ when it `resets_at`. The numbers below are only today's defaults, to give a sens
 Model details: [Jev](https://docs.typesafe.ai) and Cloudflare's
 [Clef-omni](https://developers.cloudflare.com/workers-ai/models/clef-omni/). The full request and reply for
 `/v1/judgment` and `/v1/watches` are in the [guide]($GUIDE_URL); an overview for people is at [$SITE/decisions/]($SITE/decisions/).
+
+## Applet-specific: A Sorta Fairytale About Me
+
+This section is one registry applet's private contract, not a platform service. The `/v1/story/*` endpoints exist
+only for that applet; other applets should use the general services above (`POST /v1/judgment`, `GET /v1/services`).
+
+Record 20 seconds with `POST /v1/camera/video` and `extract_frames:6` to get six caller-accessible JPEG capture ids without returning large video bytes. Use `POST /v1/camera/snapshot` with `store:["memory"]` and `return_image:false` for a portrait capture id. Call `POST /v1/story/generate` with `frame_capture_ids`, `portrait_capture_id`, `mode:"kind"|"wild"`, and optional already-read context. GLM 5.3 Flash first inventories the frames, then writes a spoken story. The card saves title, narration and mode through `POST /v1/applet/tables/stories/rows`. A private fork writes to its own instance. `POST /v1/story/stop {}` discards late results and stops this caller's audio/video. Narration resolves the applet speech registry selection, requires Aura 1 and explicit cloud permission, and queues sentence-bounded chunks of at most 600 characters. The intro is https://bridgit.cc/assets/audio/a-sorta-fairytale-about-me-intro.mp3 (15 seconds, source 00:52–01:07). Video extraction, location lookup, context calls, writing and narration each require their normal grants; discovery creates none.
 """.trimStart()
 
     fun llms(samplesFile: String): String = buildString {

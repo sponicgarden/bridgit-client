@@ -1554,35 +1554,35 @@ Returns: service, source, fetched_at, data (provider JSON or bounded image), att
 Example: `POST /v1/services/context {"service":"places","latitude":52.2297,"longitude":21.0122,"radius_m":500,"limit":5}`
 
 ### `POST /v1/story`
-Create a kind fairy tale or wild fictional story from 2–8 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read..
+Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Create a kind fairy tale or wild fictional story from 2–8 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read..
 Body (JSON): `mode` (required) kind or wild; `frame_capture_ids` (required) 2–8 kept camera frame capture ids; `portrait_capture_id` (required) Kept portrait capture id; `context` Optional context already read through /services/context; treated as untrusted observations.
 Returns: title, narration, inventory, mode, model, cost_usd, elapsed_ms, presentation_token; saves a declared story row for the bundled fairytale applet.
 Example: `POST /v1/story {"mode":"kind","frame_capture_ids":["cap_one","cap_two"],"portrait_capture_id":"cap_portrait"}`
 
 ### `POST /v1/story/generate`
-Create a kind fairy tale or wild fictional story from 2–8 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read..
+Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Create a kind fairy tale or wild fictional story from 2–8 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read..
 Body (JSON): `mode` (required) kind or wild; `frame_capture_ids` (required) 2–8 kept camera frame capture ids; `portrait_capture_id` (required) Kept portrait capture id; `context` Optional context already read through /services/context; treated as untrusted observations.
 Returns: title, narration, inventory, mode, model, cost_usd, elapsed_ms, presentation_token. The caller chooses which fields to keep in its own declared tables..
 Example: `POST /v1/story/generate {"mode":"kind","frame_capture_ids":["cap_one","cap_two"],"portrait_capture_id":"cap_portrait"}`
 
 ### `POST /v1/story/stop`
-Stop this caller's story presentation; discard late model results and stop its audio and video.
+Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Stop this caller's story presentation; discard late model results and stop its audio and video.
 Returns: stopped.
 Example: `POST /v1/story/stop {}`
 
 ### `POST /v1/story/image`
-Generate a fairytale illustration through the Make Fairytale Image registry task and present it as a full-screen HTML interaction card; existing Azure account quota applies. Requires interactions access too. Stop suppresses late cards..
+Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Generate a fairytale illustration through the Make Fairytale Image registry task and present it as a full-screen HTML interaction card; existing Azure account quota applies. Requires interactions access too. Stop suppresses late cards..
 Body (JSON): `wait_for_reveal` Prepare now and display after /story/reveal; `presentation_token` (required) Token from /story or /story/presentation; Stop invalidates it; `title` (required) Story title, at most 160 characters; `narration` (required) Completed story, at most 8000 characters; `request_id` (required) Stable idempotency key for this story image, 8–128 letters/digits/dash/underscore; reuse on an unknown outcome.
 Returns: interaction_id, task_key, model, quota, display {shown_as, full_screen, missing?, fix?}; picture bytes stay on the phone and do not cross the card response bridge.
 Example: `POST /v1/story/image {"presentation_token":"1","title":"The tiny kingdom","narration":"Once upon a time…","request_id":"fairytale-12345678"}`
 
 ### `POST /v1/story/presentation`
-Start a new presentation token for replaying a saved story; invalidates older presentation work.
+Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Start a new presentation token for replaying a saved story; invalidates older presentation work.
 Returns: presentation_token.
 Example: `POST /v1/story/presentation {}`
 
 ### `POST /v1/story/reveal`
-Allow prepared narration and illustration to appear.
+Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Allow prepared narration and illustration to appear.
 Body (JSON): `presentation_token` (required) Current story token.
 Returns: revealed.
 Example: `POST /v1/story/reveal`

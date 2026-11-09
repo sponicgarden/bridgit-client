@@ -1702,7 +1702,7 @@
      "tool": "services_context"
     },
     {
-     "summary": "Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
+     "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
      "path": "/v1/story",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-story.json",
@@ -1712,7 +1712,7 @@
      "tool": "story"
     },
     {
-     "summary": "Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
+     "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
      "path": "/v1/story/generate",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-story-generate.json",
@@ -1722,7 +1722,7 @@
      "tool": "story_generate"
     },
     {
-     "summary": "Stop this caller's story presentation; discard late model results and stop its audio and video",
+     "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Stop this caller's story presentation; discard late model results and stop its audio and video",
      "path": "/v1/story/stop",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-story-stop.json",
@@ -1732,7 +1732,7 @@
      "tool": "story_stop"
     },
     {
-     "summary": "Generate a fairytale illustration through the Make Fairytale Image registry task and present it as a full-screen HTML interaction card; existing Azure account quota applies. Requires interactions access too. Stop suppresses late cards.",
+     "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Generate a fairytale illustration through the Make Fairytale Image registry task and present it as a full-screen HTML interaction card; existing Azure account quota applies. Requires interactions access too. Stop suppresses late cards.",
      "path": "/v1/story/image",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-story-image.json",
@@ -1742,7 +1742,7 @@
      "tool": "story_image"
     },
     {
-     "summary": "Start a new presentation token for replaying a saved story; invalidates older presentation work",
+     "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Start a new presentation token for replaying a saved story; invalidates older presentation work",
      "path": "/v1/story/presentation",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-story-presentation.json",
@@ -1752,7 +1752,7 @@
      "tool": "story_presentation"
     },
     {
-     "summary": "Allow prepared narration and illustration to appear",
+     "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Allow prepared narration and illustration to appear",
      "path": "/v1/story/reveal",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-story-reveal.json",
@@ -7581,7 +7581,7 @@
   "kind": "source_generated",
   "released": "Check public updater manifest; source documentation is not release evidence."
  },
- "documentation_revision": 114,
+ "documentation_revision": 115,
  "api_revision": 135,
  "installed_api_revision": null,
  "categories": [

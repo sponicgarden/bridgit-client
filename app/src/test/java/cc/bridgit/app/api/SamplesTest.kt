@@ -63,6 +63,10 @@ class SamplesTest {
         assertEquals(samples.size, Samples.select(file, null, null).getJSONArray("samples").length())
         try { Samples.select(file, "nope", null); fail() } catch (e: ApiError) { assertEquals("not_found", e.code); assertTrue(e.message!!.contains("html-step")) }
     }
+    @Test fun samplesReportTheInstalledApiRevision() {
+        assertEquals(ApiChanges.CURRENT, Samples.select(file, null, null).getInt("api_revision"))
+        assertEquals(ApiChanges.CURRENT, Samples.select(file, samples.first().getString("id"), null).getInt("api_revision"))
+    }
 }
 
 /**
@@ -90,4 +94,5 @@ class DeclarativeDocsTest {
         assertTrue(docs.getValue("guide").contains("`GET /v1/samples`"))
         assertTrue(docs.getValue("demo").contains("/samples?id=html-step"))
     }
+
 }

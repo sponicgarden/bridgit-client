@@ -8169,7 +8169,7 @@
    "requires": null
   },
   {
-   "summary": "Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
    "method": "POST",
    "auth": true,
    "mcp_tool": "story",
@@ -8212,7 +8212,7 @@
    "requires": null
   },
   {
-   "summary": "Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
    "method": "POST",
    "auth": true,
    "mcp_tool": "story_generate",
@@ -8255,7 +8255,7 @@
    "requires": null
   },
   {
-   "summary": "Stop this caller's story presentation; discard late model results and stop its audio and video",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Stop this caller's story presentation; discard late model results and stop its audio and video",
    "method": "POST",
    "auth": true,
    "mcp_tool": "story_stop",
@@ -8273,7 +8273,7 @@
    "requires": null
   },
   {
-   "summary": "Generate a fairytale illustration through the Make Fairytale Image registry task and present it as a full-screen HTML interaction card; existing Azure account quota applies. Requires interactions access too. Stop suppresses late cards.",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Generate a fairytale illustration through the Make Fairytale Image registry task and present it as a full-screen HTML interaction card; existing Azure account quota applies. Requires interactions access too. Stop suppresses late cards.",
    "method": "POST",
    "auth": true,
    "mcp_tool": "story_image",
@@ -8322,7 +8322,7 @@
    "requires": null
   },
   {
-   "summary": "Start a new presentation token for replaying a saved story; invalidates older presentation work",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Start a new presentation token for replaying a saved story; invalidates older presentation work",
    "method": "POST",
    "auth": true,
    "mcp_tool": "story_presentation",
@@ -8340,7 +8340,7 @@
    "requires": null
   },
   {
-   "summary": "Allow prepared narration and illustration to appear",
+   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Allow prepared narration and illustration to appear",
    "method": "POST",
    "auth": true,
    "mcp_tool": "story_reveal",

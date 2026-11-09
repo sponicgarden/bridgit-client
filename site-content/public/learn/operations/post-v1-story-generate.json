@@ -1,9 +1,9 @@
 {
- "documentation_revision": 114,
+ "documentation_revision": 115,
  "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
-  "summary": "Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
+  "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Create a kind fairy tale or wild fictional story from 2\u20138 kept video frame captures, a portrait and optional context, using GLM 5.3 Flash. Images must be accessible to this caller; no new capture or location read.",
   "method": "POST",
   "auth": true,
   "mcp_tool": "story_generate",

@@ -1,9 +1,9 @@
 {
- "documentation_revision": 114,
+ "documentation_revision": 115,
  "api_revision": 135,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
-  "summary": "Start a new presentation token for replaying a saved story; invalidates older presentation work",
+  "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Start a new presentation token for replaying a saved story; invalidates older presentation work",
   "method": "POST",
   "auth": true,
   "mcp_tool": "story_presentation",

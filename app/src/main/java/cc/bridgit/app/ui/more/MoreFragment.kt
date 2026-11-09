@@ -219,7 +219,7 @@ class MoreFragment : Fragment() {
         val success = com.google.android.material.color.MaterialColors.getColor(b.root, R.attr.colorSuccess)
         val muted = com.google.android.material.color.MaterialColors.getColor(b.root, com.google.android.material.R.attr.colorOnSurfaceVariant)
         val out = android.text.SpannableStringBuilder()
-        for ((count, color, icon) in listOf(Triple(enabled, success, R.drawable.ic_check_circle), Triple(disabled, muted, R.drawable.agents_ic_pause))) {
+        for ((count, color, icon) in listOf(Triple(enabled, if (enabled == 0) muted else success, R.drawable.ic_check_circle), Triple(disabled, muted, R.drawable.agents_ic_pause))) {
             if (out.isNotEmpty()) out.append("   ")
             val start = out.length
             out.append("● ").append(count.toString())

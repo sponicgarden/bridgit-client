@@ -151,18 +151,29 @@ class GalleryVideoModule(app: BridgeApp) : Capability(app) {
             requireUsable()
             val limit = Rules.integer(query("limit"), "limit", 1, 100, 20)
             val out = JSONArray()
-            // Over-fetch a little: rows still being recorded (is_pending=1) are skipped, never an error (A0256).
-            val args = android.os.Bundle().apply { putString(android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "date_added DESC, _id DESC"); putString(android.content.ContentResolver.QUERY_ARG_SQL_LIMIT, (limit + 5).toString()) }
-            val cols = arrayOf("_id", "display_name", "duration", "size", "mime_type", "date_added", "is_pending")
-            val rows = try { app.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cols, args, null) } catch (e: IllegalArgumentException) {
-                app.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cols.take(6).toTypedArray(), args, null)
+            // Rows still being recorded (is_pending=1) are skipped, never an error (A0256). Some Android builds reject the
+            // SQL sort/limit args or the is_pending column (IllegalArgumentException), so fall back step by step, finally
+            // to the bare query sorted here; the listing never answers 500 because of how MediaStore was asked.
+            val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            val base = arrayOf("_id", "display_name", "duration", "size", "mime_type", "date_added")
+            val sorted = android.os.Bundle().apply { putString(android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "date_added DESC, _id DESC"); putString(android.content.ContentResolver.QUERY_ARG_SQL_LIMIT, (limit + 5).toString()) }
+            val attempts: List<Pair<Array<String>, android.os.Bundle?>> = listOf(base + "is_pending" to sorted, base to sorted, base to null)
+            val items = ArrayList<JSONObject>()
+            for ((cols, args) in attempts) {
+                val cursor = (try { app.contentResolver.query(uri, cols, args, null) } catch (e: RuntimeException) { null }) ?: continue
+                items.clear()
+                try {
+                    cursor.use { c ->
+                        while (c.moveToNext()) {
+                            val item = runCatching { Rules.galleryVideoItem(if (cols.size > 6) c.getInt(6) else 0, c.getLong(0), c.getString(1), c.getLong(2), c.getLong(3), c.getString(4), c.getLong(5), ::isoAt) }.getOrNull()
+                            if (item != null) items.add(item)
+                            if (args != null && items.size >= limit) break
+                        }
+                    }
+                } catch (e: RuntimeException) { continue }
+                break
             }
-            rows?.use { c ->
-                while (out.length() < limit && c.moveToNext()) {
-                    val item = runCatching { Rules.galleryVideoItem(if (c.columnCount > 6) c.getInt(6) else 0, c.getLong(0), c.getString(1), c.getLong(2), c.getLong(3), c.getString(4), c.getLong(5), ::isoAt) }.getOrNull()
-                    if (item != null) out.put(item)
-                }
-            }
+            Rules.newestVideosFirst(items).take(limit).forEach { out.put(it) }
             Reply.Json(JSONObject().put("items", out).put("access_mode", if (app.granted(Manifest.permission.READ_MEDIA_VIDEO)) "full" else "selected"))
         }
         endpoint(PlannedEndpoints.GALLERY_VIDEO) {

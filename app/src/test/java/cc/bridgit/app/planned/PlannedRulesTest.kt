@@ -9,6 +9,11 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PlannedRulesTest {
+    @Test fun videosWithoutSqlSortComeNewestFirst() {
+        val iso = { ms: Long -> "t%05d".format(ms / 1000) }
+        val items = listOf(1L to 10L, 3L to 30L, 2L to 30L).map { (id, at) -> Rules.galleryVideoItem(0, id, "v$id.mp4", 1, 1, null, at, iso)!! }
+        assertEquals(listOf(3L, 2L, 1L), Rules.newestVideosFirst(items).map { it.getLong("id") })
+    }
     @Test fun galleryVideoListingSkipsCapturesStillRecording() {
         val iso = { ms: Long -> "t$ms" }
         assertNull(Rules.galleryVideoItem(1, 7, "a.mp4", 0, 0, "video/mp4", 5, iso))

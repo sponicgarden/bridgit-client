@@ -4,6 +4,9 @@ import cc.bridgit.app.api.ErrorCatalog
 import org.json.JSONObject
 
 object Rules {
+    /** Newest first by added_at then id, for a listing read without a SQL sort (A0256). */
+    fun newestVideosFirst(items: List<JSONObject>): List<JSONObject> =
+        items.sortedWith(compareByDescending<JSONObject> { it.optString("added_at") }.thenByDescending { it.optLong("id") })
     /**
      * One gallery video row. A capture still being written (MediaStore IS_PENDING=1, or a row whose name/size is not
      * filled in yet) is excluded (null) so listing never fails mid-recording (A0256). Null columns never throw.

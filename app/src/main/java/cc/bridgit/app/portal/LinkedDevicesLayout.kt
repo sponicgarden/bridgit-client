@@ -1,5 +1,7 @@
 package cc.bridgit.app.portal
 
+import cc.bridgit.app.link.LinkModel.State
+
 /**
  * The Linked devices map (owner, 5 Nov 2026): every hub, portal and satellite this phone is linked to, in three rows.
  * Portals that view this phone are drawn as view-only satellites (Kind.VIEWER in the satellite row); the portal row
@@ -21,7 +23,9 @@ object LinkedDevicesLayout {
      * device ([portalLink]) for a hub, a satellite id, or a relay agent id for a viewing iPhone/iPad.
      */
     data class Peer(val id: String, val name: String, val online: Boolean, val status: String? = null,
-                    val type: cc.bridgit.app.platform.DeviceType? = null)
+                    val type: cc.bridgit.app.platform.DeviceType? = null,
+                    /** A0243: the link's two directions as this phone sees them: [out] this phone uses the peer, [inn] the peer uses this phone. */
+                    val out: State? = null, val inn: State? = null)
 
     /**
      * A device on this phone's network (owner, 5 Nov 2026): one the last network scan found, or one added to Bridgit
@@ -43,8 +47,21 @@ object LinkedDevicesLayout {
     /** A row of the map, named up its left edge. */
     enum class Lane { PORTALS, HUBS, SATELLITES, NETWORK }
 
-    /** A line from a portal or satellite ([from]) to its hub ([to]), by node key. */
-    data class Edge(val from: String, val to: String)
+    /**
+     * A line from a portal or satellite ([from]) to its hub ([to]), by node key. [flow]: the link's two directions
+     * (A0243), drawn as two arrows; null for a network device or a link whose directions aren't known (one plain line).
+     */
+    data class Edge(val from: String, val to: String, val flow: Flow? = null)
+
+    /**
+     * A link's two directions, each on only when both devices opted in (double opt-in, LNK-03/04).
+     * [forward]: [Edge.from] uses [Edge.to] (an arrow from → to); [back]: [Edge.to] uses [Edge.from].
+     * [LinkModel.State.WAITING_FOR_TARGET]: the using device said yes, the used one hasn't; WAITING_FOR_USER the reverse.
+     */
+    data class Flow(val forward: State, val back: State)
+
+    /** Each direction with no opt-in recorded reads as off. */
+    private fun flow(forward: State?, back: State?) = if (forward == null && back == null) null else Flow(forward ?: State.OFF, back ?: State.OFF)
 
     data class Diagram(val portals: List<Node>, val hubs: List<Node>, val satellites: List<Node>, val edges: List<Edge>,
                        val network: List<Node> = emptyList()) {
@@ -89,20 +106,22 @@ object LinkedDevicesLayout {
         val portals = mutableListOf<Node>()
         if (viewing.isNotEmpty()) {
             portals += Node(SELF_PORTAL, thisName, Role.PORTAL, Kind.THIS_PHONE, true, type = thisType)
-            hubs.filter { it.portalLink != null }.forEach { edges += Edge(SELF_PORTAL, it.key) }
+            val byId = viewing.associateBy { it.id }
+            hubs.filter { it.portalLink != null }.forEach { h -> val p = byId[h.portalLink]; edges += Edge(SELF_PORTAL, h.key, flow(p?.out, p?.inn)) }
         }
 
         val sats = mutableListOf<Node>()
         satellites.forEach { p ->
-            val n = Node("sat:${p.id}", p.name, Role.SATELLITE, Kind.SATELLITE, p.online, p.id, type = p.type); sats += n; edges += Edge(n.key, SELF_HUB)
+            val n = Node("sat:${p.id}", p.name, Role.SATELLITE, Kind.SATELLITE, p.online, p.id, type = p.type); sats += n; edges += Edge(n.key, SELF_HUB, flow(p.inn, p.out))
         }
         // Portals viewing this phone are view-only satellites (owner, 5 Nov 2026): same row and colour, after the full ones.
         viewers.forEach { p ->
-            val n = Node("portal:${p.id}", p.name, Role.SATELLITE, Kind.VIEWER, p.online, p.id, status = p.status, type = p.type); sats += n; edges += Edge(n.key, SELF_HUB)
+            val n = Node("portal:${p.id}", p.name, Role.SATELLITE, Kind.VIEWER, p.online, p.id, status = p.status, type = p.type); sats += n; edges += Edge(n.key, SELF_HUB, flow(p.inn, p.out))
         }
         if (hubsOf.isNotEmpty()) {
             sats += Node(SELF_SAT, thisName, Role.SATELLITE, Kind.THIS_PHONE, true, type = thisType)
-            hubs.filter { it.satLink != null }.forEach { edges += Edge(SELF_SAT, it.key) }
+            val byId = hubsOf.associateBy { it.id }
+            hubs.filter { it.satLink != null }.forEach { h -> val p = byId[h.satLink]; edges += Edge(SELF_SAT, h.key, flow(p?.out, p?.inn)) }
         }
         // This phone's node the network row hangs from: its hub, else its satellite, else its portal.
         val self = listOf(SELF_HUB, SELF_SAT, SELF_PORTAL).firstOrNull { k -> (hubs + sats + portals).any { it.key == k } }

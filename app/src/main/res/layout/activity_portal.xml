@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Linked devices (owner, 5 Nov 2026; trust tiers 8 Nov 2026): every link listed in three sections in this order,
-     Your Other Devices, Devices of Associates, Devices in the Wild; then the map of every hub, portal and satellite
-     linked to this phone (and the devices on its network), and one small Pair a device strip below. Tapping a device
+<!-- Linked devices (owner, 5 Nov 2026; trust tiers 8 Nov 2026): the map of every hub, portal and satellite
+     linked to this phone (and the devices on its network) first, each link as two arrows (A0243); then every link
+     listed in three sections, Your Other Devices, Devices of Associates, Devices in the Wild; and one small Pair a
+     device strip below. Tapping a device
      in a section or on the map shows it and what can be done with it. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -71,18 +72,13 @@
         android:textColor="?attr/colorError"
         android:visibility="gone" />
 
-    <!-- Trust tiers: a heading per tier and a row per link, filled in by PortalActivity.renderTiers(). -->
-    <LinearLayout
-        android:id="@+id/tierSections"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:orientation="vertical" />
-
+    <!-- A0243: the map comes first; each link is two arrows, one per direction, in its double opt-in state.
+         Its height follows its rows (LinkedDevicesDiagram.onMeasure). -->
     <cc.bridgit.app.portal.LinkedDevicesDiagram
         android:id="@+id/diagram"
         android:layout_width="match_parent"
-        android:layout_height="360dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:focusable="true"
@@ -91,6 +87,16 @@
     <!-- Legend: the colours and shapes on the map. -->
     <LinearLayout
         android:id="@+id/legend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:importantForAccessibility="noHideDescendants"
+        android:orientation="horizontal" />
+
+    <!-- Legend, second line: the four ways an arrow is drawn (on, waiting, paused, off). -->
+    <LinearLayout
+        android:id="@+id/legendLinks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -109,6 +115,14 @@
         android:text="@string/linked_hint"
         android:textAppearance="?attr/textAppearanceBodySmall"
         android:textColor="?attr/colorOnSurfaceVariant" />
+
+    <!-- Trust tiers: a heading per tier and a row per link, filled in by PortalActivity.renderTiers(). -->
+    <LinearLayout
+        android:id="@+id/tierSections"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical" />
 
     <!-- Pair a device (owner, 5 Nov 2026): a small outlined strip in the page's colours, set apart from the map by its
          edge rather than a block of blue; the three kinds of device it pairs are shown as the map's shapes. -->

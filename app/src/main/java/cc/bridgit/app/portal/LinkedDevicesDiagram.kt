@@ -14,6 +14,7 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.graphics.PointF
 import cc.bridgit.app.portal.LinkedDevicesLayout.Diagram
 import cc.bridgit.app.portal.LinkedDevicesLayout.Node
 import cc.bridgit.app.portal.LinkedDevicesLayout.Role
@@ -23,6 +24,7 @@ import kotlin.math.min
  * The Linked devices map, drawn in the Home scene's look (scene.html): the same dark field with a faint dot grid,
  * hexagon hubs, rounded tiles, dotted elbow lines and the scene's colours (hubs gold, portals violet, satellites blue,
  * this phone green), with the row names written up the left edge like Home's group names. It holds still.
+ * A0243: each link is two arrows, one per direction, showing whether both devices opted in to it (LinkLanes).
  */
 class LinkedDevicesDiagram @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
     var onNode: ((Node) -> Unit)? = null
@@ -75,6 +77,14 @@ class LinkedDevicesDiagram @JvmOverloads constructor(context: Context, attrs: At
     private val small = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 11f * sp; textAlign = Paint.Align.CENTER }
     private val rowLabel = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 11f * sp; letterSpacing = 0.12f; typeface = Typeface.MONOSPACE; textAlign = Paint.Align.CENTER }
 
+    /** A0243: each row is tall enough for a link's two arrows to run between a tile's name and the next row. */
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val rows = diagram?.rows?.size ?: 2
+        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), (rows * ROW_DP * dp).toInt())
+    }
+
+    private val lanes by lazy { LinkLanes(dark, dp) }
+
     override fun onDraw(c: Canvas) {
         val d = diagram ?: return
         val w = width.toFloat(); val h = height.toFloat()
@@ -87,11 +97,8 @@ class LinkedDevicesDiagram @JvmOverloads constructor(context: Context, attrs: At
 
         val left = 30f * dp // room for the row names
         val rows = d.rows
-        val rowsY = when (rows.size) {
-            4 -> listOf(0.12f, 0.37f, 0.62f, 0.86f)
-            3 -> listOf(0.17f, 0.5f, 0.83f)
-            else -> listOf(0.3f, 0.75f)
-        }.map { it * h }
+        // A tile sits near the top of its row, its name below it, and the rest of the row is where the arrows run.
+        val rowsY = rows.indices.map { (it * ROW_DP + TILE_Y_DP) * dp }
         val names = d.lanes.map { it.first.name }
         placed.clear()
         // Row names up the left edge, as Home's "Intelligence" and "Information".
@@ -100,6 +107,7 @@ class LinkedDevicesDiagram @JvmOverloads constructor(context: Context, attrs: At
             c.save(); c.rotate(-90f, 14f * dp, rowsY[i]); c.drawText(names[i], 14f * dp, rowsY[i] + 4f * dp, rowLabel); c.restore()
         }
         // Where each node goes: spread evenly across its row.
+        val slots = mutableMapOf<String, Float>()
         rows.forEachIndexed { i, row ->
             val slot = (w - left - 8f * dp) / row.size.coerceAtLeast(1)
             row.forEachIndexed { j, n ->
@@ -107,12 +115,14 @@ class LinkedDevicesDiagram @JvmOverloads constructor(context: Context, attrs: At
                 val half = min(big * dp, slot * 0.32f)
                 val cx = left + slot * (j + 0.5f)
                 placed[n.key] = RectF(cx - half, rowsY[i] - half, cx + half, rowsY[i] + half)
+                slots[n.key] = slot
             }
         }
-        // Lines first, under the tiles: down (or up) from the portal or satellite, across, then into the hub.
-        for (e in d.edges) {
+        val byKey = d.all.associateBy { it.key }
+        // Network devices and links whose directions aren't known: one dotted elbow line, as before.
+        for (e in d.edges.filter { it.flow == null }) {
             val a = placed[e.from] ?: continue; val b = placed[e.to] ?: continue
-            val from = d.all.first { it.key == e.from }
+            val from = byKey[e.from] ?: continue
             val goingDown = a.centerY() < b.centerY()
             val y0 = if (goingDown) a.bottom else a.top
             val y1 = if (goingDown) b.top else b.bottom
@@ -122,8 +132,47 @@ class LinkedDevicesDiagram @JvmOverloads constructor(context: Context, attrs: At
             dots.color = roleColour(from.role); dots.alpha = if (from.role == Role.NETWORK) 120 else if (from.online) 220 else 110
             c.drawPath(p, dots)
         }
-        for (n in d.all) drawNode(c, n, placed[n.key] ?: continue, (w - left - 8f * dp) / (rows.first { n in it }.size.coerceAtLeast(1)))
+        drawLinks(c, d, byKey, slots)
+        for (n in d.all) drawNode(c, n, placed[n.key] ?: continue, slots[n.key] ?: continue)
     }
+
+    /**
+     * A0243: every link as two arrows side by side, one per direction (who uses whom), each in its double opt-in state
+     * (LinkLanes). An arrow leaves a tile from under its name or from its top edge, so names and heads never overlap;
+     * the links meeting one side of a tile spread across it, ordered by where their other end is, so they don't cross.
+     */
+    private fun drawLinks(c: Canvas, d: Diagram, byKey: Map<String, Node>, slots: Map<String, Float>) {
+        val links = d.edges.filter { it.flow != null && placed[it.from] != null && placed[it.to] != null }
+        if (links.isEmpty()) return
+        // Which side of each tile a link meets it on: below (its name's side) or above.
+        fun below(at: String, other: String) = placed.getValue(at).centerY() < placed.getValue(other).centerY()
+        val ends = mutableMapOf<Pair<String, Boolean>, MutableList<Pair<Int, String>>>()
+        links.forEachIndexed { i, e ->
+            ends.getOrPut(e.from to below(e.from, e.to)) { mutableListOf() } += i to e.to
+            ends.getOrPut(e.to to below(e.to, e.from)) { mutableListOf() } += i to e.from
+        }
+        val gap = LANE_GAP_DP * dp
+        fun anchor(i: Int, at: String, other: String): PointF {
+            val box = placed.getValue(at); val n = byKey.getValue(at); val down = below(at, other)
+            val list = ends.getValue(at to down).sortedBy { placed.getValue(it.second).centerX() }
+            val k = list.size; val idx = list.indexOfFirst { it.first == i }
+            val step = min(gap * 2.6f, (slots[at] ?: box.width()) * 0.8f / k)
+            val x = box.centerX() + (idx - (k - 1) / 2f) * step
+            val y = if (down) labelBottom(n, box) + 4f * dp
+                else box.top - (if (n.role == Role.HUB) box.height() * 0.06f else 0f) - 5f * dp
+            return PointF(x, y)
+        }
+        links.forEachIndexed { i, e ->
+            val f = e.flow ?: return@forEachIndexed
+            val a = anchor(i, e.from, e.to); val b = anchor(i, e.to, e.from)
+            // Forward (from uses to) on the right of from→to; back (to uses from) beside it, drawn to→from.
+            lanes.draw(c, LinkLanes.lane(a, b, gap / 2), f.forward, badgeAt = 0.4f)
+            lanes.draw(c, LinkLanes.lane(a, b, -gap / 2).asReversed(), f.back, badgeAt = 0.4f)
+        }
+    }
+
+    /** Where a tile's name block ends (label() draws it). */
+    private fun labelBottom(n: Node, box: RectF) = box.bottom + (if (n.role == Role.HUB) 22f else 18f) * dp + 15f * sp + 4f * dp
 
     private fun drawNode(c: Canvas, n: Node, box: RectF, slot: Float) {
         val colour = if (n.thisPhone) ok else roleColour(n.role)
@@ -282,6 +331,15 @@ class LinkedDevicesDiagram @JvmOverloads constructor(context: Context, attrs: At
         return handled
     }
 
+    companion object {
+        /** One row of the map: its tiles, their names and the room for the arrows down to the next row. */
+        const val ROW_DP = 156f
+        /** Where a row's tiles sit, from the row's top. */
+        const val TILE_Y_DP = 46f
+        /** Between a link's two arrows. */
+        const val LANE_GAP_DP = 10f
+    }
+
     /** Said by TalkBack: the map in words. */
     private fun describe(d: Diagram): String {
         // "this tablet, A11 Blue Tab"; another device: "Office, tablet, offline" (its type only when it said one).
@@ -294,6 +352,18 @@ class LinkedDevicesDiagram @JvmOverloads constructor(context: Context, attrs: At
             if (d.hubs.isNotEmpty()) add("Hubs: ${list(d.hubs)}.")
             if (d.portals.isNotEmpty()) add("Portals viewing a hub: ${list(d.portals)}.")
             if (d.satellites.isNotEmpty()) add("Satellites of a hub: ${list(d.satellites)}.")
+            // A0243: each link's two directions, e.g. "Office uses this tablet: on. This tablet uses Office: waiting for Office."
+            val byKey = d.all.associateBy { it.key }
+            fun who(n: Node) = if (n.thisPhone) "this ${n.type?.noun ?: "device"}" else n.name
+            fun said(user: Node, target: Node, s: cc.bridgit.app.link.LinkModel.State) = "${who(user).replaceFirstChar { it.uppercase() }} uses ${who(target)}: " + when (s) {
+                cc.bridgit.app.link.LinkModel.State.ON -> "on"
+                cc.bridgit.app.link.LinkModel.State.PAUSED -> "paused"
+                cc.bridgit.app.link.LinkModel.State.WAITING_FOR_TARGET -> "waiting for ${who(target)}"
+                cc.bridgit.app.link.LinkModel.State.WAITING_FOR_USER -> "waiting for ${who(user)}"
+                cc.bridgit.app.link.LinkModel.State.OFF -> "off"
+            } + "."
+            for (e in d.edges) { val f = e.flow ?: continue; val a = byKey[e.from] ?: continue; val b = byKey[e.to] ?: continue
+                add(said(a, b, f.forward)); add(said(b, a, f.back)) }
             if (d.network.isNotEmpty()) add("On this ${d.all.firstOrNull { it.thisPhone }?.type?.noun ?: "device"}'s network: ${d.network.joinToString(", ") { if (it.label.isEmpty()) it.name else it.name + ", " + it.label }}.")
             if (d.alone) add("Nothing is linked yet.")
         }.joinToString(" ")

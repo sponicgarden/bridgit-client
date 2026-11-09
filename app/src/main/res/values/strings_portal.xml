@@ -99,6 +99,9 @@
     <string name="linked_hint">Tap a device to see it, show its Home or unlink it.</string>
     <string name="linked_hint_alone">Nothing is linked to this %1$s yet.</string>
     <string name="linked_pair_body">Link a hub, a satellite or an iPhone or iPad to this phone.</string>
+    <!-- A0243: the map's arrow legend (Waiting and Paused reuse the tier rows' words). -->
+    <string name="linked_flow_on">On</string>
+    <string name="linked_flow_off">Off</string>
     <string name="linked_role_hub">Hub</string>
     <string name="linked_role_portal">Portal</string>
     <string name="linked_role_satellite">Satellite</string>

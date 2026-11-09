@@ -6,6 +6,7 @@ import cc.bridgit.app.portal.LinkedDevicesLayout.Peer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import cc.bridgit.app.link.LinkModel.State as S
 import cc.bridgit.app.platform.DeviceType
 
 class LinkedDevicesLayoutTest {
@@ -132,5 +133,36 @@ class LinkedDevicesLayoutTest {
         assertEquals(DeviceType.COMPUTER, PortalClients.guess("Mac"))
         assertEquals(null, PortalClients.guess("Android"))
         assertEquals(DeviceType.TABLET, PortalClients.Info("iPhone", null, 0, sentType = DeviceType.TABLET).type)
+    }
+
+    // ---- A0243: each link's two directions ----
+
+    @Test fun `a satellite's arrows run satellite to hub for what it uses and back for what the hub uses`() {
+        val d = build(satellites = listOf(Peer("s1", "Kitchen", true, out = S.ON, inn = S.WAITING_FOR_USER)))
+        val e = d.edges.single()
+        assertEquals(Edge("sat:s1", "hub:self", LinkedDevicesLayout.Flow(forward = S.WAITING_FOR_USER, back = S.ON)), e)
+    }
+
+    @Test fun `this phone as a satellite points at its hub with its own out direction`() {
+        val d = build(hubsOf = listOf(Peer("a1", "Pixel 2 XL", true, out = S.PAUSED, inn = S.WAITING_FOR_TARGET)))
+        assertEquals(LinkedDevicesLayout.Flow(forward = S.PAUSED, back = S.WAITING_FOR_TARGET), d.edges.single { it.from == "sat:self" }.flow)
+    }
+
+    @Test fun `a phone this one both belongs to and views keeps each link's own directions`() {
+        val d = build(hubsOf = listOf(Peer("a1", "Kitchen", true, out = S.ON, inn = S.OFF)),
+            viewing = listOf(Peer("d1", "kitchen", true, out = S.ON, inn = S.OFF)))
+        assertEquals(1, d.hubs.size)
+        assertEquals(setOf("sat:self", "portal:self"), d.edges.map { it.from }.toSet())
+        assertTrue(d.edges.all { it.flow == LinkedDevicesLayout.Flow(S.ON, S.OFF) })
+    }
+
+    @Test fun `a viewer only uses this phone, and one direction alone still draws two arrows`() {
+        val d = build(viewers = listOf(Peer("r1", "iPad", true, inn = S.ON)))
+        assertEquals(LinkedDevicesLayout.Flow(forward = S.ON, back = S.OFF), d.edges.single().flow)
+    }
+
+    @Test fun `unknown directions and network devices stay a single line`() {
+        val d = build(satellites = listOf(Peer("s1", "Kitchen", true)), network = listOf(net("10.0.0.5")))
+        assertTrue(d.edges.all { it.flow == null })
     }
 }

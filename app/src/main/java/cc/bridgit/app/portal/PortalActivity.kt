@@ -126,31 +126,43 @@ class PortalActivity : AppCompatActivity() {
 
     /** Everything this phone knows about, as the map's rows. */
     private fun diagram(now: Long = System.currentTimeMillis()): LinkedDevicesLayout.Diagram {
+        sampleDiagram?.let { return it }
         val info = app.hubLinks.hubs().associateBy { it.linkId }
+        // A0243: both directions of each link, as this phone sees them, for the map's two arrows.
+        val recs = runCatching { app.links.all() }.getOrDefault(emptyList())
+        fun flow(role: Links.Role, ref: String) = recs.firstOrNull { it.role == role && it.ref == ref }
+            ?.let { r -> runCatching { app.links.outState(r) to app.links.inState(r) }.getOrNull() }
         val hubsOf = app.hubLinks.agents().map { a ->
             val heard = maxOf(a.lastUsedAt, info[a.id]?.at ?: 0L)
             val forgotten = app.hubLinks.state(a.id, now) == HubLinks.LinkState.FORGOTTEN
+            val f = flow(Links.Role.SAT, a.id)
             Peer(a.id, info[a.id]?.name ?: a.name.removePrefix("Hub "), !LinkPause.hubsPaused && !forgotten && now - heard in 0..ONLINE_MS,
                 if (LinkPause.hubsPaused) getString(R.string.linked_paused_status)
-                else if (forgotten) getString(R.string.linked_hub_forgotten_status, noun) else null, info[a.id]?.deviceType)
+                else if (forgotten) getString(R.string.linked_hub_forgotten_status, noun) else null, info[a.id]?.deviceType, f?.first, f?.second)
         }
         val viewing = runCatching { PortalLinks(this).all() }.getOrDefault(emptyList()).map { l ->
             val seen = PortalViewer.seen(l.device)
             // device_type from a phone on this version; an older one only says phone or tablet (type).
             val dev = seen?.home?.optJSONObject("device")
+            // Viewing is one way: this phone views it (both sides agreed when it shared its link); it doesn't use this phone.
             Peer(l.device, l.name, seen?.at?.let { now - it in 0..PortalPairing.SHOWN_MS } == true,
-                type = cc.bridgit.app.platform.DeviceType.parse(dev?.optString(cc.bridgit.app.platform.DeviceType.FIELD)) ?: cc.bridgit.app.platform.DeviceType.parse(dev?.optString("type")))
+                type = cc.bridgit.app.platform.DeviceType.parse(dev?.optString(cc.bridgit.app.platform.DeviceType.FIELD)) ?: cc.bridgit.app.platform.DeviceType.parse(dev?.optString("type")),
+                out = LinkModel.State.ON, inn = LinkModel.State.OFF)
         }
-        val sats = runCatching { app.satellites.all() }.getOrDefault(emptyList()).map { Peer(it.id, it.name, !LinkPause.satellites && it.online(now),
-            if (LinkPause.satellites) getString(R.string.linked_paused_status) else null, cc.bridgit.app.platform.DeviceType.parse(it.manifest?.optString(cc.bridgit.app.platform.DeviceType.FIELD))) }
+        val sats = runCatching { app.satellites.all() }.getOrDefault(emptyList()).map { val f = flow(Links.Role.HUB, it.id)
+            Peer(it.id, it.name, !LinkPause.satellites && it.online(now),
+            if (LinkPause.satellites) getString(R.string.linked_paused_status) else null, cc.bridgit.app.platform.DeviceType.parse(it.manifest?.optString(cc.bridgit.app.platform.DeviceType.FIELD)),
+            f?.first, f?.second) }
         val recent = PortalPairing.viewers(app, store, now).associateBy { it.agentId }
         // Every portal granted access is drawn, online or not (owner, 5 Nov 2026): it keeps its access until it is
         // disconnected, so the map shows it, offline when it hasn't called lately. Most recently used first.
         val granted = runCatching { PortalPairing.granted(app, store) }.getOrDefault(emptyList()).sortedByDescending { it.lastUsedAt }
         val names = granted.associate { it.id to (PortalClients.get(app, it.id)?.name ?: recent[it.id]?.kind ?: PortalModule.clientOf(it.id)) }
         // Online only while it is actually connected (called in the last minute); otherwise the map says offline (owner, 5 Nov 2026).
+        // A portal granted access views this phone (one way); the Satellites pill pauses it.
         val viewers = granted.map { a -> Peer(a.id, names[a.id] ?: a.name, recent[a.id]?.live == true,
-            type = PortalClients.get(app, a.id)?.type ?: PortalClients.guess(recent[a.id]?.kind)) }
+            type = PortalClients.get(app, a.id)?.type ?: PortalClients.guess(recent[a.id]?.kind),
+            out = LinkModel.State.OFF, inn = if (LinkPause.satellites) LinkModel.State.PAUSED else LinkModel.State.ON) }
         return LinkedDevicesLayout.build(PortalPairing.phoneName(app), cc.bridgit.app.platform.DeviceType.of(this), hubsOf, viewing, sats, viewers, networkPeers())
     }
 
@@ -239,6 +251,20 @@ class PortalActivity : AppCompatActivity() {
             b.legend.addView(glyphLabel(getString(label), role, LinkedDevicesGlyph.roleColour(dark, role)))
         }
         b.legend.addView(glyphLabel(getString(R.string.linked_role_this, noun), Role.SATELLITE, LinkedDevicesGlyph.thisPhone(dark)))
+        // A0243: the four ways an arrow is drawn, each the map's own arrow.
+        b.legendLinks.removeAllViews()
+        val lanes = LinkLanes(dark, resources.displayMetrics.density)
+        listOf(R.string.linked_flow_on to LinkModel.State.ON, R.string.linked_tier_state_waiting to LinkModel.State.WAITING_FOR_TARGET,
+            R.string.linked_tier_state_paused to LinkModel.State.PAUSED, R.string.linked_flow_off to LinkModel.State.OFF).forEachIndexed { i, (label, st) ->
+            b.legendLinks.addView(TextView(this).apply {
+                text = getString(label)
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelMedium)
+                setTextColor(attr(this, com.google.android.material.R.attr.colorOnSurfaceVariant))
+                setCompoundDrawablesRelativeWithIntrinsicBounds(LinkLanes.Swatch(lanes, st, dp(36), dp(16)), null, null, null)
+                compoundDrawablePadding = dp(6); gravity = android.view.Gravity.CENTER_VERTICAL
+                setPaddingRelative(if (i == 0) 0 else dp(14), 0, 0, 0)
+            })
+        }
     }
 
     /** Pair a device: the three kinds it pairs, as the map draws them (owner, 5 Nov 2026: icons, not a sentence). */
@@ -630,6 +656,19 @@ class PortalActivity : AppCompatActivity() {
         }
     }
 
+    /** Debug builds (debug_sheet=map): a sample map with every direction state, for screenshots; never stored. */
+    private var sampleDiagram: LinkedDevicesLayout.Diagram? = null
+
+    private fun sampleMap(long: Boolean): LinkedDevicesLayout.Diagram {
+        val hubs = listOf(Peer("h1", if (long) "Living room Pixel 2 XL (upstairs)" else "Pixel 2 XL", true, type = cc.bridgit.app.platform.DeviceType.PHONE, out = LinkModel.State.ON, inn = LinkModel.State.WAITING_FOR_USER))
+        val sats = listOf(
+            Peer("s1", "Kitchen Pixel", true, type = cc.bridgit.app.platform.DeviceType.PHONE, out = LinkModel.State.ON, inn = LinkModel.State.ON),
+            Peer("s2", if (long) "Porch camera tablet by the front door" else "Porch tab", false, type = cc.bridgit.app.platform.DeviceType.TABLET, out = LinkModel.State.WAITING_FOR_TARGET, inn = LinkModel.State.OFF),
+            Peer("s3", "Office Mac", true, type = cc.bridgit.app.platform.DeviceType.COMPUTER, out = LinkModel.State.PAUSED, inn = LinkModel.State.PAUSED))
+        val viewers = listOf(Peer("v1", "iPad", true, type = cc.bridgit.app.platform.DeviceType.TABLET, out = LinkModel.State.OFF, inn = LinkModel.State.ON))
+        return LinkedDevicesLayout.build(PortalPairing.phoneName(app), cc.bridgit.app.platform.DeviceType.of(this), hubs, emptyList(), sats, viewers)
+    }
+
     /** Debug builds (linked_sheet=tiers): sample rows for screenshots, never stored. */
     private var sampleTiers: List<Pair<LinkTier, List<LinkTierSections.Row>>>? = null
 
@@ -927,6 +966,7 @@ class PortalActivity : AppCompatActivity() {
             "tiers_pick" -> pickTier()
             "tiers_trust" -> { sampleTiers = sampleTierRows(); render(); moveTier(sampleTiers!![1].second[0]) }
             "tiers_code" -> showCode("a11-blue-tab", "K7QX-3MPA")
+            "map", "map_long" -> { sampleDiagram = sampleMap(kind == "map_long"); render() }
         }
     }
 

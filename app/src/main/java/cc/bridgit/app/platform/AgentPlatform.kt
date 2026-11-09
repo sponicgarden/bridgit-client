@@ -198,7 +198,7 @@ class AgentPlatform(val app: BridgeApp) {
         try { block() }
         finally { watchdog.cancel(); activeSensorAgent=null; activeSensorScope=null; if(captureToken!=null) service.captureEnded(captureToken); sensorLock.unlock() }
     }
-    private fun sensitive(command: String,args: JSONObject): Boolean = command in setOf("ui.action","ui.sequence","device.action","notification.reply","peripheral.action","translation.download","speech.transcribe","stream.start","alert.trigger","owner.configure")
+    private fun sensitive(command: String,args: JSONObject): Boolean = OwnerApprovalPolicy.needsOwnerTap(command,args)
     fun mutate(agent: String, command: String,args: JSONObject,key: String,credential: String? = null,relayDeadline: Long? = null,relayJob: String? = null): JSONObject {
         // Both command spellings share the same durable idempotency reservation.
         if (command == "applet.event") return mutate(agent, "application.event", args, key, credential, relayDeadline, relayJob)

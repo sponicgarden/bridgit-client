@@ -527,10 +527,15 @@ class TtsFiles(private val ctx: Context) {
     suspend fun readiness(): JSONObject {
         withContext(Dispatchers.Main) { ensure() }
         if (withTimeoutOrNull(5000) { ready.await() } != true) return JSONObject().put("ready", false).put("reason", "engine_unavailable")
-        val available = withContext(Dispatchers.IO) { tts?.voices.orEmpty().filter { !it.isNetworkConnectionRequired && TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty() } }
-        return JSONObject().put("ready", available.isNotEmpty()).put("offline_voices", available.size)
-            .put("engine", tts?.defaultEngine ?: JSONObject.NULL).put("voice", tts?.voice?.name ?: JSONObject.NULL)
-            .put("voice_quality", tts?.voice?.quality ?: JSONObject.NULL).put("voice_latency", tts?.voice?.latency ?: JSONObject.NULL)
+        // Every call here is a call into the speech service (getVoice/getVoices can take seconds: C0020's ANR), so all stay off Main.
+        return withContext(Dispatchers.IO) {
+            val t = tts
+            val available = t?.voices.orEmpty().filter { !it.isNetworkConnectionRequired && TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty() }
+            val voice = t?.voice
+            JSONObject().put("ready", available.isNotEmpty()).put("offline_voices", available.size)
+                .put("engine", t?.defaultEngine ?: JSONObject.NULL).put("voice", voice?.name ?: JSONObject.NULL)
+                .put("voice_quality", voice?.quality ?: JSONObject.NULL).put("voice_latency", voice?.latency ?: JSONObject.NULL)
+        }
     }
     /** Writes [text] to [out]. False on failure; the caller deletes [out]. */
     suspend fun synth(text: String, out: File, language: String?, rate: Float, pitch: Float): Boolean = mutex.withLock {

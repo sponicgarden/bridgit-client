@@ -115,6 +115,31 @@ class GuardedCioTest {
         }
     }
 
+    /** C0019: a port another process holds makes start() throw (BridgeService logs "Could not listen"), never a crash. */
+    @Test
+    fun portInUseFailsStartWithoutCrash() = runBlocking {
+        val uncaught = java.util.concurrent.CopyOnWriteArrayList<Throwable>()
+        val previous = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { _, e -> uncaught += e }
+        java.net.ServerSocket(0, 50, java.net.InetAddress.getByName("127.0.0.1")).use { held ->
+            try {
+                val env = io.ktor.server.engine.applicationEngineEnvironment {
+                    connector { host = "127.0.0.1"; port = held.localPort }
+                }
+                val engine = cc.bridgit.app.api.engine.GuardedCioEngine(env) { }
+                val failure = runCatching { engine.start(wait = false) }.exceptionOrNull()
+                // The bind failure may arrive wrapped in the coroutine's cancellation; it must be in the chain.
+                assertTrue("start: $failure", generateSequence(failure) { it.cause }.any { it is java.net.BindException })
+                withTimeout(5000) { engine.stopped.join() }
+                engine.stop(100, 200)
+                delay(200)
+                assertEquals(emptyList<Throwable>(), uncaught.toList())
+            } finally {
+                Thread.setDefaultUncaughtExceptionHandler(previous)
+            }
+        }
+    }
+
     @Test
     fun stopEndsRealServer() = runBlocking {
         val scope = CoroutineScope(Job() + Dispatchers.IO)

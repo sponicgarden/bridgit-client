@@ -49,6 +49,21 @@ class WorkflowContractTest {
         assertEquals("cancelled",app.platform.store.require(first.getString("id"),agent.id).getString("status"))
         rejects { app.platform.approveOperation(first.getString("id")) }
     }
+    @Test fun grantedPhoneControlsRunWithoutAnOwnerTap() {
+        val agent=app.policy.addAgent("UnattendedTester").first
+        Capabilities.setEnabled(app,"phone.control",true); app.platform.grant(agent.id,"phone.control",System.currentTimeMillis()+60000)
+        val op=app.platform.mutate(agent.id,"device.action",JSONObject().put("type","flashlight").put("on",false),"unattended-key")
+        assertNotEquals("awaiting_owner",op.getString("status"))
+        assertFalse(app.platform.store.events(agent.id,0).toString().contains("operation.awaiting_owner"))
+    }
+    @Test fun onlyPrivacyAndSecurityActionsWaitForTheOwner() {
+        fun tap(command:String,type:String?=null)=OwnerApprovalPolicy.needsOwnerTap(command,JSONObject().apply { if(type!=null) put("type",type) })
+        for(type in OwnerApprovalPolicy.unattendedDeviceActions) assertFalse(type,tap("device.action",type))
+        assertFalse(tap("translation.download"))
+        for(type in listOf("camera.snapshot","microphone.clip","clipboard","speak","open_link","open_app","message_draft","dial")) assertTrue(type,tap("device.action",type))
+        assertTrue(tap("device.action"))
+        for(command in listOf("ui.action","ui.sequence","notification.reply","peripheral.action","speech.transcribe","stream.start","alert.trigger","owner.configure")) assertTrue(command,tap(command))
+    }
     @Test fun questionAnswersAreFirstWriterWinsAndIdentityIsSnapshotted() {
         val agent=app.policy.addAgent("QuestionTester").first
         val q=app.platform.interaction(agent.id,JSONObject().put("kind","question").put("title","Choose").put("choices",JSONArray().put("A").put("B")))

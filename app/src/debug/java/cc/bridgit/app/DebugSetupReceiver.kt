@@ -23,7 +23,17 @@ import cc.bridgit.app.core.Connection
  * redeems it with POST /v1/pair, the same way an agent would.
  */
 class DebugSetupReceiver : BroadcastReceiver() {
+    /** A malformed extra or a refused service start is logged under BridgitDebug; it must not crash the app (C0022, C0032). */
     override fun onReceive(context: Context, intent: Intent) {
+        try {
+            handle(context, intent)
+        } catch (e: Exception) {
+            android.util.Log.e("BridgitDebug", "setup failed: $e", e)
+            runCatching { resultData = "error: $e" }
+        }
+    }
+
+    private fun handle(context: Context, intent: Intent) {
         val app = context.applicationContext as BridgeApp
         if (intent.hasExtra("port")) {
             app.settings.port = intent.getIntExtra("port", BuildConfig.DEFAULT_PORT).also { require(it in 1024..65535) }
@@ -468,8 +478,9 @@ class DebugSetupReceiver : BroadcastReceiver() {
             lines.forEach { android.util.Log.i("BridgitDebug", "revoke ${if (it.ok) "ok  " else "FAIL"} ${it.what}${it.how?.let { h -> " — $h" } ?: ""}") }
         }.start()
         intent.getStringExtra("caps")?.let { spec ->
-            val (name, grants) = spec.split("=", limit = 2)
-            app.agents.byName(name)?.let { a -> app.agents.update(a.id) { it.copy(caps = if (grants == "*") null else grants.split(',').filter(String::isNotBlank).toSet()) } }
+            val parsed = DebugSetupSpecs.caps(spec)
+            if (parsed == null) android.util.Log.w("BridgitDebug", "caps needs <agent name>=<grants|*>, got \"$spec\"")
+            else app.agents.byName(parsed.first)?.let { a -> app.agents.update(a.id) { it.copy(caps = parsed.second) } }
         }
         intent.getStringExtra("clipboard_decide")?.let { spec ->
             val p = spec.split(":", limit = 2)
@@ -500,7 +511,9 @@ class DebugSetupReceiver : BroadcastReceiver() {
         }
         if (intent.getBooleanExtra("listener", true)) {
             app.settings.listenerEnabled = true
-            BridgeService.start(context)
+            // Android refuses a foreground-service start while the app is in the background (C0022); keep setting up.
+            runCatching { BridgeService.start(context) }
+                .onFailure { android.util.Log.w("BridgitDebug", "listener start refused: $it") }
         } else if (intent.hasExtra("listener")) {
             app.settings.listenerEnabled = false
             BridgeService.pauseSilently(context)
@@ -658,5 +671,15 @@ footer{padding:14px 20px 20px;text-align:center;font-size:14px;opacity:.8}</styl
 <main><button onclick="Bridget.respond(JSON.stringify({table:'window'}))">Window</button><button onclick="Bridget.respond(JSON.stringify({table:'patio'}))">Patio</button>
 <button onclick="Bridget.respond(JSON.stringify({table:'bar'}))">Bar</button><button onclick="Bridget.respond(JSON.stringify({table:'booth'}))">Booth</button></main>
 <footer>&#9650; top of page touches Bridgit's bar &middot; bottom of page touches the screen edge &#9660;</footer></body></html>"""
+    }
+}
+
+/** Parsers for [DebugSetupReceiver] extras that are checked before use. */
+internal object DebugSetupSpecs {
+    /** caps="<agent name>=<a,b,...>" or "<agent name>=*" (all). Null when there is no "=" or no name. */
+    fun caps(spec: String): Pair<String, Set<String>?>? {
+        val p = spec.split("=", limit = 2)
+        if (p.size != 2 || p[0].isBlank()) return null
+        return p[0] to (if (p[1] == "*") null else p[1].split(',').map { it.trim() }.filter(String::isNotBlank).toSet())
     }
 }

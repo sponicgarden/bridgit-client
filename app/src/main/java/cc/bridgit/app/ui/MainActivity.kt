@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
             MainActivityState.destination = dest.id
             MainActivityState.cardId = if(dest.id==R.id.interactionDetail) args?.getLong("interactionId") else null
             runCatching { app.usage.count("screen:" + resources.getResourceEntryName(dest.id)) }
+            if (dest.id in TOP_LEVEL) runCatching { LastTab.save(this, resources.getResourceEntryName(dest.id)) }
             hubBar?.onDestination(dest.id in HUB_TABS, dest.id !in NO_DEVICE_BAR, home = dest.id == R.id.home)
             b.bottomNav.isVisible = dest.id in TOP_LEVEL
             applyPanelInset()
@@ -90,7 +91,7 @@ class MainActivity : AppCompatActivity() {
             navInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
             v.updatePadding(bottom = navInset); applyPanelInset(); insets
         }
-        if (savedInstanceState == null) { route(); openIssueFrom(intent); val arrival = wakeFor(intent); openInteractionFrom(intent, arrival); openTourFrom(intent); openDogFrom(intent); openOwnerSetupFrom(intent); openAgentFrom(intent); openPortalFrom(intent); openForegroundScreen(intent) }
+        if (savedInstanceState == null) { route(); openIssueFrom(intent); val arrival = wakeFor(intent); openInteractionFrom(intent, arrival); openTourFrom(intent); openDogFrom(intent); openOwnerSetupFrom(intent); openAgentFrom(intent); openPortalFrom(intent); openForegroundScreen(intent); reopenLastTab(launchBranding) }
         watchInteractionsBadge()
         watchTextPanel()
         if (launchBranding && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) showLaunchBranding()
@@ -323,6 +324,15 @@ class MainActivity : AppCompatActivity() {
         // Not over an unfinished setup prompt or first run: those must finish first.
         if (nav.currentDestination?.id in setOf(R.id.addAgent, R.id.pairCode, R.id.firstRun)) return
         nav.navigate(R.id.issueDetail, Bundle().apply { putLong("issueId", id) })
+    }
+
+    /** A0138: a plain launch from the launcher reopens the tab the owner last used. */
+    private fun reopenLastTab(plainLaunch: Boolean) {
+        val tabs = TOP_LEVEL.associateBy { resources.getResourceEntryName(it) }
+        val current = nav.currentDestination?.id?.let { runCatching { resources.getResourceEntryName(it) }.getOrNull() }
+        val start = resources.getResourceEntryName(nav.graph.startDestinationId)
+        val tab = LastTab.restore(LastTab.saved(this), plainLaunch, current, start, tabs.keys) ?: return
+        tabs[tab]?.let { b.bottomNav.selectedItemId = it }
     }
 
     /** First run, or back to an unfinished setup prompt after a crash (AGT-05a). */

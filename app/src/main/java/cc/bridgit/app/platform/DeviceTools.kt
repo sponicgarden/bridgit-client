@@ -124,7 +124,7 @@ class DeviceTools(private val app:BridgeApp) {
             if(download) { cc.bridgit.app.outbound.Outbound.call("https://dl.google.com/mlkit/translate", hint=cc.bridgit.app.outbound.Outbound.Hint("Google ML Kit", "Download on-device translation models ($from, $to); text is translated on the phone", listOf(cc.bridgit.app.outbound.Categories.NONE))) { m -> translator.downloadModelIfNeeded(DownloadConditions.Builder().requireWifi().build()).await(); m.status=cc.bridgit.app.outbound.OutboundEntry.HANDED_OFF }; return JSONObject().put("models_ready",true).put("source",from).put("target",to) }
             val manager=RemoteModelManager.getInstance()
             for(lang in setOf(from,to)-TranslateLanguage.ENGLISH) {
-                if(!manager.isModelDownloaded(TranslateRemoteModel.Builder(lang).build()).await()) throw ApiError(409,"model_download_required","Approve translation.download on the phone to download language models over Wi-Fi")
+                if(!manager.isModelDownloaded(TranslateRemoteModel.Builder(lang).build()).await()) throw ApiError(409,"model_download_required","Call translation.download first to download language models over Wi-Fi")
             }
             return JSONObject().put("text",translator.translate(args.text("text",10_000)).await()).put("source",from).put("target",to).put("backend","mlkit_on_device").put("content_is_untrusted",true)
         } finally { translator.close() }

@@ -1,5 +1,5 @@
 {
- "api_revision": 145,
+ "api_revision": 146,
  "changes": [
   {
    "date": "2026-10-27",
@@ -2385,6 +2385,21 @@
     }
    ],
    "revision": 145
+  },
+  {
+   "date": "2026-11-09",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/screen/capture",
+     "what": "People view: view \"people\" on a screenshot or camera photo finds the people on the phone (offline) and returns one crop around all of them, each person's whole visible body plus a little padding (padding 0-0.5). aspect best_fit (default) or a shape like \"20:9\", \"1:1\", \"4:5\". The reply's people_view gives the crop box in the source frame, each person's box, the returned size and aspect_ratio, and aspect_met. Nobody found: no_person_found, and nothing is returned or kept"
+    },
+    {
+     "endpoint": "/v1/camera/snapshot",
+     "what": "The same view, aspect and padding on camera photos; the crop is cut from a larger photo, then sized as asked"
+    }
+   ],
+   "revision": 146
   }
  ],
  "links": {

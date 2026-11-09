@@ -1,6 +1,6 @@
 {
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "What's on the owner's screen right now (no prompt once they've turned it on)",
@@ -61,13 +61,35 @@
     "description": "Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or \"none\" = only return it. Default: your POST /v1/captures/storage choice, else only returned",
     "type": "array",
     "required": false
+   },
+   {
+    "name": "view",
+    "description": "full (default): the whole frame. people: the phone finds the people (offline) and returns one crop around all of them, each person's whole visible body plus a little padding (found_by face: only a face was found, so the body is estimated as head and shoulders); the reply's people_view gives the crop box in the source frame, each person's box, and the returned size and aspect ratio. Nobody found: no_person_found, and nothing is returned or kept",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "full",
+     "people"
+    ]
+   },
+   {
+    "name": "aspect",
+    "description": "With view people: best_fit (default, whatever the people plus padding give) or a shape such as \"20:9\", \"1:1\", \"4:5\" (or a number, width / height, 0.1-10). The crop grows inside the frame to reach it; if the frame can't hold that shape around everyone, people_view.aspect_met is false and no one is cut off",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "padding",
+    "description": "With view people: space around the people, 0-0.5 of their larger side (default 0.08)",
+    "type": "number",
+    "required": false
    }
   ],
   "example": "POST /v1/screen/capture?size=agent",
   "idempotent": true,
   "path": "/v1/screen/capture",
   "capability": "screen",
-  "returns": "captured_at, width_px, height_px, format, size_bytes, mode, data_base64 (or raw=1 bytes); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1)",
+  "returns": "captured_at, width_px, height_px, format, size_bytes, mode, view, data_base64 (or raw=1 bytes); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1); with view people, people_view {crop {x, y, width, height}, source {width_px, height_px}, width_px, height_px, aspect_ratio, aspect_ratio_value, aspect_requested, aspect_met, people_count, people [{x, y, width, height, found_by}], detector} (X-Bridgit-Crop, X-Bridgit-Source-Size, X-Bridgit-Aspect-Ratio, X-Bridgit-People-Count with raw=1)",
   "mcp_input_schema": {
    "type": "object",
    "properties": {
@@ -75,6 +97,18 @@
      "description": "private (default): taken in memory, never put in the gallery",
      "type": "string",
      "enum": ["private"]
+    },
+    "padding": {
+     "description": "With view people: space around the people, 0-0.5 of their larger side (default 0.08)",
+     "type": "number"
+    },
+    "view": {
+     "description": "full (default): the whole frame. people: the phone finds the people (offline) and returns one crop around all of them, each person's whole visible body plus a little padding (found_by face: only a face was found, so the body is estimated as head and shoulders); the reply's people_view gives the crop box in the source frame, each person's box, and the returned size and aspect ratio. Nobody found: no_person_found, and nothing is returned or kept",
+     "type": "string",
+     "enum": [
+      "full",
+      "people"
+     ]
     },
     "max_edge_px": {
      "description": "Long edge limit, 64-20000; overrides the preset",
@@ -93,6 +127,10 @@
       "large",
       "original"
      ]
+    },
+    "aspect": {
+     "description": "With view people: best_fit (default, whatever the people plus padding give) or a shape such as \"20:9\", \"1:1\", \"4:5\" (or a number, width / height, 0.1-10). The crop grows inside the frame to reach it; if the frame can't hold that shape around everyone, people_view.aspect_met is false and no one is cut off",
+     "type": "string"
     },
     "idempotency_key": {
      "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
@@ -120,7 +158,8 @@
    "not_supported",
    "capture_timeout",
    "service_start_blocked",
-   "payload_too_large"
+   "payload_too_large",
+   "no_person_found"
   ],
   "requires": null
  }

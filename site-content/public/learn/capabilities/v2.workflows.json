@@ -114,8 +114,8 @@
    "tool": "workflow.validate"
   }
  ],
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
  "examples_url": null,
  "id": "v2.workflows",

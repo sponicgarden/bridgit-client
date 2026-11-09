@@ -119,7 +119,7 @@ class ScreenModule(app: BridgeApp) : Capability(app) {
         else -> ScreenshotService.startupBlock(true, ScreenshotService.instance != null,
             ScreenshotService.instance == null && ScreenshotService.paused(app))
     }
-    override fun details() = JSONObject().put("accessibility_service", ScreenshotService.isEnabled(app)).put("modes", org.json.JSONArray().put("private"))
+    override fun details() = JSONObject().put("accessibility_service", ScreenshotService.isEnabled(app)).put("modes", org.json.JSONArray().put("private")).put("views", org.json.JSONArray().put("full").put("people"))
 
     private val lock = Mutex()
     /** CAP-25b: per agent, 1 capture per 2 s and 60 an hour. */
@@ -142,6 +142,7 @@ class ScreenModule(app: BridgeApp) : Capability(app) {
             val mode = body.optString("mode", "private")
             if (mode != "private") throw ErrorCatalog.error("invalid_parameter", "mode must be \"private\" (system mode isn't built yet).")
             val spec = Sizing.resolve({ arg(it) }, "agent")
+            val view = cc.bridgit.app.vision.PeopleCropRules.request { arg(it) }
             if (!enabled) throw ErrorCatalog.error("capability_disabled",
                 "Screenshots are switched off on the phone. Ask the owner to turn on Screenshots in Feature enablement.", mapOf("setting" to switchKey))
             if (Build.VERSION.SDK_INT < 30) throw ErrorCatalog.error("not_supported", "Screenshots need Android 11 or newer.")
@@ -157,11 +158,23 @@ class ScreenModule(app: BridgeApp) : Capability(app) {
             admit(agent!!.id)
             if (!lock.tryLock()) throw ErrorCatalog.error("sensor_busy", "A screenshot is already being taken. Retry in a few seconds.")
             val token = api.service.captureStarted(app.getString(R.string.notif_screenshot, agentName))
+            var peopleView: JSONObject? = null
             val img = try {
-                val bmp = withTimeout(10_000) { svc.capture() }
-                try { encode(bmp, spec) } finally { bmp.recycle() }
-            } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
-                throw ErrorCatalog.error("capture_timeout", "Android didn't return the screenshot in time. Retry once.")
+                val bmp = try { withTimeout(10_000) { svc.capture() } } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+                    throw ErrorCatalog.error("capture_timeout", "Android didn't return the screenshot in time. Retry once.")
+                }
+                try {
+                    if (!view.people) encode(bmp, spec)
+                    else {
+                        // A0141: the people view; the full screenshot never leaves the phone or gets kept.
+                        val cut = cc.bridgit.app.vision.PeopleView.cut(bmp, view)
+                        try {
+                            encode(cut.bitmap, spec).also {
+                                peopleView = cc.bridgit.app.vision.PeopleCropRules.json(view, cut.crop, bmp.width, bmp.height, cut.people, it.width, it.height, cc.bridgit.app.vision.PeopleView.DETECTOR)
+                            }
+                        } finally { if (cut.bitmap !== bmp) cut.bitmap.recycle() }
+                    }
+                } finally { bmp.recycle() }
             } finally {
                 api.service.captureEnded(token)
                 lock.unlock()
@@ -169,20 +182,22 @@ class ScreenModule(app: BridgeApp) : Capability(app) {
             val now = System.currentTimeMillis()
             val at = isoAt(now)
             val kept = cc.bridgit.app.capture.CapturesModule.keep(app, this, "screen", img.bytes, img.mime, now,
-                JSONObject().put("width_px", img.width).put("height_px", img.height))
-            data = JSONObject().put("mode", mode).put("width_px", img.width).put("height_px", img.height)
+                JSONObject().put("width_px", img.width).put("height_px", img.height).apply { peopleView?.let { put("people_view", it) } })
+            data = JSONObject().put("mode", mode).put("width_px", img.width).put("height_px", img.height).put("view", if (view.people) "people" else "full")
             if (img.bytes.size > ApiServer.MAX_RAW) throw ErrorCatalog.error("payload_too_large", "The image is over 40 MB. Ask for a smaller size.")
             bytesOut = img.bytes.size.toLong()
             val raw = arg("raw").let { it == "1" || it == "true" || it == 1 || it == true }
             if (raw) Reply.Bytes(img.bytes, img.mime, mapOf("X-Bridgit-Captured-At" to at, "X-Bridgit-Mode" to mode,
-                "X-Bridgit-Width" to img.width.toString(), "X-Bridgit-Height" to img.height.toString()) + cc.bridgit.app.capability.keptHeaders(kept))
+                "X-Bridgit-Width" to img.width.toString(), "X-Bridgit-Height" to img.height.toString()) + cc.bridgit.app.capability.keptHeaders(kept)
+                + (peopleView?.let { cc.bridgit.app.vision.PeopleCropRules.headers(it) } ?: emptyMap()))
             else {
                 val b64 = Base64.encodeToString(img.bytes, Base64.NO_WRAP)
                 if (b64.length > ApiServer.MAX_PAYLOAD) throw ErrorCatalog.error("payload_too_large",
                     "The result is over 12 MB as base64. Ask for a smaller size, or add raw=1.")
                 Reply.Json(JSONObject().put("captured_at", at).put("width_px", img.width).put("height_px", img.height)
                     .put("format", if (img.mime == "image/png") "png" else "jpeg").put("mime", img.mime)
-                    .put("size_bytes", img.bytes.size).put("mode", mode).put("source", "screen").put("data_base64", b64)
+                    .put("size_bytes", img.bytes.size).put("mode", mode).put("source", "screen").put("view", if (view.people) "people" else "full")
+                    .apply { peopleView?.let { put("people_view", it) } }.put("data_base64", b64)
                     .apply { if (kept != null) put("capture", kept) })
             }
         }

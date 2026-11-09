@@ -1,6 +1,6 @@
 {
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "What an applet's portal shows now: the functions its page exposes, the state it published, its visible words, and who used it last (the owner by touch, or an agent)",

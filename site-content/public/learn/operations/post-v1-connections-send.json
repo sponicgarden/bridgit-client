@@ -1,6 +1,6 @@
 {
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Send a message, data and optionally a kept photo to one of the owner's connections. Queued and retried by default; wait_reply waits up to 15 s and returns the reply",

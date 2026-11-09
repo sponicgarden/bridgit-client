@@ -1,6 +1,6 @@
 {
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Agent activity from the phone's log, with the same redaction as remote view: no messages, parameters or results. Oldest first after since; the newest page without it. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",

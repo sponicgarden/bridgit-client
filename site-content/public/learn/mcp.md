@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 145. Full index: https://bridgit.cc/learn/index.json.
+API revision 146. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 

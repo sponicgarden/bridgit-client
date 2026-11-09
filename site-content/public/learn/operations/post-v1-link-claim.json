@@ -1,6 +1,6 @@
 {
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Device to device: a Bridgit claims this one's link code with the claim token derived from it (Authorization: Bearer rly_\u2026). Not for agents: agents use POST /v1/owner/configuration/links/claims on their own Bridgit.",

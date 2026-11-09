@@ -1,6 +1,6 @@
 {
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Fetch the same template origin. An unchanged applet gets an owner update review; a customized applet gets a local three-way upgrade task. Nothing applies automatically or calls a model. Read development first",

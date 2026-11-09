@@ -1,6 +1,6 @@
 {
  "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
- "api_revision": 145,
+ "api_revision": 146,
  "errors": [
   {
    "code": "model_unavailable",
@@ -69,6 +69,13 @@
    "code": "speech_no_match",
    "you_should": "Start a new turn when ready to speak",
    "meaning": "No speech was recognized during this bounded turn",
+   "http": 422,
+   "returned_today": true
+  },
+  {
+   "code": "no_person_found",
+   "you_should": "Reframe and retry, or ask for view full",
+   "meaning": "view people found nobody in the frame; nothing was returned or kept (source_width_px, source_height_px)",
    "http": 422,
    "returned_today": true
   },

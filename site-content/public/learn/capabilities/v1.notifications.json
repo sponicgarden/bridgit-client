@@ -16,8 +16,8 @@
   "requires_power": null,
   "tool": "notifications"
  }],
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.notifications",

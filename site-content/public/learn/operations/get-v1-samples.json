@@ -1,6 +1,6 @@
 {
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Complete interaction samples for every kind (notice, question, html, text): the POST /v1/interactions body, the reply and the answer it produces (JSON). For cards that decide or watch (Jev, Clef, the free camera change check), read https://bridgit.cc/learn/decisions.md",

@@ -54,6 +54,12 @@ object Endpoints {
         Param("quality", "integer", "JPEG quality 40-100"),
         Param("raw", "integer", "1 = return the image bytes, details in X-Bridgit-* headers"),
     )
+    /** A0141-A0143: the people view of a screenshot or photo, found and cut on the phone. */
+    private val peopleView = listOf(
+        Param("view", "string", "full (default): the whole frame. people: the phone finds the people (offline) and returns one crop around all of them, each person's whole visible body plus a little padding (found_by face: only a face was found, so the body is estimated as head and shoulders); the reply's people_view gives the crop box in the source frame, each person's box, and the returned size and aspect ratio. Nobody found: no_person_found, and nothing is returned or kept", enum = listOf("full", "people")),
+        Param("aspect", "string", "With view people: best_fit (default, whatever the people plus padding give) or a shape such as \"20:9\", \"1:1\", \"4:5\" (or a number, width / height, 0.1-10). The crop grows inside the frame to reach it; if the frame can't hold that shape around everyone, people_view.aspect_met is false and no one is cut off"),
+        Param("padding", "number", "With view people: space around the people, 0-0.5 of their larger side (default 0.08)"),
+    )
 
     val SERVICES = EndpointSpec("GET", "/services", "status", "Discover general decision and location-context services for any applet: Azure image generation, models, nearby places, air quality, pollen, time zones, maps and weather; call formats, grants and budgets; no paid call",
         example = "GET /v1/services", returns = "bridgit-services/1: services[id,name,provider,provider_model?,applet_compatible,paid,inputs,availability,call,applet,budget,docs]; catalog availability is configuration only; check grants and live call results")
@@ -139,10 +145,10 @@ object Endpoints {
             Param("zoom", "number", "Zoom ratio, e.g. 0.5 (ultra-wide), 1, 2, 5 (telephoto); the range is in /v1/capabilities after the first photo"),
             Param("max_width_px", "integer", "Width limit, 64-20000, or null for full size (default 2048 unless size is given)"),
             STORE,
-        ) + sizing.filter { it.name != "max_width_px" },
+        ) + sizing.filter { it.name != "max_width_px" } + peopleView,
         example = "POST /v1/camera/snapshot {\"camera\":\"rear\",\"zoom\":2}",
-        returns = "captured_at, width_px, height_px, format, size_bytes, data_base64 (or JPEG bytes with raw=1); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1)",
-        errors = listOf("capability_disabled", "permission_denied", "notifications_required", "device_locked", "approval_declined", "sensor_busy", "capture_cancelled", "viewfinder_required", "capture_timeout", "service_start_blocked", "payload_too_large"))
+        returns = "captured_at, width_px, height_px, format, size_bytes, view, data_base64 (or JPEG bytes with raw=1); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1); with view people, people_view {crop {x, y, width, height}, source {width_px, height_px}, width_px, height_px, aspect_ratio, aspect_ratio_value, aspect_requested, aspect_met, people_count, people [{x, y, width, height, found_by}], detector} (X-Bridgit-Crop, X-Bridgit-Source-Size, X-Bridgit-Aspect-Ratio, X-Bridgit-People-Count with raw=1)",
+        errors = listOf("capability_disabled", "permission_denied", "notifications_required", "device_locked", "approval_declined", "sensor_busy", "capture_cancelled", "viewfinder_required", "capture_timeout", "service_start_blocked", "payload_too_large", "no_person_found"))
     // Not a capture for the SEC-07 rate limit: it returns nothing, and the snapshot that follows counts.
     val CAMERA_ARM = EndpointSpec("POST", "/camera/arm", "camera", "Open the camera ahead of a photo, so your next snapshot fires in about 0.3 s",
         body = listOf(
@@ -440,10 +446,10 @@ object Endpoints {
 
     val SCREEN_CAPTURE = EndpointSpec("POST", "/screen/capture", "screen", "What's on the owner's screen right now (no prompt once they've turned it on)",
         capture = true, idempotent = true, media = true, query = sizing,
-        body = listOf(Param("mode", "string", "private (default): taken in memory, never put in the gallery", enum = listOf("private")), STORE),
-        example = "POST /v1/screen/capture?size=agent", returns = "captured_at, width_px, height_px, format, size_bytes, mode, data_base64 (or raw=1 bytes); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1)",
+        body = listOf(Param("mode", "string", "private (default): taken in memory, never put in the gallery", enum = listOf("private")), STORE) + peopleView,
+        example = "POST /v1/screen/capture?size=agent", returns = "captured_at, width_px, height_px, format, size_bytes, mode, view, data_base64 (or raw=1 bytes); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1); with view people, people_view {crop {x, y, width, height}, source {width_px, height_px}, width_px, height_px, aspect_ratio, aspect_ratio_value, aspect_requested, aspect_met, people_count, people [{x, y, width, height, found_by}], detector} (X-Bridgit-Crop, X-Bridgit-Source-Size, X-Bridgit-Aspect-Ratio, X-Bridgit-People-Count with raw=1)",
         errors = listOf("capability_disabled", "access_needed", "notifications_required", "device_locked", "rate_limited", "sensor_busy",
-            "not_supported", "capture_timeout", "service_start_blocked", "payload_too_large"))
+            "not_supported", "capture_timeout", "service_start_blocked", "payload_too_large", "no_person_found"))
 
     val LISTEN = EndpointSpec("GET", "/listen", "wakewords", "Wake words: whether the phone is listening, and the wake words the owner gave you",
         example = "GET /v1/listen", returns = "enabled, state (off|listening|hearing|paused), reason, muted_until, model (ready|not_downloaded|downloading|failed), model_name, max_seconds, wake_words[{phrase, send_clip}]. " +

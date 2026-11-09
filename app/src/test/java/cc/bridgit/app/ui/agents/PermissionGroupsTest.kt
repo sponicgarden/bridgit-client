@@ -3,6 +3,8 @@ package cc.bridgit.app.ui.agents
 import cc.bridgit.app.ui.agents.PermissionGroups.Item
 import cc.bridgit.app.ui.agents.PermissionGroups.State
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class PermissionGroupsTest {
@@ -32,4 +34,18 @@ class PermissionGroupsTest {
 
     @Test fun unrestrictedAgentBecomesExplicitWhenAGroupIsTurnedOff() =
         assertEquals(setOf("speaker", "torch", "ring"), PermissionGroups.set(null, all, listOf("camera", "mic"), on = false))
+
+    // A0219: a permission says what it does, where and when, not only its name.
+    @Test fun permissionShowsItsDescription() {
+        assertEquals("Photos when a control agent asks",
+            PermissionGroups.detail(Item("camera", "Camera", "capture", " Photos when a control agent asks ")))
+        assertNull(PermissionGroups.detail(Item("camera", "Camera", "capture")))
+        assertNull(PermissionGroups.detail(Item("camera", "Camera", "capture", "camera")))
+    }
+
+    @Test fun everyCapabilityGroupHasAPersonsTitle() {
+        val groups = listOf("capture", "photos", "talk", "where", "status", "apps", "files", "context", "private context", "control", "controls")
+        groups.forEach { assertNotNull(it, PermissionGroups.titleRes(it)) }
+        assertEquals(PermissionGroups.titleRes("controls"), PermissionGroups.titleRes("control"))
+    }
 }

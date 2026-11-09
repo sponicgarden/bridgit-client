@@ -69,7 +69,7 @@ object AgentPermissionsDialog {
         details.addView(fixer); details.addView(deviceAccess)
 
         val items = app.registry.modules.filter { it.id !in Agent.ALWAYS_ALLOWED }
-            .map { PermissionGroups.Item(it.id, it.title, it.group) }
+            .map { PermissionGroups.Item(it.id, it.title, it.group, context.getString(it.descriptionRes)) }
         val allIds = items.map { it.id }
         val expanded = mutableSetOf<String>()
         var binding = false
@@ -122,8 +122,19 @@ object AgentPermissionsDialog {
             }
             val boxes = group.items.associate { item ->
                 item.id to MaterialCheckBox(context).apply {
-                    text = item.title
+                    // Title, then what it does, where and when, on one control so it reads as one label.
+                    text = PermissionGroups.detail(item)?.let { detail ->
+                        android.text.SpannableStringBuilder(item.title).append('\n').apply {
+                            val start = length
+                            append(detail)
+                            setSpan(android.text.style.TextAppearanceSpan(context,
+                                com.google.android.material.R.style.TextAppearance_Material3_BodyMedium), start, length, 0)
+                            setSpan(android.text.style.ForegroundColorSpan(context.themeColor(
+                                com.google.android.material.R.attr.colorOnSurfaceVariant)), start, length, 0)
+                        }
+                    } ?: item.title
                     minHeight = context.dp(48)
+                    setPadding(paddingLeft, context.dp(8), paddingRight, context.dp(8))
                     setOnCheckedChangeListener { _, on -> if (!binding) { setGrants(listOf(item.id), on); refresh(true) } }
                 }
             }

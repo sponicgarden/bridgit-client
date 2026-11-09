@@ -1,6 +1,6 @@
 {
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Change this Bridgit's half of one direction: in = the other Bridgit uses this one (services), out = this one uses it (agents); paused on either; explicit owner.configuration grant required; no per-change phone approval",

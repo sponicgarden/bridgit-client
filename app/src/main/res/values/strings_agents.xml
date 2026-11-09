@@ -246,5 +246,11 @@
     <string name="agents_maximum_control">Maximum Agentic Control</string>
     <string name="agents_advanced_permissions">Advanced permissions</string>
     <string name="agents_group_count">%1$d of %2$d</string>
+    <string name="agents_perm_group_status">Bridgit status and activity</string>
+    <string name="agents_perm_group_apps">Applets and connections</string>
+    <string name="agents_perm_group_files">Files and schedules</string>
+    <string name="agents_perm_group_context">Phone and sensors</string>
+    <string name="agents_perm_group_private">Private data on this phone</string>
+    <string name="agents_perm_group_controls">Control this phone</string>
     <string name="applet_agent_required">Your favorite agent can create an applet. Please Add and configure it first.</string>
 </resources>

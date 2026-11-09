@@ -1,6 +1,6 @@
 {
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Turn battery saver on or off (needs a one-time USB grant, see /phone/battery controls) or set the screen timeout, with optional restoration",

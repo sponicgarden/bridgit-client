@@ -350,6 +350,9 @@ class CameraModule(app: BridgeApp, private val registry: Registry) : Capability(
             val flash = if (body.has("flash")) body.opt("flash") as? Boolean
                 ?: throw ErrorCatalog.error("invalid_parameter", "flash must be true or false.") else false
             val spec = snapshotSpec(this)
+            val view = cc.bridgit.app.vision.PeopleCropRules.request { arg(it) }
+            // A0141: the people view is cut from a larger photo, then sized as asked.
+            val takeSpec = if (view.people) PEOPLE_SOURCE else spec
             val zoom = if (!body.has("zoom") || body.isNull("zoom")) null else (body.opt("zoom") as? Number)?.toFloat()
                 ?.takeIf { it in 0.1f..100f } ?: throw ErrorCatalog.error("invalid_parameter", "zoom must be a number such as 0.5, 1, 2 or 5.")
             requireUsable()
@@ -366,32 +369,35 @@ class CameraModule(app: BridgeApp, private val registry: Registry) : Capability(
             }
             if(visible) registry.cameraArm.takeFor(agent!!.id)?.let { registry.cameraArm.finish(api.service,it) }
             val armed = if(visible)null else agent?.let { registry.cameraArm.takeFor(it.id) }
-            val img = if(visible) {
+            val shot = if(visible) {
                 val countdown=cc.bridgit.app.planned.Rules.integer(body.opt("countdown_seconds"),"countdown_seconds",0,10,0)
                 val result=cc.bridgit.app.capture.VisibleCapture.take(app,agent!!.id,which,groupPhoto=body.optBoolean("group_photo"),countdown=countdown,flash=flash,instructions=body.optString("instructions").trim().take(240),zoom=zoom)
                 which=result.camera ?: which
-                cc.bridgit.app.capability.ImageUtil.prepare(result.photo ?: throw cc.bridgit.app.api.ApiError(409,"capture_cancelled","No photo accepted"),"image/jpeg",spec,forceJpeg=true)
+                cc.bridgit.app.capability.ImageUtil.prepare(result.photo ?: throw cc.bridgit.app.api.ApiError(409,"capture_cancelled","No photo accepted"),"image/jpeg",takeSpec,forceJpeg=true)
             } else if (armed != null) {
                 try {
                     if (armed.rear == (which == "rear")) delay(ArmSlot.settleWaitMs(armed, System.currentTimeMillis()))
-                    api.service.camera.snapshot(which == "rear", flash, spec, zoom, warm = armed.binding, allowLocked = lockedOk)
+                    api.service.camera.snapshot(which == "rear", flash, takeSpec, zoom, warm = armed.binding, allowLocked = lockedOk)
                 }
                 finally { registry.cameraArm.finish(api.service, armed) }
             } else api.withSensor(registry.cameraLock, app.getString(R.string.notif_taking_photo, agentName)) {
-                api.service.camera.snapshot(which == "rear", flash, spec, zoom, allowLocked = lockedOk)
+                api.service.camera.snapshot(which == "rear", flash, takeSpec, zoom, allowLocked = lockedOk)
             }
+            val (img, peopleView) = if (view.people) cutPeople(shot, spec, view) else shot to null
             val warm = armed != null && armed.rear == (which == "rear")
-            data = JSONObject().put("camera", which).put("width_px", img.width).put("height_px", img.height).put("zoom", zoom ?: 1f).put("warm", warm)
+            data = JSONObject().put("camera", which).put("width_px", img.width).put("height_px", img.height).put("zoom", zoom ?: 1f).put("warm", warm).put("view", if (view.people) "people" else "full")
             val now = System.currentTimeMillis()
             val at = isoAt(now)
             val kept = cc.bridgit.app.capture.CapturesModule.keep(app, this, "camera", img.bytes, img.mime, now,
-                JSONObject().put("camera", which).put("width_px", img.width).put("height_px", img.height))
+                JSONObject().put("camera", which).put("width_px", img.width).put("height_px", img.height).apply { peopleView?.let { put("people_view", it) } })
             if(!returnImage) {
                 if(kept == null) throw ErrorCatalog.error("invalid_parameter","return_image:false requires a kept capture; send store:[memory]")
-                Reply.Json(JSONObject().put("capture",kept).put("camera",which).put("captured_at",at))
+                Reply.Json(JSONObject().put("capture",kept).put("camera",which).put("captured_at",at).apply { peopleView?.let { put("view", "people").put("people_view", it) } })
             }
-            else if (wantsRaw()) rawReply(img, mapOf("X-Bridgit-Captured-At" to at, "X-Bridgit-Camera" to which) + keptHeaders(kept))
+            else if (wantsRaw()) rawReply(img, mapOf("X-Bridgit-Captured-At" to at, "X-Bridgit-Camera" to which) + keptHeaders(kept)
+                + (peopleView?.let { cc.bridgit.app.vision.PeopleCropRules.headers(it) } ?: emptyMap()))
             else Reply.Json(envelope(img, at, "captured_at", null).put("source", "camera").put("camera", which).put("zoom", zoom ?: 1.0).put("warm", warm)
+                .put("view", if (view.people) "people" else "full").apply { peopleView?.let { put("people_view", it) } }
                 .apply { if (kept != null) put("capture", kept) })
         }
         endpoint(Endpoints.CAMERA_ARM) {
@@ -456,6 +462,29 @@ class CameraModule(app: BridgeApp, private val registry: Registry) : Capability(
         val id = r.path("id").orEmpty()
         val a = r.agent ?: throw ErrorCatalog.error("unauthorized", "Body tracking needs an agent key.")
         return registry.pose.get(id, a.id) ?: throw ErrorCatalog.error("not_found", "No body tracking session $id for this agent (they are kept 15 minutes after they end).")
+    }
+
+    /**
+     * A0141: the people view of a photo taken at [PEOPLE_SOURCE], sized to the agent's [spec] (never upscaled), with
+     * its people_view block. Throws no_person_found when nobody is in it (nothing is returned or kept).
+     */
+    private val PEOPLE_SOURCE = Sizing.Spec(4096, null, 95)
+
+    private suspend fun cutPeople(shot: Encoded, spec: Sizing.Spec, view: cc.bridgit.app.vision.PeopleCropRules.Request): Pair<Encoded, JSONObject> {
+        val src = cc.bridgit.app.vision.Finder.decode(shot.bytes, PEOPLE_SOURCE.maxEdge!!)
+            ?: throw ErrorCatalog.error("capture_timeout", "The camera's photo couldn't be read. Retry once.")
+        try {
+            val cut = cc.bridgit.app.vision.PeopleView.cut(src, view)
+            try {
+                val (tw, th) = Sizing.target(cut.bitmap.width, cut.bitmap.height, spec)
+                val out = if (tw < cut.bitmap.width) android.graphics.Bitmap.createScaledBitmap(cut.bitmap, tw, th, true) else cut.bitmap
+                try {
+                    val bytes = cc.bridgit.app.vision.Finder.jpeg(out, if (spec.original) 95 else spec.quality)
+                    return Encoded(bytes, out.width, out.height, "image/jpeg") to cc.bridgit.app.vision.PeopleCropRules.json(
+                        view, cut.crop, src.width, src.height, cut.people, out.width, out.height, cc.bridgit.app.vision.PeopleView.DETECTOR)
+                } finally { if (out !== cut.bitmap) out.recycle() }
+            } finally { if (cut.bitmap !== src) cut.bitmap.recycle() }
+        } finally { src.recycle() }
     }
 
     /** CAP-04: default 2048 px wide at q90 (1.2 behaviour); null max_width_px = full size; API-10 presets otherwise. */

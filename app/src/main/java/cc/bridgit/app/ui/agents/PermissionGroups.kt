@@ -9,7 +9,8 @@ import cc.bridgit.app.R
  * Pure logic, so both surfaces (and tests) agree on what a group master does.
  */
 object PermissionGroups {
-    data class Item(val id: String, val title: String, val group: String)
+    /** [description] says what the permission does, where and when (A0219); a bare title said none of that. */
+    data class Item(val id: String, val title: String, val group: String, val description: String = "")
     enum class State { ON, PARTIAL, OFF }
     data class Group(val key: String, val items: List<Item>, val granted: Int) {
         val state: State get() = when (granted) { 0 -> State.OFF; items.size -> State.ON; else -> State.PARTIAL }
@@ -28,11 +29,24 @@ object PermissionGroups {
     /** "control" and "controls" are one group to a person. */
     fun normalize(group: String): String = if (group == "control") "controls" else group
 
-    fun title(context: Context, group: String): String = when (normalize(group)) {
-        "capture" -> context.getString(R.string.features_group_capture)
-        "photos" -> context.getString(R.string.features_group_photos)
-        "talk" -> context.getString(R.string.features_group_talk)
-        "where" -> context.getString(R.string.features_group_where)
-        else -> group.replaceFirstChar { it.uppercase() }
+    /** The line under a permission's title, or null when there is nothing more to say. */
+    fun detail(item: Item): String? = item.description.trim().takeIf { it.isNotEmpty() && !it.equals(item.title.trim(), ignoreCase = true) }
+
+    /** A person's name for every capability group; null only for a group added without one. */
+    fun titleRes(group: String): Int? = when (normalize(group)) {
+        "capture" -> R.string.features_group_capture
+        "photos" -> R.string.features_group_photos
+        "talk" -> R.string.features_group_talk
+        "where" -> R.string.features_group_where
+        "status" -> R.string.agents_perm_group_status
+        "apps" -> R.string.agents_perm_group_apps
+        "files" -> R.string.agents_perm_group_files
+        "context" -> R.string.agents_perm_group_context
+        "private context" -> R.string.agents_perm_group_private
+        "controls" -> R.string.agents_perm_group_controls
+        else -> null
     }
+
+    fun title(context: Context, group: String): String =
+        titleRes(group)?.let { context.getString(it) } ?: group.replaceFirstChar { it.uppercase() }
 }

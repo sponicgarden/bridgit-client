@@ -141,8 +141,8 @@
    "url": "https://bridgit.cc/interactions/index.json"
   }
  },
- "documentation_revision": 128,
- "api_revision": 145,
+ "documentation_revision": 129,
+ "api_revision": 146,
  "sample_kinds": [
   "html",
   "pieces",
@@ -150,6 +150,6 @@
   "notice",
   "text"
  ],
- "error_codes": 84,
+ "error_codes": 85,
  "start_here": "https://bridgit.cc/learn/start.md"
 }

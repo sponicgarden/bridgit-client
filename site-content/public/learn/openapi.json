@@ -23,6 +23,7 @@
        "image_outcome_unknown",
        "images_unavailable",
        "speech_no_match",
+       "no_person_found",
        "speech_unavailable",
        "speech_cloud_consent_required",
        "speech_model_changed",
@@ -3794,6 +3795,10 @@
       "description": "Short framing instructions above the live preview, up to 240 characters",
       "type": "string"
      },
+     "padding": {
+      "description": "With view people: space around the people, 0-0.5 of their larger side (default 0.08)",
+      "type": "number"
+     },
      "return_image": {
       "description": "false returns capture metadata only; requires store:[memory] or another enabled retention destination; default true",
       "type": "boolean"
@@ -3827,6 +3832,14 @@
       "description": "JPEG quality 40-100",
       "type": "integer"
      },
+     "view": {
+      "description": "full (default): the whole frame. people: the phone finds the people (offline) and returns one crop around all of them, each person's whole visible body plus a little padding (found_by face: only a face was found, so the body is estimated as head and shoulders); the reply's people_view gives the crop box in the source frame, each person's box, and the returned size and aspect ratio. Nobody found: no_person_found, and nothing is returned or kept",
+      "type": "string",
+      "enum": [
+       "full",
+       "people"
+      ]
+     },
      "max_width_px": {
       "description": "Width limit, 64-20000, or null for full size (default 2048 unless size is given)",
       "type": "integer"
@@ -3840,6 +3853,10 @@
        "large",
        "original"
       ]
+     },
+     "aspect": {
+      "description": "With view people: best_fit (default, whatever the people plus padding give) or a shape such as \"20:9\", \"1:1\", \"4:5\" (or a number, width / height, 0.1-10). The crop grows inside the frame to reach it; if the frame can't hold that shape around everyone, people_view.aspect_met is false and no one is cut off",
+      "type": "string"
      },
      "viewfinder": {
       "description": "Optional visible capture/review; native card, portal and MCP-App captures always require it",
@@ -3862,7 +3879,11 @@
    }}}},
    "operationId": "postCameraSnapshot",
    "responses": {
-    "200": {"description": "captured_at, width_px, height_px, format, size_bytes, data_base64 (or JPEG bytes with raw=1); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1)"},
+    "200": {"description": "captured_at, width_px, height_px, format, size_bytes, view, data_base64 (or JPEG bytes with raw=1); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1); with view people, people_view {crop {x, y, width, height}, source {width_px, height_px}, width_px, height_px, aspect_ratio, aspect_ratio_value, aspect_requested, aspect_met, people_count, people [{x, y, width, height, found_by}], detector} (X-Bridgit-Crop, X-Bridgit-Source-Size, X-Bridgit-Aspect-Ratio, X-Bridgit-People-Count with raw=1)"},
+    "422": {
+     "description": "no_person_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
     "401": {"description": "unauthorized"},
     "413": {
      "description": "payload_too_large",
@@ -12174,6 +12195,22 @@
       "type": "string",
       "enum": ["private"]
      },
+     "padding": {
+      "description": "With view people: space around the people, 0-0.5 of their larger side (default 0.08)",
+      "type": "number"
+     },
+     "view": {
+      "description": "full (default): the whole frame. people: the phone finds the people (offline) and returns one crop around all of them, each person's whole visible body plus a little padding (found_by face: only a face was found, so the body is estimated as head and shoulders); the reply's people_view gives the crop box in the source frame, each person's box, and the returned size and aspect ratio. Nobody found: no_person_found, and nothing is returned or kept",
+      "type": "string",
+      "enum": [
+       "full",
+       "people"
+      ]
+     },
+     "aspect": {
+      "description": "With view people: best_fit (default, whatever the people plus padding give) or a shape such as \"20:9\", \"1:1\", \"4:5\" (or a number, width / height, 0.1-10). The crop grows inside the frame to reach it; if the frame can't hold that shape around everyone, people_view.aspect_met is false and no one is cut off",
+      "type": "string"
+     },
      "store": {
       "description": "Keep this capture too: any of memory (fetch it later from GET /v1/captures/{id}), files (a copy in the phone's Downloads/Bridgit), upload (POSTed to your upload_url). [] or \"none\" = only return it. Default: your POST /v1/captures/storage choice, else only returned",
       "type": "array",
@@ -12184,9 +12221,9 @@
    }}}},
    "operationId": "postScreenCapture",
    "responses": {
-    "200": {"description": "captured_at, width_px, height_px, format, size_bytes, mode, data_base64 (or raw=1 bytes); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1)"},
+    "200": {"description": "captured_at, width_px, height_px, format, size_bytes, mode, view, data_base64 (or raw=1 bytes); capture {capture_id, stored, url, memory_until, file} when kept (X-Bridgit-Capture-Id with raw=1); with view people, people_view {crop {x, y, width, height}, source {width_px, height_px}, width_px, height_px, aspect_ratio, aspect_ratio_value, aspect_requested, aspect_met, people_count, people [{x, y, width, height, found_by}], detector} (X-Bridgit-Crop, X-Bridgit-Source-Size, X-Bridgit-Aspect-Ratio, X-Bridgit-People-Count with raw=1)"},
     "422": {
-     "description": "not_supported",
+     "description": "not_supported, no_person_found",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
     },
     "401": {"description": "unauthorized"},
@@ -12622,7 +12659,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 145,
+  "x-api-revision": 146,
   "title": "Bridgit",
   "version": "1.8.0"
  }

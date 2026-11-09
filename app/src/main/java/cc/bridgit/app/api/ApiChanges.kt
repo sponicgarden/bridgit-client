@@ -662,6 +662,10 @@ object ApiChanges {
             Item("GET /v1/links entries say their tier", "/v1/links"),
             Item("New errors: link_expired, tier_not_allowed, link_approval_declined. Associate and public links have per-tier rate limits", null),
         )),
+        Revision(146, "1.8.0", "2026-11-09", listOf(
+            Item("People view: view \"people\" on a screenshot or camera photo finds the people on the phone (offline) and returns one crop around all of them, each person's whole visible body plus a little padding (padding 0-0.5). aspect best_fit (default) or a shape like \"20:9\", \"1:1\", \"4:5\". The reply's people_view gives the crop box in the source frame, each person's box, the returned size and aspect_ratio, and aspect_met. Nobody found: no_person_found, and nothing is returned or kept", "/v1/screen/capture"),
+            Item("The same view, aspect and padding on camera photos; the crop is cut from a larger photo, then sized as asked", "/v1/camera/snapshot"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

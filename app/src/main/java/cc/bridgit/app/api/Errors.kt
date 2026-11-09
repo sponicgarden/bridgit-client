@@ -33,6 +33,7 @@ object ErrorCatalog {
         Entry(502, "image_outcome_unknown", "Image generation outcome could not be confirmed", "Retry only with the same Idempotency-Key"),
         Entry(503, "images_unavailable", "The configured Azure image task is unavailable", "Check the configured model task and Azure deployment"),
         Entry(422, "speech_no_match", "No speech was recognized during this bounded turn", "Start a new turn when ready to speak"),
+        Entry(422, "no_person_found", "view people found nobody in the frame; nothing was returned or kept (source_width_px, source_height_px)", "Reframe and retry, or ask for view full"),
         Entry(503, "speech_unavailable", "Selected speech engine or backend is unavailable", "Check GET /v1/speech/models; no implicit fallback"),
         Entry(403, "speech_cloud_consent_required", "Selected speech model needs explicit cloud permission", "Ask the owner before allow_cloud=true"),
         Entry(409, "speech_model_changed", "Registry selection changed during this turn", "Resolve again before a new turn"),

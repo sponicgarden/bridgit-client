@@ -518,6 +518,36 @@
    "tool": "owner_configuration_listening_post"
   },
   {
+   "summary": "Read the permission home (A0115-A0118): every control agent, this device (profile: purposes, type, model; its own switches) and every linked device, each with granted/total and the layer that decided each permission",
+   "path": "/v1/owner/configuration/permissions",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-permissions.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-permissions.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_permissions"
+  },
+  {
+   "summary": "Change this device's profile (purposes, device type, model; same rules as the tab and the team backend) and its own permission switches: true/false sets one specifically, \"default\" returns it to the inherited (type, purpose) default; explicit owner.configuration grant required; no per-change phone approval",
+   "path": "/v1/owner/configuration/permissions/device",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-permissions-device.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-permissions-device.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_permissions_device"
+  },
+  {
+   "summary": "Replace a linked device's permissions on this phone (a portal viewer, hub or satellite), within what its pairing gave it; Superpowers required, as for agent grants; explicit owner.configuration grant required; no per-change phone approval",
+   "path": "/v1/owner/configuration/permissions/linked/{id}",
+   "method": "POST",
+   "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-permissions-linked-id.json",
+   "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-permissions-linked-id.json",
+   "control_scope": "owner.configuration",
+   "requires_power": null,
+   "tool": "owner_configuration_permissions_linked"
+  },
+  {
    "summary": "Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each",
    "path": "/v1/owner/configuration/links",
    "method": "GET",
@@ -608,8 +638,8 @@
    "tool": "owner_configuration_links_log"
   }
  ],
- "documentation_revision": 129,
- "api_revision": 146,
+ "documentation_revision": 130,
+ "api_revision": 147,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.owner_features",

@@ -1,0 +1,58 @@
+{
+ "documentation_revision": 130,
+ "api_revision": 147,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Replace a linked device's permissions on this phone (a portal viewer, hub or satellite), within what its pairing gave it; Superpowers required, as for agent grants; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_permissions_linked",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "capabilities",
+   "description": "Permission ids, a subset of can_be_given; [] removes all but the always-allowed ones",
+   "type": "array",
+   "required": true
+  }],
+  "example": "POST /v1/owner/configuration/permissions/linked/{id} {\"capabilities\":[\"portal\"]}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/permissions/linked/{id}",
+  "capability": "owner_features",
+  "returns": "the linked device as in GET plus changed; forbidden beyond can_be_given",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "capabilities": {
+     "description": "Permission ids, a subset of can_be_given; [] removes all but the always-allowed ones",
+     "type": "array",
+     "items": {"type": "object"}
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/permissions/linked/{id}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "capabilities",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

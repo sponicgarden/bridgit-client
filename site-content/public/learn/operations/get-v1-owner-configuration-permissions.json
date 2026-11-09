@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 130,
+ "api_revision": 147,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read the permission home (A0115-A0118): every control agent, this device (profile: purposes, type, model; its own switches) and every linked device, each with granted/total and the layer that decided each permission",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_permissions",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/permissions",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/permissions",
+  "capability": "owner_features",
+  "returns": "layers, agents[{id,name,kind,granted,total,super_powers,maximum_control,all_permissions,permissions[{id,group,on,layer,can_change}],change_url}], device{name,profile{purposes,device_type,model,platform,generation,synced,inherited_defaults},granted,total,permissions[{id,group,on,layer,inherited}]}, linked_devices[{id,name,kind,granted,total,can_be_given,permissions,change_url}]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

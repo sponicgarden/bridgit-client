@@ -561,7 +561,7 @@ final class ApplePermissionHelpTests: XCTestCase {
                 XCTAssertTrue(topic.steps(platform).allSatisfy { !$0.isEmpty })
             }
             XCTAssertTrue(ApplePermissionTopic.photos.steps(platform).joined().contains("gallery search and library fetch are not implemented"))
-            XCTAssertEqual(ApplePermissionTopic.screenshots.status(platform), "Not implemented")
+            XCTAssertEqual(ApplePermissionTopic.screenshots.status(platform), platform == .macOS ? "Computer use" : "Not implemented")
             XCTAssertTrue(ApplePermissionTopic.notifications.steps(platform).joined().contains("not implemented"))
         }
         XCTAssertEqual(ApplePermissionTopic.updates.status(.iOS), "TestFlight")

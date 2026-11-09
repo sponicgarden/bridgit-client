@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 146. Full index: https://bridgit.cc/learn/index.json.
+API revision 147. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -89,6 +89,9 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `owner_configuration_modes_post` | `POST /v1/owner/configuration/modes` | Replace custom modes using the native name/limit validation; [] clears; built-in and current modes protected; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_listening_get` | `GET /v1/owner/configuration/listening` | Read complete wake-word definitions and sound-event recipient configuration |
 | `owner_configuration_listening_post` | `POST /v1/owner/configuration/listening` | Replace supplied listening configuration with native validation; wake_words=[] or sounds=null clears; existing recipient/capture and Android permission checks remain; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_permissions` | `GET /v1/owner/configuration/permissions` | Read the permission home (A0115-A0118): every control agent, this device (profile: purposes, type, model; its own switches) and every linked device, each with granted/total and the layer that decided each permission |
+| `owner_configuration_permissions_device` | `POST /v1/owner/configuration/permissions/device` | Change this device's profile (purposes, device type, model; same rules as the tab and the team backend) and its own permission switches: true/false sets one specifically, "default" returns it to the inherited (type, purpose) default; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_permissions_linked` | `POST /v1/owner/configuration/permissions/linked/{id}` | Replace a linked device's permissions on this phone (a portal viewer, hub or satellite), within what its pairing gave it; Superpowers required, as for agent grants; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_links` | `GET /v1/owner/configuration/links` | Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each |
 | `owner_configuration_links_codes` | `POST /v1/owner/configuration/links/codes` | Make a one-time link code for this Bridgit as the target (8 characters, 10 minutes, 5 wrong tries); needs a Device Domain Name; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_links_code_cancel` | `DELETE /v1/owner/configuration/links/codes/{id}` | Cancel a link code that hasn't been claimed; explicit owner.configuration grant required; no per-change phone approval |

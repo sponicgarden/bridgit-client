@@ -94,8 +94,17 @@ object ConfigurationEndpoints {
             Param("notes", "string", "The owner's notes about the agent, up to 200 characters; \"\" clears"), Param("super_powers", "boolean", "Delegate/revoke Super Powers; caller must already have them"),
             Param("fixer_mode", "boolean", "Delegate/revoke Fixer Mode"), Param("maximum_control", "boolean", "Preserves the separate Superpowers role. true alone grants native maximum capabilities/roles/scopes; false stops future maximum inheritance")),
         example = "POST /v1/owner/configuration/access/agents/example {\"expected_generation\":\"<generation from discovery>\",\"control_scopes\":[\"owner.configuration\"]}", returns = "sanitized control-agent access,approval_required=false; no key creation or Android consent bypass")
+    val PERMISSIONS = read("/permissions", "Read the permission home (A0115-A0118): every control agent, this device (profile: purposes, type, model; its own switches) and every linked device, each with granted/total and the layer that decided each permission",
+        "layers, agents[{id,name,kind,granted,total,super_powers,maximum_control,all_permissions,permissions[{id,group,on,layer,can_change}],change_url}], device{name,profile{purposes,device_type,model,platform,generation,synced,inherited_defaults},granted,total,permissions[{id,group,on,layer,inherited}]}, linked_devices[{id,name,kind,granted,total,can_be_given,permissions,change_url}]")
+    val PERMISSIONS_DEVICE = write("POST", "/permissions/device", "Change this device's profile (purposes, device type, model; same rules as the tab and the team backend) and its own permission switches: true/false sets one specifically, \"default\" returns it to the inherited (type, purpose) default",
+        listOf(Param("profile", "object", "{purposes: [up to 8 short ids such as primary, dedicated, network_controller, monitor, shared], device_type: phone|tablet|computer|tv|watch|camera|other, model: 1-80 characters}; omitted fields stay"),
+            Param("switches", "object", "Switch id (GET permissions device.permissions[].id) to true, false or \"default\"")),
+        "{\"profile\":{\"purposes\":[\"network_controller\"]},\"switches\":{\"camera\":\"default\"}}", "changed{profile,switches}, backend synced|pending|unchanged, device (as in GET); same values change nothing")
+    val PERMISSIONS_LINKED = write("POST", "/permissions/linked/{id}", "Replace a linked device's permissions on this phone (a portal viewer, hub or satellite), within what its pairing gave it; Superpowers required, as for agent grants",
+        listOf(Param("capabilities", "array", "Permission ids, a subset of can_be_given; [] removes all but the always-allowed ones", true)),
+        "{\"capabilities\":[\"portal\"]}", "the linked device as in GET plus changed; forbidden beyond can_be_given")
     val ALL = listOf(ACCESS, ACCESS_FEATURES, ACCESS_AGENT, APPROVALS, APPROVAL, APPROVAL_DECIDE, INDEX, SETTINGS, ACTION, KEYS, KEY_SET, KEY_DELETE, CONNECTIONS, CONNECTION_CREATE, CONNECTION_UPDATE, CONNECTION_DELETE, CONNECTION_ROTATE,
-        CALLBACKS, CALLBACK_SET, CALLBACK_DELETE, NOTIFICATIONS, NOTIFICATIONS_SET, EMAIL, EMAIL_SET, NAME, NAME_SET, NAME_DELETE, SPECS, SPECS_SET, FEEDING, FEEDING_SET, MODES, MODES_SET, LISTENING, LISTENING_SET) +
+        CALLBACKS, CALLBACK_SET, CALLBACK_DELETE, NOTIFICATIONS, NOTIFICATIONS_SET, EMAIL, EMAIL_SET, NAME, NAME_SET, NAME_DELETE, SPECS, SPECS_SET, FEEDING, FEEDING_SET, MODES, MODES_SET, LISTENING, LISTENING_SET, PERMISSIONS, PERMISSIONS_DEVICE, PERMISSIONS_LINKED) +
         ConfigurationLinks.CONFIG
 }
 
@@ -108,7 +117,7 @@ fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
             .put("connections_url", "/v1/owner/configuration/connections").put("callbacks_url", "/v1/owner/configuration/callbacks")
             .put("notifications_url", "/v1/owner/configuration/notifications/{agent}").put("feeding_url", "/v1/owner/configuration/feeding")
             .put("email_url", "/v1/owner/configuration/email").put("name_url", "/v1/owner/configuration/name").put("specs_url", "/v1/owner/configuration/specs").put("links_url", "/v1/owner/configuration/links").put("modes_url", "/v1/owner/configuration/modes")
-            .put("listening_url", "/v1/owner/configuration/listening").put("human_authority", JSONArray(listOf("first Super Powers authority and initial key pairing", "OS consent", "account sign-in/verification", "biometric/security controls"))))
+            .put("listening_url", "/v1/owner/configuration/listening").put("permissions_url", "/v1/owner/configuration/permissions").put("human_authority", JSONArray(listOf("first Super Powers authority and initial key pairing", "OS consent", "account sign-in/verification", "biometric/security controls"))))
     }
     endpoint(ConfigurationEndpoints.ACCESS) { Reply.Json(SuperAgentAccess(app, agent!!).get()) }
     endpoint(ConfigurationEndpoints.ACCESS_FEATURES) { Reply.Json(SuperAgentAccess(app, agent!!).features(body)) }
@@ -148,5 +157,8 @@ fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
     endpoint(ConfigurationEndpoints.MODES_SET) { Reply.Json(ConfigurationResources(app, agent!!).modes(body)) }
     endpoint(ConfigurationEndpoints.LISTENING) { Reply.Json(ConfigurationResources(app, agent!!).listening()) }
     endpoint(ConfigurationEndpoints.LISTENING_SET) { Reply.Json(ConfigurationResources(app, agent!!).listening(body)) }
+    endpoint(ConfigurationEndpoints.PERMISSIONS) { Reply.Json(ConfigurationPermissions(app, agent!!).get()) }
+    endpoint(ConfigurationEndpoints.PERMISSIONS_DEVICE) { Reply.Json(ConfigurationPermissions(app, agent!!).device(body)) }
+    endpoint(ConfigurationEndpoints.PERMISSIONS_LINKED) { Reply.Json(ConfigurationPermissions(app, agent!!).linked(path("id").orEmpty(), body)) }
     ConfigurationLinks.install(this@installConfiguration, api, app)
 }

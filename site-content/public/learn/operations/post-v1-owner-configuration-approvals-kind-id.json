@@ -1,6 +1,6 @@
 {
- "documentation_revision": 129,
- "api_revision": 146,
+ "documentation_revision": 130,
+ "api_revision": 147,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Approve or decline the exact inspected request using native activation and current delegated authority; existing action scopes required; explicit owner.configuration grant required; no per-change phone approval",

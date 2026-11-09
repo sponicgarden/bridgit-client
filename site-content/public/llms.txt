@@ -4,7 +4,7 @@ Bulk export for offline indexers, not startup: https://bridgit.cc/learn/catalog.
 
 > Bridgit is an Android app that lets the owner's AI agents use their phone (camera, microphone, screen, location, cards that ask the owner questions, speaker, files, schedules and more) through a local HTTP API and MCP server on the owner's Tailscale network, or through Bridgit's relay without Tailscale. One key per agent; every call is logged on the phone.
 
-Everything below is public, needs no key and no phone, and is rebuilt from the latest Bridgit code (API revision 146, Bridgit 1.8 line). Your phone serves its own copies (`GET /v1/guide` and friends) with its switch states and address; if its `api_revision` (in `GET /v1/health`) is lower, it runs an older Bridgit: see the change log for what it lacks.
+Everything below is public, needs no key and no phone, and is rebuilt from the latest Bridgit code (API revision 147, Bridgit 1.8 line). Your phone serves its own copies (`GET /v1/guide` and friends) with its switch states and address; if its `api_revision` (in `GET /v1/health`) is lower, it runs an older Bridgit: see the change log for what it lacks.
 
 ## Evaluate without pairing
 
@@ -21,9 +21,9 @@ Everything below is public, needs no key and no phone, and is rebuilt from the l
 - [Manage a library applet](https://bridgit.cc/learn/builder/library-management.md): search the catalog, publish an offline-authored definition, manage visibility, fork and install a pinned revision
 - [Modifying applets and templates](https://bridgit.cc/learn/builder/modifying-applets.md): preserve personal requirements, integrate template updates, pause or detach
 - [Guide](https://bridgit.cc/learn/guide.md): the full agent guide, every endpoint, cards, events, schedules, conventions, errors
-- [API list](https://bridgit.cc/learn/endpoints.json): 353 endpoints with parameters, examples, errors and MCP tool names
+- [API list](https://bridgit.cc/learn/endpoints.json): 356 endpoints with parameters, examples, errors and MCP tool names
 - [OpenAPI 3.1](https://bridgit.cc/learn/openapi.json)
-- [Change log](https://bridgit.cc/learn/changes.json): what each API revision added, 1 to 146
+- [Change log](https://bridgit.cc/learn/changes.json): what each API revision added, 1 to 147
 - [Error codes](https://bridgit.cc/learn/errors.json): 85 codes, what each means and what to do
 - [MCP](https://bridgit.cc/learn/mcp.md): connecting as an MCP client, and every tool
 - [Location context services](https://bridgit.cc/learn/context-services.json): exact requests, provider keys, free allowances, costs and attribution for places, air quality, pollen, time zones, maps and weather

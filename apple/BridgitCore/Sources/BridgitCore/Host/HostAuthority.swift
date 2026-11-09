@@ -16,7 +16,15 @@ public enum HostOperation: String, Codable, CaseIterable {
     case connections, log
     case feedback, feedbackFixer = "feedback.fixer"
     case deviceRead = "device.read", appletsRead = "applets.read", appletsWrite = "applets.write", workflowsRun = "workflows.run"
-    public var capability: String { switch self { case .files, .shares, .downloads, .connections, .log, .lanDiscovery: return rawValue; case .feedback, .feedbackFixer: return "feedback"; case .administrator, .configurationRead, .configurationWrite: return "settings"; case .interactionsRead, .interactionsWrite: return "interactions"; case .speechHear, .microphoneRecord: return "mic"; case .speechSpeak: return "speaker"; case .cameraSnapshot: return "camera"; case .deviceRead: return "device"; case .appletsManage, .appletsRead, .appletsWrite, .appletsMediaRead, .appletsMediaWrite: return "applets"; case .workflowsRun: return "workflows" } }
+    #if os(macOS)
+    /// Computer use (A0112): see the screen and act in any app. Names match Android's grants.
+    case screenObserve = "screen.observe", screenControl = "screen.control"
+    #endif
+    public var capability: String { switch self {
+        #if os(macOS)
+        case .screenObserve, .screenControl: return "screen"
+        #endif
+        case .files, .shares, .downloads, .connections, .log, .lanDiscovery: return rawValue; case .feedback, .feedbackFixer: return "feedback"; case .administrator, .configurationRead, .configurationWrite: return "settings"; case .interactionsRead, .interactionsWrite: return "interactions"; case .speechHear, .microphoneRecord: return "mic"; case .speechSpeak: return "speaker"; case .cameraSnapshot: return "camera"; case .deviceRead: return "device"; case .appletsManage, .appletsRead, .appletsWrite, .appletsMediaRead, .appletsMediaWrite: return "applets"; case .workflowsRun: return "workflows" } }
 }
 enum RetiredHostCredential: String {
     case rotated = "key_rotated", removed = "agent_removed"
@@ -133,6 +141,7 @@ public struct HostRequest {
         if let target = query["target"] as? String, SatelliteForwardPolicy.validTarget(target), let operation = SatelliteForwardPolicy.operation(method: method, path: path) { return (operation, nil) }
         if let operation = HostAPIContract.operation(matching: self), operation.grant == .lanDiscovery { return (.lanDiscovery, nil) }
         if path == "/v1/satellites", method == "GET" { return (.deviceRead, nil) }
+        if let grant = ComputerUseContract.grant(method: method, path: path) { return (grant, nil) }
         if HostViewerPairing.permits(self) { return (.deviceRead, nil) }
         let p = path.split(separator: "/").map(String.init)
         guard !p.contains("."), !p.contains("..") else { return nil }
@@ -191,7 +200,7 @@ public struct HostRequest {
             if method == "DELETE" { return (.configurationWrite, nil) }
         }
         if p.count == 3, p[1] == "settings", method == "DELETE" { return (.configurationWrite, nil) }
-        if method == "GET", ["/v1/health", "/v1/capabilities", "/v1/device/profile", "/v1/discover", "/v1/openapi.json", "/v1/guide", "/v1/changes", "/v1/samples"].contains(path) { return (.deviceRead, nil) }
+        if method == "GET", ["/v1/health", "/v1/capabilities", "/v1/device/profile", "/v1/discover", "/v1/samples"].contains(path) || HostAPIPaths.selfDescription.contains(path) { return (.deviceRead, nil) }
         if ["GET", "POST"].contains(method), path == "/v1/mcp" { return (.deviceRead, nil) }
         if method == "GET", ["/v1/interactions", "/v1/events"].contains(path) { return (.interactionsRead, nil) }
         if method == "POST", path == "/v1/interactions" { return (.interactionsWrite, nil) }
@@ -715,7 +724,7 @@ public actor HostAuthority {
         let timeout = job.timeoutMilliseconds(for: agent)
         guard job.deadline > now, job.deadline - now <= timeout, job.createdAt <= now + 1000, job.createdAt > now - timeout else { throw DeviceAPIError(409, "deadline_expired", "This job has expired or has an invalid timestamp.") }
         guard let (operation, applet) = job.request.route else { throw DeviceAPIError(501, "unsupported_operation", "This Apple build does not implement this operation.") }
-        if requireFreshCapture && [.cameraSnapshot, .microphoneRecord].contains(operation) {
+        if requireFreshCapture && ([.cameraSnapshot, .microphoneRecord].contains(operation) || operation.isComputerUse) {
             guard job.createdAt >= now - 5000 else { throw DeviceAPIError(409, "capture_stale", "A capture request must be no more than five seconds old.") }
         }
         if agent.viewer == true {

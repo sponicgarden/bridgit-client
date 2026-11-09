@@ -1,10 +1,7 @@
 package cc.bridgit.app.ui.agents
 
-import android.view.Gravity
 import android.view.View
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -14,17 +11,15 @@ import cc.bridgit.app.core.Agent
 import cc.bridgit.app.power.PowerAccess
 import cc.bridgit.app.security.OwnerCheck
 import cc.bridgit.app.ui.common.dp
-import cc.bridgit.app.ui.common.themeColor
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
 
 /**
- * The one permission panel (A0130), shown while an agent is added and on its
- * Agents screen afterwards: top-level masters (Maximum Agentic Control,
- * Superpowers), then every capability group with its own master (all, some
- * or none) and count, expandable to the single permissions.
+ * The one permission panel (A0130), shown in place on the Agents and Linked Devices tab (A0115) and while an agent is
+ * added: top-level masters (API access, Maximum Agentic Control, Superpowers), then every capability group with its
+ * own master (all, some or none) and count, expandable to the single permissions. Linked devices (A0116) get the
+ * same groups without the agent masters ([linked]); this device gets its own switches ([device]).
  */
 object AgentPermissionsDialog {
     fun show(fragment: Fragment, id: String, changed: () -> Unit = {}) {
@@ -37,6 +32,77 @@ object AgentPermissionsDialog {
             .setView(scroll)
             .setPositiveButton(R.string.addagent_done, null).create()
         dialog.show()
+    }
+
+    /** Every permission an agent or linked device can be given (status and issue filing are always allowed). */
+    fun items(app: BridgeApp): List<PermissionGroups.Item> = app.registry.modules.filter { it.id !in Agent.ALWAYS_ALLOWED }
+        .map { PermissionGroups.Item(it.id, it.title, it.group, app.getString(it.descriptionRes)) }
+
+    /** This device's own switches: what any agent may use here. */
+    fun deviceItems(app: BridgeApp): List<PermissionGroups.Item> = app.registry.switchable()
+        .map { PermissionGroups.Item(it.id, it.title, it.group, app.getString(it.descriptionRes)) }
+
+    fun agentPerms(app: BridgeApp, agent: Agent) = PermissionHome.agent(items(app), agent)
+    fun linkedPerms(app: BridgeApp, l: LinkedDevices.Linked) = PermissionHome.linked(items(app), l.agent, LinkedDevices.ceiling(app, l))
+    fun devicePerms(app: BridgeApp): List<PermissionHome.Perm> {
+        val profile = cc.bridgit.app.platform.DeviceProfile(app)
+        val keys = app.registry.switchable().associate { it.id to it.switchKey!! }
+        return PermissionHome.device(deviceItems(app), { app.settings.isOn(keys.getValue(it)) }, { app.settings.isSpecific(keys.getValue(it)) }, profile::inherited)
+    }
+
+    /** Grants for an agent or linked device, as the Agents screen always set them, with the audit line. */
+    fun setGrants(app: BridgeApp, id: String, ids: Collection<String>, on: Boolean) {
+        val old = app.agents.get(id) ?: return
+        val grants = PermissionGroups.set(old.caps, items(app).map { it.id }, ids, on)
+        if (grants == old.caps) return
+        app.agents.update(id) { it.copy(caps = grants) }
+        if (!on) app.platform.invalidate(id)
+        fun label(caps: Set<String>?) = caps?.sorted()?.joinToString(",") ?: "all"
+        app.log.system("audit", "agent", "Owner changed ${old.name}'s grants: ${label(old.caps)} -> ${label(grants)}")
+    }
+
+    /** This device's switches in place: the same switch and audit line as Features, then Android's own access if it is needed. */
+    fun device(fragment: Fragment, requestAccess: (Array<String>) -> Unit, changed: () -> Unit = {}): View {
+        val app = fragment.requireActivity().application as BridgeApp
+        val context = fragment.requireContext()
+        lateinit var groups: PermissionGroupsView
+        groups = PermissionGroupsView(context, deviceItems(app), { devicePerms(app) }) { ids, on ->
+            val needs = mutableListOf<String>()
+            for (id in ids) {
+                val m = app.registry.byId(id) ?: continue
+                cc.bridgit.app.ui.home.UiActions.setSwitch(app, m, on)
+                if (on && m.blockedReason()?.startsWith("permission:") == true) needs += cc.bridgit.app.ui.home.UiActions.permissionsFor(m)
+            }
+            if (needs.isNotEmpty()) requestAccess(needs.distinct().toTypedArray())
+            changed()
+        }
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(context.dp(8), 0, context.dp(8), 0)
+            addView(groups.view)
+            tag = Runnable { groups.refresh() }
+        }
+    }
+
+    /** A linked device's permissions on this phone: the agent groups, capped at what its pairing gave it. */
+    fun linked(fragment: Fragment, id: String, changed: () -> Unit = {}): View {
+        val app = fragment.requireActivity().application as BridgeApp
+        val context = fragment.requireContext()
+        val empty = emptyList<PermissionHome.Perm>()
+        val groups = PermissionGroupsView(context, items(app), { LinkedDevices.get(app, id)?.let { linkedPerms(app, it) } ?: empty }) { ids, on ->
+            val l = LinkedDevices.get(app, id)
+            if (l != null) {
+                val ceiling = LinkedDevices.ceiling(app, l)
+                setGrants(app, id, if (on && ceiling != null) ids.filter { it in ceiling } else ids, on)
+                changed()
+            }
+        }
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(context.dp(8), 0, context.dp(8), 0)
+            addView(groups.view)
+            tag = Runnable { groups.refresh() }
+        }
     }
 
     fun content(fragment: Fragment, id: String, changed: () -> Unit = {}, close: () -> Unit = {}): View {
@@ -54,7 +120,6 @@ object AgentPermissionsDialog {
         val apiAccess = switch(R.string.agents_api_access)
         val maximum = switch(R.string.agents_maximum_control)
         val superpowers = switch(R.string.agents_super_switch)
-        val groupsBox = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
         val advanced = MaterialButton(context, null, com.google.android.material.R.attr.borderlessButtonStyle).apply {
             setText(R.string.agents_advanced_permissions)
         }
@@ -64,95 +129,15 @@ object AgentPermissionsDialog {
         }
         val fixer = switch(R.string.agents_fixer_switch)
         val deviceAccess = MaterialButton(context).apply { setText(R.string.power_max_review) }
-        content.addView(apiAccess); content.addView(maximum); content.addView(superpowers); content.addView(groupsBox)
+        var binding = false
+        lateinit var refresh: (Boolean) -> Unit
+        val empty = emptyList<PermissionHome.Perm>()
+        val groups = PermissionGroupsView(context, items(app), { app.agents.get(id)?.let { agentPerms(app, it) } ?: empty }) { ids, on ->
+            setGrants(app, id, ids, on); refresh(true)
+        }
+        content.addView(apiAccess); content.addView(maximum); content.addView(superpowers); content.addView(groups.view)
         content.addView(advanced); content.addView(details)
         details.addView(fixer); details.addView(deviceAccess)
-
-        val items = app.registry.modules.filter { it.id !in Agent.ALWAYS_ALLOWED }
-            .map { PermissionGroups.Item(it.id, it.title, it.group, context.getString(it.descriptionRes)) }
-        val allIds = items.map { it.id }
-        val expanded = mutableSetOf<String>()
-        var binding = false
-
-        fun setGrants(ids: Collection<String>, on: Boolean) {
-            val old = app.agents.get(id) ?: return
-            val grants = PermissionGroups.set(old.caps, allIds, ids, on)
-            app.agents.update(id) { it.copy(caps = grants) }
-            fun label(caps: Set<String>?) = caps?.sorted()?.joinToString(",") ?: "all"
-            app.log.system("audit", "agent", "Owner changed ${old.name}'s grants: ${label(old.caps)} -> ${label(grants)}")
-        }
-
-        // One row per group: master checkbox (on, partial, off), title, "n of m", chevron.
-        class Row(val master: MaterialCheckBox, val count: TextView, val chevron: ImageView,
-                  val children: LinearLayout, val boxes: Map<String, MaterialCheckBox>)
-        val rows = mutableMapOf<String, Row>()
-        lateinit var refresh: (Boolean) -> Unit
-        val agentNow = app.agents.get(id)
-        for (group in PermissionGroups.of(items) { agentNow?.allows(it) == true }) {
-            val title = PermissionGroups.title(context, group.key)
-            val header = LinearLayout(context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-                minimumHeight = context.dp(48)
-                isClickable = true; isFocusable = true
-                setBackgroundResource(android.util.TypedValue().also {
-                    context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true)
-                }.resourceId)
-            }
-            val master = MaterialCheckBox(context).apply { contentDescription = title }
-            val name = TextView(context).apply {
-                text = title
-                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-            }
-            val count = TextView(context).apply {
-                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
-                setTextColor(context.themeColor(com.google.android.material.R.attr.colorOnSurfaceVariant))
-                setPadding(context.dp(8), 0, context.dp(4), 0)
-            }
-            val chevron = ImageView(context).apply {
-                setImageResource(R.drawable.interactions_ic_expand)
-                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-            }
-            header.addView(master); header.addView(name); header.addView(count); header.addView(chevron)
-            val children = LinearLayout(context).apply {
-                orientation = LinearLayout.VERTICAL
-                setPadding(context.dp(32), 0, 0, 0)
-                visibility = View.GONE
-            }
-            val boxes = group.items.associate { item ->
-                item.id to MaterialCheckBox(context).apply {
-                    // Title, then what it does, where and when, on one control so it reads as one label.
-                    text = PermissionGroups.detail(item)?.let { detail ->
-                        android.text.SpannableStringBuilder(item.title).append('\n').apply {
-                            val start = length
-                            append(detail)
-                            setSpan(android.text.style.TextAppearanceSpan(context,
-                                com.google.android.material.R.style.TextAppearance_Material3_BodyMedium), start, length, 0)
-                            setSpan(android.text.style.ForegroundColorSpan(context.themeColor(
-                                com.google.android.material.R.attr.colorOnSurfaceVariant)), start, length, 0)
-                        }
-                    } ?: item.title
-                    minHeight = context.dp(48)
-                    setPadding(paddingLeft, context.dp(8), paddingRight, context.dp(8))
-                    setOnCheckedChangeListener { _, on -> if (!binding) { setGrants(listOf(item.id), on); refresh(true) } }
-                }
-            }
-            boxes.values.forEach { children.addView(it) }
-            master.addOnCheckedStateChangedListener { _, state ->
-                if (binding) return@addOnCheckedStateChangedListener
-                // A tap on a partial group turns the whole group on.
-                setGrants(group.items.map { it.id }, state != MaterialCheckBox.STATE_UNCHECKED)
-                refresh(true)
-            }
-            header.setOnClickListener {
-                if (!expanded.remove(group.key)) expanded.add(group.key)
-                refresh(false)
-            }
-            groupsBox.addView(header); groupsBox.addView(children)
-            rows[group.key] = Row(master, count, chevron, children, boxes)
-            header.tag = title
-        }
 
         refresh = refresh@{ notify ->
             val agent = app.agents.get(id) ?: return@refresh
@@ -161,22 +146,8 @@ object AgentPermissionsDialog {
             maximum.isChecked = access.isMaximum(id, requireSuper = false)
             superpowers.isChecked = agent.superPowers
             fixer.isChecked = agent.fixer
-            for (group in PermissionGroups.of(items) { agent.allows(it) }) {
-                val row = rows[group.key] ?: continue
-                row.master.checkedState = when (group.state) {
-                    PermissionGroups.State.ON -> MaterialCheckBox.STATE_CHECKED
-                    PermissionGroups.State.PARTIAL -> MaterialCheckBox.STATE_INDETERMINATE
-                    PermissionGroups.State.OFF -> MaterialCheckBox.STATE_UNCHECKED
-                }
-                row.count.text = context.getString(R.string.agents_group_count, group.granted, group.items.size)
-                row.boxes.forEach { (cap, box) -> box.isChecked = agent.allows(cap) }
-                val open = group.key in expanded
-                row.children.visibility = if (open) View.VISIBLE else View.GONE
-                row.chevron.rotation = if (open) 180f else 0f
-                val header = row.master.parent as View
-                header.contentDescription = "${header.tag}, ${row.count.text}, " + if (open) "expanded" else "collapsed"
-            }
             binding = false
+            groups.refresh()
             if (notify) changed()
         }
         content.tag = Runnable { refresh(false) }
@@ -220,7 +191,11 @@ object AgentPermissionsDialog {
             advanced.contentDescription = context.getString(R.string.agents_advanced_permissions) + if (advanced.isSelected) ", expanded" else ", collapsed"
         }
         fixer.setOnCheckedChangeListener { _, on ->
-            if (!binding) { app.agents.update(id) { it.copy(fixer = on) }; refresh(true) }
+            if (!binding) {
+                app.agents.update(id) { it.copy(fixer = on) }
+                app.log.system("audit", "agent", "Owner turned Fixer Mode ${if (on) "on" else "off"} for ${app.agents.get(id)?.name}")
+                refresh(true)
+            }
         }
         deviceAccess.setOnClickListener {
             close()

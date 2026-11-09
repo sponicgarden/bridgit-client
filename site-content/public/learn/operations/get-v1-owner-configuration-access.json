@@ -1,6 +1,6 @@
 {
- "documentation_revision": 129,
- "api_revision": 146,
+ "documentation_revision": 130,
+ "api_revision": 147,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Existing Super agents can inspect and delegate app-owned feature switches, capabilities, roles and control grants without a separate configuration grant",

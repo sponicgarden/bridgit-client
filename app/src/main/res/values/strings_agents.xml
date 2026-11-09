@@ -253,4 +253,29 @@
     <string name="agents_perm_group_private">Private data on this phone</string>
     <string name="agents_perm_group_controls">Control this phone</string>
     <string name="applet_agent_required">Your favorite agent can create an applet. Please Add and configure it first.</string>
+    <!-- A0115-A0118: the one permission home, the Agents and Linked Devices tab. -->
+    <string name="nav_agents_full">Agents and Linked Devices</string>
+    <string name="agents_section_devices">Linked devices</string>
+    <string name="agents_manage_linked">Pair and manage devices</string>
+    <string name="agents_this_device">This device</string>
+    <string name="perm_layer_default">Default</string>
+    <string name="perm_layer_super">Via Superpowers</string>
+    <string name="perm_layer_unavailable">Not given at pairing</string>
+    <string name="device_profile_edit">Edit device profile</string>
+    <string name="device_profile_title">Device profile</string>
+    <string name="device_profile_type">Type</string>
+    <string name="device_profile_model">Model</string>
+    <string name="device_profile_purposes">Purpose</string>
+    <string name="device_profile_no_purpose">No purpose set</string>
+    <string name="device_profile_save">Save</string>
+    <string name="device_type_other">Other</string>
+    <string name="purpose_primary">Primary device</string>
+    <string name="purpose_dedicated">Dedicated device</string>
+    <string name="purpose_network_controller">Network controller</string>
+    <string name="purpose_monitor">Monitor</string>
+    <string name="purpose_shared">Shared device</string>
+    <string name="linked_kind_portal">Portal</string>
+    <string name="linked_kind_hub">Hub</string>
+    <string name="linked_kind_satellite">Satellite</string>
+    <string name="perm_pointer">Permissions · %1$d of %2$d</string>
 </resources>

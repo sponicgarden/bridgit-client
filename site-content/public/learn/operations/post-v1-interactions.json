@@ -1,6 +1,6 @@
 {
- "documentation_revision": 129,
- "api_revision": 146,
+ "documentation_revision": 130,
+ "api_revision": 147,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",

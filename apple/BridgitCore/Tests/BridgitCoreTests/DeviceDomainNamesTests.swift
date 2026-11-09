@@ -225,7 +225,7 @@ final class DeviceDomainNamesTests: XCTestCase {
         XCTAssertEqual(names.first { $0.method == "GET" }?.grant, .configurationRead)
         XCTAssertTrue(names.filter { $0.method != "GET" }.allSatisfy { $0.grant == .configurationWrite })
         XCTAssertTrue(names.allSatisfy(OwnerDirectHostService.permitsOperation))
-        let revision = HostAPIChanges.document(since: 8, appVersion: "test")["changes"] as? [[String: Any]]
+        let revision = (HostAPIChanges.document(since: 8, appVersion: "test")["changes"] as? [[String: Any]])?.filter { $0["revision"] as? Int == 9 }
         XCTAssertEqual(revision?.count, 1)
         XCTAssertEqual((revision?.first?["items"] as? [[String: Any]])?.first?["endpoint"] as? String, DeviceDomainName.operationPath)
     }

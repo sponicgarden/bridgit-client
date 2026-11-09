@@ -76,8 +76,15 @@ public struct HostSettingChange {
     public static let disableDeviceCapabilities = "device_capabilities_off"
     public static let deviceCapabilityFields = ["host_camera", "host_microphone", "cloud_appraisals", "lan_discovery_enabled", "callback_allow_internet"] + TransferKind.allCases.map { $0.rawValue + "_enabled" }
     public static let fields = [disableDeviceCapabilities, wifiHistoryPermissionRequest, captureNotificationsRequest, externalCallsPausedField, speakerVolumeField, deviceNameField, "appearance", "devices_tab", "feedback_auto_fix", "callback_allow_internet", "files_enabled", "shares_enabled", "downloads_enabled", "feedback_upload", "host_enabled", "host_camera", "host_microphone", "lan_discovery_enabled", "host_direct_enabled", "host_direct_address", "host_direct_device_lock", "log_visibility", "host_wake", "cloud_appraisals", "speech_enabled", "speech_cloud"] + HostActivityRetentionField.allCases.map(\.rawValue)
+    /// Apple relay wake-ups (APNs background wake) exist only on iPhone and iPad. A Mac host
+    /// neither lists nor accepts host_wake, so its schema, supported_fields and validation agree.
+    #if os(macOS)
+    public static let hostWakeSupported = false
+    #else
+    public static let hostWakeSupported = true
+    #endif
     public static func availableFields(crashReporting: Bool) -> [String] {
-        fields + (crashReporting ? [crashReportsField] : [])
+        fields.filter { hostWakeSupported || $0 != "host_wake" } + (crashReporting ? [crashReportsField] : [])
     }
 
     public let field: String
@@ -111,6 +118,9 @@ public struct HostSettingChange {
         } else {
             guard request.method == "POST", request.query.isEmpty, Set(request.body.keys).isSubset(of: ["field", "value", "applet"]) else { throw Self.invalid() }
             body = request.body
+        }
+        if !Self.hostWakeSupported, body["field"] as? String == "host_wake" {
+            throw DeviceAPIError(422, "unsupported_setting", "Apple relay wake-ups are available on iPhone and iPad.")
         }
         guard let field = body["field"] as? String, Self.availableFields(crashReporting: crashReporting).contains(field), let value = body["value"] else { throw Self.invalid() }
         let scoped = ["speech_enabled", "speech_cloud"].contains(field)

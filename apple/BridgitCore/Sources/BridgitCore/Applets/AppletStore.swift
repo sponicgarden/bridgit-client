@@ -668,6 +668,16 @@ extension AppletStore {
                     [String(at.timeIntervalSince1970), message])
     }
 
+    /// A0113/A0114: the computer-use choice and its audit row commit together, so the
+    /// Activity log always explains how computer use came to be on or off.
+    func saveComputerUseChoice(key: String, value: String, message: String, at: Date = Date()) throws {
+        try transaction {
+            try setState(key, value: value)
+            try recordSetting(message, at: at)
+        }
+        didChange(.activity)
+    }
+
     /// Owner audit emitted only after the native export reports a completed write.
     public func recordSuccessfulHostActivityExport(count: Int, at date: Date = Date()) throws {
         guard count >= 0 else { throw DeviceAPIError(422, "invalid_parameter", "Invalid exported activity count.") }
@@ -1118,17 +1128,26 @@ extension AppletStore {
             try expireOwnerRequests(now: Date())
             guard let text = try strings("SELECT body FROM owner_requests WHERE owner=? AND id=?", [owner,id]).first else { throw DeviceAPIError(404, "request_not_found", "This request is unavailable.") }
             var body = try object(text)
-            if body["status"] as? String == "committing" { throw DeviceAPIError(409, "request_committing", "This change has committed. Read its outcome before proposing another change.") }
-            guard ["queued", "applying"].contains(body["status"] as? String ?? "") else { return body }
+            let status = body["status"] as? String ?? ""
+            if status == "committing" { throw DeviceAPIError(409, "request_committing", "This change has committed. Read its outcome before proposing another change.") }
+            // Repeating a successful cancel is harmless and returns the cancelled request.
+            if status == "cancelled" { return body }
+            // A request that already finished (completed, failed, declined, needs_os_permission,
+            // expired or outcome_unknown) was not cancelled: say so, as for committing (A0249).
+            guard ["queued", "applying"].contains(status) else {
+                throw DeviceAPIError(409, "request_closed", "This request already finished with status \(status) and was not cancelled. Read its outcome at /v1/settings/requests/\(id).")
+            }
             body["status"] = "cancelled"
             try execute("UPDATE owner_requests SET body=?,payload='{}' WHERE id=?", [try json(body), id])
             return body
         }
     }
     /// Native owner cancellation uses the same commit boundary as authenticated callers.
+    /// A request that finished meanwhile simply leaves the owner's pending list.
     public func cancelConfigurationOperation(id: String) throws {
         guard let owner = try strings("SELECT owner FROM owner_requests WHERE id=?", [id]).first else { return }
-        _ = try cancelOwnerRequest(owner: owner, id: id)
+        do { _ = try cancelOwnerRequest(owner: owner, id: id) }
+        catch let error as DeviceAPIError where error.code == "request_closed" {}
     }
     /// Claims a queued operation exactly once. Its payload is never exposed by HTTP/MCP.
     public func beginOwnerRequest(id: String, now: Date = Date()) throws -> (owner: String, payload: [String: Any]) {

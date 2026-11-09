@@ -224,13 +224,13 @@ public actor OwnerDirectHostService {
         failures[address] = (minute, count + 1)
     }
 
-    public static let supportedGrants: Set<HostOperation> = [
+    public static let supportedGrants: Set<HostOperation> = Set<HostOperation>([
         .deviceRead, .log, .feedback, .feedbackFixer, .cameraSnapshot, .microphoneRecord,
         .configurationRead, .configurationWrite, .administrator,
         .interactionsRead, .interactionsWrite, .files, .shares, .downloads, .connections,
         .appletsManage, .appletsRead, .appletsWrite, .appletsMediaRead, .appletsMediaWrite,
         .speechHear, .speechSpeak, .workflowsRun, .lanDiscovery
-    ]
+    ]).union(HostOperation.computerUseGrants)
 
     static func permits(_ incoming: HostRequest) -> Bool {
         var request = incoming

@@ -196,6 +196,10 @@ struct NativeHubLink: Identifiable {
                 await self.captureNotices.refresh()
                 return await self.captureNotices.availability == .allowed
             })
+            #if os(macOS)
+            // A0112–A0114: computer use. Off unless the caller has Superpowers or it is set on.
+            await dispatcher.attachComputerUse(local.computerUse)
+            #endif
             let secrets = NativeSatelliteSecrets()
             let satellite = SatelliteHostService(authority: authority, dispatcher: dispatcher, store: store, secrets: secrets, unavailable: { [weak self] in await self?.satelliteListenerUnavailable() }, profile: profile)
             let hub = SatelliteHubService(store: store, authority: authority, secrets: secrets, endpoint: { [weak satellite] in
@@ -1213,6 +1217,10 @@ struct NativeHubLink: Identifiable {
                 callable: ready && hardwareReady && noticeReady && enabled && allowed && !callableOperations.isEmpty, blockedReason: !allowed ? "agent_not_allowed" : !contextAllowed ? "foreground_required" : callableOperations.isEmpty ? "operation_unavailable" : !enabled ? "capability_disabled" : !noticeReady ? "notifications_off" : !hardwareReady ? "hardware_or_permission_unavailable" : !ready ? "foreground_required" : nil,
                 constraints: .init(execution: Self.allowsBackgroundAwake ? ["foreground", "background_awake"] : ["device", "settings", "interactions", "applets"].contains(runtime) ? ["foreground", "background_read"] : ["foreground"], parameters: parameters, limits: limits), operations: callableOperations)
         }
+        #if os(macOS)
+        capabilities["screen"] = ComputerUseHub.shared.capability(agent: agent, hostReady: ready,
+            operations: HostAPIRoutes.operations(for: agent, capability: "screen"), execution: ["foreground", "background_awake"])
+        #endif
         capabilities["lan_discovery"] = HostLanService.capability(agent: agent,
             serviceAvailable: local?.lan != nil, enabled: local?.lanDiscoveryEnabled == true,
             networkAvailable: local?.lan?.networkAvailable == true, hostReady: ready,

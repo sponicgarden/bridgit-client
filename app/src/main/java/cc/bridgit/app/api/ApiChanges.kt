@@ -666,6 +666,11 @@ object ApiChanges {
             Item("People view: view \"people\" on a screenshot or camera photo finds the people on the phone (offline) and returns one crop around all of them, each person's whole visible body plus a little padding (padding 0-0.5). aspect best_fit (default) or a shape like \"20:9\", \"1:1\", \"4:5\". The reply's people_view gives the crop box in the source frame, each person's box, the returned size and aspect_ratio, and aspect_met. Nobody found: no_person_found, and nothing is returned or kept", "/v1/screen/capture"),
             Item("The same view, aspect and padding on camera photos; the crop is cut from a larger photo, then sized as asked", "/v1/camera/snapshot"),
         )),
+        Revision(147, "1.8.0", "2026-11-09", listOf(
+            Item("The permission home: every control agent, this device and every linked device with granted/total and the layer that decided each permission (specific, default, superpowers, baseline, unavailable), as on the Agents and Linked Devices tab", "/v1/owner/configuration/permissions"),
+            Item("This device's profile (purposes, device_type, model) and its own switches: true/false sets one specifically, \"default\" returns it to the default its (type, purpose) pairs give it", "/v1/owner/configuration/permissions/device"),
+            Item("A linked device's permissions here (portal viewer, hub, satellite), within what its pairing gave it; Superpowers required", "/v1/owner/configuration/permissions/linked/{id}"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

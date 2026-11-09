@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 146). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 147). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,12 +14,13 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 146 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 147 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 146
-- People view: view "people" on a screenshot or camera photo finds the people on the phone (offline) and returns one crop around all of them, each person's whole visible body plus a little padding (padding 0-0.5). aspect best_fit (default) or a shape like "20:9", "1:1", "4:5". The reply's people_view gives the crop box in the source frame, each person's box, the returned size and aspect_ratio, and aspect_met. Nobody found: no_person_found, and nothing is returned or kept (`/v1/screen/capture`)
-- The same view, aspect and padding on camera photos; the crop is cut from a larger photo, then sized as asked (`/v1/camera/snapshot`)
+## New in revision 147
+- The permission home: every control agent, this device and every linked device with granted/total and the layer that decided each permission (specific, default, superpowers, baseline, unavailable), as on the Agents and Linked Devices tab (`/v1/owner/configuration/permissions`)
+- This device's profile (purposes, device_type, model) and its own switches: true/false sets one specifically, "default" returns it to the default its (type, purpose) pairs give it (`/v1/owner/configuration/permissions/device`)
+- A linked device's permissions here (portal viewer, hub, satellite), within what its pairing gave it; Superpowers required (`/v1/owner/configuration/permissions/linked/{id}`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -492,6 +493,25 @@ Body (JSON): `wake_words` Complete wake-word object list {phrase,agent_id,send_c
 Returns: same listening state as GET; no authority grants or model downloads.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/owner/configuration/listening {"wake_words":[]}`
+
+### `GET /v1/owner/configuration/permissions`
+Read the permission home (A0115-A0118): every control agent, this device (profile: purposes, type, model; its own switches) and every linked device, each with granted/total and the layer that decided each permission.
+Returns: layers, agents[{id,name,kind,granted,total,super_powers,maximum_control,all_permissions,permissions[{id,group,on,layer,can_change}],change_url}], device{name,profile{purposes,device_type,model,platform,generation,synced,inherited_defaults},granted,total,permissions[{id,group,on,layer,inherited}]}, linked_devices[{id,name,kind,granted,total,can_be_given,permissions,change_url}].
+Example: `GET /v1/owner/configuration/permissions`
+
+### `POST /v1/owner/configuration/permissions/device`
+Change this device's profile (purposes, device type, model; same rules as the tab and the team backend) and its own permission switches: true/false sets one specifically, "default" returns it to the inherited (type, purpose) default; explicit owner.configuration grant required; no per-change phone approval.
+Body (JSON): `profile` {purposes: [up to 8 short ids such as primary, dedicated, network_controller, monitor, shared], device_type: phone|tablet|computer|tv|watch|camera|other, model: 1-80 characters}; omitted fields stay; `switches` Switch id (GET permissions device.permissions[].id) to true, false or "default".
+Returns: changed{profile,switches}, backend synced|pending|unchanged, device (as in GET); same values change nothing.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/permissions/device {"profile":{"purposes":["network_controller"]},"switches":{"camera":"default"}}`
+
+### `POST /v1/owner/configuration/permissions/linked/{id}`
+Replace a linked device's permissions on this phone (a portal viewer, hub or satellite), within what its pairing gave it; Superpowers required, as for agent grants; explicit owner.configuration grant required; no per-change phone approval.
+Body (JSON): `capabilities` (required) Permission ids, a subset of can_be_given; [] removes all but the always-allowed ones.
+Returns: the linked device as in GET plus changed; forbidden beyond can_be_given.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/permissions/linked/{id} {"capabilities":["portal"]}`
 
 ### `GET /v1/owner/configuration/links`
 Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each.

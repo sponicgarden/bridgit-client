@@ -30,7 +30,8 @@ import cc.bridgit.app.ui.home.PermissionAsker
 import cc.bridgit.app.ui.home.UiActions
 
 /**
- * Feature enablement (UI-18, ui-spec 5.8): one MaterialSwitch per built capability,
+ * Feature enablement (UI-18, ui-spec 5.8): one switch per built capability, read-only since A0117 (each row opens
+ * this device's permissions on the Agents and Linked Devices tab, the one place they change),
  * grouped, with a readiness line when something is missing. Unbuilt
  * capabilities are simply absent from the registry, so they never show.
  * Max Agentic Control sits on top (moved from Home, 2 Nov 2026); Home's quick switches were
@@ -107,8 +108,10 @@ class FeaturesFragment : Fragment() {
                 r.title.text = m.title
                 r.description.text = getString(m.descriptionRes)
                 r.row.contentDescription = m.title + ", " + getString(m.descriptionRes)
-                UiActions.asSwitch(r.row) { m.enabled }
-                r.row.setOnClickListener { toggle(m) }
+                // A0117: the switch shows the state; it is changed on the Agents and Linked Devices tab (this device).
+                r.toggle.isClickable = false; r.toggle.isFocusable = false
+                r.row.contentDescription = r.row.contentDescription.toString() + ", " + getString(if (m.enabled) R.string.home_on else R.string.home_off)
+                r.row.setOnClickListener { cc.bridgit.app.ui.agents.AgentsFragment.open(this, "device") }
                 b.list.addView(r.root)
                 rows += m to r
             }
@@ -184,10 +187,4 @@ class FeaturesFragment : Fragment() {
 
     private fun openWakeWords() = startActivity(android.content.Intent(requireContext(), cc.bridgit.app.listen.WakeWordsActivity::class.java))
 
-    private fun toggle(m: Capability) {
-        val on = !m.enabled
-        UiActions.setSwitch(app, m, on)
-        if (on && m.blockedReason()?.startsWith("permission:") == true) perms.request(*UiActions.permissionsFor(m))
-        bind()
-    }
 }

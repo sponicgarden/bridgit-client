@@ -141,11 +141,18 @@ class AgentDetailFragment : Fragment() {
 
     private fun bindAgent() {
         val a = agent() ?: return
-        if (b.recommendedPermissions.childCount == 0) {
-            b.recommendedPermissions.addView(AgentPermissionsDialog.content(this, id))
-        } else {
-            (b.recommendedPermissions.getChildAt(0).tag as? Runnable)?.run()
-        }
+        // A0117: permissions are viewed and changed only on the Agents and Linked Devices tab; here, a read-only pointer.
+        val pointer = if (b.recommendedPermissions.childCount == 0)
+            cc.bridgit.app.databinding.PermissionsSummaryRowBinding.inflate(layoutInflater, b.recommendedPermissions, true).also { p ->
+                p.chevron.setImageResource(R.drawable.ic_chevron)
+                p.label.setText(R.string.nav_agents_full) // where the switches are; the section heading already says Permissions
+                (p.label.layoutParams as android.widget.LinearLayout.LayoutParams).marginStart = (16 * resources.displayMetrics.density).toInt()
+                p.root.setOnClickListener { AgentsFragment.open(this, "agent:$id") }
+            }
+        else cc.bridgit.app.databinding.PermissionsSummaryRowBinding.bind(b.recommendedPermissions.getChildAt(0))
+        val s = PermissionHome.summary(AgentPermissionsDialog.agentPerms(app, a))
+        pointer.count.text = getString(R.string.agents_group_count, s.granted, s.total)
+        pointer.root.contentDescription = getString(R.string.perm_pointer, s.granted, s.total)
         b.toolbar.title = a.name
         b.avatar.setAgent(a.name)
         b.name.text = a.name

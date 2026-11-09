@@ -1,5 +1,19 @@
 import Foundation
 
+/// The single source for the self-description paths and the applet package reference.
+/// The operation registry, authority routing and dispatcher all read these, and they match
+/// Android and site-content (`GET /v1/openapi.json`, `GET /v1/guide`, `GET /v1/changes`).
+enum HostAPIPaths {
+    static let openAPI = "/v1/openapi.json"
+    static let guide = "/v1/guide"
+    static let changes = "/v1/changes"
+    /// A successful read of one of these acknowledges the caller's API revision.
+    static let selfDescription: Set<String> = [openAPI, guide, changes]
+    /// The applet package format (bridgit-template/1, runtime.adapter bridgit.package.v1), as Android links it.
+    static let appletPackageFormat = "https://bridgit.cc/learn/builder/applet-packages.md"
+    static let appletPackageDescription = "The applet file itself: a bridgit-template/1 definition (kind applet) with runtime.adapter bridgit.package.v1 (legacy alias android.package.v1). Every field and a worked example: " + appletPackageFormat
+}
+
 /// One operation registry drives Apple HTTP discovery, OpenAPI and MCP. Discovery
 /// describes implementation; the authority and runtime profile still decide execution.
 struct HostAPIOperation {
@@ -12,7 +26,7 @@ struct HostAPIOperation {
         path.split(separator: "/").compactMap { $0.hasPrefix("{") ? String($0.dropFirst().dropLast()) : nil }
     }
     var requiresIdempotency: Bool { method != "GET" && name != "log_note" }
-    var requiresBody: Bool { ["configuration_callback_set", "log_note", "feedback_create", "feedback_status", "feedback_followup", "mic_record", "inbound_shares_create", "configuration_connections_create", "configuration_connections_update", "configuration_connections_rotate", "connections_send", "account_link_phone", "agents_add", "agents_update", "agents_rotate", "agent_update_self", "files_upload", "interactions_send", "applets_rows_add", "applets_rows_update", "settings_change", "applets_photo_import", "applets_validate", "applets_install", "applets_update", "applets_pause", "applets_retry", "linked_devices_add", "linked_devices_rename", "linked_devices_attach", "linked_devices_pause"].contains(name) }
+    var requiresBody: Bool { ComputerUseContract.bodyRequired.contains(name) || ["configuration_callback_set", "log_note", "feedback_create", "feedback_status", "feedback_followup", "mic_record", "inbound_shares_create", "configuration_connections_create", "configuration_connections_update", "configuration_connections_rotate", "connections_send", "account_link_phone", "agents_add", "agents_update", "agents_rotate", "agent_update_self", "files_upload", "interactions_send", "applets_rows_add", "applets_rows_update", "settings_change", "applets_photo_import", "applets_validate", "applets_install", "applets_update", "applets_pause", "applets_retry", "linked_devices_add", "linked_devices_rename", "linked_devices_attach", "linked_devices_pause"].contains(name) }
 
     private func pathPattern(_ variable: String) -> String {
         if name == "lan_brand_logo" { return "^[a-z0-9-]{1,64}$" }
@@ -48,6 +62,7 @@ struct HostAPIOperation {
         return schema
     }
     private var baseQuerySchema: [String: Any] {
+        if let schema = ComputerUseContract.querySchema(name) { return schema }
         if name == "log_note" { return ["type": "object", "description": "Note creation ignores query fields."] }
         if ["log_list", "log_stats", "log_export"].contains(name) {
             let boundary: [String: Any] = ["type": ["string", "integer"], "description": "Nonnegative entry ID or ISO 8601 timestamp."]
@@ -108,6 +123,7 @@ struct HostAPIOperation {
     var bodySchema: [String: Any] { bodySchema(crashReporting: false) }
 
     func bodySchema(crashReporting: Bool) -> [String: Any] {
+        if let schema = ComputerUseContract.bodySchema(name) { return schema }
         if name == "lan_discover" { return HostLanRequest.discoverSchema }
         if name == "configuration_callback_set" {
             return ["type": "object", "required": ["url"], "properties": ["url": ["type": "string", "maxLength": 2000, "writeOnly": true], "secret": ["type": "string", "pattern": "^cbs_[A-Za-z0-9_-]{43}$", "writeOnly": true]], "additionalProperties": false]
@@ -211,7 +227,7 @@ struct HostAPIOperation {
         if name == "linked_devices_pause" { return ["type": "object", "properties": ["paused": ["type": "boolean"]], "required": ["paused"], "additionalProperties": false] }
         if ["account_sign_in", "account_cancel_sign_in"].contains(name) { return ["type": "object", "maxProperties": 0] }
         if ["applets_validate", "applets_install", "applets_update"].contains(name) {
-            return ["type": "object", "properties": ["package": ["type": "object"], "config": ["type": "object", "maxProperties": 0]], "required": ["package"], "additionalProperties": false]
+            return ["type": "object", "properties": ["package": ["type": "object", "description": HostAPIPaths.appletPackageDescription], "config": ["type": "object", "maxProperties": 0]], "required": ["package"], "additionalProperties": false]
         }
         if name == "applets_pause" { return ["type": "object", "properties": ["paused": ["type": "boolean"]], "required": ["paused"], "additionalProperties": false] }
         if name == "applets_retry" { return ["type": "object", "properties": ["acknowledge_possible_charge": ["const": true]], "required": ["acknowledge_possible_charge"], "additionalProperties": false] }
@@ -245,7 +261,7 @@ struct HostAPIOperation {
 /// Apple host revisions describe Apple implementations, not Android version numbers.
 /// Increment this history when the Apple agent-facing contract changes.
 public enum HostAPIChanges {
-    public static let current = 9
+    public static let current = 11
     static func key(_ agent: HostAgent) -> String { "host-api-known:" + agent.id + ":" + agent.generation }
     static func document(since: Int, appVersion: String) -> [String: Any] {
         let revisions: [[String: Any]] = [
@@ -257,11 +273,19 @@ public enum HostAPIChanges {
             ["revision": 6, "app_version": NSNull(), "date": NSNull(), "items": [["what": "Read, change and reset the Bridgit device name independently of the OS name", "endpoint": "/v1/settings"]]],
             ["revision": 7, "app_version": NSNull(), "date": NSNull(), "items": [["what": "Read, change and reset crash reporting on configured iPhone and iPad builds", "endpoint": "/v1/settings"]]],
             ["revision": 8, "app_version": NSNull(), "date": NSNull(), "items": [["what": "Crash reporting settings on configured Mac builds", "endpoint": "/v1/settings"]]],
-            ["revision": 9, "app_version": NSNull(), "date": "2026-11-08", "items": [["what": "Bridgit names: register this Bridgit's Device Domain Name, change its label and visibility, or hide it (bridgit_name in capabilities); a visible name sends a heartbeat", "endpoint": "/v1/owner/configuration/name"]]]
+            ["revision": 9, "app_version": NSNull(), "date": "2026-11-08", "items": [["what": "Bridgit names: register this Bridgit's Device Domain Name, change its label and visibility, or hide it (bridgit_name in capabilities); a visible name sends a heartbeat", "endpoint": "/v1/owner/configuration/name"]]],
+            ["revision": 10, "app_version": NSNull(), "date": "2026-11-09", "items": [
+                ["what": "Applet package format reference linked from discovery, OpenAPI externalDocs, the package schema and these links (applet_package_format)", "endpoint": "/v1/applets/validate"],
+                ["what": "Samples describe this host: interaction_id is a UUID string, and only samples this host accepts are listed, with no_takeover: true", "endpoint": "/v1/samples"],
+                ["what": "Cancelling a configuration request that already committed or finished returns 409 request_closed instead of 200", "endpoint": "/v1/settings/requests/{id}"],
+                ["what": "Mac hosts no longer list host_wake or wake_status; Apple relay wake-ups are iPhone and iPad only", "endpoint": "/v1/settings"]]],
+            ["revision": 11, "app_version": NSNull(), "date": "2026-11-09", "items": [
+                ["what": "Mac computer use: screenshot, running apps, Accessibility tree and input actions (screen.observe, screen.control grants; screen capability). Off by default, on by default for agents with Superpowers; a specific on or off wins", "endpoint": "/v1/computer-use"],
+                ["what": "Read and set computer use (inherit, on, off) with the effective state, why, who changed it, and macOS permission status; ask macOS to show its permission prompts", "endpoint": "/v1/owner/configuration/computer-use"]]]
         ]
         return ["api_revision": current, "app_version": appVersion, "since": since,
                 "changes": revisions.filter { ($0["revision"] as? Int ?? 0) > since },
-                "links": ["guide": "/v1/guide", "openapi": "/v1/openapi.json", "capabilities": "/v1/capabilities", "changes": "/v1/changes"]]
+                "links": ["guide": HostAPIPaths.guide, "openapi": HostAPIPaths.openAPI, "capabilities": "/v1/capabilities", "changes": HostAPIPaths.changes, "applet_package_format": HostAPIPaths.appletPackageFormat]]
     }
 }
 
@@ -310,8 +334,8 @@ enum HostAPIContract {
         .init(name: "files_upload", method: "POST", path: "/v1/files", grant: .files, summary: "Send a private file as base64 in a JSON request up to 1 MB. Retained for 30 days."),
         .init(name: "satellites_list", method: "GET", path: "/v1/satellites", grant: .deviceRead, summary: "List only the satellites assigned to this agent by the owner, with last observed readiness and supported endpoints. A target never falls back to this host."),
         .init(name: "discover", method: "GET", path: "/v1/discover", grant: .deviceRead, summary: "Read caller-scoped operation discovery, optionally filtered by runtime ID"),
-        .init(name: "openapi", method: "GET", path: "/v1/openapi.json", grant: .deviceRead, summary: "Read this caller's OpenAPI contract"),
-        .init(name: "guide", method: "GET", path: "/v1/guide", grant: .deviceRead, summary: "Read the Apple host operation guide"),
+        .init(name: "openapi", method: "GET", path: HostAPIPaths.openAPI, grant: .deviceRead, summary: "Read this caller's OpenAPI contract"),
+        .init(name: "guide", method: "GET", path: HostAPIPaths.guide, grant: .deviceRead, summary: "Read the Apple host operation guide"),
         .init(name: "account_phones", method: "GET", path: "/v1/account/phones", grant: .configurationRead, summary: "List devices on the signed-in account with nullable self-reported platform and device_type. These descriptive facts do not imply permissions."),
         .init(name: "account_link_phone", method: "POST", path: "/v1/account/phones", grant: .configurationWrite, summary: "Link a phone using its one-time account code. Relay pairing is separate."),
         .init(name: "account_unlink_phone", method: "DELETE", path: "/v1/account/phones/{id}", grant: .configurationWrite, summary: "Remove a phone and its stored account history, keeping independent relay pairings."),
@@ -329,10 +353,10 @@ enum HostAPIContract {
         .init(name: "settings_change", method: "POST", path: "/v1/settings", grant: .configurationWrite, summary: "Queue an authorized settings change; applies automatically after response delivery, preserving OS consent. The capture_notifications_request action asks the OS for permission while Bridgit is active; the owner must respond. Poll its request URL for outcome; if still queued, repeat the original action with the same Idempotency-Key"),
         .init(name: "settings_reset", method: "DELETE", path: "/v1/settings/{field}", grant: .configurationWrite, summary: "Queue an authorized reset to the default; applies after response delivery, preserving OS consent"),
         .init(name: "settings_request", method: "GET", path: "/v1/settings/requests/{id}", grant: .configurationRead, summary: "Read this caller's configuration operation status; reads never execute. If queued, repeat the original action with the same Idempotency-Key"),
-        .init(name: "settings_cancel", method: "DELETE", path: "/v1/settings/requests/{id}", grant: .configurationWrite, summary: "Cancel this caller's pending configuration request"),
+        .init(name: "settings_cancel", method: "DELETE", path: "/v1/settings/requests/{id}", grant: .configurationWrite, summary: "Cancel this caller's queued or applying configuration request. Changes usually apply as soon as the change reply is delivered, so a cancel can arrive too late: once the change has committed or finished it returns 409 (request_committing or request_closed) and changes nothing; read the outcome at the request URL. Repeating a successful cancel returns the cancelled request"),
         .init(name: "samples", method: "GET", path: "/v1/samples", grant: .deviceRead, summary: "Read bundled interaction samples; id=html-connection-test checks the answer path"),
         .init(name: "device_health", method: "GET", path: "/v1/health", grant: .deviceRead, summary: "Read host health"),
-        .init(name: "api_changes", method: "GET", path: "/v1/changes", grant: .deviceRead, summary: "Read Apple host API changes since a revision"),
+        .init(name: "api_changes", method: "GET", path: HostAPIPaths.changes, grant: .deviceRead, summary: "Read Apple host API changes since a revision"),
         .init(name: "device_capabilities", method: "GET", path: "/v1/capabilities", grant: .deviceRead, summary: "Read current capability readiness"),
         .init(name: "device_profile", method: "GET", path: "/v1/device/profile", grant: .deviceRead, summary: "Read the caller-filtered device profile"),
         .init(name: "feedback_list", method: "GET", path: "/v1/feedback", grant: .feedback, summary: "List reports you filed, or all reports in Fixer Mode."),
@@ -353,8 +377,8 @@ enum HostAPIContract {
         .init(name: "interactions_get", method: "GET", path: "/v1/interactions/{id}", grant: .interactionsRead, summary: "Read a card or wait up to 55 seconds for its answer"),
         .init(name: "interactions_cancel", method: "DELETE", path: "/v1/interactions/{id}", grant: .interactionsWrite, summary: "Cancel this agent's pending card"),
         .init(name: "events", method: "GET", path: "/v1/events", grant: .interactionsRead, summary: "Read scoped interaction events with since, types, limit and wait"),
-        .init(name: "applets_validate", method: "POST", path: "/v1/applets/validate", grant: .appletsManage, summary: "Preflight an inline package without installation, grants, sensors or paid work. Unsupported package execution is rejected. URL imports and nonempty config are not supported yet"),
-        .init(name: "applets_install", method: "POST", path: "/v1/applets/install", grant: .appletsManage, summary: "Install a preflighted inline package under explicit owner-issued applet management authority; camera, speech and paid models keep their separate grants"),
+        .init(name: "applets_validate", method: "POST", path: "/v1/applets/validate", grant: .appletsManage, summary: "Preflight an inline package (format: " + HostAPIPaths.appletPackageFormat + ") without installation, grants, sensors or paid work. Unsupported package execution is rejected. URL imports and nonempty config are not supported yet"),
+        .init(name: "applets_install", method: "POST", path: "/v1/applets/install", grant: .appletsManage, summary: "Install a preflighted inline package (format: " + HostAPIPaths.appletPackageFormat + ") under explicit owner-issued applet management authority; camera, speech and paid models keep their separate grants"),
         .init(name: "applets_update", method: "POST", path: "/v1/applets/installed/{applet}/update", grant: .appletsManage, summary: "Update the matching package without destructive table migration; refuses active work"),
         .init(name: "applets_pause", method: "POST", path: "/v1/applets/installed/{applet}/pause", grant: .appletsManage, summary: "Persist pause/resume and invalidate old executions; active paid work may already have been submitted"),
         .init(name: "applets_remove", method: "DELETE", path: "/v1/applets/installed/{applet}", grant: .appletsManage, summary: "Remove an idle applet and its domain rows, photos and indexed checkpoints; reports leftover files/cache. Paid usage and idempotency audits retain their own policy"),
@@ -374,7 +398,7 @@ enum HostAPIContract {
         .init(name: "applets_rows_delete", method: "DELETE", path: "/v1/applets/installed/{applet}/tables/{table}/rows/{row}", grant: .appletsWrite, summary: "Delete an applet row; referenced photos retain their existing collection policy"),
         .init(name: "applets_rows_update", method: "PATCH", path: "/v1/applets/installed/{applet}/tables/{table}/rows/{row}", grant: .appletsWrite, summary: "Update a validated row"),
         .init(name: "applets_flow_run", method: "POST", path: "/v1/applets/installed/{applet}/flows/{flow}/run", grant: .workflowsRun, summary: "Run a granted called flow; camera, speech and cloud consent stay separate")
-    ]
+    ] + ComputerUseContract.operations
     static func allowed(_ agent: HostAgent, lanAvailable: Bool = false, callbacksAvailable: Bool = false) -> [HostAPIOperation] {
         if agent.viewer == true {
             guard agent.viewerClaimUntil == nil else { return [] }
@@ -410,7 +434,7 @@ enum HostAPIContract {
             guard id == nil || id == runtime else { return nil }
             return ["id": runtime, "runtime_id": runtime, "operations": operations.map { ["id": $0.name, "method": $0.method, "path": $0.path, "summary": $0.summary] }, "applets": runtime == "applets" || runtime == "workflows" ? agent.applets.sorted() : [], "profile_url": "/v1/device/profile"]
         }
-        return ["capabilities": entries, "scope": "this_device", "idempotency": ["retention_seconds": Int(HostIdempotencyPolicy.retentionSeconds), "per_caller_limit": HostIdempotencyPolicy.perCallerLimit, "device_limit": HostIdempotencyPolicy.deviceLimit, "cached_bytes": HostIdempotencyPolicy.cachedBytes, "compacted_result": "idempotency_result_expired"]]
+        return ["capabilities": entries, "scope": "this_device", "applet_package_format": HostAPIPaths.appletPackageFormat, "idempotency": ["retention_seconds": Int(HostIdempotencyPolicy.retentionSeconds), "per_caller_limit": HostIdempotencyPolicy.perCallerLimit, "device_limit": HostIdempotencyPolicy.deviceLimit, "cached_bytes": HostIdempotencyPolicy.cachedBytes, "compacted_result": "idempotency_result_expired"]]
     }
     static func openAPI(_ agent: HostAgent, lanAvailable: Bool = false, callbacksAvailable: Bool = false, crashReporting: Bool = false) -> [String: Any] {
         let direct = agent.ownerDirectPeers != nil
@@ -433,6 +457,9 @@ enum HostAPIContract {
                 item["parameters"] = parameters
                 item["requestBody"] = ["required": operation.requiresBody, "content": ["application/json": ["schema": operation.bodySchema(crashReporting: crashReporting)]]]
             }
+            if ["applets_validate", "applets_install", "applets_update"].contains(operation.name) {
+                item["externalDocs"] = ["description": "Applet package format", "url": HostAPIPaths.appletPackageFormat]
+            }
             if operation.name == "log_export" {
                 if direct { item["summary"] = "Stream all matching Activity as JSONL or CSV." }
                 var responses: [String: Any] = ["200": ["description": "Complete scoped export", "content": [
@@ -454,7 +481,7 @@ enum HostAPIContract {
             }
             paths[operation.path, default: [:]][operation.method.lowercased()] = item
         }
-        return ["openapi": "3.1.0", "info": ["title": "Bridgit Apple host", "version": "local-m3"], "paths": paths, "components": ["securitySchemes": [securityName: ["type": "http", "scheme": "bearer", "description": securityDescription]]]]
+        return ["openapi": "3.1.0", "info": ["title": "Bridgit Apple host", "version": "local-m3"], "externalDocs": ["description": "Applet package format", "url": HostAPIPaths.appletPackageFormat], "paths": paths, "components": ["securitySchemes": [securityName: ["type": "http", "scheme": "bearer", "description": securityDescription]]]]
     }
     static func tools(_ agent: HostAgent, lanAvailable: Bool = false, callbacksAvailable: Bool = false, crashReporting: Bool = false) -> [[String: Any]] {
         allowed(agent, lanAvailable: lanAvailable, callbacksAvailable: callbacksAvailable).map { ["name": $0.name, "description": $0.summary, "inputSchema": $0.schema(crashReporting: crashReporting)] }

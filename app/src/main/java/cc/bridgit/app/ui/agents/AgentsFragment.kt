@@ -49,6 +49,10 @@ class AgentsFragment : Fragment() {
     private lateinit var adapter: Adapter
     private var rows: List<Row> = emptyList()
     private var hubPanel: HubAgentsPanel? = null
+    /** Open permission panels: "agent:<id>", "device" (this device) or "linked:<id>". */
+    private val expanded = mutableSetOf<String>()
+    private val deviceCards = LinkedHashMap<String, cc.bridgit.app.databinding.LinkedDeviceRowBinding>()
+    private val access = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()) { renderDevices() }
     private val settingsChanged: () -> Unit = { view?.post { if (_b != null) refresh() } } // refresh also re-checks the Max banner
 
     /** Registry changes arrive per request (recordUse); coalesce them so a busy agent doesn't flood the log. */
@@ -73,6 +77,10 @@ class AgentsFragment : Fragment() {
         adapter = Adapter(
             onClick = { a -> findNavController().navigate(R.id.agentDetail, bundleOf("agentId" to a.id)) },
             onPause = { a -> togglePause(a) },
+            expanded = { "agent:${it.id}" in expanded },
+            onExpand = { a -> toggleExpanded("agent:${a.id}"); adapter.notifyItemRangeChanged(0, adapter.itemCount) },
+            panel = { a -> AgentPermissionsDialog.content(this, a.id, changed = { adapter.notifyItemRangeChanged(0, adapter.itemCount); renderDevices() }) },
+            summary = { a -> PermissionHome.summary(AgentPermissionsDialog.agentPerms(app, a)) },
         )
         b.list.adapter = adapter
         b.scroll.setOnScrollChangeListener { _: androidx.core.widget.NestedScrollView, _: Int, y: Int, _: Int, oldY: Int ->
@@ -140,7 +148,143 @@ class AgentsFragment : Fragment() {
 
     override fun onStart() { super.onStart(); app.settings.addListener(settingsChanged) }
     // Android's own screens (overlay, permissions) return to this same view, so check again here.
-    override fun onResume() { super.onResume(); renderMaxBanner(); syncHub() }
+    override fun onResume() {
+        super.onResume(); renderMaxBanner(); syncHub()
+        pendingFocus?.let { focus ->
+            expanded += focus; pendingFocus = null; refresh()
+            // Bring the opened panel's section into view.
+            val section = if (focus.startsWith("agent:")) b.agentsPanel else b.devicesPanel
+            b.scroll.post { if (_b != null) b.scroll.smoothScrollTo(0, section.top) }
+        }
+        syncProfile()
+    }
+
+    private fun toggleExpanded(key: String) { if (!expanded.remove(key)) expanded += key }
+
+    /** The profile goes up to (or comes down from) the team backend with its inherited defaults; offline it stays as it is here. */
+    private fun syncProfile() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) { runCatching { cc.bridgit.app.platform.DeviceProfile(app).sync() } }
+            renderDevices()
+        }
+    }
+
+    private fun purposeTitle(id: String): String = when (id) {
+        "primary" -> getString(R.string.purpose_primary)
+        "dedicated" -> getString(R.string.purpose_dedicated)
+        "network_controller" -> getString(R.string.purpose_network_controller)
+        "monitor" -> getString(R.string.purpose_monitor)
+        "shared" -> getString(R.string.purpose_shared)
+        else -> id.replace('_', ' ').replaceFirstChar { it.uppercase() }
+    }
+    private fun typeTitle(type: String): String = cc.bridgit.app.platform.DeviceType.parse(type)?.title ?: getString(R.string.device_type_other)
+
+    /** This device (profile and its own switches), then every linked device with its permissions here (A0116). */
+    private fun renderDevices() {
+        if (_b == null) return
+        val ctx = requireContext()
+        val profile = cc.bridgit.app.platform.DeviceProfile(app).get()
+        val linked = LinkedDevices.all(app)
+        val keys = listOf("device") + linked.map { "linked:${it.agent.id}" }
+        deviceCards.keys.filter { it !in keys }.forEach { k -> deviceCards.remove(k)?.let { b.devices.removeView(it.root) } }
+        keys.forEachIndexed { i, key ->
+            val card = deviceCards.getOrPut(key) {
+                cc.bridgit.app.databinding.LinkedDeviceRowBinding.inflate(layoutInflater, b.devices, false).also { c ->
+                    b.devices.addView(c.root, i.coerceAtMost(b.devices.childCount))
+                    c.permissions.root.setOnClickListener { toggleExpanded(key); renderDevices() }
+                    if (key == "device") {
+                        c.edit.isVisible = true
+                        c.edit.setOnClickListener { editProfile() }
+                        c.header.setOnClickListener { editProfile() }
+                    }
+                }
+            }
+            val perms: List<PermissionHome.Perm>
+            if (key == "device") {
+                card.name.text = cc.bridgit.app.platform.DeviceName.of(app)
+                card.line2.text = listOf(getString(R.string.agents_this_device), typeTitle(profile.deviceType), profile.model).joinToString(" · ")
+                card.purposes.text = profile.purposes.map(::purposeTitle).joinToString(", ").ifEmpty { getString(R.string.device_profile_no_purpose) }
+                card.icon.setImageResource(R.drawable.ic_nav_device)
+                perms = AgentPermissionsDialog.devicePerms(app)
+            } else {
+                val l = linked.first { "linked:${it.agent.id}" == key }
+                card.name.text = l.name
+                card.line2.text = getString(when (l.kind) {
+                    LinkedDevices.Kind.PORTAL -> R.string.linked_kind_portal
+                    LinkedDevices.Kind.HUB -> R.string.linked_kind_hub
+                    LinkedDevices.Kind.SATELLITE -> R.string.linked_kind_satellite
+                })
+                card.purposes.isVisible = false
+                card.icon.setImageResource(if (l.kind == LinkedDevices.Kind.PORTAL) R.drawable.ic_computer else R.drawable.ic_nav_device)
+                perms = AgentPermissionsDialog.linkedPerms(app, l)
+            }
+            val s = PermissionHome.summary(perms)
+            val open = key in expanded
+            card.permissions.count.text = getString(R.string.agents_group_count, s.granted, s.total)
+            card.permissions.chevron.rotation = if (open) 180f else 0f
+            card.permissions.root.contentDescription = getString(R.string.perm_pointer, s.granted, s.total) + if (open) ", expanded" else ", collapsed"
+            card.header.contentDescription = listOf(card.name.text, card.line2.text, card.purposes.text.takeIf { card.purposes.isVisible }).filterNotNull().joinToString(", ")
+            card.permissionsPanel.isVisible = open
+            if (open) {
+                val panel = card.permissionsPanel.getChildAt(0)
+                if (panel == null) card.permissionsPanel.addView(
+                    if (key == "device") AgentPermissionsDialog.device(this, { access.launch(it) }) { renderDevices() }
+                    else AgentPermissionsDialog.linked(this, key.removePrefix("linked:")) { renderDevices() })
+                else (panel.tag as? Runnable)?.run()
+            } else card.permissionsPanel.removeAllViews()
+        }
+    }
+
+    /** The profile editor: type (one), purposes (one or more), model. The same rules as the API and the backend. */
+    private fun editProfile() {
+        val ctx = requireContext()
+        val store = cc.bridgit.app.platform.DeviceProfile(app)
+        val p = store.get()
+        val d = resources.displayMetrics.density
+        fun label(text: Int) = android.widget.TextView(ctx).apply {
+            setText(text)
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge)
+            setPadding(0, (16 * d).toInt(), 0, (4 * d).toInt())
+        }
+        fun chip(text: String, checked: Boolean) = com.google.android.material.chip.Chip(ctx).apply {
+            setChipDrawable(com.google.android.material.chip.ChipDrawable.createFromAttributes(ctx, null, 0,
+                com.google.android.material.R.style.Widget_Material3_Chip_Filter))
+            this.text = text; isCheckable = true; isChecked = checked
+        }
+        val types = com.google.android.material.chip.ChipGroup(ctx).apply { isSingleSelection = true; isSelectionRequired = true }
+        val typeIds = cc.bridgit.app.platform.DeviceProfile.Rules.TYPES
+        typeIds.forEach { t -> types.addView(chip(typeTitle(t), t == p.deviceType).apply { tag = t }) }
+        val purposes = com.google.android.material.chip.ChipGroup(ctx)
+        (cc.bridgit.app.platform.DeviceProfile.Rules.PURPOSES + p.purposes).distinct().forEach { id ->
+            purposes.addView(chip(purposeTitle(id), id in p.purposes).apply { tag = id })
+        }
+        val model = com.google.android.material.textfield.TextInputEditText(ctx).apply {
+            setText(p.model); isSingleLine = true
+            filters = arrayOf(android.text.InputFilter.LengthFilter(cc.bridgit.app.platform.DeviceProfile.Rules.MODEL_CHARS))
+        }
+        val modelBox = com.google.android.material.textfield.TextInputLayout(ctx).apply { addView(model) }
+        val body = android.widget.LinearLayout(ctx).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding((24 * d).toInt(), 0, (24 * d).toInt(), 0)
+            addView(label(R.string.device_profile_purposes)); addView(purposes)
+            addView(label(R.string.device_profile_type)); addView(types)
+            addView(label(R.string.device_profile_model)); addView(modelBox)
+        }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(ctx)
+            .setTitle(R.string.device_profile_title)
+            .setView(androidx.core.widget.NestedScrollView(ctx).apply { addView(body) })
+            .setPositiveButton(R.string.device_profile_save) { _, _ ->
+                val chosenType = (0 until types.childCount).map { types.getChildAt(it) as com.google.android.material.chip.Chip }.firstOrNull { it.isChecked }?.tag as? String
+                val chosen = (0 until purposes.childCount).map { purposes.getChildAt(it) as com.google.android.material.chip.Chip }.filter { it.isChecked }.map { it.tag as String }
+                try {
+                    store.update(chosen, chosenType, model.text?.toString().orEmpty(), by = "Owner")
+                } catch (e: cc.bridgit.app.api.ApiError) {
+                    Snackbar.make(b.root, e.message ?: "", Snackbar.LENGTH_LONG).show(); return@setPositiveButton
+                }
+                renderDevices(); syncProfile()
+            }
+            .setNegativeButton(R.string.cancel, null).show()
+    }
 
     /** Switched to the hub: its agents cover this phone's list, and Add agent goes away (agents are added on the hub). */
     private fun syncHub() { val onHub = hubPanel?.sync() == true; _b?.fab?.isVisible = !onHub; _b?.toolbar?.isVisible = !onHub }
@@ -201,8 +345,7 @@ class AgentsFragment : Fragment() {
         renderTools()
         adapter.status = status()
         // Portal pairings only view the phone: one row links to More › Linked devices instead of agent cards.
-        val portal = runCatching { cc.bridgit.app.portal.PortalPairing.paired(app, RelayStore(app)) }.getOrDefault(emptyList())
-        renderPortalRow(portal)
+        renderDevices()
         val agents = cc.bridgit.app.ui.home.HomeStates.controlAgents(app)
         // Show the cards straight away with the last known counts, then fill in today's numbers.
         val known = rows.associate { it.agent.id to it.today }
@@ -213,14 +356,6 @@ class AgentsFragment : Fragment() {
             }
             if (_b != null) show(counted)
         }
-    }
-
-    private fun renderPortalRow(portal: List<Agent>) {
-        b.portalRow.isVisible = portal.isNotEmpty()
-        if (portal.isEmpty()) return
-        // The device it said it is (iPad, iPhone…) once it has called; "iPhone/iPad" until then, as on Home.
-        val names = portal.map { cc.bridgit.app.portal.PortalModule.clientOf(it.id) ?: "iPhone/iPad" }.distinct()
-        b.portalRow.text = getString(R.string.portal_agents_row, names.joinToString(", "))
     }
 
     private fun show(list: List<Row>) {
@@ -315,6 +450,7 @@ class AgentsFragment : Fragment() {
 
     override fun onDestroyView() {
         hubPanel = null
+        deviceCards.clear() // their views go with this view; the next view builds its own
         app.agents.removeListener(agentsChanged)
         view?.removeCallbacks(refreshSoon)
         super.onDestroyView()
@@ -323,10 +459,30 @@ class AgentsFragment : Fragment() {
 
     data class Status(val allPaused: Boolean, val tailscaleUp: Boolean, val externalPaused: Boolean)
 
+    companion object {
+        /** A read-only pointer elsewhere (A0117) opens this tab with one panel open: "agent:<id>", "device" or "linked:<id>". */
+        @Volatile var pendingFocus: String? = null
+
+        /** Every other screen's way into the permissions: switch to this tab with [focus]'s panel open. */
+        fun open(fragment: Fragment, focus: String) {
+            pendingFocus = focus
+            val nav = fragment.findNavController()
+            nav.navigate(R.id.agents, null, androidx.navigation.NavOptions.Builder().setLaunchSingleTop(true)
+                .setPopUpTo(nav.graph.startDestinationId, inclusive = false, saveState = true).build())
+        }
+    }
+
     /** [now] is part of the row so "seen 2m ago" and the dot are rebound on each tick. */
     data class Row(val agent: Agent, val today: Int, val now: Long)
 
-    private class Adapter(private val onClick: (Agent) -> Unit, private val onPause: (Agent) -> Unit) : ListAdapter<Row, Adapter.Holder>(DIFF) {
+    private class Adapter(
+        private val onClick: (Agent) -> Unit,
+        private val onPause: (Agent) -> Unit,
+        private val expanded: (Agent) -> Boolean,
+        private val onExpand: (Agent) -> Unit,
+        private val panel: (Agent) -> View,
+        private val summary: (Agent) -> PermissionHome.Summary,
+    ) : ListAdapter<Row, Adapter.Holder>(DIFF) {
         class Holder(val b: AgentsRowBinding) : RecyclerView.ViewHolder(b.root)
 
         var status = Status(allPaused = false, tailscaleUp = true, externalPaused = false)
@@ -404,6 +560,21 @@ class AgentsFragment : Fragment() {
             h.b.info.contentDescription = listOf(a.name, h.b.connection.text, h.b.line2.text).joinToString(", ") + dev
             h.b.root.contentDescription = h.b.info.contentDescription
             h.b.root.setOnClickListener { onClick(a) }
+
+            // A0115: "Permissions  12 of 20", and the full panel with its switches in place when opened.
+            val s = summary(a)
+            val open = expanded(a)
+            h.b.permissions.count.text = ctx.getString(R.string.agents_group_count, s.granted, s.total)
+            h.b.permissions.chevron.rotation = if (open) 180f else 0f
+            h.b.permissions.root.contentDescription = ctx.getString(R.string.perm_pointer, s.granted, s.total) + if (open) ", expanded" else ", collapsed"
+            h.b.permissions.root.setOnClickListener { onExpand(a) }
+            h.b.permissionsPanel.isVisible = open
+            val shown = h.b.permissionsPanel.getChildAt(0)
+            if (!open || h.b.permissionsPanel.tag != a.id) { h.b.permissionsPanel.removeAllViews(); h.b.permissionsPanel.tag = null }
+            if (open) {
+                if (h.b.permissionsPanel.childCount == 0) { h.b.permissionsPanel.addView(panel(a)); h.b.permissionsPanel.tag = a.id }
+                else (shown?.tag as? Runnable)?.run()
+            }
         }
 
         companion object {

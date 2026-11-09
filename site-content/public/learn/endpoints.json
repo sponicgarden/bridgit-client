@@ -2071,6 +2071,92 @@
    "requires": null
   },
   {
+   "summary": "Read the permission home (A0115-A0118): every control agent, this device (profile: purposes, type, model; its own switches) and every linked device, each with granted/total and the layer that decided each permission",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_permissions",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/permissions",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/permissions",
+   "capability": "owner_features",
+   "returns": "layers, agents[{id,name,kind,granted,total,super_powers,maximum_control,all_permissions,permissions[{id,group,on,layer,can_change}],change_url}], device{name,profile{purposes,device_type,model,platform,generation,synced,inherited_defaults},granted,total,permissions[{id,group,on,layer,inherited}]}, linked_devices[{id,name,kind,granted,total,can_be_given,permissions,change_url}]",
+   "errors": [],
+   "requires": null
+  },
+  {
+   "summary": "Change this device's profile (purposes, device type, model; same rules as the tab and the team backend) and its own permission switches: true/false sets one specifically, \"default\" returns it to the inherited (type, purpose) default; explicit owner.configuration grant required; no per-change phone approval",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_permissions_device",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "profile",
+     "description": "{purposes: [up to 8 short ids such as primary, dedicated, network_controller, monitor, shared], device_type: phone|tablet|computer|tv|watch|camera|other, model: 1-80 characters}; omitted fields stay",
+     "type": "object",
+     "required": false
+    },
+    {
+     "name": "switches",
+     "description": "Switch id (GET permissions device.permissions[].id) to true, false or \"default\"",
+     "type": "object",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/owner/configuration/permissions/device {\"profile\":{\"purposes\":[\"network_controller\"]},\"switches\":{\"camera\":\"default\"}}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/permissions/device",
+   "capability": "owner_features",
+   "returns": "changed{profile,switches}, backend synced|pending|unchanged, device (as in GET); same values change nothing",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "not_found",
+    "conflict",
+    "upstream_failed"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Replace a linked device's permissions on this phone (a portal viewer, hub or satellite), within what its pairing gave it; Superpowers required, as for agent grants; explicit owner.configuration grant required; no per-change phone approval",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_permissions_linked",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [{
+    "name": "capabilities",
+    "description": "Permission ids, a subset of can_be_given; [] removes all but the always-allowed ones",
+    "type": "array",
+    "required": true
+   }],
+   "example": "POST /v1/owner/configuration/permissions/linked/{id} {\"capabilities\":[\"portal\"]}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/permissions/linked/{id}",
+   "capability": "owner_features",
+   "returns": "the linked device as in GET plus changed; forbidden beyond can_be_given",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "not_found",
+    "conflict",
+    "upstream_failed"
+   ],
+   "requires": null
+  },
+  {
    "summary": "Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each",
    "method": "GET",
    "auth": true,
@@ -12015,7 +12101,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 146,
- "count": 353,
+ "api_revision": 147,
+ "count": 356,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

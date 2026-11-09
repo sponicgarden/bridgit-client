@@ -24,7 +24,7 @@
         <argument android:name="cardId" app:argType="string" />
     </fragment>
     <!-- Owner, 30 Oct 2026: Agents is a tab again; Applets lives in the Interactions screen as a subtab. -->
-    <fragment android:id="@+id/agents" android:name="cc.bridgit.app.ui.agents.AgentsFragment" android:label="@string/nav_agents" />
+    <fragment android:id="@+id/agents" android:name="cc.bridgit.app.ui.agents.AgentsFragment" android:label="@string/nav_agents_full" />
     <!-- Not a tab since 1.5 (D26): opened from More, Home's Today card and Agent detail. -->
     <fragment android:id="@+id/activity" android:name="cc.bridgit.app.ui.activity.ActivityFragment" android:label="@string/nav_activity" />
     <fragment android:id="@+id/more" android:name="cc.bridgit.app.ui.more.MoreFragment" android:label="@string/nav_more" />

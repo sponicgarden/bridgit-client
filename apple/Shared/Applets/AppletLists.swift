@@ -80,9 +80,8 @@ enum AppletLists {
     static func sample(_ id: String?) throws -> [String: Any] {
         guard let url = Bundle.main.url(forResource: "samples", withExtension: "json"),
               let root = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any] else { throw DeviceAPIError(503, "samples_unavailable", "The sample library did not load.") }
-        guard let id else { return root }
-        guard let row = (root["samples"] as? [[String: Any]])?.first(where: { $0["id"] as? String == id }) else { throw DeviceAPIError(404, "sample_not_found", "This sample is unavailable.") }
-        return row
+        // The bundle is Android's catalog; serve it as this host's contract (UUID interaction_id).
+        return try HostSamples.appleHost(root, id: id)
     }
 
     /// The Apple bundle carries the Android 3347 catalog with the accessible checklist slider.

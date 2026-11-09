@@ -7,6 +7,8 @@ import UserNotifications
 #endif
 #if os(iOS)
 import UIKit
+#else
+import AppKit
 #endif
 
 enum HardwareSensor: String, CaseIterable, Identifiable {
@@ -141,6 +143,9 @@ struct HardwareAccessView: View {
                     }
                 }
                 WiFiHistoryAccessView()
+                #if os(macOS)
+                ComputerUseAccessView()
+                #endif
                 ForEach(ApplePermissionTopic.hardware.filter { $0 != .camera && $0 != .microphone }) { topic in
                     LabeledContent(topic.title, value: topic.status(.current))
                 }
@@ -175,6 +180,56 @@ struct HardwareAccessView: View {
         }
     }
 }
+
+#if os(macOS)
+/// A0112–A0114: the owner's computer-use choice and the two macOS permissions it needs.
+/// "With Superpowers" is the default: on only for agents the owner gave Superpowers.
+private struct ComputerUseAccessView: View {
+    @ObservedObject private var hub = ComputerUseHub.shared
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SectionLabel(text: "Computer use").accessibilityAddTraits(.isHeader)
+            Picker("Computer use", selection: Binding(get: { hub.choice.setting }, set: { value in Task { await hub.set(value) } })) {
+                Text("With Superpowers").tag(ComputerUseSetting.inherit)
+                Text("On").tag(ComputerUseSetting.on)
+                Text("Off").tag(ComputerUseSetting.off)
+            }
+            .pickerStyle(.segmented)
+            .disabled(hub.service == nil)
+            .accessibilityIdentifier("computer-use-setting")
+            permission("Accessibility", granted: hub.permissions.accessibility, pane: "Privacy_Accessibility")
+            permission("Screen Recording", granted: hub.permissions.screenRecording, pane: "Privacy_ScreenCapture")
+            if !hub.permissions.complete {
+                Button("Grant") { Task { await hub.requestPermissions() } }
+                    .accessibilityLabel("Grant computer use permissions")
+                    .accessibilityIdentifier("computer-use-grant")
+            }
+            if let problem = hub.problem { Text(problem).foregroundStyle(B.error) }
+            Divider()
+        }
+        .task { await hub.refresh() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            Task { await hub.refresh() }
+        }
+    }
+
+    private func permission(_ title: String, granted: Bool, pane: String) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Text(granted ? "On" : "Off")
+            if !granted {
+                Button("Open Settings") {
+                    if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?" + pane) { openURL(url) }
+                }
+                .accessibilityLabel("Open " + title + " settings")
+            }
+        }
+    }
+}
+#endif
 
 /// OS consent is independent of feature switches and per-agent/app-specific authority.
 enum HardwareAccessPolicy {
@@ -221,7 +276,7 @@ enum ApplePermissionTopic: String, Identifiable, CaseIterable {
         switch self {
         case .camera, .microphone: "OS permission"
         case .photos: "Selected attachments only"
-        case .screenshots: "Not implemented"
+        case .screenshots: platform == .macOS ? "Computer use" : "Not implemented"
         case .notifications: "Capture notifications"
         case .battery: platform == .macOS ? "While this Mac is awake" : "Foreground required for capture"
         case .updates: platform == .macOS ? "Install a newer Mac build" : "TestFlight"
@@ -244,6 +299,11 @@ enum ApplePermissionTopic: String, Identifiable, CaseIterable {
                     "This picker does not grant agents access to your photo library. Agent gallery search and library fetch are not implemented.",
                     "Saved applet photos remain subject to that applet’s media permissions and the agent’s applet scope."]
         case .screenshots:
+            if platform == .macOS {
+                return ["Computer use lets an agent see this Mac’s screen and use its apps. With Superpowers, it is on only for agents you gave Superpowers. On allows every agent with screen access; Off stops all of them.",
+                        "Click Grant, then switch on Bridgit in Privacy & Security › Accessibility and › Screen & System Audio Recording. macOS may ask you to reopen Bridgit.",
+                        "Choose Off here, or Turn off computer use in the menu bar, to stop an agent at any time."]
+            }
             return ["Agent capture of this device’s screen is not implemented in this Apple build.",
                     "Attaching an existing screenshot to a report does not enable device screenshot capture."]
         case .notifications:

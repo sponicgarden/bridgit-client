@@ -1,5 +1,5 @@
 {
- "api_revision": 146,
+ "api_revision": 147,
  "changes": [
   {
    "date": "2026-10-27",
@@ -2400,6 +2400,25 @@
     }
    ],
    "revision": 146
+  },
+  {
+   "date": "2026-11-09",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/owner/configuration/permissions",
+     "what": "The permission home: every control agent, this device and every linked device with granted/total and the layer that decided each permission (specific, default, superpowers, baseline, unavailable), as on the Agents and Linked Devices tab"
+    },
+    {
+     "endpoint": "/v1/owner/configuration/permissions/device",
+     "what": "This device's profile (purposes, device_type, model) and its own switches: true/false sets one specifically, \"default\" returns it to the default its (type, purpose) pairs give it"
+    },
+    {
+     "endpoint": "/v1/owner/configuration/permissions/linked/{id}",
+     "what": "A linked device's permissions here (portal viewer, hub, satellite), within what its pairing gave it; Superpowers required"
+    }
+   ],
+   "revision": 147
   }
  ],
  "links": {

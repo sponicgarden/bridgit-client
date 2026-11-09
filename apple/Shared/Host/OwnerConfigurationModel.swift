@@ -199,7 +199,7 @@ struct CrashReportingSettings {
         }
         if request.method == "GET" {
             guard request.query.isEmpty, request.body.isEmpty else { throw DeviceAPIError(422, "invalid_parameter", "Settings reads take no parameters.") }
-            var values: [String: Any] = ["feedback_upload": FeedbackReports.shared.sendingEnabled, "host_enabled": local.host?.enabledIntent ?? false, "host_status": local.host?.state.rawValue ?? "stopped", "camera_os_permission": AppleCamera.permission, "host_camera": local.host?.cameraEnabled ?? false, "host_microphone": local.host?.microphoneEnabled ?? false, "host_wake": local.host?.wakeEnabled ?? false, "wake_status": local.host?.wakeStatus ?? "off", "cloud_appraisals": local.modelEnabled,
+            var values: [String: Any] = ["feedback_upload": FeedbackReports.shared.sendingEnabled, "host_enabled": local.host?.enabledIntent ?? false, "host_status": local.host?.state.rawValue ?? "stopped", "camera_os_permission": AppleCamera.permission, "host_camera": local.host?.cameraEnabled ?? false, "host_microphone": local.host?.microphoneEnabled ?? false, "cloud_appraisals": local.modelEnabled,
                 "applets": local.packages.compactMap { package -> [String: Any]? in
                     guard let id = package["id"] as? String, agent.allowsApplet(id, operation: .configurationRead) else { return nil }
                     return ["id": id, "speech_enabled": local.speech.enabled.contains(id), "speech_cloud": local.speech.cloudAllowed.contains(id)]
@@ -241,20 +241,20 @@ struct CrashReportingSettings {
             let enabledTransfers = try await store.enabledTransfers()
             for kind in TransferKind.allCases { values[kind.rawValue + "_enabled"] = enabledTransfers.contains(kind) }
             values["feedback_auto_fix"] = UserDefaults.standard.object(forKey: "feedback.bug.autoFix") as? Bool ?? true
-            var supported = HostSettingChange.availableFields(crashReporting: crashReporting != nil)
+            let supported = HostSettingChange.availableFields(crashReporting: crashReporting != nil)
             if let crashReporting { values[HostSettingChange.crashReportsField] = crashReporting.read() }
             values["appearance"] = AppleFixtureWorkspace.defaults.string(forKey: "appearance") ?? "System"
             values["devices_tab"] = AppleFixtureWorkspace.defaults.string(forKey: "devices.tab") ?? "map"
-            #if os(macOS)
-            supported.removeAll { $0 == "host_wake" }
-            #endif
+            // Wake-ups are listed only where they can be changed (iPhone and iPad), so a read never
+            // advertises a field the same host refuses (A0249).
+            if HostSettingChange.hostWakeSupported {
+                values["host_wake"] = local.host?.wakeEnabled ?? false
+                values["wake_status"] = local.host?.wakeStatus ?? "off"
+            }
             return try .json(["values": values, "supported_fields": supported, "device_capabilities_off_fields": HostSettingChange.deviceCapabilityFields
                 + (crashReporting != nil ? [HostSettingChange.crashReportsField] : []), "write_mode": "authorized_after_delivery", "operation_expires_seconds": 600, "request_limit_per_caller": 3, "request_url": "/v1/settings/requests/{id}", "secrets": "write_only"])
         }
         let change = try HostSettingChange(request, agent: agent, crashReporting: crashReporting != nil)
-        #if os(macOS)
-        guard change.field != "host_wake" else { throw DeviceAPIError(422, "unsupported_setting", "This setting is available on iPhone and iPad.") }
-        #endif
         if let applet = change.applet { _ = try await store.package(applet) }
         let summary = Self.summary(change)
         let value = try await store.createOwnerRequest(owner: owner, sender: agent.name, summary: summary, payload: change.payload)

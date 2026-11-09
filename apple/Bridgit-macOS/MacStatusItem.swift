@@ -1,4 +1,6 @@
 import AppKit
+import BridgitCore
+import Combine
 import SwiftUI
 
 /// Menu-bar images must have a small AppKit point size. A SwiftUI .frame does not resize
@@ -48,6 +50,27 @@ import SwiftUI
             button.setAccessibilityLabel("Bridgit")
         }
         let menu = NSMenu(); menu.delegate = self; item.menu = menu; self.item = item
+        // A0112: show while an agent is using computer use, for a minute after its last action.
+        computerUseWatch = ComputerUseHub.shared.$lastAgentActivity.receive(on: RunLoop.main).sink { [weak self] at in
+            guard let self, at != nil else { return }
+            self.showComputerUse(true)
+            self.computerUseReset?.invalidate()
+            self.computerUseReset = Timer.scheduledTimer(withTimeInterval: 61, repeats: false) { [weak self] _ in
+                Task { @MainActor in self?.showComputerUse(ComputerUseHub.shared.agentActive()) }
+            }
+        }
+    }
+    private var computerUseWatch: AnyCancellable?
+    private var computerUseReset: Timer?
+    private func showComputerUse(_ active: Bool) {
+        guard let button = item?.button else { return }
+        if active, let symbol = NSImage(systemSymbolName: "cursorarrow.motionlines", accessibilityDescription: "An agent is using this Mac") {
+            button.image = symbol
+            button.toolTip = "Bridgit · an agent is using this Mac"
+        } else {
+            if let mark = NSImage(named: "Mark") { button.image = Self.image(from: mark) }
+            button.toolTip = "Bridgit"
+        }
     }
     private func observe(_ center: NotificationCenter, _ name: Notification.Name, action: @escaping @MainActor (LocalHostModel) async -> Void) {
         let observer = center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
@@ -61,6 +84,12 @@ import SwiftUI
         add("Open Bridgit", action: #selector(openBridgit), to: menu)
         add(model?.paused == true ? "Resume device views" : "Pause device views", action: #selector(pauseViews), to: menu)
         if local?.host?.state == .connected || local?.host?.state == .connecting { add("Stop host", action: #selector(stopHost), to: menu) }
+        if ComputerUseHub.shared.agentActive() {
+            let active = NSMenuItem(title: "An agent is using this Mac", action: nil, keyEquivalent: ""); active.isEnabled = false; menu.addItem(active)
+        }
+        if ComputerUseHub.shared.service != nil, ComputerUseHub.shared.choice.setting != .off {
+            add("Turn off computer use", action: #selector(stopComputerUse), to: menu)
+        }
         let appearance = NSMenu(title: "Appearance")
         for value in ["System", "Light", "Dark"] {
             let row = NSMenuItem(title: value, action: #selector(changeAppearance(_:)), keyEquivalent: ""); row.target = self; row.representedObject = value
@@ -74,6 +103,7 @@ import SwiftUI
     @objc private func openBridgit() { open?(); NSApp.activate(ignoringOtherApps: true) }
     @objc private func pauseViews() { model?.pause() }
     @objc private func stopHost() { Task { await local?.host?.stop() } }
+    @objc private func stopComputerUse() { Task { await ComputerUseHub.shared.set(.off); showComputerUse(false) } }
     @objc private func changeAppearance(_ sender: NSMenuItem) { if let value = sender.representedObject as? String { AppleFixtureWorkspace.defaults.set(value, forKey: "appearance") } }
     @objc private func quit() { Task { await local?.host?.stop(); NSApp.terminate(nil) } }
     func showMenu() { item?.button?.performClick(nil) }

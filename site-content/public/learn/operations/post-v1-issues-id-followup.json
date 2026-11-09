@@ -1,6 +1,6 @@
 {
- "documentation_revision": 129,
- "api_revision": 146,
+ "documentation_revision": 130,
+ "api_revision": 147,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Follow up on an issue you filed: a note (\"still happens on 1.7.2\"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it)",

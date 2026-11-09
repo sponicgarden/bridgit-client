@@ -10,6 +10,9 @@ import UniformTypeIdentifiers
 @MainActor
 final class LocalAppletModel: ObservableObject {
     @Published private(set) var host: LocalHostModel?
+    #if os(macOS)
+    private(set) var computerUse: ComputerUseService?
+    #endif
     @Published private(set) var packages: [[String: Any]] = []
     @Published private(set) var inboxBadgeCount = 0
     @Published private(set) var revision = 0
@@ -60,6 +63,14 @@ final class LocalAppletModel: ObservableObject {
                 await MainActor.run { self?.lanDiscoveryEnabled == true }
             })
             connections = OutboundConnectionService(store: store, outboundAccess: DeviceOutboundPolicy.access, deviceName: { await MainActor.run { LocalHostModel.deviceName } })
+            #if os(macOS)
+            // A0112–A0114: one computer-use service per store, shared by the host and the owner's controls.
+            let computerUse = ComputerUseService(store: store, backend: MacComputerUseBackend(),
+                changed: { choice in await ComputerUseHub.shared.received(choice) },
+                acted: { await ComputerUseHub.shared.agentActed() })
+            self.computerUse = computerUse
+            Task { await ComputerUseHub.shared.attach(computerUse) }
+            #endif
             let speech = self.speech
             speech.packageForBudget = { try await store.package($0) }
             engine = AppletEngine(store: store, speech: { operation, step, applet in try await speech.run(operation: operation, step: step, applet: applet) }, checkPrerequisites: { required in

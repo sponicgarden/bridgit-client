@@ -19,7 +19,36 @@ class Settings(context: Context) {
     private fun changed() = synchronized(listeners) { listeners.toList() }.forEach { it() }
 
     fun isOn(switchKey: String) = prefs.getBoolean("switch_$switchKey", switchKey in DEFAULT_ON)
-    fun setOn(switchKey: String, on: Boolean) { prefs.edit().putBoolean("switch_$switchKey", on).apply(); onSwitch?.invoke(switchKey, on); changed() }
+    /** The owner (or an agent with configuration authority) sets a switch: from now on it is specifically set (A0116). */
+    fun setOn(switchKey: String, on: Boolean) {
+        prefs.edit().putBoolean("switch_$switchKey", on).remove("switch_default_$switchKey").apply(); onSwitch?.invoke(switchKey, on); changed()
+    }
+
+    /**
+     * Permission layers for a device switch (A0116): a switch nobody has set follows its inherited default (the device's
+     * (type, purpose) tables, else its baseline). A stored value without the default mark was set by the owner, including
+     * every value saved before device profiles existed, so a default never overrides a choice.
+     */
+    fun isSpecific(switchKey: String): Boolean = prefs.contains("switch_$switchKey") && !prefs.getBoolean("switch_default_$switchKey", false)
+
+    /** Applies an inherited default; does nothing to a specifically set switch. Returns whether the value changed. */
+    fun applyDefault(switchKey: String, on: Boolean): Boolean {
+        if (isSpecific(switchKey)) return false
+        val was = isOn(switchKey)
+        prefs.edit().putBoolean("switch_$switchKey", on).putBoolean("switch_default_$switchKey", true).apply()
+        if (was != on) { onSwitch?.invoke(switchKey, on); changed() }
+        return was != on
+    }
+
+    /** Back to the inherited default (the API's "default"): forgets the specific value; [inherited] is the default in force, null for the baseline. */
+    fun clearSpecific(switchKey: String, inherited: Boolean?) {
+        val was = isOn(switchKey)
+        val e = prefs.edit().remove("switch_$switchKey").remove("switch_default_$switchKey")
+        if (inherited != null) e.putBoolean("switch_$switchKey", inherited).putBoolean("switch_default_$switchKey", true)
+        e.apply()
+        if (was != isOn(switchKey)) onSwitch?.invoke(switchKey, isOn(switchKey))
+        changed()
+    }
     /** Feature-use tallies hear which switch was flipped (never by whom). */
     var onSwitch: ((String, Boolean) -> Unit)? = null
 

@@ -1470,6 +1470,10 @@ private extension HostOperation {
         case .workflowsRun: return "Run applet flows"
         case .cameraSnapshot: return "Take camera snapshots"
         case .lanDiscovery: return "Network discovery"
+        #if os(macOS)
+        case .screenObserve: return "See the screen and app interfaces"
+        case .screenControl: return "Control this Mac"
+        #endif
         case .connections: return "Send to approved connections"
         case .log: return "Read Activity and write notes"
         case .feedback: return "File and follow up on your reports"

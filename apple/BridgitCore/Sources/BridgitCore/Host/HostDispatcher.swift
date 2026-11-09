@@ -85,6 +85,13 @@ public actor HostDispatcher {
     private var mcpInitialized = Set<String>()
     private var mcpTasks: [String: Task<HostResponse, Never>] = [:]
     public init(authority: HostAuthority, store: AppletStore, engine: AppletEngine, appletChanged: ((String, String) async -> Void)? = nil, profile: @escaping Profile, sensor: Sensor? = nil, samples: ((String?) throws -> [String: Any])? = nil, configuration: HostConfigurationService? = nil, connections: OutboundConnectionService? = nil, additionalApplets: AdditionalApplets? = nil, additionalAppletAction: AdditionalAppletAction? = nil, additionalViewerApplets: AdditionalApplets? = nil, satelliteForward: SatelliteForward? = nil, satelliteList: SatelliteList? = nil, feedback: Feedback? = nil, lan: HostLanService? = nil, callbacks: CallbackHostService? = nil, captureNotifications: (() async -> Bool)? = nil) { self.captureNotifications = captureNotifications; self.lan = lan; self.callbacks = callbacks; self.feedback = feedback; self.satelliteForward = satelliteForward; self.satelliteList = satelliteList; self.additionalViewerApplets = additionalViewerApplets; self.additionalApplets = additionalApplets; self.additionalAppletAction = additionalAppletAction; self.connections = connections; self.appletChanged = appletChanged; self.configuration = configuration; self.samples = samples; self.sensor = sensor; self.authority = authority; self.store = store; self.engine = engine; self.profile = profile }
+    private var computerUse: ComputerUseService?
+    /// Mac computer use (A0112–A0114). Without it these routes answer computer_use_unsupported.
+    public func attachComputerUse(_ service: ComputerUseService?) { computerUse = service }
+    private func computerUseResponse(_ request: HostRequest, agent: HostAgent) async throws -> HostResponse {
+        guard let computerUse else { throw DeviceAPIError(501, "computer_use_unsupported", "Computer use is available only in the Mac app.") }
+        return try await computerUse.handle(request, agent: agent)
+    }
     public func dispatch(_ job: HostJob) async -> HostResponse { await dispatch(job, admitted: false) }
     /// The Device Domain Name hint (bridgit.cc/names) from the cache; no network call.
     private func bridgitName(_ agent: HostAgent) async -> [String: Any]? {
@@ -132,7 +139,7 @@ public actor HostDispatcher {
             try await response.beforeDelivery?()
             try Task.checkCancellation()
             if response.status < 400, response.acknowledgesAPIChanges ||
-                (job.request.method == "GET" && ["/v1/changes", "/v1/guide", "/v1/openapi.json"].contains(job.request.path)) {
+                (job.request.method == "GET" && HostAPIPaths.selfDescription.contains(job.request.path)) {
                 let previous = response.afterOriginalDelivery
                 response.afterOriginalDelivery = { [authority, store] in
                     await previous?()
@@ -332,6 +339,9 @@ public actor HostDispatcher {
             if request.method == "GET" { return .init(status: 405, data: Data(), headers: ["Allow": "POST"]) }
             return try await mcp(request.body, agent: agent, job: job)
         }
+        if request.method == "GET", ComputerUseContract.handles(request) {
+            return try await computerUseResponse(request, agent: agent)
+        }
         if request.method == "GET" {
             if route.0 == .lanDiscovery {
                 guard let lan else { throw DeviceAPIError(503, "lan_unavailable", "Network discovery is unavailable.") }
@@ -350,7 +360,7 @@ public actor HostDispatcher {
             if request.path == "/v1/events" { try Self.queryFields(request.query, allowed: ["since", "wait", "types", "limit"]) }
             else if request.path == "/v1/interactions" { try Self.queryFields(request.query, allowed: ["status", "limit"]) }
             else if p.count == 3 && p[1] == "interactions" { try Self.queryFields(request.query, allowed: ["wait"]) }
-            else if ["/v1/health", "/v1/capabilities", "/v1/device/profile", "/v1/openapi.json", "/v1/guide", "/v1/connections"].contains(request.path) { try Self.queryFields(request.query, allowed: []) }
+            else if ["/v1/health", "/v1/capabilities", "/v1/device/profile", HostAPIPaths.openAPI, HostAPIPaths.guide, "/v1/connections"].contains(request.path) { try Self.queryFields(request.query, allowed: []) }
             return try await read(request, agent: agent)
         }
         if route.0 == .appletsWrite && request.method == "DELETE" {
@@ -406,11 +416,16 @@ public actor HostDispatcher {
         if let note { return try await store.recordHostNote(note, agent: current, reservation: (record, fingerprint)) }
         let result: HostResponse
         let additional: HostResponse?
-        do { additional = try await additionalAppletAction?(request, agent) }
+        do { additional = ComputerUseContract.handles(request) ? nil : try await additionalAppletAction?(request, agent) }
         catch let error as DeviceAPIError where (400...499).contains(error.status) {
             additional = .failure(error)
         }
         if let additional { result = additional }
+        else if ComputerUseContract.handles(request) {
+            // Recheck the current grant and the computer-use setting just before acting.
+            do { result = try await computerUseResponse(request, agent: current) }
+            catch let error as DeviceAPIError where (400...499).contains(error.status) && error.status != 408 { result = .failure(error) }
+        }
         else {
         switch route.0 {
         case .lanDiscovery:
@@ -695,15 +710,15 @@ public actor HostDispatcher {
             try Self.queryFields(request.query, allowed: ["id"])
             if let id = request.query["id"], !(id is String) { throw DeviceAPIError(422, "invalid_parameter", "Capability ID must be a string.") }
             return try .json(HostAPIContract.discovery(agent, id: request.query["id"] as? String, lanAvailable: await lan?.isEnabled() ?? false, callbacksAvailable: callbacks != nil))
-        case "/v1/changes":
+        case HostAPIPaths.changes:
             try Self.queryFields(request.query, allowed: ["since"])
             let since = try Self.queryInteger(request.query["since"], default: 0, range: 0...Int.max)
             let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "local"
             return try .json(HostAPIChanges.document(since: since, appVersion: version))
-        case "/v1/openapi.json": return try .json(HostAPIContract.openAPI(agent, lanAvailable: await lan?.isEnabled() ?? false, callbacksAvailable: callbacks != nil, crashReporting: await configuration?.supportsCrashReporting() ?? false))
-        case "/v1/guide":
+        case HostAPIPaths.openAPI: return try .json(HostAPIContract.openAPI(agent, lanAvailable: await lan?.isEnabled() ?? false, callbacksAvailable: callbacks != nil, crashReporting: await configuration?.supportsCrashReporting() ?? false))
+        case HostAPIPaths.guide:
             let text = HostAPIContract.allowed(agent, lanAvailable: await lan?.isEnabled() ?? false, callbacksAvailable: callbacks != nil).map { "- \($0.method) \($0.path): \($0.summary)" }.joined(separator: "\n")
-            return .init(contentType: "text/markdown", data: Data(("# Bridgit Apple host\n\n" + text + "\n\nInspect /v1/device/profile before calling. Actions require an Idempotency-Key unless the operation documents it as optional. Protection lasts 86400 seconds. Compacted replies return idempotency_result_expired without repeating work.\n").utf8))
+            return .init(contentType: "text/markdown", data: Data(("# Bridgit Apple host\n\n" + text + "\n\nInspect /v1/device/profile before calling. Applet package format: " + HostAPIPaths.appletPackageFormat + ". Actions require an Idempotency-Key unless the operation documents it as optional. Protection lasts 86400 seconds. Compacted replies return idempotency_result_expired without repeating work.\n").utf8))
         case "/v1/health":
             var health: [String: Any] = ["ok": true, "status": "ok", "app": "Bridgit", "api_revision": HostAPIChanges.current,
                 "device_id": authority.deviceID, "name": "Bridgit", "transport": agent.usesRelay ? "relay" : "tailscale",
@@ -857,7 +872,7 @@ public actor HostDispatcher {
             afterDelivery = response.afterDelivery
             beforeDelivery = response.beforeDelivery
             acknowledgesAPIChanges = response.status < 400 && request.method == "GET" &&
-                ["/v1/changes", "/v1/guide", "/v1/openapi.json"].contains(request.path)
+                HostAPIPaths.selfDescription.contains(request.path)
             var content: [[String: Any]] = []
             if response.contentType == "image/jpeg" { content.append(["type": "image", "mimeType": "image/jpeg", "data": response.data.base64EncodedString()]) }
             else if response.contentType.hasPrefix("text/") || ["application/json", "application/x-ndjson"].contains(response.contentType) { content.append(["type": "text", "text": String(decoding: response.data, as: UTF8.self)]) }

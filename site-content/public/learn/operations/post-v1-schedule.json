@@ -1,6 +1,6 @@
 {
- "documentation_revision": 129,
- "api_revision": 146,
+ "documentation_revision": 130,
+ "api_revision": 147,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Hand the phone an action manifest once: any action it can take (any /v1 call you're allowed, plus download, play, show, send and delete of saved files), each with its own schedule. The owner approves each new manifest once on the phone; then it runs by itself and results arrive as schedule.* events",

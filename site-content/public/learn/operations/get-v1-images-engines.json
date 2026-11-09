@@ -1,6 +1,6 @@
 {
- "documentation_revision": 129,
- "api_revision": 146,
+ "documentation_revision": 130,
+ "api_revision": 147,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "The opt-in on-phone vision engines for find and crop, from the Bridgit team's signed software manifest (checked daily, so new engines can appear without an app update): what each is good at, its speed and size on a mid-range phone, its licence, and whether its model is downloaded. They are free and work offline, and run only when you name them (engine, outline)",

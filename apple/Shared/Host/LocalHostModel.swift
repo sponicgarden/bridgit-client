@@ -612,6 +612,13 @@ struct NativeHubLink: Identifiable {
         return try? Self.presentedDirectControlSetup(oneTimeSetup, address: ownerDirectAddress, port: ownerDirectPort)
     }
 
+    /// A0239: what the owner copies or shares for the agent: the guided setup prompt, with the record at its end.
+    func presentedControlSetupPrompt(direct: Bool) -> String? {
+        guard let record = presentedControlSetup(direct: direct) else { return nil }
+        let fields = (try? JSONSerialization.jsonObject(with: Data(record.utf8)) as? [String: Any]) ?? [:]
+        return HostAgentSetupPrompt.build(setupJSON: record, agentName: fields["agent_name"] as? String)
+    }
+
     static func presentedDirectControlSetup(_ setupText: String, address: TailnetAddress?, port: UInt16?) throws -> String {
         guard var setup = try JSONSerialization.jsonObject(with: Data(setupText.utf8)) as? [String: Any] else {
             return setupText
@@ -631,7 +638,7 @@ struct NativeHubLink: Identifiable {
 
     private func controlSetup(_ agent: HostAgent, token: String, deviceID: String, identity: RelayHostIdentity) throws -> String {
         var setup: [String: Any] = [
-            "agent_id": agent.id, "generation": agent.generation, "mode": agent.mode, "token": token,
+            "agent_id": agent.id, "agent_name": agent.name, "generation": agent.generation, "mode": agent.mode, "token": token,
             "operations": agent.operations.map(\.rawValue).sorted(), "applets": agent.applets.sorted(), "phone_name": Self.deviceName
         ]
         if agent.ownerDirectPeers != nil {

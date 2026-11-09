@@ -1194,7 +1194,9 @@ struct HostSetupSecret: View {
         guard let text = host.oneTimeSetup else { return [:] }
         return (try? JSONSerialization.jsonObject(with: Data(text.utf8)) as? [String: Any]) ?? [:]
     }
-    private var setupText: String { host.presentedControlSetup(direct: connection == .direct) ?? "" }
+    /// A0239: the guided setup prompt (as on Android), not the bare record; the record ends the prompt.
+    private var setupText: String { host.presentedControlSetupPrompt(direct: connection == .direct) ?? "" }
+    private var setupRecord: String { host.presentedControlSetup(direct: connection == .direct) ?? "" }
     private var displayedSetupText: String {
         #if DEBUG
         if CommandLine.arguments.contains("-fixtureHideOneTimeSecrets") { return "Setup secrets hidden for fixture" }
@@ -1204,7 +1206,7 @@ struct HostSetupSecret: View {
     private var fixtureHasCallbackKey: Bool {
         #if DEBUG
         guard CommandLine.arguments.contains("-fixtureHideOneTimeSecrets"),
-              let object = try? JSONSerialization.jsonObject(with: Data(setupText.utf8)) as? [String: Any] else { return false }
+              let object = try? JSONSerialization.jsonObject(with: Data(setupRecord.utf8)) as? [String: Any] else { return false }
         return object["callback_secret"] is String
         #else
         return false

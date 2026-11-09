@@ -2222,6 +2222,15 @@ Add up to 5 contacts to an issue you filed (or send `contacts` when filing): an 
 - Webhook `slack` (hooks.slack.com) posts `{text}`; `discord` (discord.com) posts `{content}`. Those URLs are the secret: reads show only the host.
 - Failed deliveries retry with backoff; after 8 in a row the contact is `failing` until you `PATCH {"paused":false}`. Only https on public hosts; no redirects are followed.
 
+## Log every API error you get
+
+Every agent and harness: whenever a Bridgit API call returns an error status, an error code, or times out, automatically log it with `POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/errors` (your `bgk_` key says who you are). This is a log, not a bug report: it does not count toward the bug and feature filing cap. Real bugs still go through `POST /v1/agent/issues`.
+- Body: `{"endpoint","method","http_status"?,"error_code"?,"request_id"?,"timestamp"?,"explanation","context"?}`. Send at least one of `http_status` and `error_code`. `explanation` is up to 500 characters in your own words on what went wrong; `context` is up to 2000 characters (a string or an object).
+- Identical failures (same endpoint, method, status and code) within 10 minutes bundle into one entry with a `count` and first and last seen: 201 for a new entry, 200 for a bundled one. Sending the same `request_id` again changes nothing.
+- At most 120 reports an hour per agent (429). Don't log the 429 from this endpoint itself, and don't retry in a loop when logging fails.
+- Don't send secrets (values are redacted anyway).
+- `GET /v1/agent/errors[?limit=&since=]` lists your own entries; `GET|DELETE /v1/agent/errors/{id}` reads or removes one; `DELETE /v1/agent/errors` clears yours.
+
 ## Rules
 
 - A call to the phone failed or got no answer? Run the connection ladder first (https://bridgit.cc/learn/connection.md) and send its per-layer results as `diagnosis`; start the description with the layer that failed ("Failing layer: transport"). The issue then shows `failing_layer`. The same layer names apply to any automatic error log.

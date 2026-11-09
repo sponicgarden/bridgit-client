@@ -1,5 +1,5 @@
 {
- "api_revision": 147,
+ "api_revision": 148,
  "changes": [
   {
    "date": "2026-10-27",
@@ -2419,6 +2419,15 @@
     }
    ],
    "revision": 147
+  },
+  {
+   "date": "2026-11-09",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/welcome",
+    "what": "The Bridgit Interface Guide: this agent's full briefing, built live for this device; the setup prompt is now a few lines that point here"
+   }],
+   "revision": 148
   }
  ],
  "links": {

@@ -671,6 +671,9 @@ object ApiChanges {
             Item("This device's profile (purposes, device_type, model) and its own switches: true/false sets one specifically, \"default\" returns it to the default its (type, purpose) pairs give it", "/v1/owner/configuration/permissions/device"),
             Item("A linked device's permissions here (portal viewer, hub, satellite), within what its pairing gave it; Superpowers required", "/v1/owner/configuration/permissions/linked/{id}"),
         )),
+        Revision(148, "1.8.0", "2026-11-09", listOf(
+            Item("The Bridgit Interface Guide: this agent's full briefing, built live for this device; the setup prompt is now a few lines that point here", "/v1/welcome"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

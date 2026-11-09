@@ -44,8 +44,11 @@ class PairingExportTest {
                     app.updateListener { it.copy(port = port) }
                     val export = vm.prepareExport()!!
                     assertFalse(export.prompt.contains(":18529/"))
-                    assertTrue(export.prompt.contains("http://127.0.0.1:$port/v1/mcp"))
-                    assertTrue(export.prompt.contains("http://127.0.0.1:$port/mcp"))
+                    // Direct agents get the short prompt; the MCP addresses are in the briefing it points to (GET /v1/welcome).
+                    if (connection == Connection.USERSPACE) {
+                        assertTrue(export.prompt.contains("http://127.0.0.1:$port/v1/mcp"))
+                        assertTrue(export.prompt.contains("http://127.0.0.1:$port/mcp"))
+                    } else assertTrue(export.prompt.contains("http://127.0.0.1:$port/v1/welcome"))
                     assertEquals("http://127.0.0.1:$port/v1", org.json.JSONObject(export.qr).getString("base_url"))
                     if (connection == Connection.USERSPACE) assertTrue(export.prompt.contains("BRIDGIT_PORT=$port"))
                 }

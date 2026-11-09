@@ -1,6 +1,6 @@
 {
- "documentation_revision": 130,
- "api_revision": 147,
+ "documentation_revision": 131,
+ "api_revision": 148,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Inspect an installed applet, including data_url for schemas, saved rows, photos and processing status; control agents can inspect any applet",

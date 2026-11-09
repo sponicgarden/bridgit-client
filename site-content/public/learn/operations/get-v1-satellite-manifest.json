@@ -1,6 +1,6 @@
 {
- "documentation_revision": 130,
- "api_revision": 147,
+ "documentation_revision": 131,
+ "api_revision": 148,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Phone to phone: what this satellite offers its hub (only for a hub link's key). Agents use GET /v1/satellites on the hub.",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 130,
- "api_revision": 147,
+ "documentation_revision": 131,
+ "api_revision": 148,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Stop this caller's story presentation; discard late model results and stop its audio and video",

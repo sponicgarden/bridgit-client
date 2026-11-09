@@ -12264,6 +12264,19 @@
    },
    "tags": ["lan_control"]
   }},
+  "/v1/welcome": {"get": {
+   "summary": "The Bridgit Interface Guide: this agent's full briefing (connection, rules, first calls, first replies, pointers), built live for this device and agent; the short setup prompt points here (plain text)",
+   "operationId": "getWelcome",
+   "responses": {
+    "200": {"description": "text/plain"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "tags": ["status"]
+  }},
   "/v1/schedule/assets/{name}": {
    "get": {
     "summary": "One saved file's bytes, e.g. a photo a scheduled action took",
@@ -12778,7 +12791,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 147,
+  "x-api-revision": 148,
   "title": "Bridgit",
   "version": "1.8.0"
  }

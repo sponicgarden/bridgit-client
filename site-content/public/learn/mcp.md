@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 147. Full index: https://bridgit.cc/learn/index.json.
+API revision 148. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -145,6 +145,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `discover_report` | `POST /v1/discover/report` | Report an explicit catalog selection or bounded self-reported feedback; never verified evidence |
 | `guide` | `GET /v1/guide` | This guide, generated live (Markdown) |
 | `start` | `GET /v1/start` | The starter (https://bridgit.cc/learn/start.md) served from the phone, so an agent without web access reads it too: the four stages of building an applet (Markdown, no key needed) |
+| `welcome` | `GET /v1/welcome` | The Bridgit Interface Guide: this agent's full briefing (connection, rules, first calls, first replies, pointers), built live for this device and agent; the short setup prompt points here (plain text) |
 | `demo` | `GET /v1/demo` | The demo to offer right after pairing: a five-minute first-run tour run from cards on the phone, then a menu of more demos picked by a few questions (Markdown) |
 | `samples` | `GET /v1/samples` | Complete interaction samples for every kind (notice, question, html, text): the POST /v1/interactions body, the reply and the answer it produces (JSON). For cards that decide or watch (Jev, Clef, the free camera change check), read https://bridgit.cc/learn/decisions.md |
 | `registry` | `GET /v1/registry` | The API registry: every API group with its fixed name and number, its calls, and the one permission that governs them (API access, on by default, all-or-nothing for now) |

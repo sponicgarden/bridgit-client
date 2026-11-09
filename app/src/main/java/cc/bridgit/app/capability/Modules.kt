@@ -69,7 +69,7 @@ class StatusModule(app: BridgeApp) : Capability(app) {
     override val titleRes = R.string.cap_status
     override val descriptionRes = R.string.cap_status_desc
     override val group = "status"
-    override val endpoints = listOf(Endpoints.SERVICES, Endpoints.SPEECH_MODELS, Endpoints.HEALTH, Endpoints.DEVICE_DISPLAY, Endpoints.DEVICE_RESOURCES, Endpoints.DEVICES, Endpoints.CAPABILITIES, Endpoints.LIMITS, Endpoints.DISCOVER, Endpoints.DISCOVERY_REPORT, Endpoints.GUIDE, Endpoints.START, Endpoints.DEMO, Endpoints.SAMPLES, Endpoints.OPENAPI, Endpoints.REGISTRY, Endpoints.CHANGES, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.PAIR, Endpoints.MCP, Endpoints.ME, Endpoints.OWNER_EMAIL, Endpoints.OWNER_EMAIL_SET) + cc.bridgit.app.satellite.SatelliteEndpoints.ALL
+    override val endpoints = listOf(Endpoints.SERVICES, Endpoints.SPEECH_MODELS, Endpoints.HEALTH, Endpoints.DEVICE_DISPLAY, Endpoints.DEVICE_RESOURCES, Endpoints.DEVICES, Endpoints.CAPABILITIES, Endpoints.LIMITS, Endpoints.DISCOVER, Endpoints.DISCOVERY_REPORT, Endpoints.GUIDE, Endpoints.START, Endpoints.WELCOME, Endpoints.DEMO, Endpoints.SAMPLES, Endpoints.OPENAPI, Endpoints.REGISTRY, Endpoints.CHANGES, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.PAIR, Endpoints.MCP, Endpoints.ME, Endpoints.OWNER_EMAIL, Endpoints.OWNER_EMAIL_SET) + cc.bridgit.app.satellite.SatelliteEndpoints.ALL
 
     /** GET /v1/owner/email and the health block: where the owner's email verification stands. */
     private fun ownerEmailJson(): JSONObject {
@@ -272,6 +272,14 @@ class StatusModule(app: BridgeApp) : Capability(app) {
                 agent?.superPowers == true) { agent?.allows(it) ?: false }, "text/markdown; charset=utf-8")
         }
         endpoint(Endpoints.START) { Reply.Text(cc.bridgit.app.api.CapabilityCatalog.start(), "text/markdown; charset=utf-8") }
+        endpoint(Endpoints.WELCOME) {
+            markKnown(this)
+            val a = agent
+            val callback = a?.let { app.callbacks.get(it.id)?.let { _ -> app.callbacks.secret(it.id) } }
+            Reply.Text(cc.bridgit.app.api.SetupPrompt.build(agentName, cc.bridgit.app.api.SetupPrompt.KEY_ON_FILE, cc.bridgit.app.core.Connection.DIRECT,
+                app.address(), cc.bridgit.app.ui.addagent.AddAgentViewModel.deviceModel(), app.registry.caps(), null, callback,
+                cc.bridgit.app.ui.addagent.AddAgentViewModel.identity(app)) { a?.allows(it) ?: false }, "text/plain; charset=utf-8")
+        }
         endpoint(Endpoints.DEMO) {
             val tour = runCatching { app.assets.open(cc.bridgit.app.api.Demos.TOUR_ASSET).bufferedReader().use { it.readText() } }.getOrNull()
             Reply.Text(cc.bridgit.app.api.Demos.build(agentName, app.registry.caps(), tour) { agent?.allows(it) ?: false },

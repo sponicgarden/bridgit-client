@@ -157,7 +157,7 @@ class ApiLogicTest {
         assertTrue(p.contains("- Agent name: Muse\n"))
         assertTrue(p.contains("Store the key only in \"~/.config/bridgit/agents/Muse/header\" (mode 600)"))
         assertTrue(p.contains("- Connected test: curl -sS -m 60 -H @\"\$HOME/.config/bridgit/agents/Muse/header\" http://my-phone.tailnet-name.ts.net:8735/v1/health\n"))
-        assertTrue("connected sentence", p.contains("means you're connected; nothing else proves it. After first call 3 (capabilities), tell the owner so"))
+        assertTrue("connected sentence", p.contains("means you're connected; nothing else proves it."))
         assertTrue("timeout fallback", p.contains("run the connection ladder first") && p.contains("More → Relay"))
         assertTrue(p.contains("/v1/camera/snapshot") && p.contains("/v1/image/last"))
         assertTrue(p.contains("GET /v1/guide is the full reference: use it only when needed"))
@@ -170,7 +170,7 @@ class ApiLogicTest {
         assertTrue("24-hour email rule", p.contains("owner_email.status") && p.contains("POST /v1/owner/email") && p.contains("24 hours"))
         assertTrue(p.contains("GET /v1/limits"))
         println("setup prompt length: ${p.length}")
-        assertTrue("AGT-10 budget: ${p.length}", p.length < 7000)
+        assertTrue("AGT-10 budget: ${p.length}", p.length < 6000)
         // AGT-09 order, and the first calls in their order
         val order = sections.map { p.indexOf(it) }
         assertTrue(order.none { it < 0 }); assertEquals(order.sorted(), order)
@@ -186,7 +186,7 @@ class ApiLogicTest {
             val p = SetupPrompt.build("Muse", key, connection, addr, "Google Pixel 10 Pro XL", caps("camera"), "helper", device = named)
             assertEquals("A0213: identity first, fixed fields in a fixed order", listOf("IDENTITY",
                 "- Device domain name: kitchen-tab",
-                "- Friendly name: Kitchen Tab (display only; use the domain name)",
+                "- Friendly name: Kitchen Tab (display only)",
                 "- Model: Google Pixel 10 Pro XL",
                 "- Agent name: Muse",
                 "- Owner: o***@example.com (verified)"), p.lines().take(6))
@@ -199,7 +199,7 @@ class ApiLogicTest {
             val first = p.lineSequence().first { it.startsWith("1. GET /v1/health:") }
             assertTrue(first, first.contains("This device's domain name is kitchen-tab") && first.contains("never register another name"))
             assertFalse("a named device is never told to register", first.contains("register it") || first.contains("register a name"))
-            assertTrue("A0213 budget: ${p.length}", p.length < 7000)
+            assertTrue("A0213 budget: ${p.length}", p.length < 6000)
         }
     }
 
@@ -256,6 +256,21 @@ class ApiLogicTest {
         assertTrue("watches don't take it", all.none { it.method == "POST" && it.fullPath == "/v1/watches" && it.idempotent })
     }
 
+    @Test fun shortPromptCarriesOnlyWhatComesBeforeTheGuide() {
+        val key = Keys.generate()
+        val unnamed = DeviceIdentity(null, "A9 Cream Tab", "Samsung SM-X210", null)
+        val p = SetupPrompt.short("Grok Bot 2", key, addr, unnamed)
+        assertEquals("key exactly once", 1, Regex(Regex.escape(key)).findAll(p).count())
+        assertTrue(p.contains("http://my-phone.tailnet-name.ts.net:8735/v1") && p.contains("IP fallback: http://100.101.102.103:8735/v1"))
+        assertTrue(p.contains("only in \"~/.config/bridgit/agents/Grok Bot 2/header\" (mode 600)"))
+        assertTrue("first reply is the naming question", p.contains("needs a friendly name to register your device. Can we call it '<name>'?"))
+        assertTrue("points at the guide", p.contains("The Bridgit Interface Guide is here:") && p.contains("http://my-phone.tailnet-name.ts.net:8735/v1/welcome") && p.contains(SetupPrompt.WELCOME_URL))
+        assertTrue("a few lines", p.lines().size <= 4 && p.length < 1000)
+        val named = SetupPrompt.short("Grok Bot 2", key, addr, unnamed.copy(domainName = "cremeo-ow"))
+        assertFalse("a named device is never asked to name it", named.contains("Can we call it"))
+        assertTrue(Endpoints.all.single { it.fullPath == "/v1/welcome" }.auth)
+    }
+
     @Test fun setupPromptAgentNameWithSpaces() {
         val key = Keys.generate()
         val p = SetupPrompt.build("Claude dev", key, Connection.DIRECT, addr, "Pixel", caps("camera"), null)
@@ -273,15 +288,15 @@ class ApiLogicTest {
         val p = SetupPrompt.build("Grok", key, Connection.DIRECT, addr, "Pixel 10 Pro XL", caps("gallery", "camera"), null,
             secret)
         assertEquals("secret exactly once", 1, Regex(Regex.escape(secret)).findAll(p).count())
-        assertTrue(p.contains("CALLBACK SECRET\n- $secret\n- Store it like your key"))
-        assertTrue("AGT-10 budget: ${p.length}", p.length < 7000)
+        assertTrue(p.contains("CALLBACK SECRET\n- $secret\n- Keep it like your key"))
+        assertTrue("AGT-10 budget: ${p.length}", p.length < 6000)
         assertTrue(p.indexOf("CALLBACK SECRET") in p.indexOf("RULES")..p.indexOf("AFTER YOU'RE CONNECTED"))
         // Worst case (AGT-10): longest name, MagicDNS + IP fallback, every feature on, callback secret, direct and relay.
         for (connection in listOf(Connection.DIRECT, Connection.RELAY)) {
             val worst = SetupPrompt.build("A".repeat(24), key, connection, addr, "Samsung SM-X238U",
                 caps("gallery", "camera", "mic"), null, secret)
             println("setup prompt worst case ($connection, private=${cc.bridgit.app.BuildConfig.PRIVATE_CONTROL}): ${worst.length}")
-            assertTrue("AGT-10 worst case $connection: ${worst.length}", worst.length < 7000)
+            assertTrue("AGT-10 worst case $connection: ${worst.length}", worst.length < 6000)
         }
         assertFalse(SetupPrompt.build("Grok", key, Connection.DIRECT, addr, "Pixel", caps(), null).contains("CALLBACK"))
     }
@@ -324,7 +339,7 @@ class ApiLogicTest {
         assertTrue(p.contains("retry_after_s"))
         assertTrue(p.contains("curl -m 60") && p.contains("duration + 90 s with transcribe=true"))
         // Paste-only owners get the demo question straight away; it still runs only on a yes, and is asked once.
-        assertTrue(p.contains("If the owner pasted only this prompt, ask \"Want a 5-minute demo"))
+        assertTrue(p.contains("\"Want a 5-minute demo on your phone?\""))
         assertTrue(p.contains("If they gave you a task, do it first, then ask."))
         assertTrue(p.contains("On yes, follow GET /v1/demo"))
         assertTrue(p.contains("Ask once."))

@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 147). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 148). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,13 +14,11 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 147 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 148 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 147
-- The permission home: every control agent, this device and every linked device with granted/total and the layer that decided each permission (specific, default, superpowers, baseline, unavailable), as on the Agents and Linked Devices tab (`/v1/owner/configuration/permissions`)
-- This device's profile (purposes, device_type, model) and its own switches: true/false sets one specifically, "default" returns it to the default its (type, purpose) pairs give it (`/v1/owner/configuration/permissions/device`)
-- A linked device's permissions here (portal viewer, hub, satellite), within what its pairing gave it; Superpowers required (`/v1/owner/configuration/permissions/linked/{id}`)
+## New in revision 148
+- The Bridgit Interface Guide: this agent's full briefing, built live for this device; the setup prompt is now a few lines that point here (`/v1/welcome`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -822,6 +820,11 @@ Example: `GET /v1/guide`
 The starter (https://bridgit.cc/learn/start.md) served from the phone, so an agent without web access reads it too: the four stages of building an applet (Markdown, no key needed).
 Returns: text/markdown.
 Example: `GET /v1/start`
+
+### `GET /v1/welcome`
+The Bridgit Interface Guide: this agent's full briefing (connection, rules, first calls, first replies, pointers), built live for this device and agent; the short setup prompt points here (plain text).
+Returns: text/plain.
+Example: `GET /v1/welcome`
 
 ### `GET /v1/demo`
 The demo to offer right after pairing: a five-minute first-run tour run from cards on the phone, then a menu of more demos picked by a few questions (Markdown).

@@ -1,4 +1,4 @@
-Reference published at https://bridgit.cc/learn/demo.md (API revision 147), the same as `GET /v1/demo` on a phone with everything switched on: Bridgit's demo, for when the owner asks for one. Part 1 is the first-run tour for a new owner; part 2 is the menu, for when they want more. It describes cards and calls and asks nothing of the reader.
+Reference published at https://bridgit.cc/learn/demo.md (API revision 148), the same as `GET /v1/demo` on a phone with everything switched on: Bridgit's demo, for when the owner asks for one. Part 1 is the first-run tour for a new owner; part 2 is the menu, for when they want more. It describes cards and calls and asks nothing of the reader.
 
 # Bridgit first-run demo
 

@@ -148,6 +148,16 @@
    "tool": "start"
   },
   {
+   "summary": "The Bridgit Interface Guide: this agent's full briefing (connection, rules, first calls, first replies, pointers), built live for this device and agent; the short setup prompt points here (plain text)",
+   "path": "/v1/welcome",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-welcome.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-welcome.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "welcome"
+  },
+  {
    "summary": "The demo to offer right after pairing: a five-minute first-run tour run from cards on the phone, then a menu of more demos picked by a few questions (Markdown)",
    "path": "/v1/demo",
    "method": "GET",
@@ -448,8 +458,8 @@
    "tool": "owner_configuration_links_disconnect_all"
   }
  ],
- "documentation_revision": 130,
- "api_revision": 147,
+ "documentation_revision": 131,
+ "api_revision": 148,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.status",

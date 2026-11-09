@@ -1,6 +1,6 @@
 {
- "documentation_revision": 130,
- "api_revision": 147,
+ "documentation_revision": 131,
+ "api_revision": 148,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "A photo the owner took with the Portal's camera: every photo watch of the chosen targets checks it right away, as if it had taken it (the Camera tab's path). Answers that take longer than about 25 s finish on the phone and show in the applet. The owner's portal pairing only; this is the portal's one write.",

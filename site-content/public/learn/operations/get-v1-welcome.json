@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 131,
+ "api_revision": 148,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The Bridgit Interface Guide: this agent's full briefing (connection, rules, first calls, first replies, pointers), built live for this device and agent; the short setup prompt points here (plain text)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "welcome",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/welcome",
+  "idempotent": false,
+  "path": "/v1/welcome",
+  "capability": "status",
+  "returns": "text/plain",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

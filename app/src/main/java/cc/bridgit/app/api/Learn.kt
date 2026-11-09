@@ -80,6 +80,7 @@ object Learn {
         "learn/decisions.md" to decisions(),
         "learn/context-services.json" to JSONObject().put("schema","bridgit-context-services/1").put("services",cc.bridgit.app.judgment.ContextCatalog.services()).toString(1) + "\n",
         "learn/playbook.md" to Playbook.build(),
+        "learn/welcome.md" to SetupPrompt.publicExample(cc.bridgit.app.core.Connection.DIRECT, helperSource),
         "learn/pairing-direct.txt" to SetupPrompt.publicExample(cc.bridgit.app.core.Connection.DIRECT, helperSource),
         "learn/pairing-userspace.txt" to SetupPrompt.publicExample(cc.bridgit.app.core.Connection.USERSPACE, helperSource),
         "learn/introduction.txt" to introduction(helperSource),
@@ -916,6 +917,7 @@ Record 20 seconds with `POST /v1/camera/video` and `extract_frames:6` to get six
         appendLine()
         appendLine("- [Interaction samples](${Samples.URL}): a tested request body for every card kind (${kinds.joinToString(", ")}), with the answer each produces")
         appendLine("- [Interaction examples]($INTERACTIONS_URL): $INTERACTION_EXAMPLES everyday cards to copy and change")
+        appendLine("- [Bridgit Interface Guide](${SetupPrompt.WELCOME_URL}): the agent briefing the setup prompt points to (on a device: GET /v1/welcome)")
         appendLine("- [Demo script]($DEMO_URL): the five-minute first-run tour and the menu of more demos ([tour alone as a skill](${Demos.SKILL_URL}))")
         appendLine()
         appendLine("## Connecting without Tailscale")

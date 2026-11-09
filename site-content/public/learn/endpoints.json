@@ -3991,6 +3991,24 @@
    "requires": null
   },
   {
+   "summary": "The Bridgit Interface Guide: this agent's full briefing (connection, rules, first calls, first replies, pointers), built live for this device and agent; the short setup prompt points here (plain text)",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "welcome",
+   "query": [],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/welcome",
+   "idempotent": false,
+   "path": "/v1/welcome",
+   "capability": "status",
+   "returns": "text/plain",
+   "errors": [],
+   "requires": null
+  },
+  {
    "summary": "The demo to offer right after pairing: a five-minute first-run tour run from cards on the phone, then a menu of more demos picked by a few questions (Markdown)",
    "method": "GET",
    "auth": true,
@@ -12101,7 +12119,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 147,
- "count": 356,
+ "api_revision": 148,
+ "count": 357,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

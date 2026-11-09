@@ -181,9 +181,10 @@ class AddAgentViewModel(application: Application) : AndroidViewModel(application
         // A callback set for this agent: the prompt carries its existing secret (EVT-06), never a new one.
         val callback = agentId?.let { id -> app.callbacks.get(id)?.let { app.callbacks.secret(id) } }
         val agent = agentId?.let { app.agents.get(it) }
-        prompt = SetupPrompt.build(name, k, connection, address, deviceModel(), app.registry.caps(), helper, callback, identity(app)) {
-            agent?.allows(it) == true
-        }
+        // Direct and relay agents get the short prompt and fetch the full briefing (GET /v1/welcome); userspace needs the helper inline.
+        prompt = if (connection == Connection.USERSPACE)
+            SetupPrompt.build(name, k, connection, address, deviceModel(), app.registry.caps(), helper, callback, identity(app)) { agent?.allows(it) == true }
+        else SetupPrompt.short(name, k, address, identity(app))
     }
 
     /** Rebuilds the prompt (for example once the Tailscale address is known). */

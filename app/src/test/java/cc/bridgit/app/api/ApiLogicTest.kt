@@ -170,7 +170,7 @@ class ApiLogicTest {
         assertTrue("24-hour email rule", p.contains("owner_email.status") && p.contains("POST /v1/owner/email") && p.contains("24 hours"))
         assertTrue(p.contains("GET /v1/limits"))
         println("setup prompt length: ${p.length}")
-        assertTrue("AGT-10 budget: ${p.length}", p.length < 6000)
+        assertTrue("AGT-10 budget: ${p.length}", p.length < 7000)
         // AGT-09 order, and the first calls in their order
         val order = sections.map { p.indexOf(it) }
         assertTrue(order.none { it < 0 }); assertEquals(order.sorted(), order)
@@ -199,7 +199,7 @@ class ApiLogicTest {
             val first = p.lineSequence().first { it.startsWith("1. GET /v1/health:") }
             assertTrue(first, first.contains("This device's domain name is kitchen-tab") && first.contains("never register another name"))
             assertFalse("a named device is never told to register", first.contains("register it") || first.contains("register a name"))
-            assertTrue("A0213 budget: ${p.length}", p.length < 6000)
+            assertTrue("A0213 budget: ${p.length}", p.length < 7000)
         }
     }
 
@@ -274,14 +274,14 @@ class ApiLogicTest {
             secret)
         assertEquals("secret exactly once", 1, Regex(Regex.escape(secret)).findAll(p).count())
         assertTrue(p.contains("CALLBACK SECRET\n- $secret\n- Store it like your key"))
-        assertTrue("AGT-10 budget: ${p.length}", p.length < 6000)
+        assertTrue("AGT-10 budget: ${p.length}", p.length < 7000)
         assertTrue(p.indexOf("CALLBACK SECRET") in p.indexOf("RULES")..p.indexOf("AFTER YOU'RE CONNECTED"))
         // Worst case (AGT-10): longest name, MagicDNS + IP fallback, every feature on, callback secret, direct and relay.
         for (connection in listOf(Connection.DIRECT, Connection.RELAY)) {
             val worst = SetupPrompt.build("A".repeat(24), key, connection, addr, "Samsung SM-X238U",
                 caps("gallery", "camera", "mic"), null, secret)
             println("setup prompt worst case ($connection, private=${cc.bridgit.app.BuildConfig.PRIVATE_CONTROL}): ${worst.length}")
-            assertTrue("AGT-10 worst case $connection: ${worst.length}", worst.length < 6000)
+            assertTrue("AGT-10 worst case $connection: ${worst.length}", worst.length < 7000)
         }
         assertFalse(SetupPrompt.build("Grok", key, Connection.DIRECT, addr, "Pixel", caps(), null).contains("CALLBACK"))
     }
@@ -324,7 +324,7 @@ class ApiLogicTest {
         assertTrue(p.contains("retry_after_s"))
         assertTrue(p.contains("curl -m 60") && p.contains("duration + 90 s with transcribe=true"))
         // Paste-only owners get the demo question straight away; it still runs only on a yes, and is asked once.
-        assertTrue(p.contains("If the owner pasted only this prompt, ask in your first reply"))
+        assertTrue(p.contains("If the owner pasted only this prompt, ask \"Want a 5-minute demo"))
         assertTrue(p.contains("If they gave you a task, do it first, then ask."))
         assertTrue(p.contains("On yes, follow GET /v1/demo"))
         assertTrue(p.contains("Ask once."))

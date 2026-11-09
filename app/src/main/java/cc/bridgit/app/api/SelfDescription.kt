@@ -35,7 +35,7 @@ object SetupPrompt {
     /** Step 1's naming sentence: never asks a named device to register; an unnamed one only after the owner agrees (A0058, A0213). */
     fun naming(domainName: String?): String =
         if (domainName != null) "This device's domain name is $domainName, registered for good (bridgit_name.name confirms it): never register another name."
-        else "Domain name: if bridgit_name.status is \"registered\", bridgit_name.name is this device's domain name for good: never register another. Only if it is \"unregistered\": ask the owner which name they want (bridgit_name.advice, ${Learn.NAMES_URL}), then register it (bridgit_name.how)."
+        else "Domain name: if bridgit_name.status is \"registered\", bridgit_name.name is this device's domain name for good: never register another. Only if it is \"unregistered\": ask the owner which name they want (bridgit_name.advice, ${Learn.NAMES_URL}) as your whole first reply, two warm sentences with no features, applets or numbers (those wait for your next reply): Bridgit gives their devices senses and a place to build applets, and needs a friendly name to register this one; propose one name of about 10 characters, e.g. \"Can we call it 'cremeo-ow'?\"; then register it (bridgit_name.how)."
 
     /**
      * The ordered first calls, shared by the setup prompt and the relay connector text (one source, no drift).
@@ -110,7 +110,7 @@ object SetupPrompt {
                 sb.appendLine("- Connected test: curl -sS -m 60 -H @\"$home/header\" ${addr.baseUrl}/health")
             }
         }
-        sb.appendLine("  A reply naming your agent${device.domainName?.let { " and bridgit_name.name $it" } ?: ""} means you're connected; nothing else proves it. After first call 3 (capabilities), tell the owner so and name the available features.")
+        sb.appendLine("  A reply naming your agent${device.domainName?.let { " and bridgit_name.name $it" } ?: ""} means you're connected; nothing else proves it. After first call 3 (capabilities), tell the owner so and name the available features${if (device.domainName == null) ", in the reply after the naming question" else ""}.")
         sb.appendLine("- Never print, log or paste the key (command lines, reports, chat, memory).")
         sb.appendLine("- Key refused (401, reason key_rotated or agent_removed)? Stop and ask the owner for a new setup prompt, then REPLACE the key in $store; never keep two.")
         sb.appendLine("- MCP (same key): ${addr.baseUrl}/mcp for the API; ${addr.baseUrl.removeSuffix("/v1")}/mcp only for private-build control tools (GET /v2/capabilities) once the owner approves the session.")
@@ -147,8 +147,8 @@ object SetupPrompt {
             sb.appendLine()
         }
         sb.appendLine("AFTER YOU'RE CONNECTED")
-        sb.appendLine("1. If the owner pasted only this prompt, ask in your first reply: \"Want a 5-minute demo on your phone?\" If they gave you a task, do it first, then ask. Ask once. On yes, follow GET /v1/demo (its captures are covered by that yes).")
-        sb.appendLine("2. If they want more, ask about their day and suggest an applet. \"Not now\" ends onboarding, not their task.")
+        sb.appendLine("1. If the owner pasted only this prompt, ask \"Want a 5-minute demo on your phone?\" ${if (device.domainName == null) "once the device is named" else "in your first reply"}. If they gave you a task, do it first, then ask. Ask once. On yes, follow GET /v1/demo (its captures are covered by that yes).")
+        sb.appendLine("2. Your intro reply (after the name is registered, or your first if it already was): sound eager and glad to build, since you build and the owner only approves. One line confirming the name; three things this device could do for them in plain words, from features that are ready (no counts, blocked features or jargon); one question, the demo or what they'd like to build. If they want more, ask about their day and suggest an applet. \"Not now\" ends onboarding, not their task.")
         sb.appendLine("3. Report every bug and missing feature directly to Bridgit's servers, with this device's domain name. Never include keys; omit private data unless the owner agreed to share it. How: ${Learn.BUGS_URL}")
         sb.appendLine()
         sb.append(pointers())

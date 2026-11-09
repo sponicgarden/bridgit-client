@@ -88,6 +88,9 @@
        "link_paused",
        "link_waiting",
        "not_on_target",
+       "link_expired",
+       "tier_not_allowed",
+       "link_approval_declined",
        "target_offline",
        "code_invalid",
        "code_expired",
@@ -830,16 +833,16 @@
     "requestBody": {"content": {"application/json": {"schema": {
      "type": "object",
      "properties": {
+      "friendly_name": {
+       "description": "Required when registering (unless the owner already named this phone): up to 40 characters, any style, unique among the owner's devices; displayed nearly everywhere, never public. Also changes it later",
+       "type": "string"
+      },
       "visible": {
        "description": "Public lookup shows label and online; default true; false hides",
        "type": "boolean"
       },
       "name": {
        "description": "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served",
-       "type": "string"
-      },
-      "friendly_name": {
-       "description": "Required when registering (unless the owner already named this phone): up to 40 characters, any style, unique among the owner's devices; displayed nearly everywhere, never public. Also changes it later",
        "type": "string"
       },
       "label": {
@@ -1733,12 +1736,21 @@
       "description": "Its link code, K7QX-3MPA (required unless link is given)",
       "type": "string"
      },
+     "tier": {
+      "description": "This Bridgit's tier for the link (default: the one the code was made with); the narrower of the two applies",
+      "type": "string",
+      "enum": [
+       "own",
+       "associate",
+       "public"
+      ]
+     },
      "port": {
       "description": "Its Bridgit port, with host",
       "type": "integer"
      },
      "reverse_services": {
-      "description": "What the other Bridgit may use here in return (it opts in on its side); default none",
+      "description": "What the other Bridgit may use here in return (it opts in on its side); default none. Limited by the tier",
       "type": "array",
       "items": {"type": "string"}
      },
@@ -1754,6 +1766,14 @@
       "description": "Its Tailscale address, when the names backend can't resolve the name",
       "type": "string"
      },
+     "associate_email": {
+      "description": "associate: the other person's email",
+      "type": "string"
+     },
+     "associate": {
+      "description": "associate: the other person's name",
+      "type": "string"
+     },
      "agents": {
       "description": "This Bridgit's control agent ids that may use it; default: the calling agent",
       "type": "array",
@@ -1764,7 +1784,7 @@
    }}}},
    "operationId": "postOwnerConfigurationLinksClaims",
    "responses": {
-    "200": {"description": "the new link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})"},
+    "200": {"description": "the new link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})"},
     "410": {
      "description": "code_expired, code_used_up",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -2297,7 +2317,7 @@
    }}}},
    "operationId": "postOwnerConfigurationLinksIdDisconnect",
    "responses": {
-    "200": {"description": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until"},
+    "200": {"description": "the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until"},
     "422": {
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -3289,7 +3309,7 @@
    }}}},
    "operationId": "postOwnerConfigurationLinksIdDirectionsDirection",
    "responses": {
-    "200": {"description": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})"},
+    "200": {"description": "the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})"},
     "410": {
      "description": "code_expired, code_used_up",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -3617,7 +3637,7 @@
    "x-bridgit-control-scope": "owner.configuration",
    "operationId": "getOwnerConfigurationLinks",
    "responses": {
-    "200": {"description": "links[id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}], codes[{id, services, directions, expires_at, tries_left, state, granter}], services (vocabulary), suggested_services, paused_all{satellites, hubs}, name (this Bridgit's Device Domain Name or null), operations"},
+    "200": {"description": "links[id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}], portals[{id (portal:\u2026 a device viewing this one, viewing:\u2026 one this device views), kind, name, tier, expires_at, review_at, associate}], codes[{id, services, directions, expires_at, tries_left, state, granter, tier, access_ms, associate}], tiers[{tier, label, services, about}], services (vocabulary), suggested_services, paused_all{satellites, hubs}, name (this Bridgit's Device Domain Name or null), operations"},
     "422": {
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -4619,7 +4639,7 @@
    "x-bridgit-control-scope": "owner.configuration",
    "operationId": "postOwnerConfigurationLinksIdUndo",
    "responses": {
-    "200": {"description": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})"},
+    "200": {"description": "the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})"},
     "410": {
      "description": "code_expired, code_used_up",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -6805,10 +6825,31 @@
       "type": "array",
       "items": {"type": "string"}
      },
+     "tier": {
+      "description": "own (default: the owner's own device), associate (a named person's device: services interactions, sounds, speaker, view, ends or is reviewed) or public (a device in the wild: one of interactions, view, in only, at most 24 h, the owner allows each change)",
+      "type": "string",
+      "enum": [
+       "own",
+       "associate",
+       "public"
+      ]
+     },
+     "associate_email": {
+      "description": "associate: the person's email (required; their Bridgit confirms the link from that account)",
+      "type": "string"
+     },
      "services": {
       "description": "What the claiming Bridgit may use here: camera, gallery, interactions, location, mic, sounds, speaker, view (suggested: camera, mic, speaker, interactions, view); required for in",
       "type": "array",
       "items": {"type": "string"}
+     },
+     "access_ms": {
+      "description": "associate and public: how long the claimed link's access lasts (associate 1 min-90 days, default 30 days; public 1 min-24 h, default 1 h)",
+      "type": "integer"
+     },
+     "associate": {
+      "description": "associate: the person's name",
+      "type": "string"
      },
      "agents": {
       "description": "For out: this Bridgit's control agent ids that may use the claiming Bridgit",
@@ -6820,7 +6861,7 @@
    }}}},
    "operationId": "postOwnerConfigurationLinksCodes",
    "responses": {
-    "200": {"description": "code_id, code (K7QX-3MPA: give it with the name), name, expires_at, services, directions, link (bridgit://link#\u2026 for a QR code), name_lookup, how"},
+    "200": {"description": "code_id, code (K7QX-3MPA: give it with the name), name, expires_at, tier, tier_about, access_ms, associate, services, directions, link (bridgit://link#\u2026 for a QR code), name_lookup, how"},
     "410": {
      "description": "code_expired, code_used_up",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -10363,6 +10404,90 @@
    ],
    "tags": ["owner_features"]
   }},
+  "/v1/owner/configuration/links/{id}/tier": {"post": {
+   "summary": "Set a link's trust tier on this Bridgit: own (Your Other Devices), associate (Devices of Associates) or public (Devices in the Wild). Narrowing applies at once and removes services the tier doesn't allow; widening a link record needs the other Bridgit to widen too. Also renews an associate's or public link's access. id: a link id, portal:<agent id> or viewing:<device id>; explicit owner.configuration grant required; no per-change phone approval",
+   "x-bridgit-control-scope": "owner.configuration",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "tier": {
+      "description": "own, associate or public",
+      "type": "string",
+      "enum": [
+       "own",
+       "associate",
+       "public"
+      ]
+     },
+     "review_at": {
+      "description": "associate: a review reminder (ms) before the end date; a Portal pairing may have only a review date",
+      "type": "integer"
+     },
+     "associate_email": {
+      "description": "associate: the person's email (required unless already set)",
+      "type": "string"
+     },
+     "access_ms": {
+      "description": "associate and public: access from now (renews it)",
+      "type": "integer"
+     },
+     "associate": {
+      "description": "associate: the person's name",
+      "type": "string"
+     }
+    },
+    "required": ["tier"]
+   }}}},
+   "operationId": "postOwnerConfigurationLinksIdTier",
+   "responses": {
+    "200": {"description": "the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}, or the portal entry), tier_before"},
+    "410": {
+     "description": "code_expired, code_used_up",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "403": {
+     "description": "forbidden, agent_not_allowed, code_invalid, link_revoked",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "502": {
+     "description": "upstream_failed",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "target_offline, team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict, name_required, link_waiting",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }
+   ],
+   "tags": ["owner_features"]
+  }},
   "/v1/camera/arm": {"post": {
    "summary": "Open the camera ahead of a photo, so your next snapshot fires in about 0.3 s",
    "requestBody": {"content": {"application/json": {"schema": {
@@ -12497,7 +12622,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 144,
+  "x-api-revision": 145,
   "title": "Bridgit",
   "version": "1.8.0"
  }

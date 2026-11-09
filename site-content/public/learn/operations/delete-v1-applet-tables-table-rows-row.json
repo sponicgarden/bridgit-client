@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Delete one row in this applet principal's own declared table using the same table-store cleanup as the owner UI",

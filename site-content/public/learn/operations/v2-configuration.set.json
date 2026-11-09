@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Commands + ToolSchemas + PlatformApi.openApi",
  "operation": {
   "path": "/v2/call",
@@ -56,6 +56,7 @@
        "DELETE /v1/owner/configuration/links/codes/{id}",
        "POST /v1/owner/configuration/links/claims",
        "POST /v1/owner/configuration/links/{id}/directions/{direction}",
+       "POST /v1/owner/configuration/links/{id}/tier",
        "POST /v1/owner/configuration/links/{id}/undo",
        "POST /v1/owner/configuration/links/pause-all",
        "POST /v1/owner/configuration/links/{id}/disconnect",
@@ -115,6 +116,7 @@
          "DELETE /v1/owner/configuration/links/codes/{id}",
          "POST /v1/owner/configuration/links/claims",
          "POST /v1/owner/configuration/links/{id}/directions/{direction}",
+         "POST /v1/owner/configuration/links/{id}/tier",
          "POST /v1/owner/configuration/links/{id}/undo",
          "POST /v1/owner/configuration/links/pause-all",
          "POST /v1/owner/configuration/links/{id}/disconnect",
@@ -178,6 +180,7 @@
       "DELETE /v1/owner/configuration/links/codes/{id}",
       "POST /v1/owner/configuration/links/claims",
       "POST /v1/owner/configuration/links/{id}/directions/{direction}",
+      "POST /v1/owner/configuration/links/{id}/tier",
       "POST /v1/owner/configuration/links/{id}/undo",
       "POST /v1/owner/configuration/links/pause-all",
       "POST /v1/owner/configuration/links/{id}/disconnect",

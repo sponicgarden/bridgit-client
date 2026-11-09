@@ -2084,7 +2084,7 @@
    "idempotent": false,
    "path": "/v1/owner/configuration/links",
    "capability": "owner_features",
-   "returns": "links[id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}], codes[{id, services, directions, expires_at, tries_left, state, granter}], services (vocabulary), suggested_services, paused_all{satellites, hubs}, name (this Bridgit's Device Domain Name or null), operations",
+   "returns": "links[id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}], portals[{id (portal:\u2026 a device viewing this one, viewing:\u2026 one this device views), kind, name, tier, expires_at, review_at, associate}], codes[{id, services, directions, expires_at, tries_left, state, granter, tier, access_ms, associate}], tiers[{tier, label, services, about}], services (vocabulary), suggested_services, paused_all{satellites, hubs}, name (this Bridgit's Device Domain Name or null), operations",
    "errors": [],
    "requires": null
   },
@@ -2115,13 +2115,42 @@
      "description": "For out: this Bridgit's control agent ids that may use the claiming Bridgit",
      "type": "array",
      "required": false
+    },
+    {
+     "name": "tier",
+     "description": "own (default: the owner's own device), associate (a named person's device: services interactions, sounds, speaker, view, ends or is reviewed) or public (a device in the wild: one of interactions, view, in only, at most 24 h, the owner allows each change)",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "own",
+      "associate",
+      "public"
+     ]
+    },
+    {
+     "name": "access_ms",
+     "description": "associate and public: how long the claimed link's access lasts (associate 1 min-90 days, default 30 days; public 1 min-24 h, default 1 h)",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "associate",
+     "description": "associate: the person's name",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "associate_email",
+     "description": "associate: the person's email (required; their Bridgit confirms the link from that account)",
+     "type": "string",
+     "required": false
     }
    ],
    "example": "POST /v1/owner/configuration/links/codes {\"services\":[\"camera\",\"mic\",\"speaker\",\"interactions\",\"view\"]}",
    "idempotent": true,
    "path": "/v1/owner/configuration/links/codes",
    "capability": "owner_features",
-   "returns": "code_id, code (K7QX-3MPA: give it with the name), name, expires_at, services, directions, link (bridgit://link#\u2026 for a QR code), name_lookup, how",
+   "returns": "code_id, code (K7QX-3MPA: give it with the name), name, expires_at, tier, tier_about, access_ms, associate, services, directions, link (bridgit://link#\u2026 for a QR code), name_lookup, how",
    "errors": [
     "invalid_parameter",
     "forbidden",
@@ -2221,8 +2250,31 @@
     },
     {
      "name": "reverse_services",
-     "description": "What the other Bridgit may use here in return (it opts in on its side); default none",
+     "description": "What the other Bridgit may use here in return (it opts in on its side); default none. Limited by the tier",
      "type": "array",
+     "required": false
+    },
+    {
+     "name": "tier",
+     "description": "This Bridgit's tier for the link (default: the one the code was made with); the narrower of the two applies",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "own",
+      "associate",
+      "public"
+     ]
+    },
+    {
+     "name": "associate",
+     "description": "associate: the other person's name",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "associate_email",
+     "description": "associate: the other person's email",
+     "type": "string",
      "required": false
     }
    ],
@@ -2230,7 +2282,7 @@
    "idempotent": true,
    "path": "/v1/owner/configuration/links/claims",
    "capability": "owner_features",
-   "returns": "the new link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})",
+   "returns": "the new link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})",
    "errors": [
     "invalid_parameter",
     "forbidden",
@@ -2282,7 +2334,76 @@
    "idempotent": true,
    "path": "/v1/owner/configuration/links/{id}/directions/{direction}",
    "capability": "owner_features",
-   "returns": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})",
+   "returns": "the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "not_found",
+    "conflict",
+    "upstream_failed",
+    "name_required",
+    "code_invalid",
+    "code_expired",
+    "code_used_up",
+    "link_revoked",
+    "link_waiting",
+    "target_offline",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Set a link's trust tier on this Bridgit: own (Your Other Devices), associate (Devices of Associates) or public (Devices in the Wild). Narrowing applies at once and removes services the tier doesn't allow; widening a link record needs the other Bridgit to widen too. Also renews an associate's or public link's access. id: a link id, portal:<agent id> or viewing:<device id>; explicit owner.configuration grant required; no per-change phone approval",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_links_tier",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "tier",
+     "description": "own, associate or public",
+     "type": "string",
+     "required": true,
+     "enum": [
+      "own",
+      "associate",
+      "public"
+     ]
+    },
+    {
+     "name": "access_ms",
+     "description": "associate and public: access from now (renews it)",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "review_at",
+     "description": "associate: a review reminder (ms) before the end date; a Portal pairing may have only a review date",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "associate",
+     "description": "associate: the person's name",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "associate_email",
+     "description": "associate: the person's email (required unless already set)",
+     "type": "string",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/owner/configuration/links/{id}/tier {\"tier\":\"associate\",\"associate\":\"Sam\",\"associate_email\":\"sam@example.com\",\"access_ms\":2592000000}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/links/{id}/tier",
+   "capability": "owner_features",
+   "returns": "the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}, or the portal entry), tier_before",
    "errors": [
     "invalid_parameter",
     "forbidden",
@@ -2315,7 +2436,7 @@
    "idempotent": true,
    "path": "/v1/owner/configuration/links/{id}/undo",
    "capability": "owner_features",
-   "returns": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})",
+   "returns": "the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})",
    "errors": [
     "invalid_parameter",
     "forbidden",
@@ -10038,7 +10159,7 @@
    "idempotent": true,
    "path": "/v1/owner/configuration/links/{id}/disconnect",
    "capability": "status",
-   "returns": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until",
+   "returns": "the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until",
    "errors": [
     "invalid_parameter",
     "forbidden",
@@ -11848,7 +11969,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 144,
- "count": 352,
+ "api_revision": 145,
+ "count": 353,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

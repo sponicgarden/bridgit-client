@@ -1,0 +1,117 @@
+{
+ "documentation_revision": 128,
+ "api_revision": 145,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set a link's trust tier on this Bridgit: own (Your Other Devices), associate (Devices of Associates) or public (Devices in the Wild). Narrowing applies at once and removes services the tier doesn't allow; widening a link record needs the other Bridgit to widen too. Also renews an associate's or public link's access. id: a link id, portal:<agent id> or viewing:<device id>; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_links_tier",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "tier",
+    "description": "own, associate or public",
+    "type": "string",
+    "required": true,
+    "enum": [
+     "own",
+     "associate",
+     "public"
+    ]
+   },
+   {
+    "name": "access_ms",
+    "description": "associate and public: access from now (renews it)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "review_at",
+    "description": "associate: a review reminder (ms) before the end date; a Portal pairing may have only a review date",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "associate",
+    "description": "associate: the person's name",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "associate_email",
+    "description": "associate: the person's email (required unless already set)",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/links/{id}/tier {\"tier\":\"associate\",\"associate\":\"Sam\",\"associate_email\":\"sam@example.com\",\"access_ms\":2592000000}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/links/{id}/tier",
+  "capability": "owner_features",
+  "returns": "the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}, or the portal entry), tier_before",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "tier": {
+     "description": "own, associate or public",
+     "type": "string",
+     "enum": [
+      "own",
+      "associate",
+      "public"
+     ]
+    },
+    "review_at": {
+     "description": "associate: a review reminder (ms) before the end date; a Portal pairing may have only a review date",
+     "type": "integer"
+    },
+    "associate_email": {
+     "description": "associate: the person's email (required unless already set)",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/links/{id}/tier",
+     "type": "string"
+    },
+    "access_ms": {
+     "description": "associate and public: access from now (renews it)",
+     "type": "integer"
+    },
+    "associate": {
+     "description": "associate: the person's name",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "tier",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed",
+   "name_required",
+   "code_invalid",
+   "code_expired",
+   "code_used_up",
+   "link_revoked",
+   "link_waiting",
+   "target_offline",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

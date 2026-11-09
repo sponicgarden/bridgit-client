@@ -655,6 +655,13 @@ object ApiChanges {
             Item("Monitor resources: Bridgit's own CPU, memory, network, disk, storage and context switches over time, with hourly and daily summaries per build, thresholds and a level (ok, elevated, high). Off by default; health carries a short resource_monitor block", "/v1/device/resources"),
             Item("device.resource_monitor (off by default) and device.resource_monitor_interval (1s, 10s, 1m default, 1h): read in GET /v1/settings, changed with POST /v1/settings or POST /v1/owner/configuration/settings", "/v1/settings"),
         )),
+        Revision(145, "1.8.0", "2026-11-09", listOf(
+            Item("Link trust tiers: every link is own (Your Other Devices), associate (Devices of Associates: a person named by email, view/interactions/speaker/sounds only, ends within 90 days) or public (Devices in the Wild: view or interactions only, ends within 24 h, the owner allows each change). links[].tier, tier_here, tier_there, expires_at, associate_email, registration; portals[] and tiers[]", "/v1/owner/configuration/links"),
+            Item("Make a code for a tier: POST …/links/codes {tier, access_ms, associate, associate_email}; the claim takes the code's tier and may only narrow it ({tier})", "/v1/owner/configuration/links/codes"),
+            Item("Change a link's or Portal pairing's tier, end date or associate (narrowing works at once; widening a link needs the other Bridgit too)", "/v1/owner/configuration/links/{id}/tier"),
+            Item("GET /v1/links entries say their tier", "/v1/links"),
+            Item("New errors: link_expired, tier_not_allowed, link_approval_declined. Associate and public links have per-tier rate limits", null),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

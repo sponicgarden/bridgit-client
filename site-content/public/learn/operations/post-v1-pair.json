@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Fetch your key with a 6-digit code shown on the phone (alternative to the setup prompt)",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Change table columns while preserving the row id and other values. Owner control agents can act on any applet; applet principals need installer sharing; values are validated",

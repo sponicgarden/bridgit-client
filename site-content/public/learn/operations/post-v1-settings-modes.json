@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Replace custom mode definitions; create, rename or remove unused custom modes; [] clears them. Built-in modes and the current mode cannot be removed. Needs App settings and Agent Super Powers",

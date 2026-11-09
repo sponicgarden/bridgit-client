@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each",
@@ -16,7 +16,7 @@
   "idempotent": false,
   "path": "/v1/owner/configuration/links",
   "capability": "owner_features",
-  "returns": "links[id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}], codes[{id, services, directions, expires_at, tries_left, state, granter}], services (vocabulary), suggested_services, paused_all{satellites, hubs}, name (this Bridgit's Device Domain Name or null), operations",
+  "returns": "links[id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}], portals[{id (portal:\u2026 a device viewing this one, viewing:\u2026 one this device views), kind, name, tier, expires_at, review_at, associate}], codes[{id, services, directions, expires_at, tries_left, state, granter, tier, access_ms, associate}], tiers[{tier, label, services, about}], services (vocabulary), suggested_services, paused_all{satellites, hubs}, name (this Bridgit's Device Domain Name or null), operations",
   "mcp_input_schema": {
    "type": "object",
    "properties": {},

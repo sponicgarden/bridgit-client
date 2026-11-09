@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "A bundled manufacturer logo, as GET /v1/lan/brands/{id}/logo, without the Network discovery switch. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",

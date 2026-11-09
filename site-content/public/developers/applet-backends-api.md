@@ -129,6 +129,14 @@ The existing half-hour scheduler considers photos through the last completed UTC
 
 A database claim deduplicates each viewer/hour, and an atomic rolling-hour send reservation prevents sends less than 60 minutes apart. Delivery failures are recorded and not repeatedly mailed; the next hour can try again. Every email has a token-protected stop-email form; GET only displays the confirmation, POST stops photo emails without revoking portal access. No live subscription is enabled as part of deploying this feature.
 
+### Pet-only pictures
+
+The owner can ask for a copy of one history photo with the people removed: `POST /v1/watch/applet/pet-only?phone=<install>&applet=dog` with `{"id": <gallery photo id>}` and an `Idempotency-Key` header (8-128 letters, digits, dashes or underscores). The photo, including anyone in it, is sent to Azure OpenAI's image model to be redrawn; nothing is sent until the owner asks. Only confident gallery photos qualify. One copy per photo: asking again returns it (`existing: true`), and retrying with the same key never pays twice (`replayed: true`). The answer includes `pet_only: {at, bytes}`, `cost_usd` and the current caps. A provider refusal charges nothing (`image_refused`). Only one request per photo runs at a time; another gets `pet_only_busy`. If the copy was paid for but couldn't be saved, a retry with the same key saves it without paying again.
+
+Each copy costs about $0.02. Caps are on by default: $0.25 a day and $2 a month (`service: "petonly"`), and copies count toward the account's 40 images a month. `GET` on the same route returns the caps (`service.limits`, `service.default_limits`), spend, the monthly allowance and the privacy note. `PUT {"limits": [{id, usd, per}]}` changes the caps (`[]` removes them) and `DELETE {"limits": "default"}` restores the defaults; every change is audited. Signed phones can use `/v1/budgets/services/petonly` (GET, PUT, DELETE). `DELETE {"id": <photo id>}` deletes one copy. These routes are owner-only.
+
+Gallery rows carry `pet_only_at` (null when there is no copy). `GET /v1/watch/applet/image?...&id=<id>&version=pet_only` returns the copy to anyone who can open the original. A copy is deleted with its photo: when photo sharing is switched off, when the portal is deleted, and after 30 days.
+
 ### Photo episodes
 
 The owner can `POST /v1/watch/applet/episodes?phone=<install>&applet=dog` to enable

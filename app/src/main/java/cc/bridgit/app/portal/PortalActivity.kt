@@ -16,6 +16,12 @@ import androidx.lifecycle.lifecycleScope
 import cc.bridgit.app.BridgeApp
 import cc.bridgit.app.R
 import cc.bridgit.app.databinding.ActivityPortalBinding
+import cc.bridgit.app.link.Granter
+import cc.bridgit.app.link.LinkModel
+import cc.bridgit.app.link.LinkTier
+import cc.bridgit.app.link.LinkTierPolicy
+import cc.bridgit.app.link.Links
+import cc.bridgit.app.link.PortalTiers
 import cc.bridgit.app.portal.LinkedDeviceSheet.Tone
 import cc.bridgit.app.portal.LinkedDevicesLayout.Kind
 import cc.bridgit.app.portal.LinkedDevicesLayout.Node
@@ -58,7 +64,7 @@ class PortalActivity : AppCompatActivity() {
             v.updatePadding(bottom = bars.bottom); insets
         }
         b.toolbar.setNavigationOnClickListener { finish() }
-        b.pairDevice.setOnClickListener { startActivity(Intent(this, PairDeviceActivity::class.java)) }
+        b.pairDevice.setOnClickListener { pickTier() }
         b.diagram.onNode = ::openNode
         b.pauseSatellites.setOnClickListener { LinkPause.setSatellites(!LinkPause.satellites) }
         b.pauseHubs.setOnClickListener { LinkPause.setHubs(!LinkPause.hubsPaused) }
@@ -75,6 +81,7 @@ class PortalActivity : AppCompatActivity() {
         render()
         lifecycleScope.launch { SatelliteStore.changed.collectLatest { render() } }
         lifecycleScope.launch { HubLinks.changes.collectLatest { render() } }
+        lifecycleScope.launch { Links.changes.collectLatest { render() } }
         lifecycleScope.launch { LinkPause.changed.collectLatest { render() } }
         // A newly paired portal's first call, or a removed one: redraw now, not on the next tick.
         lifecycleScope.launch { PortalPairing.portalsChanged(app).collectLatest { render() } }
@@ -113,6 +120,7 @@ class PortalActivity : AppCompatActivity() {
         val d = diagram()
         buildLegend(d.portals.isNotEmpty())
         b.diagram.show(d)
+        renderTiers(d)
         b.hint.text = if (d.alone) getString(R.string.linked_hint_alone, noun) else getString(R.string.linked_hint)
     }
 
@@ -588,6 +596,312 @@ class PortalActivity : AppCompatActivity() {
         }
     }
 
+    // ---- Trust tiers (owner, 8 Nov 2026): Your Other Devices, Devices of Associates, Devices in the Wild ----
+    // Design: docs/design/link-tiers-android.md (Claude in place of Sol, 9 Nov 2026), on docs/design/list-screens.md.
+
+    private fun tierTitle(t: LinkTier) = getString(when (t) { LinkTier.OWN -> R.string.linked_tier_own
+        LinkTier.ASSOCIATE -> R.string.linked_tier_associate; LinkTier.PUBLIC -> R.string.linked_tier_public })
+    private fun tierAbout(t: LinkTier) = getString(when (t) { LinkTier.OWN -> R.string.linked_tier_own_about
+        LinkTier.ASSOCIATE -> R.string.linked_tier_associate_about; LinkTier.PUBLIC -> R.string.linked_tier_public_about })
+    private fun attr(v: View, a: Int) = com.google.android.material.color.MaterialColors.getColor(v, a)
+    private fun text(style: Int, colourAttr: Int, build: TextView.() -> Unit = {}) = TextView(this).apply {
+        setTextAppearance(style); setTextColor(attr(this, colourAttr)); build() }
+
+    /** The links behind a node on the map, with their tiers and the state worth saying. */
+    private fun tierParts(n: Node, links: List<Links.Rec>, pt: PortalTiers, now: Long): List<LinkTierSections.Part> {
+        fun rec(r: Links.Rec?) = r?.let {
+            val reg = cc.bridgit.app.link.LinkRegistry.Backend.status(app, it.id)?.optString("state")
+            val state = when {
+                it.expired(now) -> LinkTierSections.State.ENDED
+                reg == "suspended" -> LinkTierSections.State.PAUSED
+                reg == "pending" || app.links.inState(it).wire.startsWith("waiting") || app.links.outState(it).wire.startsWith("waiting") -> LinkTierSections.State.WAITING
+                else -> null
+            }
+            LinkTierSections.Part(it.id, it.effectiveTier, it.expiresAt, it.reviewAt, it.associate, it.associateEmail, state)
+        }
+        fun portal(key: String, apiId: String) = pt.get(key).let {
+            LinkTierSections.Part(apiId, it.tier, it.expiresAt, it.reviewAt, it.associate, it.associateEmail, if (it.expired(now)) LinkTierSections.State.ENDED else null) }
+        return when (n.kind) {
+            Kind.HUB -> listOfNotNull(n.satLink?.let { s -> rec(links.firstOrNull { it.role == Links.Role.SAT && it.ref == s }) },
+                n.portalLink?.let { d -> portal(PortalTiers.viewing(d), PortalTiers.viewing(d)) })
+            Kind.SATELLITE -> listOfNotNull(rec(links.firstOrNull { it.role == Links.Role.HUB && it.ref == n.id }))
+            Kind.VIEWER -> listOf(portal(PortalTiers.viewer(n.id), "portal:${n.id}"))
+            else -> emptyList()
+        }
+    }
+
+    /** Debug builds (linked_sheet=tiers): sample rows for screenshots, never stored. */
+    private var sampleTiers: List<Pair<LinkTier, List<LinkTierSections.Row>>>? = null
+
+    /** A heading per tier, then a row per linked device (tap: its sheet; shield: move it to another tier). */
+    private fun renderTiers(d: LinkedDevicesLayout.Diagram) {
+        val box = b.tierSections
+        box.removeAllViews()
+        val now = System.currentTimeMillis()
+        val groups = sampleTiers ?: run {
+            val links = runCatching { app.links.all() }.getOrDefault(emptyList()); val pt = PortalTiers(app)
+            runCatching { LinkTierSections.group(d.all) { tierParts(it, links, pt, now) } }.getOrDefault(emptyList())
+        }
+        for ((t, rows) in groups) {
+            box.addView(text(com.google.android.material.R.style.TextAppearance_Material3_TitleSmall, com.google.android.material.R.attr.colorPrimary) {
+                text = tierTitle(t); ViewCompat.setAccessibilityHeading(this, true)
+                setPaddingRelative(dp(16), dp(16), dp(16), dp(8))
+            })
+            if (rows.isEmpty()) box.addView(text(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium, com.google.android.material.R.attr.colorOnSurfaceVariant) {
+                text = getString(R.string.linked_tier_none); setPaddingRelative(dp(16), 0, dp(16), dp(8))
+            })
+            rows.forEachIndexed { i, r ->
+                if (i > 0) box.addView(View(this).apply { setBackgroundColor(attr(this, com.google.android.material.R.attr.colorOutlineVariant)) },
+                    LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, maxOf(1, dp(1))).apply { marginStart = dp(68) })
+                box.addView(tierRowView(r, now))
+            }
+        }
+    }
+
+    private fun stateWord(s: LinkTierSections.State) = getString(when (s) {
+        LinkTierSections.State.ENDED -> R.string.linked_tier_state_ended
+        LinkTierSections.State.PAUSED -> R.string.linked_tier_state_paused
+        LinkTierSections.State.WAITING -> R.string.linked_tier_state_waiting })
+
+    private fun tierRowView(r: LinkTierSections.Row, now: Long): View {
+        val n = r.node
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL; gravity = android.view.Gravity.CENTER_VERTICAL
+            minimumHeight = dp(64); setPaddingRelative(dp(16), dp(12), dp(4), dp(12))
+            val tv = android.util.TypedValue(); context.theme.resolveAttribute(android.R.attr.selectableItemBackground, tv, true)
+            setBackgroundResource(tv.resourceId); isClickable = true; isFocusable = true
+            setOnClickListener { if (sampleTiers == null) openNode(n) }
+        }
+        // The map's glyph for the device's role, so a row and its tile read as the same device.
+        val dark = LinkedDevicesGlyph.dark(this)
+        row.addView(android.widget.ImageView(this).apply {
+            setImageDrawable(LinkedDevicesGlyph.Icon(n.role, LinkedDevicesGlyph.roleColour(dark, n.role), dp(24), 1.6f * resources.displayMetrics.density))
+            scaleType = android.widget.ImageView.ScaleType.CENTER; importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, LinearLayout.LayoutParams(dp(40), dp(40)).apply { marginEnd = dp(12) })
+        val texts = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        texts.addView(text(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium, com.google.android.material.R.attr.colorOnSurface) {
+            text = n.name; maxLines = 2; ellipsize = android.text.TextUtils.TruncateAt.END })
+        val secondary = listOfNotNull(if (n.online) getString(R.string.linked_status_online) else n.status?.replaceFirstChar { it.uppercase() } ?: getString(R.string.linked_status_offline),
+            roleLabel(n)).joinToString(" · ")
+        texts.addView(text(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium, com.google.android.material.R.attr.colorOnSurfaceVariant) {
+            text = secondary; maxLines = 2; ellipsize = android.text.TextUtils.TruncateAt.END; setPadding(0, dp(2), 0, 0) })
+        val detail = when {
+            r.state != null -> stateWord(r.state)
+            r.expiresAt != null -> getString(R.string.linked_tier_ends, whenText(r.expiresAt, now))
+            r.reviewAt != null -> getString(R.string.linked_tier_review, whenText(r.reviewAt, now))
+            else -> null
+        }
+        val meta = listOfNotNull(r.associate ?: r.email, detail).joinToString(" · ")
+        if (meta.isNotEmpty()) texts.addView(text(com.google.android.material.R.style.TextAppearance_Material3_BodySmall, com.google.android.material.R.attr.colorOnSurfaceVariant) {
+            text = meta; maxLines = 2; ellipsize = android.text.TextUtils.TruncateAt.END; setPadding(0, dp(4), 0, 0) })
+        row.contentDescription = listOf(n.name, secondary, meta).filter { it.isNotEmpty() }.joinToString(", ")
+        row.addView(texts, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        row.addView(android.widget.ImageButton(this).apply {
+            setImageResource(R.drawable.ic_shield)
+            imageTintList = android.content.res.ColorStateList.valueOf(attr(this, com.google.android.material.R.attr.colorOnSurfaceVariant))
+            val tv = android.util.TypedValue(); context.theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, tv, true)
+            setBackgroundResource(tv.resourceId)
+            contentDescription = getString(R.string.linked_tier_move_a11y, n.name, tierTitle(r.tier))
+            isEnabled = r.ids.isNotEmpty() || sampleTiers != null
+            setOnClickListener { moveTier(r) }
+        }, LinearLayout.LayoutParams(dp(48), dp(48)))
+        return row
+    }
+
+    /** "8 Dec", or "8 Dec, 14:05" within a day. */
+    private fun whenText(t: Long, now: Long = System.currentTimeMillis()): String = android.text.format.DateUtils.formatDateTime(this, t,
+        android.text.format.DateUtils.FORMAT_SHOW_DATE or android.text.format.DateUtils.FORMAT_ABBREV_MONTH or android.text.format.DateUtils.FORMAT_NO_YEAR or
+            (if (t - now < LinkTierPolicy.DAY_MS) android.text.format.DateUtils.FORMAT_SHOW_TIME else 0))
+
+    /** Three choices in the owner's order, each with what the other side can do; [current] is marked when moving. */
+    private fun tierChooser(current: LinkTier?, title: String, onPick: (LinkTier) -> Unit) {
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPaddingRelative(0, dp(8), 0, dp(8)) }
+        val dialog = MaterialAlertDialogBuilder(this).setTitle(title).setView(box).setNegativeButton(R.string.linked_close, null).create()
+        for (t in LinkTier.ORDER) box.addView(LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL; gravity = android.view.Gravity.CENTER_VERTICAL
+            minimumHeight = dp(72); setPaddingRelative(dp(24), dp(12), dp(12), dp(12))
+            val tv = android.util.TypedValue(); context.theme.resolveAttribute(android.R.attr.selectableItemBackground, tv, true)
+            setBackgroundResource(tv.resourceId); isClickable = true; isFocusable = true
+            val col = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+            col.addView(text(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium,
+                if (t == current) com.google.android.material.R.attr.colorPrimary else com.google.android.material.R.attr.colorOnSurface) { text = tierTitle(t) })
+            col.addView(text(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium, com.google.android.material.R.attr.colorOnSurfaceVariant) {
+                text = tierAbout(t); maxLines = 3; setPadding(0, dp(2), 0, 0) })
+            addView(col, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+            if (t == current) addView(android.widget.ImageView(context).apply {
+                setImageResource(R.drawable.ic_check); scaleType = android.widget.ImageView.ScaleType.CENTER
+                imageTintList = android.content.res.ColorStateList.valueOf(attr(this, com.google.android.material.R.attr.colorPrimary))
+                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            }, LinearLayout.LayoutParams(dp(48), dp(48)))
+            if (t == current) ViewCompat.setStateDescription(this, getString(R.string.linked_tier_selected))
+            setOnClickListener { dialog.dismiss(); onPick(t) }
+        })
+        dialog.show()
+    }
+
+    /** Pair a device starts with who the device is for; each tier has its own flow. */
+    private fun pickTier() = tierChooser(null, getString(R.string.linked_tier_pick)) { t ->
+        when (t) {
+            LinkTier.OWN -> startActivity(Intent(this, PairDeviceActivity::class.java))
+            LinkTier.ASSOCIATE -> associateFlow()
+            LinkTier.PUBLIC -> publicFlow()
+        }
+    }
+
+    private fun label(text: Int) = text(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge, com.google.android.material.R.attr.colorOnSurface) {
+        setText(text); setPaddingRelative(0, dp(16), 0, dp(4)) }
+
+    private fun radios(vararg options: Int, checked: Int = 0) = android.widget.RadioGroup(this).apply {
+        options.forEachIndexed { i, o -> addView(com.google.android.material.radiobutton.MaterialRadioButton(context).apply { id = View.generateViewId(); setText(o); minHeight = dp(48); isChecked = i == checked }) }
+    }
+    private fun android.widget.RadioGroup.picked() = (0 until childCount).first { (getChildAt(it) as android.widget.RadioButton).isChecked }
+
+    /** Single-select choice chips for a duration, in one wrapping row. */
+    private fun durations(vararg options: Int, checked: Int) = com.google.android.material.chip.ChipGroup(this).apply {
+        isSingleSelection = true; isSelectionRequired = true; chipSpacingHorizontal = dp(8)
+        options.forEachIndexed { i, o -> addView(com.google.android.material.chip.Chip(context, null, com.google.android.material.R.attr.chipStyle).apply {
+            id = View.generateViewId(); setText(o); isCheckable = true; isChecked = i == checked; setEnsureMinTouchTargetSize(true) }) }
+    }
+    private fun com.google.android.material.chip.ChipGroup.picked() = (0 until childCount).first { (getChildAt(it) as com.google.android.material.chip.Chip).isChecked }
+
+    private fun field(hint: Int, max: Int, type: Int) = com.google.android.material.textfield.TextInputLayout(this).let { box ->
+        val f = com.google.android.material.textfield.TextInputEditText(box.context).apply { setSingleLine(); inputType = type; filters = arrayOf(android.text.InputFilter.LengthFilter(max)) }
+        box.hint = getString(hint); box.addView(f); box to f
+    }
+    private fun nameField() = field(R.string.linked_tier_name_hint, 60, android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_CAP_WORDS)
+    private fun emailField() = field(R.string.linked_tier_email_hint, 254, android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
+
+    /** Devices of Associates: their name and email, what they can do (each one ticked), and for how long. */
+    private fun associateFlow() {
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPaddingRelative(dp(24), dp(8), dp(24), 0) }
+        val (nameBox, name) = nameField(); box.addView(nameBox)
+        val (emailBox, email) = emailField(); box.addView(emailBox, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(8) })
+        box.addView(label(R.string.linked_tier_can_use))
+        val services = listOf(LinkModel.VIEW to R.string.linked_tier_svc_view, "interactions" to R.string.linked_tier_svc_interactions,
+            "speaker" to R.string.linked_tier_svc_speaker, "sounds" to R.string.linked_tier_svc_sounds)
+        val boxes = services.map { (id, t) -> id to CheckBox(this).apply { setText(t); minHeight = dp(48); isChecked = id == LinkModel.VIEW || id == "interactions" } }
+        boxes.forEach { box.addView(it.second) }
+        box.addView(label(R.string.linked_tier_for))
+        val period = durations(R.string.linked_tier_week, R.string.linked_tier_month, R.string.linked_tier_quarter, checked = 1)
+        box.addView(period)
+        val d = MaterialAlertDialogBuilder(this).setTitle(R.string.linked_tier_associate)
+            .setView(android.widget.ScrollView(this).apply { addView(box) })
+            .setPositiveButton(R.string.linked_tier_make, null).setNegativeButton(R.string.linked_close, null).create()
+        d.setOnShowListener {
+            d.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val who = name.text?.toString()?.trim().orEmpty()
+                val mail = LinkTierPolicy.email(email.text?.toString())
+                val chosen = boxes.filter { it.second.isChecked }.map { it.first }.toSet()
+                nameBox.error = if (who.isEmpty()) getString(R.string.linked_tier_need_name) else null
+                emailBox.error = if (mail == null) getString(R.string.linked_tier_need_email) else null
+                if (who.isEmpty() || mail == null) return@setOnClickListener
+                if (chosen.isEmpty()) { Toast.makeText(this, R.string.linked_tier_need_service, Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+                d.dismiss()
+                makeTierCode(LinkTier.ASSOCIATE, chosen, longArrayOf(7, 30, 90)[period.picked()] * LinkTierPolicy.DAY_MS, who, mail)
+            }
+        }
+        d.show()
+    }
+
+    /** Devices in the Wild: one thing they can do, for an hour or a day. */
+    private fun publicFlow() {
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPaddingRelative(dp(24), 0, dp(24), 0) }
+        box.addView(label(R.string.linked_tier_can_use))
+        val what = radios(R.string.linked_tier_svc_view, R.string.linked_tier_svc_interactions); box.addView(what)
+        box.addView(label(R.string.linked_tier_for))
+        val period = durations(R.string.linked_tier_hour, R.string.linked_tier_day, checked = 0); box.addView(period)
+        MaterialAlertDialogBuilder(this).setTitle(R.string.linked_tier_public).setView(android.widget.ScrollView(this).apply { addView(box) })
+            .setPositiveButton(R.string.linked_tier_make) { _, _ ->
+                makeTierCode(LinkTier.PUBLIC, setOf(if (what.picked() == 0) LinkModel.VIEW else "interactions"),
+                    if (period.picked() == 0) 3600_000L else LinkTierPolicy.DAY_MS, null, null)
+            }.setNegativeButton(R.string.linked_close, null).show()
+    }
+
+    private fun makeTierCode(tier: LinkTier, services: Set<String>, accessMs: Long, associate: String?, email: String?) {
+        if (busy) return
+        busy = true; b.error.isVisible = false
+        lifecycleScope.launch {
+            val r = withContext(Dispatchers.IO) { runCatching {
+                app.links.makeCode(services, setOf("in"), emptySet(), Granter.person(app.links.selfName()), tier = tier, accessMs = accessMs, associate = associate, associateEmail = email)
+            } }
+            busy = false
+            r.onSuccess { showCode(it.optString("name"), it.optString("code")) }.onFailure { b.error.text = it.message ?: it.javaClass.simpleName; b.error.isVisible = true }
+            render()
+        }
+    }
+
+    /** The code and this device's name, to hand over. A secure window in release builds, like the pairing codes. */
+    private fun showCode(name: String, code: String) {
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPaddingRelative(dp(24), dp(8), dp(24), 0) }
+        box.addView(text(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge, com.google.android.material.R.attr.colorOnSurface) { text = name })
+        box.addView(text(com.google.android.material.R.style.TextAppearance_Material3_HeadlineMedium, com.google.android.material.R.attr.colorOnSurface) {
+            text = code; typeface = android.graphics.Typeface.MONOSPACE; letterSpacing = 0.1f; setTextIsSelectable(true); setPadding(0, dp(8), 0, 0)
+            contentDescription = code.toCharArray().filter { it != '-' }.joinToString(" ") })
+        box.addView(text(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium, com.google.android.material.R.attr.colorOnSurfaceVariant) {
+            text = getString(R.string.linked_tier_code_valid); setPadding(0, dp(8), 0, 0) })
+        val d = MaterialAlertDialogBuilder(this).setTitle(R.string.linked_tier_code_title).setView(box)
+            .setPositiveButton(R.string.linked_tier_copy) { _, _ ->
+                val cm = getSystemService(android.content.ClipboardManager::class.java)
+                cm?.setPrimaryClip(android.content.ClipData.newPlainText(getString(R.string.linked_tier_code_title), "$name $code").apply {
+                    description.extras = android.os.PersistableBundle().apply { putBoolean(android.content.ClipDescription.EXTRA_IS_SENSITIVE, true) } })
+                Toast.makeText(this, R.string.linked_tier_copied, Toast.LENGTH_SHORT).show()
+            }.setNegativeButton(R.string.linked_close, null).create()
+        if (!cc.bridgit.app.BuildConfig.DEBUG) d.window?.setFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE, android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        d.show()
+    }
+
+    /** Trust: move a linked device to another tier. An associate needs an email (and may have a name). */
+    private fun moveTier(r: LinkTierSections.Row) = tierChooser(r.tier, r.node.name) { t ->
+        if (t == r.tier || sampleTiers != null) return@tierChooser
+        if (t == LinkTier.ASSOCIATE && r.email == null) {
+            val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPaddingRelative(dp(24), dp(8), dp(24), 0) }
+            val (nameBox, name) = nameField(); box.addView(nameBox)
+            val (emailBox, email) = emailField(); box.addView(emailBox, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(8) })
+            val d = MaterialAlertDialogBuilder(this).setTitle(R.string.linked_tier_associate).setView(box)
+                .setPositiveButton(android.R.string.ok, null).setNegativeButton(R.string.linked_close, null).create()
+            d.setOnShowListener {
+                d.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                    val mail = LinkTierPolicy.email(email.text?.toString())
+                    emailBox.error = if (mail == null) getString(R.string.linked_tier_need_email) else null
+                    if (mail == null) return@setOnClickListener
+                    d.dismiss(); applyTier(r, t, name.text?.toString()?.trim()?.takeIf { it.isNotEmpty() }, mail)
+                }
+            }
+            d.show()
+        } else applyTier(r, t, null, null)
+    }
+
+    private fun applyTier(r: LinkTierSections.Row, t: LinkTier, associate: String?, email: String?) {
+        val person = Granter.person(app.links.selfName())
+        lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) { runCatching { r.ids.forEach { id ->
+                if (PortalTiers.keyFromApiId(id) != null) app.links.setPortalTier(id, t, null, null, associate, person, associateEmail = email)
+                else app.links.setTier(id, t, null, null, associate, person, associateEmail = email)
+            } } }
+            result.onSuccess { Toast.makeText(this@PortalActivity, getString(R.string.linked_tier_moved, tierTitle(t)), Toast.LENGTH_SHORT).show() }
+                .onFailure { b.error.text = it.message ?: it.javaClass.simpleName; b.error.isVisible = true }
+            render()
+        }
+    }
+
+    /** Debug: populated tiers for the design pass (a 60-character name, a long email, every row state). */
+    private fun sampleTierRows(): List<Pair<LinkTier, List<LinkTierSections.Row>>> {
+        val now = System.currentTimeMillis()
+        fun node(key: String, name: String, role: Role, kind: Kind, online: Boolean, status: String? = null) =
+            Node(key, name, role, kind, online, key, status = status, type = cc.bridgit.app.platform.DeviceType.TABLET)
+        fun row(n: Node, t: LinkTier, exp: Long? = null, review: Long? = null, who: String? = null, email: String? = null, s: LinkTierSections.State? = null) =
+            LinkTierSections.Row(n, t, listOf("lnk_sample"), exp, review, who, email, s)
+        return listOf(
+            LinkTier.OWN to listOf(row(node("a", "Kitchen tab", Role.HUB, Kind.HUB, true), LinkTier.OWN),
+                row(node("b", "Porch camera phone", Role.SATELLITE, Kind.SATELLITE, false), LinkTier.OWN, s = LinkTierSections.State.WAITING)),
+            LinkTier.ASSOCIATE to listOf(
+                row(node("c", "Samantha's living room tablet next to the big window upstairs", Role.SATELLITE, Kind.SATELLITE, true), LinkTier.ASSOCIATE,
+                    exp = now + 30 * LinkTierPolicy.DAY_MS, who = "Samantha Okonkwo-Lindqvist", email = "samantha.okonkwo-lindqvist@example-mail.com"),
+                row(node("d", "iPhone", Role.SATELLITE, Kind.VIEWER, false), LinkTier.ASSOCIATE, review = now + 90 * LinkTierPolicy.DAY_MS),
+                row(node("e", "Dog walker's phone", Role.SATELLITE, Kind.SATELLITE, true), LinkTier.ASSOCIATE, who = "Jo", s = LinkTierSections.State.PAUSED)),
+            LinkTier.PUBLIC to listOf(row(node("f", "Visitor", Role.SATELLITE, Kind.VIEWER, true), LinkTier.PUBLIC, exp = now + 3 * 3600_000L)))
+    }
+
     /** Debug builds: opens a sample (debug_sheet=this|viewer|viewer_live|satellite|satellite_off|hub|hub_stale|network|network_off). */
     private fun showSample(kind: String) {
         val now = System.currentTimeMillis()
@@ -609,6 +923,10 @@ class PortalActivity : AppCompatActivity() {
             "hub_stale" -> hubSheet("Living room Pixel 2 XL", null, null, false, false, HubLinks.LinkState.STALE, true, false, now - 3 * 86_400_000L, null, null, nop, nop).open()
             "network" -> networkSheet("Hikvision DS-2CD2143G2-I Front Door", "Camera", true, true, now - 3 * 60_000, "192.168.1.42").show(this)
             "network_off" -> networkSheet("Tapo C210", "Camera", false, false, null, "192.168.1.57").show(this)
+            "tiers" -> { sampleTiers = sampleTierRows(); render() }
+            "tiers_pick" -> pickTier()
+            "tiers_trust" -> { sampleTiers = sampleTierRows(); render(); moveTier(sampleTiers!![1].second[0]) }
+            "tiers_code" -> showCode("a11-blue-tab", "K7QX-3MPA")
         }
     }
 

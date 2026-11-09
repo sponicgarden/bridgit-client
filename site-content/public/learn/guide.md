@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 144). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 145). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,12 +14,15 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 144 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 145 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 144
-- Monitor resources: Bridgit's own CPU, memory, network, disk, storage and context switches over time, with hourly and daily summaries per build, thresholds and a level (ok, elevated, high). Off by default; health carries a short resource_monitor block (`/v1/device/resources`)
-- device.resource_monitor (off by default) and device.resource_monitor_interval (1s, 10s, 1m default, 1h): read in GET /v1/settings, changed with POST /v1/settings or POST /v1/owner/configuration/settings (`/v1/settings`)
+## New in revision 145
+- Link trust tiers: every link is own (Your Other Devices), associate (Devices of Associates: a person named by email, view/interactions/speaker/sounds only, ends within 90 days) or public (Devices in the Wild: view or interactions only, ends within 24 h, the owner allows each change). links[].tier, tier_here, tier_there, expires_at, associate_email, registration; portals[] and tiers[] (`/v1/owner/configuration/links`)
+- Make a code for a tier: POST …/links/codes {tier, access_ms, associate, associate_email}; the claim takes the code's tier and may only narrow it ({tier}) (`/v1/owner/configuration/links/codes`)
+- Change a link's or Portal pairing's tier, end date or associate (narrowing works at once; widening a link needs the other Bridgit too) (`/v1/owner/configuration/links/{id}/tier`)
+- GET /v1/links entries say their tier (`/v1/links`)
+- New errors: link_expired, tier_not_allowed, link_approval_declined. Associate and public links have per-tier rate limits
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -495,13 +498,13 @@ Example: `POST /v1/owner/configuration/listening {"wake_words":[]}`
 
 ### `GET /v1/owner/configuration/links`
 Read this Bridgit's links with the owner's other Bridgits: both directions, their states, service lists, allowed agents and who granted each.
-Returns: links[id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}], codes[{id, services, directions, expires_at, tries_left, state, granter}], services (vocabulary), suggested_services, paused_all{satellites, hubs}, name (this Bridgit's Device Domain Name or null), operations.
+Returns: links[id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}], portals[{id (portal:… a device viewing this one, viewing:… one this device views), kind, name, tier, expires_at, review_at, associate}], codes[{id, services, directions, expires_at, tries_left, state, granter, tier, access_ms, associate}], tiers[{tier, label, services, about}], services (vocabulary), suggested_services, paused_all{satellites, hubs}, name (this Bridgit's Device Domain Name or null), operations.
 Example: `GET /v1/owner/configuration/links`
 
 ### `POST /v1/owner/configuration/links/codes`
 Make a one-time link code for this Bridgit as the target (8 characters, 10 minutes, 5 wrong tries); needs a Device Domain Name; explicit owner.configuration grant required; no per-change phone approval.
-Body (JSON): `services` What the claiming Bridgit may use here: camera, gallery, interactions, location, mic, sounds, speaker, view (suggested: camera, mic, speaker, interactions, view); required for in; `directions` ["in"] (default: the claiming Bridgit uses this one), ["out"] (this one uses it) or both; `agents` For out: this Bridgit's control agent ids that may use the claiming Bridgit.
-Returns: code_id, code (K7QX-3MPA: give it with the name), name, expires_at, services, directions, link (bridgit://link#… for a QR code), name_lookup, how.
+Body (JSON): `services` What the claiming Bridgit may use here: camera, gallery, interactions, location, mic, sounds, speaker, view (suggested: camera, mic, speaker, interactions, view); required for in; `directions` ["in"] (default: the claiming Bridgit uses this one), ["out"] (this one uses it) or both; `agents` For out: this Bridgit's control agent ids that may use the claiming Bridgit; `tier` own (default: the owner's own device), associate (a named person's device: services interactions, sounds, speaker, view, ends or is reviewed) or public (a device in the wild: one of interactions, view, in only, at most 24 h, the owner allows each change); `access_ms` associate and public: how long the claimed link's access lasts (associate 1 min-90 days, default 30 days; public 1 min-24 h, default 1 h); `associate` associate: the person's name; `associate_email` associate: the person's email (required; their Bridgit confirms the link from that account).
+Returns: code_id, code (K7QX-3MPA: give it with the name), name, expires_at, tier, tier_about, access_ms, associate, services, directions, link (bridgit://link#… for a QR code), name_lookup, how.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/owner/configuration/links/codes {"services":["camera","mic","speaker","interactions","view"]}`
 
@@ -513,21 +516,28 @@ Example: `DELETE /v1/owner/configuration/links/codes/{id} `
 
 ### `POST /v1/owner/configuration/links/claims`
 Claim another Bridgit's link code: this Bridgit then uses it (its user opt-in), and may offer the other direction too; explicit owner.configuration grant required; no per-change phone approval.
-Body (JSON): `name` The other Bridgit's Device Domain Name (required unless link is given); `code` Its link code, K7QX-3MPA (required unless link is given); `link` Its bridgit://link#… link (holds name, code and its Tailscale address); `host` Its Tailscale address, when the names backend can't resolve the name; `port` Its Bridgit port, with host; `agents` This Bridgit's control agent ids that may use it; default: the calling agent; `reverse_services` What the other Bridgit may use here in return (it opts in on its side); default none.
-Returns: the new link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}).
+Body (JSON): `name` The other Bridgit's Device Domain Name (required unless link is given); `code` Its link code, K7QX-3MPA (required unless link is given); `link` Its bridgit://link#… link (holds name, code and its Tailscale address); `host` Its Tailscale address, when the names backend can't resolve the name; `port` Its Bridgit port, with host; `agents` This Bridgit's control agent ids that may use it; default: the calling agent; `reverse_services` What the other Bridgit may use here in return (it opts in on its side); default none. Limited by the tier; `tier` This Bridgit's tier for the link (default: the one the code was made with); the narrower of the two applies; `associate` associate: the other person's name; `associate_email` associate: the other person's email.
+Returns: the new link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}).
 Accepts `Idempotency-Key`.
 Example: `POST /v1/owner/configuration/links/claims {"name":"kitchen-tab","code":"K7QX-3MPA"}`
 
 ### `POST /v1/owner/configuration/links/{id}/directions/{direction}`
 Change this Bridgit's half of one direction: in = the other Bridgit uses this one (services), out = this one uses it (agents); paused on either; explicit owner.configuration grant required; no per-change phone approval.
 Body (JSON): `services` in only: the service list (what the other Bridgit may use here); [] leaves only the link itself; `agents` out only: this Bridgit's control agent ids that may use the other one; setting it is this Bridgit's opt-in; `paused` Pause or resume this direction on this Bridgit.
-Returns: the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}).
+Returns: the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}).
 Accepts `Idempotency-Key`.
 Example: `POST /v1/owner/configuration/links/{id}/directions/{direction} {"agents":["agt_…"]}`
 
+### `POST /v1/owner/configuration/links/{id}/tier`
+Set a link's trust tier on this Bridgit: own (Your Other Devices), associate (Devices of Associates) or public (Devices in the Wild). Narrowing applies at once and removes services the tier doesn't allow; widening a link record needs the other Bridgit to widen too. Also renews an associate's or public link's access. id: a link id, portal:<agent id> or viewing:<device id>; explicit owner.configuration grant required; no per-change phone approval.
+Body (JSON): `tier` (required) own, associate or public; `access_ms` associate and public: access from now (renews it); `review_at` associate: a review reminder (ms) before the end date; a Portal pairing may have only a review date; `associate` associate: the person's name; `associate_email` associate: the person's email (required unless already set).
+Returns: the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}, or the portal entry), tier_before.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/links/{id}/tier {"tier":"associate","associate":"Sam","associate_email":"sam@example.com","access_ms":2592000000}`
+
 ### `POST /v1/owner/configuration/links/{id}/undo`
 Undo a disconnect within 10 seconds; after that linking again needs a new code; explicit owner.configuration grant required; no per-change phone approval.
-Returns: the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}).
+Returns: the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}).
 Accepts `Idempotency-Key`.
 Example: `POST /v1/owner/configuration/links/{id}/undo `
 
@@ -1836,7 +1846,7 @@ Example: `POST /v1/link/disconnect {"direction":"both"}`
 ### `POST /v1/owner/configuration/links/{id}/disconnect`
 Disconnect (or pause) a link at once: calls are refused from now, and it is final after 10 seconds unless undone; any control agent of this device (taking access away needs no owner.configuration grant).
 Body (JSON): `direction` in (the other Bridgit uses this one), out (this one uses it) or both (default); `pause` true pauses instead (resume with directions {paused:false}, which needs owner.configuration).
-Returns: the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until.
+Returns: the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/owner/configuration/links/{id}/disconnect {"direction":"both"}`
 
@@ -2397,6 +2407,9 @@ All endpoints use the paired agent's Authorization bearer key over the existing 
 | 403 | `link_paused` | The owner paused that link (`link_id`) | Wait until it is resumed; don't retry before then |
 | 409 | `link_waiting` | Only one Bridgit has opted in to that direction so far (`waiting_for`: user or target) | Ask the other side's owner or agent to opt in; GET /v1/owner/configuration/links shows the states |
 | 403 | `not_on_target` | That call doesn't pass a link: the endpoint, the target's service list, or a call that already came over a link (calls pass on once) | Leave out the target, or link that Bridgit directly |
+| 403 | `link_expired` | That link's access ended: an associate's or a device in the wild's grant passed its end date (`link_id`, `tier`) | Don't retry; ask the owner to renew it or link again |
+| 403 | `tier_not_allowed` | That link's trust tier doesn't allow this call (`tier`: own, associate or public) | Use only what the link lists in services; ask the owner to change the tier |
+| 409 | `link_approval_declined` | A device in the wild asked for something that needs the owner's Allow, and the owner denied it or didn't answer within 30 s (`reason`) | Don't retry automatically |
 | 503 | `target_offline` | The linked Bridgit didn't answer (`last_seen`, `retry_after_s`) | Retry later; its owner may need to check Tailscale or Bridgit on it |
 | 403 | `code_invalid` | Wrong link code; 5 wrong tries void a code | Check the code with the owner; don't guess |
 | 410 | `code_expired` | That link code expired (codes last 10 minutes) | Ask for a new code |

@@ -3130,6 +3130,16 @@
      "tool": "owner_configuration_links_directions"
     },
     {
+     "summary": "Set a link's trust tier on this Bridgit: own (Your Other Devices), associate (Devices of Associates) or public (Devices in the Wild). Narrowing applies at once and removes services the tier doesn't allow; widening a link record needs the other Bridgit to widen too. Also renews an associate's or public link's access. id: a link id, portal:<agent id> or viewing:<device id>; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/links/{id}/tier",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-tier.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-links-id-tier.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_links_tier"
+    },
+    {
      "summary": "Undo a disconnect within 10 seconds; after that linking again needs a new code; explicit owner.configuration grant required; no per-change phone approval",
      "path": "/v1/owner/configuration/links/{id}/undo",
      "method": "POST",
@@ -7631,8 +7641,8 @@
   "kind": "source_generated",
   "released": "Check public updater manifest; source documentation is not release evidence."
  },
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "installed_api_revision": null,
  "categories": [
   "sense",

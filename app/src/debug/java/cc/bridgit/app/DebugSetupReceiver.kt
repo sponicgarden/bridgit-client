@@ -89,7 +89,7 @@ class DebugSetupReceiver : BroadcastReceiver() {
         }
         // appearance=light|dark|system: this build's own theme, so a screenshot needn't change the shared device's dark mode.
         intent.getStringExtra("appearance")?.let { app.settings.appearance = it; android.os.Handler(android.os.Looper.getMainLooper()).post { app.applyAppearance() } }
-        // linked_sheet=viewer|viewer_live|satellite|satellite_off|hub|hub_stale|network|network_off|this opens Linked
+        // linked_sheet=viewer|viewer_live|satellite|satellite_off|hub|hub_stale|network|network_off|this|tiers|tiers_pick|tiers_trust|tiers_code opens Linked
         // devices with a sample device dialog (the app must be in front).
         intent.getStringExtra("linked_sheet")?.let { k ->
             context.startActivity(Intent(context, cc.bridgit.app.portal.PortalActivity::class.java)

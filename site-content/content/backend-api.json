@@ -144,6 +144,7 @@
       "/v1/watch/applet/people/merge",
       "/v1/watch/applet/people/move",
       "/v1/watch/applet/people/update",
+      "/v1/watch/applet/pet-only",
       "/v1/watch/applet/photo-emails/unsubscribe",
       "/v1/watch/applet/photo-links",
       "/v1/watch/applet/push",

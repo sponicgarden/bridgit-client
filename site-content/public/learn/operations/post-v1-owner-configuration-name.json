@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Register this Bridgit's two names in one step on the first control call (Device Domain Name + friendly name), or change its friendly name, label or visibility; the domain name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
@@ -48,16 +48,16 @@
   "mcp_input_schema": {
    "type": "object",
    "properties": {
+    "friendly_name": {
+     "description": "Required when registering (unless the owner already named this phone): up to 40 characters, any style, unique among the owner's devices; displayed nearly everywhere, never public. Also changes it later",
+     "type": "string"
+    },
     "visible": {
      "description": "Public lookup shows label and online; default true; false hides",
      "type": "boolean"
     },
     "name": {
      "description": "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served",
-     "type": "string"
-    },
-    "friendly_name": {
-     "description": "Required when registering (unless the owner already named this phone): up to 40 characters, any style, unique among the owner's devices; displayed nearly everywhere, never public. Also changes it later",
      "type": "string"
     },
     "idempotency_key": {

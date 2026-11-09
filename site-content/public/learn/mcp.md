@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 144. Full index: https://bridgit.cc/learn/index.json.
+API revision 145. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -94,6 +94,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `owner_configuration_links_code_cancel` | `DELETE /v1/owner/configuration/links/codes/{id}` | Cancel a link code that hasn't been claimed; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_links_claims` | `POST /v1/owner/configuration/links/claims` | Claim another Bridgit's link code: this Bridgit then uses it (its user opt-in), and may offer the other direction too; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_links_directions` | `POST /v1/owner/configuration/links/{id}/directions/{direction}` | Change this Bridgit's half of one direction: in = the other Bridgit uses this one (services), out = this one uses it (agents); paused on either; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_links_tier` | `POST /v1/owner/configuration/links/{id}/tier` | Set a link's trust tier on this Bridgit: own (Your Other Devices), associate (Devices of Associates) or public (Devices in the Wild). Narrowing applies at once and removes services the tier doesn't allow; widening a link record needs the other Bridgit to widen too. Also renews an associate's or public link's access. id: a link id, portal:<agent id> or viewing:<device id>; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_links_undo` | `POST /v1/owner/configuration/links/{id}/undo` | Undo a disconnect within 10 seconds; after that linking again needs a new code; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_links_pause_all` | `POST /v1/owner/configuration/links/pause-all` | Pause or resume links by role, as the Linked devices pills do; each pauses both directions of those links; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_links_log` | `GET /v1/owner/configuration/links/log` | Read the grants log: every link event on this Bridgit and the ones the other Bridgits reported, newest first, with who did each |

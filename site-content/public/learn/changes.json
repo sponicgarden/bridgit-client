@@ -1,5 +1,5 @@
 {
- "api_revision": 144,
+ "api_revision": 145,
  "changes": [
   {
    "date": "2026-10-27",
@@ -2358,6 +2358,33 @@
     }
    ],
    "revision": 144
+  },
+  {
+   "date": "2026-11-09",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/owner/configuration/links",
+     "what": "Link trust tiers: every link is own (Your Other Devices), associate (Devices of Associates: a person named by email, view/interactions/speaker/sounds only, ends within 90 days) or public (Devices in the Wild: view or interactions only, ends within 24 h, the owner allows each change). links[].tier, tier_here, tier_there, expires_at, associate_email, registration; portals[] and tiers[]"
+    },
+    {
+     "endpoint": "/v1/owner/configuration/links/codes",
+     "what": "Make a code for a tier: POST \u2026/links/codes {tier, access_ms, associate, associate_email}; the claim takes the code's tier and may only narrow it ({tier})"
+    },
+    {
+     "endpoint": "/v1/owner/configuration/links/{id}/tier",
+     "what": "Change a link's or Portal pairing's tier, end date or associate (narrowing works at once; widening a link needs the other Bridgit too)"
+    },
+    {
+     "endpoint": "/v1/links",
+     "what": "GET /v1/links entries say their tier"
+    },
+    {
+     "endpoint": null,
+     "what": "New errors: link_expired, tier_not_allowed, link_approval_declined. Associate and public links have per-tier rate limits"
+    }
+   ],
+   "revision": 145
   }
  ],
  "links": {

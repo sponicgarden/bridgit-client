@@ -18,8 +18,8 @@
   ],
   "tool": "device.action"
  }],
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
  "examples_url": null,
  "id": "v2.camera.snapshot",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Whether the owner has verified their email. Bridgit works for 24 hours from the first agent call; after that, until they do, only the status endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes) and feedback keep working, plus the control tools capabilities, events, operation.get and feedback.create; every other call answers email_required",

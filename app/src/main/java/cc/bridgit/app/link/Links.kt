@@ -57,8 +57,17 @@ class Links(private val app: BridgeApp) {
         val farIn: Far? = null, val farOut: Far? = null, val pending: Pending? = null,
         /** The other Bridgit's platform as it said when claiming (ios, ipados, macos); null = Android. */
         val platform: String? = null,
+        /** This device's trust tier for the link (§16); [farTier] the other device's, as it last reported. The narrower applies. */
+        val tier: LinkTier = LinkTier.OWN, val farTier: LinkTier? = null,
+        /** Associate and public links: when access ends (removed then) and, for associates, when the owner reviews it. */
+        val expiresAt: Long? = null, val reviewAt: Long? = null,
+        /** Associate links: the other person's name, as the owner gave it, and their email (the backend checks it). */
+        val associate: String? = null, val associateEmail: String? = null,
     ) {
         fun covers(direction: String) = pending != null && (pending.direction == "both" || pending.direction == direction)
+        /** The tier that applies: both devices must agree to widen it. */
+        val effectiveTier: LinkTier get() = LinkTier.narrowest(tier, farTier)
+        fun expired(now: Long = System.currentTimeMillis()) = expiresAt != null && now >= expiresAt
 
         fun toJson(): JSONObject = JSONObject().put("id", id).put("role", role.wire).put("ref", ref).put("created_at", createdAt)
             .put("peer_name", peerName ?: JSONObject.NULL).put("peer_install", peerInstall ?: JSONObject.NULL).put("provisional", provisional)
@@ -67,6 +76,9 @@ class Links(private val app: BridgeApp) {
             .put("out_revoked", outRevoked).put("out_agents", JSONArray(outAgents.sorted()))
             .put("far_in", farIn?.toJson() ?: JSONObject.NULL).put("far_out", farOut?.toJson() ?: JSONObject.NULL)
             .put("platform", platform ?: JSONObject.NULL)
+            .put("tier", tier.wire).put("far_tier", farTier?.wire ?: JSONObject.NULL)
+            .put("expires_at", expiresAt ?: JSONObject.NULL).put("review_at", reviewAt ?: JSONObject.NULL).put("associate", associate ?: JSONObject.NULL)
+            .put("associate_email", associateEmail ?: JSONObject.NULL)
             .put("pending", pending?.let { JSONObject().put("direction", it.direction).put("until", it.until).put("granter", it.granter.toJson()).put("event_id", it.eventId ?: JSONObject.NULL) } ?: JSONObject.NULL)
 
         companion object {
@@ -79,8 +91,17 @@ class Links(private val app: BridgeApp) {
                     o.optBoolean("out_opt_in"), Granter.fromJson(o.optJSONObject("out_granter")), o.optBoolean("out_paused"), o.optBoolean("out_revoked"),
                     set("out_agents"), Far.fromJson(o.optJSONObject("far_in")), Far.fromJson(o.optJSONObject("far_out")),
                     o.optJSONObject("pending")?.let { p -> Granter.fromJson(p.optJSONObject("granter"))?.let { Pending(p.optString("direction"), p.optLong("until"), it, p.optString("event_id").takeIf { e -> e.isNotEmpty() && !p.isNull("event_id") }) } },
-                    str("platform")?.takeIf { it in PLATFORMS })
+                    str("platform")?.takeIf { it in PLATFORMS },
+                    tierOf(o), str("far_tier")?.let { LinkTier.parseOrPublic(it) },
+                    o.optLong("expires_at").takeIf { !o.isNull("expires_at") && it > 0 }, o.optLong("review_at").takeIf { !o.isNull("review_at") && it > 0 },
+                    str("associate"), str("associate_email"))
             }
+
+            /**
+             * Migration (§16): a record saved before tiers existed is one of the owner's own links (LNK-01), so it reads
+             * as own; a value that is there but not understood reads as public, the most restrictive.
+             */
+            fun tierOf(o: JSONObject): LinkTier = if (!o.has("tier")) LinkTier.OWN else LinkTier.parseOrPublic(o.optString("tier"))
         }
     }
 
@@ -134,7 +155,7 @@ class Links(private val app: BridgeApp) {
         val result = kept + added
         if (added.isNotEmpty() || kept.size != recs.size) {
             save(result)
-            added.forEach { r -> log.add(entry(r, "both", "migrated", null, JSONObject().put("in", LinkModel.json(r.inServices)).put("out", r.outOptIn),
+            added.forEach { r -> log.add(entry(r, "both", "migrated", null, JSONObject().put("in", LinkModel.json(r.inServices)).put("out", r.outOptIn).put("tier", r.tier.wire),
                 r.inGranter ?: Granter.migrated(r.createdAt, me), delivered = true)) }
         }
         return result
@@ -199,6 +220,11 @@ class Links(private val app: BridgeApp) {
         return JSONObject().put("id", r.id).put("name", peerLabel(r)).put("bridgit_name", r.peerName ?: JSONObject.NULL)
             .put("target", targetOf(r)).put("sat_id", if (r.role == Role.HUB) r.ref else JSONObject.NULL)
             .put("role", r.role.wire).put("created_at", r.createdAt)
+            .put("tier", r.effectiveTier.wire).put("tier_here", r.tier.wire).put("tier_there", r.farTier?.wire ?: JSONObject.NULL)
+            .put("tier_about", LinkTierPolicy.about(r.effectiveTier)).put("associate", r.associate ?: JSONObject.NULL).put("associate_email", r.associateEmail ?: JSONObject.NULL)
+            .put("registration", LinkRegistry.Backend.status(app, r.id) ?: JSONObject.NULL)
+            .put("registration_there", LinkRegistry.Backend.peerStatus(app, r.id) ?: JSONObject.NULL)
+            .put("expires_at", r.expiresAt ?: JSONObject.NULL).put("review_at", r.reviewAt ?: JSONObject.NULL)
             .put("in", JSONObject().put("state", inState(r).wire).put("services", LinkModel.json(r.inServices))
                 .put("granter", r.inGranter?.toJson() ?: JSONObject.NULL).put("paused", inAgent?.paused == true)
                 .put("revoked", r.inRevoked).put("other_side", r.farIn?.toJson() ?: JSONObject.NULL)
@@ -239,7 +265,7 @@ class Links(private val app: BridgeApp) {
             else "You may not use ${peerLabel(r)} yet. Ask the owner, or an agent with owner.configuration: POST /v1/owner/configuration/links/${r.id}/directions/out {\"agents\":[\"${a.id}\"]}."
         return o.put("link_id", r.id).put("target", t).put("bridgit_name", r.peerName ?: JSONObject.NULL)
             .put("role", r.role.wire).put("reachable", canReach)
-            .put("platform", r.platform ?: "android").put("state", outState(r).wire).put("services", LinkModel.json(r.farOut?.services ?: emptySet()))
+            .put("platform", r.platform ?: "android").put("tier", r.effectiveTier.wire).put("state", outState(r).wire).put("services", LinkModel.json(r.farOut?.services ?: emptySet()))
             .put("directions", JSONObject()
                 .put("in", JSONObject().put("state", inState(r).wire).put("services", LinkModel.json(r.inServices)).put("about", "${peerLabel(r)} uses this device"))
                 .put("out", JSONObject().put("state", outState(r).wire).put("services", LinkModel.json(r.farOut?.services ?: emptySet()))
@@ -281,6 +307,7 @@ class Links(private val app: BridgeApp) {
         val r = find(target) ?: throw ErrorCatalog.error("unknown_target", "No linked Bridgit called $target. GET /v1/links lists the ones you may use; leave target out to use this device.")
         val label = peerLabel(r)
         if (r.outRevoked) throw ErrorCatalog.error("link_revoked", "This device no longer uses $label: the link was disconnected. Linking again needs a new link code.", mapOf("link_id" to r.id))
+        if (r.expired()) throw ErrorCatalog.error("link_expired", "The link with $label ended on ${r.expiresAt}. The owner can renew it or link again.", mapOf("link_id" to r.id, "tier" to r.effectiveTier.wire))
         if (r.covers("out")) throw ErrorCatalog.error("link_paused", "The owner is disconnecting this device from $label (Undo is possible until ${r.pending!!.until}). Don't retry.", mapOf("link_id" to r.id, "reason" to "disconnecting", "undo_until" to r.pending.until))
         if (agent.id !in outAgents(r)) throw ErrorCatalog.error("target_not_granted", "The owner hasn't let ${agent.name} use $label. Ask them, or an agent with owner.configuration: POST /v1/owner/configuration/links/${r.id}/directions/out {\"agents\":[…]}.", mapOf("link_id" to r.id))
         if (!r.outOptIn) throw ErrorCatalog.error("link_waiting", "This device hasn't opted in to use $label yet: POST /v1/owner/configuration/links/${r.id}/directions/out {\"agents\":[…]}.", mapOf("link_id" to r.id, "waiting_for" to "user"))
@@ -321,19 +348,28 @@ class Links(private val app: BridgeApp) {
     /** [hash]: SHA-256 of the code's claim token (the bearer of POST /v1/link/claim); [offerId]: its offer at the names backend. */
     data class Code(val id: String, val hash: String, val services: Set<String>, val directions: Set<String>, val agents: Set<String>,
                     val createdAt: Long, val expiresAt: Long, val tries: Int = 0, val state: String = "open", val granter: Granter,
-                    val offerId: String? = null, val relayAgent: String? = null) {
+                    val offerId: String? = null, val relayAgent: String? = null,
+                    /** The tier the claimed link gets (§16), how long its access lasts from the claim, and the associate's name. */
+                    val tier: LinkTier = LinkTier.OWN, val grantMs: Long? = null, val associate: String? = null, val associateEmail: String? = null) {
         fun toJson(): JSONObject = JSONObject().put("id", id).put("hash", hash).put("offer_id", offerId ?: JSONObject.NULL).put("relay_agent", relayAgent ?: JSONObject.NULL).put("services", LinkModel.json(services))
             .put("directions", JSONArray(directions.sorted())).put("agents", JSONArray(agents.sorted())).put("created_at", createdAt)
             .put("expires_at", expiresAt).put("tries", tries).put("state", state).put("granter", granter.toJson())
+            .put("tier", tier.wire).put("grant_ms", grantMs ?: JSONObject.NULL).put("associate", associate ?: JSONObject.NULL)
+            .put("associate_email", associateEmail ?: JSONObject.NULL)
         fun public(): JSONObject = JSONObject().put("id", id).put("services", LinkModel.json(services)).put("directions", JSONArray(directions.sorted()))
             .put("expires_at", expiresAt).put("tries_left", LinkCode.MAX_TRIES - tries).put("state", state).put("granter", granter.toJson())
+            .put("tier", tier.wire).put("access_ms", grantMs ?: JSONObject.NULL).put("associate", associate ?: JSONObject.NULL)
+            .put("associate_email", associateEmail ?: JSONObject.NULL)
         companion object {
             fun fromJson(o: JSONObject): Code? = runCatching {
                 fun set(k: String) = o.optJSONArray(k)?.let { a -> (0 until a.length()).map { a.getString(it) }.toSet() } ?: emptySet()
                 Code(o.getString("id"), o.getString("hash"), set("services"), set("directions"), set("agents"), o.getLong("created_at"),
                     o.getLong("expires_at"), o.optInt("tries"), o.optString("state", "open"), Granter.fromJson(o.optJSONObject("granter"))!!,
                     o.optString("offer_id").takeIf { !o.isNull("offer_id") && it.isNotEmpty() },
-                    o.optString("relay_agent").takeIf { !o.isNull("relay_agent") && it.isNotEmpty() })
+                    o.optString("relay_agent").takeIf { !o.isNull("relay_agent") && it.isNotEmpty() },
+                    Rec.tierOf(o), o.optLong("grant_ms").takeIf { !o.isNull("grant_ms") && it > 0 },
+                    o.optString("associate").takeIf { !o.isNull("associate") && it.isNotEmpty() },
+                    o.optString("associate_email").takeIf { !o.isNull("associate_email") && it.isNotEmpty() })
             }.getOrNull()
         }
     }
@@ -360,26 +396,32 @@ class Links(private val app: BridgeApp) {
      * LNK-17: a new one-time code for this device as the target. [directions]: "in" lets the claiming device use this
      * one for [services]; "out" also opts this device in to use the claiming device, with [agents] of its own.
      */
-    fun makeCode(services: Set<String>, directions: Set<String>, agents: Set<String>, granter: Granter, now: Long = System.currentTimeMillis()): JSONObject {
+    fun makeCode(services: Set<String>, directions: Set<String>, agents: Set<String>, granter: Granter, now: Long = System.currentTimeMillis(),
+                 tier: LinkTier = LinkTier.OWN, accessMs: Long? = null, associate: String? = null, associateEmail: String? = null): JSONObject {
         val name = registeredName() ?: throw nameRequired()
         if (directions.isEmpty() || !directions.all { it == "in" || it == "out" }) throw ErrorCatalog.error("invalid_parameter", "directions must be [\"in\"], [\"out\"] or [\"in\",\"out\"].")
         if ("in" in directions && services.isEmpty()) throw ErrorCatalog.error("invalid_parameter", "services is required for the in direction: what the other device may use here (suggested: ${LinkModel.SUGGESTED.joinToString()}).")
         if ("in" !in directions && services.isNotEmpty()) throw ErrorCatalog.error("invalid_parameter", "services only applies to the in direction.")
         if ("out" !in directions && agents.isNotEmpty()) throw ErrorCatalog.error("invalid_parameter", "agents only applies to the out direction.")
+        val (who, email) = checkTier(tier, services, accessMs, associate, associateEmail, now)
+        if (tier == LinkTier.PUBLIC && directions != setOf("in")) throw ErrorCatalog.error("invalid_parameter", "A device in the wild only uses this one (directions [\"in\"]): this device never uses an unknown device.")
         agents.forEach { requireControlAgent(it) }
         if (openCodes(now).size >= 5) throw ErrorCatalog.error("conflict", "Five link codes are already waiting. Cancel one (DELETE /v1/owner/configuration/links/codes/{id}) or let them expire.")
         val code = LinkCode.generate()
         val keys = LinkCode.keys(code, name)
         var c = Code(LinkIds.newCode(), LinkCode.sha256(keys.claimToken), services, directions, agents, now, now + LinkCode.VALID_MS, granter = granter,
-            relayAgent = runCatching { claimAgent(LinkCode.sha256(keys.claimToken), now + LinkCode.VALID_MS) }.getOrNull())
+            relayAgent = runCatching { claimAgent(LinkCode.sha256(keys.claimToken), now + LinkCode.VALID_MS) }.getOrNull(),
+            tier = tier, grantMs = accessMs.takeIf { tier != LinkTier.OWN }, associate = who, associateEmail = email)
         synchronized(this) { saveCodes(codes(now) + c) }
         // LNK-19: the names backend learns only the code's hash and where to reach this device.
         val offer = runCatching { LinkResolver.offer(app, keys.codeHash, c.expiresAt) }
         offer.getOrNull()?.let { id -> c = c.copy(offerId = id); synchronized(this) { saveCodes(codes(now).map { if (it.id == c.id) it.copy(offerId = id) else it }) } }
         log.add(LinkLog.Entry(LinkLog.newId(), now, "-", directions.singleOrNull() ?: "both", "code_made", null,
-            JSONObject().put("services", LinkModel.json(services)).put("directions", JSONArray(directions.sorted())), granter, selfName(), c.id, delivered = true))
-        app.log.system("audit", "link", "${granter.label()} made a link code (works once, for 10 minutes)")
+            JSONObject().put("services", LinkModel.json(services)).put("directions", JSONArray(directions.sorted())).put("tier", tier.wire)
+                .put("associate", who ?: JSONObject.NULL), granter, selfName(), c.id, delivered = true))
+        app.log.system("audit", "link", "${granter.label()} made a link code for ${LinkTierPolicy.label(tier)} (works once, for 10 minutes)")
         return JSONObject().put("code_id", c.id).put("code", LinkCode.format(code)).put("name", name).put("expires_at", c.expiresAt)
+            .put("tier", tier.wire).put("tier_about", LinkTierPolicy.about(tier)).put("access_ms", c.grantMs ?: JSONObject.NULL).put("associate", who ?: JSONObject.NULL)
             .put("services", LinkModel.json(services)).put("directions", JSONArray(directions.sorted())).put("link", codeLink(code, name))
             .put("name_lookup", if (offer.isSuccess) "ready" else "unavailable: claim with the link (it holds this device's Tailscale address)")
             .put("how", "On the other Bridgit, an agent with owner.configuration calls POST /v1/owner/configuration/links/claims {\"name\":\"$name\",\"code\":\"${LinkCode.format(code)}\"} (or {\"link\":\"…\"}). The code works once, for 10 minutes, and 5 wrong tries void it.")
@@ -524,9 +566,13 @@ class Links(private val app: BridgeApp) {
             inServices = LinkModel.servicesOf(caps).let { if ("in" in code.directions) it else emptySet() }, inGranter = code.granter,
             outOptIn = "out" in code.directions, outGranter = if ("out" in code.directions) code.granter else null, outAgents = code.agents,
             farIn = Far(true, at = now), farOut = existing?.farOut,
-            platform = body.optString("platform").takeIf { it in PLATFORMS })
+            platform = body.optString("platform").takeIf { it in PLATFORMS },
+            // The code's tier, chosen by this device's owner, decides; the claimer can only narrow it later (§16).
+            tier = code.tier, expiresAt = runCatching { LinkTierPolicy.expiry(code.tier, code.grantMs, now) }.getOrElse { now + LinkTierPolicy.PUBLIC_DEFAULT_MS },
+            associate = code.associate, associateEmail = code.associateEmail)
         synchronized(this) { save(load().filter { it.id != id && !(it.role == Role.SAT && it.ref == agentId) } + r) }
-        log.add(entry(r, null, "code_claimed", null, JSONObject().put("by", peerName ?: display), claimer, codeId = code.id))
+        log.add(entry(r, null, "code_claimed", null, JSONObject().put("by", peerName ?: display).put("tier", r.tier.wire), claimer, codeId = code.id))
+        LinkRegistry.current.register(app, r)
         if ("in" in code.directions) log.add(entry(r, "in", "opt_in", null, LinkModel.json(r.inServices), code.granter, codeId = code.id))
         log.add(entry(r, "in", "opt_in_far", null, "claimed", claimer, codeId = code.id, reason = "the claim is ${peerName ?: display}'s user opt-in"))
         if ("out" in code.directions) log.add(entry(r, "out", "opt_in", null, JSONObject().put("agents", JSONArray(code.agents.sorted())), code.granter, codeId = code.id))
@@ -535,6 +581,7 @@ class Links(private val app: BridgeApp) {
             .put("bridgit_name", registeredName() ?: JSONObject.NULL)
             .put("install", runCatching { cc.bridgit.app.feedback.InstallIdentity.status(app)?.installId }.getOrNull() ?: JSONObject.NULL)
             .put("services", LinkModel.json(r.inServices)).put("directions", JSONArray(code.directions.sorted()))
+            .put("tier", r.tier.wire).put("expires_at", r.expiresAt ?: JSONObject.NULL)
             .put("events", JSONArray(log.undelivered(id).map { it.toJson() }))
     }
 
@@ -561,12 +608,16 @@ class Links(private val app: BridgeApp) {
      * else the names backend resolves the name with a proof of the code (LNK-19). [agents]: this device's agents that
      * may use the target (default: the agent claiming). [reverseServices]: what the target may use here in return.
      */
-    fun claim(t: ClaimTarget, agents: Set<String>, reverseServices: Set<String>, granter: Granter): JSONObject =
-        whileClaiming { claimNow(t, agents, reverseServices, granter) }
+    fun claim(t: ClaimTarget, agents: Set<String>, reverseServices: Set<String>, granter: Granter, tier: LinkTier? = null, associate: String? = null,
+              associateEmail: String? = null): JSONObject =
+        whileClaiming { claimNow(t, agents, reverseServices, granter, tier, associate, associateEmail) }
 
-    private fun claimNow(t: ClaimTarget, agents: Set<String>, reverseServices: Set<String>, granter: Granter): JSONObject {
+    private fun claimNow(t: ClaimTarget, agents: Set<String>, reverseServices: Set<String>, granter: Granter, tier: LinkTier?, associate: String?,
+                         associateEmail: String?): JSONObject {
         registeredName() ?: throw nameRequired()
         if (LinkPause.satellites) throw ErrorCatalog.error("forbidden", LinkPause.SATELLITES_MESSAGE, mapOf("reason" to "satellites_paused"))
+        // The tier this device asks for is checked before anything is sent; the target's own tier is applied after.
+        if (tier != null) checkTier(tier, reverseServices, null, associate, associateEmail, System.currentTimeMillis(), forClaim = true)
         val code = LinkCode.normalise(t.code) ?: throw ErrorCatalog.error("code_invalid", "That isn't a link code (8 letters and digits, like K7QX-3MPA).")
         val targetName = t.name?.let { cc.bridgit.app.feedback.DeviceNames.parse(it) } ?: throw ErrorCatalog.error("invalid_parameter", "name is required: the other Bridgit's Device Domain Name.")
         agents.forEach { requireControlAgent(it) }
@@ -595,15 +646,26 @@ class Links(private val app: BridgeApp) {
         val directions = o.optJSONArray("directions")?.let { a -> (0 until a.length()).map { a.optString(it) }.toSet() } ?: setOf("in")
         app.satellites.update(s.id) { it.copy(agents = agents) }
         val old = all().firstOrNull { it.role == Role.HUB && it.ref == s.id }
+        // A target from before tiers sends none: its codes were for the owner's own devices.
+        val far = if (o.has("tier")) LinkTier.parseOrPublic(o.optString("tier")) else LinkTier.OWN
+        val mine = tier ?: far
+        val applies = LinkTier.narrowest(mine, far)
+        val reverse = LinkTierPolicy.effectiveServices(applies, reverseServices)
         val r = Rec(linkId, Role.HUB, s.id, old?.createdAt ?: now, peerName, p.install,
-            inServices = reverseServices, inGranter = if (reverseServices.isNotEmpty()) granter else null,
+            inServices = reverse, inGranter = if (reverse.isNotEmpty()) granter else null,
             outOptIn = true, outGranter = granter,
-            farIn = Far("out" in directions, at = now), farOut = Far("in" in directions && services.isNotEmpty(), services = services, at = now))
+            farIn = Far("out" in directions, at = now), farOut = Far("in" in directions && services.isNotEmpty(), services = services, at = now),
+            tier = mine, farTier = far,
+            expiresAt = o.optLong("expires_at").takeIf { applies != LinkTier.OWN && it > now },
+            associate = associate?.let { cleanName(it) }, associateEmail = LinkTierPolicy.email(associateEmail))
+        // The reverse direction's link agent only gets what the tier allows.
+        if (reverse != reverseServices) app.satellites.meta(s.id)?.returnAgent?.let { syncAgent(it, reverse) }
         synchronized(this) { save(load().filter { it.id != linkId && !(it.role == Role.HUB && it.ref == s.id) } + r) }
         o.optJSONArray("events")?.let { receiveEvents(r, it) }
         log.add(entry(r, "out", "opt_in", null, JSONObject().put("agents", JSONArray(agents.sorted())), granter, reason = "claimed a link code"))
-        if (reverseServices.isNotEmpty()) log.add(entry(r, "in", "opt_in", null, LinkModel.json(reverseServices), granter))
-        app.log.system("audit", "link", "${granter.label()} linked this device to ${peerName ?: s.name} (${LinkModel.words(services)})")
+        if (reverse.isNotEmpty()) log.add(entry(r, "in", "opt_in", null, LinkModel.json(reverse), granter))
+        app.log.system("audit", "link", "${granter.label()} linked this device to ${peerName ?: s.name} (${LinkModel.words(services)}; ${LinkTierPolicy.label(applies)})")
+        LinkRegistry.current.register(app, r)
         SatelliteHub.pushHubInfo(app, s.id)
         flushSoon(linkId)
         return json(get(linkId) ?: r)
@@ -619,6 +681,8 @@ class Links(private val app: BridgeApp) {
                 if (agents != null) throw ErrorCatalog.error("invalid_parameter", "agents belongs to the out direction (this device's agents that may use the other one).")
                 if (services != null) {
                     if (r.inRevoked || r.covers("in")) throw ErrorCatalog.error("link_revoked", "This direction was disconnected. Linking again needs a new link code.")
+                    try { LinkTierPolicy.checkServices(r.effectiveTier, services) } catch (e: IllegalArgumentException) {
+                        throw ErrorCatalog.error("tier_not_allowed", e.message ?: "Not allowed in this tier", mapOf("tier" to r.effectiveTier.wire)) }
                     val before = r.inServices
                     setInServices(r, services)
                     log.add(entry(r, "in", if (before.isEmpty()) "opt_in" else "services_changed", LinkModel.json(before), LinkModel.json(services), granter))
@@ -659,7 +723,161 @@ class Links(private val app: BridgeApp) {
 
     /** The grants a hub's return agent for satellite [satId] should have (SatelliteHub.pushHubInfo); null before a record exists. */
     fun returnCaps(satId: String): Set<String>? = all().firstOrNull { it.role == Role.HUB && it.ref == satId }?.let {
-        if (it.inRevoked) emptySet() else LinkModel.capsFor(it.inServices) }
+        if (it.inRevoked || it.expired()) emptySet() else LinkModel.capsFor(LinkTierPolicy.effectiveServices(it.effectiveTier, it.inServices)) }
+
+    // ---- Trust tiers (§16) -------------------------------------------------------------------------
+
+    /**
+     * Checks a tier request: services allowed in [tier], a lifetime in range, and the associate's name for associates.
+     * Returns the cleaned name. [forClaim]: the claiming side, where services are the reverse ones and the access
+     * lifetime is the target's to set.
+     */
+    fun checkTier(tier: LinkTier, services: Set<String>, accessMs: Long?, associate: String?, associateEmail: String?, now: Long,
+                  forClaim: Boolean = false): Pair<String?, String?> {
+        try {
+            LinkTierPolicy.checkServices(tier, services)
+            if (!forClaim) LinkTierPolicy.expiry(tier, accessMs, now)
+        } catch (e: IllegalArgumentException) { throw ErrorCatalog.error("invalid_parameter", e.message ?: "Not allowed in this tier", mapOf("tier" to tier.wire)) }
+        if (tier != LinkTier.ASSOCIATE && (associate != null || associateEmail != null))
+            throw ErrorCatalog.error("invalid_parameter", "associate and associate_email only apply to the associate tier.")
+        val email = associateEmail?.let { LinkTierPolicy.email(it) ?: throw ErrorCatalog.error("invalid_parameter", "associate_email must be an email address.") }
+        // The backend confirms an associate from an install on that email's account, so the email is required.
+        if (tier == LinkTier.ASSOCIATE && email == null && !forClaim)
+            throw ErrorCatalog.error("invalid_parameter", "associate_email is required for an associate's device: the person's email (their Bridgit confirms the link from that account).")
+        return associate?.let { cleanName(it) } to email
+    }
+
+    private fun cleanName(s: String) = s.filterNot { it.isISOControl() }.trim().take(60).takeIf { it.isNotEmpty() }
+
+    /** The tier that applies to the link agent [agentId] here; a link agent without a record gets the most restrictive. */
+    fun tierOfInAgent(agentId: String): LinkTier = byInAgent(agentId)?.effectiveTier ?: LinkTier.PUBLIC
+
+    /** After a tier narrowed: the "in" service list keeps only what the new tier allows, and public links get an end date. */
+    private fun narrowToTier(r: Rec, now: Long = System.currentTimeMillis()) {
+        val t = r.effectiveTier
+        val keep = LinkTierPolicy.effectiveServices(t, r.inServices)
+        if (keep != r.inServices) setInServices(r, keep)
+        if (t == LinkTier.PUBLIC) {
+            val latest = now + LinkTierPolicy.PUBLIC_MAX_MS
+            if (r.expiresAt == null || r.expiresAt > latest) update(r.id) { it.copy(expiresAt = latest) }
+        }
+    }
+
+    /**
+     * POST …/links/{id}/tier: this device's tier for the link. Narrowing applies at once (and the other device narrows
+     * too when told); widening needs the other device to widen as well, so what applies is always the narrower.
+     * [accessMs]: an associate's or public link's access from now (renews it); [reviewAt] an associate's review date.
+     */
+    fun setTier(id: String, tier: LinkTier, accessMs: Long?, reviewAt: Long?, associate: String?, granter: Granter, now: Long = System.currentTimeMillis(),
+                associateEmail: String? = null): JSONObject {
+        val r = get(id) ?: throw notFound(id)
+        if (r.inRevoked && r.outRevoked) throw ErrorCatalog.error("link_revoked", "This link was disconnected. Linking again needs a new link code.")
+        val keep = tier == LinkTier.ASSOCIATE
+        val (who, email) = checkTier(tier, emptySet(), accessMs, associate ?: r.associate.takeIf { keep }, associateEmail ?: r.associateEmail.takeIf { keep }, now)
+        if (reviewAt != null && (tier != LinkTier.ASSOCIATE || reviewAt <= now || reviewAt > now + LinkTierPolicy.ASSOCIATE_MAX_MS))
+            throw ErrorCatalog.error("invalid_parameter", "review_at is for associates: a time in the next 365 days (ms).")
+        val max = if (tier == LinkTier.PUBLIC) LinkTierPolicy.PUBLIC_MAX_MS else LinkTierPolicy.ASSOCIATE_MAX_MS
+        // Associates and public links always end (the backend requires it); a review date is a reminder before that.
+        val expires = when {
+            tier == LinkTier.OWN -> null
+            accessMs != null -> LinkTierPolicy.expiry(tier, accessMs, now)
+            r.expiresAt != null && r.expiresAt > now && r.expiresAt - now <= max -> r.expiresAt
+            else -> LinkTierPolicy.expiry(tier, null, now)
+        }
+        if (reviewAt != null && expires != null && reviewAt > expires) throw ErrorCatalog.error("invalid_parameter", "review_at must come before the link ends ($expires).")
+        val before = r.effectiveTier
+        val n = update(r.id) { it.copy(tier = tier, expiresAt = expires, reviewAt = if (keep) reviewAt ?: it.reviewAt?.takeIf { a -> expires == null || a <= expires } else null,
+            associate = if (keep) who else null, associateEmail = if (keep) email else null) } ?: r
+        narrowToTier(n, now)
+        log.add(entry(n, "both", "tier_changed", JSONObject().put("tier", r.tier.wire).put("expires_at", r.expiresAt ?: JSONObject.NULL),
+            JSONObject().put("tier", tier.wire).put("expires_at", expires ?: JSONObject.NULL).put("applies", n.effectiveTier.wire), granter))
+        app.log.system("audit", "link", "${granter.label()} set the link with ${peerLabel(n)} to ${LinkTierPolicy.label(tier)}" +
+            if (n.effectiveTier != tier) " (${peerLabel(n)} keeps it at ${n.effectiveTier.wire} until it agrees)" else "")
+        LinkRegistry.current.update(app, get(r.id) ?: n)
+        flushSoon(r.id)
+        return json(get(r.id) ?: n).put("tier_before", before.wire)
+    }
+
+    /**
+     * The team backend's state for a link is authoritative (§16.3): revoked or expired there removes it here; suspended
+     * (one end changed Google account) pauses both directions until it is active again.
+     */
+    fun backendCut(id: String, state: String) {
+        val r = get(id) ?: return
+        val g = Granter(Granter.RULE, selfName(), rule = "backend_$state")
+        if (state == "suspended") { if (app.agents.get(inAgentId(r) ?: "")?.paused != true || !r.outPaused) disconnect(r.id, "both", g, pause = true); return }
+        if (r.pending == null) disconnect(r.id, "both", g)
+    }
+
+    /** Associate and public links past their end date are removed for good, with the other device told (LNK-30). */
+    fun expireDue(now: Long = System.currentTimeMillis()) {
+        for (r in all()) {
+            if (!r.expired(now)) continue
+            update(r.id) { it.copy(pending = null, inRevoked = true, inServices = emptySet(), outRevoked = true, outOptIn = false, outAgents = emptySet()) }
+            inAgentId(r)?.let { syncAgent(it, emptySet()) }
+            val g = Granter(Granter.RULE, selfName(), rule = "expired")
+            log.add(entry(r, "both", "disconnected", "on", "off", g, reason = "access ended"))
+            runCatching { flush(r.id, readS = 5) }
+            removeLocally(r, g, "access ended")
+            app.log.system("audit", "link", "The link with ${peerLabel(r)} (${LinkTierPolicy.label(r.effectiveTier)}) reached its end date and was removed")
+        }
+        // Portal pairings past their end date lose their relay token for good.
+        val tiers = PortalTiers(app); val store = cc.bridgit.app.relay.RelayStore(app)
+        for (a in runCatching { cc.bridgit.app.portal.PortalPairing.granted(app, store) }.getOrDefault(emptyList())) {
+            if (!tiers.known(PortalTiers.viewer(a.id)) || !tiers.get(PortalTiers.viewer(a.id)).expired(now)) continue
+            cc.bridgit.app.portal.PortalPairing.disconnect(app, store, a.id)
+            tiers.forget(PortalTiers.viewer(a.id))
+            app.log.system("audit", "link", "${a.name}'s view of this device reached its end date and was removed")
+        }
+    }
+
+    // ---- Every link by tier, for Linked devices and GET …/links ----------------------------------
+
+    /** One link of any kind as Linked devices groups it: a [Links] record, a Portal viewer, or this phone viewing another. */
+    data class Tiered(val id: String, val kind: String, val name: String, val tier: LinkTier, val expiresAt: Long?, val reviewAt: Long?, val associate: String?) {
+        fun toJson(): JSONObject = JSONObject().put("id", id).put("kind", kind).put("name", name).put("tier", tier.wire)
+            .put("expires_at", expiresAt ?: JSONObject.NULL).put("review_at", reviewAt ?: JSONObject.NULL).put("associate", associate ?: JSONObject.NULL)
+    }
+
+    /** Portal pairings and views, with their tiers ([all] covers the link records). */
+    fun portalTiers(): List<Tiered> {
+        val tiers = PortalTiers(app); val store = cc.bridgit.app.relay.RelayStore(app)
+        val viewers = runCatching { cc.bridgit.app.portal.PortalPairing.granted(app, store) }.getOrDefault(emptyList())
+            .filter { !isLinkAgent(it.id) }.map { a ->
+                val e = tiers.get(PortalTiers.viewer(a.id))
+                Tiered("portal:${a.id}", "portal_viewer", cc.bridgit.app.portal.PortalClients.get(app, a.id)?.name ?: a.name, e.tier, e.expiresAt, e.reviewAt, e.associate ?: e.associateEmail)
+            }
+        val viewing = runCatching { cc.bridgit.app.portal.PortalLinks(app).all() }.getOrDefault(emptyList()).map { l ->
+            val e = tiers.get(PortalTiers.viewing(l.device))
+            Tiered(PortalTiers.viewing(l.device), "portal_viewing", l.name, e.tier, e.expiresAt, e.reviewAt, e.associate ?: e.associateEmail)
+        }
+        return viewers + viewing
+    }
+
+    /** POST …/links/{portal:…|viewing:…}/tier: a Portal pairing's tier. Same rules as [setTier]; a viewer's end date removes it. */
+    fun setPortalTier(apiId: String, tier: LinkTier, accessMs: Long?, reviewAt: Long?, associate: String?, granter: Granter, now: Long = System.currentTimeMillis(),
+                      associateEmail: String? = null): JSONObject {
+        val key = PortalTiers.keyFromApiId(apiId) ?: throw notFound(apiId)
+        val entry = portalTiers().firstOrNull { it.id == apiId } ?: throw notFound(apiId)
+        val tiers = PortalTiers(app); val old = tiers.get(key, now)
+        val keep = tier == LinkTier.ASSOCIATE
+        val (who, email) = checkTier(tier, emptySet(), accessMs, associate ?: old.associate.takeIf { keep }, associateEmail ?: old.associateEmail.takeIf { keep }, now)
+        if (reviewAt != null && (tier != LinkTier.ASSOCIATE || reviewAt <= now || reviewAt > now + LinkTierPolicy.ASSOCIATE_MAX_MS))
+            throw ErrorCatalog.error("invalid_parameter", "review_at is for associates: a time in the next 365 days (ms).")
+        val viewer = key.startsWith(PortalTiers.VIEWER)
+        val expires = when {
+            tier == LinkTier.OWN || !viewer -> null
+            accessMs != null -> LinkTierPolicy.expiry(tier, accessMs, now)
+            tier == LinkTier.ASSOCIATE && (reviewAt != null || old.reviewAt != null) -> old.expiresAt
+            else -> LinkTierPolicy.expiry(tier, null, now)
+        }
+        val n = PortalTiers.Entry(tier, if (keep) reviewAt ?: old.reviewAt else null, expires, if (keep) who else null, if (keep) email else null)
+        tiers.set(key, n)
+        log.add(LinkLog.Entry(LinkLog.newId(), now, "-", "both", "tier_changed", old.toJson(), n.toJson().put("pairing", apiId), granter, selfName(), delivered = true))
+        app.log.system("audit", "link", "${granter.label()} set ${entry.name} to ${LinkTierPolicy.label(tier)}")
+        changes.value = changes.value + 1
+        return entry.copy(tier = n.tier, expiresAt = n.expiresAt, reviewAt = n.reviewAt, associate = n.associate ?: n.associateEmail).toJson()
+    }
 
     // ---- Disconnecting (LNK-26..31) ----------------------------------------------------------------
 
@@ -753,6 +971,7 @@ class Links(private val app: BridgeApp) {
         }
         synchronized(this) { save(load().filter { it.id != r.id }) }
         if (why != null) log.add(entry(r, "both", "removed", "on", "off", granter, reason = why, delivered = true))
+        LinkRegistry.current.revoke(app, r, why ?: "disconnected")
     }
 
     // ---- Keeping both logs and both views in step (LNK-23) ----------------------------------------
@@ -769,6 +988,8 @@ class Links(private val app: BridgeApp) {
         val i = inHalf(r, pendingCounts = false); val o = outHalf(r, pendingCounts = false)
         return JSONObject().put("in", JSONObject().put("opted_in", i.optedIn).put("paused", i.paused).put("services", LinkModel.json(if (i.optedIn) r.inServices else emptySet())).put("revoked", r.inRevoked))
             .put("out", JSONObject().put("opted_in", o.optedIn).put("paused", o.paused).put("revoked", r.outRevoked))
+            .put("tier", r.tier.wire).put("expires_at", r.expiresAt ?: JSONObject.NULL)
+            .put("registration", LinkRegistry.Backend.status(app, r.id)?.optString("id")?.takeIf { it.startsWith("dlk_") } ?: JSONObject.NULL)
     }
 
     /** The link block a hub sends in hub-info and a satellite sends in its manifest. */
@@ -833,9 +1054,19 @@ class Links(private val app: BridgeApp) {
     fun applyFar(id: String, state: JSONObject, now: Long = System.currentTimeMillis()): Boolean {
         val i = state.optJSONObject("in"); val o = state.optJSONObject("out")
         val before = get(id) ?: return false
+        // The other device's tier: a narrower one narrows what applies here at once; a wider one widens nothing (§16).
+        val farTier = if (state.has("tier")) LinkTier.parseOrPublic(state.optString("tier")) else before.farTier
+        // The other device registered the link with the backend as its host: this device confirms its end.
+        state.optString("registration").takeIf { !state.isNull("registration") && LinkRegistry.DLK_RE.matches(it) }?.let { LinkRegistry.Backend.confirmSoon(app, id, it) }
         val after = update(id) { r -> r.copy(
             farOut = i?.let { Far(it.optBoolean("opted_in"), it.optBoolean("paused"), runCatching { LinkModel.parseServices(it.optJSONArray("services")) }.getOrDefault(emptySet()), now) } ?: r.farOut,
-            farIn = o?.let { Far(it.optBoolean("opted_in"), it.optBoolean("paused"), at = now) } ?: r.farIn) } ?: return false
+            farIn = o?.let { Far(it.optBoolean("opted_in"), it.optBoolean("paused"), at = now) } ?: r.farIn,
+            farTier = farTier) } ?: return false
+        if (after.effectiveTier != before.effectiveTier) {
+            narrowToTier(after)
+            log.add(entry(after, "both", "tier_changed", before.effectiveTier.wire, after.effectiveTier.wire, Granter(Granter.PERSON, peerLabel(after)),
+                reason = "${peerLabel(after)} set the link to ${after.farTier?.wire}", delivered = true))
+        }
         // LNK-30: a direction the other device disconnected for good is marked off here too, even before its log entry arrives.
         if (i?.optBoolean("revoked") == true) farRevoked(after, null, "${peerLabel(after)} disconnected this device's use of it")
         if (o?.optBoolean("revoked") == true) markInOff(get(id) ?: after, null, "${peerLabel(after)} stopped using this device")
@@ -886,10 +1117,13 @@ class Links(private val app: BridgeApp) {
     /** From the service's periodic check: final disconnects, undelivered events, notices for removed links. */
     fun checkIfDue(now: Long = System.currentTimeMillis()) {
         finishDue(now)
+        runCatching { expireDue(now) }
         if (now - lastFlush < 5 * 60_000L) return
         lastFlush = now
         all().filter { log.undelivered(it.id).isNotEmpty() }.forEach { runCatching { flush(it.id) } }
         notices.retry(now)
+        runCatching { LinkRegistry.Backend.backfill(app, all(), now) }
+        runCatching { LinkRegistry.Backend.sync(app) { id, state -> backendCut(id, state) } }
     }
     @Volatile private var lastFlush = 0L
 

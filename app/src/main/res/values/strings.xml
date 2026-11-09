@@ -24,6 +24,10 @@
     <string name="notif_capture_sub">Logged in Bridgit\'s activity</string>
     <string name="notif_taking_photo">%1$s is taking a photo</string>
     <string name="locked_photo_title">%1$s wants to take a photo</string>
+    <string name="link_public_ask_title">%1$s (in the wild) asks</string>
+    <string name="link_public_log_asked">%1$s, a device in the wild, asked for %2$s</string>
+    <string name="link_public_log_allowed">You allowed %2$s from %1$s</string>
+    <string name="link_public_log_refused">%2$s from %1$s was refused</string>
     <string name="locked_photo_allow">Allow</string>
     <string name="locked_photo_deny">Deny</string>
     <string name="locked_photo_log_asked">%1$s asked to take a photo while the phone was locked</string>

@@ -1,6 +1,6 @@
 {
  "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
- "api_revision": 144,
+ "api_revision": 145,
  "errors": [
   {
    "code": "model_unavailable",
@@ -525,6 +525,27 @@
    "you_should": "Leave out the target, or link that Bridgit directly",
    "meaning": "That call doesn't pass a link: the endpoint, the target's service list, or a call that already came over a link (calls pass on once)",
    "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "link_expired",
+   "you_should": "Don't retry; ask the owner to renew it or link again",
+   "meaning": "That link's access ended: an associate's or a device in the wild's grant passed its end date (`link_id`, `tier`)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "tier_not_allowed",
+   "you_should": "Use only what the link lists in services; ask the owner to change the tier",
+   "meaning": "That link's trust tier doesn't allow this call (`tier`: own, associate or public)",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "link_approval_declined",
+   "you_should": "Don't retry automatically",
+   "meaning": "A device in the wild asked for something that needs the owner's Allow, and the owner denied it or didn't answer within 30 s (`reason`)",
+   "http": 409,
    "returned_today": true
   },
   {

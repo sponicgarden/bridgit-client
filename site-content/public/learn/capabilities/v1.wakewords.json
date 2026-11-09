@@ -28,8 +28,8 @@
    "tool": "listen_clip"
   }
  ],
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.wakewords",

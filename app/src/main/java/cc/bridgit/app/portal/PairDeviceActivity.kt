@@ -130,7 +130,11 @@ class PairDeviceActivity : AppCompatActivity() {
                     // Always: it registers the phone only when needed, and it starts the listener service, which
                     // isn't running when the phone has no agents yet. The service tells the relay about the new token.
                     RelaySetup.turnOn(app, store)
-                    PortalPairing.create(app, store).also { cc.bridgit.app.BridgeService.running?.relay?.wake() }
+                    PortalPairing.create(app, store).also {
+                        // Pair a device is the "Your Other Devices" flow (Linked devices › Pair › tier, owner 8 Nov 2026).
+                        cc.bridgit.app.link.PortalTiers(app).set(cc.bridgit.app.link.PortalTiers.viewer(it.agent.id), cc.bridgit.app.link.PortalTiers.Entry(cc.bridgit.app.link.LinkTier.OWN))
+                        cc.bridgit.app.BridgeService.running?.relay?.wake()
+                    }
                 }
             }
             busy = false

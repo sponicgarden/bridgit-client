@@ -29,6 +29,12 @@ class RelayDispatcher(private val app:BridgeApp,private val api:ApiServer) {
             return JSONObject().put("status",r.first).put("content_type","application/json").put("body_base64",Sealed.b64(r.second.toString().toByteArray())).put("headers",JSONObject())
         }
         val portal=PortalData.isPortalConfig(strings(config,"routes"),strings(config,"tools"))
+        // Trust tiers (§16): a Portal pairing past its end date (an associate's or a device in the wild's) is refused.
+        // Its routes are read-only already; link agents get their tier checks in ApiServer.linkAgentCall.
+        if(portal&&!app.links.isLinkAgent(id)){
+            val t=cc.bridgit.app.link.PortalTiers(app).get(cc.bridgit.app.link.PortalTiers.viewer(id))
+            if(t.expired())throw ApiError(403,"link_expired","This viewer's access has ended. The owner can renew it on Linked devices")
+        }
         // Settings › Security › Relay: signed requests only. Sealed jobs are signed with the agent's own key (HPKE auth);
         // a connector token alone is a bearer secret. Read-only portals are exempt.
         // A linked Bridgit's own calls (events, peers, disconnect) carry no control; its service calls follow the rule.

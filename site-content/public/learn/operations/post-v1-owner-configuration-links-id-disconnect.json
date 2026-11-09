@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Disconnect (or pause) a link at once: calls are refused from now, and it is final after 10 seconds unless undone; any control agent of this device (taking access away needs no owner.configuration grant)",
@@ -34,7 +34,7 @@
   "idempotent": true,
   "path": "/v1/owner/configuration/links/{id}/disconnect",
   "capability": "status",
-  "returns": "the link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until",
+  "returns": "the link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until}), undo_until",
   "mcp_input_schema": {
    "type": "object",
    "properties": {

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Linked devices (owner, 5 Nov 2026): the map of every hub, portal and satellite linked to this phone (and the
-     devices on its network) fills the screen, with one small Pair a device strip below. Tapping a device on the map shows it and what can be done with it. -->
+<!-- Linked devices (owner, 5 Nov 2026; trust tiers 8 Nov 2026): every link listed in three sections in this order,
+     Your Other Devices, Devices of Associates, Devices in the Wild; then the map of every hub, portal and satellite
+     linked to this phone (and the devices on its network), and one small Pair a device strip below. Tapping a device
+     in a section or on the map shows it and what can be done with it. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
@@ -18,6 +20,18 @@
         app:navigationIcon="@drawable/ic_back"
         app:title="@string/linked_title"
         app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
     <!-- Pause pills (owner, 5 Nov 2026; design pass by Sol 6.1): two small pills in the map's panel colour, green outline
          and dot while that side is on, red while paused. Each takes every satellite, or every hub, off the network
@@ -57,13 +71,20 @@
         android:textColor="?attr/colorError"
         android:visibility="gone" />
 
+    <!-- Trust tiers: a heading per tier and a row per link, filled in by PortalActivity.renderTiers(). -->
+    <LinearLayout
+        android:id="@+id/tierSections"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:orientation="vertical" />
+
     <cc.bridgit.app.portal.LinkedDevicesDiagram
         android:id="@+id/diagram"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="360dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:layout_weight="1"
         android:focusable="true"
         android:importantForAccessibility="yes" />
 
@@ -152,4 +173,6 @@
                 app:icon="@drawable/ic_qr" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

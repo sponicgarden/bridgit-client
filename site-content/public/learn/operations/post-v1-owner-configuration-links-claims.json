@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Claim another Bridgit's link code: this Bridgit then uses it (its user opt-in), and may offer the other direction too; explicit owner.configuration grant required; no per-change phone approval",
@@ -50,8 +50,31 @@
    },
    {
     "name": "reverse_services",
-    "description": "What the other Bridgit may use here in return (it opts in on its side); default none",
+    "description": "What the other Bridgit may use here in return (it opts in on its side); default none. Limited by the tier",
     "type": "array",
+    "required": false
+   },
+   {
+    "name": "tier",
+    "description": "This Bridgit's tier for the link (default: the one the code was made with); the narrower of the two applies",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "own",
+     "associate",
+     "public"
+    ]
+   },
+   {
+    "name": "associate",
+    "description": "associate: the other person's name",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "associate_email",
+    "description": "associate: the other person's email",
+    "type": "string",
     "required": false
    }
   ],
@@ -59,7 +82,7 @@
   "idempotent": true,
   "path": "/v1/owner/configuration/links/claims",
   "capability": "owner_features",
-  "returns": "the new link (id, name, bridgit_name, target, sat_id, role, in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})",
+  "returns": "the new link (id, name, bridgit_name, target, sat_id, role, tier (own|associate|public: the narrower of tier_here and tier_there), tier_here, tier_there, tier_about, associate, associate_email, expires_at, review_at, registration{id, tier, role host|peer, state, error} (the team backend's record), in{state, services, granter, paused, revoked, other_side}, out{state, agents[{id,name}], granter, paused, revoked, services, other_side}, disconnecting{direction, undo_until})",
   "mcp_input_schema": {
    "type": "object",
    "properties": {
@@ -67,12 +90,21 @@
      "description": "Its link code, K7QX-3MPA (required unless link is given)",
      "type": "string"
     },
+    "tier": {
+     "description": "This Bridgit's tier for the link (default: the one the code was made with); the narrower of the two applies",
+     "type": "string",
+     "enum": [
+      "own",
+      "associate",
+      "public"
+     ]
+    },
     "port": {
      "description": "Its Bridgit port, with host",
      "type": "integer"
     },
     "reverse_services": {
-     "description": "What the other Bridgit may use here in return (it opts in on its side); default none",
+     "description": "What the other Bridgit may use here in return (it opts in on its side); default none. Limited by the tier",
      "type": "array",
      "items": {"type": "string"}
     },
@@ -88,8 +120,16 @@
      "description": "Its Tailscale address, when the names backend can't resolve the name",
      "type": "string"
     },
+    "associate_email": {
+     "description": "associate: the other person's email",
+     "type": "string"
+    },
     "idempotency_key": {
      "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "associate": {
+     "description": "associate: the other person's name",
      "type": "string"
     },
     "agents": {

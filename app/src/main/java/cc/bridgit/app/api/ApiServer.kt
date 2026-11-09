@@ -384,7 +384,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
      * opt-in; here, the shape of a link: the owner's pause pills, a direction being disconnected or paused, and only
      * calls that pass a link. Returns the agent the other device calls for (its On-Behalf-Of), when it says.
      */
-    private fun linkAgentCall(spec: EndpointSpec, agent: Agent, header: (String) -> String?): Pair<String, String>? {
+    private suspend fun linkAgentCall(spec: EndpointSpec, agent: Agent, header: (String) -> String?): Pair<String, String>? {
         val P = cc.bridgit.app.satellite.SatellitePolicy
         val hub = app.hubLinks.isHub(agent.id)
         // The owner's pills, by role as on Linked devices: Hubs pauses this device's hubs, Satellites its satellites, both ways.
@@ -403,9 +403,20 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
             if (app.agents.get(agent.id)?.paused == true)
                 throw ErrorCatalog.error("link_paused", "The owner paused this link here. Wait until it is resumed; don't retry before then.", mapOf("link_id" to rec?.id))
         }
-        val services = cc.bridgit.app.link.LinkModel.servicesOf(app.agents.get(agent.id)?.caps)
+        // Trust tier (§16): what the tier allows bounds the grants, whatever they say; a link agent with no record gets
+        // the most restrictive tier.
+        val T = cc.bridgit.app.link.LinkTierPolicy
+        val tier = rec?.effectiveTier ?: cc.bridgit.app.link.LinkTier.PUBLIC
+        if (!plumbing && rec != null && rec.expired())
+            throw ErrorCatalog.error("link_expired", "This device's link with ${app.links.peerLabel(rec)} has ended. Its owner can renew it or link again.", mapOf("link_id" to rec.id, "tier" to tier.wire))
+        val services = T.effectiveServices(tier, cc.bridgit.app.link.LinkModel.servicesOf(app.agents.get(agent.id)?.caps))
         if (!cc.bridgit.app.link.LinkPolicy.mayCall(spec, services))
             throw ErrorCatalog.error("not_on_target", "${spec.method} ${spec.fullPath} doesn't pass a link here (this device shares: ${cc.bridgit.app.link.LinkModel.words(services)}).")
+        if (!T.mayCall(tier, spec, services))
+            throw ErrorCatalog.error("tier_not_allowed", "${spec.method} ${spec.fullPath} is only for the owner's own devices; this link is ${T.label(tier)}.", mapOf("tier" to tier.wire))
+        T.perMinute(tier)?.let { n -> if (!limiter.tryAcquire("link-tier:${agent.id}", n))
+            throw ErrorCatalog.error("rate_limited", "At most $n calls a minute from ${T.label(tier)}.", mapOf("retry_after_s" to limiter.retryAfterS("link-tier:${agent.id}"))) }
+        if (T.needsApproval(tier, spec)) cc.bridgit.app.link.PublicLinkApproval.require(app, rec?.let { app.links.peerLabel(it) } ?: agent.name, spec)
         if (!plumbing && rec != null) runCatching { cc.bridgit.app.link.LinkNotifier.used(app, rec) }
         return if (hub) P.parseOnBehalfOf(header(P.ON_BEHALF_HEADER)) else null
     }

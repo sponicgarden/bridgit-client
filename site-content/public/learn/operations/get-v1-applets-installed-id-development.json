@@ -1,6 +1,6 @@
 {
- "documentation_revision": 127,
- "api_revision": 144,
+ "documentation_revision": 128,
+ "api_revision": 145,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read the exact personal package, template baseline, customization journal, revision and pending upgrade task. Owner control agents can inspect any installed applet; private, keep local unless the owner consents to model upload",

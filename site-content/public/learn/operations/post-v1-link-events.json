@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Device to device: the other Bridgit of a link sends its grants-log events and its halves of both directions (link agents only). Not for agents.",

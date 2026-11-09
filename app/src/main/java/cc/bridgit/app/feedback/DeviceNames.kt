@@ -21,7 +21,8 @@ import java.util.concurrent.TimeUnit
 object DeviceNames {
     /** Same advice the backend gives (feedback/src/names.mjs NAME_ADVICE). */
     const val ADVICE = "Pick a Device Domain Name for this Bridgit: about 10 characters, as cute and friendly to a person as you can make it, like kitchen-tab or porch-cam. " +
-        "3 to 30 lowercase letters, digits and hyphens; no slashes. First come, first served, like a domain: if it's taken, pick another."
+        "3 to 30 lowercase letters, digits and hyphens; no slashes. First come, first served, like a domain: if it's taken, pick another. " +
+        FriendlyName.ADVICE
     const val OPERATION = "POST /v1/owner/configuration/name"
     private const val KEY = "bridgit_name"
     private const val HEARTBEAT_S_DEFAULT = 300
@@ -37,6 +38,7 @@ object DeviceNames {
 
     private fun save(app: BridgeApp, own: JSONObject) {
         val keep = JSONObject().put("name", own.getString("name")).put("label", own.opt("label") ?: JSONObject.NULL)
+            .put("friendly_name", own.opt("friendly_name") ?: JSONObject.NULL)
             .put("visible", own.optBoolean("visible")).put("heartbeat_every_s", own.optInt("heartbeat_every_s", HEARTBEAT_S_DEFAULT))
         app.platform.store.setting(KEY, keep.toString(), true)
     }
@@ -54,10 +56,11 @@ object DeviceNames {
     fun hint(app: BridgeApp): JSONObject {
         val own = cached(app)
         return if (own == null) JSONObject().put("status", "unregistered").put("advice", ADVICE)
-            .put("how", "Register a name first: $OPERATION {\"name\":\"kitchen-tab\"} (control MCP: configuration.set with that operation). Taken? Suggest another.")
+            .put("how", "Register both names in one step: $OPERATION {\"name\":\"kitchen-tab\",\"friendly_name\":\"Kitchen tablet\"} (control MCP: configuration.set with that operation). Taken? Suggest another.")
             .put("about", cc.bridgit.app.api.Learn.NAMES_URL).put("specs", DeviceSpecs.hint(null, DeviceSpecs.shared(app)))
         else JSONObject().put("status", "registered").put("name", own.getString("name")).put("label", own.opt("label") ?: JSONObject.NULL)
-            .put("visible", own.optBoolean("visible")).put("how", "Registered. Change label or visible with $OPERATION.").put("about", cc.bridgit.app.api.Learn.NAMES_URL)
+            .put("friendly_name", own.opt("friendly_name") ?: JSONObject.NULL).put("needs_friendly_name", own.optString("friendly_name").isEmpty())
+            .put("visible", own.optBoolean("visible")).put("how", if (own.optString("friendly_name").isEmpty()) "Registered, but no friendly name yet. Set one with $OPERATION {\"friendly_name\":\"Kitchen tablet\"}. ${FriendlyName.ADVICE}" else "Registered. Change friendly_name, label or visible with $OPERATION.").put("about", cc.bridgit.app.api.Learn.NAMES_URL)
             .put("specs", DeviceSpecs.hint(own.getString("name"), DeviceSpecs.shared(app)))
     }
 
@@ -69,28 +72,41 @@ object DeviceNames {
         save(app, json); return hint(app).put("visible_since", json.opt("visible_since")).put("last_seen_at", json.opt("last_seen_at"))
     }
 
-    /** Registers [name] (POST /v1/names) when this Bridgit has none; otherwise changes label/visibility only. */
-    fun set(app: BridgeApp, name: String?, label: Any?, hasLabel: Boolean, visible: Boolean?): JSONObject {
+    /**
+     * Registers [name] together with its friendly name (POST /v1/names) when this Bridgit has none; otherwise changes
+     * friendly name, label or visibility. [friendly] defaults, for a registration, to the name the owner already gave
+     * this phone (DeviceName); with neither, registering is refused so both names are chosen in one step (A0151).
+     */
+    fun set(app: BridgeApp, name: String?, label: Any?, hasLabel: Boolean, visible: Boolean?, friendly: String? = null): JSONObject {
         val held = cached(app)?.optString("name")
         if (held == null && name != null) {
-            val body = JSONObject().put("name", name).apply { if (hasLabel) put("label", label ?: JSONObject.NULL); visible?.let { put("visible", it) } }
+            val chosen = friendly ?: app.platform.store.setting("device_name", "").let { FriendlyName.parse(it) }
+                ?: throw ErrorCatalog.error("friendly_name_required", "Give this Bridgit a friendly name in the same step as its domain name. ${FriendlyName.ADVICE}")
+            val body = JSONObject().put("name", name).put("friendly_name", chosen).apply { if (hasLabel) put("label", label ?: JSONObject.NULL); visible?.let { put("visible", it) } }
             val (code, json) = call(app, "POST", "/v1/names", body)
             if (code == 409 && json.optString("error") == "already_named") return refresh(app).also { throw ErrorCatalog.error("already_named", json.optString("message"), mapOf("name" to json.opt("name"))) }
             check(app, code, json)
             save(app, json); lastHeartbeatAt = System.currentTimeMillis()
+            keepFriendlyLocally(app, json)
             DeviceSpecs.afterRegistration(app) // A0077: the spec sheet goes to Bridgit with the new name
             return hint(app).put("registered", true).put("created", code == 201)
         }
         if (held == null) {
             // The phone may have no cached copy (cleared settings); ask before saying there is no name.
             if (refresh(app).optString("status") != "registered") throw ErrorCatalog.error("invalid_parameter", "name is required: this Bridgit has no name yet. $ADVICE")
-            return set(app, name, label, hasLabel, visible)
+            return set(app, name, label, hasLabel, visible, friendly)
         }
         if (name != null && name != held) throw ErrorCatalog.error("already_named", "This Bridgit is already $held. A Bridgit keeps its first name.", mapOf("name" to held))
-        val changes = JSONObject().apply { if (hasLabel) put("label", label ?: JSONObject.NULL); visible?.let { put("visible", it) } }
+        val changes = JSONObject().apply { friendly?.let { put("friendly_name", it) }; if (hasLabel) put("label", label ?: JSONObject.NULL); visible?.let { put("visible", it) } }
         if (changes.length() == 0) return refresh(app)
         val (code, json) = call(app, "PATCH", "/v1/names/me", changes)
-        check(app, code, json); save(app, json); return hint(app)
+        check(app, code, json); save(app, json); keepFriendlyLocally(app, json); return hint(app)
+    }
+
+    /** The friendly name the backend accepted is also this phone's display name everywhere in the app (DeviceName). */
+    private fun keepFriendlyLocally(app: BridgeApp, own: JSONObject) {
+        val f = FriendlyName.parse(own.optString("friendly_name")) ?: return
+        if (app.platform.store.setting("device_name", "") != f) cc.bridgit.app.platform.DeviceName.set(app, f)
     }
 
     /** DELETE /v1/names/me: hides the name and clears the label; the name stays this Bridgit's. */
@@ -116,6 +132,7 @@ object DeviceNames {
         val message = json.optString("message").ifEmpty { "The team backend answered $code." }
         when (json.optString("error")) {
             "name_taken" -> throw ErrorCatalog.error("name_taken", message, mapOf("lookup" to json.opt("lookup")))
+            "friendly_name_taken" -> throw ErrorCatalog.error("friendly_name_taken", message, mapOf("friendly_name" to json.opt("friendly_name"), "held_by" to json.opt("held_by")))
             "already_named" -> throw ErrorCatalog.error("already_named", message, mapOf("name" to json.opt("name")))
             "invalid_parameter" -> throw ErrorCatalog.error("invalid_parameter", message)
             "rate_limited" -> throw ErrorCatalog.error("rate_limited", message, mapOf("retry_after_s" to 3600))

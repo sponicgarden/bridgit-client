@@ -320,8 +320,11 @@ class UnattendedConfigurationTest {
         for (bad in listOf("ab", "porch/cam", "-cam", "two--hyphens", "x".repeat(31), "has space")) assertNull(bad, cc.bridgit.app.feedback.DeviceNames.parse(bad))
         assertEquals("unregistered", cc.bridgit.app.feedback.DeviceNames.hint(app).getString("status"))
         assertTrue(cc.bridgit.app.feedback.DeviceNames.hint(app).getString("how").contains(cc.bridgit.app.feedback.DeviceNames.OPERATION))
-        for (body in listOf("""{"name":"a/b"}""", """{"name":7}""", """{"nick":"x"}""", """{}""", """{"label":5}""", """{"visible":"yes"}""", """{"label":"${"x".repeat(61)}"}"""))
+        for (body in listOf("""{"name":"a/b"}""", """{"name":7}""", """{"nick":"x"}""", """{}""", """{"label":5}""", """{"visible":"yes"}""", """{"label":"${"x".repeat(61)}"}""", """{"friendly_name":""}""", """{"friendly_name":5}""", """{"friendly_name":"${"x".repeat(41)}"}"""))
             try { service.name(o(body)); fail(body) } catch (e: ApiError) { assertEquals(body, "invalid_parameter", e.code) }
+        // A0151: both names are chosen in one step; a domain name alone, with no friendly name on this phone, is refused before any call.
+        app.platform.store.setting("device_name", "", true)
+        try { service.name(o("""{"name":"kitchen-tab"}""")); fail() } catch (e: ApiError) { assertEquals("friendly_name_required", e.code) }
         app.platform.store.setting("bridgit_name", """{"name":"porch-cam","label":null,"visible":true,"heartbeat_every_s":300}""", true)
         assertEquals("porch-cam", cc.bridgit.app.feedback.DeviceNames.hint(app).getString("name"))
         try { service.name(o("""{"name":"kitchen-tab"}""")); fail() } catch (e: ApiError) { assertEquals("already_named", e.code); assertEquals("porch-cam", e.extra["name"]) }

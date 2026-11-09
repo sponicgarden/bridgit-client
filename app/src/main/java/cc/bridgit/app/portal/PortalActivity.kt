@@ -382,8 +382,7 @@ class PortalActivity : AppCompatActivity() {
                 satelliteOf.takeIf { it.isNotEmpty() }?.let { getString(R.string.linked_this_satellite_of, it.joinToString(", ")) },
                 viewOnlyOf.takeIf { it.isNotEmpty() }?.let { getString(R.string.linked_this_view_only_of, it.joinToString(", ")) }),
             where = where(known), tiles = tiles(known), services = known?.services.orEmpty(),
-            primary = DeviceDetailSheet.Action(getString(R.string.linked_view)) { showHome(null, name) },
-            primaryCaption = getString(R.string.linked_view_this_caption, noun))
+            primary = DeviceDetailSheet.Action(getString(R.string.linked_view)) { showHome(null) })
 
     /** A hub: this phone is its satellite ([Node.satLink]), its view-only satellite ([Node.portalLink]) or both. */
     private fun openHub(n: Node) {
@@ -395,7 +394,7 @@ class PortalActivity : AppCompatActivity() {
         val heard = maxOf(agent?.lastUsedAt ?: 0L, info?.at ?: 0L, seen?.at ?: 0L).takeIf { it > 0 }
         hubSheet(n.name, knownFromHome(seen?.home), seen?.at, n.online, LinkPause.hubsPaused, state, n.satLink != null, n.portalLink != null, heard,
             info?.let { it.targets.size to it.portals.size },
-            showHome = homeId?.let { { showHome(it, n.name) } }, pairAgain = { pairAgain(n.satLink!!) }, remove = { removeHub(n) },
+            showHome = homeId?.let { { showHome(it) } }, pairAgain = { pairAgain(n.satLink!!) }, remove = { removeHub(n) },
             link = n.satLink?.let { id -> app.links.all().firstOrNull { it.role == cc.bridgit.app.link.Links.Role.SAT && it.ref == id } })
             .open()
     }
@@ -415,7 +414,6 @@ class PortalActivity : AppCompatActivity() {
                 state == HubLinks.LinkState.STALE -> add(getString(R.string.linked_hub_stale, noun))
                 satellite && shared == null -> add(getString(R.string.linked_hub_waiting))
             }
-            addAll(linkFacts(link))
             updatedAt?.takeIf { known != null }?.let { add(getString(R.string.linked_updated_ago, ago(it))) }
         }
         return DeviceDetailSheet(name, subtitle(known),
@@ -429,8 +427,7 @@ class PortalActivity : AppCompatActivity() {
                 showHome != null -> DeviceDetailSheet.Action(getString(R.string.linked_view), run = showHome)
                 else -> null
             },
-            primaryCaption = if (!stale && showHome != null) getString(R.string.linked_view_hub_caption) else null,
-            pause = link?.let { pauseAction(it, name) },
+            pause = link?.let { pauseAction(it, name) }, link = linkDiagram(link, name),
             destructive = if (link != null && !portal) DeviceDetailSheet.Destructive(getString(R.string.link_disconnect), null) { disconnectWithUndo(link, name) }
             else DeviceDetailSheet.Destructive(getString(if (satellite) R.string.satellite_unlink else R.string.portal_other_remove),
                 buildList {
@@ -496,7 +493,7 @@ class PortalActivity : AppCompatActivity() {
             { if (live()) conn(R.string.linked_conn_sat_live, getString(R.string.linked_conn_sat_live_body), true)
               else conn(R.string.linked_conn_sat_off, getString(if (status() == "unlinked") R.string.linked_fact_unlinked else R.string.linked_conn_sat_off_body), false) },
             listOfNotNull(lastSeen?.let { getString(R.string.linked_fact_last_seen, ago(it)) },
-                shareError?.let { getString(R.string.satellite_share_failed, it) } ?: sharedAt?.let { getString(R.string.linked_fact_shared, ago(it)) }) + linkFacts(link),
+                shareError?.let { getString(R.string.satellite_share_failed, it) } ?: sharedAt?.let { getString(R.string.linked_fact_shared, ago(it)) }),
             where(known), tiles(known),
             controls = { box ->
                 manage?.let { (on, flip) ->
@@ -529,7 +526,7 @@ class PortalActivity : AppCompatActivity() {
                 }
             },
             secondary = DeviceDetailSheet.Action(getString(R.string.satellite_check), run = check),
-            pause = link?.let { pauseAction(it, name) },
+            pause = link?.let { pauseAction(it, name) }, link = linkDiagram(link, name),
             destructive = if (link != null) DeviceDetailSheet.Destructive(getString(R.string.link_disconnect), null) { disconnectWithUndo(link, name) }
             else DeviceDetailSheet.Destructive(getString(R.string.satellite_remove), getString(R.string.satellite_remove_confirm, name), remove))
     }
@@ -554,25 +551,13 @@ class PortalActivity : AppCompatActivity() {
 
     // ---- Linked Bridgits on the device sheet (docs/spec-linked-bridgits.md, LNK-26, LNK-27, LNK-42) ----
 
-    /** One line per direction that isn't off: "This tablet uses: camera, microphone", "It uses this tablet: Home and applets". */
-    private fun linkFacts(r: cc.bridgit.app.link.Links.Rec?): List<String> {
-        r ?: return emptyList()
+    /** A0149: the link's two arrows. [farName]: as the sheet shows it (the friendly name, A0151); this phone is named as on its own sheet. */
+    private fun linkDiagram(r: cc.bridgit.app.link.Links.Rec?, farName: String): cc.bridgit.app.link.LinkDiagram.Model? {
+        r ?: return null
         val l = app.links
-        fun value(state: cc.bridgit.app.link.LinkModel.State, services: Set<String>) = when (state) {
-            cc.bridgit.app.link.LinkModel.State.ON -> serviceWords(services)
-            cc.bridgit.app.link.LinkModel.State.PAUSED -> getString(R.string.link_state_paused)
-            cc.bridgit.app.link.LinkModel.State.OFF -> null
-            else -> getString(R.string.link_state_waiting)
-        }
-        return listOfNotNull(
-            value(l.outState(r), r.farOut?.services ?: emptySet())?.let { getString(R.string.link_this_uses, noun, it) },
-            value(l.inState(r), r.inServices)?.let { getString(R.string.link_it_uses, noun, it) })
+        return cc.bridgit.app.link.LinkDiagram.model(PortalPairing.phoneName(app), farName,
+            l.outState(r), r.farOut?.services ?: emptySet(), l.inState(r), r.inServices)
     }
-
-    private fun serviceWords(services: Set<String>): String = cc.bridgit.app.link.LinkModel.SERVICES.filter { it in services }.map { getString(when (it) {
-        "camera" -> R.string.link_service_camera; "mic" -> R.string.link_service_mic; "speaker" -> R.string.link_service_speaker
-        "interactions" -> R.string.link_service_interactions; "location" -> R.string.link_service_location; "gallery" -> R.string.link_service_gallery
-        "sounds" -> R.string.link_service_sounds; else -> R.string.link_service_view }) }.joinToString(", ").ifEmpty { getString(R.string.link_state_waiting) }
 
     /** Pause both directions, or Resume them: one tap each way (LNK-27). */
     private fun pauseAction(r: cc.bridgit.app.link.Links.Rec, name: String): DeviceDetailSheet.Action {
@@ -628,9 +613,10 @@ class PortalActivity : AppCompatActivity() {
     }
 
     /** Home, Applets and Camera switch to [device] (null: this phone), as the Home hexagon's chooser does. */
-    private fun showHome(device: String?, name: String) {
+    private fun showHome(device: String?) {
         PortalLinks(this).select(device)
-        Toast.makeText(this, getString(R.string.linked_home_now, name), Toast.LENGTH_SHORT).show()
+        // A0150: land on Home, not back on the screen Linked devices was opened from (More). Its device bar names the device.
+        startActivity(homeIntent(this))
         finish()
     }
 
@@ -683,6 +669,10 @@ class PortalActivity : AppCompatActivity() {
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
 
     companion object {
+        /** Bridgit's main screen, brought to the front on its Home tab (MainActivity reads owner_setup_target). */
+        fun homeIntent(ctx: android.content.Context): Intent = Intent(ctx, cc.bridgit.app.ui.MainActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra("owner_setup_target", "home")
+
         /** Debug builds only: a sample device dialog to open (see showSample). */
         const val EXTRA_SAMPLE = "debug_sheet"
         /** A hub counts as online when it called this satellite in the last 10 minutes (it checks every 5). */

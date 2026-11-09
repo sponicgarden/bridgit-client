@@ -112,6 +112,7 @@ object FeedbackUploader {
             .put("capture_source", r.captureSource).put("context", ctx).put("agent", agent ?: JSONObject.NULL)
             .put("log", r.log)
             .put("images", JSONArray(images.map { JSONObject().put("data_base64", Base64.encodeToString(it, Base64.NO_WRAP)) }))
+            .apply { if (r.kind == IssueKind.APPLET) r.applet?.let { put("applet", JSONObject(it.toString())) } } // A0178
     }
 
     /** What goes over the wire for one history entry (FBK-14 history upload). */

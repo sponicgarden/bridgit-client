@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Listen for any sounds: whether the phone tells you when the room gets loud (8.23)",

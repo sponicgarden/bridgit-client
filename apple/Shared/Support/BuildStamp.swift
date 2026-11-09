@@ -29,8 +29,19 @@ extension View {
 }
 
 /// Like Android's VersionStamp, keeps screenshots identifiable without adding a focus stop.
+/// Two lines by design: the version, then the build number (A0156/A0158).
 struct BuildStamp: View {
+    /// Line one is "v" + CFBundleShortVersionString; line two is CFBundleVersion, with a
+    /// yymmddHHMM stamp shortened to its eight-digit mmddHHMM form (2611071810 → 11071810).
+    /// An unstamped build (project.yml default "1") shows "1" here; tools/install-macos.sh refuses those.
+    static func lines(version: String, build: String) -> (version: String, build: String) {
+        let shortBuild = build.count == 10 && build.hasPrefix("26") && build.allSatisfy(\.isNumber)
+            ? String(build.dropFirst(2)) : build
+        return ("v" + version, shortBuild)
+    }
     var foreground: Color? = nil
+    /// Tests pass a fixed version/build; the app reads its own Info.plist.
+    var info: (version: String, build: String)? = nil
     @Environment(\.buildStampVisible) private var visible
     private var hiddenFromAccessibility: Bool {
         #if DEBUG
@@ -40,13 +51,12 @@ struct BuildStamp: View {
         #endif
     }
     var body: some View {
-        if visible, let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
-           let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
-            let shortBuild = build.count == 10 && build.hasPrefix("26") && build.allSatisfy(\.isNumber)
-                ? String(build.dropFirst(2)) : build
+        if visible, let version = info?.version ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
+           let build = info?.build ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
+            let lines = Self.lines(version: version, build: build)
             VStack(alignment: .leading, spacing: 1) {
-                Text(verbatim: "v" + version)
-                Text(verbatim: shortBuild)
+                Text(verbatim: lines.version)
+                Text(verbatim: lines.build)
             }
                 .font(.system(size: 9).monospacedDigit())
                 .foregroundStyle(foreground ?? .secondary)
@@ -86,10 +96,11 @@ enum WideSection: String, CaseIterable, Identifiable {
 }
 
 struct WideBrandHeader: View {
+    var stampInfo: (version: String, build: String)? = nil
     var body: some View {
         HStack(spacing: 8) {
             BrandBar(compact: true)
-            BuildStamp(foreground: B.onSurfaceVariant)
+            BuildStamp(foreground: B.onSurfaceVariant, info: stampInfo)
         }
     }
 }

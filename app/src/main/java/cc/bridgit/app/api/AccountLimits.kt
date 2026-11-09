@@ -68,6 +68,7 @@ object AccountLimits {
     /** What this build enforces on the phone itself. Pure. */
     fun phone(trust: String?): JSONObject = JSONObject()
         .put("captures_per_minute_per_agent", RateLimiter.CAPTURES_PER_AGENT)
+        .put("lan_device_actions_per_minute_per_agent", RateLimiter.DEVICE_ACTIONS_PER_AGENT)
         .put("open_waits_per_agent", 4)
         .put("watches", JSONObject().put("per_agent", WatchRules.MAX_PER_AGENT)
             .put("default_paid_checks_per_hour", WatchRules.maxChecksPerHour(trust))

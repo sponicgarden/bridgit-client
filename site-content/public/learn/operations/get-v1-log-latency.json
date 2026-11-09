@@ -1,0 +1,70 @@
+{
+ "documentation_revision": 126,
+ "api_revision": 144,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "How long API calls take on this device, from receiving the request to sending the response: count, median, p95 and max per API, and the slow calls with the device context they ran in (network, battery, thermal, app build, screen, load). Every transport: HTTP, MCP, relay, cards, schedules and the control server. Kept in memory: the newest 5000 calls, at most 7 days, empty after a restart. Calls you may see follow the log's visibility",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "log_latency",
+  "query": [
+   {
+    "name": "api",
+    "description": "Only this API: its operation name as in openapi.json (e.g. getHealth), or tool <name> / <METHOD> <path> for the control server",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "slow_ms",
+    "description": "A call this slow or slower counts as slow, 1-600000, default 1000",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "Slow calls to return, newest first, 0-200, default 50",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "minutes",
+    "description": "Only calls from the last 1-10080 minutes; default every kept call",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/log/latency?slow_ms=2000",
+  "idempotent": false,
+  "path": "/v1/log/latency",
+  "capability": "log",
+  "returns": "device {name (the Device Domain Name, or null before one is registered), magic_dns}, kept {calls, capacity, max_age_hours, oldest, since_restart}, in_flight, slow_ms, apis[api, method, path, count, errors, median_ms, p95_ms, max_ms, slow] (slowest p95 first), slow_calls[ts, api, method, path, via, request_id, agent, agent_id, duration_ms, outcome (success or error), http, result, bytes_in, bytes_out (0 where not counted), in_flight (calls running when it arrived, itself included), ran_on, context], context_now. context: network {type wifi/cellular/ethernet/other/none, metered}, battery {percent, charging, power_save}, thermal, app {version, build, commit}, screen {on, locked}, listener_ready; sampled at most every 10 s. No parameters, bodies, addresses, location or sensor data",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "minutes": {
+     "description": "Only calls from the last 1-10080 minutes; default every kept call",
+     "type": "integer"
+    },
+    "limit": {
+     "description": "Slow calls to return, newest first, 0-200, default 50",
+     "type": "integer"
+    },
+    "api": {
+     "description": "Only this API: its operation name as in openapi.json (e.g. getHealth), or tool <name> / <METHOD> <path> for the control server",
+     "type": "string"
+    },
+    "slow_ms": {
+     "description": "A call this slow or slower counts as slow, 1-600000, default 1000",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

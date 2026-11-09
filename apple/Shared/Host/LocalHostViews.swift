@@ -1306,10 +1306,25 @@ struct HostSetupSecret: View {
 }
 
 struct HostAgentPermissionDraft {
-    var operations: Set<HostOperation> = [.deviceRead]
+    /// Every grant starts on; the owner unticks what the agent should not have.
+    var operations: Set<HostOperation> = Set(HostOperation.allCases).subtracting([.feedback])
     var applets = Set<String>()
-    var sealed = true
+    /// A0227: relay agents start as connector agents, as on Android. Encrypted requests need the
+    /// agent's own public key, which the owner rarely has, and left Create agent greyed out.
+    var sealed = false
     var peer = ""
+}
+
+/// A long form must scroll on macOS so the buttons under it stay on screen; iOS forms already scroll.
+struct MacFormScroll<Content: View>: View {
+    @ViewBuilder var content: Content
+    var body: some View {
+        #if os(macOS)
+        ScrollView { content.formStyle(.columns) }
+        #else
+        content
+        #endif
+    }
 }
 
 struct HostAgentForm: View {
@@ -1342,7 +1357,7 @@ struct HostAgentForm: View {
     private var selectedGrants: Set<HostOperation> { operations.intersection(grantChoices) }
     @State private var operations: Set<HostOperation> = [.deviceRead]
     @State private var applets = Set<String>()
-    @State private var sealed = true
+    @State private var sealed = false
     @State private var peer = ""
     @State private var maintainedChoices: [[String: Any]] = []
     @State private var choicesProblem: String?
@@ -1353,8 +1368,9 @@ struct HostAgentForm: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Control agent permissions").font(.title2.bold()).accessibilityAddTraits(.isHeader)
             Text(isDirect ? "Only share the direct key with the intended agent on your Tailscale network." :
-                 "Creating an agent saves only the permissions you select. Start host separately when you want this device to accept requests.")
+                 "The agent gets only the permissions you select. Create agent also starts the host so the agent can reach this device through the Bridgit relay.")
                 .font(.callout).foregroundStyle(B.onSurfaceVariant)
+            MacFormScroll {
             Form {
                 if onCreated == nil { TextField("Agent name", text: $name) }
                 else { LabeledContent("Agent name", value: name) }
@@ -1367,8 +1383,11 @@ struct HostAgentForm: View {
                     if sealed { TextField("Agent P-256 public key (base64)", text: $peer).font(.system(.caption, design: .monospaced)) }
                     else { Text("Connector access uses a bearer token and the relay can read requests. Grant only the access you need.").font(.callout).foregroundStyle(B.onSurfaceVariant) }
                 }
-                ForEach(grantChoices, id: \.self) { operation in
-                    Toggle(operation.ownerLabel, isOn: Binding(get: { operations.contains(operation) }, set: { if $0 { operations.insert(operation) } else { operations.remove(operation) } }))
+                // Columns, not one long list, so the whole set fits on screen without scrolling.
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 250), alignment: .leading)], alignment: .leading, spacing: 8) {
+                    ForEach(grantChoices, id: \.self) { operation in
+                        Toggle(operation.ownerLabel, isOn: Binding(get: { operations.contains(operation) }, set: { if $0 { operations.insert(operation) } else { operations.remove(operation) } }))
+                    }
                 }
                 if !selectedGrants.isDisjoint(with: [.workflowsRun, .speechHear, .speechSpeak, .configurationRead, .configurationWrite, .appletsManage, .appletsRead, .appletsWrite, .appletsMediaRead, .appletsMediaWrite]) {
                     ForEach(appletChoices, id: \.id) { item in
@@ -1381,6 +1400,7 @@ struct HostAgentForm: View {
                     if let choicesProblem { Text(choicesProblem).foregroundStyle(B.error) }
                     Text("Flow access can send an applet's photos to cloud models when you have separately enabled appraisals. Existing view links keep their original permissions.").font(.callout).foregroundStyle(B.onSurfaceVariant)
                 }
+            }
             }
             if let problem = host.problem { Text(problem).foregroundStyle(B.error) }
             HStack {
@@ -1398,12 +1418,22 @@ struct HostAgentForm: View {
                                       peer: sealed && !isDirect ? peer.trimmingCharacters(in: .whitespacesAndNewlines) : nil,
                                       ownerDirect: isDirect)
                     if host.oneTimeSetup != nil {
+                        // A0227: a relay agent can reach this device only while the host runs. As on
+                        // Android, creating it turns the host on instead of leaving a second step.
+                        if !isDirect, host.state != .connected, host.state != .connecting { Task { await host.start() } }
                         if let onCreated { onCreated() } else { dismiss() }
                     }
                 }
-            }.buttonStyle(.borderedProminent).disabled(host.creatingAgent || host.busy || name.isEmpty || selectedGrants.isEmpty || (isDirect && host.ownerDirectAddress == nil) ||
+            }.buttonStyle(.borderedProminent).disabled(host.creatingAgent || host.busy || name.isEmpty || selectedGrants.isEmpty ||
                 (!isDirect && sealed && peer.isEmpty) || (!operations.contains(.administrator) && (operations.contains(.workflowsRun) || (!operations.contains(.appletsManage) && !operations.isDisjoint(with: [.appletsRead, .appletsWrite, .appletsMediaRead, .appletsMediaWrite]))) && applets.isEmpty)) }
         }.padding(24)
+        .task {
+            if isDirect, host.ownerDirectAddress == nil {
+                do { try await host.enableConfiguredOwnerDirect() }
+                catch is CancellationError {}
+                catch { host.problem = error.localizedDescription }
+            }
+        }
         .task {
             guard let viewer = local.configuration.viewer, viewer.configuredSignedIn else { return }
             do {
@@ -1413,7 +1443,7 @@ struct HostAgentForm: View {
             } catch { choicesProblem = "Installed library applets could not be loaded. " + error.localizedDescription }
         }
         #if os(macOS)
-        .frame(minWidth: 480, idealWidth: 620, minHeight: 420, idealHeight: 600)
+        .frame(minWidth: 480, idealWidth: 900, minHeight: 420, idealHeight: 560)
         #endif
     }
 }

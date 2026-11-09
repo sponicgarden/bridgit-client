@@ -92,6 +92,8 @@
                     <include android:id="@+id/keep" layout="@layout/settings_row" />
                     <include android:id="@+id/export" layout="@layout/settings_row" />
                     <include android:id="@+id/clear" layout="@layout/settings_row" />
+                    <include android:id="@+id/resourceMonitor" layout="@layout/settings_switch_row" />
+                    <include android:id="@+id/resourceInterval" layout="@layout/settings_row" />
                 </LinearLayout>
 
                 <LinearLayout style="@style/Widget.Bridgit.SettingsSection">

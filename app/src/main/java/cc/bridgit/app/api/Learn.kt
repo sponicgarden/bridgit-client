@@ -34,6 +34,10 @@ object Learn {
     const val DEMO_URL = "$BASE/demo.md"
     const val MCP_URL = "$BASE/mcp.md"
     const val BUGS_URL = "$BASE/bugs.md"
+    /** The connection ladder (A0092): the standard first response when a call to the phone fails. */
+    const val CONNECTION_URL = "$BASE/connection.md"
+    /** Its read-only script, a static file next to it (site-content/public/learn/connection.sh). */
+    const val CONNECTION_SCRIPT_URL = "$BASE/connection.sh"
     const val CONTROL_URL = "$BASE/control.md"
     const val DECISIONS_URL = "$BASE/decisions.md"
     const val EVALUATION_URL = "$BASE/evaluate.md"
@@ -72,6 +76,7 @@ object Learn {
         "learn/mcp.md" to mcp(),
         "learn/control.md" to control(),
         "learn/bugs.md" to bugs(),
+        "learn/connection.md" to connection(),
         "learn/decisions.md" to decisions(),
         "learn/context-services.json" to JSONObject().put("schema","bridgit-context-services/1").put("services",cc.bridgit.app.judgment.ContextCatalog.services()).toString(1) + "\n",
         "learn/playbook.md" to Playbook.build(),
@@ -193,6 +198,7 @@ object Learn {
                 .put("modifying_applets", doc(cc.bridgit.app.applets.AppletEvolution.GUIDE, "Required before modifying personal applets, publishing templates, integrating upgrades, pausing updates or detaching", null))
                 .put("decisions", doc(DECISIONS_URL, "Designing applets with decision models: Jev for text, Clef for photos, sound and video; camera watches and the free on-phone change check that skips paid calls; which route, how to write questions and thresholds, preparing media, cost and limits", null))
                 .put("bugs", doc(BUGS_URL, "File bugs, issues and feature requests directly with Bridgit servers", null))
+                .put("connection", doc(CONNECTION_URL, "When a call to the phone fails: the connection ladder (network, transport, app, auth, capability), one read-only check per layer, a result to paste into a bug report as diagnosis, and a script that runs it ($CONNECTION_SCRIPT_URL)", null))
                 .put("phone_stands", doc(STANDS_URL, "Where to put the phone (pet watch, door, overhead reading, wall or kitchen display, bedside, car) and stands, mounts, cases and cables to hold it, with Amazon links and sizes of common Android phones and tablets; JSON: $STANDS_JSON_URL", null))
                 .put("api_page", doc("$SITE/api/", "The human-readable API page", null)))
             .put("file_a_bug_directly", "POST $FEEDBACK_BACKEND/v1/agents/register {\"name\",\"model\",\"harness\"}, then POST $FEEDBACK_BACKEND/v1/agent/issues with the key it returns. Details: $BUGS_URL")
@@ -495,11 +501,14 @@ Private builds only. Scope `peripherals`.
         appendLine("POST $FEEDBACK_BACKEND/v1/agents/register {\"name\":\"<your agent name>\",\"model\":\"<your model id>\",\"harness\":\"<e.g. Claude Code>\"}")
         appendLine("  -> 201 with key (bgk_...). Keep it secret.")
         appendLine("POST $FEEDBACK_BACKEND/v1/agent/issues  (Authorization: Bearer <bgk_ key>)")
-        appendLine("  {\"kind\":\"bug\"|\"feature\",\"description\",\"agent_info\"?,\"context\"?,\"log\"?,\"images\"?,\"client_issue_id\"?,\"request_autofix\"?,\"no_autofix\"?,\"contacts\"?,\"parent\"?,\"links\"?}")
+        appendLine("  {\"kind\":\"bug\"|\"feature\"|\"applet\",\"description\",\"applet\"?,\"agent_info\"?,\"context\"?,\"diagnosis\"?,\"log\"?,\"images\"?,\"client_issue_id\"?,\"request_autofix\"?,\"no_autofix\"?,\"contacts\"?,\"parent\"?,\"links\"?}")
         appendLine("  client_issue_id: your own positive integer (a number, not a string); sending the same one again returns the first issue with duplicate: true instead of filing twice.")
-        appendLine("GET  $FEEDBACK_BACKEND/v1/agent/issues?waiting=true   (or /v1/agent/issues/{id})")
+        appendLine("  applet (kind applet only, every field optional): {\"name\"?,\"what_it_does\"?,\"devices\"?:[...],\"data_used\"?:[...],\"portal_shows\"?}")
+        appendLine("GET  $FEEDBACK_BACKEND/v1/agent/issues?waiting=true   (or ?kind=applet, or /v1/agent/issues/{id})")
+        appendLine("GET|PUT|PATCH|DELETE $FEEDBACK_BACKEND/v1/agent/issues/{id}/applet  PUT {\"applet\":{...}} replaces it; PATCH {\"applet\":{\"name\":\"...\",\"devices\":null}} merges, null clears a field; DELETE clears it")
         appendLine("POST $FEEDBACK_BACKEND/v1/agent/issues/{id}/verify {\"verdict\":\"works\"|\"still_broken\"|\"unverified\",\"tested_version\",\"note\"}")
         appendLine("POST $FEEDBACK_BACKEND/v1/agent/issues/{id}/request-autofix {\"note\"?}")
+        appendLine("GET|PUT|DELETE $FEEDBACK_BACKEND/v1/agent/issues/{id}/diagnosis  PUT {\"diagnosis\":[{\"layer\",\"outcome\",\"target\"?,\"ms\"?,\"detail\"?,\"at\"?}]}")
         appendLine("GET|POST $FEEDBACK_BACKEND/v1/agent/issues/{id}/contacts  {\"kind\":\"email\",\"email\"} | {\"kind\":\"webhook\",\"url\",\"format\"?:\"json\"|\"slack\"|\"discord\"}, \"notify_on\"?")
         appendLine("GET|PATCH|DELETE $FEEDBACK_BACKEND/v1/agent/issues/{id}/contacts/{cid}  PATCH {\"notify_on\"?,\"paused\"?,\"url\"?}")
         appendLine("POST $FEEDBACK_BACKEND/v1/agent/issues/{id}/contacts/{cid}/rotate-secret | test | resend-confirmation")
@@ -522,10 +531,75 @@ Private builds only. Scope `peripherals`.
         appendLine()
         appendLine("## Rules")
         appendLine()
+        appendLine("- A call to the phone failed or got no answer? Run the connection ladder first ($CONNECTION_URL) and send its per-layer results as `diagnosis`; start the description with the layer that failed (\"Failing layer: transport\"). The issue then shows `failing_layer`. The same layer names apply to any automatic error log.")
         appendLine("- One bug report per problem; include the `request_id` of the failing call. Add `\"no_autofix\":true` when it needs a person, or `\"request_autofix\":true` (or `POST .../request-autofix` later) to ask for an automatic fix. That is a request, not a promise: the team's switches, review, tests and budget decide.")
         appendLine("- When an issue is `waiting_for_retest`, install `fixed_in` or later, re-run the repro, then verify. Never tell anyone something is fixed until a re-test says `works`. " +
             "`unverified` means you couldn't test it, not a guess at `still_broken`.")
         appendLine("- Issues never carry your Bridgit key, or anything private the owner hasn't agreed to share.")
+    }
+
+    /** The connection ladder (A0092): published at [CONNECTION_URL], so it is readable when the phone is not. */
+    fun connection(): String = buildString {
+        val target = "<ip>:<port>"
+        appendLine("# When a call fails: the connection ladder")
+        appendLine()
+        appendLine("Run this whenever a call to a Bridgit phone fails or gets no answer, before retrying, guessing or filing a bug. " +
+            "\"curl: http=000\" can mean the phone is off the tailnet, its Tailscale stopped, Bridgit isn't running, or Bridgit is running but stuck: four different problems with four different fixes. " +
+            "Check one layer at a time, from the bottom up, and stop at the first one that fails: that is where the connection is broken. Every check is read-only and cheap; none captures anything or changes a setting.")
+        appendLine()
+        appendLine("Script: $CONNECTION_SCRIPT_URL runs layers 1 to 4 and prints one result per layer " +
+            "(`HOST=<phone Tailscale IP> PORT=<port> HDR=<your header file> sh connection.sh`; it needs curl, and `tailscale` for layer 1). It sends your key only to the phone and never prints it.")
+        appendLine()
+        appendLine("## The layers")
+        appendLine()
+        appendLine("| # | Layer | Question | Check | Fails as |")
+        appendLine("|---|---|---|---|---|")
+        appendLine("| 1 | `network` | Is the phone on the tailnet? | `tailscale ping -c 1 --timeout 5s <ip>` (or the peer's Online in `tailscale status --json`) | `off_tailnet` (no matching peer), `peer_offline` (listed, no pong) |")
+        appendLine("| 2 | `transport` | Does anything accept TCP on the Bridgit port? | `curl -s -o /dev/null -m 5 -w '%{time_connect}' http://$target/`; exit 7 = refused, exit 28 with time_connect 0 = no TCP answer | `refused` (phone up, nothing listening), `timeout`, `no_route` |")
+        appendLine("| 3 | `app` | Does Bridgit answer `GET /v1/health`, how fast? | `curl -s -m 10 -H @<header file> -w '%{http_code} %{time_total}' http://$target/v1/health` | `no_answer` (connected, no reply: wedged), `http_5xx` (up but erroring), `not_bridgit` |")
+        appendLine("| 4 | `auth` | Is it the key? | If health answered 401 or 403, call it once more without the header and compare | `key_rejected` (401 with and without the key: wrong or revoked), `api_access_off` (403, reason api_access_off), `email_required` |")
+        appendLine("| 5 | `capability` | Health is green but the real call failed: can this feature act? | `GET /v1/capabilities` (`agent_allowed`, `enabled`, `ready`, `blocked_reason`), then `GET /v1/log?agent=me` for the failed `request_id`. Repeat the action only if the owner asked for it. | `not_allowed`, `disabled`, `not_ready`, `action_failed` (with the error code) |")
+        appendLine()
+        appendLine("What each result tells the owner:")
+        appendLine("- `network` fails: the phone is off the tailnet. Its Tailscale may be stopped (a Play update can stop it; Bridgit asks it to reconnect on its own), or the phone is off or asleep. Ask the owner to open Tailscale on the phone. Not on the tailnet yourself? Ask for More → Relay setup.")
+        appendLine("- `transport` fails with `refused`: the phone is reachable but Bridgit isn't listening. Bridgit is stopped or paused, or still rebinding after the address changed. Ask the owner to open Bridgit; it starts listening by itself.")
+        appendLine("- `transport` fails with `timeout` while `network` passed: the address or port is wrong (compare `base_url` from your last health), or the phone's Tailscale stopped between the two checks.")
+        appendLine("- `app` fails: Bridgit accepted the connection but didn't answer in time (`no_answer`) or answered with an error. Wait 30 s and repeat once; then file a bug with the `request_id` if any.")
+        appendLine("- `auth` fails: the app is fine; your key isn't. Don't retry with the same key: ask the owner to check the agent under Agents, or to pair you again.")
+        appendLine("- `capability` fails: the connection is fine; that one feature can't act. Name it (its `title`) and `blocked_reason` to the owner.")
+        appendLine()
+        appendLine("## What health says about the listener")
+        appendLine()
+        appendLine("Bridgit listens only on the phone's Tailscale addresses, never on the LAN, so \"reachable on Wi-Fi\" does not mean reachable for agents. " +
+            "`GET /v1/health` has a `listener` block: `state` (`listening`, `rebinding`, `waiting_for_tailscale`, `bind_failed` or `stopped`), `binds` (`tailscale`), `bound_to` and `port`, `tailscale_addresses` (what the phone has right now), `on_tailnet`, `tailscale_installed`, `magic_dns` and `bind_error`. " +
+            "`bound_to` differing from `tailscale_addresses` means Bridgit is moving to a new address: use the new one in a few seconds. Read over the relay, the block tells you whether the Tailscale side is down while the app is fine.")
+        appendLine()
+        appendLine("## Over the relay")
+        appendLine()
+        appendLine("No tailnet: layer 1 is `GET <relay address>/quota` (it answers without using a job; 401 means your `rly_` token, which is `auth`). " +
+            "Layer 2 is a `POST <relay address>/jobs?wait=30` for `GET /v1/health`: `phone_unreachable`, or a `202` that never completes, means the phone's relay connection is down. Layer 3 is that job's answer, and its `listener` block as above.")
+        appendLine()
+        appendLine("## The result to record and file")
+        appendLine()
+        appendLine("One JSON object per layer you ran, in order:")
+        appendLine()
+        appendLine("```")
+        appendLine("{\"layer\": \"network|transport|app|auth|capability\", \"outcome\": \"pass|fail|skip\", \"target\": \"<phone ip>:8734\", \"ms\": 41, \"detail\": \"refused: nothing listens on port 8734\", \"at\": \"2026-11-08T16:41:00Z\"}")
+        appendLine("```")
+        appendLine()
+        appendLine("`skip` is for a layer you couldn't run (no `tailscale` command, userspace networking) or didn't need after an earlier failure. Start `detail` with the failure word from the table. Never put your key, a token or the owner's data in a result.")
+        appendLine("Filing a bug (${BUGS_URL}): send the results as `\"diagnosis\": [ ... ]` with `POST $FEEDBACK_BACKEND/v1/agent/issues`, and begin the description with \"Failing layer: <layer>\". " +
+            "The issue then reports `failing_layer` (the first layer that failed; `none` if none failed). Fix or extend them later with `PUT $FEEDBACK_BACKEND/v1/agent/issues/{id}/diagnosis`; `DELETE` clears them. Keys and tokens are removed before they are stored.")
+        appendLine()
+        appendLine("## Example")
+        appendLine()
+        appendLine("8 Nov 2026: every route to a Pixel answered http=000. Layer 1 passed (`tailscale status` listed the phone at its address) while nothing answered on the Bridgit port: the break was on the phone's app side, not the device or the network. The owner confirmed Bridgit wasn't running.")
+        appendLine()
+        appendLine("```")
+        appendLine("[{\"layer\":\"network\",\"outcome\":\"pass\",\"target\":\"pixel-10-pro-xl <phone ip>\",\"detail\":\"listed in tailscale status\"},")
+        appendLine(" {\"layer\":\"transport\",\"outcome\":\"fail\",\"target\":\"<phone ip>:8734\",\"detail\":\"timeout: http=000 on every route\"},")
+        appendLine(" {\"layer\":\"app\",\"outcome\":\"skip\"}, {\"layer\":\"auth\",\"outcome\":\"skip\"}]")
+        appendLine("```")
     }
 
     /**
@@ -842,6 +916,10 @@ Record 20 seconds with `POST /v1/camera/video` and `extract_frames:6` to get six
         appendLine("## Placing the phone")
         appendLine()
         appendLine("- [Stands and mounts]($STANDS_URL): where to put the phone for each kind of job, and stands, mounts, cases and cables to hold it there, with links and the sizes of common Android phones and tablets ([JSON]($STANDS_JSON_URL), [page]($SITE/phonestands/))")
+        appendLine()
+        appendLine("## When a call fails")
+        appendLine()
+        appendLine("- [The connection ladder]($CONNECTION_URL): the standard first response when a call to the phone fails. Check network, transport, app, auth and capability in turn, each read-only, and send the per-layer results with a bug report as `diagnosis` ([script]($CONNECTION_SCRIPT_URL))")
         appendLine()
         appendLine("## Bugs and feature requests")
         appendLine()

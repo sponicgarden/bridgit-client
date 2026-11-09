@@ -1,9 +1,9 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
-  "summary": "Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
+  "summary": "Register this Bridgit's two names in one step on the first control call (Device Domain Name + friendly name), or change its friendly name, label or visibility; the domain name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
   "method": "POST",
   "auth": true,
   "mcp_tool": "owner_configuration_name_post",
@@ -15,6 +15,12 @@
    {
     "name": "name",
     "description": "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "friendly_name",
+    "description": "Required when registering (unless the owner already named this phone): up to 40 characters, any style, unique among the owner's devices; displayed nearly everywhere, never public. Also changes it later",
     "type": "string",
     "required": false
    },
@@ -34,11 +40,11 @@
     "required": false
    }
   ],
-  "example": "POST /v1/owner/configuration/name {\"name\":\"kitchen-tab\"}",
+  "example": "POST /v1/owner/configuration/name {\"name\":\"kitchen-tab\",\"friendly_name\":\"Kitchen tablet\"}",
   "idempotent": true,
   "path": "/v1/owner/configuration/name",
   "capability": "owner_features",
-  "returns": "status,name,label,visible; 409 name_taken (lookup) means suggest another; 409 already_named means the name is fixed",
+  "returns": "status,name,friendly_name,needs_friendly_name,label,visible; 409 name_taken (lookup) means suggest another domain name; 409 friendly_name_taken (held_by) means another friendly name; 409 already_named means the name is fixed",
   "mcp_input_schema": {
    "type": "object",
    "properties": {
@@ -48,6 +54,10 @@
     },
     "name": {
      "description": "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served",
+     "type": "string"
+    },
+    "friendly_name": {
+     "description": "Required when registering (unless the owner already named this phone): up to 40 characters, any style, unique among the owner's devices; displayed nearly everywhere, never public. Also changes it later",
      "type": "string"
     },
     "idempotency_key": {

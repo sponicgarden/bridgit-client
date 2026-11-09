@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "One kept capture: from memory, or from its phone file after memory let it go; optional max_edge_px returns a bounded image preview",

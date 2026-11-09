@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "From an installed applet's own card: discover only its declared tables, typed columns and descriptions. Control agents inspect applets with /applets/installed/{id}/data",

@@ -279,7 +279,16 @@ class AgentPlatform(val app: BridgeApp) {
     }
     private fun commandScope(command:String,args:JSONObject) = if(command=="device.action") DeviceTools.scopeFor(args.optString("type")) else Commands.scope(command)
     private fun publicSession(record: JSONObject): JSONObject = PlatformStore.copy(record).apply { remove("credential_hash") }
-    fun publicOperation(op: JSONObject): JSONObject = PlatformStore.copy(op).apply { remove("input"); remove("identity"); remove("digest"); remove("credential_hash") }
+    fun publicOperation(op: JSONObject): JSONObject = PlatformStore.copy(op).apply { remove("input"); remove("identity"); remove("digest"); remove("credential_hash")
+        if(optString("status")=="awaiting_owner") put("approval",approvalHint(app.granted(android.Manifest.permission.POST_NOTIFICATIONS),optLong("expires_at"))) }
+    /** Tells the agent where the owner approves a waiting operation, so it can direct them (A0145). */
+    fun approvalHint(notificationShown: Boolean, expiresAt: Long): JSONObject = JSONObject()
+        .put("where",if(notificationShown) "A Bridgit notification on the owner's phone titled with this agent's name opens the review. Or open Bridgit, More, Agent permissions, and tap the request under Questions and approvals."
+            else "Notifications are off for Bridgit, so no notification was posted. The owner opens Bridgit, More, Agent permissions, and taps the request under Questions and approvals.")
+        .put("notification_posted",notificationShown)
+        .put("screen","More > Agent permissions > Questions and approvals")
+        .put("expires_at",expiresAt)
+        .put("note","Waiting for the owner is not success. Tell the owner exactly where to tap; poll operation.get until it is no longer awaiting_owner.")
     suspend fun read(agent: String,command: String,args: JSONObject,credential:String?=null): JSONObject {
         if(credential!=null && getAgent(agent).hash!=credential) throw ApiError(401,"unauthorized","Key was rotated")
         app.alerts.checkAgentCall(exempt = command in cc.bridgit.app.alerts.EmailGate.EXEMPT_TOOLS)

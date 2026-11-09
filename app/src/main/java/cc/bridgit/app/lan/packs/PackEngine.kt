@@ -86,6 +86,29 @@ object PackEngine {
         return Bound(location, controls, identity, clean(childText(device, "modelName")), clean(childText(device, "friendlyName")))
     }
 
+    /** Body fields of POST /v1/lan/devices/action that are never action parameters. */
+    val RESERVED_BODY = setOf("device", "action", "channel", "params")
+
+    /**
+     * A0212: an action's parameters from a POST /v1/lan/devices/action body. They may be nested in `params`
+     * ({"params":{"level":25}}) or sent beside device and action ({"level":25}); only the action's own declared
+     * names are taken from the top level, so other body fields stay ignored. The same name in both places with
+     * different values is refused rather than guessed.
+     */
+    fun gather(action: DevicePack.Action?, body: JSONObject): JSONObject {
+        val nested = if (!body.has("params") || body.isNull("params")) JSONObject()
+            else body.get("params") as? JSONObject ?: throw PackError("params must be an object.", false)
+        val out = JSONObject(nested.toString())
+        action?.params?.forEach { p ->
+            if (p.name in RESERVED_BODY || !body.has(p.name)) return@forEach
+            val v = body.get(p.name)
+            if (out.has(p.name) && out.get(p.name).toString() != v.toString())
+                throw PackError("${p.name} is given twice with different values; send it once, at the top level or in params.", false)
+            out.put(p.name, v)
+        }
+        return out
+    }
+
     /** The action's parameters as text for the templates, checked against the pack's types. */
     fun params(action: DevicePack.Action, given: JSONObject): Map<String, String> {
         val unknown = given.keys().asSequence().filter { k -> action.params.none { it.name == k } }.toList()

@@ -401,6 +401,9 @@
     <string name="link_it_uses">It uses this %1$s: %2$s</string>
     <string name="link_state_waiting">waiting</string>
     <string name="link_state_paused">paused</string>
+    <string name="link_state_on">on</string>
+    <string name="link_state_off">off</string>
+    <string name="link_diagram_a11y">%1$s to %2$s: %3$s</string>
     <string name="link_service_camera">camera</string>
     <string name="link_service_mic">microphone</string>
     <string name="link_service_speaker">speaker</string>

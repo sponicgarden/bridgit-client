@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import cc.bridgit.app.feedback.FeedbackStatusSync
+import cc.bridgit.app.feedback.OwnerFeedbackCounts
 import cc.bridgit.app.portal.LinkedDeviceCounts
 import cc.bridgit.app.portal.PortalPairing
 import cc.bridgit.app.portal.PortalLinks
@@ -95,7 +96,11 @@ class MoreFragment : Fragment() {
                 (requireActivity().application as BridgeApp).feedback.changed.collect { refreshSummaries() }
             }
         }
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { FeedbackStatusSync.freshen(requireActivity().application as BridgeApp) }
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val app = requireActivity().application as BridgeApp
+            FeedbackStatusSync.freshen(app)
+            if (OwnerFeedbackCounts.refresh(app)) withContext(Dispatchers.Main) { if (_b != null) refreshSummaries() }
+        }
         row(b.whatCan, R.drawable.feedback_ic_lightbulb, R.string.more_what_can) { findNavController().navigate(R.id.whatCan) }
         b.search.doAfterTextChanged { renderSearch() }
         b.searchContainer.post {
@@ -172,10 +177,17 @@ class MoreFragment : Fragment() {
     private suspend fun refreshSummaries() {
         val app = requireActivity().application as BridgeApp
         val summaries = withContext(Dispatchers.IO) { listOf(IssueKind.BUG, IssueKind.FEATURE).map { app.feedback.summary(it) } }
+        // A0170: the headline is the owner's total across all their devices, each device's own counts underneath.
+        val owner = withContext(Dispatchers.IO) { OwnerFeedbackCounts.cached(app) }
         val bb = _b ?: return
-        for ((row, counts) in listOf(bb.reportBug to summaries[0], bb.requestFeature to summaries[1])) {
-            row.metrics.text = getString(R.string.more_issue_metrics, counts.first, counts.second)
-            row.metrics.contentDescription = getString(R.string.more_issue_metrics_cd, row.title.text, counts.first, counts.second)
+        for ((row, kind, local) in listOf(Triple(bb.reportBug, IssueKind.BUG, summaries[0]), Triple(bb.requestFeature, IssueKind.FEATURE, summaries[1]))) {
+            val mine = OwnerFeedbackCounts.Counts(local.first, local.second)
+            val total = OwnerFeedbackCounts.total(owner, kind, mine)
+            val perDevice = OwnerFeedbackCounts.breakdown(owner, kind, mine)
+            val headline = getString(R.string.more_issue_metrics, total.filed, total.fixed)
+            row.metrics.text = if (perDevice == null) headline else getString(R.string.more_issue_metrics_owner, headline, perDevice)
+            row.metrics.contentDescription = getString(R.string.more_issue_metrics_cd, row.title.text, total.filed, total.fixed) +
+                (perDevice?.let { " " + getString(R.string.more_issue_metrics_devices_cd, it) } ?: "")
         }
         val hubInfo = app.hubLinks.hubs().associateBy { it.linkId }
         val counts = LinkedDeviceCounts.count(

@@ -181,7 +181,7 @@ class AddAgentViewModel(application: Application) : AndroidViewModel(application
         // A callback set for this agent: the prompt carries its existing secret (EVT-06), never a new one.
         val callback = agentId?.let { id -> app.callbacks.get(id)?.let { app.callbacks.secret(id) } }
         val agent = agentId?.let { app.agents.get(it) }
-        prompt = SetupPrompt.build(name, k, connection, address, deviceModel(), app.registry.caps(), helper, callback) {
+        prompt = SetupPrompt.build(name, k, connection, address, deviceModel(), app.registry.caps(), helper, callback, identity(app)) {
             agent?.allows(it) == true
         }
     }
@@ -203,6 +203,9 @@ class AddAgentViewModel(application: Application) : AndroidViewModel(application
                     .getOrDefault(false)
             }
         }) ?: return null
+        // No cached domain name (never named, or settings cleared): ask Bridgit once so the prompt names a named device.
+        if (cc.bridgit.app.feedback.DeviceNames.cached(app) == null)
+            withContext(Dispatchers.IO) { runCatching { cc.bridgit.app.feedback.DeviceNames.refresh(app) } }
         buildPrompt(address)
         return Export(prompt ?: return null, SetupPrompt.qrPayload(name, k, address))
     }
@@ -243,6 +246,20 @@ class AddAgentViewModel(application: Application) : AndroidViewModel(application
 
     companion object {
         const val NO_CALL_MS = 10 * 60 * 1000L
+
+        /**
+         * The prompt's IDENTITY block (A0213): the Device Domain Name the phone has cached from Bridgit, the friendly
+         * name (the name record's label, else the phone's own name), the model and the owner email as health shows it.
+         */
+        fun identity(app: BridgeApp): cc.bridgit.app.api.DeviceIdentity {
+            val own = cc.bridgit.app.feedback.DeviceNames.cached(app)
+            val domain = own?.optString("name")?.takeIf { it.isNotBlank() }
+            val label = own?.optString("label")?.takeIf { own.opt("label") is String && it.isNotBlank() }
+            val email = cc.bridgit.app.alerts.EmailGate.mask(app.settings.alertEmail)
+            val verified = runCatching { app.alerts.gate().status == cc.bridgit.app.alerts.EmailGate.Status.VERIFIED }.getOrDefault(false)
+            return cc.bridgit.app.api.DeviceIdentity(domain, label ?: cc.bridgit.app.platform.DeviceName.of(app), deviceModel(),
+                email?.let { "$it (${if (verified) "verified" else "not verified yet"})" })
+        }
 
         /** "Google Pixel 10 Pro XL"; just the model if it already names the maker. */
         fun deviceModel(): String {

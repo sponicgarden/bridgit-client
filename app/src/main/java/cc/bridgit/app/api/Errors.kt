@@ -71,6 +71,8 @@ object ErrorCatalog {
         Entry(403, "forbidden", "Not allowed for this agent (`reason`, for example `fixer_mode_off` or `super_powers_off`: the owner hasn't given you Bridgit Fixer Mode or Agent Super Powers; `agent_paused`: the owner paused you)", "Don't retry; for `agent_paused`, wait until the owner resumes you"),
         Entry(409, "in_progress", "Same `Idempotency-Key` still running", "Wait, then retry with the same key"),
         Entry(409, "conflict", "The interaction isn't in a state for this (for example a text panel that's closed or finished)", "Read it with GET /v1/interactions/{id}; start a new one if needed"),
+        Entry(409, "friendly_name_taken", "Another of this owner's devices already has that friendly name (`friendly_name`, `held_by`)", "Pick a different friendly name; nothing was registered"),
+        Entry(400, "friendly_name_required", "Registering a Device Domain Name also needs the friendly name, in the same step", "Send friendly_name (up to 40 characters, any style) with name"),
         Entry(409, "name_taken", "That Device Domain Name belongs to another Bridgit (`lookup`)", "Suggest another name; don't retry unchanged"),
         Entry(409, "already_named", "This Bridgit already has its Device Domain Name for good (`name`)", "Use that name; change only label or visible"),
         Entry(409, "idempotency_expired", "Same `Idempotency-Key` already done, but its media result is no longer replayed (15 min)", "Don't repeat; use a new key only if you really want a new capture"),

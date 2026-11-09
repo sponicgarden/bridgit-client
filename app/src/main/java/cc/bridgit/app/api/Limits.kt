@@ -42,6 +42,15 @@ class RateLimiter(private val clock: () -> Long = System::currentTimeMillis, pri
         const val AUTH_FAILS_PER_IP = 5          // SEC-06
         const val CAPTURES_PER_AGENT = 10        // SEC-07
         const val CAPTURES_PER_IP = 30           // SEC-07
+        const val DEVICE_ACTIONS_PER_AGENT = 30  // A0212: POST /v1/lan/devices/action has its own bucket
+        const val DEVICE_ACTIONS_PER_IP = 60     // A0212
+
+        /** One SEC-07 bucket: key prefix, per-agent and per-address limits, and what the rate_limited message calls a hit. */
+        data class Bucket(val key: String, val perAgent: Int, val perIp: Int, val noun: String)
+        val CAPTURES = Bucket("cap", CAPTURES_PER_AGENT, CAPTURES_PER_IP, "captures")
+        val DEVICE_ACTIONS = Bucket("lan", DEVICE_ACTIONS_PER_AGENT, DEVICE_ACTIONS_PER_IP, "LAN device actions")
+        /** A0212: LAN device control doesn't share the captures bucket or its wording. */
+        fun bucket(capability: String) = if (capability == "lan_control") DEVICE_ACTIONS else CAPTURES
         const val NOTES_PER_AGENT = 60           // LOG-11
         const val SATELLITE_CALLS_PER_AGENT = 60 // SAT-37: forwarded calls per minute, per hub agent
     }

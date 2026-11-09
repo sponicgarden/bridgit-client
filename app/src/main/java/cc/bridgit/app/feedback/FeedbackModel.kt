@@ -3,10 +3,71 @@ package cc.bridgit.app.feedback
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** Issue kind: a bug or a feature request (section 11). Copied in concept from the Spotka reporter (D14). */
+/**
+ * Issue kind: a bug, a feature request, or an applet request (A0178: a new applet, with its portal
+ * page, to be built) (section 11). Copied in concept from the Spotka reporter (D14).
+ */
 enum class IssueKind(val id: String) {
-    BUG("bug"), FEATURE("feature");
-    companion object { fun of(id: String?) = values().firstOrNull { it.id == id } }
+    BUG("bug"), FEATURE("feature"), APPLET("applet");
+    /** Features and applet requests are always held for a person: they never ask for automatic repair. */
+    val alwaysHeld get() = this != BUG
+    companion object {
+        fun of(id: String?) = values().firstOrNull { it.id == id }
+        /** For error messages: "bug, feature or applet". */
+        val names = values().map { it.id }.let { it.dropLast(1).joinToString() + " or " + it.last() }
+    }
+}
+
+/**
+ * A0178: what an applet request asks for. Every field is optional; strings are trimmed and empty
+ * ones dropped. Same bounds as the Bridgit team's backend (bridgit-cloud feedback Worker).
+ */
+object AppletRequest {
+    const val NAME = 120
+    const val WHAT_IT_DOES = 2000
+    const val PORTAL_SHOWS = 2000
+    const val DEVICE = 80
+    const val DEVICES = 10
+    const val DATA_ITEM = 120
+    const val DATA_USED = 20
+    val FIELDS = listOf("name", "what_it_does", "devices", "data_used", "portal_shows")
+
+    /**
+     * The stored form of [raw], or null when it holds nothing. Throws [FeedbackError] when [raw] is
+     * sent with a kind other than applet, has an unknown field, or breaks a bound.
+     */
+    fun normalize(kind: IssueKind, raw: JSONObject?): JSONObject? {
+        if (raw == null) return null
+        if (kind != IssueKind.APPLET) throw FeedbackError("invalid_parameter", "applet is only for kind applet.")
+        raw.keys().forEach { if (it !in FIELDS) throw FeedbackError("invalid_parameter", "applet.$it is not a field; use ${FIELDS.joinToString()}.") }
+        val out = JSONObject()
+        fun text(key: String, max: Int) {
+            if (!raw.has(key) || raw.isNull(key)) return
+            val t = (raw.get(key) as? String ?: throw FeedbackError("invalid_parameter", "applet.$key must be text.")).trim()
+            if (t.length > max) throw FeedbackError("invalid_parameter", "applet.$key is limited to $max characters.")
+            if (t.isNotEmpty()) out.put(key, t)
+        }
+        fun list(key: String, maxItems: Int, maxEach: Int) {
+            if (!raw.has(key) || raw.isNull(key)) return
+            val a = raw.get(key) as? JSONArray ?: throw FeedbackError("invalid_parameter", "applet.$key must be a list of text.")
+            val items = (0 until a.length()).map { i ->
+                val t = (a.get(i) as? String ?: throw FeedbackError("invalid_parameter", "applet.$key must be a list of text.")).trim()
+                if (t.length > maxEach) throw FeedbackError("invalid_parameter", "Each item of applet.$key is limited to $maxEach characters.")
+                t
+            }.filter { it.isNotEmpty() }
+            if (items.size > maxItems) throw FeedbackError("invalid_parameter", "applet.$key holds up to $maxItems items.")
+            if (items.isNotEmpty()) out.put(key, JSONArray(items))
+        }
+        text("name", NAME)
+        text("what_it_does", WHAT_IT_DOES)
+        list("devices", DEVICES, DEVICE)
+        list("data_used", DATA_USED, DATA_ITEM)
+        text("portal_shows", PORTAL_SHOWS)
+        return out.takeIf { it.length() > 0 }
+    }
+
+    /** "a, b, c" from the form into a list, empty parts dropped. */
+    fun split(text: String): JSONArray = JSONArray(text.split(',').map { it.trim() }.filter { it.isNotEmpty() })
 }
 
 /** Issue statuses (FBK-09, FBK-11a). */
@@ -127,6 +188,8 @@ data class Issue(
     val remoteId: Long? = null,
     val uploadedAt: Long = 0,
     val uploadError: String? = null,
+    /** A0178: what an applet request asks for ([AppletRequest]); null for bugs and features. */
+    val applet: JSONObject? = null,
 ) {
     /**
      * The team-wide number, e.g. M0023 (the owner's form) or A0023 (an agent), once the Bridgit team

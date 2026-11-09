@@ -106,7 +106,6 @@
     <string name="linked_role_view_only">View-only satellite</string>
     <string name="linked_role_this">This %1$s</string>
     <string name="linked_close">Close</string>
-    <string name="linked_home_now">Home now shows %1$s</string>
     <string name="linked_hub_satellite">This %1$s is its satellite.</string>
     <string name="linked_hub_waiting">It hasn\'t sent its Home yet. Make sure the hub is on and has the latest Bridgit; it checks in every 5 minutes.</string>
     <string name="linked_viewer_body">Views this %1$s\'s Home through Bridgit. Read-only.</string>
@@ -193,9 +192,7 @@
     <string name="linked_view_only_part">(%1$d view-only)</string>
     <string name="linked_this_satellite_of">Satellite of %1$s.</string>
     <string name="linked_this_view_only_of">View-only satellite of %1$s.</string>
-    <string name="linked_view">View</string>
-    <string name="linked_view_this_caption">Opens this %1$s\'s Home.</string>
-    <string name="linked_view_hub_caption">Opens this hub\'s Home.</string>
+    <string name="linked_view">Open its Home</string>
     <string name="linked_hub_view_only">This %1$s is its view-only satellite.</string>
     <string name="linked_hub_uses">Uses its %1$s and %2$s.</string>
     <string name="linked_updated_ago">Updated %1$s</string>

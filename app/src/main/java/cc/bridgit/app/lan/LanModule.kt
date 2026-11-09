@@ -111,7 +111,7 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
             authorize(this)
             val packs = DevicePackStore.get(app)
             Reply.Json(JSONObject().put("devices", JSONArray(app.lanDevices.all().filter { it.agentId == agent!!.id }.map { d ->
-                if (d.adapter in LanRules.adapters) d.publicJson() else d.publicJson(packs.installed(d.adapter)?.actions?.map { it.name }.orEmpty()) }))
+                if (d.adapter in LanRules.adapters) d.publicJson() else d.publicJson(packs.installed(d.adapter)) }))
                 .put("adapters", adapterSchemas(packs)).put("device_packs", PACKS.fullPath).put("camera_inventory", "/v1/lan-cameras"))
         }
         lanEndpoint(ACTION_LOG) {
@@ -213,7 +213,7 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
             val req = this
             val op = lanOp(req, "action", body.optString("action").ifEmpty { null }, (body.opt("channel") as? Number)?.toInt() ?: 0,
                 JSONObject().put("device", body.optString("device")).put("action", body.optString("action"))
-                    .put("channel", body.opt("channel") ?: JSONObject.NULL).put("params", body.opt("params") ?: JSONObject.NULL))
+                    .put("channel", body.opt("channel") ?: JSONObject.NULL).put("params", loggedParams(body)))
             knownDevice(op, body.optString("device"), agent?.id)
             logged(op) { operation(req) { lan ->
                 val d = owned(body.getString("device"), agent!!.id); lan.check(d.host)
@@ -224,10 +224,9 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
                 }
                 val isPack = d.adapter !in LanRules.adapters
                 if (!isPack) LanRules.validateAction(d.adapter, action, channel)
-                val params = if (!body.has("params")) JSONObject() else body.get("params") as? JSONObject
-                    ?: throw PackEngine.PackError("params must be an object.", false)
+                val params = PackEngine.gather(null, body)
                 if (!isPack && params.length() > 0) throw PackEngine.PackError("This adapter's actions take no params.", false)
-                val result = if (isPack) runPack(req, lan, d, action, params, op)
+                val result = if (isPack) runPack(req, lan, d, action, body, op)
                 else if (d.adapter == "tapo_onvif") {
                     val c = LanCamera("lan:probe", d.name, d.host, d.username, d.password)
                     cameraAuthorized(req)
@@ -242,9 +241,10 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
      * (it moved port after a restart) Bridgit finds it again by SSDP, checks it is the same device (UDN), saves the
      * new addresses and retries once. A timeout is not retried: the outcome is unknown.
      */
-    private fun runPack(req: Req, lan: HostLan, d: LanDevice, action: String, params: JSONObject, op: LanActionLog.Op): JSONObject {
+    private fun runPack(req: Req, lan: HostLan, d: LanDevice, action: String, body: JSONObject, op: LanActionLog.Op): JSONObject {
         val packs = DevicePackStore.get(app)
         val pack = packs.pack(d.adapter)
+        val params = PackEngine.gather(pack.action(action), body)
         val net = LanPackNet(lan) { owned(d.id, req.agent!!.id); authorize(req) }
         fun rebind(): PackEngine.Bound {
             val b = PackEngine.bind(pack, d.host, net)
@@ -265,6 +265,14 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
         if (d.extra.optString("pack_version") != pack.version && bound === stored)
             app.lanDevices.save(d.with(JSONObject(d.extra.toString()).put("pack_version", pack.version)))
         return out.put("pack", pack.id).put("pack_version", pack.version)
+    }
+    /** The action's parameters for the outlet log: params plus any top-level ones (A0212: both are accepted). */
+    private fun loggedParams(body: JSONObject): Any {
+        val flat = body.keys().asSequence().filter { it !in PackEngine.RESERVED_BODY }.toList()
+        if (flat.isEmpty()) return body.opt("params") ?: JSONObject.NULL
+        val out = (body.opt("params") as? JSONObject)?.let { JSONObject(it.toString()) } ?: JSONObject()
+        flat.forEach { if (!out.has(it)) out.put(it, body.get(it)) }
+        return out
     }
     /** Names the device in the log before the operation starts, when it is this agent's enrollment. */
     private fun knownDevice(op: LanActionLog.Op, id: String, agentId: String?) {
@@ -314,7 +322,7 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
             body = listOf(Param("hosts", "array", "Optional literal private IPv4 targets, at most 254; no other networks"), Param("subnet", "boolean", "Probe the direct /24.. /30 subnet on TCP 80,443,554,2020; default false")),
             example = "POST /v1/lan/discover {\"hosts\":[\"192.168.1.1\"]}", returns = "network, total_devices, total_categories, categories[id,title,count,device_ids], devices[id,name,type,category,model,identifier,services,brand,verified=false,enrolled=false], observations, methods, limits, complete=false; untrusted partial observations, never a complete online inventory")
         val INVENTORY = EndpointSpec("GET", "/lan/devices", "lan_control", "This agent's enrolled devices and adapter/action schemas",
-            example = "GET /v1/lan/devices", returns = "devices[id,name,host,adapter,enrolled,verified_at,availability=not_checked,actions], adapters; no credentials, no probe")
+            example = "GET /v1/lan/devices", returns = "devices[id,name,host,adapter,enrolled,verified_at,availability=not_checked,actions[action,method,path,body,params]], adapters; device-pack actions list params[name,type,required,min,max|max_length] (empty when none) and their body carries example params; no credentials, no probe")
         val ENROLL = EndpointSpec("POST", "/lan/devices/enroll", "lan_enrollment", "Verify a supported device with authorized credentials and enroll it for this agent", capture = true, idempotent = true,
             body = listOf(Param("host", "string", "Direct LAN literal IPv4", true), Param("adapter", "string", "A built-in adapter (${LanRules.adapters.joinToString()}) or a device pack id from GET /v1/lan/packs, e.g. upnp_av for speakers; packs download on first use", true), Param("name", "string", "Owner's device label, 1..60 chars", true),
                 Param("username", "string", "Authorized local device/router account"), Param("password", "string", "Authorized local password, never returned"), Param("talk_cloud_password", "string", "Optional separate authorized Tapo cloud password, encrypted privately; passive authentication only, no speaker playback"), Param("allow_http", "boolean", "Explicitly permit unencrypted LAN HTTP, including supplied credentials. Default false (HTTPS with normal certificate validation). Required for Tapo ONVIF.")),
@@ -324,8 +332,8 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
             body = listOf(Param("device", "string", "Enrolled device id", true)), example = "POST /v1/lan/devices/remove {\"device\":\"net:example\"}", returns = "removed; Devices-tab entries remain owner-managed")
         val ACTION = EndpointSpec("POST", "/lan/devices/action", "lan_control", "Run a fixed supported action on this agent's enrolled device", capture = true, idempotent = true,
             body = listOf(Param("device", "string", "Enrolled device id", true), Param("action", "string", "Use this device's advertised actions (built-in: status, relay_on, relay_off, dhcp_leases; packs list theirs in GET /v1/lan/devices adapters)", true), Param("channel", "integer", "Shelly relay channel 0..3; must be advertised by device; default 0"),
-                Param("params", "object", "Device-pack action parameters, e.g. {\"url\":\"https://example.com/chime.mp3\"} for play or {\"level\":30} for volume_set")),
-            example = "POST /v1/lan/devices/action {\"device\":\"net:example\",\"action\":\"volume_set\",\"params\":{\"level\":25}}", returns = "device, action, availability=online, checked_at, result; failures do not prove offline. Camera snapshots/move use existing lan_camera endpoints.")
+                Param("params", "object", "Device-pack action parameters, e.g. {\"url\":\"https://example.com/chime.mp3\"} for play, {\"level\":30} for volume_set or {\"muted\":true} for mute_set. They may also be sent beside device and action ({\"level\":30}); the same name in both places must agree. Each action's parameters (name, type, required, bounds) are listed in GET /v1/lan/devices devices[].actions[].params")),
+            example = "POST /v1/lan/devices/action {\"device\":\"net:example\",\"action\":\"volume_set\",\"params\":{\"level\":25}}", returns = "device, action, availability=online, checked_at, result; failures do not prove offline. Its own rate limit: ${cc.bridgit.app.api.RateLimiter.DEVICE_ACTIONS_PER_AGENT} actions a minute per agent, separate from captures. Camera snapshots/move use existing lan_camera endpoints.")
         val ACTION_LOG = EndpointSpec("GET", "/lan/devices/log", "lan_control", "The runtime log of this agent's device operations (outlet flow): every enroll, action and removal, in order, with trigger, device and outcome",
             query = listOf(Param("device", "string", "Only this enrolled device id"), Param("op_id", "string", "Only the entries of one operation"),
                 Param("since", "integer", "Only entries after this log id"), Param("order", "string", "desc (newest first, default) or asc"),

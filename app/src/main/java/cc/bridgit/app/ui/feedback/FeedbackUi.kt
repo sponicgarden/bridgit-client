@@ -43,6 +43,14 @@ fun Fragment.handleFeedbackMenu(item: MenuItem, screen: String, screenContext: (
     return true
 }
 
+/** The icon and name an issue kind is shown with (My issues, the issue screen). */
+val IssueKind.iconRes get() = when (this) {
+    IssueKind.BUG -> R.drawable.feedback_ic_bug; IssueKind.FEATURE -> R.drawable.feedback_ic_lightbulb; IssueKind.APPLET -> R.drawable.ic_nav_applets
+}
+val IssueKind.nameRes get() = when (this) {
+    IssueKind.BUG -> R.string.feedback_kind_bug; IssueKind.FEATURE -> R.string.feedback_kind_feature; IssueKind.APPLET -> R.string.feedback_kind_applet
+}
+
 /**
  * FBK-05 drafts: description and Don't auto-fix per kind, saved on every keystroke in
  * private SharedPreferences "feedback_drafts". Screenshots are never stored.
@@ -58,7 +66,37 @@ class FeedbackDrafts(context: Context) {
     }
 
     fun clear(kind: IssueKind) {
-        prefs.edit().remove("${kind.id}.description").remove("${kind.id}.no_autofix").apply()
+        prefs.edit().remove("${kind.id}.description").remove("${kind.id}.no_autofix").remove("${kind.id}.fields").apply()
+    }
+
+    /** A0178: the applet request's other boxes as typed (name, devices, data used, portal), keyed by [AppletForm] field. */
+    fun appletFields(): Map<String, String> = runCatching {
+        val o = JSONObject(prefs.getString("${IssueKind.APPLET.id}.fields", null) ?: "{}")
+        o.keys().asSequence().associateWith { o.optString(it) }
+    }.getOrDefault(emptyMap())
+
+    fun saveAppletFields(fields: Map<String, String>) {
+        prefs.edit().putString("${IssueKind.APPLET.id}.fields", JSONObject(fields).toString()).apply()
+    }
+}
+
+/**
+ * A0178: the applet form's boxes into the `applet` object. The description box is what it does
+ * (up to its 2,000-character limit; the full text stays in the description); devices and data
+ * used are comma-separated.
+ */
+object AppletForm {
+    const val NAME = "name"
+    const val DEVICES = "devices"
+    const val DATA = "data_used"
+    const val PORTAL = "portal_shows"
+
+    fun build(description: String, fields: Map<String, String>): JSONObject = JSONObject().apply {
+        description.trim().take(cc.bridgit.app.feedback.AppletRequest.WHAT_IT_DOES).trim().takeIf { it.isNotEmpty() }?.let { put("what_it_does", it) }
+        fields[NAME]?.trim()?.takeIf { it.isNotEmpty() }?.let { put("name", it) }
+        fields[DEVICES]?.let { cc.bridgit.app.feedback.AppletRequest.split(it) }?.takeIf { it.length() > 0 }?.let { put("devices", it) }
+        fields[DATA]?.let { cc.bridgit.app.feedback.AppletRequest.split(it) }?.takeIf { it.length() > 0 }?.let { put("data_used", it) }
+        fields[PORTAL]?.trim()?.takeIf { it.isNotEmpty() }?.let { put("portal_shows", it) }
     }
 }
 

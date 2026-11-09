@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "The Portal's own update state (A0050): whether it prompts for new TestFlight builds, its build and the newest one, and which request it applied. Agents read it in GET /v1/owner/settings → portal_updates and change it with owner configuration actions portal.update_prompts and portal.update_now. The owner's portal pairing only.",

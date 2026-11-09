@@ -688,7 +688,9 @@ class AddAgentFragment : Fragment() {
 
     private fun share(prompt: String) {
         val name = vm.name.trim()
-        val device = cc.bridgit.app.platform.DeviceName.of(app)
+        // A0213: name the device by its domain name first; the friendly name is display only.
+        val id = AddAgentViewModel.identity(app)
+        val device = id.domainName?.let { "$it (${id.friendlyName})" } ?: id.friendlyName
         // Share sends a note for the person on top of the prompt; Copy still copies the bare prompt.
         val text = cc.bridgit.app.ui.common.ShareText.prompt(getString(R.string.share_agent_heading, name, device), getString(R.string.share_agent_note, name, device), prompt)
         val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)

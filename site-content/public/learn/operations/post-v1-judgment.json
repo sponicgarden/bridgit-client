@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Ask Jev typed questions about text/JSON, or Clef about one retained sound/wake-word clip (audio is sent to the decision backend); run matching conditional actions",

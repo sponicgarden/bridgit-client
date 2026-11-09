@@ -122,6 +122,15 @@
                     android:layout_weight="1"
                     android:text="@string/feedback_type_feature"
                     app:icon="@drawable/feedback_ic_lightbulb" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/type_applet"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/feedback_type_applet"
+                    app:icon="@drawable/ic_nav_applets" />
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
             <!-- 3-4. What happened: label, Auto-fix and the description in one shaded panel. -->
@@ -194,6 +203,88 @@
                     android:minLines="3"
                     android:scrollbars="vertical" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- A0178: an applet request's fields, shown for the Applet type only. -->
+            <LinearLayout
+                android:id="@+id/applet_fields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/applet_name_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/feedback_applet_name">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/applet_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAutofill="no"
+                        android:inputType="textCapSentences"
+                        android:maxLength="120" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/applet_devices_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/feedback_applet_devices"
+                    app:helperText="@string/feedback_applet_list_hint">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/applet_devices"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAutofill="no"
+                        android:inputType="textCapSentences"
+                        android:maxLength="890" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/applet_data_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/feedback_applet_data"
+                    app:helperText="@string/feedback_applet_list_hint">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/applet_data"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAutofill="no"
+                        android:inputType="textCapSentences"
+                        android:maxLength="2500" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/applet_portal_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/feedback_applet_portal">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/applet_portal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top|start"
+                        android:importantForAutofill="no"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:maxLength="2000"
+                        android:maxLines="3"
+                        android:minLines="2" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
 
             </LinearLayout>
 

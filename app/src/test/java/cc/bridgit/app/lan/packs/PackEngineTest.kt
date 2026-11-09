@@ -150,4 +150,45 @@ class PackEngineTest {
         val e = assertThrows(PackEngine.PackError::class.java) { PackEngine.run(pack, bound, "pause", JSONObject(), net) }
         assertTrue(e.device); assertTrue(e.message!!, e.message!!.contains("701") && e.message!!.contains("Transition not available"))
     }
+
+    /** Report A0212: parameters sent beside device and action (the guide's names) used to be dropped. */
+    @Test fun takesParamsAtTheTopLevelOrNested() {
+        fun gather(action: String, json: String) = PackEngine.gather(pack.action(action), JSONObject(json))
+        assertEquals(25, gather("volume_set", """{"device":"net:x","action":"volume_set","level":25}""").getInt("level"))
+        assertTrue(gather("mute_set", """{"device":"net:x","action":"mute_set","muted":true}""").getBoolean("muted"))
+        assertEquals("https://example.com/a.mp3", gather("play", """{"device":"net:x","action":"play","url":"https://example.com/a.mp3"}""").getString("url"))
+        assertEquals(30, gather("volume_set", """{"device":"net:x","action":"volume_set","params":{"level":30}}""").getInt("level"))
+        // Agreeing duplicates are fine; disagreeing ones are refused, not guessed.
+        assertEquals(30, gather("volume_set", """{"action":"volume_set","level":30,"params":{"level":30}}""").getInt("level"))
+        assertThrows(PackEngine.PackError::class.java) { gather("volume_set", """{"action":"volume_set","level":30,"params":{"level":40}}""") }
+        assertThrows(PackEngine.PackError::class.java) { gather("volume_set", """{"action":"volume_set","params":[1]}""") }
+        // Only the action's own parameters come from the top level; device, action, channel and others stay out.
+        val g = gather("volume_set", """{"device":"net:x","action":"volume_set","channel":0,"level":20,"note":"x"}""")
+        assertEquals(setOf("level"), g.keys().asSequence().toSet())
+        assertEquals(0, gather("stop", """{"device":"net:x","action":"stop","level":20}""").length())
+        assertEquals(0, PackEngine.gather(null, JSONObject("""{"device":"net:x","action":"relay_on","level":3}""")).length())
+        assertEquals(0, gather("status", """{"device":"net:x","action":"status"}""").length())
+        // The gathered values reach the device.
+        val ok = FakeNet(null) { _, a, _ -> soapReply(a.substringAfter('#').trim('"'), "") }
+        PackEngine.run(pack, bound, "volume_set", gather("volume_set", """{"device":"net:x","action":"volume_set","level":25}"""), ok)
+        assertTrue(ok.calls.single().third.contains("<DesiredVolume>25</DesiredVolume>"))
+    }
+
+    /** Report A0212: GET /v1/lan/devices lists each action's parameters and an example body that runs. */
+    @Test fun inventoryDocumentsEachActionsParams() {
+        val d = cc.bridgit.app.lan.LanDevice("net:x", "Kitchen", "192.168.1.64", "upnp_av", "agent-a", "", "", false, 1,
+            extra = JSONObject().put("pack_version", pack.version))
+        val actions = d.publicJson(pack).getJSONArray("actions")
+        val byName = (0 until actions.length()).associate { actions.getJSONObject(it).let { a -> a.getString("action") to a } }
+        assertEquals(pack.actions.map { it.name }.toSet(), byName.keys)
+        val level = byName.getValue("volume_set").getJSONArray("params").getJSONObject(0)
+        assertEquals("level", level.getString("name")); assertEquals("integer", level.getString("type")); assertTrue(level.getBoolean("required"))
+        assertEquals(0, level.getInt("min")); assertEquals(100, level.getInt("max"))
+        assertEquals(0, byName.getValue("status").getJSONArray("params").length())
+        assertFalse(byName.getValue("status").getJSONObject("body").has("params"))
+        assertEquals("boolean", byName.getValue("mute_set").getJSONArray("params").getJSONObject(0).getString("type"))
+        // Every advertised body passes the engine's own validation.
+        val net = FakeNet(null) { _, a, _ -> soapReply(a.substringAfter('#').trim('"'), "") }
+        for ((name, a) in byName) if (name != "status") PackEngine.run(pack, bound, name, PackEngine.gather(pack.action(name), a.getJSONObject("body")), net)
+    }
 }

@@ -88,7 +88,8 @@ class SettingsCatalogTest {
             "capturesOwnerUploadUrl" to "captures.owner_upload_url", "capturesLockedCameraApproval" to "captures.locked_camera_approval",
             "securityDeviceLock" to "security.device_lock", "securityPlaceAlerts" to "security.new_place_alerts",
             "securityBiometric" to "security.biometric", "securityRelaySignedOnly" to "security.relay_signed_only",
-            "externalCallsPaused" to "privacy.pause_external_calls")
+            "externalCallsPaused" to "privacy.pause_external_calls",
+            "resourceMonitor" to "device.resource_monitor", "resourceMonitorInterval" to "device.resource_monitor_interval")
         val notSettings = setOf("onSwitch", "firstRunDone", "emailGraceStartedAt", "emailVerifiedAt")
         assertEquals("New Settings property: add it to SettingsCatalog and this map", emptySet<String>(), props - mapped.keys - notSettings)
         mapped.values.forEach { k -> assertTrue(k, all.any { it.key == k }) }

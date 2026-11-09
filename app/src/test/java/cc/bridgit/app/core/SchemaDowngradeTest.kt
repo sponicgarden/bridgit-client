@@ -63,7 +63,8 @@ class SchemaDowngradeTest {
             db.rawQuery("SELECT upload_state FROM reports WHERE id = ${issue.id}", null).use { c -> c.moveToFirst(); c.getString(0) }
         }
         assertEquals("pending", state)
-        assertEquals(3, version("feedback.db"))
+        // v4 (A0178) added applet_json; the upgrade from 1 must reach the current version.
+        assertEquals(4, version("feedback.db"))
     }
 
     /** Any store past version 1 must keep a newer file instead of crashing startup. */

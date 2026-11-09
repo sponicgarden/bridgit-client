@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- A0189/A0190: Monitor resources (Settings › Log). Bridgit's own CPU, memory, network, disk over time; off by default. -->
+    <string name="settings_resource_monitor">Monitor resources</string>
+    <!-- Shown under the switch while it is on: when it was turned on. -->
+    <string name="settings_resource_monitor_since">Since %1$s</string>
+    <string name="settings_resource_interval">Sampling interval</string>
+    <string name="settings_resource_interval_1s">1 second</string>
+    <string name="settings_resource_interval_10s">10 seconds</string>
+    <string name="settings_resource_interval_1m">1 minute</string>
+    <string name="settings_resource_interval_1h">1 hour</string>
+    <string name="settings_changed_resource_monitor">You turned Monitor resources %1$s</string>
+    <string name="settings_changed_resource_interval">You set the resource sampling interval to %1$s</string>
+</resources>

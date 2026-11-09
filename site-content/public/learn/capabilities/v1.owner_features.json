@@ -418,7 +418,7 @@
    "tool": "owner_configuration_name_get"
   },
   {
-   "summary": "Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
+   "summary": "Register this Bridgit's two names in one step on the first control call (Device Domain Name + friendly name), or change its friendly name, label or visibility; the domain name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
    "path": "/v1/owner/configuration/name",
    "method": "POST",
    "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-name.json",
@@ -598,8 +598,8 @@
    "tool": "owner_configuration_links_log"
   }
  ],
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.owner_features",

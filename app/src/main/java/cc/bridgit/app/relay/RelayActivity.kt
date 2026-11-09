@@ -346,13 +346,18 @@ class RelayActivity : AppCompatActivity() {
         }
     }
 
+    /** The relay text's bootstrap: the setup prompt's first calls (with this device's domain name) and its pointers. */
+    private fun relayCalls(): String = cc.bridgit.app.api.SetupPrompt.firstCalls(
+        cc.bridgit.app.feedback.DeviceNames.cached(app)?.optString("name")?.takeIf { it.isNotBlank() }).trimEnd() +
+        "\n\n" + cc.bridgit.app.api.SetupPrompt.pointers()
+
     private fun createAuthorized(existing: cc.bridgit.app.core.Agent?, n: String, mode: String, pub: String, o: Offer, selected: BooleanArray, superPowers: Boolean = false) {
         val (a, token) = register(existing, n, mode, pub, o, selected, superPowers)
         val config = store.agents().first { it.getString("id") == a.id }
         val details = JSONObject().put("base", store.base).put("device_id", store.device).put("agent_id", a.id)
             .put("generation", a.keyHash).put("mode", mode).put("token", token)
             .put("phone_hpke_public", Sealed.publicKey(store.hpke())).put("mcp_url", store.base + "/mcp").put("allowlist", config).toString(2)
-        val prompt = if (mode == "connector") getString(R.string.relay_prompt, store.base, token, cc.bridgit.app.api.SetupPrompt.firstCalls().trimEnd(), details) else details
+        val prompt = if (mode == "connector") getString(R.string.relay_prompt, store.base, token, relayCalls(), details) else details
         render()
         val routes = o.routes.indices.count { selected[it] }; val tools = o.tools.indices.count { selected[o.routes.size + it] }
         val access = if (routes == o.routes.size && tools == o.tools.size) getString(R.string.relay_access_all)

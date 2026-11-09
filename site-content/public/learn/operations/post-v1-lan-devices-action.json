@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Run a fixed supported action on this agent's enrolled device",
@@ -32,7 +32,7 @@
    },
    {
     "name": "params",
-    "description": "Device-pack action parameters, e.g. {\"url\":\"https://example.com/chime.mp3\"} for play or {\"level\":30} for volume_set",
+    "description": "Device-pack action parameters, e.g. {\"url\":\"https://example.com/chime.mp3\"} for play, {\"level\":30} for volume_set or {\"muted\":true} for mute_set. They may also be sent beside device and action ({\"level\":30}); the same name in both places must agree. Each action's parameters (name, type, required, bounds) are listed in GET /v1/lan/devices devices[].actions[].params",
     "type": "object",
     "required": false
    }
@@ -41,7 +41,7 @@
   "idempotent": true,
   "path": "/v1/lan/devices/action",
   "capability": "lan_control",
-  "returns": "device, action, availability=online, checked_at, result; failures do not prove offline. Camera snapshots/move use existing lan_camera endpoints.",
+  "returns": "device, action, availability=online, checked_at, result; failures do not prove offline. Its own rate limit: 30 actions a minute per agent, separate from captures. Camera snapshots/move use existing lan_camera endpoints.",
   "mcp_input_schema": {
    "type": "object",
    "properties": {
@@ -58,7 +58,7 @@
      "type": "string"
     },
     "params": {
-     "description": "Device-pack action parameters, e.g. {\"url\":\"https://example.com/chime.mp3\"} for play or {\"level\":30} for volume_set",
+     "description": "Device-pack action parameters, e.g. {\"url\":\"https://example.com/chime.mp3\"} for play, {\"level\":30} for volume_set or {\"muted\":true} for mute_set. They may also be sent beside device and action ({\"level\":30}); the same name in both places must agree. Each action's parameters (name, type, required, bounds) are listed in GET /v1/lan/devices devices[].actions[].params",
      "type": "object"
     },
     "device": {

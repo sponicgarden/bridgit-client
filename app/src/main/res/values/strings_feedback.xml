@@ -9,12 +9,23 @@
     <!-- Form (FBK-03, FBK-04) -->
     <string name="feedback_title_bug">Report a bug</string>
     <string name="feedback_title_feature">Request a feature</string>
+    <string name="feedback_title_applet">Request an applet</string>
     <string name="feedback_submit">Submit</string>
     <string name="feedback_sending">Sending…</string>
     <string name="feedback_intro_bug">Tell your agent to file a bug or a feature request. Or describe what went wrong.</string>
     <string name="feedback_intro_feature">Tell your agent to file a bug or a feature request. Or describe what you’d like.</string>
     <string name="feedback_label_bug">What happened?</string>
     <string name="feedback_label_feature">What would you like to see?</string>
+    <!-- A0178 applet requests: a new applet, with its portal page, to be built. -->
+    <string name="feedback_intro_applet">Tell your agent to request an applet. Or describe the one you’d like.</string>
+    <string name="feedback_label_applet">What should the applet do?</string>
+    <string name="feedback_applet_placeholder">What it does and who it’s for</string>
+    <string name="feedback_applet_name">Name</string>
+    <string name="feedback_applet_what">What it does</string>
+    <string name="feedback_applet_devices">Devices</string>
+    <string name="feedback_applet_data">Data used</string>
+    <string name="feedback_applet_portal">Its portal page shows</string>
+    <string name="feedback_applet_list_hint">Separate with commas</string>
     <string name="feedback_no_autofix">Attempt Auto-fix</string>
     <string name="feedback_no_autofix_hint">Auto-fix is off: this is left for a person to look at. Nothing gets fixed automatically.</string>
     <string name="feedback_description">Description</string>
@@ -45,6 +56,7 @@
     <string name="feedback_type">Type</string>
     <string name="feedback_type_bug">Bug</string>
     <string name="feedback_type_feature">Feature</string>
+    <string name="feedback_type_applet">Applet</string>
     <string name="feedback_auto_caption">App version, device info and the screen you were on are included automatically.</string>
     <string name="feedback_rate_limited">That\'s 10 reports this hour. Try again later.</string>
     <string name="feedback_save_failed">Couldn\'t save the report. Please try again.</string>
@@ -76,6 +88,7 @@
     <string name="feedback_view_report">View report</string>
     <string name="feedback_filed_log_bug">You filed a bug report</string>
     <string name="feedback_filed_log_feature">You filed a feature request</string>
+    <string name="feedback_filed_log_applet">You filed an applet request</string>
 
     <!-- My issues (FBK-09, ui-spec 5.12) -->
     <string name="feedback_my_issues">My issues</string>
@@ -88,6 +101,7 @@
     <string name="feedback_empty_filtered">No reports match this filter.</string>
     <string name="feedback_kind_bug">Bug</string>
     <string name="feedback_kind_feature">Feature request</string>
+    <string name="feedback_kind_applet">Applet request</string>
     <string name="feedback_row_meta">%1$s · %2$s</string>
     <string name="feedback_row_meta_updated">%1$s · %2$s · updated by %3$s</string>
     <string name="feedback_row_desc">%1$s %2$s, %3$s. Status: %4$s. %5$s</string>

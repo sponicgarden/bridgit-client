@@ -68,6 +68,16 @@
    "tool": "device_display"
   },
   {
+   "summary": "Monitor resources (A0189): Bridgit's own footprint over time, never other apps or content: CPU, memory, network, disk, storage, context switches (the wakeup proxy), with battery and thermal state as device context. Off by default; switch it and choose the interval (1s, 10s, 1m default, 1h) with the settings device.resource_monitor and device.resource_monitor_interval (POST /v1/settings, or POST /v1/owner/configuration/settings with the owner.configuration grant)",
+   "path": "/v1/device/resources",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-device-resources.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-device-resources.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "device_resources"
+  },
+  {
    "summary": "Host and owner-configured external devices, supported actions and access status",
    "path": "/v1/devices",
    "method": "GET",
@@ -438,8 +448,8 @@
    "tool": "owner_configuration_links_disconnect_all"
   }
  ],
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.status",

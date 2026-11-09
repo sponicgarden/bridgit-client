@@ -50,7 +50,7 @@ class LearnTest {
                 Address("phone.example.invalid", null, 8734), "example Android device",
                 listOf(CapInfo("camera", "Camera", "camera", true, true, null),
                     CapInfo("gallery", "Gallery", "gallery", true, true, null)),
-                helperSource, "<CALLBACK_SECRET_OMITTED>")
+                helperSource, "<CALLBACK_SECRET_OMITTED>", device = SetupPrompt.EXAMPLE_DEVICE)
             assertEquals(actual, files.getValue(path))
             assertTrue(files.getValue("learn/introduction.txt").contains(files.getValue("learn/pairing-direct.txt")))
         }

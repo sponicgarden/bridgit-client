@@ -1,6 +1,6 @@
 {
  "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
- "api_revision": 139,
+ "api_revision": 144,
  "errors": [
   {
    "code": "model_unavailable",
@@ -343,6 +343,20 @@
    "you_should": "Read it with GET /v1/interactions/{id}; start a new one if needed",
    "meaning": "The interaction isn't in a state for this (for example a text panel that's closed or finished)",
    "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "friendly_name_taken",
+   "you_should": "Pick a different friendly name; nothing was registered",
+   "meaning": "Another of this owner's devices already has that friendly name (`friendly_name`, `held_by`)",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "friendly_name_required",
+   "you_should": "Send friendly_name (up to 40 characters, any style) with name",
+   "meaning": "Registering a Device Domain Name also needs the friendly name, in the same step",
+   "http": 400,
    "returned_today": true
   },
   {

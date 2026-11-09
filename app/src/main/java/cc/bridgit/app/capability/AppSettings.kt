@@ -77,6 +77,8 @@ class SettingsController(private val app: BridgeApp) {
             } ?: JSONObject.NULL
             else -> when (key) {
                 "device.name" -> app.platform.store.setting("device_name", "")
+                "device.resource_monitor" -> s.resourceMonitor
+                "device.resource_monitor_interval" -> s.resourceMonitorInterval
                 "listener.enabled" -> s.listenerEnabled
                 "listener.port" -> s.port
                 "listener.allow_internet_callbacks" -> s.allowInternetCallbacks
@@ -194,6 +196,9 @@ class SettingsController(private val app: BridgeApp) {
             key == "captures.owner_files" -> s.capturesOwnerFiles = value as Boolean
             key == "captures.locked_camera_approval" -> s.capturesLockedCameraApproval = value as Boolean
             key == "device.name" -> cc.bridgit.app.platform.DeviceName.set(app, value as String)
+            // A0189/A0190: the monitor follows these through Settings' listener (monitor.ResourceMonitor.sync).
+            key == "device.resource_monitor" -> s.resourceMonitor = value as Boolean
+            key == "device.resource_monitor_interval" -> s.resourceMonitorInterval = value as String
             key == "privacy.log_visibility" -> s.logVisibility = value as String
             key == "privacy.outbound_log" -> s.setOutboundLog(value as Boolean, by)
             key == "privacy.lockscreen_text" -> prefs.edit().putBoolean(InteractionNotifier.PREF_LOCKSCREEN_TEXT, value as Boolean).apply()

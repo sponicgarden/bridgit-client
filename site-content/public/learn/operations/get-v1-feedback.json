@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Deprecated: the old address of GET /v1/issues, same behaviour (list key reports)",
@@ -22,12 +22,13 @@
    },
    {
     "name": "kind",
-    "description": "bug or feature",
+    "description": "bug, feature or applet (an applet request)",
     "type": "string",
     "required": false,
     "enum": [
      "bug",
-     "feature"
+     "feature",
+     "applet"
     ]
    },
    {

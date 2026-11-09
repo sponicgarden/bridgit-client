@@ -1084,7 +1084,7 @@
    "combinations": [],
    "operations": [
     {
-     "summary": "Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
+     "summary": "Issues Tracking: bug reports, feature requests and applet requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
      "path": "/v1/issues",
      "method": "GET",
      "documentation": "https://bridgit.cc/learn/operations/get-v1-issues.json",
@@ -2280,6 +2280,16 @@
      "tool": "log_stats"
     },
     {
+     "summary": "How long API calls take on this device, from receiving the request to sending the response: count, median, p95 and max per API, and the slow calls with the device context they ran in (network, battery, thermal, app build, screen, load). Every transport: HTTP, MCP, relay, cards, schedules and the control server. Kept in memory: the newest 5000 calls, at most 7 days, empty after a restart. Calls you may see follow the log's visibility",
+     "path": "/v1/log/latency",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-log-latency.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-log-latency.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "log_latency"
+    },
+    {
      "summary": "Every matching entry as JSONL or CSV; direct HTTP streams without a total size cap; MCP/relay envelopes capped at 8 MiB",
      "path": "/v1/log/export",
      "method": "GET",
@@ -2970,7 +2980,7 @@
      "tool": "owner_configuration_name_get"
     },
     {
-     "summary": "Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
+     "summary": "Register this Bridgit's two names in one step on the first control call (Device Domain Name + friendly name), or change its friendly name, label or visibility; the domain name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
      "path": "/v1/owner/configuration/name",
      "method": "POST",
      "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-name.json",
@@ -4116,6 +4126,16 @@
      "control_scope": null,
      "requires_power": null,
      "tool": "device_display"
+    },
+    {
+     "summary": "Monitor resources (A0189): Bridgit's own footprint over time, never other apps or content: CPU, memory, network, disk, storage, context switches (the wakeup proxy), with battery and thermal state as device context. Off by default; switch it and choose the interval (1s, 10s, 1m default, 1h) with the settings device.resource_monitor and device.resource_monitor_interval (POST /v1/settings, or POST /v1/owner/configuration/settings with the owner.configuration grant)",
+     "path": "/v1/device/resources",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-device-resources.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-device-resources.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "device_resources"
     },
     {
      "summary": "Host and owner-configured external devices, supported actions and access status",
@@ -7611,8 +7631,8 @@
   "kind": "source_generated",
   "released": "Check public updater manifest; source documentation is not release evidence."
  },
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "installed_api_revision": null,
  "categories": [
   "sense",

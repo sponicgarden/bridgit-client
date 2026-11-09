@@ -101,8 +101,7 @@ class MyIssuesFragment : Fragment() {
         override fun onBindViewHolder(h: Holder, position: Int) {
             val r = getItem(position)
             val ctx = h.b.root.context
-            val bug = r.kind == IssueKind.BUG
-            h.b.icon.setImageResource(if (bug) R.drawable.feedback_ic_bug else R.drawable.feedback_ic_lightbulb)
+            h.b.icon.setImageResource(r.kind.iconRes)
             h.b.firstLine.text = r.firstLine
             val date = SimpleDateFormat("d MMM", Locale.getDefault()).format(Date(r.createdAt))
             val updatedBy = r.lastBy?.takeIf { r.updatedAt > r.createdAt }
@@ -111,7 +110,7 @@ class MyIssuesFragment : Fragment() {
                 else ctx.getString(R.string.feedback_row_meta, number, date)
             StatusChip.style(h.b.status, r.status)
             h.b.root.contentDescription = ctx.getString(R.string.feedback_row_desc,
-                ctx.getString(if (bug) R.string.feedback_kind_bug else R.string.feedback_kind_feature),
+                ctx.getString(r.kind.nameRes),
                 number, r.firstLine, StatusMachine.label(r.status), h.b.meta.text)
             h.b.root.setOnClickListener { onClick(r) }
         }

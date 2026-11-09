@@ -91,16 +91,18 @@ class ConfigurationResources(private val app: BridgeApp, private val caller: Age
     }
     suspend fun name(): JSONObject { access.require(); return withContext(Dispatchers.IO) { cc.bridgit.app.feedback.DeviceNames.refresh(app) } }
     suspend fun name(body: JSONObject): JSONObject {
-        access.require(); ConfigurationAccess.only(body, "name", "label", "visible")
+        access.require(); ConfigurationAccess.only(body, "name", "friendly_name", "label", "visible")
         val name = if (body.has("name")) (body.opt("name") as? String)?.let { cc.bridgit.app.feedback.DeviceNames.parse(it) }
             ?: throw ErrorCatalog.error("invalid_parameter", "name must be a Device Domain Name. ${cc.bridgit.app.feedback.DeviceNames.ADVICE}") else null
+        val friendly = if (body.has("friendly_name")) (body.opt("friendly_name") as? String)?.let { cc.bridgit.app.feedback.FriendlyName.parse(it) }
+            ?: throw ErrorCatalog.error("invalid_parameter", "friendly_name must be 1-${cc.bridgit.app.feedback.FriendlyName.MAX} characters, any style, no control characters") else null
         val label = body.opt("label")
         if (body.has("label") && label != JSONObject.NULL && (label !is String || label.length > 60)) throw ErrorCatalog.error("invalid_parameter", "label must be text up to 60 characters, or null to clear")
         if (body.has("visible") && body.opt("visible") !is Boolean) throw ErrorCatalog.error("invalid_parameter", "visible must be true or false")
-        if (body.length() == 0) throw ErrorCatalog.error("invalid_parameter", "Send name to register, or label/visible to change")
+        if (body.length() == 0) throw ErrorCatalog.error("invalid_parameter", "Send name and friendly_name to register, or friendly_name/label/visible to change")
         return withContext(Dispatchers.IO) {
             val result = cc.bridgit.app.feedback.DeviceNames.set(app, name, (label as? String)?.trim()?.ifEmpty { null }, body.has("label"),
-                if (body.has("visible")) body.getBoolean("visible") else null)
+                if (body.has("visible")) body.getBoolean("visible") else null, friendly)
             access.audit("bridgit name"); result
         }
     }

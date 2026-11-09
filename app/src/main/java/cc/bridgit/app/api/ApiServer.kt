@@ -180,6 +180,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
         var ranOn: String? = null
         var forwardedOut = 0L
         var onBehalf: Pair<String, String>? = null
+        val inFlight = app.latency.begin()
         try {
             if (!Net.isTailnet(source)) throw ErrorCatalog.error("forbidden_source", "Only devices on the owner's Tailscale network may call Bridgit.")
             if (spec.auth) {
@@ -336,6 +337,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
             val err = ErrorCatalog.error("internal_error", "Bridgit hit a bug (${e.javaClass.simpleName}). It's in the diagnostic log.")
             runCatching { call.respondBytes(err.toJson(rid).toString().toByteArray(), ContentType.Application.Json, HttpStatusCode.InternalServerError) }
         } finally {
+            app.latency.end()
             // An upload the endpoint didn't take (error, replay, crash) is deleted now.
             (if (req != null) req?.leftoverRawFile() else rawFile)?.delete()
             val r = req
@@ -343,13 +345,17 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
             if (spec.path == "/pair") logParams.remove("code")
             app.usage.count("api:${spec.method} ${spec.fullPath}:$result")
             val name = agent?.name?.let { n -> onBehalf?.let { "${it.second} via ${n.removePrefix("Hub ")}" } ?: n }
+            val tookMs = System.currentTimeMillis() - started
+            app.latency.record(ApiLatency.Call(ts = started, api = OpenApi.opId(spec), method = spec.method, path = spec.fullPath, via = "http",
+                requestId = rid, agentId = agent?.id, agent = name, durationMs = tookMs, http = http, result = result,
+                bytesIn = bytesIn, bytesOut = r?.bytesOut ?: forwardedOut, inFlight = inFlight, ranOn = ranOn))
             val msg = r?.message ?: describe(name, spec, http, result) + (ranOn?.let { " on $it" } ?: "")
             app.log.append(LogEntry(
                 ts = started, channel = "audit", kind = if (spec.path == "/pair") "pairing" else "request",
                 level = when { http >= 500 -> "error"; http >= 400 -> "warn"; else -> "info" },
                 agentId = agent?.id, agent = name, sourceIp = source, method = spec.method, endpoint = spec.fullPath,
                 params = Redactor.params(logParams), http = http, result = result, bytesIn = bytesIn,
-                bytesOut = r?.bytesOut ?: forwardedOut, durationMs = System.currentTimeMillis() - started, requestId = rid,
+                bytesOut = r?.bytesOut ?: forwardedOut, durationMs = tookMs, requestId = rid,
                 message = Redactor.string(msg, 300),
                 data = (r?.data ?: JSONObject()).also { d -> revokedReason?.let { d.put("reason", it) }; ranOn?.let { d.put("ran_on", it) }
                     onBehalf?.let { d.put("on_behalf_of", JSONObject().put("id", it.first).put("name", it.second)) } }.let { Redactor.params(it) }))
@@ -361,13 +367,15 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
     private fun chargeCapture(spec: EndpointSpec, agent: Agent?, source: String, sub: String? = null) {
         if (!spec.capture) return
         val a = agent!!
-        val k = "cap-agent:${a.id}" + (sub?.let { ":$it" } ?: "")
-        if (!limiter.tryAcquire(k, RateLimiter.CAPTURES_PER_AGENT))
-            throw ErrorCatalog.error("rate_limited", "At most ${RateLimiter.CAPTURES_PER_AGENT} captures per minute per agent.",
+        val b = RateLimiter.bucket(spec.capability)
+        val k = "${b.key}-agent:${a.id}" + (sub?.let { ":$it" } ?: "")
+        if (!limiter.tryAcquire(k, b.perAgent))
+            throw ErrorCatalog.error("rate_limited", "At most ${b.perAgent} ${b.noun} per minute per agent.",
                 mapOf("retry_after_s" to limiter.retryAfterS(k)))
-        if (!limiter.tryAcquire("cap-ip:$source", RateLimiter.CAPTURES_PER_IP))
-            throw ErrorCatalog.error("rate_limited", "At most ${RateLimiter.CAPTURES_PER_IP} captures per minute from one address.",
-                mapOf("retry_after_s" to limiter.retryAfterS("cap-ip:$source")))
+        val ik = "${b.key}-ip:$source"
+        if (!limiter.tryAcquire(ik, b.perIp))
+            throw ErrorCatalog.error("rate_limited", "At most ${b.perIp} ${b.noun} per minute from one address.",
+                mapOf("retry_after_s" to limiter.retryAfterS(ik)))
     }
 
     /**
@@ -619,6 +627,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
         var http = 200
         var result = "ok"
         var idemKey: String? = null
+        val inFlight = app.latency.begin()
         try {
             // A linked Bridgit over the relay gets the same link checks as over Tailscale.
             if (app.links.isLinkAgent(agent.id)) linkAgentCall(spec, agent) { null }
@@ -677,8 +686,13 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
             val err = ErrorCatalog.error("internal_error", "Bridgit hit a bug (${e.javaClass.simpleName}). It's in the diagnostic log.")
             return Outcome(500, "application/json", err.toJson(rid).toString().toByteArray(), emptyMap(), err)
         } finally {
+            app.latency.end()
             r.params.keys().forEach { logParams.put(it, r.params.get(it)) }
             app.usage.count("mcp:${spec.method} ${spec.fullPath}:$result")
+            val tookMs = System.currentTimeMillis() - started
+            app.latency.record(ApiLatency.Call(ts = started, api = OpenApi.opId(spec), method = spec.method, path = spec.fullPath, via = via,
+                requestId = rid, agentId = agent.id, agent = agent.name, durationMs = tookMs, http = http, result = result,
+                bytesIn = body.toString().length.toLong(), bytesOut = r.bytesOut, inFlight = inFlight))
             // Relay and card calls share this path; the log says which one it was.
             val viaLabel = if (via == "mcp") "MCP" else via
             val msg = r.message?.let { if ("MCP" in it || viaLabel in it) it else "$it (via $viaLabel)" } ?: (describe(agent.name, spec, http, result) + " (via $viaLabel)")
@@ -687,7 +701,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 level = when { http >= 500 -> "error"; http >= 400 -> "warn"; else -> "info" },
                 agentId = agent.id, agent = agent.name, sourceIp = source, method = spec.method, endpoint = spec.fullPath,
                 params = Redactor.params(logParams), http = http, result = result, bytesIn = body.toString().length.toLong(),
-                bytesOut = r.bytesOut, durationMs = System.currentTimeMillis() - started, requestId = rid,
+                bytesOut = r.bytesOut, durationMs = tookMs, requestId = rid,
                 message = Redactor.string(msg, 300),
                 data = (r.data ?: JSONObject()).put("via", via).let { Redactor.params(it) }))
         }

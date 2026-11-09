@@ -498,7 +498,7 @@ struct NativeHubLink: Identifiable {
     func enableConfiguredOwnerDirect(requester: HostAgent? = nil) async throws {
         let candidates = availableTailnetAddresses
         guard let address = ownerDirectPreferredAddress.flatMap({ candidates.contains($0) ? $0 : nil })
-                ?? (candidates.count == 1 ? candidates.first : nil) else {
+                ?? (candidates.count == 1 ? candidates.first : Optional(candidates.filter { !$0.isIPv6 }).flatMap { $0.count == 1 ? $0.first : nil }) else {
             throw DeviceAPIError(409, "tailnet_required", "Choose a Tailscale address in Control agents first.")
         }
         try await startOwnerDirect(address, requester: requester)
@@ -546,6 +546,8 @@ struct NativeHubLink: Identifiable {
             guard !existing.contains(where: { $0.name.trimmingCharacters(in: .whitespacesAndNewlines).caseInsensitiveCompare(name.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame }) else { throw DeviceAPIError(409, "agent_name_in_use", "A control agent already uses that name. Choose another name.") }
             let agent: HostAgent, token: String
             if ownerDirect {
+                // The listener drops when the app is left; bring it back instead of asking the owner to.
+                if ownerDirectAddress == nil { try await enableConfiguredOwnerDirect() }
                 guard let address = ownerDirectAddress, let port = ownerDirectPort,
                       availableTailnetAddresses.contains(address), OwnerDirectHostService.baseURL(address: address, port: port) != nil else {
                     throw DeviceAPIError(409, "listener_required", "Start the direct Tailscale listener before creating an agent.")

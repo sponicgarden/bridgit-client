@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Set/replace/clear alert address using native enrollment; this never fabricates confirmation; explicit owner.configuration grant required; no per-change phone approval",

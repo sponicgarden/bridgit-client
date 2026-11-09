@@ -1,9 +1,9 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
-  "summary": "Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
+  "summary": "Issues Tracking: bug reports, feature requests and applet requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
   "method": "GET",
   "auth": true,
   "mcp_tool": "issues_list",
@@ -22,12 +22,13 @@
    },
    {
     "name": "kind",
-    "description": "bug or feature",
+    "description": "bug, feature or applet (an applet request)",
     "type": "string",
     "required": false,
     "enum": [
      "bug",
-     "feature"
+     "feature",
+     "applet"
     ]
    },
    {
@@ -70,11 +71,12 @@
      "type": "integer"
     },
     "kind": {
-     "description": "bug or feature",
+     "description": "bug, feature or applet (an applet request)",
      "type": "string",
      "enum": [
       "bug",
-      "feature"
+      "feature",
+      "applet"
      ]
     },
     "limit": {

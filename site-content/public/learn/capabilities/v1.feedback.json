@@ -8,7 +8,7 @@
  "combinations": [],
  "operations": [
   {
-   "summary": "Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
+   "summary": "Issues Tracking: bug reports, feature requests and applet requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
    "path": "/v1/issues",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-issues.json",
@@ -128,8 +128,8 @@
    "tool": null
   }
  ],
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.feedback",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Your own key for the Bridgit team's Issues Tracking backend: file issues, check their status and verify fixes there directly. Agent issue filing always goes directly to the servers",

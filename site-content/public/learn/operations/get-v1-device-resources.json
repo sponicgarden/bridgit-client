@@ -1,0 +1,72 @@
+{
+ "documentation_revision": 126,
+ "api_revision": 144,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Monitor resources (A0189): Bridgit's own footprint over time, never other apps or content: CPU, memory, network, disk, storage, context switches (the wakeup proxy), with battery and thermal state as device context. Off by default; switch it and choose the interval (1s, 10s, 1m default, 1h) with the settings device.resource_monitor and device.resource_monitor_interval (POST /v1/settings, or POST /v1/owner/configuration/settings with the owner.configuration grant)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "device_resources",
+  "query": [
+   {
+    "name": "view",
+    "description": "summary (default: status, current hour, today), samples (raw samples), hourly or daily (summaries per period and build)",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "summary",
+     "samples",
+     "hourly",
+     "daily"
+    ]
+   },
+   {
+    "name": "since",
+    "description": "Only entries at or after this time: ISO 8601 (2026-11-09T10:00:00Z) or epoch milliseconds",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "Newest entries to return, 1-1440 (default 100)",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/device/resources?view=hourly&limit=24",
+  "idempotent": false,
+  "path": "/v1/device/resources",
+  "capability": "status",
+  "returns": "enabled, running, since, stopped_at, interval, interval_s, intervals, default_interval (1m), level (current hour: ok|elevated|high), latest (newest sample), scope (bridgit_only), platform, bridgit_name, build {version, version_code, commit}, current_hour, today (summaries), thresholds {metric: {elevated, high}}, retention {samples, hours, days, samples_kept}, measures (what each number is; Android gives apps no per-app energy or wakeup count), view, and samples[] | hours[] | days[]. A sample: at, interval_s, build, version_code, cpu_percent (of one core), cpu_device_percent, rss_mb, peak_rss_mb, java_heap_mb, native_heap_mb, threads, network_bytes {rx, tx}, disk_bytes {read, write}, context_switches, storage_mb, battery {percent, charging, temperature_c}, thermal, monitor_cost_ms. A summary: period, start, end, build, version_code, samples, covered_s, cpu_percent {avg, peak}, rss_mb {avg, peak}, peak_rss_mb, network_bytes, network_mb_per_hour, disk_bytes, disk_write_mb_per_hour, context_switches, context_switches_per_s, storage_mb, battery_percent {first, last}, thermal_worst, monitor_cost_ms, level, over [{metric, value, level}]. Unavailable numbers are null",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "view": {
+     "description": "summary (default: status, current hour, today), samples (raw samples), hourly or daily (summaries per period and build)",
+     "type": "string",
+     "enum": [
+      "summary",
+      "samples",
+      "hourly",
+      "daily"
+     ]
+    },
+    "limit": {
+     "description": "Newest entries to return, 1-1440 (default 100)",
+     "type": "integer"
+    },
+    "since": {
+     "description": "Only entries at or after this time: ISO 8601 (2026-11-09T10:00:00Z) or epoch milliseconds",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

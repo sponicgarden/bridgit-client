@@ -111,7 +111,8 @@ class ReportFormViewModel : ViewModel() {
 
     fun attachedCount() = (picked.size + if (includeLastScreen && lastScreen != null) 1 else 0).coerceAtMost(FeedbackLimits.MAX_IMAGES)
 
-    fun submit(app: BridgeApp, kind: IssueKind, text: String, noAutofix: Boolean, screen: String?, screenContext: String?, logEntryId: Long) {
+    fun submit(app: BridgeApp, kind: IssueKind, text: String, noAutofix: Boolean, screen: String?, screenContext: String?, logEntryId: Long,
+               applet: org.json.JSONObject? = null) {
         if (_submitting.value) return
         _submitting.value = true
         // Snapshot before the suspend so a toggle mid-save can't change what is sent.
@@ -132,9 +133,12 @@ class ReportFormViewModel : ViewModel() {
                             for (i in 0 until recent.length()) put(recent.get(i))
                         }
                     }
-                    app.feedback.create(kind, text, noAutofix, images, log, ctx, "form").also {
-                        app.log.system("audit", "feedback", app.getString(
-                            if (kind == IssueKind.BUG) R.string.feedback_filed_log_bug else R.string.feedback_filed_log_feature))
+                    app.feedback.create(kind, text, noAutofix, images, log, ctx, "form", applet = applet).also {
+                        app.log.system("audit", "feedback", app.getString(when (kind) {
+                            IssueKind.BUG -> R.string.feedback_filed_log_bug
+                            IssueKind.FEATURE -> R.string.feedback_filed_log_feature
+                            IssueKind.APPLET -> R.string.feedback_filed_log_applet
+                        }))
                         FeedbackDrafts(app).clear(kind)
                     }
                 }

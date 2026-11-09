@@ -51,8 +51,10 @@ class FeedbackStore(private val context: Context, private val clock: () -> Long 
      */
     @Synchronized
     fun create(kind: IssueKind, description: String, noAutofix: Boolean, images: List<ByteArray>,
-               log: JSONArray, ctx: JSONObject, captureSource: String, agentId: String? = null, agent: String? = null): Issue {
+               log: JSONArray, ctx: JSONObject, captureSource: String, agentId: String? = null, agent: String? = null,
+               applet: JSONObject? = null): Issue {
         val text = description.trim()
+        val request = AppletRequest.normalize(kind, applet)
         if (text.isEmpty()) throw FeedbackError("invalid_parameter", "Please describe the problem before sending.")
         if (text.length > FeedbackLimits.MAX_DESCRIPTION) throw FeedbackError("invalid_parameter", "The description is limited to 10,000 characters.")
         if (images.size > FeedbackLimits.MAX_IMAGES) throw FeedbackError("invalid_parameter", "Up to 5 screenshots per report.")
@@ -64,7 +66,7 @@ class FeedbackStore(private val context: Context, private val clock: () -> Long 
             throw FeedbackError("rate_limited", "At most ${FeedbackLimits.API_PER_HOUR_PER_AGENT} reports per hour per agent.")
         }
         val now = clock()
-        val held = noAutofix || kind == IssueKind.FEATURE // features are always held for review (FBK-04)
+        val held = noAutofix || kind.alwaysHeld // features and applet requests are always held for review (FBK-04, A0178)
         val written = mutableListOf<File>()
         db.beginTransaction()
         val id: Long
@@ -74,7 +76,7 @@ class FeedbackStore(private val context: Context, private val clock: () -> Long 
             put("status", IssueStatus.NEW.id); put("created_at", now); put("updated_at", now)
             put("capture_source", captureSource); put("agent_id", agentId); put("agent", agent)
             put("context_json", ctx.toString()); put("log_json", log.toString()); put("images_json", "[]")
-            put("last_by", agent ?: "owner")
+            put("last_by", agent ?: "owner"); put("applet_json", request?.toString())
             put("upload_state", if (uploadEnabled()) UploadState.PENDING else UploadState.OFF)
         })
         val names = images.mapIndexed { i, bytes ->
@@ -268,10 +270,11 @@ class FeedbackStore(private val context: Context, private val clock: () -> Long 
             upload = s("upload_state") ?: UploadState.SKIPPED,
             remoteId = c.getColumnIndexOrThrow("remote_id").let { if (c.isNull(it)) null else c.getLong(it) },
             uploadedAt = c.getColumnIndexOrThrow("uploaded_at").let { if (c.isNull(it)) 0 else c.getLong(it) },
-            uploadError = s("upload_error"))
+            uploadError = s("upload_error"),
+            applet = s("applet_json")?.let { runCatching { JSONObject(it) }.getOrNull() })
     }
 
-    private class Helper(ctx: Context) : SQLiteOpenHelper(ctx, "feedback.db", null, 3) {
+    private class Helper(ctx: Context) : SQLiteOpenHelper(ctx, "feedback.db", null, 4) {
         override fun onCreate(db: SQLiteDatabase) {
             db.execSQL("""CREATE TABLE reports (id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL, description TEXT NOT NULL,
                 no_autofix INTEGER NOT NULL, status TEXT NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL,
@@ -281,6 +284,7 @@ class FeedbackStore(private val context: Context, private val clock: () -> Long 
             db.execSQL("CREATE INDEX history_report ON history(report_id, id)")
             addUploadColumns(db)
             addHistoryColumns(db)
+            addAppletColumn(db)
         }
         /** Upgrades add only what is missing; backfills run only when the columns are new, so a kept newer file (onDowngrade) is not rewritten. */
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -292,6 +296,7 @@ class FeedbackStore(private val context: Context, private val clock: () -> Long 
                 // History from before this version stays on the phone too.
                 db.execSQL("UPDATE history SET upload_state = '${UploadState.SKIPPED}', kind = '${HistoryKind.STATUS}'")
             }
+            if (oldVersion < 4) addAppletColumn(db)
         }
         /** C0018: an older build installed over a newer one keeps the newer file (its columns are additive). Android's default throws and stops the app starting. */
         override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
@@ -303,6 +308,8 @@ class FeedbackStore(private val context: Context, private val clock: () -> Long 
             db.execSQL("CREATE INDEX IF NOT EXISTS history_upload ON history(upload_state, id)")
             return added
         }
+        /** v4 (A0178): what an applet request asks for, as JSON; null for bugs, features and older issues. */
+        private fun addAppletColumn(db: SQLiteDatabase) = Schema.addColumn(db, "reports", "applet_json", "TEXT")
         /** v2 (FBK-14): where each issue stands with the Bridgit team's backend. True when they were new. */
         private fun addUploadColumns(db: SQLiteDatabase): Boolean {
             val added = Schema.addColumn(db, "reports", "upload_state", "TEXT")

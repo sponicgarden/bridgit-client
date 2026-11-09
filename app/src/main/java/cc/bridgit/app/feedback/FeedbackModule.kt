@@ -66,6 +66,13 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
         }
     }
 
+    private fun kindPhrase(kind: IssueKind) = when (kind) {
+        IssueKind.BUG -> "a bug report"; IssueKind.FEATURE -> "a feature request"; IssueKind.APPLET -> "an applet request"
+    }
+
+    /** The applet request's fields (A0178), on applet requests only. */
+    private fun JSONObject.withApplet(r: Issue) = apply { if (r.kind == IssueKind.APPLET) put("applet", r.applet ?: JSONObject.NULL) }
+
     /** Links an agent uses to check back on issue [id]. */
     private fun links(id: Long, base: String) = JSONObject().put("url", "$base/$id").put("followup_url", "$base/$id/followup")
 
@@ -86,7 +93,7 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
             val mine = query("mine")?.let { it == "1" || it.equals("true", ignoreCase = true) } ?: false
             val onlyFor = if (mine || !isDeveloper()) agent!!.id else null
             val status = query("status")?.let { IssueStatus.of(it) ?: throw ErrorCatalog.error("invalid_parameter", "Unknown status \"$it\".") }
-            val kind = query("kind")?.let { IssueKind.of(it) ?: throw ErrorCatalog.error("invalid_parameter", "kind must be bug or feature.") }
+            val kind = query("kind")?.let { IssueKind.of(it) ?: throw ErrorCatalog.error("invalid_parameter", "kind must be ${IssueKind.names}.") }
             val since = query("since")?.let { LogQuery.iso(it) ?: throw ErrorCatalog.error("invalid_parameter", "since must be an ISO time.") }
             val limit = query("limit")?.let { it.toIntOrNull()?.takeIf { n -> n in 1..100 } ?: throw ErrorCatalog.error("invalid_parameter", "limit must be 1 to 100.") } ?: 50
             val wait = query("wait")?.let { it.toIntOrNull()?.takeIf { n -> n in 0..55 } ?: throw ErrorCatalog.error("invalid_parameter", "wait must be 0 to 55.") } ?: 0
@@ -125,7 +132,7 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
             if (!dev) {
                 // The filing agent gets its issue's text, status and history; never the owner's screenshots, context or log.
                 data = JSONObject().put("issue", r.number)
-                return@endpoint Reply.Json(r.summaryJson(::isoAt).put("description", r.description)
+                return@endpoint Reply.Json(r.summaryJson(::isoAt).put("description", r.description).withApplet(r)
                     .put("team_note", r.teamNote ?: JSONObject.NULL).put("history", history)
                     .put("followup_outcomes", JSONArray(StatusMachine.outcomesForReporter(r.status))).put("links", links(r.id, base)))
             }
@@ -145,7 +152,7 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
             if (total * 4 / 3 > ApiServer.MAX_PAYLOAD) throw ErrorCatalog.error("payload_too_large", "The images are over 12 MB. Ask with size=thumb.")
             bytesOut = total
             data = JSONObject().put("issue", r.number)
-            Reply.Json(r.summaryJson(::isoAt).put("description", r.description).put("context", r.context)
+            Reply.Json(r.summaryJson(::isoAt).put("description", r.description).withApplet(r).put("context", r.context)
                 .put("images", images).put("log", r.log)
                 .put("team_note", r.teamNote ?: JSONObject.NULL)
                 .put("history", JSONArray(r.history.map { it.toJson(::isoAt) }))
@@ -188,8 +195,12 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
 
         endpoint(spec(Endpoints.ISSUES_POST, Endpoints.FEEDBACK_POST)) {
             val a = agent!!
-            val kind = IssueKind.of(body.optString("kind")) ?: throw ErrorCatalog.error("invalid_parameter", "kind must be bug or feature.")
+            val kind = IssueKind.of(body.optString("kind")) ?: throw ErrorCatalog.error("invalid_parameter", "kind must be ${IssueKind.names}.")
             val description = body.optString("description", "")
+            val applet = when {
+                !body.has("applet") || body.isNull("applet") -> null
+                else -> body.optJSONObject("applet") ?: throw ErrorCatalog.error("invalid_parameter", "applet must be an object.")
+            }
             val imgs = body.optJSONArray("images")
             if (imgs != null && imgs.length() > 0)
                 cc.bridgit.app.api.PowerGate.require(app.agents.get(a.id), cc.bridgit.app.core.Power.FIXER, "Attaching images")
@@ -205,13 +216,14 @@ class FeedbackModule(app: BridgeApp) : Capability(app) {
                 val ctx = FeedbackContext.build(app, null, null, "agent")
                     .put("agent", FeedbackContext.agentInfo(app, a.id, header("User-Agent"), body.optJSONObject("agent_info")))
                 app.feedback.create(kind, description, body.optBoolean("no_autofix", false), jpegs, FeedbackContext.recentLog(app),
-                    ctx, "agent", a.id, a.name)
+                    ctx, "agent", a.id, a.name, applet)
             } catch (e: FeedbackError) { mapError(e) }
             params.put("description", "[${description.length} chars]")
-            message = "${a.name} filed ${if (kind == IssueKind.BUG) "a bug report" else "a feature request"} ${r.number}"
+            message = "${a.name} filed ${kindPhrase(kind)} ${r.number}"
             data = JSONObject().put("issue", r.number)
             // ref (the team number, e.g. A0042) is null until the phone has sent the issue; GET url shows it then.
             val reply = JSONObject().put("id", r.id).put("ref", r.ref ?: JSONObject.NULL).put("number", r.ref ?: JSONObject.NULL).put("status", r.status.id).put("no_autofix", r.noAutofix)
+                .put("kind", r.kind.id).withApplet(r)
                 .put("sent_to_team", r.upload).put("url", "$base/${r.id}").put("followup_url", "$base/${r.id}/followup")
                 .put("check_back", "GET $base/${r.id} shows its status, the Bridgit team's note and history; GET $base lists your issues. " +
                     "Once it's marked fixed, POST $base/${r.id}/followup {\"outcome\":\"works\"} or {\"outcome\":\"still_broken\",\"note\":\"…\"}.")

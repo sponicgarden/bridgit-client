@@ -64,6 +64,29 @@ class Settings(context: Context) {
         get() = prefs.getInt("retention_days", 0)
         set(v) { prefs.edit().putInt("retention_days", v.coerceIn(0, 365)).apply(); changed() }
 
+    /**
+     * A0189: Monitor resources (Settings › Log; device.resource_monitor). Off by default. On, Bridgit samples its own
+     * footprint (monitor.ResourceMonitor). Each change stamps [resourceMonitorChangedAt], the "since" agents and the owner see.
+     */
+    var resourceMonitor: Boolean
+        get() = prefs.getBoolean(RESOURCE_MONITOR_PREF, false)
+        set(v) {
+            if (v == resourceMonitor) return
+            prefs.edit().putBoolean(RESOURCE_MONITOR_PREF, v).putLong("resource_monitor_changed_at", System.currentTimeMillis()).apply(); changed()
+        }
+    /** When [resourceMonitor] last changed (ms), or 0 if never. Set by the switch itself, not editable. */
+    val resourceMonitorChangedAt: Long get() = prefs.getLong("resource_monitor_changed_at", 0L)
+
+    /** A0190: how often the resource monitor samples: 1s, 10s, 1m (default) or 1h (device.resource_monitor_interval). */
+    var resourceMonitorInterval: String
+        get() = prefs.getString("resource_monitor_interval", null)?.takeIf { it in cc.bridgit.app.monitor.ResourceLog.INTERVALS }
+            ?: cc.bridgit.app.monitor.ResourceLog.DEFAULT_INTERVAL
+        set(v) {
+            require(v in cc.bridgit.app.monitor.ResourceLog.INTERVALS) { "Unknown interval $v" }
+            if (v == resourceMonitorInterval) return
+            prefs.edit().putString("resource_monitor_interval", v).apply(); changed()
+        }
+
     /** "system", "light" or "dark" (UI-19 Appearance). */
     var appearance: String
         get() = prefs.getString("appearance", "system") ?: "system"
@@ -200,6 +223,7 @@ class Settings(context: Context) {
         /** Master switches that start on (the rest start off, SEC-03): Budgets, since agents can only change within the owner's ceiling (docs/spec-budgets.md). */
         val DEFAULT_ON = setOf("budgets", "applet_portals")
         const val OUTBOUND_LOG_PREF = "outbound_log"
+        const val RESOURCE_MONITOR_PREF = "resource_monitor"
         const val EXTERNAL_PAUSED_PREF = "external_calls_paused"
         const val PREF_INTERNET_CALLBACKS = "allow_internet_callbacks"
     }

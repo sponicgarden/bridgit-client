@@ -106,6 +106,11 @@ class ReportFormFragment : Fragment() {
             render()
         }
         b.noAutofix.setOnCheckedChangeListener { _, _ -> if (!binding) { saveDraft(); render() } }
+        for (box in appletBoxes().values) box.doAfterTextChanged {
+            if (binding) return@doAfterTextChanged
+            drafts.saveAppletFields(appletFields())
+            if (vm.error != null) { vm.error = null; render() }
+        }
 
         b.lastScreenRow.setOnClickListener { b.lastScreenSwitch.toggle() }
         b.lastScreenSwitch.setOnCheckedChangeListener { sw, on ->
@@ -130,7 +135,7 @@ class ReportFormFragment : Fragment() {
         }
         b.type.addOnButtonCheckedListener { _, id, checked ->
             if (binding || !checked) return@addOnButtonCheckedListener
-            val k = if (id == R.id.type_feature) IssueKind.FEATURE else IssueKind.BUG
+            val k = when (id) { R.id.type_feature -> IssueKind.FEATURE; R.id.type_applet -> IssueKind.APPLET; else -> IssueKind.BUG }
             if (k == vm.kind) return@addOnButtonCheckedListener
             saveDraft()          // keep this kind's draft …
             vm.kind = k
@@ -184,10 +189,18 @@ class ReportFormFragment : Fragment() {
 
     private fun currentText() = b.description.text?.toString() ?: ""
 
+    /** A0178: the applet request's boxes besides the description, by [AppletForm] field. */
+    private fun appletBoxes() = mapOf(AppletForm.NAME to b.appletName, AppletForm.DEVICES to b.appletDevices,
+        AppletForm.DATA to b.appletData, AppletForm.PORTAL to b.appletPortal)
+
+    private fun appletFields() = appletBoxes().mapValues { it.value.text?.toString() ?: "" }
+
     private fun loadDraft() {
         binding = true
         b.description.setText(drafts.description(vm.kind))
         b.description.setSelection(b.description.text?.length ?: 0)
+        val fields = drafts.appletFields()
+        appletBoxes().forEach { (k, box) -> box.setText(fields[k] ?: "") }
         b.noAutofix.isChecked = !drafts.noAutofix(vm.kind) // the box reads "Auto-fix": checked = agents may fix it
         binding = false
     }
@@ -198,15 +211,21 @@ class ReportFormFragment : Fragment() {
         val bb = _b ?: return
         binding = true
         val bug = vm.kind == IssueKind.BUG
+        val applet = vm.kind == IssueKind.APPLET
         val submitting = vm.submitting.value
-        bb.toolbar.title = getString(if (bug) R.string.feedback_title_bug else R.string.feedback_title_feature)
-        bb.intro.setText(if (bug) R.string.feedback_intro_bug else R.string.feedback_intro_feature)
-        bb.label.setText(if (bug) R.string.feedback_label_bug else R.string.feedback_label_feature)
-        bb.descriptionLayout.placeholderText = getString(if (bug) R.string.feedback_description_placeholder else R.string.feedback_feature_placeholder)
-        // Features are always held for review, so the box is hidden for them (FBK-04 item 3).
+        fun pick(bugRes: Int, featureRes: Int, appletRes: Int) = when (vm.kind) {
+            IssueKind.BUG -> bugRes; IssueKind.FEATURE -> featureRes; IssueKind.APPLET -> appletRes
+        }
+        bb.toolbar.title = getString(pick(R.string.feedback_title_bug, R.string.feedback_title_feature, R.string.feedback_title_applet))
+        bb.intro.setText(pick(R.string.feedback_intro_bug, R.string.feedback_intro_feature, R.string.feedback_intro_applet))
+        bb.label.setText(pick(R.string.feedback_label_bug, R.string.feedback_label_feature, R.string.feedback_label_applet))
+        bb.descriptionLayout.placeholderText = getString(pick(R.string.feedback_description_placeholder,
+            R.string.feedback_feature_placeholder, R.string.feedback_applet_placeholder))
+        // Features and applet requests are always held for review, so the box is hidden for them (FBK-04 item 3, A0178).
         bb.noAutofix.isVisible = bug
         bb.noAutofixHint.isVisible = bug && !bb.noAutofix.isChecked
-        bb.type.check(if (bug) R.id.type_bug else R.id.type_feature)
+        bb.appletFields.isVisible = applet
+        bb.type.check(pick(R.id.type_bug, R.id.type_feature, R.id.type_applet))
 
         bb.banner.isVisible = vm.error != null
         bb.bannerText.text = vm.error
@@ -240,6 +259,8 @@ class ReportFormFragment : Fragment() {
         bb.logRow.isEnabled = enabled
         bb.typeBug.isEnabled = enabled
         bb.typeFeature.isEnabled = enabled
+        bb.typeApplet.isEnabled = enabled
+        appletBoxes().values.forEach { it.isEnabled = enabled }
 
         // Submit (FBK-03): disabled while empty or importing; spinner + "Sending…" while saving.
         bb.submit.isEnabled = !submitting && !vm.importing && currentText().isNotBlank()
@@ -314,7 +335,8 @@ class ReportFormFragment : Fragment() {
         vm.error = null
         requireContext().getSystemService(InputMethodManager::class.java)?.hideSoftInputFromWindow(b.description.windowToken, 0)
         b.description.clearFocus()
-        vm.submit(app, vm.kind, text, vm.kind == IssueKind.BUG && !b.noAutofix.isChecked, screen, screenContext, logEntryId)
+        val applet = if (vm.kind == IssueKind.APPLET) AppletForm.build(text, appletFields().also { drafts.saveAppletFields(it) }) else null
+        vm.submit(app, vm.kind, text, vm.kind == IssueKind.BUG && !b.noAutofix.isChecked, screen, screenContext, logEntryId, applet)
     }
 
     private fun onOutcome(o: ReportFormViewModel.Outcome) {
@@ -328,7 +350,7 @@ class ReportFormFragment : Fragment() {
                 }
                 // The team number arrives a few seconds after the save: update the open dialog.
                 if (dialog?.isShowing == true) { dialog?.setMessage(message); return }
-                binding = true; b.description.setText(""); b.noAutofix.isChecked = true; binding = false
+                binding = true; b.description.setText(""); appletBoxes().values.forEach { it.setText("") }; b.noAutofix.isChecked = true; binding = false
                 render()
                 // FBK-08. Stays up across rotation: the outcome is consumed only by a button.
                 val builder = MaterialAlertDialogBuilder(requireContext())

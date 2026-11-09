@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Watch activity on the selected monitoring phone for one approved registry edition. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",

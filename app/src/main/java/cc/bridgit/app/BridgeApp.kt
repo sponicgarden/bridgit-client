@@ -97,6 +97,8 @@ class BridgeApp : Application() {
     /** ADB setup (8.27): Bridgit's own client of this device's Wireless debugging. */
     val adb by lazy { cc.bridgit.app.adb.AdbClient(this) }
     val requests = cc.bridgit.app.api.RequestState()
+    /** A0186: receive-to-response time of every API call, with curated device context (GET /v1/log/latency). */
+    val latency by lazy { cc.bridgit.app.api.ApiLatency({ cc.bridgit.app.api.LatencyContext.sample(this) }) }
 
     /** What the listener is doing, for Home, the notification and the Add-agent check. */
     data class ListenerState(
@@ -156,6 +158,8 @@ class BridgeApp : Application() {
         agents.onFirstUse = { a -> if (cc.bridgit.app.ui.home.HomeStates.controlAgents(this).any { it.id == a.id }) cc.bridgit.app.ui.common.AgentConnectionSound.play(this) }
         agents.onKeyRetired = { id -> cc.bridgit.app.feedback.TeamKeys.retire(this, id) } // FBK-15
         log = LogStore(this) { settings.retention() }
+        // A0189: Monitor resources (off by default) follows its two settings from here on.
+        runCatching { cc.bridgit.app.monitor.ResourceMonitor.attach(this) }
         // The optional on-phone software's manifest, once a day; it only fetches while an engine is in use.
         runCatching { cc.bridgit.app.vision.SoftwareCheckWorker.schedule(this) }
         // Automatic app updates (A0050), on unless the owner turned them off.

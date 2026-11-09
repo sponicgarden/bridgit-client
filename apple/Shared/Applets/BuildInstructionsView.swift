@@ -302,10 +302,19 @@ struct ControlAgentSetup: View {
                             Text("Cancel").frame(minWidth: 44, minHeight: 44).contentShape(Rectangle())
                         }
                         Spacer()
-                        Button { configuring = true } label: {
+                        Button {
+                            Task {
+                                if host.ownerDirectAddress == nil {
+                                    do { try await host.enableConfiguredOwnerDirect() }
+                                    catch is CancellationError {}
+                                    catch { host.problem = error.localizedDescription }
+                                }
+                                configuring = true
+                            }
+                        } label: {
                             Text("Next").frame(minWidth: 44, minHeight: 44).contentShape(Rectangle())
                         }.buttonStyle(.borderedProminent)
-                            .disabled(host.ownerDirectAddress == nil || host.ownerDirectStarting)
+                            .disabled(host.ownerDirectStarting)
                     }
                 }
                 .padding()

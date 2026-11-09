@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Deprecated: the old address of POST /v1/issues, same behaviour",
@@ -14,12 +14,13 @@
   "body": [
    {
     "name": "kind",
-    "description": "bug or feature",
+    "description": "bug, feature or applet (an applet request: a new applet, with its portal page, to be built)",
     "type": "string",
     "required": true,
     "enum": [
      "bug",
-     "feature"
+     "feature",
+     "applet"
     ]
    },
    {
@@ -29,8 +30,14 @@
     "required": true
    },
    {
+    "name": "applet",
+    "description": "kind applet only, every field optional: {\"name\" (120 chars), \"what_it_does\" (2,000), \"devices\" (up to 10, 80 chars each), \"data_used\" (up to 20, 120 chars each), \"portal_shows\" (2,000)}",
+    "type": "object",
+    "required": false
+   },
+   {
     "name": "no_autofix",
-    "description": "true = leave it for a person",
+    "description": "true = leave it for a person (features and applet requests always are)",
     "type": "boolean",
     "required": false
    },
@@ -51,7 +58,7 @@
   "idempotent": true,
   "path": "/v1/feedback",
   "capability": "feedback",
-  "returns": "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}",
+  "returns": "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, no_autofix, kind, applet (applet requests), sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}",
   "errors": [
    "forbidden",
    "invalid_parameter",

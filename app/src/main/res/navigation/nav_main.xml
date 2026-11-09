@@ -54,7 +54,7 @@
     <fragment android:id="@+id/adbSetup" android:name="cc.bridgit.app.ui.adb.AdbSetupFragment" />
     <fragment android:id="@+id/tailscaleSetup" android:name="cc.bridgit.app.ui.tailscale.TailscaleSetupFragment" />
     <fragment android:id="@+id/settings" android:name="cc.bridgit.app.ui.more.SettingsFragment" />
-    <!-- P1b Issues Tracking (section 11). reportForm: kind = "bug" | "feature"; optional logEntryId attaches one log entry. -->
+    <!-- P1b Issues Tracking (section 11). reportForm: kind = "bug" | "feature" | "applet"; optional logEntryId attaches one log entry. -->
     <fragment android:id="@+id/reportForm" android:name="cc.bridgit.app.ui.feedback.ReportFormFragment">
         <argument android:name="kind" app:argType="string" android:defaultValue="bug" />
         <argument android:name="screen" app:argType="string" app:nullable="true" android:defaultValue="@null" />

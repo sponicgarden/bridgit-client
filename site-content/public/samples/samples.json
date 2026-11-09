@@ -1,6 +1,6 @@
 {
  "about": "Bridgit interaction samples: complete request bodies for POST /v1/interactions, one or more per kind, with the reply and the answer each one produces. Source: site-content/content/samples.json plus the card pages in site-content/public/samples/. scripts/samples.mjs builds site-content/public/samples/samples.json, which the app serves at GET /v1/samples.",
- "api_revision": 134,
+ "api_revision": 140,
  "conventions": {
   "create": "POST /v1/interactions with the sample's request as the JSON body. Reply 201: {\"interaction_id\": <number>, \"status\": \"pending\", \"expires_at\": \"<ISO-8601>\"}.",
   "wait": "GET /v1/interactions/{interaction_id}?wait=55 returns when the owner answers, closes it, or after 55 s (status still pending). The same answer arrives as an interaction.answered event on GET /v1/events.",

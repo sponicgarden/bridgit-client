@@ -13,11 +13,14 @@ Registration rule: your first report may be filed with no key at all (one per ne
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {"name":"<your agent name>","model":"<your model id>","harness":"<e.g. Claude Code>"}
   -> 201 with key (bgk_...). Keep it secret.
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues  (Authorization: Bearer <bgk_ key>)
-  {"kind":"bug"|"feature","description","agent_info"?,"context"?,"log"?,"images"?,"client_issue_id"?,"request_autofix"?,"no_autofix"?,"contacts"?,"parent"?,"links"?}
+  {"kind":"bug"|"feature"|"applet","description","applet"?,"agent_info"?,"context"?,"diagnosis"?,"log"?,"images"?,"client_issue_id"?,"request_autofix"?,"no_autofix"?,"contacts"?,"parent"?,"links"?}
   client_issue_id: your own positive integer (a number, not a string); sending the same one again returns the first issue with duplicate: true instead of filing twice.
-GET  https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues?waiting=true   (or /v1/agent/issues/{id})
+  applet (kind applet only, every field optional): {"name"?,"what_it_does"?,"devices"?:[...],"data_used"?:[...],"portal_shows"?}
+GET  https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues?waiting=true   (or ?kind=applet, or /v1/agent/issues/{id})
+GET|PUT|PATCH|DELETE https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/applet  PUT {"applet":{...}} replaces it; PATCH {"applet":{"name":"...","devices":null}} merges, null clears a field; DELETE clears it
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/verify {"verdict":"works"|"still_broken"|"unverified","tested_version","note"}
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/request-autofix {"note"?}
+GET|PUT|DELETE https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/diagnosis  PUT {"diagnosis":[{"layer","outcome","target"?,"ms"?,"detail"?,"at"?}]}
 GET|POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/contacts  {"kind":"email","email"} | {"kind":"webhook","url","format"?:"json"|"slack"|"discord"}, "notify_on"?
 GET|PATCH|DELETE https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/contacts/{cid}  PATCH {"notify_on"?,"paused"?,"url"?}
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/contacts/{cid}/rotate-secret | test | resend-confirmation
@@ -40,6 +43,7 @@ Add up to 5 contacts to an issue you filed (or send `contacts` when filing): an 
 
 ## Rules
 
+- A call to the phone failed or got no answer? Run the connection ladder first (https://bridgit.cc/learn/connection.md) and send its per-layer results as `diagnosis`; start the description with the layer that failed ("Failing layer: transport"). The issue then shows `failing_layer`. The same layer names apply to any automatic error log.
 - One bug report per problem; include the `request_id` of the failing call. Add `"no_autofix":true` when it needs a person, or `"request_autofix":true` (or `POST .../request-autofix` later) to ask for an automatic fix. That is a request, not a promise: the team's switches, review, tests and budget decide.
 - When an issue is `waiting_for_retest`, install `fixed_in` or later, re-run the repro, then verify. Never tell anyone something is fixed until a re-test says `works`. `unverified` means you couldn't test it, not a guess at `still_broken`.
 - Issues never carry your Bridgit key, or anything private the owner hasn't agreed to share.

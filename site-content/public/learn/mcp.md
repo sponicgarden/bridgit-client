@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 139. Full index: https://bridgit.cc/learn/index.json.
+API revision 144. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -79,7 +79,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `owner_configuration_email_get` | `GET /v1/owner/configuration/email` | Read alert-address enrollment status; verification remains a real email step |
 | `owner_configuration_email_post` | `POST /v1/owner/configuration/email` | Set/replace/clear alert address using native enrollment; this never fabricates confirmation; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_name_get` | `GET /v1/owner/configuration/name` | Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend |
-| `owner_configuration_name_post` | `POST /v1/owner/configuration/name` | Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_name_post` | `POST /v1/owner/configuration/name` | Register this Bridgit's two names in one step on the first control call (Device Domain Name + friendly name), or change its friendly name, label or visibility; the domain name is kept for good; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_name_delete` | `DELETE /v1/owner/configuration/name` | Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_specs_get` | `GET /v1/owner/configuration/specs` | Read whether this Bridgit stores its static spec sheet with Bridgit (default on), the sheet it sends and the copy the team backend holds |
 | `owner_configuration_specs_post` | `POST /v1/owner/configuration/specs` | Switch storing the static spec sheet with Bridgit on or off (off deletes the stored copy) or store the current sheet now; same logic as Settings › Team; explicit owner.configuration grant required; no per-change phone approval |
@@ -133,6 +133,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `services` | `GET /v1/services` | Discover general decision and location-context services for any applet: Azure image generation, models, nearby places, air quality, pollen, time zones, maps and weather; call formats, grants and budgets; no paid call |
 | `health` | `GET /v1/health` | Is Bridgit up, and which agent you are |
 | `device_display` | `GET /v1/device/display` | This phone's display right now and the canvas a card's page gets: full screen (presentation full_screen) per orientation and the standard card frame. Static specs (screen size, cameras) are also stored with Bridgit: ask GET <team backend>/v1/names/{name}/specs first when the phone may be busy or offline |
+| `device_resources` | `GET /v1/device/resources` | Monitor resources (A0189): Bridgit's own footprint over time, never other apps or content: CPU, memory, network, disk, storage, context switches (the wakeup proxy), with battery and thermal state as device context. Off by default; switch it and choose the interval (1s, 10s, 1m default, 1h) with the settings device.resource_monitor and device.resource_monitor_interval (POST /v1/settings, or POST /v1/owner/configuration/settings with the owner.configuration grant) |
 | `devices` | `GET /v1/devices` | Host and owner-configured external devices, supported actions and access status |
 | `capabilities` | `GET /v1/capabilities` | What's switched on and ready, and why not |
 | `limits` | `GET /v1/limits` | Your account's limits right now, and what is used: Jev and Clef calls an hour, the monthly model budget, paid watch checks, and the limits this phone enforces itself. Limits differ per account and can change: read them here, never assume documented numbers |
@@ -158,12 +159,13 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `log_read` | `GET /v1/log` | Read the log; with order=asc&since=<id>&wait=55 it follows new entries |
 | `log_entry` | `GET /v1/log/{id}` | One log entry |
 | `log_stats` | `GET /v1/log/stats` | Counts, errors and p50/p95 time per agent and endpoint |
+| `log_latency` | `GET /v1/log/latency` | How long API calls take on this device, from receiving the request to sending the response: count, median, p95 and max per API, and the slow calls with the device context they ran in (network, battery, thermal, app build, screen, load). Every transport: HTTP, MCP, relay, cards, schedules and the control server. Kept in memory: the newest 5000 calls, at most 7 days, empty after a restart. Calls you may see follow the log's visibility |
 | `log_export` | `GET /v1/log/export` | Every matching entry as JSONL or CSV; direct HTTP streams without a total size cap; MCP/relay envelopes capped at 8 MiB |
 | `log_device` | `GET /v1/log/device` | Snapshot of Android logcat visible to Bridgit's app UID; requires Fixer Mode (Bridgit Fixer Mode) |
 | `log_exits` | `GET /v1/log/exits` | Android 11+ Bridgit process exits, crashes and ANRs; Fixer Mode; Android-managed history (Bridgit Fixer Mode) |
 | `log_note` | `POST /v1/log` | Write a note to the agent channel |
 | `audit` | `GET /v1/audit` | Deprecated alias of /v1/log?channel=audit (removed in v3) |
-| `issues_list` | `GET /v1/issues` | Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode |
+| `issues_list` | `GET /v1/issues` | Issues Tracking: bug reports, feature requests and applet requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode |
 | `issues_team_key` | `GET /v1/issues/team-key` | Your own key for the Bridgit team's Issues Tracking backend: file issues, check their status and verify fixes there directly. Agent issue filing always goes directly to the servers |
 | `issues_get` | `GET /v1/issues/{id}` | One issue with its status history, team note and what you can send back; agents in Fixer Mode also get images, context and the attached log (and their first read marks a new issue seen) |
 | `issues_status` | `POST /v1/issues/{id}/status` | Move an issue: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode) (Bridgit Fixer Mode) |

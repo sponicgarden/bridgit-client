@@ -260,6 +260,46 @@ You choose how it is switched on with `ui.portal.include` (needs API revision 98
 
 The Insurance inventory applet (`applets/insurance-inventory/applet.json`) is the worked example: its portal is its only screen.
 
+## Applet pages (Spaces): one page for the web, the portal and Muse
+
+One of an applet's standard options is a **page**: a gallery, a poll, a report or a walk-through that people see on the web and the owner sees in the Bridgit portal and in a Muse Space. You write it **once** in the `bridgit-page/1` format, and each host draws it its own way. Don't write host-specific versions: the format handles each host's chrome, data, actions and fallbacks.
+
+- **Blocks**: the card pieces above, with the same fields (`header`, `status`, `text`, `note`, `metrics`, `gallery`, `video`, `table`, `timeline`, `people`, `devices`, `draft`, `buttons`), plus five page blocks:
+  - `section` `{title, eyebrow?, collapsed?}`
+  - `image` `{src, alt, caption?, frame: none|card|gilt, aspect?}`
+  - `rich_text` `{html}`: sanitised. Allowed are `p h3 h4 ul ol li strong em a blockquote code pre br hr table…` and inline svg with static shapes; links must be `https:`.
+  - `scenes` `{prompt?, items: [{label, says?, result?, image?}]}`
+  - `vote` `{options, key, label, image?, into, per_viewer?, show_counts?, audience?, closes_at?}`
+
+  Limits: at most 48 blocks, 8 sources and 64 KB per page.
+- **Data**: the card `sources`, plus `{"snapshot": "<name>"}`. The portal reads them live. The web and Muse hosts read the snapshot the device publishes while the page is published. `reply` and `batch` sources work in the portal only.
+- **Media** by reference only: `{"photo": "kept:…"}` or `{"$source": "…"}`, never bytes or URLs. Web and Muse pages get signed, expiring links.
+- **Hosts**:
+  - **Web**: the page on bridgit.cc. It ends with the **Get Bridgit footer by default**: the footer is the last thing on the page.
+  - **Portal**: in the app, drawn natively, with no footer.
+  - **Muse**: static HTML for a Space, with no footer. Scenes become a list, and a vote shows its counts and links to the web page.
+
+From an agent key your phone minted (`https://bridgit-feedback.bridgit-app.workers.dev`, `Authorization: Bearer bgk_…`):
+
+1. `PUT /v1/applets/installed/{applet}/pages/{page}` `{definition, expected_revision}`. The answer is **202 awaiting_owner**: the owner approves the page on the device. Waiting for approval is not success. Watch `GET …/events` for `page.approved` or `page.rejected`. `PATCH` `{patch, expected_revision}` changes fields (`null` clears one), and `DELETE` removes the page. An applet has at most 4 pages.
+2. `POST …/publish` `{hosts: ["web","muse"], visibility: "link"|"signed_in"}`. The answer is **202 pending_owner**: publishing is sharing, so the owner approves it.
+3. Once it is published, the web page is at `GET /v1/pages/{public_id}/html`. For a Muse Space, fetch `GET /v1/pages/{public_id}/export?host=muse` and place the HTML in the owner's Space. Fetch it again after each `page.approved`.
+4. Votes from the web page reach the device as rows `{option, voter}` in the table the vote names (`into`). You see each vote as a `page.action` event, without the voter.
+5. The footer is your decision: `PUT …/footer` `{get_bridgit: false, removed_reason: "…"}` removes it, which is audit-logged and needs no approval, and `DELETE …/footer` restores it. Leave it on unless there's a reason.
+
+If the owner switched off your control of applets, changes answer `403 permission_off: controlling_applets`. Reads still work. Every write takes an `Idempotency-Key`. The worked example is the Karol Portrait Gallery: a `gallery` of portraits in gilt frames, a `vote` into a `votes` table, and a `table` with the tally.
+
+```json
+{"format": "bridgit-page/1", "title": "Karol Portrait Gallery", "theme": {"accent": "gilt"},
+ "sources": {"portraits": {"table": "portraits", "limit": 24}, "votes": {"table": "votes", "limit": 500}},
+ "blocks": [
+  {"type": "header", "title": "Karol's Portrait Gallery", "text": "Vote for your favourite."},
+  {"type": "gallery", "photos": {"$source": "portraits.items"}, "photo": "photo", "caption": "title"},
+  {"type": "section", "title": "Vote for your favourite"},
+  {"type": "vote", "options": {"$source": "portraits.items"}, "key": "id", "label": "title", "image": "photo", "into": "votes", "show_counts": true}
+ ]}
+```
+
 ## Runs on its own, or only when used
 
 An applet with watches or a schedule runs on its own, and its budget's actions say how often. One with neither, whose flows only a card button (`called` or `button` trigger) starts, runs only when the owner uses it: it has no scheduled actions, and Installed applets shows **Open** for it (its card, or its portal when the portal is its interface). The Insurance inventory works this way.

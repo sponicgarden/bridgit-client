@@ -146,7 +146,7 @@ class ApiLogicTest {
         CapInfo(it, it, it, it in on, true, null)
     }
 
-    private val sections = listOf("CONNECTION", "YOUR KEY", "HOW TO CALL", "FIRST CALLS, IN ORDER", "WORKING WITH THE PHONE", "RULES", "AFTER YOU'RE CONNECTED")
+    private val sections = listOf("IDENTITY", "CONNECTION", "RULES", "FIRST CALLS, IN ORDER", "GOTCHAS", "AFTER YOU'RE CONNECTED", "POINTERS")
 
     @Test fun setupPromptDirect() {
         val key = Keys.generate()
@@ -154,11 +154,11 @@ class ApiLogicTest {
         assertEquals("key exactly once", 1, Regex(Regex.escape(key)).findAll(p).count())
         assertTrue(p.contains("http://my-phone.tailnet-name.ts.net:8735/v1"))
         assertTrue(p.contains("IP fallback: http://100.101.102.103:8735/v1"))
-        assertTrue(p.contains("Your agent name is \"Muse\""))
-        assertTrue(p.contains("create \"~/.config/bridgit/agents/Muse/header\" (mode 600)"))
-        assertTrue(p.contains("2. curl -sS -m 60 -H @\"\$HOME/.config/bridgit/agents/Muse/header\" http://my-phone.tailnet-name.ts.net:8735/v1/health\n"))
-        assertTrue("connected sentence", p.contains("means you're connected. After first call 3 (capabilities), tell the owner so"))
-        assertTrue("timeout fallback", p.contains("If curl times out") && p.contains("More → Relay"))
+        assertTrue(p.contains("- Agent name: Muse\n"))
+        assertTrue(p.contains("Store the key only in \"~/.config/bridgit/agents/Muse/header\" (mode 600)"))
+        assertTrue(p.contains("- Connected test: curl -sS -m 60 -H @\"\$HOME/.config/bridgit/agents/Muse/header\" http://my-phone.tailnet-name.ts.net:8735/v1/health\n"))
+        assertTrue("connected sentence", p.contains("means you're connected; nothing else proves it. After first call 3 (capabilities), tell the owner so"))
+        assertTrue("timeout fallback", p.contains("run the connection ladder first") && p.contains("More → Relay"))
         assertTrue(p.contains("/v1/camera/snapshot") && p.contains("/v1/image/last"))
         assertTrue(p.contains("GET /v1/guide is the full reference: use it only when needed"))
         assertTrue(p.contains("GET /v1/demo"))
@@ -178,11 +178,51 @@ class ApiLogicTest {
         assertTrue(calls.toString(), calls.none { it < 0 }); assertEquals(calls.sorted(), calls)
     }
 
-    @Test fun setupPromptAsksForAFriendlyNameFirstAndLinksTheAgentPage() {
+    private val named = DeviceIdentity("kitchen-tab", "Kitchen Tab", "Google Pixel 10 Pro XL", "o***@example.com (verified)")
+
+    @Test fun setupPromptOpensWithTheIdentityBlockAndTheDomainName() {
+        val key = Keys.generate()
+        for (connection in listOf(Connection.DIRECT, Connection.USERSPACE)) {
+            val p = SetupPrompt.build("Muse", key, connection, addr, "Google Pixel 10 Pro XL", caps("camera"), "helper", device = named)
+            assertEquals("A0213: identity first, fixed fields in a fixed order", listOf("IDENTITY",
+                "- Device domain name: kitchen-tab",
+                "- Friendly name: Kitchen Tab (display only; use the domain name)",
+                "- Model: Google Pixel 10 Pro XL",
+                "- Agent name: Muse",
+                "- Owner: o***@example.com (verified)"), p.lines().take(6))
+            assertTrue("connected test checks the domain name", p.contains("bridgit_name.name kitchen-tab means you're connected; nothing else proves it"))
+            val store = if (connection == Connection.USERSPACE) "env" else "header"
+            assertTrue("rotation rule replaces the one stored key", p.contains("key_rotated") && p.contains("ask the owner for a new setup prompt, then REPLACE the key in \"~/.config/bridgit/agents/Muse/$store\"; never keep two"))
+            assertTrue("one canonical store, mode 600", p.contains("Store the key only in \"~/.config/bridgit/agents/Muse/$store\" (mode 600)"))
+            assertTrue("says which MCP when", p.contains("/v1/mcp for the API") && p.contains("/mcp only for private-build control tools"))
+            assertTrue("A0213 order: rules before the bootstrap", p.indexOf("RULES") in p.indexOf("CONNECTION") until p.indexOf("FIRST CALLS, IN ORDER"))
+            val first = p.lineSequence().first { it.startsWith("1. GET /v1/health:") }
+            assertTrue(first, first.contains("This device's domain name is kitchen-tab") && first.contains("never register another name"))
+            assertFalse("a named device is never told to register", first.contains("register it") || first.contains("register a name"))
+            assertTrue("A0213 budget: ${p.length}", p.length < 6000)
+        }
+    }
+
+    @Test fun setupPromptOnlyRegistersANameWhenTheDeviceHasNoneAndTheOwnerChoseIt() {
+        val p = SetupPrompt.build("Muse", Keys.generate(), Connection.DIRECT, addr, "Pixel", caps("camera"), null)
+        assertTrue(p.startsWith("IDENTITY\n- Device domain name: none yet (see FIRST CALLS 1)\n"))
+        assertTrue("friendly name falls back to the model", p.contains("- Friendly name: Pixel (display only"))
+        assertTrue(p.contains("- Owner: email not set yet"))
         val first = SetupPrompt.firstCalls().lineSequence().first { it.startsWith("1. GET /v1/health:") }
-        assertTrue(first, first.indexOf("register a name") in 0 until first.indexOf("owner_email"))
-        assertTrue(first, first.contains("about 10 characters, friendly and cute to people") && first.contains("says if it's free"))
+        val registered = first.indexOf("if bridgit_name.status is \"registered\"")
+        val unregistered = first.indexOf("Only if it is \"unregistered\": ask the owner which name they want")
+        assertTrue(first, registered >= 0 && unregistered > registered && first.indexOf("then register it") > unregistered)
+        assertTrue(first, first.contains("never register another"))
         assertTrue(first, first.contains(Learn.NAMES_URL)); assertEquals("https://bridgit.cc/agents/names/", Learn.NAMES_URL)
+        assertTrue(first, first.indexOf("bridgit_name") < first.indexOf("owner_email"))
+        assertFalse("the old unconditional step is gone", first.contains("first register a name"))
+    }
+
+    @Test fun setupPromptSamplesAreAsciiSafe() {
+        val p = SetupPrompt.build("Muse", Keys.generate(), Connection.DIRECT, addr, "Pixel", caps("gallery", "camera", "mic"), null, device = named)
+        val smart = setOf('\u2018', '\u2019', '\u201C', '\u201D')
+        assertTrue("A0213: no smart quotes anywhere", p.none { it in smart })
+        p.lineSequence().filter { it.contains('{') }.forEach { line -> assertTrue("JSON sample not ASCII: $line", line.substring(line.indexOf('{')).all { it.code < 128 }) }
     }
 
     @Test fun startPageServedFromThePhone() {
@@ -219,11 +259,11 @@ class ApiLogicTest {
     @Test fun setupPromptAgentNameWithSpaces() {
         val key = Keys.generate()
         val p = SetupPrompt.build("Claude dev", key, Connection.DIRECT, addr, "Pixel", caps("camera"), null)
-        assertTrue(p.contains("create \"~/.config/bridgit/agents/Claude dev/header\""))
+        assertTrue(p.contains("only in \"~/.config/bridgit/agents/Claude dev/header\""))
         assertTrue(p.contains("-H @\"\$HOME/.config/bridgit/agents/Claude dev/header\""))
         assertFalse("no unquoted path", Regex("""[^"]~/\.config/bridgit/agents/Claude dev""").containsMatchIn(p))
         val u = SetupPrompt.build("Claude dev", key, Connection.USERSPACE, addr, "Pixel", caps("camera"), "helper")
-        assertTrue(u.contains("create \"~/.config/bridgit/agents/Claude dev/env\""))
+        assertTrue(u.contains("only in \"~/.config/bridgit/agents/Claude dev/env\""))
         assertTrue(u.contains("BRIDGIT_ENV=\"\$HOME/.config/bridgit/agents/Claude dev/env\""))
     }
 

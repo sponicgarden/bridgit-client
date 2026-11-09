@@ -1768,7 +1768,7 @@
    "requires": null
   },
   {
-   "summary": "Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
+   "summary": "Register this Bridgit's two names in one step on the first control call (Device Domain Name + friendly name), or change its friendly name, label or visibility; the domain name is kept for good; explicit owner.configuration grant required; no per-change phone approval",
    "method": "POST",
    "auth": true,
    "mcp_tool": "owner_configuration_name_post",
@@ -1780,6 +1780,12 @@
     {
      "name": "name",
      "description": "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "friendly_name",
+     "description": "Required when registering (unless the owner already named this phone): up to 40 characters, any style, unique among the owner's devices; displayed nearly everywhere, never public. Also changes it later",
      "type": "string",
      "required": false
     },
@@ -1799,11 +1805,11 @@
      "required": false
     }
    ],
-   "example": "POST /v1/owner/configuration/name {\"name\":\"kitchen-tab\"}",
+   "example": "POST /v1/owner/configuration/name {\"name\":\"kitchen-tab\",\"friendly_name\":\"Kitchen tablet\"}",
    "idempotent": true,
    "path": "/v1/owner/configuration/name",
    "capability": "owner_features",
-   "returns": "status,name,label,visible; 409 name_taken (lookup) means suggest another; 409 already_named means the name is fixed",
+   "returns": "status,name,friendly_name,needs_friendly_name,label,visible; 409 name_taken (lookup) means suggest another domain name; 409 friendly_name_taken (held_by) means another friendly name; 409 already_named means the name is fixed",
    "errors": [
     "invalid_parameter",
     "forbidden",
@@ -2648,7 +2654,7 @@
    "idempotent": false,
    "path": "/v1/lan/devices",
    "capability": "lan_control",
-   "returns": "devices[id,name,host,adapter,enrolled,verified_at,availability=not_checked,actions], adapters; no credentials, no probe",
+   "returns": "devices[id,name,host,adapter,enrolled,verified_at,availability=not_checked,actions[action,method,path,body,params]], adapters; device-pack actions list params[name,type,required,min,max|max_length] (empty when none) and their body carries example params; no credentials, no probe",
    "errors": [],
    "requires": null
   },
@@ -2766,7 +2772,7 @@
     },
     {
      "name": "params",
-     "description": "Device-pack action parameters, e.g. {\"url\":\"https://example.com/chime.mp3\"} for play or {\"level\":30} for volume_set",
+     "description": "Device-pack action parameters, e.g. {\"url\":\"https://example.com/chime.mp3\"} for play, {\"level\":30} for volume_set or {\"muted\":true} for mute_set. They may also be sent beside device and action ({\"level\":30}); the same name in both places must agree. Each action's parameters (name, type, required, bounds) are listed in GET /v1/lan/devices devices[].actions[].params",
      "type": "object",
      "required": false
     }
@@ -2775,7 +2781,7 @@
    "idempotent": true,
    "path": "/v1/lan/devices/action",
    "capability": "lan_control",
-   "returns": "device, action, availability=online, checked_at, result; failures do not prove offline. Camera snapshots/move use existing lan_camera endpoints.",
+   "returns": "device, action, availability=online, checked_at, result; failures do not prove offline. Its own rate limit: 30 actions a minute per agent, separate from captures. Camera snapshots/move use existing lan_camera endpoints.",
    "errors": [],
    "requires": null
   },
@@ -3521,7 +3527,7 @@
    "idempotent": false,
    "path": "/v1/health",
    "capability": "status",
-   "returns": "status, app, app_version, build_type (release, or debug for a test build), distribution (private or play), build_tag (null for the real app; debug or test claude <feature> for test builds), package (cc.bridgit.app is the real app), app_label (the name Android lists this build under), mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}",
+   "returns": "status, app, app_version, build_type (release, or debug for a test build), distribution (private or play), build_tag (null for the real app; debug or test claude <feature> for test builds), package (cc.bridgit.app is the real app), app_label (the name Android lists this build under), mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, listener {state (listening, rebinding, waiting_for_tailscale, bind_failed or stopped), binds (tailscale: Bridgit listens only on its Tailscale addresses, never the LAN), bound_to, port, tailscale_addresses (what the phone has now), on_tailnet, tailscale_installed, magic_dns, bind_error, ladder (what to do when a call fails)}, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}, resource_monitor {enabled, since, interval, level, cpu_percent, rss_mb, details: /v1/device/resources}",
    "errors": [],
    "requires": null
   },
@@ -3541,6 +3547,49 @@
    "capability": "status",
    "returns": "width_px, height_px (the full display in its current rotation), density_dpi, density, aspect_ratio (long:short, e.g. 20:9), rotation (0, 90, 180 or 270), orientation (portrait or landscape), refresh_hz, full_screen_card {portrait {width_px, height_px}, landscape {width_px, height_px}} (the whole display less the camera cutout; compose full-screen images to this size), standard_card {width_px, height_px, measured} (the bordered card frame; measured false = estimated from the window)",
    "errors": [],
+   "requires": null
+  },
+  {
+   "summary": "Monitor resources (A0189): Bridgit's own footprint over time, never other apps or content: CPU, memory, network, disk, storage, context switches (the wakeup proxy), with battery and thermal state as device context. Off by default; switch it and choose the interval (1s, 10s, 1m default, 1h) with the settings device.resource_monitor and device.resource_monitor_interval (POST /v1/settings, or POST /v1/owner/configuration/settings with the owner.configuration grant)",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "device_resources",
+   "query": [
+    {
+     "name": "view",
+     "description": "summary (default: status, current hour, today), samples (raw samples), hourly or daily (summaries per period and build)",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "summary",
+      "samples",
+      "hourly",
+      "daily"
+     ]
+    },
+    {
+     "name": "since",
+     "description": "Only entries at or after this time: ISO 8601 (2026-11-09T10:00:00Z) or epoch milliseconds",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "limit",
+     "description": "Newest entries to return, 1-1440 (default 100)",
+     "type": "integer",
+     "required": false
+    }
+   ],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/device/resources?view=hourly&limit=24",
+   "idempotent": false,
+   "path": "/v1/device/resources",
+   "capability": "status",
+   "returns": "enabled, running, since, stopped_at, interval, interval_s, intervals, default_interval (1m), level (current hour: ok|elevated|high), latest (newest sample), scope (bridgit_only), platform, bridgit_name, build {version, version_code, commit}, current_hour, today (summaries), thresholds {metric: {elevated, high}}, retention {samples, hours, days, samples_kept}, measures (what each number is; Android gives apps no per-app energy or wakeup count), view, and samples[] | hours[] | days[]. A sample: at, interval_s, build, version_code, cpu_percent (of one core), cpu_device_percent, rss_mb, peak_rss_mb, java_heap_mb, native_heap_mb, threads, network_bytes {rx, tx}, disk_bytes {read, write}, context_switches, storage_mb, battery {percent, charging, temperature_c}, thermal, monitor_cost_ms. A summary: period, start, end, build, version_code, samples, covered_s, cpu_percent {avg, peak}, rss_mb {avg, peak}, peak_rss_mb, network_bytes, network_mb_per_hour, disk_bytes, disk_write_mb_per_hour, context_switches, context_switches_per_s, storage_mb, battery_percent {first, last}, thermal_worst, monitor_cost_ms, level, over [{metric, value, level}]. Unavailable numbers are null",
+   "errors": ["invalid_parameter"],
    "requires": null
   },
   {
@@ -4700,6 +4749,49 @@
    "requires": null
   },
   {
+   "summary": "How long API calls take on this device, from receiving the request to sending the response: count, median, p95 and max per API, and the slow calls with the device context they ran in (network, battery, thermal, app build, screen, load). Every transport: HTTP, MCP, relay, cards, schedules and the control server. Kept in memory: the newest 5000 calls, at most 7 days, empty after a restart. Calls you may see follow the log's visibility",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "log_latency",
+   "query": [
+    {
+     "name": "api",
+     "description": "Only this API: its operation name as in openapi.json (e.g. getHealth), or tool <name> / <METHOD> <path> for the control server",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "slow_ms",
+     "description": "A call this slow or slower counts as slow, 1-600000, default 1000",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "limit",
+     "description": "Slow calls to return, newest first, 0-200, default 50",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "minutes",
+     "description": "Only calls from the last 1-10080 minutes; default every kept call",
+     "type": "integer",
+     "required": false
+    }
+   ],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/log/latency?slow_ms=2000",
+   "idempotent": false,
+   "path": "/v1/log/latency",
+   "capability": "log",
+   "returns": "device {name (the Device Domain Name, or null before one is registered), magic_dns}, kept {calls, capacity, max_age_hours, oldest, since_restart}, in_flight, slow_ms, apis[api, method, path, count, errors, median_ms, p95_ms, max_ms, slow] (slowest p95 first), slow_calls[ts, api, method, path, via, request_id, agent, agent_id, duration_ms, outcome (success or error), http, result, bytes_in, bytes_out (0 where not counted), in_flight (calls running when it arrived, itself included), ran_on, context], context_now. context: network {type wifi/cellular/ethernet/other/none, metered}, battery {percent, charging, power_save}, thermal, app {version, build, commit}, screen {on, locked}, listener_ready; sampled at most every 10 s. No parameters, bodies, addresses, location or sensor data",
+   "errors": ["invalid_parameter"],
+   "requires": null
+  },
+  {
    "summary": "Every matching entry as JSONL or CSV; direct HTTP streams without a total size cap; MCP/relay envelopes capped at 8 MiB",
    "method": "GET",
    "auth": true,
@@ -4928,7 +5020,7 @@
    "requires": null
   },
   {
-   "summary": "Issues Tracking: bug reports and feature requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
+   "summary": "Issues Tracking: bug reports, feature requests and applet requests, the ones you filed, or every issue for agents in Bridgit Fixer Mode",
    "method": "GET",
    "auth": true,
    "mcp_tool": "issues_list",
@@ -4947,12 +5039,13 @@
     },
     {
      "name": "kind",
-     "description": "bug or feature",
+     "description": "bug, feature or applet (an applet request)",
      "type": "string",
      "required": false,
      "enum": [
       "bug",
-      "feature"
+      "feature",
+      "applet"
      ]
     },
     {
@@ -5063,7 +5156,7 @@
    "idempotent": false,
    "path": "/v1/issues/{id}",
    "capability": "feedback",
-   "returns": "issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
+   "returns": "issue: ref (team number, e.g. M0042, or null until sent), description, applet (applet requests only), status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
    "errors": ["not_found"],
    "requires": null
   },
@@ -5153,12 +5246,13 @@
    "body": [
     {
      "name": "kind",
-     "description": "bug or feature",
+     "description": "bug, feature or applet (an applet request: a new applet, with its portal page, to be built)",
      "type": "string",
      "required": true,
      "enum": [
       "bug",
-      "feature"
+      "feature",
+      "applet"
      ]
     },
     {
@@ -5168,8 +5262,14 @@
      "required": true
     },
     {
+     "name": "applet",
+     "description": "kind applet only, every field optional: {\"name\" (120 chars), \"what_it_does\" (2,000), \"devices\" (up to 10, 80 chars each), \"data_used\" (up to 20, 120 chars each), \"portal_shows\" (2,000)}",
+     "type": "object",
+     "required": false
+    },
+    {
      "name": "no_autofix",
-     "description": "true = leave it for a person",
+     "description": "true = leave it for a person (features and applet requests always are)",
      "type": "boolean",
      "required": false
     },
@@ -5190,7 +5290,7 @@
    "idempotent": true,
    "path": "/v1/issues",
    "capability": "feedback",
-   "returns": "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}",
+   "returns": "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, no_autofix, kind, applet (applet requests), sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}",
    "errors": [
     "forbidden",
     "invalid_parameter",
@@ -5218,12 +5318,13 @@
     },
     {
      "name": "kind",
-     "description": "bug or feature",
+     "description": "bug, feature or applet (an applet request)",
      "type": "string",
      "required": false,
      "enum": [
       "bug",
-      "feature"
+      "feature",
+      "applet"
      ]
     },
     {
@@ -5334,7 +5435,7 @@
    "idempotent": false,
    "path": "/v1/feedback/{id}",
    "capability": "feedback",
-   "returns": "issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
+   "returns": "issue: ref (team number, e.g. M0042, or null until sent), description, applet (applet requests only), status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
    "errors": ["not_found"],
    "requires": null
   },
@@ -5424,12 +5525,13 @@
    "body": [
     {
      "name": "kind",
-     "description": "bug or feature",
+     "description": "bug, feature or applet (an applet request: a new applet, with its portal page, to be built)",
      "type": "string",
      "required": true,
      "enum": [
       "bug",
-      "feature"
+      "feature",
+      "applet"
      ]
     },
     {
@@ -5439,8 +5541,14 @@
      "required": true
     },
     {
+     "name": "applet",
+     "description": "kind applet only, every field optional: {\"name\" (120 chars), \"what_it_does\" (2,000), \"devices\" (up to 10, 80 chars each), \"data_used\" (up to 20, 120 chars each), \"portal_shows\" (2,000)}",
+     "type": "object",
+     "required": false
+    },
+    {
      "name": "no_autofix",
-     "description": "true = leave it for a person",
+     "description": "true = leave it for a person (features and applet requests always are)",
      "type": "boolean",
      "required": false
     },
@@ -5461,7 +5569,7 @@
    "idempotent": true,
    "path": "/v1/feedback",
    "capability": "feedback",
-   "returns": "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}",
+   "returns": "id (use in URLs), ref and number (the team-wide number, e.g. A0042; null until the phone sends it to the Bridgit team, then GET url shows it), status, no_autofix, kind, applet (applet requests), sent_to_team, url (check back with GET), followup_url, team_api {base_url, key_endpoint, docs}",
    "errors": [
     "forbidden",
     "invalid_parameter",
@@ -11740,7 +11848,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 139,
- "count": 350,
+ "api_revision": 144,
+ "count": 352,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

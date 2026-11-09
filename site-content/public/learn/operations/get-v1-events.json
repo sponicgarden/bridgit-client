@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Your events, oldest first: answers, closes, expiries, switch changes. interaction.renotified records an explicit card reminder. Repeated phone answers emit interaction.answered with resubmission=true and previous_answer; agents decide whether to accept the change. An answer given after the question expired comes as interaction.answered with late=true. action.executed: one of your HTML cards ran Bridgit.act (interaction_id, method, path, status, ok, error)",

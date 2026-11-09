@@ -38,6 +38,8 @@ object MoreSettingsSearch {
         Entry(R.id.keep, R.string.settings_keep),
         Entry(R.id.export, R.string.settings_export),
         Entry(R.id.clear, R.string.settings_clear),
+        Entry(R.id.resourceMonitor, R.string.settings_resource_monitor),
+        Entry(R.id.resourceInterval, R.string.settings_resource_interval),
         Entry(R.id.notifListener, R.string.channel_listener),
         Entry(R.id.notifCapture, R.string.channel_capture),
         Entry(R.id.notifQuestions, R.string.channel_questions),

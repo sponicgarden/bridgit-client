@@ -38,6 +38,16 @@
    "tool": "log_stats"
   },
   {
+   "summary": "How long API calls take on this device, from receiving the request to sending the response: count, median, p95 and max per API, and the slow calls with the device context they ran in (network, battery, thermal, app build, screen, load). Every transport: HTTP, MCP, relay, cards, schedules and the control server. Kept in memory: the newest 5000 calls, at most 7 days, empty after a restart. Calls you may see follow the log's visibility",
+   "path": "/v1/log/latency",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-log-latency.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-log-latency.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "log_latency"
+  },
+  {
    "summary": "Every matching entry as JSONL or CSV; direct HTTP streams without a total size cap; MCP/relay envelopes capped at 8 MiB",
    "path": "/v1/log/export",
    "method": "GET",
@@ -88,8 +98,8 @@
    "tool": "audit"
   }
  ],
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.log",

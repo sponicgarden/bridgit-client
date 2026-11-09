@@ -637,6 +637,24 @@ object ApiChanges {
         Revision(139, "1.8.0", "2026-11-09", listOf(
             Item("Outlet flow log: every LAN device enroll, action (relay_on, relay_off, status, device-pack actions) and removal is logged as it happens: a started entry before anything reaches the device, any bind or retry step, and the outcome (ok, failed or unknown_outcome with the error), all sharing one op_id, with the trigger (agent, transport, request id) and the device. Read your own with GET /v1/lan/devices/log; the log grant also sees them in GET /v1/log?kind=lan", "/v1/lan/devices/log"),
         )),
+        Revision(140, "1.8.0", "2026-11-09", listOf(
+            Item("Health has a listener block: state (listening, rebinding, waiting_for_tailscale, bind_failed, stopped), what it is bound to and the Tailscale addresses the phone has now, so an agent can tell a network problem from Bridgit not listening", "/v1/health"),
+            Item("The connection ladder: what to do when a call fails, layer by layer (network, transport, app, auth, capability), with a result per layer to send with a bug report as diagnosis: ${Learn.CONNECTION_URL}", null),
+        )),
+        Revision(141, "1.8.0", "2026-11-09", listOf(
+            Item("LAN device actions take their parameters beside device and action ({\"action\":\"volume_set\",\"level\":25}) as well as in params; each device's actions in GET /v1/lan/devices list their params (name, type, required, bounds) with an example body", "/v1/lan/devices/action"),
+            Item("LAN device actions have their own rate limit (${RateLimiter.DEVICE_ACTIONS_PER_AGENT} a minute per agent) and rate_limited message, separate from captures", "/v1/lan/devices/action"),
+        )),
+        Revision(142, "1.8.0", "2026-11-09", listOf(
+            Item("API latency telemetry: every call on every transport is timed from receipt to response; count, median, p95 and max per API, and slow calls with the device context they ran in (network type and metered, battery, power saver, thermal, app build, screen, calls in flight)", "/v1/log/latency"),
+        )),
+        Revision(143, "1.8.0", "2026-11-09", listOf(
+            Item("Applet requests: a third issue kind, applet, asks for a new applet with its portal page. File it with an optional applet object (name, what_it_does, devices, data_used, portal_shows); it is always held for a person. List them with kind=applet", "/v1/issues"),
+        )),
+        Revision(144, "1.8.0", "2026-11-09", listOf(
+            Item("Monitor resources: Bridgit's own CPU, memory, network, disk, storage and context switches over time, with hourly and daily summaries per build, thresholds and a level (ok, elevated, high). Off by default; health carries a short resource_monitor block", "/v1/device/resources"),
+            Item("device.resource_monitor (off by default) and device.resource_monitor_interval (1s, 10s, 1m default, 1h): read in GET /v1/settings, changed with POST /v1/settings or POST /v1/owner/configuration/settings", "/v1/settings"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }
@@ -655,7 +673,7 @@ object ApiChanges {
     /** Where an agent learns the current API (API-09). */
     fun links(): JSONObject = JSONObject().put("guide", "/v1/guide").put("demo", "/v1/demo").put("openapi", "/v1/openapi.json")
         .put("services", "/v1/services").put("discover", "/v1/discover").put("start", "/v1/start").put("starter", CapabilityCatalog.START_URL).put("catalog", CapabilityCatalog.INDEX_URL).put("catalog_bulk_export", CapabilityCatalog.URL).put("capabilities", "/v1/capabilities").put("changes", "/v1/changes").put("samples", "/v1/samples").put("issues", "/v1/issues").put("feedback", "/v1/feedback")
-        .put("applet_practices", "/v1/applets/practices").put("owner_features", "/v1/owner/features").put("resources", "/v1/resources").put("control_capabilities", "/v2/capabilities").put("learn", Learn.INDEX_URL).put("llms_txt", Learn.LLMS_URL)
+        .put("applet_practices", "/v1/applets/practices").put("owner_features", "/v1/owner/features").put("resources", "/v1/resources").put("control_capabilities", "/v2/capabilities").put("learn", Learn.INDEX_URL).put("llms_txt", Learn.LLMS_URL).put("connection", Learn.CONNECTION_URL)
 
     /** health's "whats_new": null when the agent is up to date. */
     fun whatsNew(known: Int): Any = if (known >= CURRENT) JSONObject.NULL else JSONObject()

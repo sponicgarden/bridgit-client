@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Deprecated: the old address of GET /v1/issues/{id}, same behaviour",
@@ -47,7 +47,7 @@
   "idempotent": false,
   "path": "/v1/feedback/{id}",
   "capability": "feedback",
-  "returns": "issue: ref (team number, e.g. M0042, or null until sent), description, status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
+  "returns": "issue: ref (team number, e.g. M0042, or null until sent), description, applet (applet requests only), status, team_note, history[at, kind, status, by, note], followup_outcomes; Fixer Mode: context, images[data_base64], log[], allowed_next",
   "errors": ["not_found"],
   "requires": null
  }

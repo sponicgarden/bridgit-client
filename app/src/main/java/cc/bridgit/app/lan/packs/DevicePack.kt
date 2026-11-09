@@ -52,7 +52,22 @@ object DevicePack {
     data class Arg(val name: String, val template: String, val document: Boolean)
     data class Out(val name: String, val from: String, val type: String)
     data class Step(val service: String, val action: String, val args: List<Arg>, val outs: List<Out>, val optional: Boolean)
-    data class Action(val name: String, val params: List<Param>, val steps: List<Step>)
+    data class Action(val name: String, val params: List<Param>, val steps: List<Step>) {
+        /** Each parameter's name, type, required flag and bounds, as GET /v1/lan/devices and /v1/lan/packs document them. */
+        fun paramSchema() = JSONArray(params.map { p ->
+            JSONObject().put("name", p.name).put("type", p.type).put("required", p.required).apply {
+                if (p.type == "integer") put("min", p.min).put("max", p.maxValue) else if (p.type != "boolean") put("max_length", p.max)
+            } })
+        /** A ready-to-edit value for each required parameter (A0212), for the advertised request body. */
+        fun exampleParams() = JSONObject().apply {
+            params.filter { it.required }.forEach { p -> put(p.name, when (p.type) {
+                "integer" -> (p.min + (p.maxValue - p.min) / 4).coerceIn(p.min, p.maxValue)
+                "boolean" -> true
+                "url" -> "https://example.com/audio.mp3"
+                else -> "text"
+            }) }
+        }
+    }
     data class Describe(val deviceType: String, val services: Map<String, String>)
     data class Pack(
         val id: String, val version: String, val engine: Int, val title: String, val limitations: String,
@@ -60,10 +75,7 @@ object DevicePack {
     ) {
         fun action(name: String) = actions.firstOrNull { it.name == name }
         fun schema() = JSONObject().put("id", id).put("version", version).put("title", title).put("limitations", limitations)
-            .put("actions", JSONArray(actions.map { a -> JSONObject().put("action", a.name).put("params", JSONArray(a.params.map { p ->
-                JSONObject().put("name", p.name).put("type", p.type).put("required", p.required).apply {
-                    if (p.type == "integer") put("min", p.min).put("max", p.maxValue) else if (p.type != "boolean") put("max_length", p.max)
-                } })) }))
+            .put("actions", JSONArray(actions.map { a -> JSONObject().put("action", a.name).put("params", a.paramSchema()) }))
     }
 
     private val ID = Regex("^[a-z][a-z0-9_]{2,40}$")

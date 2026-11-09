@@ -152,6 +152,7 @@ class SettingsFragment : Fragment() {
         b.export.value.setText(R.string.settings_export_desc)
         row(b.clear, R.string.settings_clear) { askClear() }
         b.clear.value.setText(R.string.settings_clear_desc)
+        resourceMonitorRows()
 
         // Notifications: one row per channel P1a creates.
         row(b.notifListener, R.string.channel_listener) { UiActions.openChannelSettings(requireContext(), BridgeApp.CHANNEL_LISTENER) }
@@ -367,6 +368,7 @@ class SettingsFragment : Fragment() {
             ?: getString(R.string.settings_captures_owner_upload_none)
         b.keep.value.text = if (st.retentionEntries == 0 && st.retentionDays == 0) getString(R.string.settings_keep_forever)
             else getString(R.string.settings_keep_value, if (st.retentionEntries == 0) "∞" else NumberFormat.getIntegerInstance().format(st.retentionEntries), st.retentionDays)
+        bindResourceMonitor()
         b.theme.value.setText(when (st.appearance) {
             "light" -> R.string.settings_theme_light
             "dark" -> R.string.settings_theme_dark
@@ -705,6 +707,61 @@ class SettingsFragment : Fragment() {
                 url.ifEmpty { getString(R.string.settings_captures_owner_upload_none) }.let { runCatching { java.net.URI(it).host }.getOrNull() ?: it }))
             bind(); true
         }
+    }
+
+    /**
+     * A0189/A0190: Monitor resources (off by default) and its sampling interval. The same Settings properties as
+     * device.resource_monitor / device.resource_monitor_interval in POST /v1/settings and /v1/owner/configuration/settings;
+     * monitor.ResourceMonitor follows them.
+     */
+    private fun resourceMonitorRows() {
+        val r = b.resourceMonitor
+        r.title.setText(R.string.settings_resource_monitor)
+        UiActions.asSwitch(r.root) { app.settings.resourceMonitor }
+        r.root.setOnClickListener {
+            val on = !app.settings.resourceMonitor
+            app.settings.resourceMonitor = on
+            audit(getString(R.string.settings_changed_resource_monitor, getString(if (on) R.string.home_on else R.string.home_off)))
+            bind()
+        }
+        row(b.resourceInterval, R.string.settings_resource_interval, inline = true) { askResourceInterval() }
+    }
+
+    private fun intervalLabel(v: String) = getString(when (v) {
+        "1s" -> R.string.settings_resource_interval_1s
+        "10s" -> R.string.settings_resource_interval_10s
+        "1h" -> R.string.settings_resource_interval_1h
+        else -> R.string.settings_resource_interval_1m
+    })
+
+    private fun bindResourceMonitor() {
+        val st = app.settings
+        val r = b.resourceMonitor
+        r.toggle.isChecked = st.resourceMonitor
+        val since = st.resourceMonitorChangedAt.takeIf { st.resourceMonitor && it > 0 }
+        r.value.isVisible = since != null
+        if (since != null) r.value.text = getString(R.string.settings_resource_monitor_since,
+            android.text.format.DateUtils.formatDateTime(requireContext(), since, android.text.format.DateUtils.FORMAT_SHOW_TIME or android.text.format.DateUtils.FORMAT_SHOW_DATE or android.text.format.DateUtils.FORMAT_ABBREV_MONTH))
+        r.root.contentDescription = if (since != null) "${r.title.text}, ${r.value.text}" else r.title.text
+        b.resourceInterval.value.text = intervalLabel(st.resourceMonitorInterval)
+        b.resourceInterval.root.contentDescription = "${b.resourceInterval.title.text}, ${b.resourceInterval.value.text}"
+    }
+
+    private fun askResourceInterval() {
+        val values = cc.bridgit.app.monitor.ResourceLog.INTERVALS
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.settings_resource_interval)
+            .setSingleChoiceItems(values.map { intervalLabel(it) }.toTypedArray(), values.indexOf(app.settings.resourceMonitorInterval).coerceAtLeast(0)) { d, which ->
+                val v = values[which]
+                if (v != app.settings.resourceMonitorInterval) {
+                    app.settings.resourceMonitorInterval = v
+                    audit(getString(R.string.settings_changed_resource_interval, intervalLabel(v)))
+                }
+                d.dismiss()
+                bind()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun askVisibility() {

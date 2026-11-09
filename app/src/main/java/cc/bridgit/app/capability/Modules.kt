@@ -69,7 +69,7 @@ class StatusModule(app: BridgeApp) : Capability(app) {
     override val titleRes = R.string.cap_status
     override val descriptionRes = R.string.cap_status_desc
     override val group = "status"
-    override val endpoints = listOf(Endpoints.SERVICES, Endpoints.SPEECH_MODELS, Endpoints.HEALTH, Endpoints.DEVICE_DISPLAY, Endpoints.DEVICES, Endpoints.CAPABILITIES, Endpoints.LIMITS, Endpoints.DISCOVER, Endpoints.DISCOVERY_REPORT, Endpoints.GUIDE, Endpoints.START, Endpoints.DEMO, Endpoints.SAMPLES, Endpoints.OPENAPI, Endpoints.REGISTRY, Endpoints.CHANGES, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.PAIR, Endpoints.MCP, Endpoints.ME, Endpoints.OWNER_EMAIL, Endpoints.OWNER_EMAIL_SET) + cc.bridgit.app.satellite.SatelliteEndpoints.ALL
+    override val endpoints = listOf(Endpoints.SERVICES, Endpoints.SPEECH_MODELS, Endpoints.HEALTH, Endpoints.DEVICE_DISPLAY, Endpoints.DEVICE_RESOURCES, Endpoints.DEVICES, Endpoints.CAPABILITIES, Endpoints.LIMITS, Endpoints.DISCOVER, Endpoints.DISCOVERY_REPORT, Endpoints.GUIDE, Endpoints.START, Endpoints.DEMO, Endpoints.SAMPLES, Endpoints.OPENAPI, Endpoints.REGISTRY, Endpoints.CHANGES, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.PAIR, Endpoints.MCP, Endpoints.ME, Endpoints.OWNER_EMAIL, Endpoints.OWNER_EMAIL_SET) + cc.bridgit.app.satellite.SatelliteEndpoints.ALL
 
     /** GET /v1/owner/email and the health block: where the owner's email verification stands. */
     private fun ownerEmailJson(): JSONObject {
@@ -122,6 +122,19 @@ class StatusModule(app: BridgeApp) : Capability(app) {
             val g = cc.bridgit.app.interact.DisplayInfo.read(app)
             Reply.Json(cc.bridgit.app.interact.CardViewport.displayJson(g, cc.bridgit.app.interact.DisplayInfo.standard(g)))
         }
+        endpoint(Endpoints.DEVICE_RESOURCES) {
+            val views = cc.bridgit.app.monitor.ResourceMonitor.VIEWS
+            val view = query("view")?.trim()?.ifEmpty { null } ?: "summary"
+            if (view !in views) throw cc.bridgit.app.api.ErrorCatalog.error("invalid_parameter", "view must be one of ${views.joinToString(", ")}")
+            val limitText = query("limit")?.trim()?.ifEmpty { null }
+            val limit = if (limitText == null) 100 else limitText.toIntOrNull()?.takeIf { it in 1..1440 }
+                ?: throw cc.bridgit.app.api.ErrorCatalog.error("invalid_parameter", "limit must be a whole number from 1 to 1440")
+            val since = query("since")?.trim()?.ifEmpty { null }?.let { t ->
+                t.toLongOrNull() ?: runCatching { java.time.Instant.parse(t).toEpochMilli() }.getOrNull()
+                    ?: throw cc.bridgit.app.api.ErrorCatalog.error("invalid_parameter", "since must be ISO 8601 (2026-11-09T10:00:00Z) or epoch milliseconds")
+            }
+            Reply.Json(cc.bridgit.app.monitor.ResourceMonitor.report(app, view, since, limit))
+        }
         endpoint(Endpoints.SERVICES) {
             Reply.Json(cc.bridgit.app.judgment.ServiceCatalog.json(cc.bridgit.app.feedback.FeedbackUploader.configured, app.settings.externalCallsPaused))
         }
@@ -141,13 +154,17 @@ class StatusModule(app: BridgeApp) : Capability(app) {
                 .put("battery_runtime", cc.bridgit.app.power.Battery.runtimeReport(app, bat))
                 .put("charging", (bat?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0)
                 .put("bind_address", s.boundTo.firstOrNull() ?: JSONObject.NULL).put("port", api.port)
+                // A0092: listener vs the phone's current Tailscale addresses, for the connection ladder.
+                .put("listener", cc.bridgit.app.api.ListenerReport.json(s, cc.bridgit.app.BridgeService.tailscaleAddresses(), app.settings.port,
+                    cc.bridgit.app.platform.TailscaleStatus.installed(app)))
                 .put("base_url", app.address().baseUrl)
                 .put("bridgit_name", cc.bridgit.app.feedback.DeviceNames.hint(app, agent?.id))
                 .put("owner_email", ownerEmailJson())
                 .put("api_revision", cc.bridgit.app.api.ApiChanges.CURRENT)
                 .put("whats_new", cc.bridgit.app.api.ApiChanges.whatsNew(agent?.let { app.agents.get(it.id) }?.knownApiRevision ?: 0))
                 .put("links", cc.bridgit.app.api.ApiChanges.links())
-                .put("display", runCatching { cc.bridgit.app.interact.CardViewport.healthJson(cc.bridgit.app.interact.DisplayInfo.read(app)) }.getOrDefault(JSONObject.NULL)))
+                .put("display", runCatching { cc.bridgit.app.interact.CardViewport.healthJson(cc.bridgit.app.interact.DisplayInfo.read(app)) }.getOrDefault(JSONObject.NULL))
+                .put("resource_monitor", runCatching { cc.bridgit.app.monitor.ResourceMonitor.healthJson(app) }.getOrDefault(JSONObject.NULL)))
         }
         endpoint(Endpoints.ME) {
             val model = body.optString("model", "").trim()
@@ -650,7 +667,7 @@ class LogModule(app: BridgeApp) : Capability(app) {
     override val titleRes = R.string.cap_log
     override val descriptionRes = R.string.cap_log_desc
     override val group = "status"
-    override val endpoints = listOf(Endpoints.LOG, Endpoints.LOG_ENTRY, Endpoints.LOG_STATS, Endpoints.LOG_EXPORT, Endpoints.DEVICE_LOG, Endpoints.DEVICE_EXITS, Endpoints.LOG_NOTE, Endpoints.AUDIT)
+    override val endpoints = listOf(Endpoints.LOG, Endpoints.LOG_ENTRY, Endpoints.LOG_STATS, Endpoints.LOG_LATENCY, Endpoints.LOG_EXPORT, Endpoints.DEVICE_LOG, Endpoints.DEVICE_EXITS, Endpoints.LOG_NOTE, Endpoints.AUDIT)
 
     private val noteLimiter = cc.bridgit.app.api.RateLimiter()
 
@@ -709,6 +726,28 @@ class LogModule(app: BridgeApp) : Capability(app) {
             }
             Reply.Json(JSONObject().put("by_agent", group { e -> e.agentId?.let { app.agents.get(it)?.name } ?: e.agent ?: "(no key)" })
                 .put("by_endpoint", group { "${it.method} ${it.endpoint}" }).put("entries", rows.size))
+        }
+        endpoint(Endpoints.LOG_LATENCY) {
+            val slowMs = intArg(this, "slow_ms", cc.bridgit.app.api.ApiLatency.DEFAULT_SLOW_MS.toInt(), 1, 600_000).toLong()
+            val limit = intArg(this, "limit", 50, 0, 200)
+            val minutes = intArg(this, "minutes", 0, 1, 10_080)
+            val api = query("api")?.trim()?.takeIf { it.isNotEmpty() }
+            val t = app.latency
+            val mine = allowed(this)
+            val kept = t.calls()
+            val calls = kept.filter { c -> (mine == null || c.agentId in mine) && (api == null || c.api == api) &&
+                (minutes == 0 || c.ts >= System.currentTimeMillis() - minutes * 60_000L) }
+            params.put("returned", calls.size)
+            Reply.Json(JSONObject()
+                .put("device", JSONObject().put("name", cc.bridgit.app.feedback.DeviceNames.cached(app)?.optString("name")?.takeIf { it.isNotEmpty() } ?: JSONObject.NULL)
+                    .put("magic_dns", app.listener.value.magicDns ?: JSONObject.NULL))
+                .put("kept", JSONObject().put("calls", kept.size).put("capacity", t.capacity).put("max_age_hours", t.maxAgeMs / 3_600_000)
+                    .put("oldest", kept.firstOrNull()?.let { isoAt(it.ts) } ?: JSONObject.NULL).put("since_restart", isoAt(t.startedAt)))
+                .put("in_flight", t.running).put("slow_ms", slowMs)
+                .put("apis", cc.bridgit.app.api.ApiLatency.aggregate(calls, slowMs))
+                .put("slow_calls", JSONArray(calls.asReversed().asSequence().filter { it.durationMs >= slowMs }.take(limit)
+                    .map { cc.bridgit.app.api.ApiLatency.json(it, ::isoAt) }.toList()))
+                .put("context_now", t.contextNow() ?: JSONObject.NULL))
         }
         endpoint(Endpoints.LOG_EXPORT) {
             val format = query("format") ?: "jsonl"

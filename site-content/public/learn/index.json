@@ -1,7 +1,7 @@
 {
  "catalog_bulk_export": "https://bridgit.cc/learn/catalog.json",
  "app_version": "1.8.0",
- "endpoint_count": 350,
+ "endpoint_count": 352,
  "file_a_bug_directly": "POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {\"name\",\"model\",\"harness\"}, then POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues with the key it returns. Details: https://bridgit.cc/learn/bugs.md",
  "catalog": "https://bridgit.cc/learn/catalog-index.json",
  "read_first": [
@@ -96,6 +96,11 @@
    "on_the_phone": null,
    "url": "https://bridgit.cc/learn/decisions.md"
   },
+  "connection": {
+   "what": "When a call to the phone fails: the connection ladder (network, transport, app, auth, capability), one read-only check per layer, a result to paste into a bug report as diagnosis, and a script that runs it (https://bridgit.cc/learn/connection.sh)",
+   "on_the_phone": null,
+   "url": "https://bridgit.cc/learn/connection.md"
+  },
   "mcp": {
    "what": "Using Bridgit as an MCP server: the instructions it sends and every tool name",
    "on_the_phone": "POST /v1/mcp",
@@ -132,8 +137,8 @@
    "url": "https://bridgit.cc/interactions/index.json"
   }
  },
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "sample_kinds": [
   "pieces",
   "notice",
@@ -141,6 +146,6 @@
   "html",
   "text"
  ],
- "error_codes": 79,
+ "error_codes": 81,
  "start_here": "https://bridgit.cc/learn/start.md"
 }

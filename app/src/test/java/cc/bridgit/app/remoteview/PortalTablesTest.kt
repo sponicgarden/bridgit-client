@@ -21,9 +21,9 @@ class PortalTablesTest {
     @Test fun inventoryPortalIsItsInterface() {
         val d = AppletPackage.check(inventory()).definition
         assertEquals(listOf("photos", "items"), PortalTables.tablesOf(d))
-        assertEquals(listOf("camera", "create", "export", "csv"), PortalTables.actionsOf(d))
+        assertEquals(listOf("camera", "create", "csv"), PortalTables.actionsOf(d))
         assertTrue(PortalRecords.always(d)); assertTrue(PortalTables.portalIsInterface(d))
-        assertEquals(setOf("camera", "create", "export", "csv"), PortalTables.buttonIds(d.getJSONObject("ui").getJSONObject("card")))
+        assertEquals(setOf("camera", "create", "csv"), PortalTables.buttonIds(d.getJSONObject("ui").getJSONObject("card")))
     }
 
     @Test fun badDeclarationsAreRefused() {

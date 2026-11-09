@@ -110,9 +110,20 @@ class IssueDetailFragment : Fragment() {
         else -> getString(R.string.feedback_upload_skipped)
     }
 
+    /** A0178: the description, then an applet request's fields one per line ("What it does" only when it isn't the description). */
+    private fun appletText(description: String, a: org.json.JSONObject): String {
+        fun list(k: String) = a.optJSONArray(k)?.let { arr -> (0 until arr.length()).joinToString { arr.optString(it) } }
+        val what = a.optString("what_it_does").takeIf { it.isNotEmpty() && !description.trim().startsWith(it) }
+        val lines = listOf(R.string.feedback_applet_name to a.optString("name"), R.string.feedback_applet_what to what,
+            R.string.feedback_applet_devices to list("devices"), R.string.feedback_applet_data to list("data_used"),
+            R.string.feedback_applet_portal to a.optString("portal_shows"))
+            .filter { !it.second.isNullOrEmpty() }.map { (label, v) -> getString(label) + ": " + v }
+        return if (lines.isEmpty()) description else description + "\n\n" + lines.joinToString("\n")
+    }
+
     private fun bind(r: Issue) {
         val bug = r.kind == IssueKind.BUG
-        val kindName = getString(if (bug) R.string.feedback_kind_bug else R.string.feedback_kind_feature)
+        val kindName = getString(r.kind.nameRes)
         b.toolbar.title = r.ref?.let { getString(R.string.feedback_detail_title, kindName, it) }
             ?: getString(R.string.feedback_detail_title_unsent, kindName)
         StatusChip.style(b.status, r.status)
@@ -120,7 +131,7 @@ class IssueDetailFragment : Fragment() {
         // Features are always held (FBK-04), so the flag only says something on bugs.
         b.noAutofix.isVisible = r.noAutofix && bug
         b.filed.text = getString(R.string.feedback_detail_filed, Fmt.dateTime(r.createdAt), r.agent ?: "owner") + "\n" + uploadLine(r)
-        b.description.text = r.description
+        b.description.text = r.applet?.let { appletText(r.description, it) } ?: r.description
 
         bindImages(r)
 

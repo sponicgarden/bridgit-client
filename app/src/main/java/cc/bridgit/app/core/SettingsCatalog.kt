@@ -53,6 +53,8 @@ object SettingsCatalog {
     /** The fixed settings, in the order the phone's Settings screen shows them. */
     val fixed: List<SettingDef> = listOf(
         SettingDef("device.name", "string", "Device display name, up to 60 characters; empty text clears the override"),
+        b("device.resource_monitor", "Monitor resources: Bridgit samples its own CPU, memory, network, disk, storage and wakeup proxy over time (never other apps). Off by default; read the log with GET /v1/device/resources"),
+        e("device.resource_monitor_interval", "How often Monitor resources samples: 1s or 10s for live diagnosis, 1m (default) or 1h for cheap always-on watching", cc.bridgit.app.monitor.ResourceLog.INTERVALS),
         b("listener.enabled", "Always-on listener: Bridgit answers agents"),
         i("listener.port", "The port agents call", 1024, 65535),
         b("listener.allow_internet_callbacks", "Callback URLs may be public HTTPS addresses, not only tailnet ones"),

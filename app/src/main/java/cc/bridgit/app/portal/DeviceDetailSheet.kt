@@ -54,6 +54,8 @@ class DeviceDetailSheet(
     val pause: Action? = null,
     /** Unlink, Remove or Disconnect, with the confirmation it asks first. */
     val destructive: Destructive? = null,
+    /** A0149: a linked Bridgit's two-device diagram (shown first) and its iconic details; null for a device that isn't a link. */
+    val link: cc.bridgit.app.link.LinkDiagram.Model? = null,
 ) {
     data class Status(val text: String, val live: Boolean)
     data class Connection(val title: String, val body: String, val live: Boolean)
@@ -93,6 +95,9 @@ class DeviceDetailSheet(
         }
         root.addView(NestedScrollView(ctx).apply { addView(capped) }, LinearLayout.LayoutParams(-1, 0, 1f))
         fun section(v: View, top: Int = 16) = body.addView(v, LinearLayout.LayoutParams(-1, -2).apply { topMargin = ctx.dp(top) })
+
+        // A0149: the link diagram first, so the whole state of the link reads at a glance.
+        link?.let { m -> section(LinkHeaderView(ctx, m), 0) }
 
         // Header.
         section(text(ctx, name, M.style.TextAppearance_Material3_TitleLarge, M.attr.colorOnSurface).apply { setTypeface(typeface, android.graphics.Typeface.BOLD) }, 0)
@@ -138,6 +143,7 @@ class DeviceDetailSheet(
         }
         refresh()
 
+        link?.let { m -> LinkHeaderView.details(ctx, m)?.let { section(it, 16) } }
         facts.forEachIndexed { i, f -> section(text(ctx, f, cc.bridgit.app.R.style.TextAppearance_Bridgit_BodyMedium, M.attr.colorOnSurface), if (i == 0) 16 else 8) }
 
         where?.takeIf { it.address != null || it.connections.isNotEmpty() }?.let { w ->

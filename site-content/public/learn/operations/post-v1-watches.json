@@ -1,6 +1,6 @@
 {
- "documentation_revision": 120,
- "api_revision": 139,
+ "documentation_revision": 126,
+ "api_revision": 144,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Call me back when ...: the phone reads the data you pick (location, motion, a camera photo, ...) on an interval, asks Clef or Jev (paid) your question about the last few readings, and calls you back when the answer matches. With a photo, a free change check on the phone skips the paid call while the picture stays the same; model none is local only. Designing one (which model, the change check, a worked door-camera example, cost): https://bridgit.cc/learn/decisions.md",

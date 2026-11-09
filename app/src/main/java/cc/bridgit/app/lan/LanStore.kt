@@ -23,6 +23,22 @@ class LanDevice(val id: String, val name: String, val host: String, val adapter:
         .put("actions", JSONArray(actions.map { action -> JSONObject().put("action", action)
             .put("method", "POST").put("path", "/v1/lan/devices/action")
             .put("body", JSONObject().put("device", id).put("action", action)) }))
+    /**
+     * A device-pack enrollment's public JSON (A0212): each action also documents its parameters (name, type,
+     * required, bounds; empty when it takes none), and the advertised body carries example values for the
+     * required ones in `params`.
+     */
+    fun publicJson(pack: cc.bridgit.app.lan.packs.DevicePack.Pack?): JSONObject {
+        val actions = pack?.actions.orEmpty()
+        val out = publicJson(actions.map { it.name })
+        val list = out.getJSONArray("actions")
+        actions.forEachIndexed { i, a ->
+            val entry = list.getJSONObject(i).put("params", a.paramSchema())
+            val example = a.exampleParams()
+            if (example.length() > 0) entry.getJSONObject("body").put("params", example)
+        }
+        return out
+    }
     fun stored() = JSONObject().put("id", id).put("name", name).put("host", host).put("adapter", adapter).put("agent_id", agentId)
         .put("username", username).put("password", password).put("allow_http", http).put("verified_at", verifiedAt).put("identity", identity).put("extra", extra)
     fun with(extra: JSONObject) = LanDevice(id, name, host, adapter, agentId, username, password, http, verifiedAt, identity, extra)

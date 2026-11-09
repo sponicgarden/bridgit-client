@@ -50,10 +50,11 @@ object ConfigurationEndpoints {
     val EMAIL_SET = write("POST", "/email", "Set/replace/clear alert address using native enrollment; this never fabricates confirmation",
         listOf(Param("email", "string|null", "Valid email; null removes after server confirmation", true)), "{\"email\":\"owner@example.com\"}", "email,state,human_verification_required,delivery; pending/failed delivery does not imply verification")
     val NAME = read("/name", "Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend", "status unregistered|registered,name,label,visible,advice,how")
-    val NAME_SET = write("POST", "/name", "Register this Bridgit's Device Domain Name on the first control call, or change its label/visibility; a name is kept for good",
+    val NAME_SET = write("POST", "/name", "Register this Bridgit's two names in one step on the first control call (Device Domain Name + friendly name), or change its friendly name, label or visibility; the domain name is kept for good",
         listOf(Param("name", "string", "Required when unregistered: 3-30 lowercase letters, digits and hyphens, about 10 characters, cute and friendly (kitchen-tab); first come, first served"),
+            Param("friendly_name", "string", "Required when registering (unless the owner already named this phone): up to 40 characters, any style, unique among the owner's devices; displayed nearly everywhere, never public. Also changes it later"),
             Param("label", "string|null", "Up to 60 characters shown on public lookup; null clears"), Param("visible", "boolean", "Public lookup shows label and online; default true; false hides")),
-        "{\"name\":\"kitchen-tab\"}", "status,name,label,visible; 409 name_taken (lookup) means suggest another; 409 already_named means the name is fixed")
+        "{\"name\":\"kitchen-tab\",\"friendly_name\":\"Kitchen tablet\"}", "status,name,friendly_name,needs_friendly_name,label,visible; 409 name_taken (lookup) means suggest another domain name; 409 friendly_name_taken (held_by) means another friendly name; 409 already_named means the name is fixed")
     val NAME_DELETE = write("DELETE", "/name", "Hide this Bridgit's Device Domain Name and clear its label; the name stays this Bridgit's", emptyList(), "", "status,name,label=null,visible=false")
     val SPECS = read("/specs", "Read whether this Bridgit stores its static spec sheet with Bridgit (default on), the sheet it sends and the copy the team backend holds",
         "share, name, specs (the current sheet), stored {available, specs, specs_updated_at} or {available:false, reason}, uploaded_at, delete_pending, lookup (the public GET agents use)")

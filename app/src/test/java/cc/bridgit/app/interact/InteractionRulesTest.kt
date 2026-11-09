@@ -69,4 +69,15 @@ class InteractionRulesTest {
         for ((b, v) in listOf("no" to emptyMap(), null to mapOf("when" to "Never"), null to mapOf("ghost" to "x"), null to emptyMap<String, String>()))
             try { InteractionRules.checkAnswer(controls, b, v); fail("accepted $b $v") } catch (_: InteractionError) {}
     }
+
+    /** A0094: display="full_screen" in a request is reply-only; it stays accepted but the reply says it was ignored. */
+    @Test fun displayInRequestIsReportedIgnored() {
+        val body = q(btn("ok")) { put("display", "full_screen") }
+        InteractionRules.parse(body)
+        val qs = InteractionRules.ignoredFields(body, IKind.QUESTION)!!.getString("display")
+        assertTrue(qs, "only in the reply" in qs && "kind html" in qs)
+        val h = InteractionRules.ignoredFields(body, IKind.HTML)!!.getString("display")
+        assertTrue(h, "presentation \"full_screen\"" in h)
+        assertNull(InteractionRules.ignoredFields(q(btn("ok")), IKind.QUESTION))
+    }
 }

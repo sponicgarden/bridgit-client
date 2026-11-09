@@ -69,6 +69,17 @@ class ScreenshotService : AccessibilityService() {
         @Volatile var instance: ScreenshotService? = null
             private set
 
+        /** True when Android reports no accessibility service running at all: a UI-test tool holds UiAutomation (A0068, A0095). */
+        fun paused(ctx: Context): Boolean = ctx.getSystemService(AccessibilityManager::class.java)
+            ?.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK).isNullOrEmpty()
+
+        /**
+         * A0095: what the capability reports when the service is switched on. Paused never clears by itself (a test
+         * driver left connected held the A9's accessibility for two days), so it is a blocked reason, not ready=true.
+         */
+        fun startupBlock(enabled: Boolean, connected: Boolean, paused: Boolean): String? =
+            if (enabled && !connected && paused) "accessibility_paused" else null
+
         /** Whether the owner has turned the service on in Accessibility settings (true even before it connects). */
         fun isEnabled(ctx: Context): Boolean {
             val me = ComponentName(ctx, ScreenshotService::class.java)
@@ -82,8 +93,7 @@ class ScreenshotService : AccessibilityService() {
          * accessibility service and reports none running; retrying can't help until it stops.
          */
         fun notStartedError(ctx: Context) =
-            if (ctx.getSystemService(AccessibilityManager::class.java)
-                    ?.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK).isNullOrEmpty())
+            if (paused(ctx))
                 ErrorCatalog.error("service_start_blocked",
                     "Android has paused every accessibility service on this phone, Bridgit's screenshot service included. " +
                         "That usually means a UI-test tool (Maestro, uiautomator, Appium) is connected over adb. " +
@@ -106,7 +116,8 @@ class ScreenModule(app: BridgeApp) : Capability(app) {
         Build.VERSION.SDK_INT < 30 -> "android_version"
         !ScreenshotService.isEnabled(app) -> "accessibility_off"
         !app.captureNotificationsOn() -> "notifications_off"
-        else -> null
+        else -> ScreenshotService.startupBlock(true, ScreenshotService.instance != null,
+            ScreenshotService.instance == null && ScreenshotService.paused(app))
     }
     override fun details() = JSONObject().put("accessibility_service", ScreenshotService.isEnabled(app)).put("modes", org.json.JSONArray().put("private"))
 
@@ -137,8 +148,9 @@ class ScreenModule(app: BridgeApp) : Capability(app) {
             if (!ScreenshotService.isEnabled(app)) throw ErrorCatalog.error("access_needed",
                 "Bridgit's screenshot service is off. Ask the owner to open Bridgit > More > Hardware access > Screenshots and turn it on.",
                 mapOf("setting" to "accessibility_screenshot"))
-            requireUsable()
+            // Before requireUsable: accessibility_paused needs the specific "stop the test tool" error, not a generic one.
             val svc = ScreenshotService.instance ?: throw ScreenshotService.notStartedError(app)
+            requireUsable()
             if (app.getSystemService(KeyguardManager::class.java)?.isKeyguardLocked == true)
                 throw ErrorCatalog.error("device_locked", "The phone is locked, so there's nothing to see. Ask the owner to unlock it.")
             cc.bridgit.app.capture.CapturesModule.checkStore(app, this, "screen")

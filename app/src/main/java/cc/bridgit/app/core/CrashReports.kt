@@ -41,6 +41,7 @@ object CrashReports {
             o.isEnableSystemEventBreadcrumbs = false
             o.isEnableAppComponentBreadcrumbs = false
             o.isAnrEnabled = true
+            o.isAttachAnrThreadDump = true // background ANRs often arrive with no parsed frames; the raw dump still shows what was stuck
             o.isEnableAutoSessionTracking = false // no ping on every launch: Bridgit talks to Sentry only when something breaks
             o.tracesSampleRate = null
             o.setBeforeSend { e, _ -> scrub(e) }

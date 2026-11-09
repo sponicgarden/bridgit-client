@@ -543,11 +543,13 @@ class AddAgentFragment : Fragment() {
         val id = vm.agentId
         panel.isVisible = id != null
         if (id != null) {
-            val state = app.agents.get(id)?.toJson()?.toString()
-            if (panel.tag != state) {
-                panel.tag = state
+            // Built once per agent, then refreshed in place so open groups stay open.
+            if (panel.tag != id || panel.childCount == 0) {
+                panel.tag = id
                 panel.removeAllViews()
                 panel.addView(cc.bridgit.app.ui.agents.AgentPermissionsDialog.content(this, id))
+            } else {
+                (panel.getChildAt(0).tag as? Runnable)?.run()
             }
         }
     }

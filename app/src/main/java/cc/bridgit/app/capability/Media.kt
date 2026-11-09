@@ -26,6 +26,8 @@ import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -107,6 +109,24 @@ object ImageUtil {
     }
 }
 
+/** A0064: CameraX camera-state errors that mean the photo can't happen soon, as the agent's error. Null: keep waiting. */
+object CameraBlock {
+    const val GRACE_MS = 3_000L
+
+    fun error(code: Int?, rear: Boolean): ApiError? {
+        val which = if (rear) "rear" else "front"
+        return when (code) {
+            androidx.camera.core.CameraState.ERROR_CAMERA_IN_USE, androidx.camera.core.CameraState.ERROR_MAX_CAMERAS_IN_USE ->
+                ApiError(409, "sensor_busy", "Another app on the phone is using the $which camera (for example the Camera app " +
+                    "or a video call). Ask the owner to close it, then retry.", mapOf("reason" to "camera_in_use"))
+            androidx.camera.core.CameraState.ERROR_CAMERA_DISABLED ->
+                ApiError(409, "sensor_busy", "Android has the camera turned off (device policy or the camera privacy switch).",
+                    mapOf("reason" to "camera_disabled"))
+            else -> null
+        }
+    }
+}
+
 class CameraCapture(private val context: Context, private val owner: LifecycleOwner) {
 
     /** Zoom range of the last camera used, for /v1/capabilities and error messages. */
@@ -182,7 +202,7 @@ class CameraCapture(private val context: Context, private val owner: LifecycleOw
                     delay(400) // let focus and exposure settle at the new zoom
                 }
                 // take() yields Result: success, or the capture error. null here means timeout.
-                val outcome = withTimeoutOrNull(20_000) { take(w.capture, file) }
+                val outcome = unlessTaken(w.camera, rear) { withTimeoutOrNull(20_000) { take(w.capture, file) } }
                     ?: throw ApiError(504, "capture_timeout", "Camera did not produce a photo in time")
                 outcome.exceptionOrNull()?.let { throw ApiError(409, "sensor_busy", "Capture failed: ${it.message}") }
                 android.util.Log.i(TAG, "snapshot saved")
@@ -196,6 +216,33 @@ class CameraCapture(private val context: Context, private val owner: LifecycleOw
     }
 
     private companion object { const val TAG = "BridgitCamera" }
+
+    /**
+     * A0064: while another app (the Camera app, a video call) holds the camera, Android refuses Bridgit's open and
+     * CameraX keeps retrying quietly, so the photo used to wait the full 20 s and end in capture_timeout. Runs [block]
+     * but fails with [CameraBlock]'s error once the camera has reported it for [CameraBlock.GRACE_MS] (a brief
+     * hand-over between apps still gets its photo).
+     */
+    private suspend fun <T> unlessTaken(camera: Camera, rear: Boolean, block: suspend () -> T): T {
+        val blocked = kotlinx.coroutines.flow.MutableStateFlow<ApiError?>(null)
+        val live = camera.cameraInfo.cameraState
+        val obs = androidx.lifecycle.Observer<androidx.camera.core.CameraState> { st -> blocked.value = CameraBlock.error(st.error?.code, rear) }
+        withContext(Dispatchers.Main) { live.observeForever(obs) }
+        try {
+            return kotlinx.coroutines.coroutineScope {
+                val watcher = launch {
+                    while (true) {
+                        blocked.first { it != null }
+                        delay(CameraBlock.GRACE_MS)
+                        blocked.value?.let { android.util.Log.w(TAG, "camera held by another app: ${it.code}"); throw it }
+                    }
+                }
+                try { block() } finally { watcher.cancel() }
+            }
+        } finally {
+            withContext(kotlinx.coroutines.NonCancellable + Dispatchers.Main) { live.removeObserver(obs) }
+        }
+    }
 
     private suspend fun take(capture: ImageCapture, file: File): Result<Unit> =
         suspendCancellableCoroutine { cont ->

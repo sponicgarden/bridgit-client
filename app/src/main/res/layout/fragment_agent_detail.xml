@@ -421,25 +421,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.Bridgit.Card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/capability_permissions"
-                    android:visibility="gone"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardBackgroundColor="?attr/colorSurface">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/agents_advanced_permissions"
-                        android:textAppearance="?attr/textAppearanceBodyMedium"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton

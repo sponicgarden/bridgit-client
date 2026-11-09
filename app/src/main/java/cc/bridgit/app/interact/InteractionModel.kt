@@ -120,6 +120,18 @@ object InteractionRules {
 
     private fun bad(msg: String): Nothing = throw InteractionError("invalid_parameter", msg)
 
+    /**
+     * A0094: `display` is a reply field (whether Bridgit came to the front), not a request one. An agent that sends
+     * display="full_screen" expecting an edge-to-edge card gets it silently ignored, then reads display.full_screen=true
+     * back. Still accepted (no contract change), but the reply now says it was ignored and what to use instead.
+     */
+    fun ignoredFields(b: JSONObject, kind: IKind): JSONObject? {
+        if (!b.has("display")) return null
+        val hint = if (kind == IKind.HTML) "To fill the screen edge to edge, send presentation \"full_screen\"."
+            else "Only kind html can fill the screen edge to edge (presentation \"full_screen\"); put a photo in the page as data:image/*."
+        return JSONObject().put("display", "display is only in the reply: it says whether Bridgit came to the front, not how the card is laid out. $hint")
+    }
+
     /** Parses and checks a POST /v1/interactions body (CAP-31). */
     fun parse(b: JSONObject, piecesScope: CardPieces.Scope? = null): Draft {
         val kind = IKind.of(b.optString("kind")) ?: bad("kind must be notice, question, html, pieces or text.")

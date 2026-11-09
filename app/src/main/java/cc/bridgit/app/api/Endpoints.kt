@@ -331,9 +331,10 @@ object Endpoints {
             Param("content_aspect", "string", "kind=html: the page's fixed shape as width:height, e.g. \"16:9\" or \"1280x720\". When it differs from the canvas by more than 10 %, the reply's display.aspect_mismatch says so (also checked from width/height in the page's viewport meta)"),
         ),
         example = "POST /v1/interactions {\"kind\":\"question\",\"title\":\"Pay this invoice?\",\"controls\":[{\"type\":\"button\",\"id\":\"yes\",\"label\":\"Pay\",\"style\":\"primary\"},{\"type\":\"button\",\"id\":\"no\",\"label\":\"Not now\"}]}",
-        returns = "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen (the screen was taken over), missing?: [open_on_arrival, display_over_other_apps], fix?, " +
+        returns = "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen (Bridgit came to the front over other apps; it says nothing about the card's layout, which is presentation), missing?: [open_on_arrival, display_over_other_apps], fix?, " +
             "presentation (standard|full_screen), viewport {width_px, height_px, width_dp, height_dp, density} (the exact canvas the card's page gets in that presentation), aspect_mismatch? {content, viewport, advice} (the page's declared shape differs from the canvas by more than 10 %)}. " +
-            "When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix",
+            "When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix. " +
+            "ignored? {field: why}: request fields Bridgit did not use (display is reply-only; ask for an edge-to-edge card with presentation)",
         errors = listOf("capability_disabled", "notifications_required", "invalid_parameter", "payload_too_large", "too_many_open", "photo_not_found"))
     val TEXT_STREAM = EndpointSpec("POST", "/text/stream", "interactions", "Add text to your live text panel (an interaction of kind text); it scrolls on the phone as it arrives",
         privateFields = setOf("append"),

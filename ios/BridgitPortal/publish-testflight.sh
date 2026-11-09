@@ -97,6 +97,29 @@ xcodebuild -project BridgitPortal.xcodeproj -scheme BridgitPortal -configuration
   CURRENT_PROJECT_VERSION="$BUILD_NUMBER" DEVELOPMENT_TEAM="$TEAM_ID" \
   OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN" archive -quiet
 
+# Crash symbols (dSYMs) to Sentry, so crash and hang reports show file and line. Before Nov 2026 none were
+# uploaded and every Apple stack was unreadable. Sentry's upload API takes a zip, so no sentry-cli is needed.
+# The org is in Sentry's EU region, so uploads go to de.sentry.io. Token and org come from Bitwarden item
+# "Sentry — Sponic Gardens"; any failure is reported, never fatal.
+SENTRY_ITEM="cc10c985-fd97-46b8-aa97-b47b0136282e"
+SENTRY_PROJECT="bridgit-portal-ios"
+upload_dsyms() {
+  local dsyms="$WORK/BridgitPortal.xcarchive/dSYMs" zip="$WORK/dsyms.zip" hdr="$WORK/sentry.hdr" org code
+  [[ -d "$dsyms" ]] || { echo "    No dSYMs in the archive; skipped." >&2; return 0; }
+  ditto -c -k --keepParent "$dsyms" "$zip"
+  org="$( umask 077; "$BW" bw get item "$SENTRY_ITEM" | python3 -c '
+import json, sys
+f = {x["name"]: x["value"] for x in json.load(sys.stdin).get("fields") or []}
+open(sys.argv[1], "w").write("Authorization: Bearer " + f["SENTRY_AUTH_TOKEN"].strip() + "\n")
+print(f["SENTRY_ORG"], end="")' "$hdr" )" || { echo "    Could not read the Sentry token; skipped." >&2; rm -f "$hdr"; return 0; }
+  code="$(curl --retry 3 --retry-all-errors --retry-delay 2 -sS -o "$WORK/sentry.json" -w '%{http_code}' -H @"$hdr" \
+    -F "file=@$zip" "https://de.sentry.io/api/0/projects/$org/$SENTRY_PROJECT/files/dsyms/")" || code=000
+  rm -f "$hdr"
+  [[ "$code" == 2* ]] && echo "    dSYMs uploaded" || echo "    dSYM upload failed (HTTP $code)" >&2
+}
+echo "==> Upload crash symbols to Sentry"
+upload_dsyms
+
 echo "==> Export IPA"
 xcodebuild -exportArchive -archivePath "$WORK/BridgitPortal.xcarchive" -exportPath "$WORK/export" \
   -exportOptionsPlist "$HERE/ExportOptions.plist" -quiet

@@ -25,12 +25,20 @@ class AlertRelay(context: Context, private val base: String = BASE) : AlertSende
     enum class Subscribe { PENDING, CONFIRMED, BAD_EMAIL, RATE_LIMITED, FAILED }
     enum class State { NONE, PENDING, CONFIRMED, UNKNOWN }
 
+    /** Which limit refused the latest [subscribe] and how long it lasts, as bridgit.cc said (A0028: not always five minutes). */
+    @Volatile var lastRateLimit: EmailVerificationRules.RateLimit? = null
+        private set
+
     fun subscribe(email: String): Subscribe = try {
-        when (SafeHttp.post("$base/api/alerts/subscribe", SafeHttp.Policy.PUBLIC, headers(json = true),
-            JSONObject().put("email", email).toString().toByteArray(), DEADLINE_MS)) {
+        val r = SafeHttp.request("$base/api/alerts/subscribe", SafeHttp.Policy.PUBLIC, "POST", headers(json = true),
+            JSONObject().put("email", email).toString().toByteArray(), DEADLINE_MS, 4096, "$base/api/alerts/subscribe")
+        when (r.status) {
             200 -> if (status(email) == State.CONFIRMED) Subscribe.CONFIRMED else Subscribe.PENDING
             400 -> Subscribe.BAD_EMAIL
-            429 -> Subscribe.RATE_LIMITED
+            429 -> {
+                lastRateLimit = EmailVerificationRules.rateLimit(String(r.bytes ?: ByteArray(0)), r.header("retry-after"))
+                Subscribe.RATE_LIMITED
+            }
             else -> Subscribe.FAILED
         }
     } catch (e: Exception) { Subscribe.FAILED }

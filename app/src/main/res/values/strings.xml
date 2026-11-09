@@ -94,6 +94,7 @@
     <string name="wake_set_up">Set up</string>
     <string name="wake_needs_model">Download the Vosk offline speech model (41 MB, by Alpha Cephei) to use wake words</string>
     <string name="features_no_hardware">This device doesn\'t have one</string>
+    <string name="features_accessibility_paused">Paused by a connected test tool</string>
     <string name="wake_needs_words">Add a wake word and pick the control agent it goes to</string>
     <string name="wake_intro">Bridgit listens on the phone for the words you choose. Only what you say after one goes to its control agent; nothing before it is kept or sent. Android\'s green microphone dot shows while it listens.</string>
     <string name="wake_listen_switch">Listen for wake words</string>

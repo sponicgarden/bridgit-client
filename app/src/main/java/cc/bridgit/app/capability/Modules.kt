@@ -163,7 +163,12 @@ class StatusModule(app: BridgeApp) : Capability(app) {
             when (r) {
                 cc.bridgit.app.alerts.AlertRelay.Subscribe.PENDING, cc.bridgit.app.alerts.AlertRelay.Subscribe.CONFIRMED -> {}
                 cc.bridgit.app.alerts.AlertRelay.Subscribe.BAD_EMAIL -> throw ErrorCatalog.error("invalid_parameter", "bridgit.cc didn't accept that address. Check it with the owner.")
-                cc.bridgit.app.alerts.AlertRelay.Subscribe.RATE_LIMITED -> throw ErrorCatalog.error("rate_limited", "Confirmation-email requests are rate limited (seven per address per 24 hours, five per network per hour, and at least five minutes apart). No new email was sent.", mapOf("retry_after_s" to 300))
+                cc.bridgit.app.alerts.AlertRelay.Subscribe.RATE_LIMITED -> {
+                    // bridgit.cc names the limit and the real wait; a fixed 300 s sent agents retrying against a daily cap (A0028).
+                    val l = app.alerts.relay.lastRateLimit
+                    throw ErrorCatalog.error("rate_limited", l?.message ?: "Confirmation-email requests are rate limited (seven per address per 24 hours, five per network per hour, and at least five minutes apart). No new email was sent.",
+                        mapOf("retry_after_s" to (l?.retryAfterS ?: cc.bridgit.app.alerts.EmailVerificationRules.DEFAULT_RETRY_AFTER_S)) + (l?.limit?.let { mapOf("limit" to it) } ?: emptyMap()))
+                }
                 cc.bridgit.app.alerts.AlertRelay.Subscribe.FAILED -> throw ErrorCatalog.error("upstream_failed", "bridgit.cc couldn't send the confirmation email. Retry in a few minutes.", mapOf("service" to "bridgit.cc"))
             }
             Reply.Json(ownerEmailJson().put("next", if (r == cc.bridgit.app.alerts.AlertRelay.Subscribe.CONFIRMED) "This device already verified that address. No email was sent; nothing to do." else "Tell the owner: an email from bridgit.cc is on its way to ${cc.bridgit.app.alerts.EmailGate.mask(email)}. Tap the link in it and press Confirm (check spam). The link works for 30 days."))

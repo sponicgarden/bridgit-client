@@ -12,7 +12,7 @@
   "app/src/main/java/cc/bridgit/app/adb/AdbSetupHelp.kt": "abc90047e9d71b9cc918a16de6790eae11558b91e4cd475174b4600749557a7e",
   "app/src/test/java/cc/bridgit/app/api/LearnTest.kt": "9aa584d5e21eea3a027bb8dd5f9be7034e3b0d8bdb2b25401d0758ceadc5923a",
   "app/src/main/java/cc/bridgit/app/api/Playbook.kt": "28d2aa0d5324cd5b09e4de7855dc71539851d3336c42eccb4742d9282172535a",
-  "app/src/main/java/cc/bridgit/app/api/Learn.kt": "67b0e906a71cfc7bc8394103933814a16af1fe6005d71b0b31ba0418884b3585"
+  "app/src/main/java/cc/bridgit/app/api/Learn.kt": "d952d939641a1fd727ffc454b1facae077e55d7677abdf68e92496ef2ac51a16"
  },
  "generator": "SetupPrompt.build (private distribution)"
 }

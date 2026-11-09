@@ -133,6 +133,7 @@ class InteractionModule(app: BridgeApp) : Capability(app) {
             Reply.Json(JSONObject().put("interaction_id", i.id).put("status", i.status.id).put("expires_at", isoAt(i.expiresAt))
                 .put("display", displayJson(shown).also { canvas(it, d) }).apply {
                     if (i.stack != null) put("stack", i.stack).put("stack_index", i.stackIndex).put("stack_size", i.stackSize)
+                    InteractionRules.ignoredFields(body, d.kind)?.let { put("ignored", it) }
                     withNext(this, i)
                 }, status = 201)
         }

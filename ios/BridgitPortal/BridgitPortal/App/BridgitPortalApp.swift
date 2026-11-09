@@ -22,6 +22,7 @@ struct BridgitPortalApp: App {
                 .environmentObject(model.updates)
                 .modifier(UpdatePromptAlert(updates: model.updates))
                 .tint(B.primary)
+                .buildStampFallback() // version and build on every screen, sheet and alert (A0159)
                 .onOpenURL { model.handle(url: $0) }
                 .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
                     if let url = activity.webpageURL { model.handle(url: url) }

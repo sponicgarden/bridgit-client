@@ -35,9 +35,7 @@ struct BuildStamp: View {
     /// yymmddHHMM stamp shortened to its eight-digit mmddHHMM form (2611071810 → 11071810).
     /// An unstamped build (project.yml default "1") shows "1" here; tools/install-macos.sh refuses those.
     static func lines(version: String, build: String) -> (version: String, build: String) {
-        let shortBuild = build.count == 10 && build.hasPrefix("26") && build.allSatisfy(\.isNumber)
-            ? String(build.dropFirst(2)) : build
-        return ("v" + version, shortBuild)
+        BuildStampText.lines(version: version, build: build)
     }
     var foreground: Color? = nil
     /// Tests pass a fixed version/build; the app reads its own Info.plist.
@@ -65,6 +63,10 @@ struct BuildStamp: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("fixture-build-stamp")
                 .accessibilityHidden(hiddenFromAccessibility)
+                #if os(iOS)
+                // Tells the corner fallback (BuildStampOverlay.swift) this screen already has its stamp.
+                .background(BuildStampProbe())
+                #endif
         }
     }
 }

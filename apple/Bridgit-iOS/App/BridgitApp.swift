@@ -28,6 +28,7 @@ struct BridgitApp: App {
                 .environmentObject(model.relays)
                 .tint(B.primary)
                 .background(WindowAppearance(appearance: appearance))
+                .buildStampFallback() // version on every screen, sheet and alert that lacks its own (A0159)
                 .task { local.configuration.viewer = model }
                 .onOpenURL { firstRun.receive($0, platform: "ios"); model.handle(url: $0) }
                 .onChange(of: phase) { _, phase in

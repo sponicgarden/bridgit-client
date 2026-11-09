@@ -105,6 +105,8 @@
 		52A9A4E42A64ACFFF6FFBB77 /* BuildInstructionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9FE7CDBFB937EF56B2D3CA /* BuildInstructionsView.swift */; };
 		5301CC9C1CA75F730101D44A /* PortableLibraryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEBFB12C703BB88A8921457 /* PortableLibraryController.swift */; };
 		5386144AEDB44924C518CF1B /* BuildStamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DD0D9788FEC298C7AA62C46 /* BuildStamp.swift */; };
+		AAC3A826039A42438CF2E8A6 /* BuildStampOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E5FBB0EA0606A4C6961700 /* BuildStampOverlay.swift */; };
+		90E21C925C2409560B166A08 /* BuildStampOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E5FBB0EA0606A4C6961700 /* BuildStampOverlay.swift */; };
 		541C2C3A6C8AEFE95BE9955F /* PhotoTargetPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C64723DF6D71014D093D88 /* PhotoTargetPicker.swift */; };
 		5644A940A3405C8BCF7B23AA /* CrashReportingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CABCCFE2A4F4C61E89F43F /* CrashReportingTests.swift */; };
 		56B685A07D7EF7E6A82C5A91 /* whatcan_phone_controls.webp in Resources */ = {isa = PBXBuildFile; fileRef = E3F693C0BDCF1B9194728BDF /* whatcan_phone_controls.webp */; };
@@ -484,6 +486,7 @@
 		9D3DAA86AEE4DFEBB600E12B /* whatcan_phone_status_and_context.webp */ = {isa = PBXFileReference; path = whatcan_phone_status_and_context.webp; sourceTree = "<group>"; };
 		9D68C58FD9EF753867731396 /* LocalAppletTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAppletTests.swift; sourceTree = "<group>"; };
 		9DD0D9788FEC298C7AA62C46 /* BuildStamp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildStamp.swift; sourceTree = "<group>"; };
+		11E5FBB0EA0606A4C6961700 /* BuildStampOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildStampOverlay.swift; sourceTree = "<group>"; };
 		9E57523F1560D1AA46719B49 /* CrashReports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReports.swift; sourceTree = "<group>"; };
 		9F13323825960072F8AE6E29 /* AppletListsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletListsTests.swift; sourceTree = "<group>"; };
 		9F39EBA75ACD12ED44F3E717 /* LocalInteractionInbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalInteractionInbox.swift; sourceTree = "<group>"; };
@@ -1056,6 +1059,7 @@
 				B449A299A92B9CB60350F72A /* AppleFixtureWorkspace.swift */,
 				7CD24C7252A7ED1B954B1D5E /* BridgitDialog.swift */,
 				9DD0D9788FEC298C7AA62C46 /* BuildStamp.swift */,
+				11E5FBB0EA0606A4C6961700 /* BuildStampOverlay.swift */,
 				9E57523F1560D1AA46719B49 /* CrashReports.swift */,
 				A758C45A48CAB1AB93048ED1 /* DeviceTypeDescription.swift */,
 				E46E5C09E11E0A67DA06C8D9 /* Keychain.swift */,
@@ -1701,6 +1705,7 @@
 				9E5F91A64D10E07EF54F8263 /* BridgitNames.swift in Sources */,
 				52A9A4E42A64ACFFF6FFBB77 /* BuildInstructionsView.swift in Sources */,
 				5386144AEDB44924C518CF1B /* BuildStamp.swift in Sources */,
+				AAC3A826039A42438CF2E8A6 /* BuildStampOverlay.swift in Sources */,
 				0C7F22F8553974B3B4931EDF /* CaptureNotices.swift in Sources */,
 				AE89B3877045B4304934C2B9 /* CardLibraryRow.swift in Sources */,
 				D891B40FD5ED5AC8344241B2 /* CardPreviewRules.swift in Sources */,
@@ -1791,6 +1796,7 @@
 				9886EFCDD806CC2EAF2E367D /* BridgitNames.swift in Sources */,
 				F41FC89429CE09C777FB8239 /* BuildInstructionsView.swift in Sources */,
 				ABEEFC95DB1B6713F9E4957A /* BuildStamp.swift in Sources */,
+				90E21C925C2409560B166A08 /* BuildStampOverlay.swift in Sources */,
 				8EE12741D6EE7DC2C29ADBD5 /* CameraView.swift in Sources */,
 				67DC1AC32DEC43F216561A3C /* CaptureNotices.swift in Sources */,
 				AED4992EE4D22D3B7462087A /* CardLibraryRow.swift in Sources */,

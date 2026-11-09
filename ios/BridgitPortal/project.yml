@@ -21,7 +21,10 @@ targets:
   BridgitPortal:
     type: application
     platform: iOS
-    sources: [BridgitPortal]
+    sources:
+      - BridgitPortal
+      # The shared corner version label (A0159), the same file the iPhone/iPad app compiles.
+      - path: ../../apple/Shared/Support/BuildStampOverlay.swift
     dependencies:
       - package: BridgitAppletRuntime
       - package: Sentry

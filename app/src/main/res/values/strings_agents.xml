@@ -100,11 +100,10 @@
     <string name="addagent_trouble_userspace">1. On the control agent\'s host, check tailscaled is running and signed in to the same account as this phone.\n2. Check this phone\'s Tailscale app is on.\n3. Check ~/bin/bridgit exists and is executable, and ~/.config/bridgit/env has BRIDGIT_HOST, BRIDGIT_PORT and BRIDGIT_KEY.\n4. Ask the control agent to run: ~/bin/bridgit GET /v1/health\n5. A 401 means the key is wrong: paste the prompt again or rotate the key.</string>
     <string name="addagent_done">Done</string>
 
-    <string name="addagent_leave_title">You won\'t see this key again</string>
-    <string name="addagent_leave_body">Copied it?</string>
-    <string name="addagent_leave_copy">Copy and leave</string>
-    <string name="addagent_leave_stay">Stay</string>
-    <string name="addagent_leave">Leave</string>
+    <string name="addagent_leave_title">Leave without copying the key?</string>
+    <string name="addagent_leave_body">You won\'t see it again.</string>
+    <string name="addagent_leave_copy">Copy key</string>
+    <string name="addagent_leave">Leave without copying</string>
 
     <string name="addagent_resumed">Picked up where you left off. The key is still here for %1$d more minutes.</string>
     <string name="addagent_key_gone">This key can\'t be shown again. Rotate the key to get a new prompt.</string>

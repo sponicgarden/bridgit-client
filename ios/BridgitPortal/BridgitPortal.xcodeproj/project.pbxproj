@@ -50,6 +50,7 @@
 		D63E2D8B565B618890615A3F /* AppletListsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14787813826F4E880B4216AC /* AppletListsTests.swift */; };
 		E1CEB801760FC3B446CD6934 /* DeviceIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864F3A6B04C6C50B06BC0B40 /* DeviceIdentity.swift */; };
 		E49EC820A6335906F9E6F04E /* Pairing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1C1A974AAA4D8972093FA8 /* Pairing.swift */; };
+		358A4EB1BC27DC1E34B2852D /* BuildStampOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D82C598BA74C89ED5EFC063 /* BuildStampOverlay.swift */; };
 		E6E1BB5DE678258BFEEB6617 /* UpdatePrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4BA266B55F41540B79C48F /* UpdatePrompts.swift */; };
 		F0CF90F1A05227FF4651FD4E /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 976A65CB1B748876EF4B3087 /* CameraView.swift */; };
 		F48E8CA675CB0CF48FD7023C /* PortalDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FD5FB990663945CAD66D114 /* PortalDevice.swift */; };
@@ -87,6 +88,7 @@
 		4A1B0CB527F9EC59565BEE0D /* BridgitPortalTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BridgitPortalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A29808EE6C74191C1B4EAA3 /* DecisionInstall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionInstall.swift; sourceTree = "<group>"; };
 		4BC7DE3FB1100C3CFB68486E /* CrashReports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReports.swift; sourceTree = "<group>"; };
+		7D82C598BA74C89ED5EFC063 /* BuildStampOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BuildStampOverlay.swift; path = ../../apple/Shared/Support/BuildStampOverlay.swift; sourceTree = SOURCE_ROOT; };
 		4C4BA266B55F41540B79C48F /* UpdatePrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePrompts.swift; sourceTree = "<group>"; };
 		4F0CB82E6392798732CCCCB0 /* LinkedDevicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedDevicesView.swift; sourceTree = "<group>"; };
 		4FD5FB990663945CAD66D114 /* PortalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortalDevice.swift; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				64B30F2AC4E9B0492C24096E /* AppletLists.swift */,
+				7D82C598BA74C89ED5EFC063 /* BuildStampOverlay.swift */,
 				4BC7DE3FB1100C3CFB68486E /* CrashReports.swift */,
 				24F40C2CFFF50AD759E478A6 /* Keychain.swift */,
 				3D6250A3CB4DCA87A7B7AF68 /* SampleData.swift */,
@@ -518,6 +521,7 @@
 				BDC03611F396480D48A10211 /* SignIn.swift in Sources */,
 				9398960187A254FAE091910E /* SignInPairViews.swift in Sources */,
 				A6553405EA17EE59E8B2A10E /* Theme.swift in Sources */,
+				358A4EB1BC27DC1E34B2852D /* BuildStampOverlay.swift in Sources */,
 				E6E1BB5DE678258BFEEB6617 /* UpdatePrompts.swift in Sources */,
 				F7B855844EAF3C643CE68D5C /* WatchClient.swift in Sources */,
 				905ACEB2064CA0CB6FA83070 /* WatchModels.swift in Sources */,

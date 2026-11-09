@@ -444,15 +444,18 @@ class AddAgentFragment : Fragment() {
         }
     }
 
-    /** ✕, system back or Done on the prompt step: ask first if the key hasn't been taken (AGT-05). */
+    /**
+     * ✕, system back or Done on the prompt step: ask first if the key hasn't been taken (AGT-05).
+     * Copy stays on the screen with the usual confirmation, so the key is never dropped unseen;
+     * dismissing the dialog also stays (A0217).
+     */
     private fun onClose() {
         if (vm.step.value == 4 && vm.key != null && !vm.acknowledged) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.addagent_leave_title)
                 .setMessage(R.string.addagent_leave_body)
-                .setPositiveButton(R.string.addagent_leave_copy) { _, _ -> warnFirst { exportSetup { copy(it.prompt, quiet = true); leave() } } }
-                .setNegativeButton(R.string.addagent_leave_stay, null)
-                .setNeutralButton(R.string.addagent_leave) { _, _ -> leave() }
+                .setPositiveButton(R.string.addagent_leave_copy) { _, _ -> warnFirst { exportSetup { copy(it.prompt) } } }
+                .setNegativeButton(R.string.addagent_leave) { _, _ -> leave() }
                 .show()
         } else leave()
     }

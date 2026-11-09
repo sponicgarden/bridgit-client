@@ -120,7 +120,11 @@ class AgentPlatform(val app: BridgeApp) {
     }
     fun stopAll() { store.setting("active_control").takeIf { it.isNotEmpty() }?.let { store.find(it,kind="session") }?.let { closeSession(it,"stopped_by_owner") }; app.policy.agents().forEach { invalidate(it.id) }; ProjectionService.instance?.stopSelf(); tools.stopAudio() }
     fun getAgent(id: String) = app.policy.agents().firstOrNull { it.id == id } ?: throw ApiError(401,"unauthorized","Agent was removed")
-    fun changed() { app.sendBroadcast(Intent("cc.bridgit.app.PLATFORM_CHANGED").setPackage(app.packageName)) }
+    /** Bumped on every change, so open screens (Home, Agent permissions) refresh what is waiting for the owner. */
+    val changes = kotlinx.coroutines.flow.MutableStateFlow(0L)
+    fun changed() { changes.value = changes.value + 1; app.sendBroadcast(Intent("cc.bridgit.app.PLATFORM_CHANGED").setPackage(app.packageName)) }
+    /** Requests waiting for the owner's tap, newest first, expired ones left out (A0145: Home and Agent permissions show these). */
+    fun pendingApprovals(now: Long = System.currentTimeMillis()): List<JSONObject> = store.list(limit=300).filter { isPendingApproval(it,now) }
     fun recheckCredentials() {
         val agents=app.policy.agents()
         credentialEpochs.keys.filter { id -> agents.none { it.id==id } }.forEach { id -> invalidate(id); credentialEpochs.remove(id) }
@@ -223,7 +227,7 @@ class AgentPlatform(val app: BridgeApp) {
             cc.bridgit.app.ui.home.HomeStates.controlAgents(app).any { it.id == agent }
         val pending = sensitive(command,args) && !unattendedConfiguration
         store.save(agent,"operation",op.put("status",if(pending) "awaiting_owner" else "accepted"))
-        if (!pending) launchOperation(op) else { PlatformNotifications.show(app,op); store.emit(agent,"operation.awaiting_owner",op.getString("id")); changed() }
+        if (!pending) launchOperation(op) else { store.save(agent,"operation",op.put("notification_posted",PlatformNotifications.show(app,op))); store.emit(agent,"operation.awaiting_owner",op.getString("id")); changed() }
         return publicOperation(store.require(op.getString("id"),agent,"operation"))
     }
     fun approveOperation(id: String) {
@@ -280,11 +284,13 @@ class AgentPlatform(val app: BridgeApp) {
     private fun commandScope(command:String,args:JSONObject) = if(command=="device.action") DeviceTools.scopeFor(args.optString("type")) else Commands.scope(command)
     private fun publicSession(record: JSONObject): JSONObject = PlatformStore.copy(record).apply { remove("credential_hash") }
     fun publicOperation(op: JSONObject): JSONObject = PlatformStore.copy(op).apply { remove("input"); remove("identity"); remove("digest"); remove("credential_hash")
-        if(optString("status")=="awaiting_owner") put("approval",approvalHint(app.granted(android.Manifest.permission.POST_NOTIFICATIONS),optLong("expires_at"))) }
+        val posted=if(has("notification_posted")) optBoolean("notification_posted") else PlatformNotifications.canPost(app,PlatformNotifications.channelFor(this)); remove("notification_posted")
+        if(optString("status")=="awaiting_owner") put("approval",approvalHint(posted,optLong("expires_at"))) }
     /** Tells the agent where the owner approves a waiting operation, so it can direct them (A0145). */
     fun approvalHint(notificationShown: Boolean, expiresAt: Long): JSONObject = JSONObject()
-        .put("where",if(notificationShown) "A Bridgit notification on the owner's phone titled with this agent's name opens the review. Or open Bridgit, More, Agent permissions, and tap the request under Questions and approvals."
-            else "Notifications are off for Bridgit, so no notification was posted. The owner opens Bridgit, More, Agent permissions, and taps the request under Questions and approvals.")
+        .put("where",if(notificationShown) "A Bridgit notification on the owner's phone titled with this agent's name opens the review. Or the owner opens Bridgit and taps Review on the banner at the top of Home; the request is also first on More, Agent permissions, under Questions and approvals."
+            else "Bridgit notifications (or its Agent control requests channel) are off, so no notification was posted. The owner opens Bridgit and taps Review on the banner at the top of Home, or opens More, Agent permissions, where the request is first under Questions and approvals.")
+        .put("home_banner",true)
         .put("notification_posted",notificationShown)
         .put("screen","More > Agent permissions > Questions and approvals")
         .put("expires_at",expiresAt)
@@ -407,4 +413,16 @@ object Commands {
         name in setOf("images.ocr","images.barcode","speech.transcribe") -> name
         else -> throw ApiError(404,"unknown_tool","Unknown tool")
     }
+}
+
+/** An operation, control session or applet flow at awaiting_owner, or a pending question, that has not expired. */
+fun isPendingApproval(record: JSONObject, now: Long = System.currentTimeMillis()): Boolean {
+    val waiting = when (record.optString("kind")) {
+        "operation", "session", "workflow" -> record.optString("status") == "awaiting_owner"
+        "interaction" -> record.optString("status") == "pending"
+        else -> false
+    }
+    if (!waiting) return false
+    val deadline = record.optLong(if (record.optString("kind") == "session") "request_expires_at" else "expires_at")
+    return deadline <= 0 || deadline > now
 }

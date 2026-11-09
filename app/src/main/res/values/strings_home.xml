@@ -48,6 +48,13 @@
     </plurals>
     <string name="home_banner_answer">Answer</string>
     <string name="home_banner_see_questions">See them</string>
+    <!-- Agent requests waiting for the owner's approval in Agent permissions (A0145); they expire in minutes. -->
+    <string name="home_banner_approval_one">%1$s asks to approve %2$s</string>
+    <plurals name="home_banner_approvals">
+        <item quantity="one">%1$d request waiting for approval</item>
+        <item quantity="other">%1$d requests waiting for approval</item>
+    </plurals>
+    <string name="home_banner_review">Review</string>
 
     <!-- Home: agents, today, quick switches (UI-11) -->
     <string name="home_agents">Control agents</string>

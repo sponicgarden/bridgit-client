@@ -60,6 +60,8 @@ class HomeFragment : Fragment() {
 
     /** Questions the owner hasn't answered, expired ones included (loaded off the main thread). */
     private var waiting: List<Interaction> = emptyList()
+    /** Agent requests waiting for approval in Agent permissions (A0145), loaded off the main thread. */
+    private var approvals: List<org.json.JSONObject> = emptyList()
     private var bannerKey = ""
     private var tourCard: TourHomeCardBinding? = null
     private var scene: DiagnosticsScene? = null
@@ -92,6 +94,9 @@ class HomeFragment : Fragment() {
                 // Bridgit Portal viewer: switching phones rebuilds the scene for the chosen one.
                 launch { cc.bridgit.app.portal.PortalLinks(app).selected.collect { d -> if (d != shownDevice) rebuildScene() } }
                 launch { app.log.latestId.collectLatest { delay(150); scene?.pollLog() } }
+                // Approvals: refresh on every platform change, and every 15 s so expired ones drop off.
+                launch { app.platform.changes.collectLatest { delay(300); loadApprovals() } }
+                launch { while (true) { delay(15_000); loadApprovals() } }
                 launch {
                     app.interactions.changed.collectLatest {
                         waiting = withContext(Dispatchers.IO) { runCatching { app.interactions.waitingQuestions() }.getOrDefault(emptyList()) }
@@ -160,6 +165,15 @@ class HomeFragment : Fragment() {
     }
 
     private fun requestRender() = dirty.update { it + 1 }
+
+    private suspend fun loadApprovals() {
+        val now = withContext(Dispatchers.IO) { runCatching { app.platform.pendingApprovals().filter { it.optString("kind") != "interaction" } }.getOrDefault(emptyList()) }
+        if (now.map { it.optString("id") } != approvals.map { it.optString("id") }) { approvals = now; requestRender() }
+    }
+
+    private fun openApproval(id: String?) = startActivity(
+        android.content.Intent(requireContext(), cc.bridgit.app.platform.ControlCenterActivity::class.java)
+            .apply { if (id != null) putExtra(cc.bridgit.app.platform.ControlCenterActivity.EXTRA_REVIEW_ID, id) })
 
     private fun render() {
         if (_b == null) return
@@ -371,6 +385,16 @@ class HomeFragment : Fragment() {
         val ctx = requireContext()
         val s = app.listener.value
         val out = mutableListOf<Banner>()
+        // Agent requests waiting for approval come first: they expire in minutes (A0145).
+        approvals.singleOrNull()?.let { r ->
+            val name = r.optJSONObject("identity")?.optString("name")?.ifBlank { null } ?: "Agent"
+            val what = r.optJSONObject("review_context")?.optString("title")?.ifBlank { null } ?: cc.bridgit.app.platform.PlatformNotifications.actionLabel(r)
+            out += Banner("approve1:${r.optString("id")}", getString(R.string.home_banner_approval_one, cap(name, 18), what),
+                getString(R.string.home_banner_review), false, R.drawable.ic_nav_interactions) { openApproval(r.optString("id")) }
+        }
+        if (approvals.size > 1)
+            out += Banner("approveN:${approvals.size}", resources.getQuantityString(R.plurals.home_banner_approvals, approvals.size, approvals.size),
+                getString(R.string.home_banner_review), false, R.drawable.ic_nav_interactions) { openApproval(null) }
         waiting.singleOrNull()?.let { q ->
             out += Banner("ask1:${q.id}", getString(R.string.home_banner_question_one, cap(InteractionUi.agentName(q), 18), q.title),
                 getString(R.string.home_banner_answer), false, R.drawable.ic_nav_interactions) {

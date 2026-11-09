@@ -76,7 +76,8 @@ private struct AgentCard: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(agent.name).font(.headline).foregroundStyle(B.onSurface)
                     if let conn = agent.connectionText, !conn.isEmpty {
-                        Text(conn).font(.caption).foregroundStyle(B.onSurfaceVariant).lineLimit(2)
+                        Text(conn).font(.caption).foregroundStyle(B.onSurfaceVariant)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     TimelineView(.periodic(from: .now, by: 30)) { ctx in
                         HStack(spacing: 6) {

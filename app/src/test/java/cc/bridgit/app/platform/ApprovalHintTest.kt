@@ -25,6 +25,31 @@ class ApprovalHintTest {
     @Test fun noApprovalHintOnceTheOperationIsNotWaiting() {
         for(status in listOf("accepted","completed","expired")) assertFalse(app.platform.publicOperation(JSONObject().put("id","o").put("status",status)).has("approval"))
     }
+    @Test fun hintUsesWhetherTheNotificationWasActuallyPosted() {
+        val op=JSONObject().put("id","o2").put("status","awaiting_owner").put("expires_at",123L).put("notification_posted",false)
+        val out=app.platform.publicOperation(op)
+        assertFalse(out.getJSONObject("approval").getBoolean("notification_posted"))
+        assertTrue(out.getJSONObject("approval").getBoolean("home_banner"))
+        assertFalse(out.has("notification_posted"))
+    }
+    @Test fun pendingApprovalsLeaveOutExpiredAndDecidedRequests() {
+        val now=1_000_000L
+        assertTrue(isPendingApproval(JSONObject().put("kind","operation").put("status","awaiting_owner").put("expires_at",now+1),now))
+        assertFalse(isPendingApproval(JSONObject().put("kind","operation").put("status","awaiting_owner").put("expires_at",now-1),now))
+        assertFalse(isPendingApproval(JSONObject().put("kind","operation").put("status","accepted").put("expires_at",now+1),now))
+        assertTrue(isPendingApproval(JSONObject().put("kind","session").put("status","awaiting_owner").put("request_expires_at",now+1),now))
+        assertFalse(isPendingApproval(JSONObject().put("kind","session").put("status","awaiting_owner").put("request_expires_at",now-1),now))
+        assertTrue(isPendingApproval(JSONObject().put("kind","workflow").put("status","awaiting_owner"),now))
+        assertTrue(isPendingApproval(JSONObject().put("kind","interaction").put("status","pending").put("expires_at",now+1),now))
+        assertFalse(isPendingApproval(JSONObject().put("kind","event").put("status","awaiting_owner"),now))
+    }
+    @Test fun waitingOperationsAndSessionsUseTheHeadsUpChannel() {
+        val high=cc.bridgit.app.interact.InteractionNotifier.CHANNEL_QUESTIONS
+        assertEquals(high,PlatformNotifications.channelFor(JSONObject().put("kind","operation")))
+        assertEquals(high,PlatformNotifications.channelFor(JSONObject().put("kind","session")))
+        assertEquals(BridgeApp.INTERACTION_CHANNEL,PlatformNotifications.channelFor(JSONObject().put("kind","workflow")))
+        assertEquals("device.action open_app",PlatformNotifications.actionLabel(JSONObject().put("command","device.action").put("input",JSONObject().put("type","open_app"))))
+    }
     @Test fun hintAdmitsWhenNoNotificationWasPosted() {
         assertFalse(app.platform.approvalHint(false,1).getBoolean("notification_posted"))
         assertTrue(app.platform.approvalHint(false,1).getString("where").contains("no notification"))

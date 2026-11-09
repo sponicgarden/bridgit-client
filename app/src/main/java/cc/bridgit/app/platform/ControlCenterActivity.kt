@@ -19,6 +19,9 @@ import com.google.android.material.button.MaterialButton
 import cc.bridgit.app.*
 import org.json.JSONObject
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collectLatest
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import cc.bridgit.app.ui.common.dp
 
 /** All authority changes and approvals originate in this non-exported owner surface. */
@@ -44,7 +47,29 @@ class ControlCenterActivity:AppCompatActivity() {
         render()
     }
     private val document=registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if(uri!=null) safely { runtime.files.import(importAgent ?: return@safely,uri); render() } }
-    override fun onCreate(state:Bundle?) { super.onCreate(state); screen=cc.bridgit.app.ui.common.OwnerScreen(this,getString(cc.bridgit.app.R.string.more_control_center)); render() }
+    override fun onCreate(state:Bundle?) {
+        super.onCreate(state); screen=cc.bridgit.app.ui.common.OwnerScreen(this,getString(cc.bridgit.app.R.string.more_control_center)); render()
+        // A request that arrives, is decided or expires while this screen is open shows without tapping Refresh (A0145).
+        lifecycleScope.launch { repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.RESUMED) {
+            launch { runtime.changes.collectLatest { kotlinx.coroutines.delay(300); refreshIfPendingChanged() } }
+            launch { while(true) { kotlinx.coroutines.delay(15_000); refreshIfPendingChanged() } }
+        } }
+        if(state==null) openReviewFrom(intent)
+    }
+    override fun onNewIntent(intent:Intent) { super.onNewIntent(intent); setIntent(intent); openReviewFrom(intent) }
+    /** The notification names one request: open its review straight away instead of the whole screen (A0145). */
+    private fun openReviewFrom(intent:Intent?) {
+        val id=intent?.getStringExtra(EXTRA_REVIEW_ID) ?: return
+        intent?.removeExtra(EXTRA_REVIEW_ID)
+        val record=runtime.pendingApprovals().firstOrNull { it.optString("id")==id }
+        if(record==null) Toast.makeText(this,"This request is no longer waiting.",Toast.LENGTH_LONG).show() else safely { review(record) }
+    }
+    private var shownPending=""
+    private fun pendingKey(list:List<JSONObject>)=list.joinToString(",") { it.optString("id") }
+    private suspend fun refreshIfPendingChanged() {
+        val now=kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { pendingKey(runtime.pendingApprovals()) }
+        if(now!=shownPending) render()
+    }
     override fun onResume() { super.onResume(); foreground=true; render() }
     override fun onPause() { foreground=false; NfcAdapter.getDefaultAdapter(this)?.disableReaderMode(this); super.onPause() }
     private fun heading(text:String)=screen.header(text)
@@ -67,6 +92,11 @@ class ControlCenterActivity:AppCompatActivity() {
         if(!::screen.isInitialized) return
         val position=scroll.scrollY; root.removeAllViews()
         text("${runtime.store.setting("device_name",Build.MODEL)} • ${BuildConfigInfo.versionName(this)} • ${if(BuildConfig.PRIVATE_CONTROL) "Private control build" else "Play feature set"}\nDevice: ${runtime.store.deviceId}")
+        // Waiting requests first: they expire in minutes and were buried under every grant switch (A0145).
+        heading("Questions and approvals")
+        val pending=runtime.pendingApprovals(); shownPending=pendingKey(pending)
+        if(pending.isEmpty()) text("No requests are waiting.")
+        pending.forEach { record -> button("${record.optJSONObject("identity")?.optString("name") ?: "Control agent"}: ${record.optString("title",record.optJSONObject("review_context")?.optString("title") ?: PlatformNotifications.actionLabel(record))}") { review(record) } }
         text("New capabilities start off. Enable a feature and separately grant it to a named control agent. Stop cancels active authority. Android permissions are always granted through Android.")
         button("Stop all control agent work") { runtime.stopAll(); app.policy.listenerEnabled=false; BridgeService.stop(this); render() }
         button("Refresh status and requests") { render() }
@@ -112,10 +142,6 @@ class ControlCenterActivity:AppCompatActivity() {
             if(BuildConfig.PRIVATE_CONTROL) button("Choose notification apps for ${agent.name}") { chooseNotificationApps(agent.id) }
             button("Share a selected file with ${agent.name}") { importAgent=agent.id; document.launch(arrayOf("image/*","text/plain","application/pdf","audio/*")) }
         }
-        heading("Questions and approvals")
-        val pending=runtime.store.list(limit=300).filter { (it.optString("kind")=="operation" && it.optString("status")=="awaiting_owner") || (it.optString("kind")=="session" && it.optString("status")=="awaiting_owner") || (it.optString("kind")=="interaction" && it.optString("status")=="pending") || (it.optString("kind")=="workflow" && it.optString("status")=="awaiting_owner") }
-        if(pending.isEmpty()) text("No requests are waiting.")
-        pending.forEach { record -> button("${record.optJSONObject("identity")?.optString("name") ?: "Control agent"}: ${record.optString("title",record.optJSONObject("review_context")?.optString("title") ?: record.optString("command",record.optString("kind")))}") { review(record) } }
         heading("Control sessions")
         runtime.store.list(kind="session").filter { it.optString("status")=="active" }.forEach { record -> text("${record.optJSONObject("identity")?.optString("name")} • ${record.optString("purpose")}\n${record.optString("apps")}"); button("Stop this control session") { runtime.closeSession(record,"stopped_by_owner"); render() } }
         heading("Approved recipients and event delivery")
@@ -258,7 +284,9 @@ class ControlCenterActivity:AppCompatActivity() {
         },NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_NFC_B or NfcAdapter.FLAG_READER_NFC_F or NfcAdapter.FLAG_READER_NFC_V,null)
         Toast.makeText(this,"Hold your own tag near the phone",Toast.LENGTH_LONG).show()
     }
-    companion object { @Volatile var foreground=false; private set }
+    companion object { @Volatile var foreground=false; private set
+        /** The id of one waiting request to open for review (from its notification or the Home banner). */
+        const val EXTRA_REVIEW_ID="review_id" }
 }
 class ShareReceiveActivity:AppCompatActivity() {
     override fun onCreate(state:Bundle?) {

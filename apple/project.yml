@@ -1,0 +1,461 @@
+name: Bridgit
+options:
+  bundleIdPrefix: cc.bridgit
+  deploymentTarget:
+    iOS: "17.4"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    SWIFT_EMIT_LOC_STRINGS: YES
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: 9QHUBZYQ86 # Sponic Gardens, Inc (TestFlight team)
+    CODE_SIGN_STYLE: Automatic
+packages:
+  BridgitAppletRuntime:
+    path: BridgitAppletRuntime
+  BridgitCore:
+    path: BridgitCore
+  BridgitSpeech:
+    path: BridgitSpeech
+  Sentry:
+    url: https://github.com/getsentry/sentry-cocoa
+    exactVersion: 9.31.0
+targets:
+  Bridgit-iOS:
+    type: application
+    platform: iOS
+    sources:
+      - Bridgit-iOS
+      - Shared
+      - path: ../app/src/main/res/drawable-nodpi
+        includes: ["whatcan_*.webp"]
+        buildPhase: resources
+    dependencies:
+      - target: Bridgit-Share-iOS
+        embed: true
+      - package: BridgitCore
+      - package: BridgitAppletRuntime
+      - package: BridgitSpeech
+      - package: Sentry
+        product: Sentry
+    info:
+      path: Bridgit-iOS/Info.plist
+      properties:
+        BridgitInboundShareGroup: "$(BRIDGIT_INBOUND_SHARE_GROUP)"
+        CFBundleDisplayName: Bridgit
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UILaunchScreen: {}
+        NSPhotoLibraryUsageDescription: Choose photos for a local Bridgit applet.
+        NSSpeechRecognitionUsageDescription: Recognize speech locally for applets and microphone clips you explicitly enable.
+        NSMicrophoneUsageDescription: Use the microphone for applet speech turns and host recordings you explicitly enable.
+        NSCameraUsageDescription: Take photos for Bridgit applets and scan a pairing code.
+        NSBonjourServices:
+          - _linkplay._tcp
+          - _googlecast._tcp
+          - _airplay._tcp
+          - _raop._tcp
+          - _spotify-connect._tcp
+          - _sonos._tcp
+          - _rtsp._tcp
+          - _androidtvremote2._tcp
+          - _mediaremotetv._tcp
+          - _ipp._tcp
+          - _ipps._tcp
+          - _printer._tcp
+          - _pdl-datastream._tcp
+          - _shelly._tcp
+          - _hue._tcp
+          - _hap._tcp
+          - _matter._tcp
+          - _matterc._udp
+          - _home-assistant._tcp
+          - _esphomelib._tcp
+          - _wled._tcp
+          - _mqtt._tcp
+          - _smb._tcp
+          - _adisk._tcp
+          - _ssh._tcp
+          - _sftp-ssh._tcp
+          - _rfb._tcp
+          - _rdp._tcp
+          - _http._tcp
+          - _https._tcp
+        NSLocalNetworkUsageDescription: Connect to approved private-network devices and host requests from control agents you authorize.
+        ITSAppUsesNonExemptEncryption: false
+        UIBackgroundModes: [remote-notification]
+        BridgitAPNsEnvironment: "$(BRIDGIT_APNS_ENVIRONMENT)"
+        UIAppFonts: [BricolageGrotesque-Bold.ttf]
+        CFBundleURLTypes:
+          - CFBundleURLName: cc.bridgit.portal
+            CFBundleURLSchemes: [bridgit]
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+    postCompileScripts:
+      - &buildRevision
+        name: Record source revision for About
+        basedOnDependencyAnalysis: false
+        outputFiles: [$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/BuildRevision.txt]
+        script: |
+          set -eu
+          revision=""
+          if revision=$(git -C "$SRCROOT" rev-parse --short=12 HEAD 2>/dev/null); then
+            if [ -n "$(git -C "$SRCROOT" status --porcelain --untracked-files=normal)" ]; then
+              revision="$revision*"
+            fi
+          fi
+          printf '%s\n' "$revision" > "$SCRIPT_OUTPUT_FILE_0"
+      - &diagnosticsAssets
+        name: Copy the APK Home scene
+        basedOnDependencyAnalysis: true
+        inputFiles:
+          - $(SRCROOT)/../app/src/main/assets/diagnostics/scene.html
+          - $(SRCROOT)/../app/src/main/assets/diagnostics/home-status.js
+          - $(SRCROOT)/../app/src/main/assets/diagnostics/symbols.woff2
+          - $(SRCROOT)/../app/src/main/assets/diagnostics/portal-overlay.js
+          - $(SRCROOT)/../app/src/main/assets/diagnostics/devices.html
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/scene.html
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/home-status.js
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/symbols.woff2
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/portal-overlay.js
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/devices.html
+        script: |
+          # One source of truth: the same scene files the APK ships (app/src/main/assets/diagnostics):
+          # Home's scene and the Devices tab's map.
+          set -e
+          dest="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/diagnostics"
+          mkdir -p "$dest"
+          cp "$SRCROOT/../app/src/main/assets/diagnostics/scene.html" "$SRCROOT/../app/src/main/assets/diagnostics/home-status.js" "$SRCROOT/../app/src/main/assets/diagnostics/symbols.woff2" "$SRCROOT/../app/src/main/assets/diagnostics/portal-overlay.js" "$SRCROOT/../app/src/main/assets/diagnostics/devices.html" "$dest/"
+      - name: Copy bundled applet packages
+        basedOnDependencyAnalysis: true
+        inputFiles:
+          - $(SRCROOT)/../applets/insurance-inventory/applet.json
+          - $(SRCROOT)/../applets/a-sorta-fairytale-about-me/applet.json
+          - $(SRCROOT)/../applets/chef-helper/applet.json
+          - $(SRCROOT)/../applets/exercise-check/applet.json
+          - $(SRCROOT)/../applets/dog-monitor/applet.json
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/insurance-inventory.json
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/a-sorta-fairytale-about-me.json
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/chef-helper.json
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/exercise-check.json
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/dog-monitor.json
+        script: |
+          set -e
+          mkdir -p "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Applets"
+          for id in insurance-inventory chef-helper a-sorta-fairytale-about-me exercise-check dog-monitor; do
+            cp "$SRCROOT/../applets/$id/applet.json" "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Applets/$id.json"
+          done
+      - &deviceBrandAssets
+        name: Copy the APK device brand logos
+        basedOnDependencyAnalysis: false
+        script: |
+          # The APK's bundled brand logos and catalog (app/src/main/assets/device-brands), next to diagnostics/
+          # so the map page's ../device-brands/ paths resolve. Always re-synced; it is a handful of small files.
+          # The List draws logos natively, and UIImage can't read SVG, so each SVG is also rendered to PNG
+          # (brand-logos/<asset>.png) with macOS Quick Look. Without a render, the app shows the brand's name instead.
+          set -e
+          src="$SRCROOT/../app/src/main/assets/device-brands"
+          res="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH"
+          mkdir -p "$res/device-brands" "$res/brand-logos"
+          rsync -a --delete "$src/" "$res/device-brands/"
+          # Each SVG is drawn on a mid-grey backdrop (#808080) first, so white logos survive Quick Look's white page;
+          # the app turns that grey back into transparency (BrandImages.trim).
+          cache="$DERIVED_FILE_DIR/brand-logos"
+          work="$DERIVED_FILE_DIR/brand-logos-src"
+          mkdir -p "$cache" "$work"
+          for f in "$src"/*.svg; do
+            name="$(basename "$f")"
+            out="$cache/$name.png"
+            if [ ! -f "$out" ] || [ "$f" -nt "$out" ]; then
+              perl -0pe 's/(<svg\b[^>]*>)/$1<rect x="-100000" y="-100000" width="200000" height="200000" fill="#808080"\/>/s' "$f" > "$work/$name"
+              qlmanage -t -s 256 -o "$cache" "$work/$name" >/dev/null 2>&1 || echo "warning: no PNG render for $name"
+            fi
+          done
+          rsync -a --delete "$cache/" "$res/brand-logos/"
+    postBuildScripts:
+      - &crashReportingResource
+        name: Crash reporting address (Sentry DSN)
+        basedOnDependencyAnalysis: false
+        inputFiles:
+          - $(SRCROOT)/../tools/package-apple-crash-reporting.sh
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/CrashReporting.plist
+        script: /bin/sh "$SCRIPT_INPUT_FILE_0"
+    settings:
+      base:
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        BRIDGIT_HOST_BUNDLE_ID: cc.bridgit.portal
+        PRODUCT_BUNDLE_IDENTIFIER: "$(BRIDGIT_HOST_BUNDLE_ID)"
+        BRIDGIT_INBOUND_SHARE_GROUP: group.cc.bridgit.portal.inbound
+        REGISTER_APP_GROUPS: NO
+        PRODUCT_NAME: Bridgit
+        PRODUCT_MODULE_NAME: Bridgit_iOS
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_ENTITLEMENTS: Bridgit-iOS/Bridgit.entitlements
+      configs:
+        Debug:
+          ASSETCATALOG_COMPILER_APPICON_NAME: AppIconDebug
+          BRIDGIT_HOST_BUNDLE_ID: cc.bridgit.portal.debug
+          BRIDGIT_INBOUND_SHARE_GROUP: group.cc.bridgit.portal.debug.inbound
+          BRIDGIT_APNS_ENVIRONMENT: development
+        # TestFlight builds are signed by publish-testflight.sh with the team's distribution
+        # certificate and the "Bridgit App Store" profile; Debug stays automatic.
+        Release:
+          BRIDGIT_APNS_ENVIRONMENT: production
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: Bridgit Portal App Store Apple Host
+  Bridgit-ParityUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [Bridgit-ParityUITests]
+    dependencies:
+      - target: Bridgit-iOS
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Bridgit-iOS
+  Bridgit-iOSTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Bridgit-iOSTests, SharedTests]
+    dependencies:
+      - target: Bridgit-iOS
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Bridgit.app/Bridgit"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+  Bridgit-macOS:
+    type: application
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - Bridgit-macOS
+      - Shared
+      - path: ../app/src/main/res/drawable-nodpi
+        includes: ["whatcan_*.webp"]
+        buildPhase: resources
+    dependencies:
+      - target: Bridgit-Share-macOS
+        embed: true
+      - package: BridgitCore
+      - package: BridgitAppletRuntime
+      - package: BridgitSpeech
+      - package: Sentry
+        product: Sentry
+    info:
+      path: Bridgit-macOS/Info.plist
+      properties:
+        BridgitInboundShareGroup: "$(BRIDGIT_INBOUND_SHARE_GROUP)"
+        CFBundleDisplayName: Bridgit
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSApplicationCategoryType: public.app-category.productivity
+        NSPhotoLibraryUsageDescription: Choose photos for a local Bridgit applet.
+        NSCameraUsageDescription: Use the camera for approved local Bridgit actions.
+        NSBonjourServices:
+          - _linkplay._tcp
+          - _googlecast._tcp
+          - _airplay._tcp
+          - _raop._tcp
+          - _spotify-connect._tcp
+          - _sonos._tcp
+          - _rtsp._tcp
+          - _androidtvremote2._tcp
+          - _mediaremotetv._tcp
+          - _ipp._tcp
+          - _ipps._tcp
+          - _printer._tcp
+          - _pdl-datastream._tcp
+          - _shelly._tcp
+          - _hue._tcp
+          - _hap._tcp
+          - _matter._tcp
+          - _matterc._udp
+          - _home-assistant._tcp
+          - _esphomelib._tcp
+          - _wled._tcp
+          - _mqtt._tcp
+          - _smb._tcp
+          - _adisk._tcp
+          - _ssh._tcp
+          - _sftp-ssh._tcp
+          - _rfb._tcp
+          - _rdp._tcp
+          - _http._tcp
+          - _https._tcp
+        NSLocalNetworkUsageDescription: Connect to approved private-network devices and host requests from control agents you authorize.
+        NSSpeechRecognitionUsageDescription: Recognize speech locally for applets and microphone clips you explicitly enable.
+        NSMicrophoneUsageDescription: Use the microphone for applet speech turns and host recordings you explicitly enable.
+        CFBundleURLTypes:
+          - CFBundleURLName: cc.bridgit.macos
+            CFBundleURLSchemes: [bridgit]
+    postCompileScripts:
+      - *buildRevision
+      - *diagnosticsAssets
+      - *deviceBrandAssets
+      - name: Copy the shared card library
+        basedOnDependencyAnalysis: true
+        inputFiles: [$(SRCROOT)/../applets/insurance-inventory/applet.json, $(SRCROOT)/../applets/a-sorta-fairytale-about-me/applet.json, $(SRCROOT)/../applets/chef-helper/applet.json, $(SRCROOT)/../applets/exercise-check/applet.json, $(SRCROOT)/../applets/dog-monitor/applet.json]
+        outputFiles: [$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/insurance-inventory.json, $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/a-sorta-fairytale-about-me.json, $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/chef-helper.json, $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/exercise-check.json, $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/dog-monitor.json]
+        script: |
+          set -e
+          mkdir -p "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Applets"
+          for id in insurance-inventory chef-helper a-sorta-fairytale-about-me exercise-check dog-monitor; do
+            cp "$SRCROOT/../applets/$id/applet.json" "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Applets/$id.json"
+          done
+    postBuildScripts:
+      - *crashReportingResource
+    settings:
+      base:
+        PRODUCT_NAME: Bridgit
+        BRIDGIT_HOST_BUNDLE_ID: cc.bridgit.macos.local
+        PRODUCT_BUNDLE_IDENTIFIER: "$(BRIDGIT_HOST_BUNDLE_ID)"
+        BRIDGIT_INBOUND_SHARE_GROUP: "$(DEVELOPMENT_TEAM).cc.bridgit.macos.inbound"
+        REGISTER_APP_GROUPS: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        PRODUCT_MODULE_NAME: Bridgit_macOS
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_ENTITLEMENTS: Bridgit-macOS/Bridgit.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_APP_SANDBOX: NO
+      configs:
+        Debug:
+          BRIDGIT_HOST_BUNDLE_ID: cc.bridgit.macos.local.debug
+          BRIDGIT_INBOUND_SHARE_GROUP: "$(DEVELOPMENT_TEAM).cc.bridgit.macos.debug.inbound"
+          ASSETCATALOG_COMPILER_APPICON_NAME: AppIconDebug
+  Bridgit-macOSTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: Bridgit-macOSTests
+        excludes: [Fixtures/**]
+      - path: SharedTests
+    dependencies:
+      - target: Bridgit-macOS
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Bridgit.app/Contents/MacOS/Bridgit"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+  Bridgit-Share-iOS:
+    productName: BridgitShare
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.4"
+    sources:
+      - path: ShareExtension
+        includes: [ShareViewController.swift]
+    dependencies:
+      - package: BridgitCore
+    info:
+      path: ShareExtension/iOS-Info.plist
+      properties:
+        CFBundleDisplayName: Bridgit
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        BridgitInboundShareGroup: "$(BRIDGIT_INBOUND_SHARE_GROUP)"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).ShareViewController"
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsText: true
+              NSExtensionActivationSupportsFileWithMaxCount: 10
+              NSExtensionActivationSupportsImageWithMaxCount: 10
+              NSExtensionActivationSupportsMovieWithMaxCount: 10
+              NSExtensionActivationSupportsWebURLWithMaxCount: 10
+    settings:
+      base:
+        PRODUCT_NAME: BridgitShare
+        PRODUCT_MODULE_NAME: BridgitShare_iOS
+        BRIDGIT_HOST_BUNDLE_ID: cc.bridgit.portal
+        PRODUCT_BUNDLE_IDENTIFIER: "$(BRIDGIT_HOST_BUNDLE_ID).Share"
+        BRIDGIT_INBOUND_SHARE_GROUP: group.cc.bridgit.portal.inbound
+        CODE_SIGN_ENTITLEMENTS: ShareExtension/iOS.entitlements
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SKIP_INSTALL: YES
+        REGISTER_APP_GROUPS: NO
+        TARGETED_DEVICE_FAMILY: "1,2"
+      configs:
+        Debug:
+          BRIDGIT_HOST_BUNDLE_ID: cc.bridgit.portal.debug
+          BRIDGIT_INBOUND_SHARE_GROUP: group.cc.bridgit.portal.debug.inbound
+  Bridgit-Share-macOS:
+    productName: BridgitShare
+    type: app-extension
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: ShareExtension
+        includes: [ShareViewController.swift]
+    dependencies:
+      - package: BridgitCore
+    info:
+      path: ShareExtension/Mac-Info.plist
+      properties:
+        CFBundleDisplayName: Bridgit
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        BridgitInboundShareGroup: "$(BRIDGIT_INBOUND_SHARE_GROUP)"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).ShareViewController"
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsText: true
+              NSExtensionActivationSupportsFileWithMaxCount: 10
+              NSExtensionActivationSupportsImageWithMaxCount: 10
+              NSExtensionActivationSupportsMovieWithMaxCount: 10
+              NSExtensionActivationSupportsWebURLWithMaxCount: 10
+    settings:
+      base:
+        PRODUCT_NAME: BridgitShare
+        PRODUCT_MODULE_NAME: BridgitShare_macOS
+        BRIDGIT_HOST_BUNDLE_ID: cc.bridgit.macos.local
+        PRODUCT_BUNDLE_IDENTIFIER: "$(BRIDGIT_HOST_BUNDLE_ID).Share"
+        BRIDGIT_INBOUND_SHARE_GROUP: "$(DEVELOPMENT_TEAM).cc.bridgit.macos.inbound"
+        CODE_SIGN_ENTITLEMENTS: ShareExtension/Mac.entitlements
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        APPLICATION_EXTENSION_API_ONLY: YES
+        ENABLE_APP_SANDBOX: YES
+        SKIP_INSTALL: YES
+        REGISTER_APP_GROUPS: NO
+      configs:
+        Debug:
+          BRIDGIT_HOST_BUNDLE_ID: cc.bridgit.macos.local.debug
+          BRIDGIT_INBOUND_SHARE_GROUP: "$(DEVELOPMENT_TEAM).cc.bridgit.macos.debug.inbound"
+schemes:
+  Bridgit-Parity:
+    build:
+      targets:
+        Bridgit-iOS: all
+        Bridgit-ParityUITests: [test]
+    test:
+      targets: [Bridgit-ParityUITests]
+  Bridgit-iOS:
+    build:
+      targets:
+        Bridgit-iOS: all
+        Bridgit-iOSTests: [test]
+    test:
+      targets: [Bridgit-iOSTests]
+  Bridgit-macOS:
+    build:
+      targets:
+        Bridgit-macOS: all
+        Bridgit-macOSTests: [test]
+    test:
+      targets: [Bridgit-macOSTests]

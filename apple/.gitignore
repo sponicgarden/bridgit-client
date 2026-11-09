@@ -1,0 +1,9 @@
+build/
+.build/
+**/.build/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcarchive/
+
+# Local coordination, not an app resource.
+BridgitSpeech/INTEGRATION-STATUS.txt

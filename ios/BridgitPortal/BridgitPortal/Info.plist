@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Bridgit Portal</string>
+	<string>Bridgit</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
+	<string>Bridgit</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -33,14 +33,14 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Take and review photos for local applets, send photos to selected applets on your paired phone, or scan a pairing code.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Share one foreground location reading with an applet you approve.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Record a short clip when you tap an applet recording button.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Transcribe your applet recording on this device for you to review.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Take and review photos for local applets, send photos to selected applets on your paired phone, or scan a pairing code.</string>
 	<key>SentryDSN</key>
 	<string></string>
 	<key>UIAppFonts</key>

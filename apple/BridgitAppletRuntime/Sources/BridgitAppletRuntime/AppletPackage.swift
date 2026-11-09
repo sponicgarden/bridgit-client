@@ -111,6 +111,7 @@ public struct AppletPackage: Sendable {
         self.version = version
         self.defaults = defaults
         self.flows = flows
+        try validateFlows(allowInputs: true)
     }
 
     /// Only a digest-verified HTML asset explicitly selected by this revision can run as its card.
@@ -118,6 +119,43 @@ public struct AppletPackage: Sendable {
         guard let name = definition["ui"]?["card"]?["asset"]?.text,
               let asset = definition["assets"]?[name], asset["media_type"] == .string("text/html") else { return nil }
         return asset["text"]?.text
+    }
+
+    public struct CSVButton: Sendable {
+        public let label: String
+        public let table: String
+        public let title: String
+        public let columns: [(String, String)]
+        public let filter: CSVRowFilter?
+    }
+
+    public var csvButtons: [CSVButton] {
+        guard case .array(let pieces)? = definition["ui"]?["card"]?["pieces"],
+              case .array(let tables)? = definition["processing"]?["tables"] else { return [] }
+        var buttons: [CSVButton] = []
+        let plainTypes = ["text", "number", "integer", "boolean", "time", "date", "choice"]
+        for piece in pieces where piece["type"] == .string("buttons") && piece["only_if"] == nil {
+            guard case .array(let items)? = piece["items"] else { continue }
+            for item in items {
+                guard declaresButton(item), let label = item["label"]?.text,
+                      item["do"]?.fields?.count == 1, let step = item["do"]?["step"],
+                      step["type"] == .string("share"), step["as"] == .string("csv"),
+                      step.fields?.keys.allSatisfy({ ["type", "as", "table", "title", "where"].contains($0) }) == true,
+                      let table = step["table"]?.text, let schema = tables.first(where: { $0["id"]?.text == table }),
+                      let fields = schema["columns"]?.fields else { continue }
+                let filter: CSVRowFilter?
+                do { filter = try step["where"].map { try CSVRowFilter($0, columns: Set(fields.keys)) } }
+                catch { continue }
+                let columns = fields.keys.sorted().compactMap { key -> (String, String)? in
+                    guard let field = fields[key], plainTypes.contains(field["type"]?.text ?? "") else { return nil }
+                    return (key, field["label"]?.text ?? key)
+                }
+                if !columns.isEmpty {
+                    buttons.append(CSVButton(label: label, table: table, title: step["title"]?.text ?? table, columns: columns, filter: filter))
+                }
+            }
+        }
+        return buttons
     }
 
     public struct BatchButton: Sendable {
@@ -231,6 +269,17 @@ public struct AppletPackage: Sendable {
         let values: [String:JSONValue]
     }
 
+    public var cameraItems: [JSONValue] {
+        guard case .array(let pieces)? = definition["ui"]?["card"]?["pieces"],
+              case .array(let grants)? = definition["permissions"]?["required"],
+              grants.contains(.string("interactions")), grants.contains(.string("camera")) else { return [] }
+        return pieces.flatMap { piece -> [JSONValue] in
+            guard piece["type"] == .string("buttons"), piece["only_if"] == nil,
+                  case .array(let items)? = piece["items"] else { return [] }
+            return items.filter { cameraButton($0) != nil }
+        }
+    }
+
     public func cameraButton(_ item: JSONValue) -> CameraButton? {
         guard declaresButton(item), item["do"]?.fields?.count == 1,
               let camera = item["do"]?["camera"]?.fields,
@@ -308,29 +357,62 @@ public struct AppletPackage: Sendable {
         return RunButton(label:label, flow:name, onCard:true)
     }
 
+    private func validateFlows(allowInputs: Bool) throws {
+        for (name, flow) in flows {
+            guard flow.fields != nil, case .array(let values)? = flow["steps"], (1...32).contains(values.count) else {
+                throw AppletRuntimeError.invalid("Missing flow or invalid steps: " + name)
+            }
+            guard flow["on_error"] == nil, flow["retries"] == nil else { throw AppletRuntimeError.invalid("Error policies belong to individual steps") }
+            if let cap = flow["max_paid_per_day"] {
+                guard case .number(let number) = cap, number.isFinite, number.rounded() == number, (1...500).contains(number) else {
+                    throw AppletRuntimeError.invalid("Paid workflow limit must be an integer from 1 to 500")
+                }
+            }
+            if let condition = flow["only_if"] { try FlowCondition.validate(condition, earlier: [], flow: true, allowInputs: allowInputs) }
+            var earlier = Set<String>()
+            for value in values {
+                let step = try FlowStep(value)
+                if let condition = step.arguments["only_if"] { try FlowCondition.validate(condition, earlier: earlier, allowInputs: allowInputs) }
+                if let id = step.id, !earlier.insert(id).inserted { throw AppletRuntimeError.invalid("Duplicate step id") }
+            }
+        }
+    }
+    public func validateFlows(configuration: [String: JSONValue]) throws {
+        for name in flows.keys { _ = try steps(for: name, configuration: configuration); _ = try flowCondition(for: name, configuration: configuration) }
+    }
+    public func flowCondition(for flow: String, configuration: [String: JSONValue]) throws -> JSONValue? {
+        guard let condition = flows[flow]?["only_if"] else { return nil }
+        let value = try bind(condition, configuration: configuration)
+        try FlowCondition.validate(value, earlier: [], flow: true)
+        return value
+    }
+    private func bind(_ value: JSONValue, configuration: [String: JSONValue]) throws -> JSONValue {
+        switch value {
+        case .object(let fields):
+            if let ref = fields["$input"] {
+                guard fields.count == 1, let name = ref.text, let input = configuration[name] else { throw AppletRuntimeError.invalid("Missing or mixed configuration reference") }
+                return input
+            }
+            if fields.count == 1, let name = fields["$flow"]?.text {
+                guard flows[name] != nil else { throw AppletRuntimeError.missingReference(name) }; return .string(name)
+            }
+            return .object(try fields.mapValues { try bind($0, configuration: configuration) })
+        case .array(let values): return .array(try values.map { try bind($0, configuration: configuration) })
+        default: return value
+        }
+    }
+
     /// The caller validates the complete instance configuration against config_schema before compiling.
     public func steps(for flow: String, configuration: [String: JSONValue]) throws -> [FlowStep] {
         guard case .array(let steps)? = flows[flow]?["steps"], (1...32).contains(steps.count) else {
             throw AppletRuntimeError.invalid("Missing flow or invalid steps: " + flow)
         }
-        func bind(_ value: JSONValue) throws -> JSONValue {
-            switch value {
-            case .object(let fields):
-                if let ref = fields["$input"] {
-                    guard fields.count == 1, let name = ref.text, let input = configuration[name] else {
-                        throw AppletRuntimeError.invalid("Missing or mixed configuration reference")
-                    }
-                    return input
-                }
-                if fields.count == 1, let name = fields["$flow"]?.text {
-                    guard flows[name] != nil else { throw AppletRuntimeError.missingReference(name) }
-                    return .string(name)
-                }
-                return .object(try fields.mapValues(bind))
-            case .array(let items): return .array(try items.map(bind))
-            default: return value
-            }
+        let compiled = try steps.map { try FlowStep(bind($0, configuration: configuration)) }
+        var earlier = Set<String>()
+        for step in compiled {
+            if let condition = step.arguments["only_if"] { try FlowCondition.validate(condition, earlier: earlier) }
+            if let id = step.id, !earlier.insert(id).inserted { throw AppletRuntimeError.invalid("Duplicate step id") }
         }
-        return try steps.map { try FlowStep(bind($0)) }
+        return compiled
     }
 }

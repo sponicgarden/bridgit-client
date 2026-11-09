@@ -18,6 +18,17 @@ class InventoryPackageTest {
 
     @Test fun inventoryPackageValidates() { p }
 
+    @Test fun currentInventoryKeepsMaintainedFeaturesAndOnlyCsvSharing() {
+        assertEquals("3.0.3", p.version)
+        val definition = p.definition
+        val ui = definition.getJSONObject("ui")
+        assertEquals(listOf("camera", "create", "csv"), (0 until ui.getJSONObject("portal").getJSONArray("actions").length()).map { ui.getJSONObject("portal").getJSONArray("actions").getString(it) })
+        val text = definition.toString()
+        assertTrue(!text.contains("Share PDF"))
+        assertTrue(text.contains("Share CSV") && text.contains("appraise"))
+        assertEquals(setOf("photos", "items"), AppletTables.parse(definition.getJSONObject("processing")).map { it.id }.toSet())
+    }
+
     /** Owner, 5 Nov 2026: it showed "Every 10 minutes" under Schedule, but it runs only when used. */
     @Test fun inventoryIsUserDrivenWithNoScheduledActions() {
         val plan = AppletPackage.compile(p, AppletPackage.fill(p, null))

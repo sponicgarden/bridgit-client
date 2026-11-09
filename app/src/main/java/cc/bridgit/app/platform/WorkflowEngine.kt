@@ -516,7 +516,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
                     fun allowed() {
                         runtime.authorize(agent,"camera.snapshot")
                         val principal=app.agents.get(agent)
-                        if (principal==null || principal.paused || !principal.allows("lan_camera") || !app.settings.isOn("lan_camera") ||
+                        if (principal==null || principal.suspended || !principal.allows("lan_camera") || !app.settings.isOn("lan_camera") ||
                             !app.captureNotificationsOn() || app.applets.forAgent(agent)?.let {
                                 val state = cc.bridgit.app.applets.AppletLifecycle.state(it)
                                 state != "running" && !(state == "paused" && trigger.optString("caller") in setOf("button", "agent"))

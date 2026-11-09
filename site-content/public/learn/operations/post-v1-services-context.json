@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read one location-context service from GET /v1/services: places, airquality, pollen, timezone, maps, streetview, weathergoogle, osm, wikipedia or openmeteo. No implicit phone-location read; send explicit coordinates. Provider keys stay write-only.",

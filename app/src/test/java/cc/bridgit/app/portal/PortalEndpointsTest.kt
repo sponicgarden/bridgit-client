@@ -77,6 +77,25 @@ class PortalEndpointsTest {
         Unit
     }
 
+    @Test fun `pairings named Bridgit Portal before A0160 become Bridgit viewer, owner names stay`() {
+        val store = RelayStore(app)
+        store.base = "https://relay.example/d/${store.device}"
+        store.enabled = true
+        val first = PortalPairing.create(app, store, singleUse = false).agent
+        val second = PortalPairing.create(app, store, singleUse = false).agent
+        val mine = PortalPairing.create(app, store, singleUse = false).agent
+        app.agents.update(first.id) { it.copy(name = "Bridgit Portal") }
+        app.agents.update(second.id) { it.copy(name = "Bridgit Portal 2") }
+        app.agents.update(mine.id) { it.copy(name = "Kitchen iPad") }
+
+        assertEquals(2, PortalPairing.renameLegacy(app, store))
+        assertEquals("Bridgit viewer", app.agents.get(first.id)!!.name)
+        assertEquals("Bridgit viewer 2", app.agents.get(second.id)!!.name)
+        assertEquals("Kitchen iPad", app.agents.get(mine.id)!!.name)
+        assertEquals(PortalData.GRANTS, app.agents.get(first.id)!!.caps)
+        assertEquals(0, PortalPairing.renameLegacy(app, store))
+    }
+
     @Test fun `paired portal reads every endpoint over the relay and is cut off when disconnected`() = runBlocking {
         app.platform.store
         app.settings.listenerEnabled = true
@@ -84,13 +103,13 @@ class PortalEndpointsTest {
         store.base = "https://relay.example/d/${store.device}"
         store.enabled = true
         val p = PortalPairing.create(app, store)
-        assertEquals("Bridgit Portal", p.agent.name)
+        assertEquals("Bridgit viewer", p.agent.name)
         assertEquals(PortalData.GRANTS, app.agents.get(p.agent.id)!!.caps)
         val link = PortalData.parsePairLink(p.link)!!
         assertEquals("https://relay.example", link["relay"]); assertEquals(store.device, link["device"])
         assertTrue(link["token"]!!.startsWith("rly_"))
         assertEquals(listOf(p.agent.id), PortalPairing.paired(app, store).map { it.id })
-        assertEquals("Bridgit Portal 2", PortalPairing.nextName(app))
+        assertEquals("Bridgit viewer 2", PortalPairing.nextName(app))
 
         // An agent action the log page should show, and a portal poll it should skip.
         app.log.append(LogEntry(ts = System.currentTimeMillis(), channel = "audit", kind = "request", agentId = p.agent.id, agent = p.agent.name,
@@ -132,7 +151,7 @@ class PortalEndpointsTest {
         val opts = scene.getJSONObject("options")
         listOf("externalDevices", "emailReminder", "agent", "called", "agents", "nodes", "checks").forEach { assertTrue(it, opts.has(it)) }
         listOf("camera", "voicerec", "tailscale", "clef", "jev", "weather", "agent").forEach { assertTrue(it, opts.getJSONObject("nodes").has(it)) }
-        assertFalse(opts.getJSONArray("agents").toString().contains("Bridgit Portal"))
+        assertFalse(opts.getJSONArray("agents").toString().contains("Bridgit viewer"))
         assertEquals(0, home.getInt("agents_count"))
         listOf("agents", "applets", "emptyApplets", "position", "rotate").forEach { assertTrue(it, scene.getJSONObject("home_status").has(it)) }
         assertTrue(scene.has("paused")); assertTrue(scene.has("listening"))

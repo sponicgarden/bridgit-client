@@ -53,7 +53,7 @@ object ContextServices {
 
     private fun authorize(app: BridgeApp, agent: String) {
         val live=app.agents.get(agent)
-        if(live == null || live.paused || !live.allows("judgment")) throw ApiError(403,"agent_not_allowed","Decision access was revoked")
+        if(live == null || live.suspended || !live.allows("judgment")) throw ApiError(403,"agent_not_allowed","Decision access was revoked")
         val inst=app.applets.forAgent(agent)
         if(inst != null && inst.optString("status")!="active") throw ApiError(403,"agent_not_allowed","The applet is paused or removed")
     }

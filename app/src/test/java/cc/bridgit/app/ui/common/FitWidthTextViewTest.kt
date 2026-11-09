@@ -26,17 +26,17 @@ class FitWidthTextViewTest {
     @Test
     fun fitTextMakesTheTextExactlyTheWidth() {
         val paint = Paint(Paint.SUBPIXEL_TEXT_FLAG or Paint.LINEAR_TEXT_FLAG).apply { textSize = 40f } // same flags as FitWidthTextView
-        val (size, scale) = FitWidthTextView.fitText(paint, "Distributed sensorial applications, built by your favorite agent.", 300f)!!
+        val (size, scale) = FitWidthTextView.fitText(paint, "Distributed sensorial applications — built by your favorite agent.", 300f)!!
         val p = Paint(paint).apply { textSize = size; textScaleX = scale }
-        assertEquals(300f, p.measureText("Distributed sensorial applications, built by your favorite agent."), 0.5f)
+        assertEquals(300f, p.measureText("Distributed sensorial applications — built by your favorite agent."), 0.5f)
     }
 
     @Test
     fun twoLineTextFitsTheWiderLine() {
         val paint = Paint(Paint.SUBPIXEL_TEXT_FLAG or Paint.LINEAR_TEXT_FLAG).apply { textSize = 40f }
-        val (size, scale) = FitWidthTextView.fitText(paint, "Distributed sensorial applications,\nbuilt by your favorite agent.", 300f)!!
+        val (size, scale) = FitWidthTextView.fitText(paint, "Distributed sensorial applications —\nbuilt by your favorite agent.", 300f)!!
         val p = Paint(paint).apply { textSize = size; textScaleX = scale }
-        val widths = listOf("Distributed sensorial applications,", "built by your favorite agent.").map { p.measureText(it) }
+        val widths = listOf("Distributed sensorial applications —", "built by your favorite agent.").map { p.measureText(it) }
         assertEquals(300f, widths.max(), 0.5f)
         assertTrue(widths.all { it <= 300.5f })
     }

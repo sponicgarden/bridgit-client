@@ -35,10 +35,12 @@ public enum AppletRuntimeError: LocalizedError, Equatable {
         case .unavailable(let step): return "This device cannot perform " + step
         case .missingReference(let path): return "Missing applet reference: " + path
         case .revoked: return "Applet permission was revoked"
+        case .paused: return "This applet is paused. Resume it before starting work."
+        case .executionStopped: return "This applet run was stopped. Start a new run to continue."
         }
     }
 
-    case invalid(String), unavailable(String), missingReference(String), revoked
+    case invalid(String), unavailable(String), missingReference(String), revoked, paused, executionStopped
 }
 
 /// Platform hosts enforce permissions, cloud consent, provider selection and budgets at every action.
@@ -87,12 +89,19 @@ public struct FlowStep: Sendable {
             guard let name = id.text, name.range(of: "^[a-z][a-z0-9_]{0,31}$", options: .regularExpression) != nil else { throw AppletRuntimeError.invalid("Invalid step id") }
             self.id = name
         } else { self.id = nil }
-        onError = f.removeValue(forKey: "on_error")?.text ?? "stop"
+        if let policy = f.removeValue(forKey: "on_error") {
+            guard let text = policy.text else { throw AppletRuntimeError.invalid("Error policy must be stop, skip or retry") }
+            onError = text
+        } else { onError = "stop" }
         guard ["stop", "skip", "retry"].contains(onError) else { throw AppletRuntimeError.invalid("Unknown error policy") }
         if let retry = f.removeValue(forKey: "retries") {
             guard onError == "retry", case .number(let n) = retry, n.rounded() == n, (1...3).contains(n) else { throw AppletRuntimeError.invalid("Retries require retry policy and 1–3 attempts") }
             retries = Int(n)
         } else { retries = onError == "retry" ? 1 : 0 }
+        if onError == "retry", ["ask_model", "appraise", "kitchen"].contains(type) || onError == "retry" && ["hear", "speak"].contains(type) && f["allow_cloud"] == .bool(true) {
+            throw AppletRuntimeError.invalid("Paid operations cannot retry implicitly")
+        }
+        if let condition = f["only_if"] { try FlowCondition.validate(condition, allowInputs: true) }
         arguments = f
     }
 }
@@ -106,19 +115,27 @@ public struct FlowOutcome: Equatable, Sendable {
 /// This core supports both Apple platforms; it does not claim that a portal is a local host.
 public struct FlowRuntime: Sendable {
     public let host: any AppletHost
-    public init(host: any AppletHost) { self.host = host }
-    public func run(instance: String, steps: [FlowStep], execution: String = UUID().uuidString, trigger: JSONValue = .object([:])) async throws -> FlowOutcome {
+    private let retrySleep: @Sendable (UInt64) async throws -> Void
+    public init(host: any AppletHost) { self.host = host; retrySleep = { try await Task.sleep(nanoseconds: $0) } }
+    init(host: any AppletHost, retrySleep: @escaping @Sendable (UInt64) async throws -> Void) { self.host = host; self.retrySleep = retrySleep }
+    public func run(instance: String, steps: [FlowStep], execution: String = UUID().uuidString, trigger: JSONValue = .object([:]), onlyIf: JSONValue? = nil) async throws -> FlowOutcome {
         guard (1...32).contains(steps.count) else { throw AppletRuntimeError.invalid("Use 1–32 steps") }
+        if let onlyIf { try FlowCondition.validate(onlyIf, earlier: [], flow: true) }
         var ids = Set<String>()
         // Refuse unsupported steps before the first side effect.
         for step in steps {
             guard host.supportedSteps.contains(step.type) || ["wait", "stop"].contains(step.type) else { throw AppletRuntimeError.unavailable(step.type) }
+            if let condition = step.arguments["only_if"] { try FlowCondition.validate(condition, earlier: ids) }
             if let id = step.id, !ids.insert(id).inserted { throw AppletRuntimeError.invalid("Duplicate step id") }
+        }
+        try Task.checkCancellation(); try await host.authorize(instance: instance)
+        if let onlyIf, try !FlowCondition.matches(onlyIf, results: [:], trigger: trigger) {
+            return FlowOutcome(results: [:], skipped: Array(steps.indices))
         }
         var results: [String: JSONValue] = [:], skipped: [Int] = []
         for (index, step) in steps.enumerated() {
             try Task.checkCancellation(); try await host.authorize(instance: instance)
-            if let condition = step.arguments["only_if"], try !conditionMatches(condition, results: results, trigger: trigger) {
+            if let condition = step.arguments["only_if"], try !FlowCondition.matches(condition, results: results, trigger: trigger) {
                 skipped.append(index); continue
             }
             var args = step.arguments; args.removeValue(forKey: "only_if")
@@ -153,21 +170,34 @@ public struct FlowRuntime: Sendable {
             }
             var attempt = 0
             while true {
+                // Authorization failures are never subject to a step's skip/retry policy.
+                try Task.checkCancellation(); try await host.authorize(instance: instance)
+                let value: JSONValue
                 do {
-                    try Task.checkCancellation(); try await host.authorize(instance: instance)
-                    let value = try await host.perform(type: step.type, arguments: args, context: AppletActionContext(instance: instance, execution: execution, step: index))
-                    // Pause/revocation during an awaited service prevents downstream actions/results.
-                    try Task.checkCancellation(); try await host.authorize(instance: instance)
-                    if let id = step.id { results[id] = value }
-                    break
+                    value = try await host.perform(type: step.type, arguments: args, context: AppletActionContext(instance: instance, execution: execution, step: index))
                 } catch is CancellationError { throw CancellationError() }
                 catch AppletRuntimeError.revoked { throw AppletRuntimeError.revoked }
+                catch AppletRuntimeError.paused { throw AppletRuntimeError.paused }
+                catch AppletRuntimeError.executionStopped { throw AppletRuntimeError.executionStopped }
                 catch {
+                    if let url = error as? URLError, url.code == .cancelled { throw CancellationError() }
+                    let failure = StepFailure(error)
+                    guard !failure.blocking else { throw error }
+                    let safe = ["lookup", "context", "wait", "stop"].contains(step.type) || step.type == "photo" && (args["keep"] == nil || args["keep"] == .bool(false))
+                    // Unknown effect outcomes halt even under skip; never deliver the next effect or retry it.
+                    if !safe && failure.ambiguous {
+                        throw AppletStepFailure(status: 500, code: "unknown_outcome", message: "This action may already have completed. Inspect its result before explicitly running it again.", effectStarted: true)
+                    }
+                    guard failure.known else { throw error }
                     if step.onError == "skip" { skipped.append(index); break }
-                    guard step.onError == "retry", attempt < step.retries else { throw error }
+                    guard step.onError == "retry", failure.transient, attempt < step.retries else { throw error }
                     let delay: [UInt64] = [2, 5, 10]
-                    try await Task.sleep(nanoseconds: delay[attempt] * 1_000_000_000); attempt += 1
+                    try await retrySleep(delay[attempt] * 1_000_000_000); attempt += 1
+                    continue
                 }
+                try Task.checkCancellation(); try await host.authorize(instance: instance)
+                if let id = step.id { results[id] = value }
+                break
             }
         }
         return FlowOutcome(results: results, skipped: skipped)
@@ -197,25 +227,37 @@ public struct FlowRuntime: Sendable {
         default: return value
         }
     }
-    private func conditionMatches(_ value: JSONValue, results: [String: JSONValue], trigger: JSONValue) throws -> Bool {
-        guard let f = value.fields else { throw AppletRuntimeError.invalid("Condition must be an object") }
-        guard ["step", "trigger"].filter({ f[$0] != nil }).count == 1 else { throw AppletRuntimeError.invalid("Condition needs one source") }
-        let source: JSONValue?
-        if let p = f["step"]?.text {
-            let parts = p.split(separator: ".", maxSplits: 1).map(String.init)
-            guard parts.count == 2 else { throw AppletRuntimeError.invalid("Condition step path") }
-            source = results[parts[0]].flatMap { path($0, parts[1]) }
-        } else if let p = f["trigger"]?.text { source = path(trigger, p) }
-        else { throw AppletRuntimeError.invalid("Unsupported condition source") }
-        let tests = Set(f.keys).subtracting(["step", "trigger"])
-        guard tests.count == 1, let test = tests.first else { throw AppletRuntimeError.invalid("Condition needs exactly one test") }
-        switch test {
-        case "exists": guard case .bool(let expected)? = f[test] else { throw AppletRuntimeError.invalid("exists requires boolean") }; return (source != nil) == expected
-        case "is": return source != nil && source == f[test]
-        case "is_not": return source != nil && source != f[test]
-        case "in": guard case .array(let values)? = f[test] else { throw AppletRuntimeError.invalid("in requires array") }; return source.map { values.contains($0) } ?? false
-        case "at_least", "below": guard case .number(let lhs)? = source, case .number(let rhs)? = f[test] else { return false }; return test == "below" ? lhs < rhs : lhs >= rhs
-        default: throw AppletRuntimeError.invalid("Unsupported condition test")
-        }
+ }
+
+/// Native hosts can declare a known rejection before any effect, without guessing from a thrown message.
+public struct AppletStepFailure: LocalizedError, Sendable {
+    public let status: Int
+    public let code: String
+    public let message: String
+    public let effectStarted: Bool?
+    public var errorDescription: String? { message }
+    public init(status: Int, code: String, message: String, effectStarted: Bool? = nil) {
+        self.status = status; self.code = code; self.message = message; self.effectStarted = effectStarted
+    }
+}
+private struct StepFailure {
+    let known: Bool
+    let blocking: Bool
+    let transient: Bool
+    let ambiguous: Bool
+    init(_ error: Error) {
+        let status: Int?, code: String, effectStarted: Bool?
+        if let failure = error as? AppletStepFailure {
+            status = failure.status; code = failure.code; effectStarted = failure.effectStarted
+        } else if let failure = error as? URLError {
+            status = [.userAuthenticationRequired, .userCancelledAuthentication].contains(failure.code) ? 401 : failure.code == .timedOut ? 408 : 503
+            code = "transport_failed"; effectStarted = nil
+        } else if error is AppletRuntimeError {
+            status = 422; code = "invalid_parameter"; effectStarted = false
+        } else { status = nil; code = "unknown_outcome"; effectStarted = nil }
+        known = status != nil
+        blocking = status == 401 || status == 403 || ["agent_not_allowed", "unauthorized", "agent_revoked", "permission_denied"].contains(code)
+        transient = status.map { [408, 409, 429].contains($0) || $0 >= 500 } ?? false
+        ambiguous = code == "unknown_outcome" || effectStarted != false && (status == nil || status == 408 || (status ?? 0) >= 500)
     }
 }

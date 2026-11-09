@@ -66,6 +66,7 @@ class PlatformApi(private val app: BridgeApp, private val v1: cc.bridgit.app.api
         val a=app.policy.authenticate(token) ?: run { limiter.record("platform_auth:$src"); throw ApiError(401,"unauthorized","Missing or invalid token") }
         if(!limiter.tryAcquire("platform_calls:${a.id}",300)) throw ApiError(429,"rate_limited","At most 300 platform requests per agent per minute")
         requireDevice(a.id,src)
+        cc.bridgit.app.api.ApiAccess.require(app.agents.get(a.id))
         app.agents.recordUse(a.id,src)
         call.request.headers["X-Bridgit-Model"]?.let { m ->
             app.agents.reportModel(a.id, m, call.request.headers["X-Bridgit-Harness"])

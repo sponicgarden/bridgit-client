@@ -39,7 +39,7 @@ object EmailGate {
         }
     }
 
-    /** Capabilities agents keep while blocked: finding out why, fixing it, reporting problems, and the owner's own read-only Bridgit Portal. */
+    /** Capabilities agents keep while blocked: finding out why, fixing it, reporting problems, and the owner's own read-only iPhone & iPad app. */
     val EXEMPT_CAPABILITIES = setOf("status", "feedback", "portal")
 
     fun exempt(capability: String) = capability in EXEMPT_CAPABILITIES
@@ -50,7 +50,7 @@ object EmailGate {
     /** The one description of what keeps working after the deadline, built from the two lists above.
      *  Every agent doc that mentions the deadline uses it, so they can't disagree. */
     val DOC_SUMMARY get() = "the " + words(EXEMPT_CAPABILITIES.toList()) +
-        " endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/issues` and the owner's read-only Bridgit Portal), " +
+        " endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/issues` and the owner's read-only iPhone & iPad app), " +
         "the control tools " + words(EXEMPT_TOOLS.map { "`$it`" }) + " (`events` still needs `events.read`), " +
         "and the routes that are not tool calls (`/v2/capabilities`, `/v2/tools`, `/v2/guide`, operation cancel)"
 

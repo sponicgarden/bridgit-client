@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Device to device: this Bridgit's other links, names and directions only, so the other device can draw them (link agents only). Not for agents.",

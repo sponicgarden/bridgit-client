@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Phone to phone: a hub trades a satellite pairing link's one-time code for its key. Not for agents.",

@@ -77,7 +77,7 @@ object ConfigurationEndpoints {
         listOf(Param("approve", "boolean", "true approves; false declines", true), Param("expected_digest", "string", "Exact SHA-256 digest from the preceding review; changed requests conflict", true)),
         "{\"approve\":true,\"expected_digest\":\"<digest from review>\"}", "kind,id,approved,result with actual native status; no initial control grants, OS permission or account verification bypass")
     val ACCESS = EndpointSpec("GET", "/owner/configuration/access", "settings", "Existing Super agents can inspect and delegate app-owned feature switches, capabilities, roles and control grants without a separate configuration grant",
-        power = cc.bridgit.app.core.Power.SUPER, example = "GET /v1/owner/configuration/access", returns = "authority,approval_required=false,agents[{id,name,generation,key_created_at,capabilities,control_scopes,effective_control_scopes,paused,super_powers,fixer_mode,maximum_control}],features[{id,name,enabled,blockers}],capabilities; no keys or hashes")
+        power = cc.bridgit.app.core.Power.SUPER, example = "GET /v1/owner/configuration/access", returns = "authority,approval_required=false,agents[{id,name,generation,key_created_at,capabilities,control_scopes,effective_control_scopes,paused,api_access,super_powers,fixer_mode,maximum_control,connection,created_at,last_used_at,request_count,model,harness,device_lock,notes}],features[{id,name,enabled,blockers}],capabilities; no keys or hashes")
     val ACCESS_FEATURES = EndpointSpec("POST", "/owner/configuration/access/features", "settings", "Super agent changes app-owned enabled device features; actual Android consent remains required",
         power = cc.bridgit.app.core.Power.SUPER, idempotent = true, idempotencyRequired = true, privateFields = setOf("*"),
         body = listOf(Param("changes", "object", "Feature id to boolean from access discovery; validated together before changes", true)),
@@ -87,7 +87,10 @@ object ConfigurationEndpoints {
         body = listOf(Param("expected_generation", "string", "Exact opaque generation from access discovery; changes on key rotation", true),
             Param("capabilities", "array|null", "Replace legacy capability ids; null allows all (relay stores explicit ids)"),
             Param("control_scopes", "array", "Replace control grants with these known scopes, durable until revoked; [] clears; native capture revocation also narrows corresponding legacy permissions"),
-            Param("paused", "boolean", "Pause/resume this paired control agent"), Param("super_powers", "boolean", "Delegate/revoke Super Powers; caller must already have them"),
+            Param("paused", "boolean", "Pause/resume this paired control agent"),
+            Param("api_access", "boolean", "API access (on by default): false refuses every API call from this agent while it stays paired; true restores it"),
+            Param("name", "string", "Rename the agent: 1-24 letters, numbers, spaces, - or _, unique on this phone"),
+            Param("notes", "string", "The owner's notes about the agent, up to 200 characters; \"\" clears"), Param("super_powers", "boolean", "Delegate/revoke Super Powers; caller must already have them"),
             Param("fixer_mode", "boolean", "Delegate/revoke Fixer Mode"), Param("maximum_control", "boolean", "Preserves the separate Superpowers role. true alone grants native maximum capabilities/roles/scopes; false stops future maximum inheritance")),
         example = "POST /v1/owner/configuration/access/agents/example {\"expected_generation\":\"<generation from discovery>\",\"control_scopes\":[\"owner.configuration\"]}", returns = "sanitized control-agent access,approval_required=false; no key creation or Android consent bypass")
     val ALL = listOf(ACCESS, ACCESS_FEATURES, ACCESS_AGENT, APPROVALS, APPROVAL, APPROVAL_DECIDE, INDEX, SETTINGS, ACTION, KEYS, KEY_SET, KEY_DELETE, CONNECTIONS, CONNECTION_CREATE, CONNECTION_UPDATE, CONNECTION_DELETE, CONNECTION_ROTATE,

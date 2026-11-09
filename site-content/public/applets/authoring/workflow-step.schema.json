@@ -1784,7 +1784,6 @@
         },
         "as": {
           "enum": [
-            "pdf",
             "csv"
           ]
         },
@@ -1804,21 +1803,6 @@
           },
           "minItems": 1,
           "maxItems": 16
-        },
-        "totals": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9_]{0,31}$"
-          },
-          "minItems": 1,
-          "maxItems": 8
-        },
-        "photos": {
-          "enum": [
-            "thumbs",
-            "none"
-          ]
         },
         "where": {
           "type": "object",

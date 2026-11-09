@@ -72,6 +72,14 @@ class PortalDataTest {
         assertTrue(subject.contains("%1\$s"))
     }
 
+    @Test fun `user-facing strings brand the product Bridgit, never Bridgit Portal`() {
+        // A0160 (owner, 9 Nov 2026): "Portal" comes off all branding. Comments may still name the mechanism.
+        File("src/main/res/values").listFiles { f -> f.name.startsWith("strings") && f.name.endsWith(".xml") }!!.forEach { f ->
+            val strings = f.readText().replace(Regex("<!--.*?-->", RegexOption.DOT_MATCHES_ALL), "")
+            assertFalse("${f.name} brands the product Bridgit Portal", strings.contains("Bridgit Portal", ignoreCase = true))
+        }
+    }
+
     @Test fun `relay is the origin without the device path`() {
         assertEquals("https://relay.example", PortalData.relayOrigin("https://relay.example/d/abcdefgh12", "abcdefgh12"))
     }

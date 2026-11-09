@@ -46,7 +46,7 @@ class CameraMonitor(private val runtime:AgentPlatform) {
     private fun checkSource(agent:String,camera:String) {
         if(!camera.startsWith("lan:")) return
         val a=runtime.app.agents.get(agent)
-        if(a==null || a.paused || !a.allows("lan_camera") || !runtime.app.settings.isOn("lan_camera")) throw ApiError(403,"agent_not_allowed","Local camera access was removed or switched off")
+        if(a==null || a.suspended || !a.allows("lan_camera") || !runtime.app.settings.isOn("lan_camera")) throw ApiError(403,"agent_not_allowed","Local camera access was removed or switched off")
         runtime.app.lanCameras.get(camera)
     }
     fun stop(agent:String,id:String):JSONObject { val record=runtime.store.require(id,agent,"stream"); jobs[id]?.cancel(); frames.remove(id); return runtime.store.save(agent,"stream",record.put("status","stopped")) }

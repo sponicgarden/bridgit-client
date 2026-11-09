@@ -188,7 +188,7 @@ struct NoPhoneView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                ScreenHeader(title: "No phone yet", lead: "Bridgit Portal shows a Bridgit phone's screens. The phone's owner grants access on the phone.")
+                ScreenHeader(title: "No phone yet", lead: "Bridgit shows a Bridgit phone's screens here. The phone's owner grants access on the phone.")
                 InfoPanel {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Two ways to get access").frostText(.label, weight: .semibold)

@@ -1,0 +1,19 @@
+<!doctype html><html data-receipt=""><meta name="viewport" content="width=device-width,initial-scale=1">
+<h1 id="page"></h1><p id="route"></p><p id="navigation"></p><a id="details">Open details</a>
+<script>
+function render() {
+  document.getElementById('page').textContent = location.hash === '#pkg.alpha-test' ? 'Alpha Test' : 'Pet monitor';
+  const route = location.pathname + location.search + location.hash;
+  document.getElementById('route').textContent = route;
+  const requestId = document.documentElement.dataset.receipt;
+  if (requestId) {
+    fetch('/observed?' + new URLSearchParams({requestId, route})).catch(() => {});
+  }
+  document.getElementById('navigation').textContent = performance.getEntriesByType('navigation')[0].type;
+  const url = new URL(location.href);
+  url.searchParams.set('detail', '1');
+  document.getElementById('details').href = url;
+}
+render(); addEventListener('hashchange', render);
+</script>
+</html>

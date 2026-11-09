@@ -1,0 +1,2527 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		002277FBCB5FE297583E5F0C /* LinkedDeviceMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C08221EF4E86B016F8B22ED /* LinkedDeviceMap.swift */; };
+		003FB2C95D9D5B52F128F9CD /* SpeechOwnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F64546C4B6FCE1ADE3CFF5 /* SpeechOwnerTests.swift */; };
+		0073B41F7D4B3844929579F8 /* whatcan_quick_settings_tile.webp in Resources */ = {isa = PBXBuildFile; fileRef = 178BCE9673819B7248F70184 /* whatcan_quick_settings_tile.webp */; };
+		014F517855D0D05E4FAA2E57 /* WatchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3D5FFBD9944B5A1337C7BD /* WatchModels.swift */; };
+		0164571360002BACD09E3D04 /* AppletCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA2FE0E3E22F0FC224967CA /* AppletCardsView.swift */; };
+		0172FB24B50BFF97222D1CCB /* AccountAgentRosterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA6569516EDA6E52D633011 /* AccountAgentRosterView.swift */; };
+		01F068E6D6B4E7B7792AF88A /* DevicesViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF1044F931B61282239746C /* DevicesViews.swift */; };
+		02598F21F93FA27F08A74696 /* OwnerPhotos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46846F7EF5140CFF7764A2FD /* OwnerPhotos.swift */; };
+		039F2DEA638B20A08FF2D4B5 /* whatcan_agent_notes.webp in Resources */ = {isa = PBXBuildFile; fileRef = 7F19B5CA1618793F0650DAFD /* whatcan_agent_notes.webp */; };
+		05F880D006F647F223DDE3CA /* NetworkInventoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550977846D4665F7565BF607 /* NetworkInventoryTests.swift */; };
+		075784F9C253A189E70B0E3B /* whatcan_app_usage.webp in Resources */ = {isa = PBXBuildFile; fileRef = D3C1E7544696D370EAFB4650 /* whatcan_app_usage.webp */; };
+		08846B2FDF3F9301E8B38E70 /* whatcan_location_history_and_places.webp in Resources */ = {isa = PBXBuildFile; fileRef = 4DA1C054C547E9BAC3EFB1F7 /* whatcan_location_history_and_places.webp */; };
+		08D17D4FDDF9B05B5F2956DC /* DevicePairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEA9FDC67B2E904568F4F42 /* DevicePairingView.swift */; };
+		092BCEC768412858A1ED64BD /* CrashReports.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57523F1560D1AA46719B49 /* CrashReports.swift */; };
+		0984EEE09995A11020A3DB11 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7D6ECCE7E8B30720457571BF /* OFL.txt */; };
+		0985D70B9C5ADF6573C4E15C /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46E5C09E11E0A67DA06C8D9 /* Keychain.swift */; };
+		0AC7BB52F12B1191061EB740 /* whatcan_flash_the_light.webp in Resources */ = {isa = PBXBuildFile; fileRef = 42A06CB958C8CF8BF8D81B30 /* whatcan_flash_the_light.webp */; };
+		0C7F22F8553974B3B4931EDF /* CaptureNotices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9908B0AA2EDEBAAF77B3429F /* CaptureNotices.swift */; };
+		0D45ED266B66E61901A4E178 /* whatcan_everything_is_logged.webp in Resources */ = {isa = PBXBuildFile; fileRef = 3476231F8A7528E842C28B58 /* whatcan_everything_is_logged.webp */; };
+		0E5271109EBC92317437BF3E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE9746C3CB8B17E8117844C /* Assets.xcassets */; };
+		0E7A8FD3A417A6C470AD671C /* whatcan_inbox.webp in Resources */ = {isa = PBXBuildFile; fileRef = 056C87B36FC2E6D48CAA0AF0 /* whatcan_inbox.webp */; };
+		0F7FF53B601B3D25C5BE65A9 /* whatcan_report_a_bug_or_ask_for_a_feature.webp in Resources */ = {isa = PBXBuildFile; fileRef = 4DAAFC1DA37C4B79D7DC5243 /* whatcan_report_a_bug_or_ask_for_a_feature.webp */; };
+		0FD6ADEA70C91A7A19873FA2 /* MoreSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFDA81568674E9D9A15A8C8 /* MoreSearch.swift */; };
+		11150D1BDCE9A493DE20A0F3 /* whatcan_per_agent_permissions.webp in Resources */ = {isa = PBXBuildFile; fileRef = 63036E48D93D70A3481EE6E8 /* whatcan_per_agent_permissions.webp */; };
+		1141269FD33161760B3C2E9A /* ViewerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC99DE05259E05278C709D4D /* ViewerConfiguration.swift */; };
+		12E3A83E20BBCD9249BE9FA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1B70BCD66AE8CE1C4AF5F0 /* Assets.xcassets */; };
+		155F9C0C789D7ED20FFDDAF6 /* whatcan_send_a_screenshot.webp in Resources */ = {isa = PBXBuildFile; fileRef = C0F6BDCCBF4DA5A3B6645284 /* whatcan_send_a_screenshot.webp */; };
+		17D7B6C36EE1EF5D1BAAB8B1 /* FeedbackEntries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F57F7ED14045A0D5E4D33AB /* FeedbackEntries.swift */; };
+		18501EDEEA50DFDEA150D788 /* whatcan_reach_bridgit_without_tailscale_relay.webp in Resources */ = {isa = PBXBuildFile; fileRef = 583A4D1342EDEEA15639E406 /* whatcan_reach_bridgit_without_tailscale_relay.webp */; };
+		1A1699CFDAB4B501B5533329 /* whatcan_you_stay_in_control.webp in Resources */ = {isa = PBXBuildFile; fileRef = 04DB8524712B179AAD01985D /* whatcan_you_stay_in_control.webp */; };
+		1B44A281D2255CF23CB5ABA4 /* CardPreviewRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DCD48BD3BEB158D6D13B7 /* CardPreviewRules.swift */; };
+		1BABC05FDCB9ECE47A24687A /* DiagnosticsSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AE9D0AC457AA51FBBD3D35 /* DiagnosticsSceneView.swift */; };
+		1D3FE75855B75C439A475FE4 /* LocalAppletViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79B830B3E0902525D9B5E8F /* LocalAppletViews.swift */; };
+		1D530AC7F45E563F73A46CE2 /* BricolageGrotesque-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1EB21C2BE0BF7B0B08E5B6A4 /* BricolageGrotesque-Bold.ttf */; };
+		1D6946B4881B5DA55458518D /* AboutBridgitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF07E9E57E734CF1226069B /* AboutBridgitButton.swift */; };
+		1D9E494D92C7088AD7CE3E9C /* whatcan_agents_learn_what_s_new.webp in Resources */ = {isa = PBXBuildFile; fileRef = 6D5EAEBECB2007162077ACA6 /* whatcan_agents_learn_what_s_new.webp */; };
+		1E81FE7EEF74AE00DCFABF7D /* whatcan_report_a_bug_or_ask_for_a_feature.webp in Resources */ = {isa = PBXBuildFile; fileRef = 4DAAFC1DA37C4B79D7DC5243 /* whatcan_report_a_bug_or_ask_for_a_feature.webp */; };
+		21C8E1677791379EB301468B /* PortableLibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0643925162690DA1D40A4FC8 /* PortableLibraryViews.swift */; };
+		24867A1EBC8060F13345CFE0 /* whatcan_questions_and_notices_to_you.webp in Resources */ = {isa = PBXBuildFile; fileRef = 12DAD39BCB005B8DCEC45B63 /* whatcan_questions_and_notices_to_you.webp */; };
+		2515A5F312F3C9FCC1503DBC /* BuildInstructionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED733D395D7B5E19EA8C6FF /* BuildInstructionsTests.swift */; };
+		2648540E93C7630323DB3EB7 /* LocalHostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6CD035A404235C0D65B339 /* LocalHostModel.swift */; };
+		264FEB17B0B0960B585F7259 /* AppleCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630798738D7313449F2634F /* AppleCamera.swift */; };
+		26C74DFC4E536747D9F7E821 /* whatcan_share_to_an_agent.webp in Resources */ = {isa = PBXBuildFile; fileRef = C732F50A23887A2514B2F903 /* whatcan_share_to_an_agent.webp */; };
+		27E98EB051E05268852B38E1 /* whatcan_add_an_agent_in_a_minute.webp in Resources */ = {isa = PBXBuildFile; fileRef = 73D984B7A0948A617BA12FF5 /* whatcan_add_an_agent_in_a_minute.webp */; };
+		28359751B074FA2B7C0DA7AC /* MaintainedAppletRuntimeAcceptanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C51E2BD04A42970516B019 /* MaintainedAppletRuntimeAcceptanceTests.swift */; };
+		297DF9A4293432DFDC49FB76 /* MacModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A58FF31DBF827EBBF1465C /* MacModelTests.swift */; };
+		2A5B85763D7A83CACD33F3DF /* RelayStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3A10890ABB10760695EB21 /* RelayStore.swift */; };
+		2D6183E9E9A6B982D7CAC5D3 /* whatcan_copy_to_clipboard.webp in Resources */ = {isa = PBXBuildFile; fileRef = 547EBD9076599301248355B5 /* whatcan_copy_to_clipboard.webp */; };
+		2E811C9F22CC1286E3B54CB8 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 28106C54C62C35426BA097DA /* Localizable.xcstrings */; };
+		2F48122482272F15F887005C /* WatchClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5517479BB25B6A3AC1060D8F /* WatchClient.swift */; };
+		30D718F7CFB36CDE6F0C641C /* MacDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF78EA293552DE7FEAF426E /* MacDiagnosticsView.swift */; };
+		3155776BA04DA16F1673131B /* PortalDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4453DE051E31F2D5C103647A /* PortalDevice.swift */; };
+		31925BF1AB268DC6D2136E3C /* whatcan_health_connect.webp in Resources */ = {isa = PBXBuildFile; fileRef = 92CE9CED5D15EF0073A56D17 /* whatcan_health_connect.webp */; };
+		31BEAAACDF31E62EC71E3994 /* whatcan_your_latest_screenshot_or_photo.webp in Resources */ = {isa = PBXBuildFile; fileRef = 4A5E4F5558ACDED7D22EC534 /* whatcan_your_latest_screenshot_or_photo.webp */; };
+		31CE833F1AAE821CBBC52DD4 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2509B4AD91E4C508B72DCFA /* ShareViewController.swift */; };
+		32416D42A96D0400A090CDE6 /* LocalSpeechModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF6D721BE11828FA857AD08 /* LocalSpeechModel.swift */; };
+		32A5C9C9C44C0CD07FAB9EBB /* AccountAgentRoster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 472B06B4BD6623777418632D /* AccountAgentRoster.swift */; };
+		32EF7FF2B96BCA5249D221B7 /* LocalHostViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3BDEE2456A51922D8995DD /* LocalHostViews.swift */; };
+		346644D4C22A6AEFCE96B75A /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA20FDD0E812E90DD666806 /* HomeView.swift */; };
+		38A11164FA3A21264D030A64 /* MacUpdatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917C39744A4B2D3DBD44858E /* MacUpdatesTests.swift */; };
+		394D8A7018C0CE7396D19B4E /* whatcan_events_and_callbacks.webp in Resources */ = {isa = PBXBuildFile; fileRef = 797528E86FF22F3FF57FF258 /* whatcan_events_and_callbacks.webp */; };
+		3A250C4547B14C7D024FFE0E /* DeviceDiagnosticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BFA5C5C37C9ED083376BED /* DeviceDiagnosticsTests.swift */; };
+		3A4076973900C9B508DD5AC6 /* AccountAgentRoster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 472B06B4BD6623777418632D /* AccountAgentRoster.swift */; };
+		3AD6C4FCF1444787F91B70CF /* AccountAgentRosterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F0A39A0CF14DC4B292CDF4 /* AccountAgentRosterTests.swift */; };
+		3AFB3375EB22171F72320D45 /* LocalInteractionInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F39EBA75ACD12ED44F3E717 /* LocalInteractionInbox.swift */; };
+		3BC40CF82AAA0E8764FD5C2D /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 28106C54C62C35426BA097DA /* Localizable.xcstrings */; };
+		3CFADB9FBC21C7F1088A192A /* ViewerConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9288867F1E5284795C7F95C2 /* ViewerConfigurationTests.swift */; };
+		3DC461F9A7CE379195431DFF /* OwnerConfigurationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0CBC34CC756BEC6622BD50C /* OwnerConfigurationModel.swift */; };
+		3E2D6ED5ACBCEEA889E43BC8 /* whatcan_check_for_updates.webp in Resources */ = {isa = PBXBuildFile; fileRef = F43220F6D47FE5E9B1EDF585 /* whatcan_check_for_updates.webp */; };
+		3FEBAC40E32CF00C45CA4200 /* DeviceWebLinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD62EE21F82558F193A2182 /* DeviceWebLinkView.swift */; };
+		402A4A97E82261165B91D25F /* SignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D7E622258DB984246D9CD9 /* SignIn.swift */; };
+		40E15ADF77EB567AB6E12FF8 /* DiagnosticsSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AE9D0AC457AA51FBBD3D35 /* DiagnosticsSceneView.swift */; };
+		419F22E5A87A3A3338B5F55C /* PortableLibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0643925162690DA1D40A4FC8 /* PortableLibraryViews.swift */; };
+		42C089DD7603CDDBA9F672E8 /* whatcan_wake_words.webp in Resources */ = {isa = PBXBuildFile; fileRef = 44655BB6611B961B4ABD45F6 /* whatcan_wake_words.webp */; };
+		437D5D9DB1EC9D324367A4E4 /* AppletLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4CC13F65EC4B78C9AAD1E7 /* AppletLists.swift */; };
+		4380A45283486936401DCAF5 /* whatcan_messages_contacts_calendar_calls.webp in Resources */ = {isa = PBXBuildFile; fileRef = 5C357A4EA108BF58067227F3 /* whatcan_messages_contacts_calendar_calls.webp */; };
+		43E0A3E424EA66DF2B1F8C7F /* NetworkInventoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550977846D4665F7565BF607 /* NetworkInventoryTests.swift */; };
+		459BB413BE1CF37057050353 /* SpeechAppletControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35633D382DA8DB0D0387E3C /* SpeechAppletControls.swift */; };
+		465230EDB01E60079068F7BA /* MaintainedAppletRuntimeAcceptanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C51E2BD04A42970516B019 /* MaintainedAppletRuntimeAcceptanceTests.swift */; };
+		488083FA8F95676E2EEDF5E6 /* DeviceCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D8274B8318DECFB02D5725 /* DeviceCameraView.swift */; };
+		4A0B43EB9245DA886BD6C487 /* LocalInteractionInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F39EBA75ACD12ED44F3E717 /* LocalInteractionInbox.swift */; };
+		4A174FC9C1D5FAE6957B78DE /* AppleFixtureWorkspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = B449A299A92B9CB60350F72A /* AppleFixtureWorkspace.swift */; };
+		4AE2EB9AAE0EF068D9857F9E /* whatcan_copy_to_clipboard.webp in Resources */ = {isa = PBXBuildFile; fileRef = 547EBD9076599301248355B5 /* whatcan_copy_to_clipboard.webp */; };
+		4B5CA544C0923C75EA796BFB /* OwnerFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8930F1F385A33666669127DA /* OwnerFilesView.swift */; };
+		4B72A226EBB90AF114AE70DA /* NetworkInventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06520AADEFA8B044C5A6DB27 /* NetworkInventory.swift */; };
+		4BA41DF77C4D3441C8EA51C7 /* whatcan_find_my_phone.webp in Resources */ = {isa = PBXBuildFile; fileRef = D296BBE70F1E18CD508028A1 /* whatcan_find_my_phone.webp */; };
+		4BF48C2C0EA3F9C7559CCAB4 /* BridgitSpeech in Frameworks */ = {isa = PBXBuildFile; productRef = C1F2A6D509413BA0C7CB2602 /* BridgitSpeech */; };
+		4C480B0193D06666EB879BF3 /* whatcan_the_api_explains_itself.webp in Resources */ = {isa = PBXBuildFile; fileRef = FF3DD3C09E5E052DBFFC3D7A /* whatcan_the_api_explains_itself.webp */; };
+		4C70E5F000FCD1F77835CCDF /* OwnerConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776D40E71C2201300926C87F /* OwnerConfigurationTests.swift */; };
+		4C9FC762418891837B0987A6 /* InboxCardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6B733C789794CF4A4071A2 /* InboxCardTests.swift */; };
+		4DC6E3691872DCF97FEA4409 /* SignInPairViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F1D7DE6BAD80DBC5D5363F /* SignInPairViews.swift */; };
+		4E6E807730750C842979093F /* PortableLibraryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEBFB12C703BB88A8921457 /* PortableLibraryController.swift */; };
+		4F54D4F4AB444B062C5B6436 /* BridgitSpeech in Frameworks */ = {isa = PBXBuildFile; productRef = 51D3D85073964487143E1E65 /* BridgitSpeech */; };
+		506E3B833C19D13559D67A88 /* FirstRunView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8548D39585553093ED4932 /* FirstRunView.swift */; };
+		520FCFA5052BE31AC9214FDC /* applet-page-fixture.html in Resources */ = {isa = PBXBuildFile; fileRef = 75E92AA530A011ECC0D78785 /* applet-page-fixture.html */; };
+		52A9A4E42A64ACFFF6FFBB77 /* BuildInstructionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9FE7CDBFB937EF56B2D3CA /* BuildInstructionsView.swift */; };
+		5301CC9C1CA75F730101D44A /* PortableLibraryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEBFB12C703BB88A8921457 /* PortableLibraryController.swift */; };
+		5386144AEDB44924C518CF1B /* BuildStamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DD0D9788FEC298C7AA62C46 /* BuildStamp.swift */; };
+		541C2C3A6C8AEFE95BE9955F /* PhotoTargetPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C64723DF6D71014D093D88 /* PhotoTargetPicker.swift */; };
+		5644A940A3405C8BCF7B23AA /* CrashReportingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CABCCFE2A4F4C61E89F43F /* CrashReportingTests.swift */; };
+		56B685A07D7EF7E6A82C5A91 /* whatcan_phone_controls.webp in Resources */ = {isa = PBXBuildFile; fileRef = E3F693C0BDCF1B9194728BDF /* whatcan_phone_controls.webp */; };
+		571BF8647101ED72C3BC18BF /* MacModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4C87A6769005C4A0E45771 /* MacModel.swift */; };
+		590B0073EA551A13652EB1AE /* NetworkMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46104BFD2E8DCDFFA34D9525 /* NetworkMapView.swift */; };
+		5932806CC869A0A8D571337D /* MacStatusItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B48BC8ECFACC04EC4D26BE24 /* MacStatusItemTests.swift */; };
+		5A1875673E5781940D83776A /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F677BACD9796BBFDF67DC94 /* SampleData.swift */; };
+		5AF3406262D23F5911B5A88D /* AppletPageBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449CCCB935392D4500856C75 /* AppletPageBrowser.swift */; };
+		5B36B6A34BB35A96C2813DF2 /* whatcan_sensors.webp in Resources */ = {isa = PBXBuildFile; fileRef = B940CF7CEFCE0D0BDEF483DF /* whatcan_sensors.webp */; };
+		5B779CCE6180DE08E027E21B /* whatcan_files_to_your_phone.webp in Resources */ = {isa = PBXBuildFile; fileRef = B7E5491EB7D5BC6B011749D5 /* whatcan_files_to_your_phone.webp */; };
+		5BBA3AB95C214E4E90C89056 /* DevicesMapOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A7B11BA4684EEF9DBBA5B73 /* DevicesMapOptions.swift */; };
+		5CD7173854A2166732B22914 /* ViewerConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9288867F1E5284795C7F95C2 /* ViewerConfigurationTests.swift */; };
+		5CED8D687A06E09E326B190A /* whatcan_agent_notes.webp in Resources */ = {isa = PBXBuildFile; fileRef = 7F19B5CA1618793F0650DAFD /* whatcan_agent_notes.webp */; };
+		5D9CE6258ACEB4E0C99BB5E2 /* DeviceTypeDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = A758C45A48CAB1AB93048ED1 /* DeviceTypeDescription.swift */; };
+		5DB06BBB3884BD0B38DA84D5 /* whatcan_you_stay_in_control.webp in Resources */ = {isa = PBXBuildFile; fileRef = 04DB8524712B179AAD01985D /* whatcan_you_stay_in_control.webp */; };
+		5E1705F8A257DB05676BF25E /* whatcan_play_an_audio_file.webp in Resources */ = {isa = PBXBuildFile; fileRef = B62EBB134CB5530DD7EE199D /* whatcan_play_an_audio_file.webp */; };
+		5E9512E401C19F8E836D3BCB /* whatcan_open_a_link_or_app.webp in Resources */ = {isa = PBXBuildFile; fileRef = 10319C8056145BF86D25F403 /* whatcan_open_a_link_or_app.webp */; };
+		604F38945DF051BCFC9188B4 /* BridgitCore in Frameworks */ = {isa = PBXBuildFile; productRef = 58ECACCCC8F09DC4379E9DF8 /* BridgitCore */; };
+		60C6AB6A7C4F592FA4C04A80 /* ConnectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6C8A0C060777E2F5BEBCC3 /* ConnectionsView.swift */; };
+		617DCED8950F817FC5545AED /* whatcan_one_key_per_agent.webp in Resources */ = {isa = PBXBuildFile; fileRef = 1F596A8D51C29293D2A24FB2 /* whatcan_one_key_per_agent.webp */; };
+		62E5349A8D6F65C5CFEE6DD5 /* BuildInstructionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED733D395D7B5E19EA8C6FF /* BuildInstructionsTests.swift */; };
+		63966DF4C945AB76CDF4A16D /* whatcan_phone_status_and_context.webp in Resources */ = {isa = PBXBuildFile; fileRef = 9D3DAA86AEE4DFEBB600E12B /* whatcan_phone_status_and_context.webp */; };
+		64143CD58B896A5136E40D73 /* AccountLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A4EA9FB6DB3E1D20F95D08 /* AccountLifecycleTests.swift */; };
+		6684A8708FD12479C8ABAF56 /* whatcan_phone_controls.webp in Resources */ = {isa = PBXBuildFile; fileRef = E3F693C0BDCF1B9194728BDF /* whatcan_phone_controls.webp */; };
+		673FD0905C5182E4A04BB233 /* AboutBridgitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF07E9E57E734CF1226069B /* AboutBridgitButton.swift */; };
+		67DC1AC32DEC43F216561A3C /* CaptureNotices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9908B0AA2EDEBAAF77B3429F /* CaptureNotices.swift */; };
+		6859BFC733148FC64C947977 /* whatcan_videos_and_downloads.webp in Resources */ = {isa = PBXBuildFile; fileRef = F67F95E72E3395D9CE3D38BC /* whatcan_videos_and_downloads.webp */; };
+		69536659265DD306FB65D33A /* FeedbackTeamKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1F6A6A0F4E0AE197AFB00 /* FeedbackTeamKeys.swift */; };
+		6977169EC1AFA62607E34B30 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE9746C3CB8B17E8117844C /* Assets.xcassets */; };
+		6A2AD3C92BE45188BDDC368C /* whatcan_take_a_photo.webp in Resources */ = {isa = PBXBuildFile; fileRef = A00CADBC9599FE54CB6EF160 /* whatcan_take_a_photo.webp */; };
+		6C48A842707ED88381BA3DA4 /* whatcan_location_history_and_places.webp in Resources */ = {isa = PBXBuildFile; fileRef = 4DA1C054C547E9BAC3EFB1F7 /* whatcan_location_history_and_places.webp */; };
+		70E1C3CFCD287BCC40D8CABE /* LocalAppletTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D68C58FD9EF753867731396 /* LocalAppletTests.swift */; };
+		723DA1D600681C939D45B39E /* AppletDeviceLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9059FEC55292E1C899BFB30 /* AppletDeviceLists.swift */; };
+		72BACB079B85ABDC0451081A /* whatcan_messages_contacts_calendar_calls.webp in Resources */ = {isa = PBXBuildFile; fileRef = 5C357A4EA108BF58067227F3 /* whatcan_messages_contacts_calendar_calls.webp */; };
+		737E3477F5DF85776DB5A50A /* InboxCardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6B733C789794CF4A4071A2 /* InboxCardTests.swift */; };
+		74821F551300A2DDB7BAE9EE /* InboundSharingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C99D99BA22CDCCE4D7AD772F /* InboundSharingModel.swift */; };
+		768D392483F0F460B63BEEF8 /* AppletsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23B4ABF262B3BD15E8791C4D /* AppletsView.swift */; };
+		7784231B287ABBE852D28895 /* MacStatusItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBEFDBBC07B64DAAB7783B4 /* MacStatusItem.swift */; };
+		779B6B68FC4AF02581BC30AD /* AppletPageBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449CCCB935392D4500856C75 /* AppletPageBrowser.swift */; };
+		787FED1FC561C01A587AD00E /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFEEA577E4AC5E45F0F7ECC6 /* AppModel.swift */; };
+		7A8E807ACA9ABEA2A25529E6 /* whatcan_add_an_agent_in_a_minute.webp in Resources */ = {isa = PBXBuildFile; fileRef = 73D984B7A0948A617BA12FF5 /* whatcan_add_an_agent_in_a_minute.webp */; };
+		7BE8C6626337E8905848E521 /* AbilityCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7472892CD66FCC5DCCCA15D /* AbilityCatalogView.swift */; };
+		7C54A9070888AC3CAE9A3F4C /* BridgitDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD24C7252A7ED1B954B1D5E /* BridgitDialog.swift */; };
+		7C7B9445244FED837AB372AF /* InboundSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCA80636B556DEC5CD48645 /* InboundSharingView.swift */; };
+		7CE953133AF8E57C6B1FBEFC /* CrashReports.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57523F1560D1AA46719B49 /* CrashReports.swift */; };
+		7E9B82C27B71E992B9AC4161 /* PhotoTargetPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C64723DF6D71014D093D88 /* PhotoTargetPicker.swift */; };
+		7F1A9CB2F1BC60FDAA3D461A /* samples.json in Resources */ = {isa = PBXBuildFile; fileRef = 00574CEAE3674F1410B75EC7 /* samples.json */; };
+		7F4F06C7410C690CC5B04238 /* whatcan_city_tour.webp in Resources */ = {isa = PBXBuildFile; fileRef = FA245C398EC97CF92EAFDFC4 /* whatcan_city_tour.webp */; };
+		81A902201BBFD2099846482B /* OwnerConfigurationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0CBC34CC756BEC6622BD50C /* OwnerConfigurationModel.swift */; };
+		8277F4AFD267E899B2A433F9 /* LocalDeviceInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AE91BBD86A05B2EBF21935 /* LocalDeviceInfoView.swift */; };
+		851E55AAADAAA8F1DB5C8219 /* whatcan_wake_words.webp in Resources */ = {isa = PBXBuildFile; fileRef = 44655BB6611B961B4ABD45F6 /* whatcan_wake_words.webp */; };
+		85728BE92A4DA15B3671890B /* BridgitMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D471D2AD62975E7A8EB2B119 /* BridgitMacApp.swift */; };
+		85A010EBA227E6EDC001927A /* whatcan_phone_status_and_context.webp in Resources */ = {isa = PBXBuildFile; fileRef = 9D3DAA86AEE4DFEBB600E12B /* whatcan_phone_status_and_context.webp */; };
+		8676B8D7DA085E70CB8DA9E8 /* whatcan_read_notifications.webp in Resources */ = {isa = PBXBuildFile; fileRef = 358378C6FE18DF726550E303 /* whatcan_read_notifications.webp */; };
+		8774A255CEFC30B7F3E4C756 /* AppletPageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B3170D0CE347BA7673CE76 /* AppletPageTests.swift */; };
+		87B013DD4BED3AB307F0A0A1 /* whatcan_transcribe_clips_on_the_phone.webp in Resources */ = {isa = PBXBuildFile; fileRef = 145D6E4EE9F19896E6F730BC /* whatcan_transcribe_clips_on_the_phone.webp */; };
+		87B149BEE4D5CAA04A82C3F4 /* whatcan_screen_sharing_as_a_fallback.webp in Resources */ = {isa = PBXBuildFile; fileRef = 38424D1822FB7714C8379242 /* whatcan_screen_sharing_as_a_fallback.webp */; };
+		8A6273BA8344A439F27CDCE1 /* AbilityCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7472892CD66FCC5DCCCA15D /* AbilityCatalogView.swift */; };
+		8D8E7C2753552F17A03FCCDC /* BridgitShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 71B4CD613D07FAE2F88A2244 /* BridgitShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		8EE12741D6EE7DC2C29ADBD5 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A8D58B4F1E8C5FF26D9EE6B /* CameraView.swift */; };
+		8F967A8523DFCE81581E4584 /* MoreSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B5746B43C06A1617CE74A73 /* MoreSearchTests.swift */; };
+		8FAD60D6E067DB2E0A888A96 /* whatcan_city_tour.webp in Resources */ = {isa = PBXBuildFile; fileRef = FA245C398EC97CF92EAFDFC4 /* whatcan_city_tour.webp */; };
+		8FDA3BCD0F917609D8D51F1D /* MacNetworkDevicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D08196B45E85F9E32A104892 /* MacNetworkDevicesView.swift */; };
+		93E01DBE0D858C5B5831B625 /* whatcan_transcribe_clips_on_the_phone.webp in Resources */ = {isa = PBXBuildFile; fileRef = 145D6E4EE9F19896E6F730BC /* whatcan_transcribe_clips_on_the_phone.webp */; };
+		945C0401E97D9B513C16B976 /* HomeSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F1F94488C8B7DC31115BA9 /* HomeSceneView.swift */; };
+		95A620E07A8FBC08E6D8FA7C /* whatcan_reach_bridgit_without_tailscale_relay.webp in Resources */ = {isa = PBXBuildFile; fileRef = 583A4D1342EDEEA15639E406 /* whatcan_reach_bridgit_without_tailscale_relay.webp */; };
+		96011DCFAFC45F655B4A2482 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46E5C09E11E0A67DA06C8D9 /* Keychain.swift */; };
+		964ECDBC52CE66CB2D6AE37E /* MacAppletWebViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44630929427140C7076907D4 /* MacAppletWebViews.swift */; };
+		9686229CF7BCB34CD2CE7BCD /* AgentMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B6826F8FC1D166982AC6CC /* AgentMark.swift */; };
+		9886EFCDD806CC2EAF2E367D /* BridgitNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224C160EDD82001B081EB60 /* BridgitNames.swift */; };
+		9A571421038F1A5662216E11 /* whatcan_record_a_short_clip.webp in Resources */ = {isa = PBXBuildFile; fileRef = D3AAE382ABFA1E081D74622B /* whatcan_record_a_short_clip.webp */; };
+		9AC20368F81A61BD3E062C10 /* MoreSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFDA81568674E9D9A15A8C8 /* MoreSearch.swift */; };
+		9B717DFB728BC553953B3AA5 /* AppleCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630798738D7313449F2634F /* AppleCamera.swift */; };
+		9C07BCFE278F74A5A9E2A16C /* MacAppletsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB5364C5F20FC4C15E520E4 /* MacAppletsView.swift */; };
+		9D5479A7A183E1F70D5FDA92 /* LocalDeviceInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AE91BBD86A05B2EBF21935 /* LocalDeviceInfoView.swift */; };
+		9E258DA700FC7F020ED7F3B7 /* CardChoiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED7A643E7B1324CB4291DB /* CardChoiceTests.swift */; };
+		9E5F91A64D10E07EF54F8263 /* BridgitNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224C160EDD82001B081EB60 /* BridgitNames.swift */; };
+		9E63443A72327AEA0A3BB959 /* MacLinkedAgentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3CFFDD3C0CF21DD5DFC972 /* MacLinkedAgentsView.swift */; };
+		9F756C64BF81073475BB371A /* whatcan_take_a_photo.webp in Resources */ = {isa = PBXBuildFile; fileRef = A00CADBC9599FE54CB6EF160 /* whatcan_take_a_photo.webp */; };
+		A088F2B5F756D5F094D8B6EC /* whatcan_screen_sharing_as_a_fallback.webp in Resources */ = {isa = PBXBuildFile; fileRef = 38424D1822FB7714C8379242 /* whatcan_screen_sharing_as_a_fallback.webp */; };
+		A098FF1C21635E32512A948E /* OwnerConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B4E9523E5C873C84AE1A67 /* OwnerConfigurationView.swift */; };
+		A0C16DE0EF96932774F34FFB /* AgentMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B6826F8FC1D166982AC6CC /* AgentMark.swift */; };
+		A0E11889A3806CD3AE67BAAC /* PhoneLive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7908C82704C657BE1721AA05 /* PhoneLive.swift */; };
+		A157119C53469BB630074D8C /* whatcan_flash_the_light.webp in Resources */ = {isa = PBXBuildFile; fileRef = 42A06CB958C8CF8BF8D81B30 /* whatcan_flash_the_light.webp */; };
+		A185983B9B3C43DD40B9DDCE /* whatcan_per_agent_permissions.webp in Resources */ = {isa = PBXBuildFile; fileRef = 63036E48D93D70A3481EE6E8 /* whatcan_per_agent_permissions.webp */; };
+		A37CC410758E301B1FC89A05 /* AbilityCatalog.json in Resources */ = {isa = PBXBuildFile; fileRef = CB07CA1C3FCBF7836A9F10F6 /* AbilityCatalog.json */; };
+		A489A017987362CEA488A95E /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 9EE92B684228F1C25334F5C3 /* Sentry */; };
+		A5B25E9FDC72A3EDDF91D50A /* whatcan_short_video_clips.webp in Resources */ = {isa = PBXBuildFile; fileRef = 2EAC2F7653364346C1ADE8DB /* whatcan_short_video_clips.webp */; };
+		A6A7E1B7A5FD1638913AE814 /* DeviceBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B41F84442FA0CE188A031819 /* DeviceBar.swift */; };
+		A754F9507B80C029D5892A4C /* whatcan_find_photos_in_your_gallery.webp in Resources */ = {isa = PBXBuildFile; fileRef = 11E855D294AFFCA276F55B18 /* whatcan_find_photos_in_your_gallery.webp */; };
+		A7A88F6765E0CC87A30E49C7 /* WatchClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5517479BB25B6A3AC1060D8F /* WatchClient.swift */; };
+		A82E8455C638C7CF55193367 /* InboundSharingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C99D99BA22CDCCE4D7AD772F /* InboundSharingModel.swift */; };
+		A86ABB0B9B2FCBB404629575 /* whatcan_send_a_screenshot.webp in Resources */ = {isa = PBXBuildFile; fileRef = C0F6BDCCBF4DA5A3B6645284 /* whatcan_send_a_screenshot.webp */; };
+		A88D2D073C48BF9351AEA2D2 /* whatcan_play_an_audio_file.webp in Resources */ = {isa = PBXBuildFile; fileRef = B62EBB134CB5530DD7EE199D /* whatcan_play_an_audio_file.webp */; };
+		A8BE409C0438749BEF8CBCD4 /* AgentsDevicesViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB437BCA928F31B8363B734 /* AgentsDevicesViews.swift */; };
+		A921B505BF6671DF5BBBA8C2 /* whatcan_location_details.webp in Resources */ = {isa = PBXBuildFile; fileRef = 13622F3E420202ADAAEA1D11 /* whatcan_location_details.webp */; };
+		ABEEFC95DB1B6713F9E4957A /* BuildStamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DD0D9788FEC298C7AA62C46 /* BuildStamp.swift */; };
+		AE89B3877045B4304934C2B9 /* CardLibraryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52D71BD2CE0CE0DE119B496 /* CardLibraryRow.swift */; };
+		AEBE3466CA68A6AA7A062726 /* HardwareAccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CB8F01C082B46C6B07979B /* HardwareAccessView.swift */; };
+		AED4992EE4D22D3B7462087A /* CardLibraryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52D71BD2CE0CE0DE119B496 /* CardLibraryRow.swift */; };
+		B0ED4C3BC980FC2DED94FC98 /* whatcan_one_key_per_agent.webp in Resources */ = {isa = PBXBuildFile; fileRef = 1F596A8D51C29293D2A24FB2 /* whatcan_one_key_per_agent.webp */; };
+		B29A2A577266F0D93B3DEE07 /* whatcan_questions_and_notices_to_you.webp in Resources */ = {isa = PBXBuildFile; fileRef = 12DAD39BCB005B8DCEC45B63 /* whatcan_questions_and_notices_to_you.webp */; };
+		B29F9F17D6EBFF63A165BF0F /* LocalDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194EF09FAADD8F7306CB5D57 /* LocalDiagnosticsView.swift */; };
+		B350427F59A3CBD6B93E6582 /* AccountAgentRosterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA6569516EDA6E52D633011 /* AccountAgentRosterView.swift */; };
+		B4D2970E56B00DEBE9BBD32B /* AbilityCatalog.json in Resources */ = {isa = PBXBuildFile; fileRef = CB07CA1C3FCBF7836A9F10F6 /* AbilityCatalog.json */; };
+		B53D2F4CDF60B55FAAC9DE89 /* MacRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A14A81AFCBD966CF24B44F1 /* MacRootView.swift */; };
+		B7FCF481B2916CD242016B33 /* BridgitCore in Frameworks */ = {isa = PBXBuildFile; productRef = 3F46DC1796A0DF3D37E8D1CD /* BridgitCore */; };
+		B83EC4913BD1F506BE371A47 /* AppletLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4CC13F65EC4B78C9AAD1E7 /* AppletLists.swift */; };
+		B8D47F6128D0FA54D30EE3AC /* MacUpdates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357F1AE55672710D51F610C3 /* MacUpdates.swift */; };
+		B90EB1A4AE7F27478A00D9F3 /* FeedbackTeamKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F1F6A6A0F4E0AE197AFB00 /* FeedbackTeamKeys.swift */; };
+		B9423EED35A8DEB9A2533937 /* whatcan_events_and_callbacks.webp in Resources */ = {isa = PBXBuildFile; fileRef = 797528E86FF22F3FF57FF258 /* whatcan_events_and_callbacks.webp */; };
+		BB56120D4947E43E2CFCD5A5 /* OwnerConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B4E9523E5C873C84AE1A67 /* OwnerConfigurationView.swift */; };
+		BB8788DDD8EF5FD39AEAF269 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 06D3ADD2F19E62B4D8D3F000 /* Assets.xcassets */; };
+		BC03800184E7E47D5DDEC3F0 /* OwnerPhotos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46846F7EF5140CFF7764A2FD /* OwnerPhotos.swift */; };
+		BC6540A3FF963BBCA7734BEA /* BridgitCore in Frameworks */ = {isa = PBXBuildFile; productRef = FC4AFEFA342CD3A5655AE1BE /* BridgitCore */; };
+		BC801A5C67765F5ECE0FF57C /* DeviceCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1BDC0DF22075FEBD2EE650 /* DeviceCameraView.swift */; };
+		BCC3FC95BA51B470A066E51A /* CaptureNoticesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996515DF7D2CDF6D38D8B744 /* CaptureNoticesTests.swift */; };
+		BD340BB3ADF864DFE3B194EB /* whatcan_health_connect.webp in Resources */ = {isa = PBXBuildFile; fileRef = 92CE9CED5D15EF0073A56D17 /* whatcan_health_connect.webp */; };
+		BD9037FB972EE24A2093D8E8 /* AppletPortalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB66DFA77167F751D5B50FDC /* AppletPortalsView.swift */; };
+		BDD6B4FFDC8DDE6050DCF80F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85381878ED68507559B95BE8 /* Theme.swift */; };
+		BFCBCEF0F8BEB3935B02D338 /* SpeechAppletControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35633D382DA8DB0D0387E3C /* SpeechAppletControls.swift */; };
+		BFCEF0F790C41EC158FBD6F3 /* LocalAppletModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF30C1362E1D6B8CCCE2CA1E /* LocalAppletModel.swift */; };
+		C08B3E7F793C24A26C296E52 /* BridgitCore in Frameworks */ = {isa = PBXBuildFile; productRef = 714A315AC5C0753EF19117D7 /* BridgitCore */; };
+		C0D26BE96606CAB5ED662471 /* BridgitDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD24C7252A7ED1B954B1D5E /* BridgitDialog.swift */; };
+		C0FCEA625327E96DFE6C22D8 /* whatcan_read_notifications.webp in Resources */ = {isa = PBXBuildFile; fileRef = 358378C6FE18DF726550E303 /* whatcan_read_notifications.webp */; };
+		C159C05D99598B4570D0E25F /* AppleApplicationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE8F8E613583D1DA360431A /* AppleApplicationDelegate.swift */; };
+		C2BB5FCB07CB208EFAB9DDCB /* whatcan_sensors.webp in Resources */ = {isa = PBXBuildFile; fileRef = B940CF7CEFCE0D0BDEF483DF /* whatcan_sensors.webp */; };
+		C35815347DD5C23454BE5B40 /* WatchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3D5FFBD9944B5A1337C7BD /* WatchModels.swift */; };
+		C4F3DAC2E119D43E0279107A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E4F06AD960D5BBA53435B694 /* PrivacyInfo.xcprivacy */; };
+		C531C5AF1062261B9FAA9741 /* whatcan_short_video_clips.webp in Resources */ = {isa = PBXBuildFile; fileRef = 2EAC2F7653364346C1ADE8DB /* whatcan_short_video_clips.webp */; };
+		C75F3DCB35EAD57210D3C3AC /* whatcan_the_api_explains_itself.webp in Resources */ = {isa = PBXBuildFile; fileRef = FF3DD3C09E5E052DBFFC3D7A /* whatcan_the_api_explains_itself.webp */; };
+		C7A02AB053A0F91C8B86E2D5 /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E9BA8C63BE4414F3714F4E /* ParsingTests.swift */; };
+		C7BA0D86AAB8E61B57F1365C /* BridgitShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2FD09D5060903E18AF6FEA1B /* BridgitShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C8AFC982FC473375917AEEBF /* ConnectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6C8A0C060777E2F5BEBCC3 /* ConnectionsView.swift */; };
+		C9EEEE0C068318E46F1FFE7C /* whatcan_agents_learn_what_s_new.webp in Resources */ = {isa = PBXBuildFile; fileRef = 6D5EAEBECB2007162077ACA6 /* whatcan_agents_learn_what_s_new.webp */; };
+		CA0CA2C466998C863336441C /* MoreSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B5746B43C06A1617CE74A73 /* MoreSearchTests.swift */; };
+		CA0DD3D868FBE1AFCF723681 /* LocalAppletViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79B830B3E0902525D9B5E8F /* LocalAppletViews.swift */; };
+		CA477A8E264BB0EB6E59682B /* whatcan_rich_html_cards.webp in Resources */ = {isa = PBXBuildFile; fileRef = 49BF7ECD11112ED243838E96 /* whatcan_rich_html_cards.webp */; };
+		CAFBD87F2C1F2BA7A6AE2FAD /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A6179418B8003F277BCA6204 /* PrivacyInfo.xcprivacy */; };
+		CB0DAB1BC52172DA565746D4 /* whatcan_your_latest_screenshot_or_photo.webp in Resources */ = {isa = PBXBuildFile; fileRef = 4A5E4F5558ACDED7D22EC534 /* whatcan_your_latest_screenshot_or_photo.webp */; };
+		CB7151D4487D40E6B3C85A4E /* NetworkMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46104BFD2E8DCDFFA34D9525 /* NetworkMapView.swift */; };
+		CB76AA857CFA6BE8EA64E40C /* LocalAppletModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF30C1362E1D6B8CCCE2CA1E /* LocalAppletModel.swift */; };
+		CDB8E6FAE69F9E62C12BCB0E /* whatcan_everything_is_logged.webp in Resources */ = {isa = PBXBuildFile; fileRef = 3476231F8A7528E842C28B58 /* whatcan_everything_is_logged.webp */; };
+		CE6CC82D389E46F0A83D5D75 /* CrashReportingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CABCCFE2A4F4C61E89F43F /* CrashReportingTests.swift */; };
+		CEC4DFA995EF5A107438B618 /* CardChoiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED7A643E7B1324CB4291DB /* CardChoiceTests.swift */; };
+		D26057718021635C3B6E0DE0 /* AccountAgentRosterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F0A39A0CF14DC4B292CDF4 /* AccountAgentRosterTests.swift */; };
+		D2B05CA6AD0D2EC34FC09EA7 /* whatcan_videos_and_downloads.webp in Resources */ = {isa = PBXBuildFile; fileRef = F67F95E72E3395D9CE3D38BC /* whatcan_videos_and_downloads.webp */; };
+		D37DA04DF3A214396A496880 /* FirstRunView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8548D39585553093ED4932 /* FirstRunView.swift */; };
+		D3ABFB1DD9E14F197C5001E0 /* whatcan_app_usage.webp in Resources */ = {isa = PBXBuildFile; fileRef = D3C1E7544696D370EAFB4650 /* whatcan_app_usage.webp */; };
+		D3B011F2152C3DF5338D0772 /* OwnerFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8930F1F385A33666669127DA /* OwnerFilesView.swift */; };
+		D51A97745C95537262912948 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2509B4AD91E4C508B72DCFA /* ShareViewController.swift */; };
+		D68430E32B10005260B1907C /* LocalDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194EF09FAADD8F7306CB5D57 /* LocalDiagnosticsView.swift */; };
+		D72294C027B27E98D8AC5703 /* InboundSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCA80636B556DEC5CD48645 /* InboundSharingView.swift */; };
+		D891B40FD5ED5AC8344241B2 /* CardPreviewRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DCD48BD3BEB158D6D13B7 /* CardPreviewRules.swift */; };
+		D91393494FE6FD0494C6C3C2 /* OwnerPhotosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC01CD741A28B8B119BF0522 /* OwnerPhotosTests.swift */; };
+		D9E8016458BA2D2AD638995B /* whatcan_find_my_phone.webp in Resources */ = {isa = PBXBuildFile; fileRef = D296BBE70F1E18CD508028A1 /* whatcan_find_my_phone.webp */; };
+		DB0C7E0E5A07B68A79A80D3D /* BridgitAppletRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 47D664FD9DE8EAA3CAE99EC3 /* BridgitAppletRuntime */; };
+		DB527BB1826ED8D61C4DA016 /* whatcan_record_a_short_clip.webp in Resources */ = {isa = PBXBuildFile; fileRef = D3AAE382ABFA1E081D74622B /* whatcan_record_a_short_clip.webp */; };
+		DBEF148EAD71CA62308446EC /* ViewerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC99DE05259E05278C709D4D /* ViewerConfiguration.swift */; };
+		DC28925CD7323050AC084793 /* whatcan_only_over_tailscale.webp in Resources */ = {isa = PBXBuildFile; fileRef = DC2C0F3D9100D6717034C3D1 /* whatcan_only_over_tailscale.webp */; };
+		DD75F36637271FD9320909E7 /* whatcan_read_text_on_the_phone.webp in Resources */ = {isa = PBXBuildFile; fileRef = B181A65BFCEC0303ECCEF525 /* whatcan_read_text_on_the_phone.webp */; };
+		DEFDC53B4039BC659D6A92EC /* whatcan_inbox.webp in Resources */ = {isa = PBXBuildFile; fileRef = 056C87B36FC2E6D48CAA0AF0 /* whatcan_inbox.webp */; };
+		E05FFB10CFA6A6D28675EC5D /* whatcan_quick_settings_tile.webp in Resources */ = {isa = PBXBuildFile; fileRef = 178BCE9673819B7248F70184 /* whatcan_quick_settings_tile.webp */; };
+		E1100E99407AC7C011880CF2 /* samples.json in Resources */ = {isa = PBXBuildFile; fileRef = 00574CEAE3674F1410B75EC7 /* samples.json */; };
+		E1E8A0AED93CA6E17D1AF862 /* LocalCameraTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF19381EEADBC87F0098CB6 /* LocalCameraTab.swift */; };
+		E2703AA3A2CC70A5A2C9CF05 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B248BDF93EAE379717438C /* MoreView.swift */; };
+		E2D0FE31C4232AC4987A1A67 /* whatcan_share_to_an_agent.webp in Resources */ = {isa = PBXBuildFile; fileRef = C732F50A23887A2514B2F903 /* whatcan_share_to_an_agent.webp */; };
+		E54FE215A4EFEC4C58FB6A1B /* DeviceWebLinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD62EE21F82558F193A2182 /* DeviceWebLinkView.swift */; };
+		E5E86C300203C2E27328B5B3 /* BridgitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9924C215897F3A10482881F1 /* BridgitApp.swift */; };
+		E7680FF587DFB2568C524DA5 /* FeedbackEntries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F57F7ED14045A0D5E4D33AB /* FeedbackEntries.swift */; };
+		E7BADA7FD85F624D88F7C547 /* NetworkInventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06520AADEFA8B044C5A6DB27 /* NetworkInventory.swift */; };
+		E7E711554D61DFF4072C00F3 /* HostLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FDC6EC1438AA3D2F131E162 /* HostLifecycleTests.swift */; };
+		E808B899DD47EF83D0A03037 /* HomeRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA8EEBE403FE973170C10F2 /* HomeRenderTests.swift */; };
+		E93CDFA979A749E9860C77B4 /* DeviceTypeDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = A758C45A48CAB1AB93048ED1 /* DeviceTypeDescription.swift */; };
+		E9605FB46CD2C4D14C3E0303 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = A20BA50B642DAA53A93F894C /* Sentry */; };
+		EA26AB6851CA6757458AF5B9 /* MoreParityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A47D231EBB3CC6D5C0FB6D /* MoreParityTests.swift */; };
+		EA7488CC558D092874C376BF /* LocalHostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6CD035A404235C0D65B339 /* LocalHostModel.swift */; };
+		EAD27F7935C15146222228A5 /* LinkedDeviceMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C08221EF4E86B016F8B22ED /* LinkedDeviceMap.swift */; };
+		ECF31E222887A425191F98B4 /* whatcan_check_for_updates.webp in Resources */ = {isa = PBXBuildFile; fileRef = F43220F6D47FE5E9B1EDF585 /* whatcan_check_for_updates.webp */; };
+		ED705EBDD9D73E2BEF1DCD6A /* LocalSpeechModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF6D721BE11828FA857AD08 /* LocalSpeechModel.swift */; };
+		EEA067F95FD3142DA45E9995 /* InboxParityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916D0AF9DE66182A29C2DE0D /* InboxParityTests.swift */; };
+		F004A4DFCE6ADFB8F1DD12EC /* HardwareAccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CB8F01C082B46C6B07979B /* HardwareAccessView.swift */; };
+		F024623F9067239C0D4731FF /* whatcan_rich_html_cards.webp in Resources */ = {isa = PBXBuildFile; fileRef = 49BF7ECD11112ED243838E96 /* whatcan_rich_html_cards.webp */; };
+		F0534E692FF851B157F635C9 /* whatcan_only_over_tailscale.webp in Resources */ = {isa = PBXBuildFile; fileRef = DC2C0F3D9100D6717034C3D1 /* whatcan_only_over_tailscale.webp */; };
+		F3DBBA72EBEAC38F86773707 /* AppletListsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F13323825960072F8AE6E29 /* AppletListsTests.swift */; };
+		F41FC89429CE09C777FB8239 /* BuildInstructionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9FE7CDBFB937EF56B2D3CA /* BuildInstructionsView.swift */; };
+		F5BA75AB70AA4913B103C613 /* whatcan_open_a_link_or_app.webp in Resources */ = {isa = PBXBuildFile; fileRef = 10319C8056145BF86D25F403 /* whatcan_open_a_link_or_app.webp */; };
+		F70BD272B337D1895FE35519 /* DevicesMapOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A7B11BA4684EEF9DBBA5B73 /* DevicesMapOptions.swift */; };
+		F7706B4BF36D7789D1A216E8 /* whatcan_files_to_your_phone.webp in Resources */ = {isa = PBXBuildFile; fileRef = B7E5491EB7D5BC6B011749D5 /* whatcan_files_to_your_phone.webp */; };
+		F77F2C745FB25F852C2BC4DF /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85381878ED68507559B95BE8 /* Theme.swift */; };
+		F7A76FDD9F41CD7B24D94012 /* MacUpdates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357F1AE55672710D51F610C3 /* MacUpdates.swift */; };
+		F7D246B1248BB400F162A6F9 /* LocalHostViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3BDEE2456A51922D8995DD /* LocalHostViews.swift */; };
+		FA7E3B555A3AA032409441B8 /* whatcan_location_details.webp in Resources */ = {isa = PBXBuildFile; fileRef = 13622F3E420202ADAAEA1D11 /* whatcan_location_details.webp */; };
+		FB0C0473EBACE53996150819 /* AppleFixtureWorkspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = B449A299A92B9CB60350F72A /* AppleFixtureWorkspace.swift */; };
+		FC30D256EF7066252AD1FC49 /* whatcan_read_text_on_the_phone.webp in Resources */ = {isa = PBXBuildFile; fileRef = B181A65BFCEC0303ECCEF525 /* whatcan_read_text_on_the_phone.webp */; };
+		FCBFD9DADF9FA183E8128469 /* BridgitAppletRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = F4A2372D438DE914A1BB6B48 /* BridgitAppletRuntime */; };
+		FD6B2A3E5780983568B792FD /* whatcan_find_photos_in_your_gallery.webp in Resources */ = {isa = PBXBuildFile; fileRef = 11E855D294AFFCA276F55B18 /* whatcan_find_photos_in_your_gallery.webp */; };
+		FE7002974C1E1A44056F8480 /* DevicePairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEA9FDC67B2E904568F4F42 /* DevicePairingView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		31E3A5994B4006607E26BCB4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B6123DC162B1243B8281D995 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E9FC17882CCF105A4833FEF9;
+			remoteInfo = "Bridgit-iOS";
+		};
+		39296C556E639C5483436E1F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B6123DC162B1243B8281D995 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BA5EB13F8EB943FA762FE151;
+			remoteInfo = "Bridgit-macOS";
+		};
+		6A01B308FA042554F1AB5AC9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B6123DC162B1243B8281D995 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 30DDDE2FCDE497995539AEA5;
+			remoteInfo = "Bridgit-Share-iOS";
+		};
+		B723DB9BF071DB961BBFFB30 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B6123DC162B1243B8281D995 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E9FC17882CCF105A4833FEF9;
+			remoteInfo = "Bridgit-iOS";
+		};
+		BD240A33CAB9C20E9B497200 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B6123DC162B1243B8281D995 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FA680A398B3916A70E366EDB;
+			remoteInfo = "Bridgit-Share-macOS";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		649BD0F0F2F5E192CA32946D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				8D8E7C2753552F17A03FCCDC /* BridgitShare.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7531173B67EBF424541E30BC /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C7BA0D86AAB8E61B57F1365C /* BridgitShare.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		00574CEAE3674F1410B75EC7 /* samples.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = samples.json; sourceTree = "<group>"; };
+		02AE9D0AC457AA51FBBD3D35 /* DiagnosticsSceneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsSceneView.swift; sourceTree = "<group>"; };
+		04DB8524712B179AAD01985D /* whatcan_you_stay_in_control.webp */ = {isa = PBXFileReference; path = whatcan_you_stay_in_control.webp; sourceTree = "<group>"; };
+		056C87B36FC2E6D48CAA0AF0 /* whatcan_inbox.webp */ = {isa = PBXFileReference; path = whatcan_inbox.webp; sourceTree = "<group>"; };
+		0643925162690DA1D40A4FC8 /* PortableLibraryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortableLibraryViews.swift; sourceTree = "<group>"; };
+		06520AADEFA8B044C5A6DB27 /* NetworkInventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInventory.swift; sourceTree = "<group>"; };
+		06D3ADD2F19E62B4D8D3F000 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0CF1044F931B61282239746C /* DevicesViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesViews.swift; sourceTree = "<group>"; };
+		0D3D5FFBD9944B5A1337C7BD /* WatchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchModels.swift; sourceTree = "<group>"; };
+		10319C8056145BF86D25F403 /* whatcan_open_a_link_or_app.webp */ = {isa = PBXFileReference; path = whatcan_open_a_link_or_app.webp; sourceTree = "<group>"; };
+		11E855D294AFFCA276F55B18 /* whatcan_find_photos_in_your_gallery.webp */ = {isa = PBXFileReference; path = whatcan_find_photos_in_your_gallery.webp; sourceTree = "<group>"; };
+		12DAD39BCB005B8DCEC45B63 /* whatcan_questions_and_notices_to_you.webp */ = {isa = PBXFileReference; path = whatcan_questions_and_notices_to_you.webp; sourceTree = "<group>"; };
+		13622F3E420202ADAAEA1D11 /* whatcan_location_details.webp */ = {isa = PBXFileReference; path = whatcan_location_details.webp; sourceTree = "<group>"; };
+		145D6E4EE9F19896E6F730BC /* whatcan_transcribe_clips_on_the_phone.webp */ = {isa = PBXFileReference; path = whatcan_transcribe_clips_on_the_phone.webp; sourceTree = "<group>"; };
+		162DCD48BD3BEB158D6D13B7 /* CardPreviewRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPreviewRules.swift; sourceTree = "<group>"; };
+		178BCE9673819B7248F70184 /* whatcan_quick_settings_tile.webp */ = {isa = PBXFileReference; path = whatcan_quick_settings_tile.webp; sourceTree = "<group>"; };
+		194EF09FAADD8F7306CB5D57 /* LocalDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDiagnosticsView.swift; sourceTree = "<group>"; };
+		19AE91BBD86A05B2EBF21935 /* LocalDeviceInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDeviceInfoView.swift; sourceTree = "<group>"; };
+		19B6826F8FC1D166982AC6CC /* AgentMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentMark.swift; sourceTree = "<group>"; };
+		19E25C1321A9336E3D9598DD /* Bridgit-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bridgit-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B5746B43C06A1617CE74A73 /* MoreSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreSearchTests.swift; sourceTree = "<group>"; };
+		1D8548D39585553093ED4932 /* FirstRunView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunView.swift; sourceTree = "<group>"; };
+		1E2B988B97E29D364FA051CE /* Bridgit-iOSTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "Bridgit-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1EB21C2BE0BF7B0B08E5B6A4 /* BricolageGrotesque-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BricolageGrotesque-Bold.ttf"; sourceTree = "<group>"; };
+		1EFDA81568674E9D9A15A8C8 /* MoreSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreSearch.swift; sourceTree = "<group>"; };
+		1F596A8D51C29293D2A24FB2 /* whatcan_one_key_per_agent.webp */ = {isa = PBXFileReference; path = whatcan_one_key_per_agent.webp; sourceTree = "<group>"; };
+		1FD62EE21F82558F193A2182 /* DeviceWebLinkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceWebLinkView.swift; sourceTree = "<group>"; };
+		23B4ABF262B3BD15E8791C4D /* AppletsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletsView.swift; sourceTree = "<group>"; };
+		24C96B4304B0B23D8CBB890E /* Bridgit-macOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bridgit-macOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		28106C54C62C35426BA097DA /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		2A7B11BA4684EEF9DBBA5B73 /* DevicesMapOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesMapOptions.swift; sourceTree = "<group>"; };
+		2DCA80636B556DEC5CD48645 /* InboundSharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundSharingView.swift; sourceTree = "<group>"; };
+		2DE9746C3CB8B17E8117844C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2EAC2F7653364346C1ADE8DB /* whatcan_short_video_clips.webp */ = {isa = PBXFileReference; path = whatcan_short_video_clips.webp; sourceTree = "<group>"; };
+		2FD09D5060903E18AF6FEA1B /* BridgitShare.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = BridgitShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		30F1F6A6A0F4E0AE197AFB00 /* FeedbackTeamKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackTeamKeys.swift; sourceTree = "<group>"; };
+		31DFAD68DACD72F92534E396 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3476231F8A7528E842C28B58 /* whatcan_everything_is_logged.webp */ = {isa = PBXFileReference; path = whatcan_everything_is_logged.webp; sourceTree = "<group>"; };
+		34F1D7DE6BAD80DBC5D5363F /* SignInPairViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInPairViews.swift; sourceTree = "<group>"; };
+		357F1AE55672710D51F610C3 /* MacUpdates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacUpdates.swift; sourceTree = "<group>"; };
+		358378C6FE18DF726550E303 /* whatcan_read_notifications.webp */ = {isa = PBXFileReference; path = whatcan_read_notifications.webp; sourceTree = "<group>"; };
+		38424D1822FB7714C8379242 /* whatcan_screen_sharing_as_a_fallback.webp */ = {isa = PBXFileReference; path = whatcan_screen_sharing_as_a_fallback.webp; sourceTree = "<group>"; };
+		3D6C8A0C060777E2F5BEBCC3 /* ConnectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionsView.swift; sourceTree = "<group>"; };
+		3E6B733C789794CF4A4071A2 /* InboxCardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxCardTests.swift; sourceTree = "<group>"; };
+		3ED733D395D7B5E19EA8C6FF /* BuildInstructionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildInstructionsTests.swift; sourceTree = "<group>"; };
+		4224C160EDD82001B081EB60 /* BridgitNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgitNames.swift; sourceTree = "<group>"; };
+		42A06CB958C8CF8BF8D81B30 /* whatcan_flash_the_light.webp */ = {isa = PBXFileReference; path = whatcan_flash_the_light.webp; sourceTree = "<group>"; };
+		4453DE051E31F2D5C103647A /* PortalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortalDevice.swift; sourceTree = "<group>"; };
+		44630929427140C7076907D4 /* MacAppletWebViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAppletWebViews.swift; sourceTree = "<group>"; };
+		44655BB6611B961B4ABD45F6 /* whatcan_wake_words.webp */ = {isa = PBXFileReference; path = whatcan_wake_words.webp; sourceTree = "<group>"; };
+		449CCCB935392D4500856C75 /* AppletPageBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletPageBrowser.swift; sourceTree = "<group>"; };
+		46104BFD2E8DCDFFA34D9525 /* NetworkMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMapView.swift; sourceTree = "<group>"; };
+		46846F7EF5140CFF7764A2FD /* OwnerPhotos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerPhotos.swift; sourceTree = "<group>"; };
+		472B06B4BD6623777418632D /* AccountAgentRoster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountAgentRoster.swift; sourceTree = "<group>"; };
+		47CB8F01C082B46C6B07979B /* HardwareAccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareAccessView.swift; sourceTree = "<group>"; };
+		49BF7ECD11112ED243838E96 /* whatcan_rich_html_cards.webp */ = {isa = PBXFileReference; path = whatcan_rich_html_cards.webp; sourceTree = "<group>"; };
+		4A14A81AFCBD966CF24B44F1 /* MacRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacRootView.swift; sourceTree = "<group>"; };
+		4A5E4F5558ACDED7D22EC534 /* whatcan_your_latest_screenshot_or_photo.webp */ = {isa = PBXFileReference; path = whatcan_your_latest_screenshot_or_photo.webp; sourceTree = "<group>"; };
+		4A8D58B4F1E8C5FF26D9EE6B /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		4D1B70BCD66AE8CE1C4AF5F0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4DA1C054C547E9BAC3EFB1F7 /* whatcan_location_history_and_places.webp */ = {isa = PBXFileReference; path = whatcan_location_history_and_places.webp; sourceTree = "<group>"; };
+		4DA2FE0E3E22F0FC224967CA /* AppletCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletCardsView.swift; sourceTree = "<group>"; };
+		4DAAFC1DA37C4B79D7DC5243 /* whatcan_report_a_bug_or_ask_for_a_feature.webp */ = {isa = PBXFileReference; path = whatcan_report_a_bug_or_ask_for_a_feature.webp; sourceTree = "<group>"; };
+		50CABCCFE2A4F4C61E89F43F /* CrashReportingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportingTests.swift; sourceTree = "<group>"; };
+		547EBD9076599301248355B5 /* whatcan_copy_to_clipboard.webp */ = {isa = PBXFileReference; path = whatcan_copy_to_clipboard.webp; sourceTree = "<group>"; };
+		54B3170D0CE347BA7673CE76 /* AppletPageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletPageTests.swift; sourceTree = "<group>"; };
+		550977846D4665F7565BF607 /* NetworkInventoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInventoryTests.swift; sourceTree = "<group>"; };
+		5517479BB25B6A3AC1060D8F /* WatchClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchClient.swift; sourceTree = "<group>"; };
+		57C51E2BD04A42970516B019 /* MaintainedAppletRuntimeAcceptanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaintainedAppletRuntimeAcceptanceTests.swift; sourceTree = "<group>"; };
+		583A4D1342EDEEA15639E406 /* whatcan_reach_bridgit_without_tailscale_relay.webp */ = {isa = PBXFileReference; path = whatcan_reach_bridgit_without_tailscale_relay.webp; sourceTree = "<group>"; };
+		594F6C137CA721BD92BB83F1 /* Bridgit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Bridgit.entitlements; sourceTree = "<group>"; };
+		5B4C87A6769005C4A0E45771 /* MacModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacModel.swift; sourceTree = "<group>"; };
+		5BF78EA293552DE7FEAF426E /* MacDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacDiagnosticsView.swift; sourceTree = "<group>"; };
+		5C357A4EA108BF58067227F3 /* whatcan_messages_contacts_calendar_calls.webp */ = {isa = PBXFileReference; path = whatcan_messages_contacts_calendar_calls.webp; sourceTree = "<group>"; };
+		5D3E2A6F915341942C2543DE /* BridgitAppletRuntime */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BridgitAppletRuntime; path = BridgitAppletRuntime; sourceTree = SOURCE_ROOT; };
+		5F6CD035A404235C0D65B339 /* LocalHostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalHostModel.swift; sourceTree = "<group>"; };
+		63036E48D93D70A3481EE6E8 /* whatcan_per_agent_permissions.webp */ = {isa = PBXFileReference; path = whatcan_per_agent_permissions.webp; sourceTree = "<group>"; };
+		64A58FF31DBF827EBBF1465C /* MacModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacModelTests.swift; sourceTree = "<group>"; };
+		64E9BA8C63BE4414F3714F4E /* ParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsingTests.swift; sourceTree = "<group>"; };
+		6602CBB7B389DFFB2EFEE8D9 /* Bridgit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Bridgit.entitlements; sourceTree = "<group>"; };
+		6B1BDC0DF22075FEBD2EE650 /* DeviceCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCameraView.swift; sourceTree = "<group>"; };
+		6D5EAEBECB2007162077ACA6 /* whatcan_agents_learn_what_s_new.webp */ = {isa = PBXFileReference; path = whatcan_agents_learn_what_s_new.webp; sourceTree = "<group>"; };
+		6DF19381EEADBC87F0098CB6 /* LocalCameraTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCameraTab.swift; sourceTree = "<group>"; };
+		6EF6D721BE11828FA857AD08 /* LocalSpeechModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSpeechModel.swift; sourceTree = "<group>"; };
+		71B4CD613D07FAE2F88A2244 /* BridgitShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BridgitShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		7380525255E86ECD2B81C74E /* BridgitSpeech */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BridgitSpeech; path = BridgitSpeech; sourceTree = SOURCE_ROOT; };
+		73D984B7A0948A617BA12FF5 /* whatcan_add_an_agent_in_a_minute.webp */ = {isa = PBXFileReference; path = whatcan_add_an_agent_in_a_minute.webp; sourceTree = "<group>"; };
+		75E92AA530A011ECC0D78785 /* applet-page-fixture.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "applet-page-fixture.html"; sourceTree = "<group>"; };
+		76F64546C4B6FCE1ADE3CFF5 /* SpeechOwnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechOwnerTests.swift; sourceTree = "<group>"; };
+		776D40E71C2201300926C87F /* OwnerConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerConfigurationTests.swift; sourceTree = "<group>"; };
+		78F0A39A0CF14DC4B292CDF4 /* AccountAgentRosterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountAgentRosterTests.swift; sourceTree = "<group>"; };
+		7908C82704C657BE1721AA05 /* PhoneLive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLive.swift; sourceTree = "<group>"; };
+		797528E86FF22F3FF57FF258 /* whatcan_events_and_callbacks.webp */ = {isa = PBXFileReference; path = whatcan_events_and_callbacks.webp; sourceTree = "<group>"; };
+		79D8274B8318DECFB02D5725 /* DeviceCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCameraView.swift; sourceTree = "<group>"; };
+		7CD24C7252A7ED1B954B1D5E /* BridgitDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgitDialog.swift; sourceTree = "<group>"; };
+		7D44ED885A656DE84FF469B2 /* BridgitCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BridgitCore; path = BridgitCore; sourceTree = SOURCE_ROOT; };
+		7D6ECCE7E8B30720457571BF /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
+		7F19B5CA1618793F0650DAFD /* whatcan_agent_notes.webp */ = {isa = PBXFileReference; path = whatcan_agent_notes.webp; sourceTree = "<group>"; };
+		85381878ED68507559B95BE8 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		877D1E2AAD28FAD4ABC0C27B /* Bridgit-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Bridgit-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8930F1F385A33666669127DA /* OwnerFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerFilesView.swift; sourceTree = "<group>"; };
+		8C08221EF4E86B016F8B22ED /* LinkedDeviceMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedDeviceMap.swift; sourceTree = "<group>"; };
+		8FDC6EC1438AA3D2F131E162 /* HostLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostLifecycleTests.swift; sourceTree = "<group>"; };
+		916D0AF9DE66182A29C2DE0D /* InboxParityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxParityTests.swift; sourceTree = "<group>"; };
+		917C39744A4B2D3DBD44858E /* MacUpdatesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacUpdatesTests.swift; sourceTree = "<group>"; };
+		91BFA5C5C37C9ED083376BED /* DeviceDiagnosticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDiagnosticsTests.swift; sourceTree = "<group>"; };
+		9288867F1E5284795C7F95C2 /* ViewerConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerConfigurationTests.swift; sourceTree = "<group>"; };
+		92CE9CED5D15EF0073A56D17 /* whatcan_health_connect.webp */ = {isa = PBXFileReference; path = whatcan_health_connect.webp; sourceTree = "<group>"; };
+		9908B0AA2EDEBAAF77B3429F /* CaptureNotices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureNotices.swift; sourceTree = "<group>"; };
+		9924C215897F3A10482881F1 /* BridgitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgitApp.swift; sourceTree = "<group>"; };
+		996515DF7D2CDF6D38D8B744 /* CaptureNoticesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureNoticesTests.swift; sourceTree = "<group>"; };
+		9C9FE7CDBFB937EF56B2D3CA /* BuildInstructionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildInstructionsView.swift; sourceTree = "<group>"; };
+		9D3DAA86AEE4DFEBB600E12B /* whatcan_phone_status_and_context.webp */ = {isa = PBXFileReference; path = whatcan_phone_status_and_context.webp; sourceTree = "<group>"; };
+		9D68C58FD9EF753867731396 /* LocalAppletTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAppletTests.swift; sourceTree = "<group>"; };
+		9DD0D9788FEC298C7AA62C46 /* BuildStamp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildStamp.swift; sourceTree = "<group>"; };
+		9E57523F1560D1AA46719B49 /* CrashReports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReports.swift; sourceTree = "<group>"; };
+		9F13323825960072F8AE6E29 /* AppletListsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletListsTests.swift; sourceTree = "<group>"; };
+		9F39EBA75ACD12ED44F3E717 /* LocalInteractionInbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalInteractionInbox.swift; sourceTree = "<group>"; };
+		9F57F7ED14045A0D5E4D33AB /* FeedbackEntries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackEntries.swift; sourceTree = "<group>"; };
+		9F677BACD9796BBFDF67DC94 /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		A00CADBC9599FE54CB6EF160 /* whatcan_take_a_photo.webp */ = {isa = PBXFileReference; path = whatcan_take_a_photo.webp; sourceTree = "<group>"; };
+		A0D7E622258DB984246D9CD9 /* SignIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignIn.swift; sourceTree = "<group>"; };
+		A4C64723DF6D71014D093D88 /* PhotoTargetPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoTargetPicker.swift; sourceTree = "<group>"; };
+		A5A47D231EBB3CC6D5C0FB6D /* MoreParityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreParityTests.swift; sourceTree = "<group>"; };
+		A6179418B8003F277BCA6204 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A758C45A48CAB1AB93048ED1 /* DeviceTypeDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTypeDescription.swift; sourceTree = "<group>"; };
+		A79B830B3E0902525D9B5E8F /* LocalAppletViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAppletViews.swift; sourceTree = "<group>"; };
+		AA3BDEE2456A51922D8995DD /* LocalHostViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalHostViews.swift; sourceTree = "<group>"; };
+		AC01CD741A28B8B119BF0522 /* OwnerPhotosTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerPhotosTests.swift; sourceTree = "<group>"; };
+		AC99DE05259E05278C709D4D /* ViewerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerConfiguration.swift; sourceTree = "<group>"; };
+		AFEA9FDC67B2E904568F4F42 /* DevicePairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicePairingView.swift; sourceTree = "<group>"; };
+		B0CBC34CC756BEC6622BD50C /* OwnerConfigurationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerConfigurationModel.swift; sourceTree = "<group>"; };
+		B181A65BFCEC0303ECCEF525 /* whatcan_read_text_on_the_phone.webp */ = {isa = PBXFileReference; path = whatcan_read_text_on_the_phone.webp; sourceTree = "<group>"; };
+		B41F84442FA0CE188A031819 /* DeviceBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBar.swift; sourceTree = "<group>"; };
+		B449A299A92B9CB60350F72A /* AppleFixtureWorkspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleFixtureWorkspace.swift; sourceTree = "<group>"; };
+		B48BC8ECFACC04EC4D26BE24 /* MacStatusItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacStatusItemTests.swift; sourceTree = "<group>"; };
+		B62EBB134CB5530DD7EE199D /* whatcan_play_an_audio_file.webp */ = {isa = PBXFileReference; path = whatcan_play_an_audio_file.webp; sourceTree = "<group>"; };
+		B6B248BDF93EAE379717438C /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
+		B7472892CD66FCC5DCCCA15D /* AbilityCatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbilityCatalogView.swift; sourceTree = "<group>"; };
+		B7E5491EB7D5BC6B011749D5 /* whatcan_files_to_your_phone.webp */ = {isa = PBXFileReference; path = whatcan_files_to_your_phone.webp; sourceTree = "<group>"; };
+		B940CF7CEFCE0D0BDEF483DF /* whatcan_sensors.webp */ = {isa = PBXFileReference; path = whatcan_sensors.webp; sourceTree = "<group>"; };
+		BAA8EEBE403FE973170C10F2 /* HomeRenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRenderTests.swift; sourceTree = "<group>"; };
+		BAE8F8E613583D1DA360431A /* AppleApplicationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleApplicationDelegate.swift; sourceTree = "<group>"; };
+		BB66DFA77167F751D5B50FDC /* AppletPortalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletPortalsView.swift; sourceTree = "<group>"; };
+		BF30C1362E1D6B8CCCE2CA1E /* LocalAppletModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAppletModel.swift; sourceTree = "<group>"; };
+		BFBEFDBBC07B64DAAB7783B4 /* MacStatusItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacStatusItem.swift; sourceTree = "<group>"; };
+		C0F6BDCCBF4DA5A3B6645284 /* whatcan_send_a_screenshot.webp */ = {isa = PBXFileReference; path = whatcan_send_a_screenshot.webp; sourceTree = "<group>"; };
+		C732F50A23887A2514B2F903 /* whatcan_share_to_an_agent.webp */ = {isa = PBXFileReference; path = whatcan_share_to_an_agent.webp; sourceTree = "<group>"; };
+		C9059FEC55292E1C899BFB30 /* AppletDeviceLists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletDeviceLists.swift; sourceTree = "<group>"; };
+		C99D99BA22CDCCE4D7AD772F /* InboundSharingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundSharingModel.swift; sourceTree = "<group>"; };
+		C9F1F94488C8B7DC31115BA9 /* HomeSceneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSceneView.swift; sourceTree = "<group>"; };
+		CB07CA1C3FCBF7836A9F10F6 /* AbilityCatalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AbilityCatalog.json; sourceTree = "<group>"; };
+		D08196B45E85F9E32A104892 /* MacNetworkDevicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacNetworkDevicesView.swift; sourceTree = "<group>"; };
+		D0B4E9523E5C873C84AE1A67 /* OwnerConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerConfigurationView.swift; sourceTree = "<group>"; };
+		D296BBE70F1E18CD508028A1 /* whatcan_find_my_phone.webp */ = {isa = PBXFileReference; path = whatcan_find_my_phone.webp; sourceTree = "<group>"; };
+		D3AAE382ABFA1E081D74622B /* whatcan_record_a_short_clip.webp */ = {isa = PBXFileReference; path = whatcan_record_a_short_clip.webp; sourceTree = "<group>"; };
+		D3C1E7544696D370EAFB4650 /* whatcan_app_usage.webp */ = {isa = PBXFileReference; path = whatcan_app_usage.webp; sourceTree = "<group>"; };
+		D471D2AD62975E7A8EB2B119 /* BridgitMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgitMacApp.swift; sourceTree = "<group>"; };
+		D52D71BD2CE0CE0DE119B496 /* CardLibraryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardLibraryRow.swift; sourceTree = "<group>"; };
+		D630798738D7313449F2634F /* AppleCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleCamera.swift; sourceTree = "<group>"; };
+		DA3A10890ABB10760695EB21 /* RelayStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayStore.swift; sourceTree = "<group>"; };
+		DAA20FDD0E812E90DD666806 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		DAA6569516EDA6E52D633011 /* AccountAgentRosterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountAgentRosterView.swift; sourceTree = "<group>"; };
+		DC2C0F3D9100D6717034C3D1 /* whatcan_only_over_tailscale.webp */ = {isa = PBXFileReference; path = whatcan_only_over_tailscale.webp; sourceTree = "<group>"; };
+		DCB437BCA928F31B8363B734 /* AgentsDevicesViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentsDevicesViews.swift; sourceTree = "<group>"; };
+		DDEBFB12C703BB88A8921457 /* PortableLibraryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortableLibraryController.swift; sourceTree = "<group>"; };
+		E35633D382DA8DB0D0387E3C /* SpeechAppletControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechAppletControls.swift; sourceTree = "<group>"; };
+		E3ED7A643E7B1324CB4291DB /* CardChoiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardChoiceTests.swift; sourceTree = "<group>"; };
+		E3F693C0BDCF1B9194728BDF /* whatcan_phone_controls.webp */ = {isa = PBXFileReference; path = whatcan_phone_controls.webp; sourceTree = "<group>"; };
+		E46E5C09E11E0A67DA06C8D9 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
+		E4F06AD960D5BBA53435B694 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		E60DDB893FE8A2D576F86723 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		EBE61133C37BBFAEB0A30B17 /* Bridgit-ParityUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "Bridgit-ParityUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EE4CC13F65EC4B78C9AAD1E7 /* AppletLists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletLists.swift; sourceTree = "<group>"; };
+		EFEEA577E4AC5E45F0F7ECC6 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		F2509B4AD91E4C508B72DCFA /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		F43220F6D47FE5E9B1EDF585 /* whatcan_check_for_updates.webp */ = {isa = PBXFileReference; path = whatcan_check_for_updates.webp; sourceTree = "<group>"; };
+		F67F95E72E3395D9CE3D38BC /* whatcan_videos_and_downloads.webp */ = {isa = PBXFileReference; path = whatcan_videos_and_downloads.webp; sourceTree = "<group>"; };
+		F7A4EA9FB6DB3E1D20F95D08 /* AccountLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountLifecycleTests.swift; sourceTree = "<group>"; };
+		FA245C398EC97CF92EAFDFC4 /* whatcan_city_tour.webp */ = {isa = PBXFileReference; path = whatcan_city_tour.webp; sourceTree = "<group>"; };
+		FA3CFFDD3C0CF21DD5DFC972 /* MacLinkedAgentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacLinkedAgentsView.swift; sourceTree = "<group>"; };
+		FCB5364C5F20FC4C15E520E4 /* MacAppletsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAppletsView.swift; sourceTree = "<group>"; };
+		FF3DD3C09E5E052DBFFC3D7A /* whatcan_the_api_explains_itself.webp */ = {isa = PBXFileReference; path = whatcan_the_api_explains_itself.webp; sourceTree = "<group>"; };
+		FFF07E9E57E734CF1226069B /* AboutBridgitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutBridgitButton.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		11F736A3658D977BEDC12114 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B7FCF481B2916CD242016B33 /* BridgitCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		194609AB2E0C7E5F56005D6D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC6540A3FF963BBCA7734BEA /* BridgitCore in Frameworks */,
+				FCBFD9DADF9FA183E8128469 /* BridgitAppletRuntime in Frameworks */,
+				4F54D4F4AB444B062C5B6436 /* BridgitSpeech in Frameworks */,
+				A489A017987362CEA488A95E /* Sentry in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4CDB2185694EC774B58512E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C08B3E7F793C24A26C296E52 /* BridgitCore in Frameworks */,
+				DB0C7E0E5A07B68A79A80D3D /* BridgitAppletRuntime in Frameworks */,
+				4BF48C2C0EA3F9C7559CCAB4 /* BridgitSpeech in Frameworks */,
+				E9605FB46CD2C4D14C3E0303 /* Sentry in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B9F69CF68129E35E2AA7B3F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				604F38945DF051BCFC9188B4 /* BridgitCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00EF990265CB696A62E79194 /* Relay */ = {
+			isa = PBXGroup;
+			children = (
+				DA3A10890ABB10760695EB21 /* RelayStore.swift */,
+			);
+			path = Relay;
+			sourceTree = "<group>";
+		};
+		028CE740A783C95E21DDB609 /* Cloud */ = {
+			isa = PBXGroup;
+			children = (
+				A0D7E622258DB984246D9CD9 /* SignIn.swift */,
+			);
+			path = Cloud;
+			sourceTree = "<group>";
+		};
+		0D3CBB92F5AB2BA20EE12EA1 /* Android3347 */ = {
+			isa = PBXGroup;
+			children = (
+				00574CEAE3674F1410B75EC7 /* samples.json */,
+			);
+			path = Android3347;
+			sourceTree = "<group>";
+		};
+		17F77A8D668243501E0E6C7A /* Applets */ = {
+			isa = PBXGroup;
+			children = (
+				EE4CC13F65EC4B78C9AAD1E7 /* AppletLists.swift */,
+				449CCCB935392D4500856C75 /* AppletPageBrowser.swift */,
+				9C9FE7CDBFB937EF56B2D3CA /* BuildInstructionsView.swift */,
+				162DCD48BD3BEB158D6D13B7 /* CardPreviewRules.swift */,
+				3D6C8A0C060777E2F5BEBCC3 /* ConnectionsView.swift */,
+				BF30C1362E1D6B8CCCE2CA1E /* LocalAppletModel.swift */,
+				A79B830B3E0902525D9B5E8F /* LocalAppletViews.swift */,
+				DDEBFB12C703BB88A8921457 /* PortableLibraryController.swift */,
+				0643925162690DA1D40A4FC8 /* PortableLibraryViews.swift */,
+			);
+			path = Applets;
+			sourceTree = "<group>";
+		};
+		1E626501370C7AA5A7BA267B /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				5D3E2A6F915341942C2543DE /* BridgitAppletRuntime */,
+				7D44ED885A656DE84FF469B2 /* BridgitCore */,
+				7380525255E86ECD2B81C74E /* BridgitSpeech */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		2C26BD536E8B33BDFBC648C7 /* FirstRun */ = {
+			isa = PBXGroup;
+			children = (
+				1D8548D39585553093ED4932 /* FirstRunView.swift */,
+			);
+			path = FirstRun;
+			sourceTree = "<group>";
+		};
+		3752A87C3A99551F3202F463 /* SharedTests */ = {
+			isa = PBXGroup;
+			children = (
+				78F0A39A0CF14DC4B292CDF4 /* AccountAgentRosterTests.swift */,
+				3ED733D395D7B5E19EA8C6FF /* BuildInstructionsTests.swift */,
+				E3ED7A643E7B1324CB4291DB /* CardChoiceTests.swift */,
+				50CABCCFE2A4F4C61E89F43F /* CrashReportingTests.swift */,
+				3E6B733C789794CF4A4071A2 /* InboxCardTests.swift */,
+				57C51E2BD04A42970516B019 /* MaintainedAppletRuntimeAcceptanceTests.swift */,
+				1B5746B43C06A1617CE74A73 /* MoreSearchTests.swift */,
+				550977846D4665F7565BF607 /* NetworkInventoryTests.swift */,
+				9288867F1E5284795C7F95C2 /* ViewerConfigurationTests.swift */,
+			);
+			path = SharedTests;
+			sourceTree = "<group>";
+		};
+		3D6CB9DF83DFAF9E4503140C /* Bridgit-iOSTests */ = {
+			isa = PBXGroup;
+			children = (
+				F7A4EA9FB6DB3E1D20F95D08 /* AccountLifecycleTests.swift */,
+				9F13323825960072F8AE6E29 /* AppletListsTests.swift */,
+				AC01CD741A28B8B119BF0522 /* OwnerPhotosTests.swift */,
+				64E9BA8C63BE4414F3714F4E /* ParsingTests.swift */,
+			);
+			path = "Bridgit-iOSTests";
+			sourceTree = "<group>";
+		};
+		4067234E5591CF91199816B9 /* Cloud */ = {
+			isa = PBXGroup;
+			children = (
+				472B06B4BD6623777418632D /* AccountAgentRoster.swift */,
+				DAA6569516EDA6E52D633011 /* AccountAgentRosterView.swift */,
+				1FD62EE21F82558F193A2182 /* DeviceWebLinkView.swift */,
+				46846F7EF5140CFF7764A2FD /* OwnerPhotos.swift */,
+				A4C64723DF6D71014D093D88 /* PhotoTargetPicker.swift */,
+				5517479BB25B6A3AC1060D8F /* WatchClient.swift */,
+				0D3D5FFBD9944B5A1337C7BD /* WatchModels.swift */,
+			);
+			path = Cloud;
+			sourceTree = "<group>";
+		};
+		41538B02DCB10AE4C2F94795 /* Devices */ = {
+			isa = PBXGroup;
+			children = (
+				2A7B11BA4684EEF9DBBA5B73 /* DevicesMapOptions.swift */,
+				06520AADEFA8B044C5A6DB27 /* NetworkInventory.swift */,
+				46104BFD2E8DCDFFA34D9525 /* NetworkMapView.swift */,
+			);
+			path = Devices;
+			sourceTree = "<group>";
+		};
+		41A12425FE2F3763B07B79B4 = {
+			isa = PBXGroup;
+			children = (
+				AC23F0039F626CE8F9EEA31F /* Bridgit-iOS */,
+				3D6CB9DF83DFAF9E4503140C /* Bridgit-iOSTests */,
+				6A14E40511BC683608766FFB /* Bridgit-macOS */,
+				814B1C5888939C4B251BC5E8 /* Bridgit-macOSTests */,
+				C57C3354C2D418C85FC18449 /* Bridgit-ParityUITests */,
+				5133E1C0AA09975DD0BB3F49 /* mac-updates */,
+				1E626501370C7AA5A7BA267B /* Packages */,
+				4FDE531D714D0BD479C9A020 /* Shared */,
+				3752A87C3A99551F3202F463 /* SharedTests */,
+				AA7738A5181297F60242206E /* ShareExtension */,
+				BA986C5F995241C0B0783743 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4391BB5CD0F9D7B4A03F970F /* app */ = {
+			isa = PBXGroup;
+			children = (
+				B8774DA9A455B31D36884465 /* src */,
+			);
+			path = app;
+			sourceTree = "<group>";
+		};
+		45BF4DA8BA3346873653E98D /* Interactions */ = {
+			isa = PBXGroup;
+			children = (
+				D52D71BD2CE0CE0DE119B496 /* CardLibraryRow.swift */,
+				C99D99BA22CDCCE4D7AD772F /* InboundSharingModel.swift */,
+				2DCA80636B556DEC5CD48645 /* InboundSharingView.swift */,
+				9F39EBA75ACD12ED44F3E717 /* LocalInteractionInbox.swift */,
+				8930F1F385A33666669127DA /* OwnerFilesView.swift */,
+			);
+			path = Interactions;
+			sourceTree = "<group>";
+		};
+		4FDE531D714D0BD479C9A020 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				17F77A8D668243501E0E6C7A /* Applets */,
+				863CD169C80A55611E103C87 /* Brand */,
+				4067234E5591CF91199816B9 /* Cloud */,
+				41538B02DCB10AE4C2F94795 /* Devices */,
+				74B7A75003225C9C63CDE884 /* Feedback */,
+				2C26BD536E8B33BDFBC648C7 /* FirstRun */,
+				A279093589B3475069181F87 /* Host */,
+				45BF4DA8BA3346873653E98D /* Interactions */,
+				9783113F050C145D46B32CF8 /* Localization */,
+				B2FA380219460DAC6A107CD1 /* Pairing */,
+				A4ABEB6055B41CDA9043C6E5 /* Resources */,
+				568F0E984DCAFE3FF7DF8D51 /* Speech */,
+				F436BF50EDC4E59BC4505D04 /* Support */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		5133E1C0AA09975DD0BB3F49 /* mac-updates */ = {
+			isa = PBXGroup;
+			children = (
+				4391BB5CD0F9D7B4A03F970F /* app */,
+			);
+			name = "mac-updates";
+			path = ..;
+			sourceTree = "<group>";
+		};
+		568F0E984DCAFE3FF7DF8D51 /* Speech */ = {
+			isa = PBXGroup;
+			children = (
+				6EF6D721BE11828FA857AD08 /* LocalSpeechModel.swift */,
+				E35633D382DA8DB0D0387E3C /* SpeechAppletControls.swift */,
+			);
+			path = Speech;
+			sourceTree = "<group>";
+		};
+		6A14E40511BC683608766FFB /* Bridgit-macOS */ = {
+			isa = PBXGroup;
+			children = (
+				06D3ADD2F19E62B4D8D3F000 /* Assets.xcassets */,
+				594F6C137CA721BD92BB83F1 /* Bridgit.entitlements */,
+				D471D2AD62975E7A8EB2B119 /* BridgitMacApp.swift */,
+				6B1BDC0DF22075FEBD2EE650 /* DeviceCameraView.swift */,
+				E60DDB893FE8A2D576F86723 /* Info.plist */,
+				FCB5364C5F20FC4C15E520E4 /* MacAppletsView.swift */,
+				44630929427140C7076907D4 /* MacAppletWebViews.swift */,
+				5BF78EA293552DE7FEAF426E /* MacDiagnosticsView.swift */,
+				FA3CFFDD3C0CF21DD5DFC972 /* MacLinkedAgentsView.swift */,
+				5B4C87A6769005C4A0E45771 /* MacModel.swift */,
+				D08196B45E85F9E32A104892 /* MacNetworkDevicesView.swift */,
+				4A14A81AFCBD966CF24B44F1 /* MacRootView.swift */,
+				BFBEFDBBC07B64DAAB7783B4 /* MacStatusItem.swift */,
+				E4F06AD960D5BBA53435B694 /* PrivacyInfo.xcprivacy */,
+			);
+			path = "Bridgit-macOS";
+			sourceTree = "<group>";
+		};
+		74B7A75003225C9C63CDE884 /* Feedback */ = {
+			isa = PBXGroup;
+			children = (
+				9F57F7ED14045A0D5E4D33AB /* FeedbackEntries.swift */,
+				30F1F6A6A0F4E0AE197AFB00 /* FeedbackTeamKeys.swift */,
+			);
+			path = Feedback;
+			sourceTree = "<group>";
+		};
+		814B1C5888939C4B251BC5E8 /* Bridgit-macOSTests */ = {
+			isa = PBXGroup;
+			children = (
+				996515DF7D2CDF6D38D8B744 /* CaptureNoticesTests.swift */,
+				BAA8EEBE403FE973170C10F2 /* HomeRenderTests.swift */,
+				8FDC6EC1438AA3D2F131E162 /* HostLifecycleTests.swift */,
+				9D68C58FD9EF753867731396 /* LocalAppletTests.swift */,
+				64A58FF31DBF827EBBF1465C /* MacModelTests.swift */,
+				B48BC8ECFACC04EC4D26BE24 /* MacStatusItemTests.swift */,
+				917C39744A4B2D3DBD44858E /* MacUpdatesTests.swift */,
+				776D40E71C2201300926C87F /* OwnerConfigurationTests.swift */,
+				76F64546C4B6FCE1ADE3CFF5 /* SpeechOwnerTests.swift */,
+			);
+			path = "Bridgit-macOSTests";
+			sourceTree = "<group>";
+		};
+		863CD169C80A55611E103C87 /* Brand */ = {
+			isa = PBXGroup;
+			children = (
+				19B6826F8FC1D166982AC6CC /* AgentMark.swift */,
+				2DE9746C3CB8B17E8117844C /* Assets.xcassets */,
+				85381878ED68507559B95BE8 /* Theme.swift */,
+			);
+			path = Brand;
+			sourceTree = "<group>";
+		};
+		8F0D8DEF96166DF5AC105C3F /* main */ = {
+			isa = PBXGroup;
+			children = (
+				D0EBE9E398FF341C3E9791D1 /* res */,
+			);
+			path = main;
+			sourceTree = "<group>";
+		};
+		9783113F050C145D46B32CF8 /* Localization */ = {
+			isa = PBXGroup;
+			children = (
+				28106C54C62C35426BA097DA /* Localizable.xcstrings */,
+			);
+			path = Localization;
+			sourceTree = "<group>";
+		};
+		A279093589B3475069181F87 /* Host */ = {
+			isa = PBXGroup;
+			children = (
+				D630798738D7313449F2634F /* AppleCamera.swift */,
+				4224C160EDD82001B081EB60 /* BridgitNames.swift */,
+				9908B0AA2EDEBAAF77B3429F /* CaptureNotices.swift */,
+				02AE9D0AC457AA51FBBD3D35 /* DiagnosticsSceneView.swift */,
+				47CB8F01C082B46C6B07979B /* HardwareAccessView.swift */,
+				19AE91BBD86A05B2EBF21935 /* LocalDeviceInfoView.swift */,
+				194EF09FAADD8F7306CB5D57 /* LocalDiagnosticsView.swift */,
+				5F6CD035A404235C0D65B339 /* LocalHostModel.swift */,
+				AA3BDEE2456A51922D8995DD /* LocalHostViews.swift */,
+				B0CBC34CC756BEC6622BD50C /* OwnerConfigurationModel.swift */,
+				D0B4E9523E5C873C84AE1A67 /* OwnerConfigurationView.swift */,
+				AC99DE05259E05278C709D4D /* ViewerConfiguration.swift */,
+			);
+			path = Host;
+			sourceTree = "<group>";
+		};
+		A4ABEB6055B41CDA9043C6E5 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0D3CBB92F5AB2BA20EE12EA1 /* Android3347 */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		AA7738A5181297F60242206E /* ShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				F2509B4AD91E4C508B72DCFA /* ShareViewController.swift */,
+			);
+			path = ShareExtension;
+			sourceTree = "<group>";
+		};
+		AC23F0039F626CE8F9EEA31F /* Bridgit-iOS */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B70BCD66AE8CE1C4AF5F0 /* Assets.xcassets */,
+				6602CBB7B389DFFB2EFEE8D9 /* Bridgit.entitlements */,
+				31DFAD68DACD72F92534E396 /* Info.plist */,
+				A6179418B8003F277BCA6204 /* PrivacyInfo.xcprivacy */,
+				BBE10F5E0D886891A77DACD1 /* App */,
+				028CE740A783C95E21DDB609 /* Cloud */,
+				C4F5AACC3C7010A395F85D0C /* Fonts */,
+				FB785A9FFB20EAC5625686E8 /* Live */,
+				00EF990265CB696A62E79194 /* Relay */,
+				F7E8156D63FC3AE144F0DBA7 /* Support */,
+				EDD60AB1D38BA46783BC57BF /* Views */,
+			);
+			path = "Bridgit-iOS";
+			sourceTree = "<group>";
+		};
+		B2FA380219460DAC6A107CD1 /* Pairing */ = {
+			isa = PBXGroup;
+			children = (
+				AFEA9FDC67B2E904568F4F42 /* DevicePairingView.swift */,
+			);
+			path = Pairing;
+			sourceTree = "<group>";
+		};
+		B8774DA9A455B31D36884465 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				8F0D8DEF96166DF5AC105C3F /* main */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		BA986C5F995241C0B0783743 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				877D1E2AAD28FAD4ABC0C27B /* Bridgit-iOS.app */,
+				1E2B988B97E29D364FA051CE /* Bridgit-iOSTests.xctest */,
+				19E25C1321A9336E3D9598DD /* Bridgit-macOS.app */,
+				24C96B4304B0B23D8CBB890E /* Bridgit-macOSTests.xctest */,
+				EBE61133C37BBFAEB0A30B17 /* Bridgit-ParityUITests.xctest */,
+				2FD09D5060903E18AF6FEA1B /* BridgitShare.appex */,
+				71B4CD613D07FAE2F88A2244 /* BridgitShare.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BBE10F5E0D886891A77DACD1 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				BAE8F8E613583D1DA360431A /* AppleApplicationDelegate.swift */,
+				EFEEA577E4AC5E45F0F7ECC6 /* AppModel.swift */,
+				9924C215897F3A10482881F1 /* BridgitApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C4F5AACC3C7010A395F85D0C /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				1EB21C2BE0BF7B0B08E5B6A4 /* BricolageGrotesque-Bold.ttf */,
+				7D6ECCE7E8B30720457571BF /* OFL.txt */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		C57C3354C2D418C85FC18449 /* Bridgit-ParityUITests */ = {
+			isa = PBXGroup;
+			children = (
+				75E92AA530A011ECC0D78785 /* applet-page-fixture.html */,
+				54B3170D0CE347BA7673CE76 /* AppletPageTests.swift */,
+				91BFA5C5C37C9ED083376BED /* DeviceDiagnosticsTests.swift */,
+				916D0AF9DE66182A29C2DE0D /* InboxParityTests.swift */,
+				A5A47D231EBB3CC6D5C0FB6D /* MoreParityTests.swift */,
+			);
+			path = "Bridgit-ParityUITests";
+			sourceTree = "<group>";
+		};
+		C7CF429A633B6FC2312DA2DD /* drawable-nodpi */ = {
+			isa = PBXGroup;
+			children = (
+				73D984B7A0948A617BA12FF5 /* whatcan_add_an_agent_in_a_minute.webp */,
+				7F19B5CA1618793F0650DAFD /* whatcan_agent_notes.webp */,
+				6D5EAEBECB2007162077ACA6 /* whatcan_agents_learn_what_s_new.webp */,
+				D3C1E7544696D370EAFB4650 /* whatcan_app_usage.webp */,
+				F43220F6D47FE5E9B1EDF585 /* whatcan_check_for_updates.webp */,
+				FA245C398EC97CF92EAFDFC4 /* whatcan_city_tour.webp */,
+				547EBD9076599301248355B5 /* whatcan_copy_to_clipboard.webp */,
+				797528E86FF22F3FF57FF258 /* whatcan_events_and_callbacks.webp */,
+				3476231F8A7528E842C28B58 /* whatcan_everything_is_logged.webp */,
+				B7E5491EB7D5BC6B011749D5 /* whatcan_files_to_your_phone.webp */,
+				D296BBE70F1E18CD508028A1 /* whatcan_find_my_phone.webp */,
+				11E855D294AFFCA276F55B18 /* whatcan_find_photos_in_your_gallery.webp */,
+				42A06CB958C8CF8BF8D81B30 /* whatcan_flash_the_light.webp */,
+				92CE9CED5D15EF0073A56D17 /* whatcan_health_connect.webp */,
+				056C87B36FC2E6D48CAA0AF0 /* whatcan_inbox.webp */,
+				13622F3E420202ADAAEA1D11 /* whatcan_location_details.webp */,
+				4DA1C054C547E9BAC3EFB1F7 /* whatcan_location_history_and_places.webp */,
+				5C357A4EA108BF58067227F3 /* whatcan_messages_contacts_calendar_calls.webp */,
+				1F596A8D51C29293D2A24FB2 /* whatcan_one_key_per_agent.webp */,
+				DC2C0F3D9100D6717034C3D1 /* whatcan_only_over_tailscale.webp */,
+				10319C8056145BF86D25F403 /* whatcan_open_a_link_or_app.webp */,
+				63036E48D93D70A3481EE6E8 /* whatcan_per_agent_permissions.webp */,
+				E3F693C0BDCF1B9194728BDF /* whatcan_phone_controls.webp */,
+				9D3DAA86AEE4DFEBB600E12B /* whatcan_phone_status_and_context.webp */,
+				B62EBB134CB5530DD7EE199D /* whatcan_play_an_audio_file.webp */,
+				12DAD39BCB005B8DCEC45B63 /* whatcan_questions_and_notices_to_you.webp */,
+				178BCE9673819B7248F70184 /* whatcan_quick_settings_tile.webp */,
+				583A4D1342EDEEA15639E406 /* whatcan_reach_bridgit_without_tailscale_relay.webp */,
+				358378C6FE18DF726550E303 /* whatcan_read_notifications.webp */,
+				B181A65BFCEC0303ECCEF525 /* whatcan_read_text_on_the_phone.webp */,
+				D3AAE382ABFA1E081D74622B /* whatcan_record_a_short_clip.webp */,
+				4DAAFC1DA37C4B79D7DC5243 /* whatcan_report_a_bug_or_ask_for_a_feature.webp */,
+				49BF7ECD11112ED243838E96 /* whatcan_rich_html_cards.webp */,
+				38424D1822FB7714C8379242 /* whatcan_screen_sharing_as_a_fallback.webp */,
+				C0F6BDCCBF4DA5A3B6645284 /* whatcan_send_a_screenshot.webp */,
+				B940CF7CEFCE0D0BDEF483DF /* whatcan_sensors.webp */,
+				C732F50A23887A2514B2F903 /* whatcan_share_to_an_agent.webp */,
+				2EAC2F7653364346C1ADE8DB /* whatcan_short_video_clips.webp */,
+				A00CADBC9599FE54CB6EF160 /* whatcan_take_a_photo.webp */,
+				FF3DD3C09E5E052DBFFC3D7A /* whatcan_the_api_explains_itself.webp */,
+				145D6E4EE9F19896E6F730BC /* whatcan_transcribe_clips_on_the_phone.webp */,
+				F67F95E72E3395D9CE3D38BC /* whatcan_videos_and_downloads.webp */,
+				44655BB6611B961B4ABD45F6 /* whatcan_wake_words.webp */,
+				04DB8524712B179AAD01985D /* whatcan_you_stay_in_control.webp */,
+				4A5E4F5558ACDED7D22EC534 /* whatcan_your_latest_screenshot_or_photo.webp */,
+			);
+			path = "drawable-nodpi";
+			sourceTree = "<group>";
+		};
+		D0EBE9E398FF341C3E9791D1 /* res */ = {
+			isa = PBXGroup;
+			children = (
+				C7CF429A633B6FC2312DA2DD /* drawable-nodpi */,
+			);
+			path = res;
+			sourceTree = "<group>";
+		};
+		EDD60AB1D38BA46783BC57BF /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				DCB437BCA928F31B8363B734 /* AgentsDevicesViews.swift */,
+				4DA2FE0E3E22F0FC224967CA /* AppletCardsView.swift */,
+				BB66DFA77167F751D5B50FDC /* AppletPortalsView.swift */,
+				23B4ABF262B3BD15E8791C4D /* AppletsView.swift */,
+				4A8D58B4F1E8C5FF26D9EE6B /* CameraView.swift */,
+				B41F84442FA0CE188A031819 /* DeviceBar.swift */,
+				79D8274B8318DECFB02D5725 /* DeviceCameraView.swift */,
+				0CF1044F931B61282239746C /* DevicesViews.swift */,
+				C9F1F94488C8B7DC31115BA9 /* HomeSceneView.swift */,
+				DAA20FDD0E812E90DD666806 /* HomeView.swift */,
+				6DF19381EEADBC87F0098CB6 /* LocalCameraTab.swift */,
+				B6B248BDF93EAE379717438C /* MoreView.swift */,
+				34F1D7DE6BAD80DBC5D5363F /* SignInPairViews.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		F436BF50EDC4E59BC4505D04 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				CB07CA1C3FCBF7836A9F10F6 /* AbilityCatalog.json */,
+				B7472892CD66FCC5DCCCA15D /* AbilityCatalogView.swift */,
+				FFF07E9E57E734CF1226069B /* AboutBridgitButton.swift */,
+				B449A299A92B9CB60350F72A /* AppleFixtureWorkspace.swift */,
+				7CD24C7252A7ED1B954B1D5E /* BridgitDialog.swift */,
+				9DD0D9788FEC298C7AA62C46 /* BuildStamp.swift */,
+				9E57523F1560D1AA46719B49 /* CrashReports.swift */,
+				A758C45A48CAB1AB93048ED1 /* DeviceTypeDescription.swift */,
+				E46E5C09E11E0A67DA06C8D9 /* Keychain.swift */,
+				8C08221EF4E86B016F8B22ED /* LinkedDeviceMap.swift */,
+				357F1AE55672710D51F610C3 /* MacUpdates.swift */,
+				1EFDA81568674E9D9A15A8C8 /* MoreSearch.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		F7E8156D63FC3AE144F0DBA7 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				C9059FEC55292E1C899BFB30 /* AppletDeviceLists.swift */,
+				9F677BACD9796BBFDF67DC94 /* SampleData.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		FB785A9FFB20EAC5625686E8 /* Live */ = {
+			isa = PBXGroup;
+			children = (
+				7908C82704C657BE1721AA05 /* PhoneLive.swift */,
+				4453DE051E31F2D5C103647A /* PortalDevice.swift */,
+			);
+			path = Live;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		30DDDE2FCDE497995539AEA5 /* Bridgit-Share-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 486CCCFB888D7289145A4D4C /* Build configuration list for PBXNativeTarget "Bridgit-Share-iOS" */;
+			buildPhases = (
+				13118583E82DE525A09AC677 /* Sources */,
+				11F736A3658D977BEDC12114 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Bridgit-Share-iOS";
+			packageProductDependencies = (
+				3F46DC1796A0DF3D37E8D1CD /* BridgitCore */,
+			);
+			productName = "Bridgit-Share-iOS";
+			productReference = 2FD09D5060903E18AF6FEA1B /* BridgitShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		BA5EB13F8EB943FA762FE151 /* Bridgit-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2BA80B3652F3AEFE857F1B89 /* Build configuration list for PBXNativeTarget "Bridgit-macOS" */;
+			buildPhases = (
+				57D79A7D03A76483D8954151 /* Sources */,
+				DD4E0A51B52A6A18E96DE437 /* Record source revision for About */,
+				363932CCFAE84C1C306DA963 /* Copy the APK Home scene */,
+				44B29613C1AA82B03B9C326A /* Copy the APK device brand logos */,
+				4CAA34622BD42F1DB9C6D8AC /* Copy the shared card library */,
+				7977F7762E25B5D89D52A4B5 /* Resources */,
+				4CDB2185694EC774B58512E0 /* Frameworks */,
+				649BD0F0F2F5E192CA32946D /* Embed Foundation Extensions */,
+				91FBAC9A39738B56BF504391 /* Crash reporting address (Sentry DSN) */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA8913FF38962685E8C18C97 /* PBXTargetDependency */,
+			);
+			name = "Bridgit-macOS";
+			packageProductDependencies = (
+				714A315AC5C0753EF19117D7 /* BridgitCore */,
+				47D664FD9DE8EAA3CAE99EC3 /* BridgitAppletRuntime */,
+				C1F2A6D509413BA0C7CB2602 /* BridgitSpeech */,
+				A20BA50B642DAA53A93F894C /* Sentry */,
+			);
+			productName = "Bridgit-macOS";
+			productReference = 19E25C1321A9336E3D9598DD /* Bridgit-macOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C75E215066D7706B96A0D43B /* Bridgit-iOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BCAE24C3A243C54A02A6D05B /* Build configuration list for PBXNativeTarget "Bridgit-iOSTests" */;
+			buildPhases = (
+				7B60527FBFDA68FC46D7DDBE /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5E2EB14536B86AD157075A14 /* PBXTargetDependency */,
+			);
+			name = "Bridgit-iOSTests";
+			packageProductDependencies = (
+			);
+			productName = "Bridgit-iOSTests";
+			productReference = 1E2B988B97E29D364FA051CE /* Bridgit-iOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D4CB9BCD44217525DA80BFA5 /* Bridgit-macOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 829A7DA028110C772F4EB6DC /* Build configuration list for PBXNativeTarget "Bridgit-macOSTests" */;
+			buildPhases = (
+				DEA9D3654D07C7A7191DDC64 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F4B757626B56917215E167DB /* PBXTargetDependency */,
+			);
+			name = "Bridgit-macOSTests";
+			packageProductDependencies = (
+			);
+			productName = "Bridgit-macOSTests";
+			productReference = 24C96B4304B0B23D8CBB890E /* Bridgit-macOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E9FC17882CCF105A4833FEF9 /* Bridgit-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C68DE961B0354C31CCCE3045 /* Build configuration list for PBXNativeTarget "Bridgit-iOS" */;
+			buildPhases = (
+				5EED4523F59A1FFDC8CDA2C5 /* Sources */,
+				A5CC04BA267854AE46549FEE /* Record source revision for About */,
+				1AB518F43C40D2599F4518D4 /* Copy the APK Home scene */,
+				912879AAC1077C804A447597 /* Copy bundled applet packages */,
+				C1EACC2B603F78796C3D45D7 /* Copy the APK device brand logos */,
+				CFA8F7BEC409D1625046E2E0 /* Resources */,
+				194609AB2E0C7E5F56005D6D /* Frameworks */,
+				7531173B67EBF424541E30BC /* Embed Foundation Extensions */,
+				1656B533E8BD866A40900CDC /* Crash reporting address (Sentry DSN) */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				26EEE0616CACED7C3B523B86 /* PBXTargetDependency */,
+			);
+			name = "Bridgit-iOS";
+			packageProductDependencies = (
+				FC4AFEFA342CD3A5655AE1BE /* BridgitCore */,
+				F4A2372D438DE914A1BB6B48 /* BridgitAppletRuntime */,
+				51D3D85073964487143E1E65 /* BridgitSpeech */,
+				9EE92B684228F1C25334F5C3 /* Sentry */,
+			);
+			productName = "Bridgit-iOS";
+			productReference = 877D1E2AAD28FAD4ABC0C27B /* Bridgit-iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F881954BF2A1226B637C6DA7 /* Bridgit-ParityUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 59F01BEF094465C00723D42B /* Build configuration list for PBXNativeTarget "Bridgit-ParityUITests" */;
+			buildPhases = (
+				5A3656BC08B0DDE4DE406143 /* Sources */,
+				5CDEB7B256B6FABAE535946F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2DC4DB71ACC4119721011561 /* PBXTargetDependency */,
+			);
+			name = "Bridgit-ParityUITests";
+			packageProductDependencies = (
+			);
+			productName = "Bridgit-ParityUITests";
+			productReference = EBE61133C37BBFAEB0A30B17 /* Bridgit-ParityUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		FA680A398B3916A70E366EDB /* Bridgit-Share-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96BA038A74BFBD833B980718 /* Build configuration list for PBXNativeTarget "Bridgit-Share-macOS" */;
+			buildPhases = (
+				D7D981CE2AA902C7A209EC0D /* Sources */,
+				B9F69CF68129E35E2AA7B3F6 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Bridgit-Share-macOS";
+			packageProductDependencies = (
+				58ECACCCC8F09DC4379E9DF8 /* BridgitCore */,
+			);
+			productName = "Bridgit-Share-macOS";
+			productReference = 71B4CD613D07FAE2F88A2244 /* BridgitShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B6123DC162B1243B8281D995 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					30DDDE2FCDE497995539AEA5 = {
+						DevelopmentTeam = 9QHUBZYQ86;
+						ProvisioningStyle = Automatic;
+					};
+					BA5EB13F8EB943FA762FE151 = {
+						DevelopmentTeam = 9QHUBZYQ86;
+						ProvisioningStyle = Manual;
+					};
+					C75E215066D7706B96A0D43B = {
+						DevelopmentTeam = 9QHUBZYQ86;
+						ProvisioningStyle = Automatic;
+					};
+					D4CB9BCD44217525DA80BFA5 = {
+						DevelopmentTeam = 9QHUBZYQ86;
+						ProvisioningStyle = Manual;
+					};
+					E9FC17882CCF105A4833FEF9 = {
+						DevelopmentTeam = 9QHUBZYQ86;
+					};
+					F881954BF2A1226B637C6DA7 = {
+						DevelopmentTeam = 9QHUBZYQ86;
+						ProvisioningStyle = Automatic;
+						TestTargetID = E9FC17882CCF105A4833FEF9;
+					};
+					FA680A398B3916A70E366EDB = {
+						DevelopmentTeam = 9QHUBZYQ86;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 59D190B58C0FA40D0FB02305 /* Build configuration list for PBXProject "Bridgit" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 41A12425FE2F3763B07B79B4;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6FA626D58668FCAFAE7410F6 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				D29315119D17DD55F1B00ABB /* XCLocalSwiftPackageReference "BridgitAppletRuntime" */,
+				05355A2B0D923CA80EDC0F56 /* XCLocalSwiftPackageReference "BridgitCore" */,
+				277CC268363662503D9317A9 /* XCLocalSwiftPackageReference "BridgitSpeech" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = BA986C5F995241C0B0783743 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E9FC17882CCF105A4833FEF9 /* Bridgit-iOS */,
+				F881954BF2A1226B637C6DA7 /* Bridgit-ParityUITests */,
+				C75E215066D7706B96A0D43B /* Bridgit-iOSTests */,
+				BA5EB13F8EB943FA762FE151 /* Bridgit-macOS */,
+				D4CB9BCD44217525DA80BFA5 /* Bridgit-macOSTests */,
+				30DDDE2FCDE497995539AEA5 /* Bridgit-Share-iOS */,
+				FA680A398B3916A70E366EDB /* Bridgit-Share-macOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5CDEB7B256B6FABAE535946F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				520FCFA5052BE31AC9214FDC /* applet-page-fixture.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7977F7762E25B5D89D52A4B5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A37CC410758E301B1FC89A05 /* AbilityCatalog.json in Resources */,
+				BB8788DDD8EF5FD39AEAF269 /* Assets.xcassets in Resources */,
+				6977169EC1AFA62607E34B30 /* Assets.xcassets in Resources */,
+				2E811C9F22CC1286E3B54CB8 /* Localizable.xcstrings in Resources */,
+				C4F3DAC2E119D43E0279107A /* PrivacyInfo.xcprivacy in Resources */,
+				E1100E99407AC7C011880CF2 /* samples.json in Resources */,
+				27E98EB051E05268852B38E1 /* whatcan_add_an_agent_in_a_minute.webp in Resources */,
+				039F2DEA638B20A08FF2D4B5 /* whatcan_agent_notes.webp in Resources */,
+				1D9E494D92C7088AD7CE3E9C /* whatcan_agents_learn_what_s_new.webp in Resources */,
+				D3ABFB1DD9E14F197C5001E0 /* whatcan_app_usage.webp in Resources */,
+				3E2D6ED5ACBCEEA889E43BC8 /* whatcan_check_for_updates.webp in Resources */,
+				8FAD60D6E067DB2E0A888A96 /* whatcan_city_tour.webp in Resources */,
+				4AE2EB9AAE0EF068D9857F9E /* whatcan_copy_to_clipboard.webp in Resources */,
+				B9423EED35A8DEB9A2533937 /* whatcan_events_and_callbacks.webp in Resources */,
+				0D45ED266B66E61901A4E178 /* whatcan_everything_is_logged.webp in Resources */,
+				F7706B4BF36D7789D1A216E8 /* whatcan_files_to_your_phone.webp in Resources */,
+				4BA41DF77C4D3441C8EA51C7 /* whatcan_find_my_phone.webp in Resources */,
+				FD6B2A3E5780983568B792FD /* whatcan_find_photos_in_your_gallery.webp in Resources */,
+				A157119C53469BB630074D8C /* whatcan_flash_the_light.webp in Resources */,
+				BD340BB3ADF864DFE3B194EB /* whatcan_health_connect.webp in Resources */,
+				DEFDC53B4039BC659D6A92EC /* whatcan_inbox.webp in Resources */,
+				A921B505BF6671DF5BBBA8C2 /* whatcan_location_details.webp in Resources */,
+				6C48A842707ED88381BA3DA4 /* whatcan_location_history_and_places.webp in Resources */,
+				72BACB079B85ABDC0451081A /* whatcan_messages_contacts_calendar_calls.webp in Resources */,
+				617DCED8950F817FC5545AED /* whatcan_one_key_per_agent.webp in Resources */,
+				DC28925CD7323050AC084793 /* whatcan_only_over_tailscale.webp in Resources */,
+				F5BA75AB70AA4913B103C613 /* whatcan_open_a_link_or_app.webp in Resources */,
+				A185983B9B3C43DD40B9DDCE /* whatcan_per_agent_permissions.webp in Resources */,
+				6684A8708FD12479C8ABAF56 /* whatcan_phone_controls.webp in Resources */,
+				85A010EBA227E6EDC001927A /* whatcan_phone_status_and_context.webp in Resources */,
+				5E1705F8A257DB05676BF25E /* whatcan_play_an_audio_file.webp in Resources */,
+				24867A1EBC8060F13345CFE0 /* whatcan_questions_and_notices_to_you.webp in Resources */,
+				E05FFB10CFA6A6D28675EC5D /* whatcan_quick_settings_tile.webp in Resources */,
+				95A620E07A8FBC08E6D8FA7C /* whatcan_reach_bridgit_without_tailscale_relay.webp in Resources */,
+				8676B8D7DA085E70CB8DA9E8 /* whatcan_read_notifications.webp in Resources */,
+				FC30D256EF7066252AD1FC49 /* whatcan_read_text_on_the_phone.webp in Resources */,
+				DB527BB1826ED8D61C4DA016 /* whatcan_record_a_short_clip.webp in Resources */,
+				0F7FF53B601B3D25C5BE65A9 /* whatcan_report_a_bug_or_ask_for_a_feature.webp in Resources */,
+				CA477A8E264BB0EB6E59682B /* whatcan_rich_html_cards.webp in Resources */,
+				A088F2B5F756D5F094D8B6EC /* whatcan_screen_sharing_as_a_fallback.webp in Resources */,
+				A86ABB0B9B2FCBB404629575 /* whatcan_send_a_screenshot.webp in Resources */,
+				5B36B6A34BB35A96C2813DF2 /* whatcan_sensors.webp in Resources */,
+				E2D0FE31C4232AC4987A1A67 /* whatcan_share_to_an_agent.webp in Resources */,
+				C531C5AF1062261B9FAA9741 /* whatcan_short_video_clips.webp in Resources */,
+				9F756C64BF81073475BB371A /* whatcan_take_a_photo.webp in Resources */,
+				C75F3DCB35EAD57210D3C3AC /* whatcan_the_api_explains_itself.webp in Resources */,
+				93E01DBE0D858C5B5831B625 /* whatcan_transcribe_clips_on_the_phone.webp in Resources */,
+				6859BFC733148FC64C947977 /* whatcan_videos_and_downloads.webp in Resources */,
+				851E55AAADAAA8F1DB5C8219 /* whatcan_wake_words.webp in Resources */,
+				1A1699CFDAB4B501B5533329 /* whatcan_you_stay_in_control.webp in Resources */,
+				31BEAAACDF31E62EC71E3994 /* whatcan_your_latest_screenshot_or_photo.webp in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CFA8F7BEC409D1625046E2E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B4D2970E56B00DEBE9BBD32B /* AbilityCatalog.json in Resources */,
+				12E3A83E20BBCD9249BE9FA2 /* Assets.xcassets in Resources */,
+				0E5271109EBC92317437BF3E /* Assets.xcassets in Resources */,
+				1D530AC7F45E563F73A46CE2 /* BricolageGrotesque-Bold.ttf in Resources */,
+				3BC40CF82AAA0E8764FD5C2D /* Localizable.xcstrings in Resources */,
+				0984EEE09995A11020A3DB11 /* OFL.txt in Resources */,
+				CAFBD87F2C1F2BA7A6AE2FAD /* PrivacyInfo.xcprivacy in Resources */,
+				7F1A9CB2F1BC60FDAA3D461A /* samples.json in Resources */,
+				7A8E807ACA9ABEA2A25529E6 /* whatcan_add_an_agent_in_a_minute.webp in Resources */,
+				5CED8D687A06E09E326B190A /* whatcan_agent_notes.webp in Resources */,
+				C9EEEE0C068318E46F1FFE7C /* whatcan_agents_learn_what_s_new.webp in Resources */,
+				075784F9C253A189E70B0E3B /* whatcan_app_usage.webp in Resources */,
+				ECF31E222887A425191F98B4 /* whatcan_check_for_updates.webp in Resources */,
+				7F4F06C7410C690CC5B04238 /* whatcan_city_tour.webp in Resources */,
+				2D6183E9E9A6B982D7CAC5D3 /* whatcan_copy_to_clipboard.webp in Resources */,
+				394D8A7018C0CE7396D19B4E /* whatcan_events_and_callbacks.webp in Resources */,
+				CDB8E6FAE69F9E62C12BCB0E /* whatcan_everything_is_logged.webp in Resources */,
+				5B779CCE6180DE08E027E21B /* whatcan_files_to_your_phone.webp in Resources */,
+				D9E8016458BA2D2AD638995B /* whatcan_find_my_phone.webp in Resources */,
+				A754F9507B80C029D5892A4C /* whatcan_find_photos_in_your_gallery.webp in Resources */,
+				0AC7BB52F12B1191061EB740 /* whatcan_flash_the_light.webp in Resources */,
+				31925BF1AB268DC6D2136E3C /* whatcan_health_connect.webp in Resources */,
+				0E7A8FD3A417A6C470AD671C /* whatcan_inbox.webp in Resources */,
+				FA7E3B555A3AA032409441B8 /* whatcan_location_details.webp in Resources */,
+				08846B2FDF3F9301E8B38E70 /* whatcan_location_history_and_places.webp in Resources */,
+				4380A45283486936401DCAF5 /* whatcan_messages_contacts_calendar_calls.webp in Resources */,
+				B0ED4C3BC980FC2DED94FC98 /* whatcan_one_key_per_agent.webp in Resources */,
+				F0534E692FF851B157F635C9 /* whatcan_only_over_tailscale.webp in Resources */,
+				5E9512E401C19F8E836D3BCB /* whatcan_open_a_link_or_app.webp in Resources */,
+				11150D1BDCE9A493DE20A0F3 /* whatcan_per_agent_permissions.webp in Resources */,
+				56B685A07D7EF7E6A82C5A91 /* whatcan_phone_controls.webp in Resources */,
+				63966DF4C945AB76CDF4A16D /* whatcan_phone_status_and_context.webp in Resources */,
+				A88D2D073C48BF9351AEA2D2 /* whatcan_play_an_audio_file.webp in Resources */,
+				B29A2A577266F0D93B3DEE07 /* whatcan_questions_and_notices_to_you.webp in Resources */,
+				0073B41F7D4B3844929579F8 /* whatcan_quick_settings_tile.webp in Resources */,
+				18501EDEEA50DFDEA150D788 /* whatcan_reach_bridgit_without_tailscale_relay.webp in Resources */,
+				C0FCEA625327E96DFE6C22D8 /* whatcan_read_notifications.webp in Resources */,
+				DD75F36637271FD9320909E7 /* whatcan_read_text_on_the_phone.webp in Resources */,
+				9A571421038F1A5662216E11 /* whatcan_record_a_short_clip.webp in Resources */,
+				1E81FE7EEF74AE00DCFABF7D /* whatcan_report_a_bug_or_ask_for_a_feature.webp in Resources */,
+				F024623F9067239C0D4731FF /* whatcan_rich_html_cards.webp in Resources */,
+				87B149BEE4D5CAA04A82C3F4 /* whatcan_screen_sharing_as_a_fallback.webp in Resources */,
+				155F9C0C789D7ED20FFDDAF6 /* whatcan_send_a_screenshot.webp in Resources */,
+				C2BB5FCB07CB208EFAB9DDCB /* whatcan_sensors.webp in Resources */,
+				26C74DFC4E536747D9F7E821 /* whatcan_share_to_an_agent.webp in Resources */,
+				A5B25E9FDC72A3EDDF91D50A /* whatcan_short_video_clips.webp in Resources */,
+				6A2AD3C92BE45188BDDC368C /* whatcan_take_a_photo.webp in Resources */,
+				4C480B0193D06666EB879BF3 /* whatcan_the_api_explains_itself.webp in Resources */,
+				87B013DD4BED3AB307F0A0A1 /* whatcan_transcribe_clips_on_the_phone.webp in Resources */,
+				D2B05CA6AD0D2EC34FC09EA7 /* whatcan_videos_and_downloads.webp in Resources */,
+				42C089DD7603CDDBA9F672E8 /* whatcan_wake_words.webp in Resources */,
+				5DB06BBB3884BD0B38DA84D5 /* whatcan_you_stay_in_control.webp in Resources */,
+				CB0DAB1BC52172DA565746D4 /* whatcan_your_latest_screenshot_or_photo.webp in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1656B533E8BD866A40900CDC /* Crash reporting address (Sentry DSN) */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../tools/package-apple-crash-reporting.sh",
+			);
+			name = "Crash reporting address (Sentry DSN)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/CrashReporting.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"$SCRIPT_INPUT_FILE_0\"";
+		};
+		1AB518F43C40D2599F4518D4 /* Copy the APK Home scene */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../app/src/main/assets/diagnostics/scene.html",
+				"$(SRCROOT)/../app/src/main/assets/diagnostics/home-status.js",
+				"$(SRCROOT)/../app/src/main/assets/diagnostics/symbols.woff2",
+				"$(SRCROOT)/../app/src/main/assets/diagnostics/portal-overlay.js",
+				"$(SRCROOT)/../app/src/main/assets/diagnostics/devices.html",
+			);
+			name = "Copy the APK Home scene";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/scene.html",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/home-status.js",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/symbols.woff2",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/portal-overlay.js",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/devices.html",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# One source of truth: the same scene files the APK ships (app/src/main/assets/diagnostics):\n# Home's scene and the Devices tab's map.\nset -e\ndest=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/diagnostics\"\nmkdir -p \"$dest\"\ncp \"$SRCROOT/../app/src/main/assets/diagnostics/scene.html\" \"$SRCROOT/../app/src/main/assets/diagnostics/home-status.js\" \"$SRCROOT/../app/src/main/assets/diagnostics/symbols.woff2\" \"$SRCROOT/../app/src/main/assets/diagnostics/portal-overlay.js\" \"$SRCROOT/../app/src/main/assets/diagnostics/devices.html\" \"$dest/\"\n";
+		};
+		363932CCFAE84C1C306DA963 /* Copy the APK Home scene */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../app/src/main/assets/diagnostics/scene.html",
+				"$(SRCROOT)/../app/src/main/assets/diagnostics/home-status.js",
+				"$(SRCROOT)/../app/src/main/assets/diagnostics/symbols.woff2",
+				"$(SRCROOT)/../app/src/main/assets/diagnostics/portal-overlay.js",
+				"$(SRCROOT)/../app/src/main/assets/diagnostics/devices.html",
+			);
+			name = "Copy the APK Home scene";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/scene.html",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/home-status.js",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/symbols.woff2",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/portal-overlay.js",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/diagnostics/devices.html",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# One source of truth: the same scene files the APK ships (app/src/main/assets/diagnostics):\n# Home's scene and the Devices tab's map.\nset -e\ndest=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/diagnostics\"\nmkdir -p \"$dest\"\ncp \"$SRCROOT/../app/src/main/assets/diagnostics/scene.html\" \"$SRCROOT/../app/src/main/assets/diagnostics/home-status.js\" \"$SRCROOT/../app/src/main/assets/diagnostics/symbols.woff2\" \"$SRCROOT/../app/src/main/assets/diagnostics/portal-overlay.js\" \"$SRCROOT/../app/src/main/assets/diagnostics/devices.html\" \"$dest/\"\n";
+		};
+		44B29613C1AA82B03B9C326A /* Copy the APK device brand logos */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy the APK device brand logos";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The APK's bundled brand logos and catalog (app/src/main/assets/device-brands), next to diagnostics/\n# so the map page's ../device-brands/ paths resolve. Always re-synced; it is a handful of small files.\n# The List draws logos natively, and UIImage can't read SVG, so each SVG is also rendered to PNG\n# (brand-logos/<asset>.png) with macOS Quick Look. Without a render, the app shows the brand's name instead.\nset -e\nsrc=\"$SRCROOT/../app/src/main/assets/device-brands\"\nres=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nmkdir -p \"$res/device-brands\" \"$res/brand-logos\"\nrsync -a --delete \"$src/\" \"$res/device-brands/\"\n# Each SVG is drawn on a mid-grey backdrop (#808080) first, so white logos survive Quick Look's white page;\n# the app turns that grey back into transparency (BrandImages.trim).\ncache=\"$DERIVED_FILE_DIR/brand-logos\"\nwork=\"$DERIVED_FILE_DIR/brand-logos-src\"\nmkdir -p \"$cache\" \"$work\"\nfor f in \"$src\"/*.svg; do\n  name=\"$(basename \"$f\")\"\n  out=\"$cache/$name.png\"\n  if [ ! -f \"$out\" ] || [ \"$f\" -nt \"$out\" ]; then\n    perl -0pe 's/(<svg\\b[^>]*>)/$1<rect x=\"-100000\" y=\"-100000\" width=\"200000\" height=\"200000\" fill=\"#808080\"\\/>/s' \"$f\" > \"$work/$name\"\n    qlmanage -t -s 256 -o \"$cache\" \"$work/$name\" >/dev/null 2>&1 || echo \"warning: no PNG render for $name\"\n  fi\ndone\nrsync -a --delete \"$cache/\" \"$res/brand-logos/\"\n";
+		};
+		4CAA34622BD42F1DB9C6D8AC /* Copy the shared card library */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../applets/insurance-inventory/applet.json",
+				"$(SRCROOT)/../applets/a-sorta-fairytale-about-me/applet.json",
+				"$(SRCROOT)/../applets/chef-helper/applet.json",
+				"$(SRCROOT)/../applets/exercise-check/applet.json",
+				"$(SRCROOT)/../applets/dog-monitor/applet.json",
+			);
+			name = "Copy the shared card library";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/insurance-inventory.json",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/a-sorta-fairytale-about-me.json",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/chef-helper.json",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/exercise-check.json",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/dog-monitor.json",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nmkdir -p \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Applets\"\nfor id in insurance-inventory chef-helper a-sorta-fairytale-about-me exercise-check dog-monitor; do\n  cp \"$SRCROOT/../applets/$id/applet.json\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Applets/$id.json\"\ndone\n";
+		};
+		912879AAC1077C804A447597 /* Copy bundled applet packages */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../applets/insurance-inventory/applet.json",
+				"$(SRCROOT)/../applets/a-sorta-fairytale-about-me/applet.json",
+				"$(SRCROOT)/../applets/chef-helper/applet.json",
+				"$(SRCROOT)/../applets/exercise-check/applet.json",
+				"$(SRCROOT)/../applets/dog-monitor/applet.json",
+			);
+			name = "Copy bundled applet packages";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/insurance-inventory.json",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/a-sorta-fairytale-about-me.json",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/chef-helper.json",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/exercise-check.json",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Applets/dog-monitor.json",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nmkdir -p \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Applets\"\nfor id in insurance-inventory chef-helper a-sorta-fairytale-about-me exercise-check dog-monitor; do\n  cp \"$SRCROOT/../applets/$id/applet.json\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Applets/$id.json\"\ndone\n";
+		};
+		91FBAC9A39738B56BF504391 /* Crash reporting address (Sentry DSN) */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../tools/package-apple-crash-reporting.sh",
+			);
+			name = "Crash reporting address (Sentry DSN)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/CrashReporting.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"$SCRIPT_INPUT_FILE_0\"";
+		};
+		A5CC04BA267854AE46549FEE /* Record source revision for About */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Record source revision for About";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/BuildRevision.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nrevision=\"\"\nif revision=$(git -C \"$SRCROOT\" rev-parse --short=12 HEAD 2>/dev/null); then\n  if [ -n \"$(git -C \"$SRCROOT\" status --porcelain --untracked-files=normal)\" ]; then\n    revision=\"$revision*\"\n  fi\nfi\nprintf '%s\\n' \"$revision\" > \"$SCRIPT_OUTPUT_FILE_0\"\n";
+		};
+		C1EACC2B603F78796C3D45D7 /* Copy the APK device brand logos */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy the APK device brand logos";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The APK's bundled brand logos and catalog (app/src/main/assets/device-brands), next to diagnostics/\n# so the map page's ../device-brands/ paths resolve. Always re-synced; it is a handful of small files.\n# The List draws logos natively, and UIImage can't read SVG, so each SVG is also rendered to PNG\n# (brand-logos/<asset>.png) with macOS Quick Look. Without a render, the app shows the brand's name instead.\nset -e\nsrc=\"$SRCROOT/../app/src/main/assets/device-brands\"\nres=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nmkdir -p \"$res/device-brands\" \"$res/brand-logos\"\nrsync -a --delete \"$src/\" \"$res/device-brands/\"\n# Each SVG is drawn on a mid-grey backdrop (#808080) first, so white logos survive Quick Look's white page;\n# the app turns that grey back into transparency (BrandImages.trim).\ncache=\"$DERIVED_FILE_DIR/brand-logos\"\nwork=\"$DERIVED_FILE_DIR/brand-logos-src\"\nmkdir -p \"$cache\" \"$work\"\nfor f in \"$src\"/*.svg; do\n  name=\"$(basename \"$f\")\"\n  out=\"$cache/$name.png\"\n  if [ ! -f \"$out\" ] || [ \"$f\" -nt \"$out\" ]; then\n    perl -0pe 's/(<svg\\b[^>]*>)/$1<rect x=\"-100000\" y=\"-100000\" width=\"200000\" height=\"200000\" fill=\"#808080\"\\/>/s' \"$f\" > \"$work/$name\"\n    qlmanage -t -s 256 -o \"$cache\" \"$work/$name\" >/dev/null 2>&1 || echo \"warning: no PNG render for $name\"\n  fi\ndone\nrsync -a --delete \"$cache/\" \"$res/brand-logos/\"\n";
+		};
+		DD4E0A51B52A6A18E96DE437 /* Record source revision for About */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Record source revision for About";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/BuildRevision.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nrevision=\"\"\nif revision=$(git -C \"$SRCROOT\" rev-parse --short=12 HEAD 2>/dev/null); then\n  if [ -n \"$(git -C \"$SRCROOT\" status --porcelain --untracked-files=normal)\" ]; then\n    revision=\"$revision*\"\n  fi\nfi\nprintf '%s\\n' \"$revision\" > \"$SCRIPT_OUTPUT_FILE_0\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		13118583E82DE525A09AC677 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31CE833F1AAE821CBBC52DD4 /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		57D79A7D03A76483D8954151 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7BE8C6626337E8905848E521 /* AbilityCatalogView.swift in Sources */,
+				673FD0905C5182E4A04BB233 /* AboutBridgitButton.swift in Sources */,
+				3A4076973900C9B508DD5AC6 /* AccountAgentRoster.swift in Sources */,
+				0172FB24B50BFF97222D1CCB /* AccountAgentRosterView.swift in Sources */,
+				9686229CF7BCB34CD2CE7BCD /* AgentMark.swift in Sources */,
+				264FEB17B0B0960B585F7259 /* AppleCamera.swift in Sources */,
+				4A174FC9C1D5FAE6957B78DE /* AppleFixtureWorkspace.swift in Sources */,
+				437D5D9DB1EC9D324367A4E4 /* AppletLists.swift in Sources */,
+				779B6B68FC4AF02581BC30AD /* AppletPageBrowser.swift in Sources */,
+				C0D26BE96606CAB5ED662471 /* BridgitDialog.swift in Sources */,
+				85728BE92A4DA15B3671890B /* BridgitMacApp.swift in Sources */,
+				9E5F91A64D10E07EF54F8263 /* BridgitNames.swift in Sources */,
+				52A9A4E42A64ACFFF6FFBB77 /* BuildInstructionsView.swift in Sources */,
+				5386144AEDB44924C518CF1B /* BuildStamp.swift in Sources */,
+				0C7F22F8553974B3B4931EDF /* CaptureNotices.swift in Sources */,
+				AE89B3877045B4304934C2B9 /* CardLibraryRow.swift in Sources */,
+				D891B40FD5ED5AC8344241B2 /* CardPreviewRules.swift in Sources */,
+				C8AFC982FC473375917AEEBF /* ConnectionsView.swift in Sources */,
+				7CE953133AF8E57C6B1FBEFC /* CrashReports.swift in Sources */,
+				BC801A5C67765F5ECE0FF57C /* DeviceCameraView.swift in Sources */,
+				08D17D4FDDF9B05B5F2956DC /* DevicePairingView.swift in Sources */,
+				5D9CE6258ACEB4E0C99BB5E2 /* DeviceTypeDescription.swift in Sources */,
+				E54FE215A4EFEC4C58FB6A1B /* DeviceWebLinkView.swift in Sources */,
+				F70BD272B337D1895FE35519 /* DevicesMapOptions.swift in Sources */,
+				40E15ADF77EB567AB6E12FF8 /* DiagnosticsSceneView.swift in Sources */,
+				E7680FF587DFB2568C524DA5 /* FeedbackEntries.swift in Sources */,
+				69536659265DD306FB65D33A /* FeedbackTeamKeys.swift in Sources */,
+				506E3B833C19D13559D67A88 /* FirstRunView.swift in Sources */,
+				F004A4DFCE6ADFB8F1DD12EC /* HardwareAccessView.swift in Sources */,
+				A82E8455C638C7CF55193367 /* InboundSharingModel.swift in Sources */,
+				D72294C027B27E98D8AC5703 /* InboundSharingView.swift in Sources */,
+				96011DCFAFC45F655B4A2482 /* Keychain.swift in Sources */,
+				002277FBCB5FE297583E5F0C /* LinkedDeviceMap.swift in Sources */,
+				BFCEF0F790C41EC158FBD6F3 /* LocalAppletModel.swift in Sources */,
+				CA0DD3D868FBE1AFCF723681 /* LocalAppletViews.swift in Sources */,
+				8277F4AFD267E899B2A433F9 /* LocalDeviceInfoView.swift in Sources */,
+				D68430E32B10005260B1907C /* LocalDiagnosticsView.swift in Sources */,
+				2648540E93C7630323DB3EB7 /* LocalHostModel.swift in Sources */,
+				F7D246B1248BB400F162A6F9 /* LocalHostViews.swift in Sources */,
+				3AFB3375EB22171F72320D45 /* LocalInteractionInbox.swift in Sources */,
+				32416D42A96D0400A090CDE6 /* LocalSpeechModel.swift in Sources */,
+				964ECDBC52CE66CB2D6AE37E /* MacAppletWebViews.swift in Sources */,
+				9C07BCFE278F74A5A9E2A16C /* MacAppletsView.swift in Sources */,
+				30D718F7CFB36CDE6F0C641C /* MacDiagnosticsView.swift in Sources */,
+				9E63443A72327AEA0A3BB959 /* MacLinkedAgentsView.swift in Sources */,
+				571BF8647101ED72C3BC18BF /* MacModel.swift in Sources */,
+				8FDA3BCD0F917609D8D51F1D /* MacNetworkDevicesView.swift in Sources */,
+				B53D2F4CDF60B55FAAC9DE89 /* MacRootView.swift in Sources */,
+				7784231B287ABBE852D28895 /* MacStatusItem.swift in Sources */,
+				F7A76FDD9F41CD7B24D94012 /* MacUpdates.swift in Sources */,
+				0FD6ADEA70C91A7A19873FA2 /* MoreSearch.swift in Sources */,
+				E7BADA7FD85F624D88F7C547 /* NetworkInventory.swift in Sources */,
+				590B0073EA551A13652EB1AE /* NetworkMapView.swift in Sources */,
+				3DC461F9A7CE379195431DFF /* OwnerConfigurationModel.swift in Sources */,
+				BB56120D4947E43E2CFCD5A5 /* OwnerConfigurationView.swift in Sources */,
+				D3B011F2152C3DF5338D0772 /* OwnerFilesView.swift in Sources */,
+				02598F21F93FA27F08A74696 /* OwnerPhotos.swift in Sources */,
+				7E9B82C27B71E992B9AC4161 /* PhotoTargetPicker.swift in Sources */,
+				5301CC9C1CA75F730101D44A /* PortableLibraryController.swift in Sources */,
+				21C8E1677791379EB301468B /* PortableLibraryViews.swift in Sources */,
+				BFCBCEF0F8BEB3935B02D338 /* SpeechAppletControls.swift in Sources */,
+				F77F2C745FB25F852C2BC4DF /* Theme.swift in Sources */,
+				DBEF148EAD71CA62308446EC /* ViewerConfiguration.swift in Sources */,
+				2F48122482272F15F887005C /* WatchClient.swift in Sources */,
+				014F517855D0D05E4FAA2E57 /* WatchModels.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A3656BC08B0DDE4DE406143 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8774A255CEFC30B7F3E4C756 /* AppletPageTests.swift in Sources */,
+				3A250C4547B14C7D024FFE0E /* DeviceDiagnosticsTests.swift in Sources */,
+				EEA067F95FD3142DA45E9995 /* InboxParityTests.swift in Sources */,
+				EA26AB6851CA6757458AF5B9 /* MoreParityTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EED4523F59A1FFDC8CDA2C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A6273BA8344A439F27CDCE1 /* AbilityCatalogView.swift in Sources */,
+				1D6946B4881B5DA55458518D /* AboutBridgitButton.swift in Sources */,
+				32A5C9C9C44C0CD07FAB9EBB /* AccountAgentRoster.swift in Sources */,
+				B350427F59A3CBD6B93E6582 /* AccountAgentRosterView.swift in Sources */,
+				A0C16DE0EF96932774F34FFB /* AgentMark.swift in Sources */,
+				A8BE409C0438749BEF8CBCD4 /* AgentsDevicesViews.swift in Sources */,
+				787FED1FC561C01A587AD00E /* AppModel.swift in Sources */,
+				C159C05D99598B4570D0E25F /* AppleApplicationDelegate.swift in Sources */,
+				9B717DFB728BC553953B3AA5 /* AppleCamera.swift in Sources */,
+				FB0C0473EBACE53996150819 /* AppleFixtureWorkspace.swift in Sources */,
+				0164571360002BACD09E3D04 /* AppletCardsView.swift in Sources */,
+				723DA1D600681C939D45B39E /* AppletDeviceLists.swift in Sources */,
+				B83EC4913BD1F506BE371A47 /* AppletLists.swift in Sources */,
+				5AF3406262D23F5911B5A88D /* AppletPageBrowser.swift in Sources */,
+				BD9037FB972EE24A2093D8E8 /* AppletPortalsView.swift in Sources */,
+				768D392483F0F460B63BEEF8 /* AppletsView.swift in Sources */,
+				E5E86C300203C2E27328B5B3 /* BridgitApp.swift in Sources */,
+				7C54A9070888AC3CAE9A3F4C /* BridgitDialog.swift in Sources */,
+				9886EFCDD806CC2EAF2E367D /* BridgitNames.swift in Sources */,
+				F41FC89429CE09C777FB8239 /* BuildInstructionsView.swift in Sources */,
+				ABEEFC95DB1B6713F9E4957A /* BuildStamp.swift in Sources */,
+				8EE12741D6EE7DC2C29ADBD5 /* CameraView.swift in Sources */,
+				67DC1AC32DEC43F216561A3C /* CaptureNotices.swift in Sources */,
+				AED4992EE4D22D3B7462087A /* CardLibraryRow.swift in Sources */,
+				1B44A281D2255CF23CB5ABA4 /* CardPreviewRules.swift in Sources */,
+				60C6AB6A7C4F592FA4C04A80 /* ConnectionsView.swift in Sources */,
+				092BCEC768412858A1ED64BD /* CrashReports.swift in Sources */,
+				A6A7E1B7A5FD1638913AE814 /* DeviceBar.swift in Sources */,
+				488083FA8F95676E2EEDF5E6 /* DeviceCameraView.swift in Sources */,
+				FE7002974C1E1A44056F8480 /* DevicePairingView.swift in Sources */,
+				E93CDFA979A749E9860C77B4 /* DeviceTypeDescription.swift in Sources */,
+				3FEBAC40E32CF00C45CA4200 /* DeviceWebLinkView.swift in Sources */,
+				5BBA3AB95C214E4E90C89056 /* DevicesMapOptions.swift in Sources */,
+				01F068E6D6B4E7B7792AF88A /* DevicesViews.swift in Sources */,
+				1BABC05FDCB9ECE47A24687A /* DiagnosticsSceneView.swift in Sources */,
+				17D7B6C36EE1EF5D1BAAB8B1 /* FeedbackEntries.swift in Sources */,
+				B90EB1A4AE7F27478A00D9F3 /* FeedbackTeamKeys.swift in Sources */,
+				D37DA04DF3A214396A496880 /* FirstRunView.swift in Sources */,
+				AEBE3466CA68A6AA7A062726 /* HardwareAccessView.swift in Sources */,
+				945C0401E97D9B513C16B976 /* HomeSceneView.swift in Sources */,
+				346644D4C22A6AEFCE96B75A /* HomeView.swift in Sources */,
+				74821F551300A2DDB7BAE9EE /* InboundSharingModel.swift in Sources */,
+				7C7B9445244FED837AB372AF /* InboundSharingView.swift in Sources */,
+				0985D70B9C5ADF6573C4E15C /* Keychain.swift in Sources */,
+				EAD27F7935C15146222228A5 /* LinkedDeviceMap.swift in Sources */,
+				CB76AA857CFA6BE8EA64E40C /* LocalAppletModel.swift in Sources */,
+				1D3FE75855B75C439A475FE4 /* LocalAppletViews.swift in Sources */,
+				E1E8A0AED93CA6E17D1AF862 /* LocalCameraTab.swift in Sources */,
+				9D5479A7A183E1F70D5FDA92 /* LocalDeviceInfoView.swift in Sources */,
+				B29F9F17D6EBFF63A165BF0F /* LocalDiagnosticsView.swift in Sources */,
+				EA7488CC558D092874C376BF /* LocalHostModel.swift in Sources */,
+				32EF7FF2B96BCA5249D221B7 /* LocalHostViews.swift in Sources */,
+				4A0B43EB9245DA886BD6C487 /* LocalInteractionInbox.swift in Sources */,
+				ED705EBDD9D73E2BEF1DCD6A /* LocalSpeechModel.swift in Sources */,
+				B8D47F6128D0FA54D30EE3AC /* MacUpdates.swift in Sources */,
+				9AC20368F81A61BD3E062C10 /* MoreSearch.swift in Sources */,
+				E2703AA3A2CC70A5A2C9CF05 /* MoreView.swift in Sources */,
+				4B72A226EBB90AF114AE70DA /* NetworkInventory.swift in Sources */,
+				CB7151D4487D40E6B3C85A4E /* NetworkMapView.swift in Sources */,
+				81A902201BBFD2099846482B /* OwnerConfigurationModel.swift in Sources */,
+				A098FF1C21635E32512A948E /* OwnerConfigurationView.swift in Sources */,
+				4B5CA544C0923C75EA796BFB /* OwnerFilesView.swift in Sources */,
+				BC03800184E7E47D5DDEC3F0 /* OwnerPhotos.swift in Sources */,
+				A0E11889A3806CD3AE67BAAC /* PhoneLive.swift in Sources */,
+				541C2C3A6C8AEFE95BE9955F /* PhotoTargetPicker.swift in Sources */,
+				4E6E807730750C842979093F /* PortableLibraryController.swift in Sources */,
+				419F22E5A87A3A3338B5F55C /* PortableLibraryViews.swift in Sources */,
+				3155776BA04DA16F1673131B /* PortalDevice.swift in Sources */,
+				2A5B85763D7A83CACD33F3DF /* RelayStore.swift in Sources */,
+				5A1875673E5781940D83776A /* SampleData.swift in Sources */,
+				402A4A97E82261165B91D25F /* SignIn.swift in Sources */,
+				4DC6E3691872DCF97FEA4409 /* SignInPairViews.swift in Sources */,
+				459BB413BE1CF37057050353 /* SpeechAppletControls.swift in Sources */,
+				BDD6B4FFDC8DDE6050DCF80F /* Theme.swift in Sources */,
+				1141269FD33161760B3C2E9A /* ViewerConfiguration.swift in Sources */,
+				A7A88F6765E0CC87A30E49C7 /* WatchClient.swift in Sources */,
+				C35815347DD5C23454BE5B40 /* WatchModels.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7B60527FBFDA68FC46D7DDBE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D26057718021635C3B6E0DE0 /* AccountAgentRosterTests.swift in Sources */,
+				64143CD58B896A5136E40D73 /* AccountLifecycleTests.swift in Sources */,
+				F3DBBA72EBEAC38F86773707 /* AppletListsTests.swift in Sources */,
+				2515A5F312F3C9FCC1503DBC /* BuildInstructionsTests.swift in Sources */,
+				CEC4DFA995EF5A107438B618 /* CardChoiceTests.swift in Sources */,
+				5644A940A3405C8BCF7B23AA /* CrashReportingTests.swift in Sources */,
+				737E3477F5DF85776DB5A50A /* InboxCardTests.swift in Sources */,
+				28359751B074FA2B7C0DA7AC /* MaintainedAppletRuntimeAcceptanceTests.swift in Sources */,
+				CA0CA2C466998C863336441C /* MoreSearchTests.swift in Sources */,
+				43E0A3E424EA66DF2B1F8C7F /* NetworkInventoryTests.swift in Sources */,
+				D91393494FE6FD0494C6C3C2 /* OwnerPhotosTests.swift in Sources */,
+				C7A02AB053A0F91C8B86E2D5 /* ParsingTests.swift in Sources */,
+				3CFADB9FBC21C7F1088A192A /* ViewerConfigurationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D7D981CE2AA902C7A209EC0D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D51A97745C95537262912948 /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DEA9D3654D07C7A7191DDC64 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AD6C4FCF1444787F91B70CF /* AccountAgentRosterTests.swift in Sources */,
+				62E5349A8D6F65C5CFEE6DD5 /* BuildInstructionsTests.swift in Sources */,
+				BCC3FC95BA51B470A066E51A /* CaptureNoticesTests.swift in Sources */,
+				9E258DA700FC7F020ED7F3B7 /* CardChoiceTests.swift in Sources */,
+				CE6CC82D389E46F0A83D5D75 /* CrashReportingTests.swift in Sources */,
+				E808B899DD47EF83D0A03037 /* HomeRenderTests.swift in Sources */,
+				E7E711554D61DFF4072C00F3 /* HostLifecycleTests.swift in Sources */,
+				4C9FC762418891837B0987A6 /* InboxCardTests.swift in Sources */,
+				70E1C3CFCD287BCC40D8CABE /* LocalAppletTests.swift in Sources */,
+				297DF9A4293432DFDC49FB76 /* MacModelTests.swift in Sources */,
+				5932806CC869A0A8D571337D /* MacStatusItemTests.swift in Sources */,
+				38A11164FA3A21264D030A64 /* MacUpdatesTests.swift in Sources */,
+				465230EDB01E60079068F7BA /* MaintainedAppletRuntimeAcceptanceTests.swift in Sources */,
+				8F967A8523DFCE81581E4584 /* MoreSearchTests.swift in Sources */,
+				05F880D006F647F223DDE3CA /* NetworkInventoryTests.swift in Sources */,
+				4C70E5F000FCD1F77835CCDF /* OwnerConfigurationTests.swift in Sources */,
+				003FB2C95D9D5B52F128F9CD /* SpeechOwnerTests.swift in Sources */,
+				5CD7173854A2166732B22914 /* ViewerConfigurationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		26EEE0616CACED7C3B523B86 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 30DDDE2FCDE497995539AEA5 /* Bridgit-Share-iOS */;
+			targetProxy = 6A01B308FA042554F1AB5AC9 /* PBXContainerItemProxy */;
+		};
+		2DC4DB71ACC4119721011561 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E9FC17882CCF105A4833FEF9 /* Bridgit-iOS */;
+			targetProxy = 31E3A5994B4006607E26BCB4 /* PBXContainerItemProxy */;
+		};
+		5E2EB14536B86AD157075A14 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E9FC17882CCF105A4833FEF9 /* Bridgit-iOS */;
+			targetProxy = B723DB9BF071DB961BBFFB30 /* PBXContainerItemProxy */;
+		};
+		AA8913FF38962685E8C18C97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FA680A398B3916A70E366EDB /* Bridgit-Share-macOS */;
+			targetProxy = BD240A33CAB9C20E9B497200 /* PBXContainerItemProxy */;
+		};
+		F4B757626B56917215E167DB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BA5EB13F8EB943FA762FE151 /* Bridgit-macOS */;
+			targetProxy = 39296C556E639C5483436E1F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0B7BD8A5B5866EE14B18C2FF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "cc.bridgit.Bridgit-iOSTests";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bridgit.app/Bridgit";
+			};
+			name = Debug;
+		};
+		0C1504C227F220B8F1D6A41A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BRIDGIT_HOST_BUNDLE_ID = cc.bridgit.macos.local;
+				BRIDGIT_INBOUND_SHARE_GROUP = "$(DEVELOPMENT_TEAM).cc.bridgit.macos.inbound";
+				CODE_SIGN_ENTITLEMENTS = "Bridgit-macOS/Bridgit.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = "Bridgit-macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGIT_HOST_BUNDLE_ID)";
+				PRODUCT_MODULE_NAME = Bridgit_macOS;
+				PRODUCT_NAME = Bridgit;
+				REGISTER_APP_GROUPS = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		2B3919ED73488CD79FAD3BD9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 9QHUBZYQ86;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		35007212560BFC5E0788A6FC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				BRIDGIT_HOST_BUNDLE_ID = cc.bridgit.macos.local.debug;
+				BRIDGIT_INBOUND_SHARE_GROUP = "$(DEVELOPMENT_TEAM).cc.bridgit.macos.debug.inbound";
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/Mac.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = YES;
+				INFOPLIST_FILE = "ShareExtension/Mac-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGIT_HOST_BUNDLE_ID).Share";
+				PRODUCT_MODULE_NAME = BridgitShare_macOS;
+				PRODUCT_NAME = BridgitShare;
+				REGISTER_APP_GROUPS = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		545ADC4568A77288492B6003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				BRIDGIT_HOST_BUNDLE_ID = cc.bridgit.portal.debug;
+				BRIDGIT_INBOUND_SHARE_GROUP = group.cc.bridgit.portal.debug.inbound;
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/iOS.entitlements;
+				INFOPLIST_FILE = "ShareExtension/iOS-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGIT_HOST_BUNDLE_ID).Share";
+				PRODUCT_MODULE_NAME = BridgitShare_iOS;
+				PRODUCT_NAME = BridgitShare;
+				REGISTER_APP_GROUPS = NO;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5921F6988C48627F5ECCDC02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "cc.bridgit.Bridgit-macOSTests";
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bridgit.app/Contents/MacOS/Bridgit";
+			};
+			name = Release;
+		};
+		5C679112E9E8A2044CD7CCEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDebug;
+				BRIDGIT_HOST_BUNDLE_ID = cc.bridgit.macos.local.debug;
+				BRIDGIT_INBOUND_SHARE_GROUP = "$(DEVELOPMENT_TEAM).cc.bridgit.macos.debug.inbound";
+				CODE_SIGN_ENTITLEMENTS = "Bridgit-macOS/Bridgit.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = "Bridgit-macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGIT_HOST_BUNDLE_ID)";
+				PRODUCT_MODULE_NAME = Bridgit_macOS;
+				PRODUCT_NAME = Bridgit;
+				REGISTER_APP_GROUPS = NO;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		683F787290BF756EE1B959D1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "cc.bridgit.Bridgit-iOSTests";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bridgit.app/Bridgit";
+			};
+			name = Release;
+		};
+		92713F6E6527064DEE451E4D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				BRIDGIT_HOST_BUNDLE_ID = cc.bridgit.portal;
+				BRIDGIT_INBOUND_SHARE_GROUP = group.cc.bridgit.portal.inbound;
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/iOS.entitlements;
+				INFOPLIST_FILE = "ShareExtension/iOS-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGIT_HOST_BUNDLE_ID).Share";
+				PRODUCT_MODULE_NAME = BridgitShare_iOS;
+				PRODUCT_NAME = BridgitShare;
+				REGISTER_APP_GROUPS = NO;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9602527F81820B31D047B31F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BRIDGIT_APNS_ENVIRONMENT = production;
+				BRIDGIT_HOST_BUNDLE_ID = cc.bridgit.portal;
+				BRIDGIT_INBOUND_SHARE_GROUP = group.cc.bridgit.portal.inbound;
+				CODE_SIGN_ENTITLEMENTS = "Bridgit-iOS/Bridgit.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Bridgit-iOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGIT_HOST_BUNDLE_ID)";
+				PRODUCT_MODULE_NAME = Bridgit_iOS;
+				PRODUCT_NAME = Bridgit;
+				PROVISIONING_PROFILE_SPECIFIER = "Bridgit Portal App Store Apple Host";
+				REGISTER_APP_GROUPS = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AB3747592279AE46301D62F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				BRIDGIT_HOST_BUNDLE_ID = cc.bridgit.macos.local;
+				BRIDGIT_INBOUND_SHARE_GROUP = "$(DEVELOPMENT_TEAM).cc.bridgit.macos.inbound";
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/Mac.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = YES;
+				INFOPLIST_FILE = "ShareExtension/Mac-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGIT_HOST_BUNDLE_ID).Share";
+				PRODUCT_MODULE_NAME = BridgitShare_macOS;
+				PRODUCT_NAME = BridgitShare;
+				REGISTER_APP_GROUPS = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		B29237F823DB7D2524A38303 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDebug;
+				BRIDGIT_APNS_ENVIRONMENT = development;
+				BRIDGIT_HOST_BUNDLE_ID = cc.bridgit.portal.debug;
+				BRIDGIT_INBOUND_SHARE_GROUP = group.cc.bridgit.portal.debug.inbound;
+				CODE_SIGN_ENTITLEMENTS = "Bridgit-iOS/Bridgit.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Bridgit-iOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGIT_HOST_BUNDLE_ID)";
+				PRODUCT_MODULE_NAME = Bridgit_iOS;
+				PRODUCT_NAME = Bridgit;
+				REGISTER_APP_GROUPS = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C3A819B4B5C26BAB2348DF0A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "cc.bridgit.Bridgit-macOSTests";
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bridgit.app/Contents/MacOS/Bridgit";
+			};
+			name = Debug;
+		};
+		C6D07C5D52C5A16E051B6B3F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "cc.bridgit.Bridgit-ParityUITests";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Bridgit-iOS";
+			};
+			name = Release;
+		};
+		D5FFBA0D64E3DE1534EBED15 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 9QHUBZYQ86;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DE1DF28E0D5FA5427B78AB75 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "cc.bridgit.Bridgit-ParityUITests";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Bridgit-iOS";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2BA80B3652F3AEFE857F1B89 /* Build configuration list for PBXNativeTarget "Bridgit-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C679112E9E8A2044CD7CCEF /* Debug */,
+				0C1504C227F220B8F1D6A41A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		486CCCFB888D7289145A4D4C /* Build configuration list for PBXNativeTarget "Bridgit-Share-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				545ADC4568A77288492B6003 /* Debug */,
+				92713F6E6527064DEE451E4D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		59D190B58C0FA40D0FB02305 /* Build configuration list for PBXProject "Bridgit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5FFBA0D64E3DE1534EBED15 /* Debug */,
+				2B3919ED73488CD79FAD3BD9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		59F01BEF094465C00723D42B /* Build configuration list for PBXNativeTarget "Bridgit-ParityUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DE1DF28E0D5FA5427B78AB75 /* Debug */,
+				C6D07C5D52C5A16E051B6B3F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		829A7DA028110C772F4EB6DC /* Build configuration list for PBXNativeTarget "Bridgit-macOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3A819B4B5C26BAB2348DF0A /* Debug */,
+				5921F6988C48627F5ECCDC02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		96BA038A74BFBD833B980718 /* Build configuration list for PBXNativeTarget "Bridgit-Share-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				35007212560BFC5E0788A6FC /* Debug */,
+				AB3747592279AE46301D62F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BCAE24C3A243C54A02A6D05B /* Build configuration list for PBXNativeTarget "Bridgit-iOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0B7BD8A5B5866EE14B18C2FF /* Debug */,
+				683F787290BF756EE1B959D1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C68DE961B0354C31CCCE3045 /* Build configuration list for PBXNativeTarget "Bridgit-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B29237F823DB7D2524A38303 /* Debug */,
+				9602527F81820B31D047B31F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		05355A2B0D923CA80EDC0F56 /* XCLocalSwiftPackageReference "BridgitCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = BridgitCore;
+		};
+		277CC268363662503D9317A9 /* XCLocalSwiftPackageReference "BridgitSpeech" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = BridgitSpeech;
+		};
+		D29315119D17DD55F1B00ABB /* XCLocalSwiftPackageReference "BridgitAppletRuntime" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = BridgitAppletRuntime;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6FA626D58668FCAFAE7410F6 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa";
+			requirement = {
+				kind = exactVersion;
+				version = 9.31.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3F46DC1796A0DF3D37E8D1CD /* BridgitCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BridgitCore;
+		};
+		47D664FD9DE8EAA3CAE99EC3 /* BridgitAppletRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BridgitAppletRuntime;
+		};
+		51D3D85073964487143E1E65 /* BridgitSpeech */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BridgitSpeech;
+		};
+		58ECACCCC8F09DC4379E9DF8 /* BridgitCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BridgitCore;
+		};
+		714A315AC5C0753EF19117D7 /* BridgitCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BridgitCore;
+		};
+		9EE92B684228F1C25334F5C3 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6FA626D58668FCAFAE7410F6 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		A20BA50B642DAA53A93F894C /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6FA626D58668FCAFAE7410F6 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		C1F2A6D509413BA0C7CB2602 /* BridgitSpeech */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BridgitSpeech;
+		};
+		F4A2372D438DE914A1BB6B48 /* BridgitAppletRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BridgitAppletRuntime;
+		};
+		FC4AFEFA342CD3A5655AE1BE /* BridgitCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BridgitCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = B6123DC162B1243B8281D995 /* Project object */;
+}

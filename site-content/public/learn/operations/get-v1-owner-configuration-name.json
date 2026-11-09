@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read this Bridgit's Device Domain Name (bridgit.cc/names); asks the team backend",

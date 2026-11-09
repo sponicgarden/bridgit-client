@@ -16,7 +16,7 @@ struct LinkSelf: Equatable {
     /// This device's Device Domain Name.
     var name: String
     /// Its system name ("Rahul's iPad"), shown on the target.
-    var displayName: String = "Bridgit Portal"
+    var displayName: String = "Bridgit"
     var install: String
     var platform: String
     var deviceType: String

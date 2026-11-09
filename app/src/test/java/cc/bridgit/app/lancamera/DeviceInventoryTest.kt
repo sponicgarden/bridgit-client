@@ -25,4 +25,16 @@ class DeviceInventoryTest {
         assertFalse(c.getBoolean("enabled"))
         assertFalse(c.getJSONObject("actions").getJSONObject("snapshot").getBoolean("enabled"))
     }
+    @Test fun pointsAgentsAtLanDiscoveryEnrollmentAndStatusWithoutSelfApproval() {
+        val blocked = DeviceInventory.json("Host", emptyList(), false, false).getJSONObject("lan_path")
+        assertFalse(blocked.getJSONObject("discover").getBoolean("usable"))
+        assertTrue(blocked.getJSONObject("discover").getString("needs").contains("owner"))
+        val p = DeviceInventory.lanPath(true, true, true, false, true, true, 2)
+        assertTrue(p.getJSONObject("discover").getBoolean("usable"))
+        assertFalse(p.getJSONObject("enroll").getBoolean("usable"))
+        assertEquals(2, p.getJSONObject("control").getInt("enrolled_devices"))
+        assertTrue(p.getJSONObject("enroll").getJSONArray("endpoints").getString(0).endsWith("/v1/lan/devices/enroll"))
+        assertTrue(p.getJSONObject("enroll").getString("note").contains("upnp_av"))
+        assertTrue(DeviceInventory.json("Host", emptyList(), false, false).getString("discovery").contains("lan_path"))
+    }
 }

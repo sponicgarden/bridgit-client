@@ -190,7 +190,7 @@ final class PhotoCamera: NSObject, ObservableObject {
         let requested = generation
         Task {
             guard await AVCaptureDevice.requestAccess(for: .video) else {
-                problem = "Camera access is off. Allow it in Settings › Bridgit Portal."; return
+                problem = "Camera access is off. Allow it in Settings › Bridgit."; return
             }
             guard requested == generation else { return }
             if !configured { configure(preferFront: preferFront) }

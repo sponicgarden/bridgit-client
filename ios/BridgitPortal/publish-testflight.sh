@@ -67,13 +67,23 @@ if [[ -z "$bundle_res" ]]; then
 fi
 
 echo "==> App Store profile \"$PROFILE_NAME\""
-profile_id="$(asc profiles list --paginate --output json | python3 -c 'import sys,json
-for p in json.load(sys.stdin)["data"]:
-  a=p["attributes"]
-  if a["name"]==sys.argv[1] and a.get("profileState")=="ACTIVE": print(p["id"]); break' "$PROFILE_NAME")"
+# Prints "ACTIVE <id>" for a usable profile with this name, else "STALE <id>" for each one Apple has
+# invalidated (it does that when the app's capabilities or certificates change). Apple refuses to create
+# a profile whose name is already taken, even by an invalid one, so stale ones are deleted first.
+# Without this, builds failed from Nov 2026 with "Multiple profiles found with the name".
+profiles="$(asc profiles list --paginate --output json | python3 -c 'import sys,json
+ps=[p for p in json.load(sys.stdin)["data"] if p["attributes"]["name"]==sys.argv[1]]
+act=[p for p in ps if p["attributes"].get("profileState")=="ACTIVE"]
+for p in act[:1] or ps: print("ACTIVE" if act else "STALE", p["id"])' "$PROFILE_NAME")"
+profile_id="$(awk '$1=="ACTIVE"{print $2}' <<<"$profiles")"
 if [[ -z "$profile_id" ]]; then
+  for stale in $(awk '$1=="STALE"{print $2}' <<<"$profiles"); do
+    echo "    Replacing invalid profile $stale"
+    asc profiles delete --id "$stale" --confirm >/dev/null
+  done
   profile_id="$(asc profiles create --name "$PROFILE_NAME" --profile-type IOS_APP_STORE --bundle "$bundle_res" --certificate "$CERT_ID" --output json | python3 -c 'import sys,json; print(json.load(sys.stdin)["data"]["id"])')"
 fi
+[[ -n "$profile_id" ]] || { echo "Could not get an App Store profile named \"$PROFILE_NAME\"." >&2; exit 1; }
 asc profiles download --id "$profile_id" --output "$WORK/app.mobileprovision" >/dev/null
 asc profiles local install --path "$WORK/app.mobileprovision" --force >/dev/null  # later builds reuse the same profile
 

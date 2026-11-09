@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "The owner's connections (webhooks out to Home Assistant, Discord, ntfy, Telegram, n8n\u2026) you can send to: id, name and service, never the address or secrets",

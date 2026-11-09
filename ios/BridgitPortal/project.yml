@@ -29,7 +29,9 @@ targets:
     info:
       path: BridgitPortal/Info.plist
       properties:
-        CFBundleDisplayName: Bridgit Portal
+        # The brand is Bridgit, never "Bridgit Portal" (A0160): home screen, Settings, Mac menu bar.
+        CFBundleDisplayName: Bridgit
+        CFBundleName: Bridgit
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         UILaunchScreen: {}

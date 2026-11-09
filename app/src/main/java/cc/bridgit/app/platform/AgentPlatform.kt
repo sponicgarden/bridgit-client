@@ -67,7 +67,7 @@ class AgentPlatform(val app: BridgeApp) {
         }
     }
     fun hasGrant(agent: String, id: String): Boolean {
-        val live = app.agents.get(agent)?.takeUnless { it.paused } ?: return false
+        val live = app.agents.get(agent)?.takeUnless { it.suspended } ?: return false
         return (Capabilities.legacy(id)?.let { live.allows(it.key) } ?: true) && store.allowed(agent,id)
     }
     fun authorize(agent: String, id: String) {

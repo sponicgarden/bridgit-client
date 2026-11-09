@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import cc.bridgit.app.core.Schema
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONArray
@@ -281,32 +282,35 @@ class FeedbackStore(private val context: Context, private val clock: () -> Long 
             addUploadColumns(db)
             addHistoryColumns(db)
         }
+        /** Upgrades add only what is missing; backfills run only when the columns are new, so a kept newer file (onDowngrade) is not rewritten. */
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-            if (oldVersion < 2) {
-                addUploadColumns(db)
+            if (oldVersion < 2 && addUploadColumns(db)) {
                 // Issues filed before uploads existed stay on the phone; only new ones are sent.
                 db.execSQL("UPDATE reports SET upload_state = '${UploadState.SKIPPED}'")
             }
-            if (oldVersion < 3) {
-                addHistoryColumns(db)
+            if (oldVersion < 3 && addHistoryColumns(db)) {
                 // History from before this version stays on the phone too.
                 db.execSQL("UPDATE history SET upload_state = '${UploadState.SKIPPED}', kind = '${HistoryKind.STATUS}'")
             }
         }
-        /** v3 (FBK-12a, FBK-14 history upload): comments, who moved it, and where each entry stands with the team. */
-        private fun addHistoryColumns(db: SQLiteDatabase) {
-            db.execSQL("ALTER TABLE history ADD COLUMN kind TEXT")
-            db.execSQL("ALTER TABLE history ADD COLUMN actor TEXT")
-            db.execSQL("ALTER TABLE history ADD COLUMN upload_state TEXT")
-            db.execSQL("CREATE INDEX history_upload ON history(upload_state, id)")
+        /** C0018: an older build installed over a newer one keeps the newer file (its columns are additive). Android's default throws and stops the app starting. */
+        override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
+        /** v3 (FBK-12a, FBK-14 history upload): comments, who moved it, and where each entry stands with the team. True when they were new. */
+        private fun addHistoryColumns(db: SQLiteDatabase): Boolean {
+            val added = Schema.addColumn(db, "history", "upload_state", "TEXT")
+            Schema.addColumn(db, "history", "kind", "TEXT")
+            Schema.addColumn(db, "history", "actor", "TEXT")
+            db.execSQL("CREATE INDEX IF NOT EXISTS history_upload ON history(upload_state, id)")
+            return added
         }
-        /** v2 (FBK-14): where each issue stands with the Bridgit team's backend. */
-        private fun addUploadColumns(db: SQLiteDatabase) {
-            db.execSQL("ALTER TABLE reports ADD COLUMN upload_state TEXT")
-            db.execSQL("ALTER TABLE reports ADD COLUMN remote_id INTEGER")
-            db.execSQL("ALTER TABLE reports ADD COLUMN uploaded_at INTEGER")
-            db.execSQL("ALTER TABLE reports ADD COLUMN upload_error TEXT")
-            db.execSQL("CREATE INDEX reports_upload ON reports(upload_state, id)")
+        /** v2 (FBK-14): where each issue stands with the Bridgit team's backend. True when they were new. */
+        private fun addUploadColumns(db: SQLiteDatabase): Boolean {
+            val added = Schema.addColumn(db, "reports", "upload_state", "TEXT")
+            Schema.addColumn(db, "reports", "remote_id", "INTEGER")
+            Schema.addColumn(db, "reports", "uploaded_at", "INTEGER")
+            Schema.addColumn(db, "reports", "upload_error", "TEXT")
+            db.execSQL("CREATE INDEX IF NOT EXISTS reports_upload ON reports(upload_state, id)")
+            return added
         }
     }
 }

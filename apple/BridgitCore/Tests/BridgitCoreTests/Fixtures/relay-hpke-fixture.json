@@ -1,0 +1,14 @@
+{
+  "note": "Synthetic test keys only; never enrolled",
+  "phone_private": "+6q6naZEzizqwAwaFxu3u08yNYGfJEpowbDeM+Zubnk=",
+  "phone_public": "BH7/Cw+e9IYqZ9zA0iiW0yonDSV67G8B1PLFL3MlgU748wGp1L/7VtcYZcra1UmRwAbAOozUrhX1DC5h/lyroOo=",
+  "agent_public": "BPG7+zGPSsGV7ddObOPMNwEzBWA2D6OqMKKAcbkz1ptrRhF2dPIszevWIhpybgYb7BvYDT2GHk7BVNn+Gt4aUa4=",
+  "agent_private": "vBJa+lv/XSTVwWwtTbnZ2D/aQKcxw3TOtmUnoq1uok4=",
+  "envelope": {
+    "request_id": "fixture-request",
+    "seq": 1,
+    "deadline": 1800000000000,
+    "enc": "BA2eItd5j+jkt1c6SquQCjRflFhMaaQFLhrIwCCc1Btfuxtc7fxVIjxBmNgDj7kDUvhR/oDGtyzyzss0/8h4BV8=",
+    "ct": "2+JxViHrSyGUYKu2PgIkVHCt+jV86Ga0fD/Yb9nsHeV95J6UFULIsnsJz6M8mEY07NQRBCeW6iZiR/8H76a+Ri5GjC9HlBbl/rPHQRMV4xkBQ8Um1oJdQnGbOw=="
+  }
+}

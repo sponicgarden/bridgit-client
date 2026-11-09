@@ -7,7 +7,7 @@ import cc.bridgit.app.ui.agents.AgentStats
 
 internal object BuildInstructionRecipients {
     fun available(agents: List<Agent>, now: Long = System.currentTimeMillis()): List<Agent> = agents
-        .filter { !it.paused && it.connection != Connection.APPLET && AgentStats.isActive(it, now) &&
+        .filter { !it.suspended && it.connection != Connection.APPLET && AgentStats.isActive(it, now) &&
             EventAccess.allowed(it, "applet.create_requested") }
         .sortedByDescending { it.lastUsedAt }
 }

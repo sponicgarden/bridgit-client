@@ -48,7 +48,7 @@ enum SampleData {
         AgentRow(name: "Claude", detail: nil, lastUsed: now - 120_000, paused: false, transport: "direct", model: "Claude Opus"),
         AgentRow(name: "Cursor", detail: nil, lastUsed: now - 3_600_000, paused: false, transport: "relay", mode: "connector"),
         AgentRow(name: "Home helper", detail: nil, lastUsed: nil, paused: true, transport: "userspace"),
-        AgentRow(name: "Bridgit Portal", detail: nil, lastUsed: now - 5_000, paused: false, transport: "relay", mode: "connector", portal: true),
+        AgentRow(name: "Bridgit viewer", detail: nil, lastUsed: now - 5_000, paused: false, transport: "relay", mode: "connector", portal: true),
     ]
 
     static let appletRows: [AppletRow] = [
@@ -113,7 +113,7 @@ enum SampleData {
 
     static let events: [WatchEvent] = (0..<24).map { i in
         let paths = ["/v1/camera/snapshot", "/v1/phone/status", "/v1/interactions", "/v1/weather", "/v1/lan/discovered", "/v1/log"]
-        let agents = ["Claude", "Cursor", "Bridgit Portal"]
+        let agents = ["Claude", "Cursor", "Bridgit viewer"]
         return WatchEvent(id: 1000 + i, ts: now - Double(24 - i) * 95_000, agent: agents[i % 3], kind: "request",
                           method: i % 4 == 2 ? "POST" : "GET", endpoint: paths[i % paths.count], http: i == 17 ? 403 : 200, caption: nil, source: nil)
     }

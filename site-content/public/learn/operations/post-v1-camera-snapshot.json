@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise)",

@@ -35,7 +35,11 @@ class SuperAgentAccess(private val app: BridgeApp, private val caller: Agent) {
     }
     private fun view(agent: Agent): JSONObject = JSONObject().put("id", agent.id).put("name", agent.name)
         .put("capabilities", agent.caps?.sorted()?.let(::JSONArray) ?: JSONObject.NULL)
-        .put("super_powers", agent.superPowers).put("fixer_mode", agent.fixer).put("paused", agent.paused)
+        .put("super_powers", agent.superPowers).put("fixer_mode", agent.fixer).put("paused", agent.paused).put("api_access", agent.apiAccess)
+        // What the Agents screen shows about the agent (A0119 parity); never its key, hash or prefix.
+        .put("connection", agent.connection.id).put("created_at", agent.createdAt).put("last_used_at", agent.lastUsedAt)
+        .put("request_count", agent.requestCount).put("model", agent.model ?: JSONObject.NULL).put("harness", agent.harness ?: JSONObject.NULL)
+        .put("device_lock", JSONArray(agent.boundIps)).put("notes", agent.notes)
         .put("maximum_control", agent.maximumControl).put("key_created_at", agent.keyCreatedAt).put("generation", generation(agent))
         .put("control_scopes", JSONArray(configuredScopes(agent)))
         .put("effective_control_scopes", JSONArray(Capabilities.all.filter { app.platform.hasGrant(agent.id, it.id) }.map { it.id }))
@@ -62,17 +66,21 @@ class SuperAgentAccess(private val app: BridgeApp, private val caller: Agent) {
         }
         require()
         parsed.forEach { (id, on) -> Capabilities.setEnabled(app, id, on) }
-        app.log.system("audit", "configuration", "${caller.name} changed enabled device features: ${parsed.keys.sorted().joinToString()}")
+        app.log.byAgent(caller.id, caller.name, "configuration", "${caller.name} changed enabled device features: ${parsed.keys.sorted().joinToString()}")
         return JSONObject().put("changed", JSONArray(parsed.keys.sorted())).put("approval_required", false)
     }
     fun agent(id: String, body: JSONObject): JSONObject {
         require(); val before = target(id)
-        ConfigurationAccess.only(body, "expected_generation", "capabilities", "control_scopes", "paused", "super_powers", "fixer_mode", "maximum_control")
+        ConfigurationAccess.only(body, "expected_generation", "capabilities", "control_scopes", "paused", "api_access", "super_powers", "fixer_mode", "maximum_control", "name", "notes")
         val expected = ConfigurationAccess.text(body, "expected_generation", 64)
         if (expected != generation(before)) throw ErrorCatalog.error("conflict", "Control key changed; inspect access again")
-        val flags = listOf("paused", "super_powers", "fixer_mode", "maximum_control").filter(body::has).associateWith { ConfigurationAccess.bool(body, it) }
+        val flags = listOf("paused", "api_access", "super_powers", "fixer_mode", "maximum_control").filter(body::has).associateWith { ConfigurationAccess.bool(body, it) }
         if (body.length() < 2) throw ErrorCatalog.error("invalid_parameter", "No access changes supplied")
         if (flags["maximum_control"] == true && body.length() != 2) throw ErrorCatalog.error("invalid_parameter", "maximum_control:true is a complete maximum grant; send it alone with expected_generation")
+        // Rename and notes use the Agents screen's own rules: the name pattern and uniqueness, notes up to 200 characters.
+        val name = if (body.has("name")) ConfigurationAccess.text(body, "name", 24).trim().also { n ->
+            app.agents.checkName(n, exceptId = id)?.let { throw ErrorCatalog.error("invalid_parameter", it) } } else null
+        val notes = if (body.has("notes")) ConfigurationAccess.text(body, "notes", 200, allowEmpty = true) else null
         val caps = if (body.has("capabilities") && !body.isNull("capabilities")) strings(body.opt("capabilities"), "capabilities", app.registry.modules.map { it.id }.toSet()) else null
         val scopes = if (body.has("control_scopes")) strings(body.opt("control_scopes"), "control_scopes", Capabilities.all.filter { !it.privateOnly || BuildConfig.PRIVATE_CONTROL }.map { it.id }.toSet()) else null
         synchronized(app.agents) { synchronized(app.platform.store) {
@@ -90,15 +98,19 @@ class SuperAgentAccess(private val app: BridgeApp, private val caller: Agent) {
                 }
                 app.agents.update(id) { live ->
                     if (expected != generation(live)) throw ErrorCatalog.error("conflict", "Control key changed")
-                    live.copy(paused = flags["paused"] ?: live.paused, superPowers = flags["super_powers"] ?: live.superPowers,
-                        fixer = flags["fixer_mode"] ?: live.fixer, maximumControl = flags["maximum_control"] ?: live.maximumControl)
+                    live.copy(paused = flags["paused"] ?: live.paused, apiAccess = flags["api_access"] ?: live.apiAccess, superPowers = flags["super_powers"] ?: live.superPowers,
+                        fixer = flags["fixer_mode"] ?: live.fixer, maximumControl = flags["maximum_control"] ?: live.maximumControl,
+                        name = name ?: live.name, notes = notes ?: live.notes)
                 }
             }
             val after = target(id)
-            val narrowed = (!current.paused && after.paused) || (current.superPowers && !after.superPowers) ||
+            val narrowed = (!current.paused && after.paused) || (current.apiAccess && !after.apiAccess) || (current.superPowers && !after.superPowers) ||
                 (current.fixer && !after.fixer) || (after.caps != null && (current.caps == null || !after.caps.containsAll(current.caps)))
             if (narrowed) app.platform.invalidate(id)
-            app.log.system("audit", "configuration", "${caller.name} changed paired control-agent access for ${before.name}: ${body.keys().asSequence().filter { it != "expected_generation" }.sorted().joinToString()}")
+            val changed = body.keys().asSequence().filter { it != "expected_generation" }.sorted().toList()
+            app.log.byAgent(caller.id, caller.name, "configuration", "${caller.name} changed paired control-agent access for ${before.name}: ${changed.joinToString()}",
+                org.json.JSONObject().put("target_agent_id", before.id).put("changed", org.json.JSONArray(changed))
+                    .apply { flags.forEach { (k, v) -> put(k, v) } })
             return view(after).put("approval_required", false)
         } }
     }

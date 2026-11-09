@@ -22,7 +22,7 @@ Weather forecasts (GET /v1/weather) come from MET Norway's Locationforecast API
 SSH uses mwiede/JSch, distributed under the Revised BSD license.
 The JSch license is bundled at app/src/main/assets/licenses/jsch.txt.
 
-The "portal" in the Bridgit Portal wordmark uses Bricolage Grotesque Bold, under the SIL Open Font
+The iPhone app bundles Bricolage Grotesque Bold, under the SIL Open Font
 License 1.1, bundled at app/src/main/assets/licenses/bricolage-grotesque-ofl.txt.
 
 The kitchen applet's People feature runs the AuraFace-v1 face embedding model by fal.ai

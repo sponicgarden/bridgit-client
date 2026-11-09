@@ -9,8 +9,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.first
 
 /**
- * Pairing a Bridgit Portal: each iPhone or iPad gets its own relay agent in connector mode ("Bridgit Portal",
- * "Bridgit Portal 2", …) with only the read-only portal routes and no control tools. Disconnecting removes the
+ * Pairing a viewer: each iPhone or iPad gets its own relay agent in connector mode ("Bridgit viewer",
+ * "Bridgit viewer 2", …) with only the read-only portal routes and no control tools. Disconnecting removes the
  * agent: its token stops working on the next relay frame (within about a second while the phone is connected).
  */
 object PortalPairing {
@@ -19,10 +19,28 @@ object PortalPairing {
     /** The phone's friendly name (see [cc.bridgit.app.platform.DeviceName]), e.g. "A11 Blue Tab". */
     fun phoneName(app: BridgeApp): String = cc.bridgit.app.platform.DeviceName.of(app)
 
-    /** "Bridgit Portal", then "Bridgit Portal 2", … for the first name no agent has yet. */
+    /** "Bridgit viewer", then "Bridgit viewer 2", … for the first name no agent has yet. */
     fun nextName(app: BridgeApp): String = generateSequence(1) { it + 1 }
         .map { if (it == 1) PortalData.AGENT_NAME else "${PortalData.AGENT_NAME} $it" }
         .first { n -> app.agents.all().none { it.name.equals(n, ignoreCase = true) } }
+
+    private val LEGACY_NAME = Regex("Bridgit Portal(?: (\\d+))?", RegexOption.IGNORE_CASE)
+
+    /**
+     * Pairings made before A0160 (9 Nov 2026) are named "Bridgit Portal", "Bridgit Portal 2", …; the brand is Bridgit,
+     * so they become "Bridgit viewer", "Bridgit viewer 2", … in place (same agent, token and grants). A name the owner
+     * chose is left alone, and so is a pairing whose new name another agent already has. Returns how many changed.
+     */
+    fun renameLegacy(app: BridgeApp, store: RelayStore): Int {
+        var n = 0
+        for (a in paired(app, store)) {
+            val num = LEGACY_NAME.matchEntire(a.name.trim())?.groupValues?.get(1) ?: continue
+            val want = if (num.isEmpty()) PortalData.AGENT_NAME else "${PortalData.AGENT_NAME} $num"
+            if (app.agents.all().any { it.id != a.id && it.name.equals(want, ignoreCase = true) }) continue
+            if (app.agents.update(a.id) { it.copy(name = want) } != null) n++
+        }
+        return n
+    }
 
     /** The relay must already be on (RelaySetup.turnOn). Returns the new agent and its pairing link (shown to the owner once). */
     /**

@@ -3,38 +3,38 @@
 <resources>
     <string name="more_portal">Linked devices</string>
     <!-- Linked devices and Pair a device (owner, 5 Nov 2026). -->
-    <string name="cap_portal">Bridgit Portal</string>
-    <string name="cap_portal_desc">Read-only data for the Bridgit Portal app on your iPhone or iPad: Home, network devices, activity, control agents and applets.</string>
-    <string name="portal_title">Bridgit Portal</string>
-    <string name="portal_hero_body">The Bridgit Portal app shows this phone\'s Home, network devices, activity, control agents and applets, live. It only reads: it can\'t take photos, record, tap or change settings.</string>
+    <string name="cap_portal">Bridgit on iPhone and iPad</string>
+    <string name="cap_portal_desc">Read-only data for the Bridgit app on your iPhone or iPad: Home, network devices, activity, control agents and applets.</string>
+    <string name="portal_title">Bridgit</string>
+    <string name="portal_hero_body">The Bridgit app on an iPhone or iPad shows this phone\'s Home, network devices, activity, control agents and applets, live. It only reads: it can\'t take photos, record, tap or change settings.</string>
     <string name="portal_pair">Show a pairing code</string>
     <string name="portal_pairing">Setting up…</string>
     <string name="portal_pair_failed_title">Can\'t show pairing code</string>
     <string name="portal_approve_failed_title">Can\'t approve request</string>
     <string name="portal_failed">Couldn\'t set up the portal: %1$s</string>
-    <string name="portal_scan_title">Scan with the Bridgit Portal app</string>
-    <string name="portal_scan_body">On the iPhone or iPad, open Bridgit Portal and scan this code. On an Android phone, open Bridgit › More › Linked devices › Pair a device › View another phone\'s Home. Or copy the link and send it. It\'s shown only now. Keep it private: whoever has it can see this phone until you disconnect it here.</string>
+    <string name="portal_scan_title">Scan with the Bridgit app</string>
+    <string name="portal_scan_body">On the iPhone or iPad, open Bridgit and scan this code. On an Android phone, open Bridgit › More › Linked devices › Pair a device › View another phone\'s Home. Or copy the link and send it. It\'s shown only now. Keep it private: whoever has it can see this phone until you disconnect it here.</string>
     <string name="portal_qr_desc">Pairing code for %1$s</string>
     <string name="portal_copy">Copy link</string>
     <string name="portal_share">Share</string>
     <string name="portal_done">Done</string>
     <!-- Share: subject and message around the pairing link. %1$s = this phone's name, %2$s = the bridgit.cc/portalpairing page, %3$s = the link. -->
-    <string name="portal_share_subject">Pair with %1$s in Bridgit Portal</string>
-    <string name="portal_share_text">"You're invited to view %1$s in Bridgit Portal.\n\nThe link at the bottom works once, on one iPhone, iPad or Android phone. It expires in 24 hours if nobody uses it.\n\n\nHOW TO CONNECT\n\n1.  Get the Bridgit Portal app (iPhone, iPad or Android):\n    %2$s\n\n2.  Copy the pairing link at the bottom of this message.\n\n3.  Paste it into the app:\n    •  iPhone or iPad: tap Paste a sign-in or pairing link.\n    •  Android: open Bridgit › More › Linked devices › Pair a device › View another phone\'s Home.\n\n\nYOUR PAIRING LINK\n\n%3$s"</string>
+    <string name="portal_share_subject">Pair with %1$s in Bridgit</string>
+    <string name="portal_share_text">"You're invited to view %1$s in Bridgit.\n\nThe link at the bottom works once, on one iPhone, iPad or Android phone. It expires in 24 hours if nobody uses it.\n\n\nHOW TO CONNECT\n\n1.  Get the Bridgit app (iPhone, iPad or Android):\n    %2$s\n\n2.  Copy the pairing link at the bottom of this message.\n\n3.  Paste it into the app:\n    •  iPhone or iPad: tap Paste a sign-in or pairing link.\n    •  Android: open Bridgit › More › Linked devices › Pair a device › View another phone\'s Home.\n\n\nYOUR PAIRING LINK\n\n%3$s"</string>
     <string name="portal_copied">Link copied</string>
     <!-- The pairing sheet once the portal has made its first call. %1$s = what it calls itself ("iPhone 16 Pro"), %2$s = phone/tablet. -->
-    <string name="portal_connected_body">%1$s can now view this %2$s\'s Home in Bridgit Portal.</string>
+    <string name="portal_connected_body">%1$s can now view this %2$s\'s Home in Bridgit.</string>
     <string name="portal_connected_someone">Your device</string>
     <string name="portal_connected_text">It now shows on Linked devices. Tap it there to disconnect it at any time.</string>
     <string name="portal_disconnect">Disconnect</string>
     <!-- Agents tab: portal pairings only view the phone, so they aren't listed as agents; one row links to More › Linked devices. -->
-    <string name="portal_agents_row">Viewing through Bridgit Portal: %1$s</string>
+    <string name="portal_agents_row">Viewing through Bridgit: %1$s</string>
     <string name="portal_disconnect_title">Disconnect %1$s?</string>
     <string name="portal_disconnect_body">The iPhone or iPad paired as %1$s stops seeing this %2$s right away. You can pair it again later.</string>
-    <string name="portal_request_title">Bridgit Portal wants to view this phone</string>
+    <string name="portal_request_title">An iPhone or iPad wants to view this phone</string>
     <string name="portal_request_text">%1$s on %2$s asks to see this phone. Tap to allow or deny.</string>
     <string name="portal_request_dialog_title">Allow %1$s to view this %2$s?</string>
-    <string name="portal_request_dialog_body">%1$s, signed in as %2$s, asks to see this %3$s through Bridgit Portal: Home, network devices, activity, control agents and applets. It only reads; it can\'t take photos, record, tap or change settings. You can disconnect it here any time.</string>
+    <string name="portal_request_dialog_body">%1$s, signed in as %2$s, asks to see this %3$s through Bridgit: Home, network devices, activity, control agents and applets. It only reads; it can\'t take photos, record, tap or change settings. You can disconnect it here any time.</string>
     <string name="portal_request_allow">Allow</string>
     <string name="portal_request_deny">Deny</string>
     <string name="portal_request_allowed">%1$s can now view this %2$s</string>
@@ -65,7 +65,7 @@
     <string name="portal_scan_confirm_body">This phone will show %1$s\'s Home, network devices and activity, read-only, through the relay. Remove it any time on More › Linked devices.</string>
     <string name="portal_scan_confirm_ok">View it</string>
     <string name="portal_scan_checking">Checking the link…</string>
-    <string name="portal_scan_not_link">That isn\'t a Bridgit Portal pairing code.</string>
+    <string name="portal_scan_not_link">That isn\'t a Bridgit pairing code.</string>
     <string name="portal_scan_failed">Couldn\'t reach that phone: %1$s</string>
     <string name="portal_scan_no_camera">Allow the camera to scan, or paste the link.</string>
     <string name="portal_other_add">Scan or paste its code</string>
@@ -109,7 +109,7 @@
     <string name="linked_home_now">Home now shows %1$s</string>
     <string name="linked_hub_satellite">This %1$s is its satellite.</string>
     <string name="linked_hub_waiting">It hasn\'t sent its Home yet. Make sure the hub is on and has the latest Bridgit; it checks in every 5 minutes.</string>
-    <string name="linked_viewer_body">Views this %1$s\'s Home through Bridgit Portal. Read-only.</string>
+    <string name="linked_viewer_body">Views this %1$s\'s Home through Bridgit. Read-only.</string>
     <!-- Device dialog (LinkedDeviceSheet): one status word per kind, agreeing with the map's online/offline. -->
     <string name="linked_status_online">Online</string>
     <string name="linked_status_offline">Offline</string>

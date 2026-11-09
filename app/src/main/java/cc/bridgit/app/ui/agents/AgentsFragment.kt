@@ -341,7 +341,7 @@ class AgentsFragment : Fragment() {
             val ctx = h.b.root.context
             val st = status
             h.b.avatar.setAgent(a.name)
-            h.b.avatar.alpha = if (a.paused) 0.5f else 1f
+            h.b.avatar.alpha = if (a.suspended) 0.5f else 1f
             h.b.name.text = a.name
             val relayMode = if (a.connection == Connection.RELAY) {
                 val app = ctx.applicationContext as BridgeApp
@@ -365,6 +365,7 @@ class AgentsFragment : Fragment() {
             // Why this agent can't reach the phone right now, if it can't.
             val blocked: String? = when {
                 a.paused -> ctx.getString(R.string.agents_status_paused)
+                !a.apiAccess -> ctx.getString(R.string.agents_status_api_off)
                 st.allPaused && !relay -> ctx.getString(R.string.agents_status_all_paused)
                 relay && st.externalPaused -> ctx.getString(R.string.agents_status_relay_paused)
                 !relay && a.connection == Connection.DIRECT && !st.tailscaleUp -> ctx.getString(R.string.agents_status_tailscale_off)

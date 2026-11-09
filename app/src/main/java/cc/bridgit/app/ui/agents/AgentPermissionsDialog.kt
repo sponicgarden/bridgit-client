@@ -51,6 +51,7 @@ object AgentPermissionsDialog {
             setText(label)
             minHeight = context.dp(48)
         }
+        val apiAccess = switch(R.string.agents_api_access)
         val maximum = switch(R.string.agents_maximum_control)
         val superpowers = switch(R.string.agents_super_switch)
         val groupsBox = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
@@ -63,7 +64,7 @@ object AgentPermissionsDialog {
         }
         val fixer = switch(R.string.agents_fixer_switch)
         val deviceAccess = MaterialButton(context).apply { setText(R.string.power_max_review) }
-        content.addView(maximum); content.addView(superpowers); content.addView(groupsBox)
+        content.addView(apiAccess); content.addView(maximum); content.addView(superpowers); content.addView(groupsBox)
         content.addView(advanced); content.addView(details)
         details.addView(fixer); details.addView(deviceAccess)
 
@@ -145,6 +146,7 @@ object AgentPermissionsDialog {
         refresh = refresh@{ notify ->
             val agent = app.agents.get(id) ?: return@refresh
             binding = true
+            apiAccess.isChecked = agent.apiAccess
             maximum.isChecked = access.isMaximum(id, requireSuper = false)
             superpowers.isChecked = agent.superPowers
             fixer.isChecked = agent.fixer
@@ -168,6 +170,15 @@ object AgentPermissionsDialog {
         }
         content.tag = Runnable { refresh(false) }
         refresh(false)
+        // A0120: the one permission over the whole API; off refuses every call while the agent stays paired.
+        apiAccess.setOnCheckedChangeListener { _, on ->
+            if (!binding) {
+                val a = app.agents.update(id) { it.copy(apiAccess = on) }
+                if (!on) app.platform.invalidate(id)
+                app.log.system("audit", "agent", "Owner turned API access ${if (on) "on" else "off"} for ${a?.name}")
+                refresh(true)
+            }
+        }
         maximum.setOnCheckedChangeListener { _, on ->
             if (!binding) {
                 if (on) OwnerCheck.run(fragment, context.getString(R.string.agents_maximum_control), onCancel = { refresh(true) }) {

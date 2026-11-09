@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSLocationUsageDescription</key>
+	<string>Allow Bridgit to identify this Wi-Fi network and remember its devices.</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Bridgit</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>cc.bridgit.macos</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>bridgit</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Use the camera for approved local Bridgit actions.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_linkplay._tcp</string>
+		<string>_googlecast._tcp</string>
+		<string>_airplay._tcp</string>
+		<string>_raop._tcp</string>
+		<string>_spotify-connect._tcp</string>
+		<string>_sonos._tcp</string>
+		<string>_rtsp._tcp</string>
+		<string>_androidtvremote2._tcp</string>
+		<string>_mediaremotetv._tcp</string>
+		<string>_ipp._tcp</string>
+		<string>_ipps._tcp</string>
+		<string>_printer._tcp</string>
+		<string>_pdl-datastream._tcp</string>
+		<string>_shelly._tcp</string>
+		<string>_hue._tcp</string>
+		<string>_hap._tcp</string>
+		<string>_matter._tcp</string>
+		<string>_matterc._udp</string>
+		<string>_home-assistant._tcp</string>
+		<string>_esphomelib._tcp</string>
+		<string>_wled._tcp</string>
+		<string>_mqtt._tcp</string>
+		<string>_smb._tcp</string>
+		<string>_adisk._tcp</string>
+		<string>_ssh._tcp</string>
+		<string>_sftp-ssh._tcp</string>
+		<string>_rfb._tcp</string>
+		<string>_rdp._tcp</string>
+		<string>_http._tcp</string>
+		<string>_https._tcp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Connect to approved private-network devices and host requests from control agents you authorize.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Use the microphone for applet speech turns and host recordings you explicitly enable.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose photos for a local Bridgit applet.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Recognize speech locally for applets and microphone clips you explicitly enable.</string>
+	<key>BridgitInboundShareGroup</key>
+	<string>$(BRIDGIT_INBOUND_SHARE_GROUP)</string>
+</dict>
+</plist>

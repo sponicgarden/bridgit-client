@@ -7,6 +7,49 @@ import UniformTypeIdentifiers
 @testable import BridgitAppletRuntime
 
 final class LocalAppletLibraryTests: XCTestCase {
+    func testRegistryColumnOrderSurvivesInstallAndReopenWithoutChangingCanonicalIdentity() async throws {
+        let base = try fixture { doc in
+            doc["processing"] = ["tables": [["id": "notes", "columns": ["alpha": ["type": "text"], "zeta": ["type": "text"]], "max_rows": 100, "keep_days": 30]]]
+        }
+        let canonical = String(decoding: base.data, as: UTF8.self)
+        let ordered = canonical.replacingOccurrences(of: #""columns":{"alpha":{"type":"text"},"zeta":{"type":"text"}}"#,
+            with: #""columns":{"zeta":{"type":"text"},"alpha":{"type":"text"}}"#)
+        XCTAssertNotEqual(ordered, canonical, "Fixture must really reverse the source columns")
+        let response = Data((#"{"key":"tpl_note","revision":1,"state":"published","definition":"# + ordered + "}").utf8)
+        let release = try RegistryPackage(response: response, selection: base.selection)
+        XCTAssertEqual(release.data, base.data, "Presentation order must not change canonical pin bytes")
+        XCTAssertEqual(release.columnOrder["notes"], ["zeta", "alpha"])
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("order.sqlite"), account = String(repeating: "a", count: 64)
+        let library = try LocalAppletLibrary(database: url, account: account)
+        try await library.install(release)
+        let found = try await library.installed("tpl_note")
+        let edition = try XCTUnwrap(found)
+        let reopened = try LocalAppletLibrary(database: url, account: account)
+        let instance = try await reopened.open(edition)
+        XCTAssertEqual(instance.columnOrder["notes"], ["zeta", "alpha"])
+        XCTAssertEqual(instance.data, base.data)
+
+        // Model a pre-v11 database: canonical bytes cannot recover original order.
+        var database: OpaquePointer?
+        XCTAssertEqual(sqlite3_open(url.path, &database), SQLITE_OK)
+        defer { sqlite3_close(database) }
+        XCTAssertEqual(sqlite3_exec(database, "ALTER TABLE local_applets DROP COLUMN column_order; PRAGMA user_version=10", nil, nil, nil), SQLITE_OK)
+        let migrated = try LocalAppletLibrary(database: url, account: account)
+        let legacy = try await migrated.open(edition)
+        XCTAssertNil(legacy.columnOrder["notes"], "Migration must not claim sorted canonical bytes preserve source order")
+        XCTAssertEqual(legacy.data, base.data)
+        let definition = try XCTUnwrap(JSONSerialization.jsonObject(with: base.data) as? [String: Any])
+        let next = try fixture(revision: 2) { doc in doc = definition; doc["version"] = "2.0.0" }
+        let update = try await migrated.reviewUpdate(next, replacing: edition)
+        try await migrated.apply(update)
+        let updatedEdition = try await migrated.installed("tpl_note")
+        let updated = try await migrated.open(XCTUnwrap(updatedEdition))
+        XCTAssertEqual(updated.columnOrder["notes"], next.columnOrder["notes"])
+        XCTAssertEqual(updated.data, next.data)
+    }
+
     private func fixture(revision: Int = 1, title: String = "Blue note", steps: [[String: Any]] = [], change: (inout [String: Any]) -> Void = { _ in }) throws -> RegistryPackage {
         var root = URL(fileURLWithPath: #filePath)
         for _ in 0..<5 { root.deleteLastPathComponent() }
@@ -23,6 +66,116 @@ final class LocalAppletLibraryTests: XCTestCase {
         return try RegistryPackage(response: JSONSerialization.data(withJSONObject: envelope), selection: entry)
     }
 
+    func testPausePersistsAndOldRunCannotResumeAfterPauseResume() async throws {
+        actor Gate {
+            var entered = false
+            var continuation: CheckedContinuation<Void, Never>?
+            func wait() async { entered = true; await withCheckedContinuation { continuation = $0 } }
+            func release() { continuation?.resume(); continuation = nil }
+        }
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("pause.sqlite"), account = String(repeating: "a", count: 64)
+        let library = try LocalAppletLibrary(database: url, account: account)
+        let release = try fixture(steps: [["id":"one", "type":"notice", "text":"First"], ["id":"two", "type":"notice", "text":"Second"]]) { doc in
+            var processing = doc["processing"] as! [String: Any]
+            processing["tables"] = [["id":"notes", "columns":["message":["type":"text"]], "max_rows":100, "keep_days":30]]
+            doc["processing"] = processing
+        }
+        try await library.install(release)
+        let loaded = try await library.installed(release.selection.key), edition = try XCTUnwrap(loaded)
+        _ = try await library.writeAgentRow(["message":.string("saved")], in: edition, table: "notes")
+        try await library.setPaused(true, in: edition)
+        let reopened = try LocalAppletLibrary(database: url, account: account)
+        let persisted = try await reopened.isPaused(edition); XCTAssertTrue(persisted)
+        let saved = try await reopened.rows(in: edition, table: "notes", limit: 10)
+        XCTAssertEqual(saved.first?["message"], .string("saved"))
+        do { _ = try await reopened.runButton("main", in: edition) { _ in XCTFail("Paused applet performed a notice") }; XCTFail("Paused run accepted") } catch AppletRuntimeError.paused {}
+        let foreign = try LocalAppletLibrary(database: url, account: String(repeating: "b", count: 64))
+        do { try await foreign.setPaused(false, in: edition); XCTFail("Foreign account changed pause") } catch is AppletRuntimeError {}
+        try await reopened.setPaused(false, in: edition)
+        let gate = Gate()
+        let run = Task { try await library.runButton("main", in: edition) { notice in
+            if notice.text == "First" { await gate.wait() } else { XCTFail("Old run advanced after pause/resume") }
+        } }
+        for _ in 0..<100 { if await gate.entered { break }; try await Task.sleep(for: .milliseconds(10)) }
+        let entered = await gate.entered; XCTAssertTrue(entered)
+        // Simulate another process changing the persisted generation without
+        // going through this process's cancellation registry.
+        var external: OpaquePointer?
+        XCTAssertEqual(sqlite3_open(url.path, &external), SQLITE_OK)
+        defer { sqlite3_close(external) }
+        XCTAssertEqual(sqlite3_exec(external, "UPDATE applet_execution_control SET paused=0,generation=generation+2", nil, nil, nil), SQLITE_OK)
+        await gate.release()
+        do { _ = try await run.value; XCTFail("Old run became valid after resume") } catch AppletRuntimeError.executionStopped {}
+        let result = try await library.runButton("main", in: edition) { _ in }
+        XCTAssertNotNil(result.results["two"])
+        try await library.remove(edition); try await library.install(release)
+        do { try await library.setPaused(true, in: edition); XCTFail("Old installation paused replacement") } catch is AppletRuntimeError {}
+        let next = try await library.installed(release.selection.key), replacement = try XCTUnwrap(next)
+        let newPaused = try await library.isPaused(replacement); XCTAssertFalse(newPaused)
+    }
+
+    func testPauseCancelsActiveOperationAcrossLibraryControllers() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("cancel.sqlite"), account = String(repeating: "a", count: 64)
+        let library = try LocalAppletLibrary(database: url, account: account)
+        let other = try LocalAppletLibrary(database: url, account: account)
+        let release = try fixture(steps: [["id":"one", "type":"notice", "text":"First"], ["id":"two", "type":"notice", "text":"Second"]])
+        try await library.install(release)
+        let loaded = try await library.installed(release.selection.key), edition = try XCTUnwrap(loaded)
+        let entered = expectation(description: "Active operation started")
+        let stopped = expectation(description: "Pause cancelled active operation")
+        let run = Task {
+            do {
+                _ = try await library.runButton("main", in: edition) { notice in
+                    guard notice.text == "First" else { XCTFail("Paused run advanced"); return }
+                    entered.fulfill()
+                    try await Task.sleep(for: .seconds(10))
+                }
+                XCTFail("Paused operation completed")
+            } catch is CancellationError { stopped.fulfill() }
+            catch { XCTFail("Unexpected pause result: \(error)") }
+        }
+        await fulfillment(of: [entered], timeout: 2)
+        try await other.setPaused(true, in: edition)
+        await fulfillment(of: [stopped], timeout: 2)
+        run.cancel()
+        await run.value
+        try await other.setPaused(false, in: edition)
+        let fresh = try await library.runButton("main", in: edition) { _ in }
+        XCTAssertNotNil(fresh.results["two"])
+    }
+
+    func testAgentRowChangesValidateSchemaAndIsolateAccountsTablesAndReinstalls() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let database = dir.appendingPathComponent("agent.sqlite")
+        let library = try LocalAppletLibrary(database: database, account: String(repeating: "a", count: 64))
+        let release = try fixture { doc in
+            doc["processing"] = ["tables": ["notes", "other"].map { ["id": $0, "columns": ["message": ["type": "text"]], "max_rows": 100, "keep_days": 30] }]
+        }
+        try await library.install(release)
+        let loaded = try await library.installed(release.selection.key), edition = try XCTUnwrap(loaded)
+        let row = try await library.writeAgentRow(["message": .string("original")], in: edition, table: "notes")
+        let id = try XCTUnwrap(row["id"]?.text)
+        XCTAssertEqual(row["by"], .object(["type": .string("agent")]))
+        let edited = try await library.writeAgentRow(["message": .string("edited")], in: edition, table: "notes", updating: id)
+        XCTAssertEqual(edited["id"], row["id"]); XCTAssertEqual(edited["message"], .string("edited"))
+        do { _ = try await library.writeAgentRow(["unknown": .string("bad")], in: edition, table: "notes", updating: id); XCTFail("Unknown column accepted") } catch is AppletRuntimeError {}
+        let rows = try await library.rowsPage(in: edition, table: "notes").rows
+        XCTAssertEqual(rows.count, 1); XCTAssertEqual(rows[0]["message"], .string("edited"))
+        do { try await library.deleteAgentRow(id, in: edition, table: "other"); XCTFail("Cross-table deletion") } catch is AppletRuntimeError {}
+        let stranger = try LocalAppletLibrary(database: database, account: String(repeating: "b", count: 64))
+        do { _ = try await stranger.writeAgentRow(["message": .string("foreign")], in: edition, table: "notes"); XCTFail("Cross-account insertion") } catch is AppletRuntimeError {}
+        do { try await stranger.deleteAgentRow(id, in: edition, table: "notes"); XCTFail("Cross-account deletion") } catch is AppletRuntimeError {}
+        try await library.deleteAgentRow(id, in: edition, table: "notes")
+        let empty = try await library.rowsPage(in: edition, table: "notes").rows; XCTAssertTrue(empty.isEmpty)
+        try await library.remove(edition); try await library.install(release)
+        do { _ = try await library.writeAgentRow(["message": .string("stale")], in: edition, table: "notes"); XCTFail("Stale edition inserted into replacement") } catch is AppletRuntimeError {}
+    }
+
     func testVersionSixLibraryKeepsInstalledEditionAfterGalleryInputMigration() async throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at:dir) }
@@ -34,7 +187,7 @@ final class LocalAppletLibraryTests: XCTestCase {
         }
         var raw: OpaquePointer?
         XCTAssertEqual(sqlite3_open(url.path,&raw),SQLITE_OK)
-        XCTAssertEqual(sqlite3_exec(raw,"DROP TRIGGER remove_history_archive; DROP TABLE applet_history_archives; DROP TRIGGER remove_package_media; DROP TABLE applet_package_media; DROP TRIGGER remove_gallery_inputs; DROP TABLE applet_gallery_inputs; PRAGMA user_version=6;",nil,nil,nil),SQLITE_OK)
+        XCTAssertEqual(sqlite3_exec(raw,"ALTER TABLE local_applets DROP COLUMN column_order; DROP TRIGGER remove_history_archive; DROP TABLE applet_history_archives; DROP TRIGGER remove_package_media; DROP TABLE applet_package_media; DROP TRIGGER remove_gallery_inputs; DROP TABLE applet_gallery_inputs; PRAGMA user_version=6;",nil,nil,nil),SQLITE_OK)
         sqlite3_close(raw)
         let upgraded = try LocalAppletLibrary(database:url,account:account)
         let installed = try await upgraded.installed(release.selection.key)!
@@ -333,11 +486,51 @@ final class LocalAppletLibraryTests: XCTestCase {
         XCTAssertEqual(second["next"],.null)
         guard case .array(let items)? = second["items"] else { return XCTFail("Missing story page") }
         XCTAssertEqual(items.map { $0["id"] },[ids[1]])
+        let cancelledWrite = Task {
+            withUnsafeCurrentTask { $0?.cancel() }
+            return try await db.cardTableAction(.object(["path":path,"method":.string("POST"),"body":.object(["row":.object(["status":.string("done"),"result":.object(["title":.string("Cancelled")])])])]), in:edition)
+        }
+        do { _ = try await cancelledWrite.value; XCTFail("Cancelled write was accepted") }
+        catch is CancellationError {}
+        let afterCancellation = try await db.cardTableAction(.object(["path":path]), in:edition)
+        XCTAssertEqual(afterCancellation["count"], .number(2))
         let stranger = try LocalAppletLibrary(database:url,account:String(repeating:"b",count:64))
         for (store,route) in [(stranger,path),(db,.string("/v1/applet/tables/private/rows")),(db,.string("/v1/location"))] {
             do { _ = try await store.cardTableAction(.object(["path":route]),in:edition); XCTFail("Unauthorized card action") }
             catch is AppletRuntimeError {}
         }
+    }
+
+    func testHostIdentitySurvivesReopenAndUpdateButChangesAfterReinstall() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("library.sqlite"), account = String(repeating: "d", count: 64)
+        let library = try LocalAppletLibrary(database: url, account: account)
+        let release = try fixture()
+        try await library.install(release)
+        let initial = try await library.installed(release.selection.key)
+        let edition = try XCTUnwrap(initial)
+        XCTAssertNotNil(edition.hostID.range(of: "^library-[a-f0-9]{56}$", options: .regularExpression))
+        let reopened = try LocalAppletLibrary(database: url, account: account)
+        let opened = try await reopened.installed(release.selection.key)
+        XCTAssertEqual(opened?.hostID, edition.hostID)
+        let plan = try await reopened.reviewUpdate(fixture(revision: 2, change: { $0["version"] = "2.0.0" }), replacing: edition)
+        try await reopened.apply(plan)
+        let changed = try await reopened.installed(release.selection.key)
+        let updated = try XCTUnwrap(changed)
+        XCTAssertEqual(updated.hostID, edition.hostID)
+        let other = try LocalAppletLibrary(database: url, account: String(repeating: "e", count: 64))
+        try await other.install(release)
+        let foreign = try await other.installed(release.selection.key)
+        XCTAssertNotEqual(foreign?.hostID, edition.hostID)
+        try await reopened.remove(updated)
+        try await reopened.install(release)
+        let replacement = try await reopened.installed(release.selection.key)
+        let next = try XCTUnwrap(replacement)
+        XCTAssertNotEqual(next.hostID, edition.hostID)
+        try await reopened.remove(updated)
+        let preserved = try await reopened.installed(release.selection.key)
+        XCTAssertEqual(preserved?.hostID, next.hostID)
     }
 
     func testOfflineButtonExecutionAndUnsupportedServicePreflight() async throws {
@@ -449,16 +642,30 @@ final class LocalAppletLibraryTests: XCTestCase {
             let selected = try await store.installed(id)
             let edition = try XCTUnwrap(selected)
             let package = try await store.open(edition).package
+            if id == "insurance-inventory" {
+                let button = try XCTUnwrap(package.csvButtons.first)
+                XCTAssertEqual(button.label, "Share CSV")
+                XCTAssertEqual(button.table, "items")
+                XCTAssertTrue(button.columns.contains { $0 == ("label", "Item") })
+                XCTAssertFalse(button.columns.contains { $0.0 == "photo" })
+                let empty = try await store.csvRows(in: edition, table: "items")
+                XCTAssertTrue(empty.isEmpty)
+                do {
+                    _ = try await store.csvRows(in: edition, table: "photos")
+                    XCTFail("Undeclared table export succeeded")
+                } catch let error as AppletRuntimeError { XCTAssertEqual(error, .unavailable("CSV export for photos")) }
+            }
             guard case .array(let pieces)? = package.definition["ui"]?["card"]?["pieces"] else { return XCTFail("Missing card") }
             let items = pieces.flatMap { piece -> [JSONValue] in
                 guard case .array(let entries)? = piece["items"] else { return [] }
                 return entries.filter { package.cameraButton($0) != nil }
             }
+            XCTAssertEqual(package.cameraItems, items)
             XCTAssertEqual(items.count,expectedButtons)
             for item in items {
                 let rowID = try await store.captureCardPhoto(item,in:edition) { lens,size in
                     XCTAssertEqual(lens,"rear"); XCTAssertEqual(size,.large)
-                    return .init(jpeg:jpeg,camera:lens)
+                    return .init(jpeg:jpeg,camera:id == "insurance-inventory" ? "default" : lens)
                 }
                 let rows = try await store.rows(in:edition,table:"photos",limit:1)
                 let row = try XCTUnwrap(rows.first)
@@ -823,6 +1030,51 @@ final class LocalAppletLibraryTests: XCTestCase {
         } catch { XCTAssertEqual(error as? AppletRuntimeError,.invalid("Unsupported value for table column label")) }
         let rows = try await store.rows(in:edition,table:"ingredients",limit:10)
         XCTAssertEqual(rows.compactMap { $0["label"]?.text },["Flour","Salt"])
+    }
+
+    func testDeclaredCSVFilterExportsOnlyMatchingRowsAfterReopen() async throws {
+        let db = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: db) }
+        let account = String(repeating: "f", count: 64)
+        let store = try LocalAppletLibrary(database: db, account: account)
+        let steps = ["Include", "omit"].enumerated().map { index, value in
+            ["id": "save" + String(index), "type": "record", "table": "notes", "row": ["message": value]] as [String: Any]
+        }
+        let release = try fixture(steps: steps) { doc in
+            var processing = doc["processing"] as! [String: Any]
+            processing["tables"] = [["id": "notes", "columns": ["message": ["type": "text"]]] as [String: Any]]
+            doc["processing"] = processing
+            let step: [String: Any] = ["type": "share", "as": "csv", "table": "notes", "where": ["column": "message", "is": " include "]]
+            doc["ui"] = ["card": ["pieces": [["type": "buttons", "items": [["label": "Share selected notes", "do": ["step": step]]]] as [String: Any]]]]
+        }
+        try await store.install(release)
+        let selected = try await store.installed(release.selection.key)
+        let edition = try XCTUnwrap(selected)
+        _ = try await store.runButton("main", in: edition) { _ in XCTFail() }
+        let reopened = try LocalAppletLibrary(database: db, account: account)
+        let button = try XCTUnwrap(release.package.csvButtons.first)
+        let matching = try await reopened.csvRows(in: edition, table: button.table, filter: try XCTUnwrap(button.filter))
+        XCTAssertEqual(matching.compactMap { $0["message"]?.text }, ["Include"])
+        do {
+            _ = try await reopened.csvRows(in: edition, table: button.table)
+            XCTFail("An action with a filter authorized an unfiltered export")
+        } catch AppletRuntimeError.unavailable {}
+    }
+
+    func testCSVFilterMatchesPinnedNumberMembershipAndMissingValueRules() throws {
+        func matches(_ predicate: [String: JSONValue], _ value: JSONValue?) throws -> Bool {
+            let fields = predicate.merging(["column": .string("cost")]) { old, _ in old }
+            let filter = try CSVRowFilter(.object(fields), columns: ["cost"])
+            return filter.includes(value.map { ["cost": $0] } ?? [:])
+        }
+        XCTAssertTrue(try matches(["at_least": .number(1250)], .string("$1,250.00")))
+        XCTAssertFalse(try matches(["below": .number(1)], .bool(false)))
+        XCTAssertTrue(try matches(["below": .number(0)], .string("-3.25")))
+        XCTAssertTrue(try matches(["in": .array([.string("TRUE"), .number(42)])], .bool(true)))
+        XCTAssertTrue(try matches(["exists": .bool(false)], nil))
+        XCTAssertFalse(try matches(["is_not": .string("done")], .null))
+        XCTAssertThrowsError(try matches(["below": .string("40")], .number(20)))
+        XCTAssertThrowsError(try matches(["is": .string("yes"), "exists": .bool(true)], .string("yes")))
     }
 
     func testInstalledFlowUpdatesOnlyItsOwnLiveRow() async throws {

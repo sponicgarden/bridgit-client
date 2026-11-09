@@ -1,0 +1,858 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%@ · iOS %@": {
+      "extractionState": "manual"
+    },
+    "%@, %@": {
+      "extractionState": "manual"
+    },
+    "%lld": {
+      "extractionState": "manual"
+    },
+    "%lld items": {
+      "extractionState": "manual"
+    },
+    "%lld photos read · %lld failed · %@": {
+      "extractionState": "manual"
+    },
+    "%lld photos sending": {
+      "extractionState": "manual"
+    },
+    "%lld photos sent": {
+      "extractionState": "manual"
+    },
+    "%lld%%": {
+      "extractionState": "manual"
+    },
+    "%lld/%lld": {
+      "extractionState": "manual"
+    },
+    "%lld…": {
+      "extractionState": "manual"
+    },
+    "Use a Bridgit pairing link or the connector setup text shared by the device owner.": {
+      "extractionState": "manual"
+    },
+    "A link wants to add \"%@\" through %@. Only add it if its owner gave you this link.": {
+      "extractionState": "manual"
+    },
+    "A lost reply can mean the cloud already processed and charged for a photo. Another attempt may charge again. This allows a retry; tap Create inventory separately to start it.": {
+      "extractionState": "manual"
+    },
+    "About this phone": {
+      "extractionState": "manual"
+    },
+    "Account snapshot": {
+      "extractionState": "manual"
+    },
+    "Account snapshot only": {
+      "extractionState": "manual"
+    },
+    "Activity": {
+      "extractionState": "manual"
+    },
+    "Add %@": {
+      "extractionState": "manual"
+    },
+    "Add a host agent": {
+      "extractionState": "manual"
+    },
+    "Add a linked device": {
+      "extractionState": "manual"
+    },
+    "Add a pairing link or sign in. This Mac will use only the access each device owner grants.": {
+      "extractionState": "manual"
+    },
+    "Add a phone": {
+      "extractionState": "manual"
+    },
+    "Add host agent": {
+      "extractionState": "manual"
+    },
+    "Add this device?": {
+      "extractionState": "manual"
+    },
+    "Added to Bridgit": {
+      "extractionState": "manual"
+    },
+    "Adding, pausing or removing agents is done on the phone.": {
+      "extractionState": "manual"
+    },
+    "Agent": {
+      "extractionState": "manual"
+    },
+    "Agent P-256 public key (base64)": {
+      "extractionState": "manual"
+    },
+    "Agent name": {
+      "extractionState": "manual"
+    },
+    "Agent setup · shown once": {
+      "extractionState": "manual"
+    },
+    "All agents": {
+      "extractionState": "manual"
+    },
+    "All applets": {
+      "extractionState": "manual"
+    },
+    "Allow": {
+      "extractionState": "manual"
+    },
+    "Allow another attempt": {
+      "extractionState": "manual"
+    },
+    "Allow another attempt for interrupted appraisals?": {
+      "extractionState": "manual"
+    },
+    "Allow cloud appraisals": {
+      "extractionState": "manual"
+    },
+    "Allow cloud appraisals?": {
+      "extractionState": "manual"
+    },
+    "Allow cloud speech": {
+      "extractionState": "manual"
+    },
+    "Allow host camera requests": {
+      "extractionState": "manual"
+    },
+    "Allow relay wake-ups": {
+      "extractionState": "manual"
+    },
+    "Android": {
+      "extractionState": "manual"
+    },
+    "Appearance": {
+      "extractionState": "manual"
+    },
+    "Applet pages on your account": {
+      "extractionState": "manual"
+    },
+    "Applet section": {
+      "extractionState": "manual"
+    },
+    "Applets": {
+      "extractionState": "manual"
+    },
+    "Applying configuration": {
+      "extractionState": "manual"
+    },
+    "Ask": {
+      "extractionState": "manual"
+    },
+    "Asks the phone for live access. Someone taps Allow on the phone, then Bridgit stays connected.": {
+      "extractionState": "manual"
+    },
+    "Attach to Device": {
+      "extractionState": "manual"
+    },
+    "Attached": {
+      "extractionState": "manual"
+    },
+    "BRIDGIT INTERFACE": {
+      "extractionState": "manual"
+    },
+    "Battery": {
+      "extractionState": "manual"
+    },
+    "Bridgit": {
+      "extractionState": "manual"
+    },
+    "Bridgit opens on this device and stays connected to it.": {
+      "extractionState": "manual"
+    },
+    "Bridgit opens on this device. It switches to live as soon as someone taps Allow on the phone.": {
+      "extractionState": "manual"
+    },
+    "Bridgit runs on Android 14 or newer. After it's installed, open More › Linked devices › Pair a device on that phone to let this device view it.": {
+      "extractionState": "manual"
+    },
+    "Bridgit: How to build a Bridgit applet": {
+      "extractionState": "manual"
+    },
+    "Build an applet": {
+      "extractionState": "manual"
+    },
+    "CONNECTION": {
+      "extractionState": "manual"
+    },
+    "CURRENT STATUS": {
+      "extractionState": "manual"
+    },
+    "Camera": {
+      "extractionState": "manual"
+    },
+    "Cameras, speakers, TVs and more — discover what’s on your Wi-Fi or Ethernet network. Device types are suggestions. Pairing and agent access stay in your control.": {
+      "extractionState": "manual"
+    },
+    "Cancel": {
+      "extractionState": "manual"
+    },
+    "Card source": {
+      "extractionState": "manual"
+    },
+    "Cards": {
+      "extractionState": "manual"
+    },
+    "Changes to features are made on the phone. This linked view only shows them.": {
+      "extractionState": "manual"
+    },
+    "Check my account again": {
+      "extractionState": "manual"
+    },
+    "Choose": {
+      "extractionState": "manual"
+    },
+    "Choose View on a linked device, then refresh. No data is simulated.": {
+      "extractionState": "manual"
+    },
+    "Choose a device": {
+      "extractionState": "manual"
+    },
+    "Choose an applet": {
+      "extractionState": "manual"
+    },
+    "Choose device": {
+      "extractionState": "manual"
+    },
+    "Choose which applets check the photos": {
+      "extractionState": "manual"
+    },
+    "Close Window": {
+      "extractionState": "manual"
+    },
+    "Cloud appraisals enabled": {
+      "extractionState": "manual"
+    },
+    "Collapsed": {
+      "extractionState": "manual"
+    },
+    "Configuration requests": {
+      "extractionState": "manual"
+    },
+    "Connect": {
+      "extractionState": "manual"
+    },
+    "Connect a phone": {
+      "extractionState": "manual"
+    },
+    "Connect phone": {
+      "extractionState": "manual"
+    },
+    "Connecting…": {
+      "extractionState": "manual"
+    },
+    "Connections": {
+      "extractionState": "manual"
+    },
+    "Connector access uses a bearer token and the relay can read requests. Grant only the access you need.": {
+      "extractionState": "manual"
+    },
+    "Copied": {
+      "extractionState": "manual"
+    },
+    "Copy address": {
+      "extractionState": "manual"
+    },
+    "Copy link": {
+      "extractionState": "manual"
+    },
+    "Create agent": {
+      "extractionState": "manual"
+    },
+    "Decline": {
+      "extractionState": "manual"
+    },
+    "Delete": {
+      "extractionState": "manual"
+    },
+    "Delete item": {
+      "extractionState": "manual"
+    },
+    "Delete this item?": {
+      "extractionState": "manual"
+    },
+    "Detach": {
+      "extractionState": "manual"
+    },
+    "Details": {
+      "extractionState": "manual"
+    },
+    "Device views are paused": {
+      "extractionState": "manual"
+    },
+    "Devices": {
+      "extractionState": "manual"
+    },
+    "Disable": {
+      "extractionState": "manual"
+    },
+    "Discover nearby devices": {
+      "extractionState": "manual"
+    },
+    "Dismiss card": {
+      "extractionState": "manual"
+    },
+    "Done": {
+      "extractionState": "manual"
+    },
+    "Each agent also needs Camera snapshots access.": {
+      "extractionState": "manual"
+    },
+    "Edit": {
+      "extractionState": "manual"
+    },
+    "Edit item": {
+      "extractionState": "manual"
+    },
+    "Enable an applet’s web page to see it here.": {
+      "extractionState": "manual"
+    },
+    "Enable cloud appraisals": {
+      "extractionState": "manual"
+    },
+    "Enable fixture appraisals": {
+      "extractionState": "manual"
+    },
+    "Enable fixture model": {
+      "extractionState": "manual"
+    },
+    "Enable speech": {
+      "extractionState": "manual"
+    },
+    "Enable the local fixture model?": {
+      "extractionState": "manual"
+    },
+    "Enable this applet's speech?": {
+      "extractionState": "manual"
+    },
+    "Encrypted requests": {
+      "extractionState": "manual"
+    },
+    "Expanded": {
+      "extractionState": "manual"
+    },
+    "FIXTURE MODE — these results do not describe your photos.": {
+      "extractionState": "manual"
+    },
+    "Feature enablement": {
+      "extractionState": "manual"
+    },
+    "Fixture appraisals enabled": {
+      "extractionState": "manual"
+    },
+    "Fixture model · no cloud call or real appraisal": {
+      "extractionState": "manual"
+    },
+    "Flow access can send an applet's photos to cloud models when you have separately enabled appraisals. Existing view links keep their original permissions.": {
+      "extractionState": "manual"
+    },
+    "From the status the phone sends to its owner's account every few minutes.": {
+      "extractionState": "manual"
+    },
+    "Grand total: New %@ · Used %@": {
+      "extractionState": "manual"
+    },
+    "Host on this device": {
+      "extractionState": "manual"
+    },
+    "How this is read": {
+      "extractionState": "manual"
+    },
+    "How to build a Bridgit applet": {
+      "extractionState": "manual"
+    },
+    "Import images": {
+      "extractionState": "manual"
+    },
+    "Inbox": {
+      "extractionState": "manual"
+    },
+    "Install": {
+      "extractionState": "manual"
+    },
+    "Install Insurance inventory": {
+      "extractionState": "manual"
+    },
+    "Install Insurance inventory on this device?": {
+      "extractionState": "manual"
+    },
+    "Insurable": {
+      "extractionState": "manual"
+    },
+    "Its activity log here is deleted. If the phone is still in use, link it again from Bridgit on it.": {
+      "extractionState": "manual"
+    },
+    "Its token will stop working and active requests will be cancelled. Local applet data is kept.": {
+      "extractionState": "manual"
+    },
+    "Keep Bridgit open to host.": {
+      "extractionState": "manual"
+    },
+    "Keeps a live connection to this phone and opens on it every time.": {
+      "extractionState": "manual"
+    },
+    "Leave the phone where your animal hangs out. Pet monitor will take photos and analyze their activities.": {
+      "extractionState": "manual"
+    },
+    "Level 2 Diagnostic": {
+      "extractionState": "manual"
+    },
+    "Library": {
+      "extractionState": "manual"
+    },
+    "Linked pages": {
+      "extractionState": "manual"
+    },
+    "Live through relay": {
+      "extractionState": "manual"
+    },
+    "Live through the Bridgit relay, with the permission the phone's owner granted this device.": {
+      "extractionState": "manual"
+    },
+    "Live through the relay": {
+      "extractionState": "manual"
+    },
+    "Load older": {
+      "extractionState": "manual"
+    },
+    "Local": {
+      "extractionState": "manual"
+    },
+    "Local fixture": {
+      "extractionState": "manual"
+    },
+    "Local preview": {
+      "extractionState": "manual"
+    },
+    "Local preview · replies stay on this Mac; no agent or device action runs.": {
+      "extractionState": "manual"
+    },
+    "Looking back over the last 24 hours…": {
+      "extractionState": "manual"
+    },
+    "Mac · %@": {
+      "extractionState": "manual"
+    },
+    "Made by your agents": {
+      "extractionState": "manual"
+    },
+    "Model": {
+      "extractionState": "manual"
+    },
+    "More": {
+      "extractionState": "manual"
+    },
+    "More applets and help": {
+      "extractionState": "manual"
+    },
+    "Name": {
+      "extractionState": "manual"
+    },
+    "New %@ · Used %@": {
+      "extractionState": "manual"
+    },
+    "New total %@ · Used total %@": {
+      "extractionState": "manual"
+    },
+    "No agent has access to this device.": {
+      "extractionState": "manual"
+    },
+    "No agents reported yet.": {
+      "extractionState": "manual"
+    },
+    "No cards": {
+      "extractionState": "manual"
+    },
+    "No image leaves this device. Results are fixed test data and are not a real appraisal.": {
+      "extractionState": "manual"
+    },
+    "No installed applets": {
+      "extractionState": "manual"
+    },
+    "No linked devices": {
+      "extractionState": "manual"
+    },
+    "No local applets installed.": {
+      "extractionState": "manual"
+    },
+    "No photo applets": {
+      "extractionState": "manual"
+    },
+    "Not insurable": {
+      "extractionState": "manual"
+    },
+    "Nothing installed yet. Add one below, or ask your agent to build one.": {
+      "extractionState": "manual"
+    },
+    "Nothing yet.": {
+      "extractionState": "manual"
+    },
+    "Off by default. A cloud voice sends text; cloud hearing sends audio. Applet steps must also request cloud use. Account and applet budgets apply.": {
+      "extractionState": "manual"
+    },
+    "On %@": {
+      "extractionState": "manual"
+    },
+    "On that device, open Linked devices and share its pairing link. You will confirm the device before access is saved.": {
+      "extractionState": "manual"
+    },
+    "On the phone, open More › Link web view and use the code it shows. Connect only your own phone.": {
+      "extractionState": "manual"
+    },
+    "Scan a pairing code from the other device for a live view through the relay.": {
+      "extractionState": "manual"
+    },
+    "On the phone, open More › Linked devices › Pair a device and tap Show a pairing code. Then scan the code.": {
+      "extractionState": "manual"
+    },
+    "On this network": {
+      "extractionState": "manual"
+    },
+    "Only refused or failed": {
+      "extractionState": "manual"
+    },
+    "Open in browser": {
+      "extractionState": "manual"
+    },
+    "Open instructions": {
+      "extractionState": "manual"
+    },
+    "Or sign in with the Google account linked to the other device.": {
+      "extractionState": "manual"
+    },
+    "Other devices": {
+      "extractionState": "manual"
+    },
+    "Owner": {
+      "extractionState": "manual"
+    },
+    "Page options": {
+      "extractionState": "manual"
+    },
+    "Page: %@": {
+      "extractionState": "manual"
+    },
+    "Pages on %@": {
+      "extractionState": "manual"
+    },
+    "Pair a device": {
+      "extractionState": "manual"
+    },
+    "Pair with a device key": {
+      "extractionState": "manual"
+    },
+    "Pair with the phone for its full network list. The account snapshot only includes cameras.": {
+      "extractionState": "manual"
+    },
+    "Paste": {
+      "extractionState": "manual"
+    },
+    "Paste a link or setup text instead": {
+      "extractionState": "manual"
+    },
+    "Paste a sign-in or pairing link": {
+      "extractionState": "manual"
+    },
+    "Paste from clipboard": {
+      "extractionState": "manual"
+    },
+    "Pause": {
+      "extractionState": "manual"
+    },
+    "Pet monitor": {
+      "extractionState": "manual"
+    },
+    "Pet monitor is set up on a capable linked device.": {
+      "extractionState": "manual"
+    },
+    "Phone": {
+      "extractionState": "manual"
+    },
+    "Phones": {
+      "extractionState": "manual"
+    },
+    "Phones on your account show their pages here once you sign in under More.": {
+      "extractionState": "manual"
+    },
+    "Photo library": {
+      "extractionState": "manual"
+    },
+    "Photos and tables stay on this device. Cloud appraisals need separate approval before a photo leaves it. Installing grants no remote agent access.": {
+      "extractionState": "manual"
+    },
+    "Prepare this host locally": {
+      "extractionState": "manual"
+    },
+    "Preparing speech…": {
+      "extractionState": "manual"
+    },
+    "Preview with sample data": {
+      "extractionState": "manual"
+    },
+    "Privacy": {
+      "extractionState": "manual"
+    },
+    "QR code for the Bridgit Android app": {
+      "extractionState": "manual"
+    },
+    "Quick controls": {
+      "extractionState": "manual"
+    },
+    "Reading %@…": {
+      "extractionState": "manual"
+    },
+    "Reading %lld of %lld": {
+      "extractionState": "manual"
+    },
+    "Refresh": {
+      "extractionState": "manual"
+    },
+    "Refresh device facts": {
+      "extractionState": "manual"
+    },
+    "Refresh from the phone": {
+      "extractionState": "manual"
+    },
+    "Registering this device…": {
+      "extractionState": "manual"
+    },
+    "Reload from the phone": {
+      "extractionState": "manual"
+    },
+    "Reload page": {
+      "extractionState": "manual"
+    },
+    "Remove": {
+      "extractionState": "manual"
+    },
+    "Remove %@ from your account?": {
+      "extractionState": "manual"
+    },
+    "Remove agent": {
+      "extractionState": "manual"
+    },
+    "Remove link": {
+      "extractionState": "manual"
+    },
+    "Remove this host agent?": {
+      "extractionState": "manual"
+    },
+    "Remove this saved device link?": {
+      "extractionState": "manual"
+    },
+    "Resume": {
+      "extractionState": "manual"
+    },
+    "Review": {
+      "extractionState": "manual"
+    },
+    "Review interrupted appraisals": {
+      "extractionState": "manual"
+    },
+    "Review pairing": {
+      "extractionState": "manual"
+    },
+    "Rich cards agents can show on the phone. Tap one to try it; your answer stays in this app.": {
+      "extractionState": "manual"
+    },
+    "Run Level 2 Diagnostic: look around this network": {
+      "extractionState": "manual"
+    },
+    "Runs on this device · local tables": {
+      "extractionState": "manual"
+    },
+    "Runs while this Mac is awake.": {
+      "extractionState": "manual"
+    },
+    "Save": {
+      "extractionState": "manual"
+    },
+    "Send answer": {
+      "extractionState": "manual"
+    },
+    "Services": {
+      "extractionState": "manual"
+    },
+    "Set it up on the phone: Applets › Config › Pet monitor.": {
+      "extractionState": "manual"
+    },
+    "Share": {
+      "extractionState": "manual"
+    },
+    "Share %@": {
+      "extractionState": "manual"
+    },
+    "Share link": {
+      "extractionState": "manual"
+    },
+    "Share setup": {
+      "extractionState": "manual"
+    },
+    "Shared with you": {
+      "extractionState": "manual"
+    },
+    "Sign in with Google": {
+      "extractionState": "manual"
+    },
+    "Sign out": {
+      "extractionState": "manual"
+    },
+    "Snapshot read %@ · Refresh to read again": {
+      "extractionState": "manual"
+    },
+    "Speech": {
+      "extractionState": "manual"
+    },
+    "Speech enabled": {
+      "extractionState": "manual"
+    },
+    "Start host": {
+      "extractionState": "manual"
+    },
+    "Start this device as a Bridgit host?": {
+      "extractionState": "manual"
+    },
+    "Start with Insurance inventory": {
+      "extractionState": "manual"
+    },
+    "Start with a useful idea, choose a recipe, and let your agent build it with the phone’s existing features.": {
+      "extractionState": "manual"
+    },
+    "Stop": {
+      "extractionState": "manual"
+    },
+    "Stop host": {
+      "extractionState": "manual"
+    },
+    "Stop reading": {
+      "extractionState": "manual"
+    },
+    "Summarize the last 24 hours": {
+      "extractionState": "manual"
+    },
+    "Switch between the rear and front camera": {
+      "extractionState": "manual"
+    },
+    "Switch phone": {
+      "extractionState": "manual"
+    },
+    "Take a photo for this applet": {
+      "extractionState": "manual"
+    },
+    "Take photo": {
+      "extractionState": "manual"
+    },
+    "Take photos": {
+      "extractionState": "manual"
+    },
+    "The card library did not load.": {
+      "extractionState": "manual"
+    },
+    "The card library didn't load.": {
+      "extractionState": "manual"
+    },
+    "The device registers its signing identity and checks the model registry online. Device speech processing is free. Cloud speech stays off unless you allow it separately. Hearing requires your microphone permission and the app in the foreground. Stop cancels the current turn.": {
+      "extractionState": "manual"
+    },
+    "The linked device and its applet data are kept. You will need a new pairing link to connect again.": {
+      "extractionState": "manual"
+    },
+    "The phone hasn't reported this feature to Bridgit.": {
+      "extractionState": "manual"
+    },
+    "These run on the phone and keep counting while your agent is offline.": {
+      "extractionState": "manual"
+    },
+    "This Mac is a view satellite · relay pairing": {
+      "extractionState": "manual"
+    },
+    "This action is not available in this build.": {
+      "extractionState": "manual"
+    },
+    "This applet can listen in bounded turns and speak on this device.": {
+      "extractionState": "manual"
+    },
+    "This applet can speak on this device.": {
+      "extractionState": "manual"
+    },
+    "This build stays on this Mac. Host access starts only when you choose.": {
+      "extractionState": "manual"
+    },
+    "This card piece is not implemented.": {
+      "extractionState": "manual"
+    },
+    "This contains a secret token. Share it only with this agent. Bridgit keeps its hash; remove the agent if the token is exposed.": {
+      "extractionState": "manual"
+    },
+    "This device": {
+      "extractionState": "manual"
+    },
+    "This device is no longer in the phone's list.": {
+      "extractionState": "manual"
+    },
+    "This iPhone or iPad can read the phone directly.": {
+      "extractionState": "manual"
+    },
+    "This registers this device's public relay identity and connects it to Bridgit. Only the host agents you explicitly add can send requests. Starting does not allow cloud models or grant camera or microphone access.": {
+      "extractionState": "manual"
+    },
+    "Try a card locally. Replies stay on this Mac.": {
+      "extractionState": "manual"
+    },
+    "Turn photos of your things into an inventory. Install it on this Mac to get started.": {
+      "extractionState": "manual"
+    },
+    "Two ways to get access": {
+      "extractionState": "manual"
+    },
+    "Unlock your device.\nUnleash agentic applications.": {
+      "extractionState": "manual"
+    },
+    "Up to a few minutes old. Attach to ask the phone for a live connection.": {
+      "extractionState": "manual"
+    },
+    "Use it": {
+      "extractionState": "manual"
+    },
+    "View": {
+      "extractionState": "manual"
+    },
+    "View applets": {
+      "extractionState": "manual"
+    },
+    "View your linked devices and their applets. This iPhone or iPad acts as a view satellite, with only the access each device owner grants.": {
+      "extractionState": "manual"
+    },
+    "Watching your dog": {
+      "extractionState": "manual"
+    },
+    "What the phone has switched on. Changes are made on the phone.": {
+      "extractionState": "manual"
+    },
+    "What this build can do": {
+      "extractionState": "manual"
+    },
+    "When you tap Create inventory, each selected photo goes to Bridgit's cloud vision model. It costs approximately half a cent per photo, subject to your account and applet limits. You can stop reading or disable model calls here. Original photos and tables stay on this device; appraisals send resized photos to the cloud. Exports are shared only when you choose.": {
+      "extractionState": "manual"
+    },
+    "Where": {
+      "extractionState": "manual"
+    },
+    "XXXX-XXXX": {
+      "extractionState": "manual"
+    },
+    "bridgit.cc/get/android": {
+      "extractionState": "manual"
+    },
+    "◈": {
+      "extractionState": "manual"
+    },
+    "🐾": {
+      "extractionState": "manual"
+    }
+  },
+  "version": "1.0"
+}

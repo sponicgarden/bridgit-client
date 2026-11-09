@@ -252,7 +252,7 @@ class OwnerActions(private val app: BridgeApp) {
             "tour.start" -> "Start a City tour"; "wake.configure" -> "Change this agent’s wake words"; "sounds.configure" -> "Change sound listening"
             "remote.configure" -> "Change remote viewing"; "callback.configure" -> "Change this agent’s callback"
             "delivery.subscribe" -> "Change event delivery"; "updates.offers" -> "Change update reminders"; "updates.auto" -> "Change automatic updates"; "updates.update_now" -> "Update Bridgit now"; "updates.install" -> "Install the verified app update"
-            "portal.update_prompts" -> "Change Bridgit Portal update prompts"; "portal.update_now" -> "Show the Bridgit Portal update prompt"
+            "portal.update_prompts" -> "Change Bridgit update prompts on a paired device"; "portal.update_now" -> "Show the Bridgit update prompt on a paired device"
             else -> "Open owner setup"
         }
         fun description(args:JSONObject):String {
@@ -279,8 +279,8 @@ class OwnerActions(private val app: BridgeApp) {
                 "updates.offers" -> if(o.getBoolean("enabled")) "Offer available app updates." else "Stop automatic update offers. Manual update checks still work."
                 "updates.auto" -> if(o.getBoolean("enabled")) "Install official app updates automatically when this phone allows it." else "Stop installing updates automatically. Update offers and manual checks still work."
                 "updates.update_now" -> "Check for the official app update and install it now if one is newer. Its checksum and app signature are verified. Bridgit restarts."
-                "portal.update_prompts" -> (if(o.getBoolean("enabled")) "Bridgit Portal on ${o.getString("portal_id")} asks you to update when a new TestFlight build is ready." else "Bridgit Portal on ${o.getString("portal_id")} stops asking you to update. TestFlight still works.")+"\nApplies the next time that device syncs with this phone."
-                "portal.update_now" -> "Bridgit Portal on ${o.getString("portal_id")} checks for a newer TestFlight build and, if there is one, asks you to update. You install it in TestFlight.\nApplies the next time that device syncs with this phone."
+                "portal.update_prompts" -> (if(o.getBoolean("enabled")) "Bridgit on ${o.getString("portal_id")} asks you to update when a new TestFlight build is ready." else "Bridgit on ${o.getString("portal_id")} stops asking you to update. TestFlight still works.")+"\nApplies the next time that device syncs with this phone."
+                "portal.update_now" -> "Bridgit on ${o.getString("portal_id")} checks for a newer TestFlight build and, if there is one, asks you to update. You install it in TestFlight.\nApplies the next time that device syncs with this phone."
                 "updates.install" -> "Use verified download ${o.getString("job_id")}. Its original checksum and app signature are checked again. Android may ask you to confirm installation."
                 "android.setup" -> "Open ${o.getString("target").replace('_',' ')} setup. You still complete any Android permission or account sign-in prompts."
                 else -> "Stop the monitor; keep saved history."

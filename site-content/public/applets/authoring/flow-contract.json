@@ -118,10 +118,8 @@
         "as",
         "columns",
         "group_by",
-        "photos",
         "table",
         "title",
-        "totals",
         "where"
       ]
     },

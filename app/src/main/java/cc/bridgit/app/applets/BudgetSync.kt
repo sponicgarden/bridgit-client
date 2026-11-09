@@ -221,7 +221,7 @@ class BudgetSync(private val app: BridgeApp) {
         r.optString("agent_id").takeIf { it.isNotEmpty() && app.agents.get(it) != null }?.let { out += it }
         val by = r.optString("requested_by").takeIf { !r.isNull("requested_by") && it.isNotEmpty() && app.agents.get(it) != null }
         if (by != null) out += by
-        else app.agents.all().filter { it.connection != cc.bridgit.app.core.Connection.APPLET && it.allows(BudgetModule.ID) && !it.paused }.forEach { out += it.id }
+        else app.agents.all().filter { it.connection != cc.bridgit.app.core.Connection.APPLET && it.allows(BudgetModule.ID) && !it.suspended }.forEach { out += it.id }
         return out.toList()
     }
 

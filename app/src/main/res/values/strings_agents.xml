@@ -210,6 +210,8 @@
     <string name="agents_status_relay">Relay</string>
     <string name="agents_status_relay_paused">Relay stopped: external calls paused</string>
     <string name="agents_status_paused">Paused</string>
+    <string name="agents_status_api_off">API access off</string>
+    <string name="agents_api_access">API access</string>
     <string name="agents_status_all_paused">All paused</string>
     <string name="agents_status_active">active now</string>
     <string name="agents_status_seen">seen %1$s</string>

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "An already authorized Super agent replaces grants or changes roles for an existing paired control agent, including its own configuration bootstrap; applets, portals and device peers excluded",
@@ -37,6 +37,24 @@
     "name": "paused",
     "description": "Pause/resume this paired control agent",
     "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "api_access",
+    "description": "API access (on by default): false refuses every API call from this agent while it stays paired; true restores it",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "name",
+    "description": "Rename the agent: 1-24 letters, numbers, spaces, - or _, unique on this phone",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "notes",
+    "description": "The owner's notes about the agent, up to 200 characters; \"\" clears",
+    "type": "string",
     "required": false
    },
    {
@@ -85,9 +103,17 @@
       "null"
      ]
     },
+    "notes": {
+     "description": "The owner's notes about the agent, up to 200 characters; \"\" clears",
+     "type": "string"
+    },
     "maximum_control": {
      "description": "Preserves the separate Superpowers role. true alone grants native maximum capabilities/roles/scopes; false stops future maximum inheritance",
      "type": "boolean"
+    },
+    "name": {
+     "description": "Rename the agent: 1-24 letters, numbers, spaces, - or _, unique on this phone",
+     "type": "string"
     },
     "idempotency_key": {
      "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
@@ -95,6 +121,10 @@
     },
     "fixer_mode": {
      "description": "Delegate/revoke Fixer Mode",
+     "type": "boolean"
+    },
+    "api_access": {
+     "description": "API access (on by default): false refuses every API call from this agent while it stays paired; true restores it",
      "type": "boolean"
     },
     "super_powers": {

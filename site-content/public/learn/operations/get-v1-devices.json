@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Host and owner-configured external devices, supported actions and access status",
@@ -16,7 +16,7 @@
   "idempotent": false,
   "path": "/v1/devices",
   "capability": "status",
-  "returns": "devices: host Android device, cameras visible to your lan_camera grant and your own LAN enrollments when lan_control is granted and enabled; SSH profiles when ssh is granted and enabled; ids, names, configured state, availability (not_checked until an action), advertised pan/tilt and exact action paths/bodies. No credentials. Inventory is passive and does not scan the LAN.",
+  "returns": "devices: host Android device, cameras visible to your lan_camera grant and your own LAN enrollments when lan_control is granted and enabled; SSH profiles when ssh is granted and enabled; ids, names, configured state, availability (not_checked until an action), advertised pan/tilt and exact action paths/bodies. No credentials. Inventory is passive and does not scan the LAN. lan_path: read-only status of the agent path for other LAN devices (speakers such as WiiM): discover, enroll and control steps with agent grant, owner switch, usable, endpoints and the number of this agent's enrolled devices; granting and approval stay with the owner.",
   "mcp_input_schema": {
    "type": "object",
    "properties": {},

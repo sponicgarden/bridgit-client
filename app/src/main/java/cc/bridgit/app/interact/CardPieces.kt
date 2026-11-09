@@ -303,7 +303,7 @@ object CardPieces {
             d.has("step") -> {
                 // One step on a tap: only share (the owner's tap and the share sheet are the consent; O1).
                 if (d.length() != 1) bad("$at.do: {\"step\": {\"type\": \"share\", …}}.")
-                val st = d.opt("step") as? JSONObject ?: bad("$at.do.step must be a step object, like {\"type\": \"share\", \"table\": \"items\", \"as\": \"pdf\"}.")
+                val st = d.opt("step") as? JSONObject ?: bad("$at.do.step must be a step object, like {\"type\": \"share\", \"table\": \"items\", \"as\": \"csv\"}.")
                 if (st.opt("type") != "share") bad("$at.do.step: a card button may run a share step only (for other steps use run_workflow).")
                 if (!scope.packaged) bad("$at: a share step works on an installed applet's card only.")
                 if (into != null) bad("$at: into goes with a call button.")
@@ -706,7 +706,7 @@ object CardPieces {
             d.has("run_workflow") -> "$label (runs its workflow)"
             d.has("flow") -> "$label (runs the flow \"${d.opt("flow").let { (it as? JSONObject)?.optString("\$flow") ?: it.toString() }}\"${if (d.has("for_each")) " once for each entry in ${eachOf(d)}, at most ${d.optInt("max", 50)}" else ""})"
             d.has("record") -> "$label (saves a row on the phone)"
-            d.has("step") -> d.optJSONObject("step").let { s -> "$label (makes ${if (s?.optString("as") == "csv") "a CSV file" else "a PDF"} of ${s?.optString("title")?.ifBlank { null }?.let { "\"${it.take(60)}\"" } ?: "the table ${s?.optString("table")}"} for you to share when you tap it)" }
+            d.has("step") -> d.optJSONObject("step").let { s -> "$label (makes ${if (s?.optString("as") == "csv") "a CSV file" else "an unavailable legacy PDF export"} of ${s?.optString("title")?.ifBlank { null }?.let { "\"${it.take(60)}\"" } ?: "the table ${s?.optString("table")}"} for you to share when you tap it)" }
             d.has("camera") -> "$label (takes photos when you tap ${b.optString("label")})"
             else -> {
                 val call = "${d.optString("method", if (d.has("body")) "POST" else "GET").uppercase()} ${d.opt("path").let { if (it is JSONArray) (0 until it.length()).joinToString("") { i -> (it.opt(i) as? String) ?: "x0" } else it.toString() }}"
@@ -740,7 +740,7 @@ object CardPieces {
             d.has("flow") -> "runs ${flow(d.opt("flow").let { (it as? JSONObject)?.optString("\$flow") ?: it.toString() })}" +
                 (if (d.has("for_each")) " once for each entry in ${each()}, at most ${"%,d".format(java.util.Locale.US, d.optInt("max", 50))}" else "")
             d.has("record") -> "saves a row on this device"
-            d.has("step") -> d.optJSONObject("step").let { s -> "makes ${if (s?.optString("as") == "csv") "a CSV file" else "a PDF"} of ${s?.optString("title")?.ifBlank { null }?.take(60) ?: s?.optString("table")?.let(table) ?: "the table"} for you to share" }
+            d.has("step") -> d.optJSONObject("step").let { s -> "makes ${if (s?.optString("as") == "csv") "a CSV file" else "an unavailable legacy PDF export"} of ${s?.optString("title")?.ifBlank { null }?.take(60) ?: s?.optString("table")?.let(table) ?: "the table"} for you to share" }
             d.has("camera") -> "takes photos"
             else -> {
                 val call = "${d.optString("method", if (d.has("body")) "POST" else "GET").uppercase()} ${d.opt("path").let { if (it is JSONArray) (0 until it.length()).joinToString("") { i -> (it.opt(i) as? String) ?: "x0" } else it.toString() }}"

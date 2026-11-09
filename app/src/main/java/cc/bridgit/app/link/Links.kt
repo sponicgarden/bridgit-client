@@ -213,24 +213,48 @@ class Links(private val app: BridgeApp) {
     /** What an agent names to run a call there (LNK-46): the Device Domain Name, else the sat: id, else the link id. */
     fun targetOf(r: Rec): String = r.peerName ?: if (r.role == Role.HUB) r.ref else r.id
 
-    /** One linked Bridgit as agent [a] sees it in GET /v1/links (and the /v1/satellites alias). */
+    /**
+     * One linked Bridgit as agent [a] sees it in GET /v1/links (and the /v1/satellites alias). Both ends of a link list
+     * it (A0152): "reachable" says whether [a] may target it; only then does the entry carry the other device's
+     * manifest (cameras, capabilities, endpoints, battery).
+     */
     fun agentEntry(r: Rec, a: Agent): JSONObject {
         val t = targetOf(r)
-        val base = if (r.role == Role.HUB) app.satellites.get(r.ref)?.let { cc.bridgit.app.satellite.SatelliteEndpoints.publicJson(it) } else null
-        val o = base ?: run {
+        val canReach = reachable(r, a)
+        val sat = if (r.role == Role.HUB) app.satellites.get(r.ref) else null
+        val full = sat?.let { cc.bridgit.app.satellite.SatelliteEndpoints.publicJson(it) }
+        val o = if (sat != null) {
+            // Not reachable by [a]: who and whether it is up, but not what the other device has.
+            if (canReach) full!! else JSONObject().put("id", t).put("name", peerLabel(r)).put("kind", "satellite")
+                .put("status", full!!.get("status")).put("last_seen", sat.lastSeen)
+                .put(cc.bridgit.app.platform.DeviceType.FIELD, full.get(cc.bridgit.app.platform.DeviceType.FIELD))
+        } else {
             val info = app.hubLinks.hubs().firstOrNull { it.linkId == r.ref }
             JSONObject().put("id", t).put("name", peerLabel(r)).put("kind", "linked_bridgit")
                 .put("status", if (info == null) "not_checked" else if (System.currentTimeMillis() - (app.agents.get(r.ref)?.lastUsedAt ?: 0) <= SatelliteStore.ONLINE_MS) "online" else "offline")
                 .put("last_seen", app.agents.get(r.ref)?.lastUsedAt ?: 0)
                 .put(cc.bridgit.app.platform.DeviceType.FIELD, info?.deviceType?.wire ?: JSONObject.NULL)
         }
+        val how = if (canReach) "Send header X-Bridgit-Target: $t (or ?target=$t) with an endpoint whose capability is in services. Example: POST /v1/camera/snapshot?target=$t {\"camera\":\"rear\"}"
+            else "You may not use ${peerLabel(r)} yet. Ask the owner, or an agent with owner.configuration: POST /v1/owner/configuration/links/${r.id}/directions/out {\"agents\":[\"${a.id}\"]}."
         return o.put("link_id", r.id).put("target", t).put("bridgit_name", r.peerName ?: JSONObject.NULL)
+            .put("role", r.role.wire).put("reachable", canReach)
             .put("platform", r.platform ?: "android").put("state", outState(r).wire).put("services", LinkModel.json(r.farOut?.services ?: emptySet()))
-            .put("how_to_call", "Send header X-Bridgit-Target: $t (or ?target=$t) with an endpoint whose capability is in services. Example: POST /v1/camera/snapshot?target=$t {\"camera\":\"rear\"}")
+            .put("directions", JSONObject()
+                .put("in", JSONObject().put("state", inState(r).wire).put("services", LinkModel.json(r.inServices)).put("about", "${peerLabel(r)} uses this device"))
+                .put("out", JSONObject().put("state", outState(r).wire).put("services", LinkModel.json(r.farOut?.services ?: emptySet()))
+                    .put("about", "this device uses ${peerLabel(r)}")))
+            .put("how_to_call", how)
     }
 
-    /** The links agent [a] may reach (it is in the user opt-in), for GET /v1/links. */
-    fun reachableBy(a: Agent): List<Rec> = all().filter { a.id in outAgents(it) && !it.outRevoked }
+    /** Whether agent [a] may target [r]: it is in the user opt-in and this device's use of it wasn't disconnected. */
+    fun reachable(r: Rec, a: Agent): Boolean = a.id in outAgents(r) && !r.outRevoked
+
+    /** The links agent [a] may reach. */
+    fun reachableBy(a: Agent): List<Rec> = all().filter { reachable(it, a) }
+
+    /** Every link of this device, either role, one entry each, for GET /v1/links (A0152: a hub lists its satellites too). */
+    fun agentList(a: Agent): JSONArray = JSONArray(all().distinctBy { it.id }.map { agentEntry(it, a) })
 
     // ---- Reaching a target (forwarding, LNK-12, LNK-46) -----------------------------------------
 

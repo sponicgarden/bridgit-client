@@ -346,6 +346,42 @@ body.design-b .node.selected .ring { stroke-width: 2; }
 #scene #band > rect { fill: #1b2230; }
 :root[data-theme="light"] #scene #band > rect { fill: var(--panel); }
 #scene #band > line { stroke: var(--dim); stroke-width: 1; }
+/* Reported-state clients can have longer honest status/count labels. Keep each action in flow. */
+body.reported-state { box-sizing: border-box; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+body.reported-state .hdrline { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; white-space: normal; padding-block: 6px; }
+body.reported-state .hdrline .left, body.reported-state .hdrline .right { display: contents; }
+body.reported-state #hdr { grid-column: 1 / -1; grid-row: 1; overflow-wrap: anywhere; }
+body.reported-state #addAgent { grid-column: 1; grid-row: 2; justify-self: start; }
+body.reported-state #rerun { grid-column: 2; grid-row: 2; justify-self: end; }
+body.reported-state #hdrCount { grid-column: 1 / -1; grid-row: 3; overflow-wrap: anywhere; }
+body.reported-state #hdrCount:empty { display: none; }
+body.reported-state .legendrow > span { min-width: 0; overflow-wrap: anywhere; }
+body.reported-state #logBox { scroll-margin-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+html[data-bridgit-reported-state=true] #log:not([data-activity-reported=true]):empty::before, body.reported-state #log[data-activity-reported=false]:empty::before { content: "Activity not reported"; }
+/* Native Dynamic Type scales text in place. The enlarged diagram pans inside its own region. */
+body.reported-state #hdr, body.reported-state .hbtn { font-size: calc(11px * var(--bridgit-text-scale, 1)); }
+body.reported-state #hdrCount, body.reported-state .applet-empty { font-size: calc(12px * var(--bridgit-text-scale, 1)); }
+body.reported-state .legendrow { font-size: calc(11.5px * var(--bridgit-text-scale, 1)); }
+body.reported-state .hbtn .gl { font-size: calc(14px * var(--bridgit-text-scale, 1)); }
+body.reported-state #appletBar, body.reported-state #logBar .lbl, body.reported-state .applet-item { font-size: calc(11px * var(--bridgit-text-scale, 1)); }
+body.reported-state .applet-icon { font-size: calc(22px * var(--bridgit-text-scale, 1)); width: calc(30px * var(--bridgit-text-scale, 1)); height: calc(30px * var(--bridgit-text-scale, 1)); }
+body.reported-state #log { font-size: calc(10.5px * var(--bridgit-text-scale, 1)); }
+body.reported-state #logHistory { font-size: calc(10px * var(--bridgit-text-scale, 1)); }
+body.reported-state #final .t1 { font-size: calc(17px * var(--bridgit-text-scale, 1)); }
+body.reported-state #final .t2, body.reported-state #final .t3 { font-size: calc(12px * var(--bridgit-text-scale, 1)); }
+body.reported-state.native-large-type .hbtn { height: auto; min-height: 44px; padding: 8px; line-height: 1.25; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+body.reported-state.native-large-type #stage { flex: 0 0 auto; height: calc(423px * var(--bridgit-text-scale, 1)); min-height: 0; overflow-x: auto; overflow-y: hidden; justify-content: flex-start; }
+body.reported-state.native-large-type svg#scene { flex: none; margin-inline: auto; }
+body.reported-state.native-large-type #logBox { --preview-height: calc(63px * var(--bridgit-text-scale, 1)); }
+body.reported-state.native-large-type #logBar { flex-basis: 44px; width: 44px; }
+body.reported-state.native-large-type #logBar .arr { width: 44px; }
+body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var(--bridgit-text-scale, 1)); }
+/* Sparse reported state (opt-in): distinct from an explicitly disabled switch. */
+.node.unreported .ring, .ext.unreported .box { stroke-dasharray: 2 3; opacity: .55; }
+.node.unavailable .ring, .ext.unavailable .box { stroke-dasharray: 6 3; opacity: .35; }
+.node.unreported .halo, .node.unavailable .halo { display: none; }
+.trace.unreported { stroke-dasharray: 2 4; opacity: .3; }
+.trace.unavailable { stroke-dasharray: 6 4; opacity: .15; }
 </style>
 </head>
 <body>
@@ -490,6 +526,8 @@ body.design-b .node.selected .ring { stroke-width: 2; }
       gPk = $("packets"), gPing = $("pings"), gTerm = $("log"), gFinal = $("final"), core = $("core"),
       hdr = $("hdr"), hdrCount = $("hdrCount"), band = $("band"), bridge = $("bridge");
   var reduceQ = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  var nativeTextScale = 1;
+  var reportedOnly = false, agentsReported = true, agentCalledReported = true, forcingStill = false; // Opt-in for clients whose sparse reports distinguish absence from off.
   var paused = false, agentCalled = false, agentList = [], run = 0, playing = false, state = {}, agentName = null, listening = [], counts = {}, linked = 0, scanned = {}, placed = [];
 
   // The oval track, sampled once by arc length, with a gap at twelve o'clock for the tunnels.
@@ -578,7 +616,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
   function ease(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
   function tick(now) {
     moving = moving.filter(function (m) {
-      var k = Math.min(1, (now - m.t0) / m.dur), e = ease(k);
+      var k = still() ? 1 : Math.min(1, (now - m.t0) / m.dur), e = ease(k);
       m.n.x = m.x0 + (m.x1 - m.x0) * e; m.n.y = m.y0 + (m.y1 - m.y0) * e; m.n.sc = m.s0 + (m.s1 - m.s0) * e; drawNode(m.n);
       if (k >= 1 && m.done) m.done();
       return k < 1;
@@ -637,7 +675,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
   }
 
   // ---------- helpers ----------
-  function still() { return reduceQ.matches; }
+  function still() { return forcingStill || (typeof window.BridgitNativeMotion === "boolean" ? window.BridgitNativeMotion : reduceQ.matches); }
   function wait(ms, my) { return new Promise(function (res, rej) { setTimeout(function () { my === run ? res() : rej("stopped"); }, still() ? 0 : ms * PACE); }); }
   function draw(path, dur) {
     var L = path.getTotalLength ? path.getTotalLength() : 0;
@@ -658,7 +696,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     if (still()) { e.textContent = final; return; }
     var t0 = performance.now();
     (function f(now) {
-      var p = Math.min(1, (now - t0) / (dur * PACE)), k = Math.floor(p * final.length), out = final.slice(0, k);
+      var p = still() ? 1 : Math.min(1, (now - t0) / (dur * PACE)), k = Math.floor(p * final.length), out = final.slice(0, k);
       for (var j = k; j < final.length; j++) out += final[j] === " " ? " " : GLYPHS[(Math.random() * GLYPHS.length) | 0];
       e.textContent = out;
       if (p < 1) requestAnimationFrame(f);
@@ -696,7 +734,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
   function nearTop() { return !$("logBox").classList.contains("open") || gTerm.scrollTop < 24; }
   function toNewest() { gTerm.scrollTop = 0; }
   function print(parts) {
-    if (quiet) return parts;
+    if (quiet || reportedOnly) return parts;
     var follow = nearTop(), height = gTerm.scrollHeight, top = gTerm.scrollTop;
     parts.id = lineSeq++; parts.row = document.createElement("div"); gTerm.prepend(parts.row); renderRow(parts);
     // Stored activity is paged from the database and stays reachable while Home is open.
@@ -712,9 +750,12 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     var off = results.filter(function (value) { return value === "off"; }).length;
     $("legendOn").textContent = linked + " Connected";
     $("legendNeedCount").textContent = blocked + " Needs access";
-    $("legendOff").textContent = off + " Off";
+    $("legendOff").textContent = offLegend(off);
     setNeedLink(blocked > 0);
-    updateSummary(); hdrCount.textContent = playing ? results.length + "/" + TOTAL : "";
+    updateSummary();
+    var known = ALL.filter(function(n){return stateOf(n.id) !== "unreported";}).length;
+    var scannedKnown = results.filter(function(v){return v !== "unreported";}).length;
+    hdrCount.textContent = playing ? reportedOnly ? scannedKnown + "/" + known + " reported" : results.length + "/" + TOTAL : "";
   }
   function recordScan(item) { scanned[item.id] = stateOf(item.id); setCount(); }
   function setBar() {}
@@ -729,7 +770,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     var l = el("line", { x1: n.x - 17, x2: n.x + 17, "class": "scanline", style: "--c:" + n.color }, gPing);
     var t0 = performance.now(), scanPeriodMs = 2400 * PACE;
     (function f(now) {
-      if (!l.parentNode || my !== run) { l.remove(); return; }
+      if (still() || !l.parentNode || my !== run) { l.remove(); return; }
       var scale = n.sc || 1;
       l.setAttribute("x1", n.x - 17 * scale); l.setAttribute("x2", n.x + 17 * scale);
       var y = n.y - 16 * scale + ((now - t0) % scanPeriodMs) / scanPeriodMs * 32 * scale;
@@ -738,7 +779,19 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     })(t0);
     return l;
   }
-  function stateOf(id) { return state[id] || "on"; }
+  function stateOf(id) { return state[id] || (reportedOnly ? "unreported" : "on"); }
+  function missingState(st) { return reportedOnly && (st === "unreported" || st === "unavailable"); }
+  function stateWord(st) { return reportedOnly && st === "unreported" ? "Not reported" : reportedOnly && st === "unavailable" ? "Unavailable" : st === "on" ? "Connected" : st === "blocked" ? "Needs access" : "Off"; }
+  function offLegend(off) {
+    var text = off + " Off";
+    if (reportedOnly) {
+      var unknown = ALL.filter(function(n){return stateOf(n.id) === "unreported";}).length;
+      var absent = ALL.filter(function(n){return stateOf(n.id) === "unavailable";}).length;
+      if (unknown) text += " · " + unknown + " Not reported";
+      if (absent) text += " · " + absent + " Unavailable";
+    }
+    return text;
+  }
 
   function reset() {
     run++; moving = [];
@@ -746,11 +799,11 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     gFinal.textContent = ""; gFinal.hidden = true; gFinal.toggle = null;
     gPk.textContent = ""; gPing.textContent = ""; counts = {}; linked = 0; scanned = {}; placed = []; inFlight = 0; lastSent = {};
     NODES.forEach(function (n) {
-      n.g.setAttribute("class", "node" + (listening.indexOf(n.id) !== -1 ? " listening" : "")); n.g.style.opacity = 0;
+      n.g.removeAttribute("aria-description"); n.g.setAttribute("class", "node" + (listening.indexOf(n.id) !== -1 ? " listening" : "")); n.g.style.opacity = 0;
       n.x = BAYX; n.y = BAYY; n.sc = 1; drawNode(n); n.badge.setAttribute("opacity", 0);
       n.trace.setAttribute("class", "trace"); n.trace.style.strokeDasharray = ""; n.trace.style.opacity = "";
     });
-    [AGENT].concat(EXTS).forEach(function (x) { x.g.setAttribute("class", "ext"); x.g.style.opacity = 0; x.badge.setAttribute("opacity", 0); });
+    [AGENT].concat(EXTS).forEach(function (x) { x.g.removeAttribute("aria-description"); x.g.setAttribute("class", "ext"); x.g.style.opacity = 0; x.badge.setAttribute("opacity", 0); });
     [tLink, tNet, tJev, tClef, tWeather].forEach(function (t) { t.style.opacity = 0; t.style.strokeDasharray = ""; });
     tLink.classList.remove("waiting");
     svg.classList.remove("paused"); paused = false;
@@ -772,6 +825,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     var st = stateOf(n.id);
     recordScan(n);
     n.g.classList.remove("testing");
+    if (missingState(st)) { n.g.classList.add(st); n.g.setAttribute("aria-description", stateWord(st)); n.trace.setAttribute("class", "trace " + st); drawNode(n); return; }
     if (st !== "on") { n.g.classList.add("off"); if (st === "blocked") n.g.classList.add("blocked"); n.trace.setAttribute("class", "trace off" + (st === "blocked" ? " blocked" : "")); drawNode(n); return; }
     n.g.classList.add("on", "flash");
     n.trace.setAttribute("class", "trace set"); drawLine(n, 220);
@@ -787,9 +841,11 @@ body.design-b .node.selected .ring { stroke-width: 2; }
       var symbol = label === "✓ Ready" ? "✓" : label === "Needs access" ? "!" : label.indexOf("Off") === 0 ? "—" : "…";
       line.push([symbol, "checkmark " + cls], [name, "", item.hex || HEX.Intelligence]);
       if (label.indexOf("Off") === 0) line.push([" · Switched off", "offt"]);
+      if (missingState(st)) line.push([" · " + stateWord(st), "dimt"]);
       results.forEach(function (c) { line.push([" · " + c[0] + " ", ""], [c[1], c[2]]); });
       renderRow(line);
     }
+    if (missingState(st)) { result(stateWord(st), "dimt"); return false; }
     await wait(260, my);
     if (st === "off") { result("Off · Switched off", "offt"); await wait(320, my); return false; }
     for (var i = 0; i < item.checks.length; i++) {
@@ -808,12 +864,12 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     var st = stateOf(n.id);
     n.g.classList.add("testing"); n.g.style.opacity = 1;
     n.x = BAYX; n.y = BAYY; n.sc = BAY_SCALE; drawNode(n);
-    var sl = design === "b" && n.id === "settings" ? null : scanline(n, my);
+    var sl = missingState(st) || design === "b" && n.id === "settings" ? null : scanline(n, my);
     try { await runChecks(n, n.label.join(" "), st, my); } finally { if (sl) sl.remove(); }
     n.g.classList.remove("testing");
     placed.push(n);
     if (design === "b" && n.id === "settings") { lockOn(n); return; }
-    await new Promise(function (res) { relayout(1400, n, function () { lockOn(n); res(); }); });
+    await new Promise(function (res) { relayout(missingState(st) ? 0 : 1400, n, function () { lockOn(n); res(); }); });
     if (my !== run) throw "stopped";
   }
 
@@ -823,7 +879,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     if (item === AGENT) agentLabel();
     var ok = await runChecks(item, name, st, my);
     if (item !== AGENT) recordScan(item);
-    if (!ok) { item.g.classList.add("off"); if (st === "blocked") item.g.classList.add("blocked"); return; }
+    if (!ok) { if (missingState(st)) { item.g.classList.add(st); item.g.setAttribute("aria-description", stateWord(st)); return; } item.g.classList.add("off"); if (st === "blocked") item.g.classList.add("blocked"); return; }
     if (item === AGENT) { agentLook(); draw(item.path, 420); await wait(300, my); return; }
     item.g.classList.add("on"); draw(item.path, 420);
 
@@ -831,7 +887,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
   }
   // Every agent with a key is set up; it is connected once it has made a call.
   function agentChecks() {
-    var base = AGENT.checks.filter(function (c) { return !c.agentLine; }).slice(0, 2);
+    var base = reportedOnly ? [] : AGENT.checks.filter(function (c) { return !c.agentLine; }).slice(0, 2);
     var shown = agentList.slice(0, 4).map(function (a) { var c = a.called ? [a.name, "Connected"] : [a.name, "Set Up", "warn"]; c.agentLine = true; return c; });
     if (agentList.length > 4) { var more = [(agentList.length - 4) + " More", agentList.slice(4).filter(function (a) { return a.called; }).length + " Connected"]; more.agentLine = true; shown.push(more); }
     AGENT.checks = base.concat(shown);
@@ -872,7 +928,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     if (empty) { AGENT.g.style.opacity = 1; tLink.style.opacity = 0; }
 
     var on = agentList.filter(function (a) { return a.called; }).length;
-    AGENT.t2.textContent = agentList.length > 1 ? on + "/" + agentList.length + " Linked" : !agentName ? "" : agentCalled ? "Connected" : "Waiting";
+    AGENT.t2.textContent = reportedOnly && !agentsReported ? "Not reported" : agentList.length > 1 ? on + "/" + agentList.length + " Linked" : !agentName ? "" : agentCalled ? "Connected" : !agentCalledReported ? "Call not reported" : "Waiting";
     AGENT.t2.removeAttribute("textLength");
     if (AGENT.t2.getComputedTextLength() > 34) { AGENT.t2.setAttribute("textLength", 34); AGENT.t2.setAttribute("lengthAdjust", "spacingAndGlyphs"); }
     AGENT.g.classList.toggle("waiting", !!agentName && !agentCalled);
@@ -891,7 +947,9 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     });
   }
   function setAgents(opts) {
-    agentName = "agent" in opts ? opts.agent : agentName; agentCalled = !!opts.called;
+    agentsReported = !reportedOnly || opts.agentsReported === true;
+    agentCalledReported = !reportedOnly || typeof opts.called === "boolean";
+    agentName = "agent" in opts ? opts.agent : reportedOnly ? null : agentName; agentCalled = !!opts.called;
     agentList = (opts.agents || (agentName ? [{ name: agentName, called: agentCalled }] : [])).map(function (a) { return { name: String(a.name), called: !!a.called }; });
     if (opts.checks && opts.checks.agent) AGENT.checks = opts.checks.agent;
     agentChecks();
@@ -904,6 +962,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
   }
   function finalCard() {
     playing = false;
+    if (reportedOnly) hdrCount.textContent = "";
     gFinal.textContent = "";
     var off = TOTAL - linked;
     function div(cls, text) { var d = document.createElement("div"); d.className = cls; d.textContent = text; gFinal.appendChild(d); return d; }
@@ -912,11 +971,11 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     $("legendOn").textContent = linked + " Connected";
     var blocked = ALL.filter(function (n) { return stateOf(n.id) === "blocked"; }).length;
     var switchedOff = ALL.filter(function (n) { return stateOf(n.id) === "off"; }).length;
-    $("legendOff").textContent = switchedOff + " Off";
+    $("legendOff").textContent = offLegend(switchedOff);
     $("legendNeedCount").textContent = blocked + " Needs access";
     setNeedLink(blocked > 0);
     updateSummary();
-    if (agentName && !agentCalled) div("t3", "Waiting for " + agentName + "'s first call.");
+    if (agentName && !agentCalled && agentCalledReported) div("t3", "Waiting for " + agentName + "'s first call.");
     gFinal.hidden = !gFinal.childNodes.length; renderPause();
   }
   // The list and the count use the same blocked nodes, excluding switched-off features.
@@ -952,7 +1011,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     svg.classList.toggle("paused", paused && !!agentName);
     // No Control Agent: keep the Add action and the empty slot visible. Paused only means something once there is an agent.
     if (!playing) hdr.classList.remove("pulse");
-    if (!playing) hdr.textContent = !agentName ? "No Control Agent" : paused ? "Paused · No control agent access" : "Device Diagnostics Complete";
+    if (!playing) hdr.textContent = !agentName ? (reportedOnly && !agentsReported ? "Control agents not reported" : "No Control Agent") : paused ? "Paused · No control agent access" : "Device Diagnostics Complete";
     $("addAgent").hidden = playing || !!agentName;
     setLive();
   }
@@ -963,7 +1022,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     var connected = !!agentName && agentCalled && !paused && !playing && stateOf("tailscale") === "on";
     AGENT.g.classList.toggle("connected", connected);
     AGENT.g.setAttribute("role", "img");
-    AGENT.g.setAttribute("aria-label", (agentName || "No Control Agent") + (connected ? " connected" : paused ? " paused" : " not connected"));
+    AGENT.g.setAttribute("aria-label", (reportedOnly && !agentsReported ? "Control agents not reported" : agentName || "No Control Agent") + (connected ? " connected" : paused ? " paused" : reportedOnly && missingState(stateOf("tailscale")) ? " · Network " + stateWord(stateOf("tailscale")).toLowerCase() : " not connected"));
     svg.classList.toggle("live", !paused && !playing && linked > 0 && ext);
   }
   // Public: the listener was paused or resumed (in the app, from this switch, the notification or Quick Settings).
@@ -974,7 +1033,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     var a = agentList.filter(function (x) { return x.name === name; })[0];
     if (!a || a.called) return;
     a.called = true;
-    if (!agentCalled) { agentName = name; agentCalled = true; AGENT.t1.textContent = agentName; agentLogo(); }
+    if (!agentCalled) { agentName = name; agentCalled = true; agentCalledReported = true; AGENT.t1.textContent = agentName; agentLogo(); }
     agentChecks(); agentLook();
     if (!gFinal.hidden && !playing) finalCard();
   }
@@ -986,10 +1045,12 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     clearSelection(); reset(); opts = opts || {}; playing = true;
     $("emailReminder").hidden = !opts.emailReminder;
     var my = run;
+    reportedOnly = opts.reportedOnly === true;
+    document.body.classList.toggle("reported-state", reportedOnly);
     state = opts.nodes || {};
-    if (opts.checks) ALL.forEach(function (n) { if (opts.checks[n.id]) n.checks = opts.checks[n.id]; });
+    if (reportedOnly || opts.checks) ALL.forEach(function (n) { if (reportedOnly) n.checks = opts.checks && opts.checks[n.id] || []; else if (opts.checks[n.id]) n.checks = opts.checks[n.id]; });
     setAgents(opts);
-    if (opts.externalDevices) showExternalDevices(opts.externalDevices);
+    if (opts.externalDevices || reportedOnly) showExternalDevices(opts.externalDevices || []);
     AGENT.t1.textContent = agentName || ""; agentLogo(); agentLook();
     try {
       hdr.textContent = "Device Diagnostics Running"; hdr.classList.add("pulse"); setCount(); runningCard();
@@ -1021,23 +1082,24 @@ body.design-b .node.selected .ring { stroke-width: 2; }
 
   // Jump to the finished state without animation.
   function skip() {
-    var opts = { agent: agentName, nodes: state, called: agentCalled, paused: paused, agents: agentList, emailReminder: !$("emailReminder").hidden }, was = playing;
+    var opts = { reportedOnly: reportedOnly, agentsReported: agentsReported, agent: agentName, nodes: state, called: agentCalled, paused: paused, agents: agentList, emailReminder: !$("emailReminder").hidden }, was = playing;
+    if (!agentCalledReported) delete opts.called;
     reset(); run++; playing = false;
     if (was) print([["  … Skipped to the result", "dimt"]]);
-    state = opts.nodes; setAgents(opts);
+    state = opts.nodes; reportedOnly = opts.reportedOnly === true; setAgents(opts);
     AGENT.t1.textContent = agentName || ""; agentLogo();
     core.setAttribute("opacity", 1); bridge.setAttribute("opacity", 1); band.setAttribute("opacity", 1);
     if (agentName) { AGENT.g.style.opacity = 1; tLink.style.opacity = 1; } agentLook();
     placed = NODES.slice();
     var parts = ringParts(), pos = slots(parts.length);
     parts.forEach(function (n, k) { n.g.style.opacity = 1; n.x = pos[k].x; n.y = pos[k].y; n.sc = 1; drawNode(n); placeLabels(n, pos[k].t); });
-    var saved = PACE; reduceQ = { matches: true };
+    var saved = PACE; forcingStill = true;
     placed.forEach(lockOn);
-    reduceQ = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false }; PACE = saved;
+    forcingStill = false; PACE = saved;
     EXTS.forEach(function (x) {
       x.g.style.opacity = 1;
       var xs = stateOf(x.id); recordScan(x);
-      if (xs === "on") { x.g.classList.add("on"); x.path.style.opacity = 1; } else { x.g.classList.add("off"); if (xs === "blocked") x.g.classList.add("blocked"); }
+      if (xs === "on") { x.g.classList.add("on"); x.path.style.opacity = 1; } else { if (missingState(xs)) { x.g.classList.add(xs); x.g.setAttribute("aria-description", stateWord(xs)); } else x.g.classList.add("off"); if (xs === "blocked") x.g.classList.add("blocked"); }
     });
     setCount(); paused = opts.paused; finalCard();
   }
@@ -1050,6 +1112,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
       if (still()) return done();
       var c = dot(color), t0 = null;
       (function f(ts) {
+        if (still()) { c.remove(); done(); return; }
         if (t0 === null) t0 = ts;
         var k = Math.min(1, (ts - t0) / dur);
         c.setAttribute("cx", x1 + (x2 - x1) * k); c.setAttribute("cy", y1 + (y2 - y1) * k);
@@ -1062,6 +1125,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
       if (still()) return done();
       var L = path.getTotalLength(), c = dot(color), t0 = null;
       function f(ts) {
+        if (still()) { c.remove(); done(); return; }
         if (t0 === null) t0 = ts;
         var k = Math.min(1, (ts - t0) / dur), p = path.getPointAtLength((reverse ? 1 - k : k) * L);
         c.setAttribute("cx", p.x); c.setAttribute("cy", p.y);
@@ -1106,7 +1170,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     if (entry.id) activityIds.add(entry.id);
     var row = document.createElement("div"), time = document.createElement("span");
     time.className = "dimt";
-    time.textContent = (entry.ts ? new Date(entry.ts).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" }) : stamp()) + "  ";
+    time.textContent = (entry.ts ? new Date(entry.ts).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" }) : reportedOnly || window.BridgitReportedState ? "Time not reported" : stamp()) + "  ";
     row.appendChild(time);
     var text = document.createElement("span");
     var failed = entry.http >= 400 || entry.level === "error" || entry.level === "warn";
@@ -1116,9 +1180,16 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     row.appendChild(text);
     return row;
   }
+  var activityReported = !window.BridgitReportedState;
+  gTerm.dataset.activityReported = activityReported ? "true" : "false";
+  function setActivityReported(value) {
+    activityReported = !!value;
+    gTerm.dataset.activityReported = activityReported ? "true" : "false";
+    historyLabel();
+  }
   function historyLabel(message) {
     var button = $("logHistory");
-    button.textContent = message || (olderAvailable ? "Scroll down for earlier activity ↓" : "Start of retained activity");
+    button.textContent = message || (!activityReported ? "Activity not reported" : olderAvailable ? "Scroll down for earlier activity ↓" : "Start of retained activity");
     button.disabled = olderLoading || !olderAvailable;
   }
   function requestOlder() {
@@ -1162,8 +1233,12 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     // Keep the portrait map proportions on wide tablets, centered in the available space.
     var stage = $("stage");
     var phoneWidth = stage.clientWidth < 600;
-    svg.style.width = (phoneWidth ? stage.clientWidth : Math.min(stage.clientWidth, Math.max(340, stage.clientHeight * .74))) + "px";
-    var bounds = svg.getBoundingClientRect(), w = bounds.width, h = bounds.height;
+    var largeType = nativeTextScale > 1.05, scale = largeType ? nativeTextScale : 1;
+    var logicalHeight = largeType ? 423 : stage.clientHeight;
+    var logicalWidth = phoneWidth ? stage.clientWidth : Math.min(stage.clientWidth, Math.max(340, logicalHeight * .74));
+    svg.style.width = (logicalWidth * scale) + "px";
+    svg.style.height = largeType ? (logicalHeight * scale) + "px" : "100%";
+    var bounds = svg.getBoundingClientRect(), w = bounds.width / scale, h = bounds.height / scale;
     if (!w || !h) return;
     svg.setAttribute("viewBox", "0 0 " + w + " " + h);
     // The band runs from BAND_TOP to BAND_BOTTOM; Tailscale and the ring sit LIFT higher than under the old, taller band.
@@ -1271,7 +1346,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     if (!$("compactSummary")) return;
     var blocked = ALL.filter(function (n) { return stateOf(n.id) === "blocked"; }).length;
     var off = ALL.filter(function (n) { return stateOf(n.id) === "off"; }).length;
-    $("compactSummary").textContent = "B · " + (playing ? "Checking · " + linked + "/" + TOTAL : linked + " connected" + (blocked ? " · " + blocked + " need access" : "") + (off ? " · " + off + " off" : ""));
+    $("compactSummary").textContent = "B · " + (playing ? "Checking · " + linked + "/" + TOTAL : linked + " connected" + (blocked ? " · " + blocked + " need access" : "") + (off ? " · " + off + " off" : "") + (reportedOnly ? " · " + ALL.filter(function(n){return stateOf(n.id) === "unreported";}).length + " not reported" : ""));
   }
   function clearSelection() {
     selectedFeature = null; $("featureDetail").hidden = true; svg.classList.remove("inspect");
@@ -1283,7 +1358,7 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     var ids = [n.id].concat(deps.map(function (d) { return d[1]; }));
     ALL.concat([AGENT]).forEach(function (item) { if (ids.indexOf(item.id) !== -1) { item.g.classList.add("selected"); if (item.trace) item.trace.classList.add("selected"); } });
     $("featureTitle").textContent = n === AGENT ? agentName || "Control agent" : n.label.join(" ");
-    $("featureStatus").textContent = n === AGENT ? (paused ? "Paused" : stateOf("tailscale") !== "on" ? "Network disconnected" : agentCalled ? "Connected" : "Waiting for first call") : stateOf(n.id) === "on" ? "Connected" : stateOf(n.id) === "blocked" ? "Needs access" : "Off";
+    $("featureStatus").textContent = n === AGENT ? (paused ? "Paused" : reportedOnly && !agentsReported ? "Not reported" : missingState(stateOf("tailscale")) ? "Network " + stateWord(stateOf("tailscale")).toLowerCase() : stateOf("tailscale") !== "on" ? "Network disconnected" : agentCalled ? "Connected" : !agentCalledReported ? "Call status not reported" : "Waiting for first call") : stateWord(stateOf(n.id));
     $("dependencyList").textContent = "";
     deps.forEach(function (d) { var li = document.createElement("li"); li.textContent = d[0]; $("dependencyList").appendChild(li); });
     $("featureDetail").hidden = false;
@@ -1315,10 +1390,36 @@ body.design-b .node.selected .ring { stroke-width: 2; }
     else if (design === "b") clearSelection();
   });
   // Live events: entries are matched and drawn as they come; finishing the setup is not needed first.
-  window.BridgitScene = { restore: restore, setup: setup, skip: skip, apply: apply, event: event, status: status, setPaused: setPaused, firstCall: firstCall, goLive: goLive, summary: summary,
+  function setTextScale(value) {
+    nativeTextScale = typeof value === "number" && isFinite(value) ? Math.max(.85, Math.min(4, value)) : 1;
+    document.documentElement.style.setProperty("--bridgit-text-scale", String(nativeTextScale));
+    var large = nativeTextScale > 1.05, stage = $("stage");
+    document.body.classList.toggle("native-large-type", large);
+    if (large) {
+      stage.setAttribute("role", "region"); stage.setAttribute("tabindex", "0");
+      stage.setAttribute("aria-label", "Enlarged device diagram. Scroll horizontally to explore.");
+    } else {
+      stage.removeAttribute("role"); stage.removeAttribute("tabindex"); stage.removeAttribute("aria-label");
+    }
+    resizeScene();
+  }
+  // Native preference changes retain the current DOM, open detail and keyboard focus.
+  function setReducedMotion(value) {
+    window.BridgitNativeMotion = !!value;
+    document.documentElement.dataset.bridgitReducedMotion = value ? "true" : "false";
+    if (value) {
+      (document.getAnimations ? document.getAnimations() : []).forEach(function(a) { try { a.finish(); } catch (_) { a.cancel(); } });
+      gPk.textContent = ""; gPing.textContent = "";
+      moving.forEach(function(m) { m.n.x = m.x1; m.n.y = m.y1; m.n.sc = m.s1; drawNode(m.n); if(m.done)m.done(); });
+      moving = [];
+    }
+    document.querySelectorAll("svg").forEach(function(s) { if(value && s.pauseAnimations)s.pauseAnimations(); else if(!value && s.unpauseAnimations)s.unpauseAnimations(); });
+    window.dispatchEvent(new Event("bridgitmotionchange"));
+  }
+  window.BridgitScene = { setTextScale: setTextScale, setActivityReported: setActivityReported, setReducedMotion: setReducedMotion, restore: restore, setup: setup, skip: skip, apply: apply, event: event, status: status, setPaused: setPaused, firstCall: firstCall, goLive: goLive, summary: summary,
     history: history, historyFailed: historyFailed, events: function (entries) { entries.forEach(event); },
     nodes: ALL.map(function (n) { return { id: n.id, caps: n.caps, rules: n.ep }; }) };
-  resizeScene();
+  if (typeof window.BridgitTextScale === "number") setTextScale(window.BridgitTextScale); else resizeScene();
   if (window.ResizeObserver) new ResizeObserver(resizeScene).observe($("stage"));
   A.ready();
 

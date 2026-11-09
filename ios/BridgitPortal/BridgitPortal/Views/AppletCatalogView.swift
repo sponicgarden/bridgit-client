@@ -434,7 +434,7 @@ final class CardLocation: NSObject, ObservableObject, @preconcurrency CLLocation
             if fresh { source.requestLocation() }
             else if let last = source.location { deliver(last,from:source) }
             else { finish(.failure(AppletRuntimeError.invalid("No cached location available"))) }
-        default: finish(.failure(AppletRuntimeError.invalid("Location access is off for Bridgit Portal")))
+        default: finish(.failure(AppletRuntimeError.invalid("Location access is off for Bridgit")))
         }
     }
 

@@ -168,6 +168,16 @@
    "tool": null
   },
   {
+   "summary": "The API registry: every API group with its fixed name and number, its calls, and the one permission that governs them (API access, on by default, all-or-nothing for now)",
+   "path": "/v1/registry",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-registry.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-registry.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "registry"
+  },
+  {
    "summary": "What's new in the API since a revision you know",
    "path": "/v1/changes",
    "method": "GET",
@@ -358,7 +368,7 @@
    "tool": "satellite_hub_agents_pause"
   },
   {
-   "summary": "The linked Bridgits (the owner's other Bridgits) you may use through this one, with what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further.",
+   "summary": "This Bridgit's links to the owner's other Bridgits, from either end (hub or satellite), with which you may use through this one and what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further.",
    "path": "/v1/links",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-links.json",
@@ -428,8 +438,8 @@
    "tool": "owner_configuration_links_disconnect_all"
   }
  ],
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.status",

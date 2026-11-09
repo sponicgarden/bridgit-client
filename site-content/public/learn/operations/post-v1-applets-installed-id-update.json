@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Propose a new version of this personal applet. Read its development snapshot, validate the complete candidate and include change evidence. The owner or an authorized controlling agent reviews every agent edit. Approval checks the expected instance revision again.",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Set app-owned settings, listener/callback policy, captures and feature switches; secrets never returned; listener disable/port change needs reconnection; explicit owner.configuration grant required; no per-change phone approval",

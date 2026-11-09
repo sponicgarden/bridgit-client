@@ -50,7 +50,7 @@ pre{background:var(--code);padding:10px;border-radius:8px;overflow-x:auto;white-
 table{border-collapse:collapse;width:100%;font-size:14px}td,th{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;vertical-align:top}
 a{color:var(--accent)}nav a{margin-right:12px}ul{margin:4px 0 4px 20px;padding:0}
 </style></head><body><main>""")
-        append("<h1>Bridgit API</h1><p class=\"sub\">Bridgit: Distributed sensorial applications, built by your favorite agent. · Version ${h(appVersion)}, API revision ${ApiChanges.CURRENT}. ")
+        append("<h1>Bridgit API</h1><p class=\"sub\">Bridgit: Distributed sensorial applications — built by your favorite agent. · Version ${h(appVersion)}, API revision ${ApiChanges.CURRENT}. ")
         append("What an AI control agent can ask an Android phone to do, and the exact calls. Base URL <code>http://&lt;phone&gt;:8734/v1</code> on the owner's Tailscale network; ")
         append("every call needs <code>Authorization: Bearer &lt;key&gt;</code> except where noted. A running phone also serves this live at <code>GET /v1/guide</code> and <code>GET /v1/openapi.json</code>.</p>")
         append("<nav><a href=\"#abilities\">Supported Control Agent Requests</a><a href=\"#technical\">How it works</a><a href=\"#${slug(APPLET_TITLE)}\">Build an applet</a><a href=\"#reference\">All endpoints</a><a href=\"#errors\">Errors</a><a href=\"#revisions\">Revisions</a></nav>")

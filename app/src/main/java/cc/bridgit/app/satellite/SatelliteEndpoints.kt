@@ -84,8 +84,7 @@ object SatelliteEndpoints {
             // LNK-46: kept as an alias of GET /v1/links, with the same entries.
             endpoint(SATELLITES) {
                 val a = agent!!
-                val list = app.links.reachableBy(a).map { app.links.agentEntry(it, a) }
-                Reply.Json(JSONObject().put("satellites", JSONArray(list)).put("how_to_call", cc.bridgit.app.link.LinkEndpoints.HOW))
+                Reply.Json(JSONObject().put("satellites", app.links.agentList(a)).put("how_to_call", cc.bridgit.app.link.LinkEndpoints.HOW))
             }
             endpoint(CLAIM) {
                 if (LinkPause.hubsPaused) throw ErrorCatalog.error("forbidden", LinkPause.HUBS_MESSAGE, mapOf("reason" to "hubs_paused"))

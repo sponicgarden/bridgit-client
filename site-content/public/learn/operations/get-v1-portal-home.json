@@ -1,9 +1,9 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
-  "summary": "The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+  "summary": "The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
   "method": "GET",
   "auth": true,
   "mcp_tool": "portal_home",

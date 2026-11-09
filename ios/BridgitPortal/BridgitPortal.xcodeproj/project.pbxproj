@@ -36,6 +36,7 @@
 		A11CD7CF806E070A463605BB /* AppletCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5FD65D671DE820B87C2E3E /* AppletCardsView.swift */; };
 		A298B9195DF6A922E1CB514D /* LinkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186FBBA681DB5E38BD88C6C3 /* LinkStore.swift */; };
 		A6553405EA17EE59E8B2A10E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E91425A628AF5F9BBDB02B /* Theme.swift */; };
+		A71D7E24C7B14BB3BA3383E6 /* BrandingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4309465551E20C0496EE05E4 /* BrandingTests.swift */; };
 		AFE99EC797A5F7B1FAAC7FB8 /* LinkModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FA0EFA2E744C0169A33E07 /* LinkModels.swift */; };
 		B07C3A7F3528CE33C4B27357 /* AppletLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B30F2AC4E9B0492C24096E /* AppletLists.swift */; };
 		B2FBB736FABA1A3347D0E362 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F40C2CFFF50AD759E478A6 /* Keychain.swift */; };
@@ -81,6 +82,7 @@
 		28204902046D40F951B77E0E /* BricolageGrotesque-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BricolageGrotesque-Bold.ttf"; sourceTree = "<group>"; };
 		3D6250A3CB4DCA87A7B7AF68 /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
 		3E5FD65D671DE820B87C2E3E /* AppletCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppletCardsView.swift; sourceTree = "<group>"; };
+		4309465551E20C0496EE05E4 /* BrandingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandingTests.swift; sourceTree = "<group>"; };
 		493F1EF009D9BBCFEB6B1D39 /* SignInPairViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInPairViews.swift; sourceTree = "<group>"; };
 		4A1B0CB527F9EC59565BEE0D /* BridgitPortalTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BridgitPortalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A29808EE6C74191C1B4EAA3 /* DecisionInstall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionInstall.swift; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				14787813826F4E880B4216AC /* AppletListsTests.swift */,
+				4309465551E20C0496EE05E4 /* BrandingTests.swift */,
 				E6F99C63AF050BDFE0C41975 /* LinkTests.swift */,
 				B12A0FBD8790DBEAEB1B89D9 /* OwnerPhotosTests.swift */,
 				B5E204ED1DD1F090963DB103 /* ParsingTests.swift */,
@@ -526,6 +529,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D63E2D8B565B618890615A3F /* AppletListsTests.swift in Sources */,
+				A71D7E24C7B14BB3BA3383E6 /* BrandingTests.swift in Sources */,
 				C86CA1932D8494471379C4A9 /* LinkTests.swift in Sources */,
 				4BD795FCD8A415E37C559B68 /* OwnerPhotosTests.swift in Sources */,
 				53DD45D8E38A95C0BF67B2C2 /* ParsingTests.swift in Sources */,

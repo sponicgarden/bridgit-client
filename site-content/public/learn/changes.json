@@ -1,5 +1,5 @@
 {
- "api_revision": 135,
+ "api_revision": 138,
  "changes": [
   {
    "date": "2026-10-27",
@@ -2253,6 +2253,39 @@
     }
    ],
    "revision": 135
+  },
+  {
+   "date": "2026-11-09",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/links",
+    "what": "Links are listed from both ends: a hub lists its satellites too, and every link is listed with role, reachable (whether you may target it) and directions {in, out} with state and services; the other device's cameras, capabilities and endpoints only when reachable. GET /v1/satellites is the same list"
+   }],
+   "revision": 136
+  },
+  {
+   "date": "2026-11-09",
+   "app_version": "1.8.0",
+   "items": [{
+    "endpoint": "/v1/health",
+    "what": "Health says which build answers: build_type, distribution, build_tag (null for the real app), package and app_label, the name Android lists it under. Test builds tag every name Android shows, e.g. \"Bridgit (debug)\" and \"Bridgit screenshots (debug)\""
+   }],
+   "revision": 137
+  },
+  {
+   "date": "2026-11-09",
+   "app_version": "1.8.0",
+   "items": [
+    {
+     "endpoint": "/v1/registry",
+     "what": "API registry: every API group with its fixed name and number, its calls, and the permission that governs it"
+    },
+    {
+     "endpoint": "/v1/owner/configuration/access/agents/{agent}",
+     "what": "API access: one permission per agent over the whole API, on by default. Off refuses every call with forbidden, reason api_access_off, while the agent stays paired. Read it as api_access in owner configuration access; a Super agent changes it with api_access on access/agents/{agent}. Access changes made through the API are logged as the agent that made them"
+    }
+   ],
+   "revision": 138
   }
  ],
  "links": {

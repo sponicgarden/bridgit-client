@@ -39,7 +39,7 @@ object ErrorCatalog {
         Entry(400, "bad_request", "Malformed HTTP or JSON", "Fix the request"),
         Entry(401, "unauthorized", "Key missing or wrong; `reason` = `key_rotated` or `agent_removed` when Bridgit knows", "Stop; tell the owner the key needs replacing"),
         Entry(403, "forbidden_source", "Caller is not on the tailnet", "Check Tailscale"),
-        Entry(403, "claim_required", "This Bridgit Portal pairing link expired before it was claimed (relay)", "Update Bridgit Portal and pair again with a new link"),
+        Entry(403, "claim_required", "This pairing link expired before it was claimed (relay)", "Update the Bridgit app and pair again with a new link"),
         Entry(403, "signed_requests_required", "The owner allows only sealed (signed) relay requests for agents that can control the phone (relay)", "Switch to sealed mode, or ask the owner"),
         Entry(403, "wrong_device", "This agent's key is locked to another Tailscale device (device lock)", "Call from the device you were set up on, or ask the owner to allow this device; don't retry"),
         Entry(403, "capability_disabled", "Master switch off", "Tell the owner which switch (`setting` field)"),

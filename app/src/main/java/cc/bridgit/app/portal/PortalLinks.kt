@@ -41,7 +41,7 @@ class PortalLinks(context: Context) {
      * link (claim=1), the token this phone made and claimed with ([PortalClient.claim]); it is saved instead of the link's.
      */
     @Synchronized fun add(link: String, now: Long = System.currentTimeMillis(), claimedToken: String? = null): Link {
-        val f = PortalData.parsePairLink(link) ?: throw IllegalArgumentException("Not a Bridgit Portal link")
+        val f = PortalData.parsePairLink(link) ?: throw IllegalArgumentException("Not a Bridgit pairing link")
         require(f["v"] == "1") { "This link is from a newer Bridgit. Update Bridgit and try again." }
         val relay = f["relay"].orEmpty(); val device = f["device"].orEmpty(); val token = claimedToken ?: f["token"].orEmpty()
         require(Regex("https://[A-Za-z0-9.-]{3,253}(:\\d{1,5})?").matches(relay)) { "The link's relay address isn't valid." }

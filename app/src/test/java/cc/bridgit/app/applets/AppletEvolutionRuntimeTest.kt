@@ -125,6 +125,33 @@ class AppletEvolutionRuntimeTest {
         app.applets.remove(id);Unit
     }
 
+    @Test fun historicalInventoryEditionsReopenAndUpgradeToCsvOnlyWithoutChangingRows()=runBlocking {
+        install().let { app.applets.remove(it.getString("id")) }
+        org.robolectric.Shadows.shadowOf(app).grantPermissions(android.Manifest.permission.CAMERA)
+        cc.bridgit.app.platform.Capabilities.all.forEach { cc.bridgit.app.platform.Capabilities.setEnabled(app,it.id,true) }
+        val current=AppletPackage.parse(File("../applets/insurance-inventory/applet.json").readText())
+        val bundled=JSONObject().put("kind","bundled").put("bundled","insurance-inventory")
+        for (version in listOf("2.0.1","3.0.0")) {
+            val old=AppletPackage.parse(File("src/test/resources/applets/insurance-inventory-$version.json").readText())
+            val original=old.definition.toString()
+            val installed=app.applets.approve(app.applets.propose(old,null,bundled,null,notify=false).getString("id"),null)
+            val id=installed.getString("id");val agent=installed.getString("agent_id")
+            val store=AppletTableStore.of(app)
+            val table=AppletTables.parse(old.definition.getJSONObject("processing")).first { it.id=="items" }
+            val row=store.add(agent,table,JSONObject().put("label","Kettle").put("quantity",1),JSONObject().put("kind","owner"))
+            app.applets.setPaused(id,true);app.applets.setPaused(id,false)
+            assertTrue(AppletEvolution.same(old.definition,app.applets.get(id)!!.getJSONObject("definition")))
+            val pending=app.applets.prepareTemplate(id,current,bundled,app.applets.get(id)!!.getLong("revision"))
+            val updated=app.applets.approve(pending.getString("id"),null)
+            assertEquals("3.0.3",updated.getString("version"))
+            assertEquals(agent,updated.getString("agent_id"))
+            assertNotNull(store.get(agent,"items",row.getString("id")))
+            assertEquals(original,old.definition.toString())
+            assertTrue(!updated.getJSONObject("definition").toString().contains("Share PDF"))
+            app.applets.remove(id)
+        }
+    }
+
     @Test fun bundledSourceCanBeCheckedAndStaleReviewIsNotSuggested()=runBlocking {
         val r=install();val id=r.getString("id")
         val bundled=JSONObject().put("kind","bundled").put("bundled","insurance-inventory")

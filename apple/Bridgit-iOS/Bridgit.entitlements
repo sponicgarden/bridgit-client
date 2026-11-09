@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict><key>com.apple.developer.networking.wifi-info</key><true/><key>aps-environment</key><string>$(BRIDGIT_APNS_ENVIRONMENT)</string><key>com.apple.developer.associated-domains</key><array><string>webcredentials:bridgit.cc</string><string>applinks:bridgit.cc</string></array><key>com.apple.security.application-groups</key><array><string>$(BRIDGIT_INBOUND_SHARE_GROUP)</string></array></dict></plist>

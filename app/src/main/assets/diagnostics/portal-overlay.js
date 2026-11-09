@@ -8,7 +8,7 @@
 (function () {
   "use strict";
   var NS = "http://www.w3.org/2000/svg";
-  var state = { hub: null, other: false, viewers: [] };
+  var state = { hub: null, typeLabel: "", sourceLabel: "", other: false, viewers: [] };
   function $(id) { return document.getElementById(id); }
   function el(tag, attrs, parent) {
     var n = document.createElementNS(NS, tag);
@@ -41,7 +41,7 @@
     el("polygon", { "class": "portal-star-a", points: HEX }, star);
     var turn = el("g", { transform: "rotate(30)" }, star);
     el("polygon", { "class": "portal-star-b", points: HEX }, turn);
-    if (!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches))
+    if (!(typeof window.BridgitNativeMotion === "boolean" ? window.BridgitNativeMotion : window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches))
       el("animateTransform", { attributeName: "transform", type: "rotate", from: "30", to: "390", dur: "120s", repeatCount: "indefinite" }, turn);
   }
   function drawHub() {
@@ -55,7 +55,11 @@
       el("text", { "class": "portal-hub-brand", y: -13, "text-anchor": "middle" }, label).textContent = "bridgit";
       el("text", { "class": "portal-hub-name", y: 2, "text-anchor": "middle" }, label);
       el("text", { "class": "portal-hub-name", y: 12, "text-anchor": "middle" }, label);
+      el("text", { "class": "portal-hub-type", y: 23, "text-anchor": "middle", "font-size": "6px", fill: "var(--muted)" }, label);
+      el("text", { "class": "portal-hub-source", y: 53, "text-anchor": "middle", "font-size": "8px", fill: "var(--muted)" }, label);
     }
+    label.querySelector(".portal-hub-type").textContent = state.typeLabel;
+    label.querySelector(".portal-hub-source").textContent = state.sourceLabel;
     label.querySelector(".portal-hub-brand").textContent = state.other ? "HUB" : "bridgit";
     var lines = split(state.hub, 11), names = label.querySelectorAll(".portal-hub-name");
     names[0].textContent = lines[0]; names[1].textContent = lines[1] || "";
@@ -63,7 +67,13 @@
     names[0].setAttribute("y", lines[1] ? 2 : 6);
     names.forEach(function (t) {
       t.removeAttribute("textLength"); t.removeAttribute("lengthAdjust");
-      if (t.getComputedTextLength && t.getComputedTextLength() > 54) { t.setAttribute("textLength", 54); t.setAttribute("lengthAdjust", "spacingAndGlyphs"); }
+      // Keep glyphs readable instead of squeezing an arbitrarily long device name.
+      // The full name remains on the device button's accessible label and details.
+      if (t.getComputedTextLength && t.getComputedTextLength() > 54) {
+        var characters = Array.from(t.textContent);
+        do { characters.pop(); t.textContent = characters.join("").trimEnd() + "…"; }
+        while (characters.length && t.getComputedTextLength() > 54);
+      }
     });
   }
   // At most two lines, broken at a space near the middle.
@@ -112,12 +122,15 @@
       g.addEventListener("click", function (e) { e.stopPropagation(); if (window.BridgitHome) window.BridgitHome.open("connected"); }, true);
     }
     var one = list.length === 1, v = list[0];
-    var tablet = one && /ipad|tab/i.test(v.kind || "");
-    var dw = tablet ? 18 : 12, dh = tablet ? 24 : 22, shown = one ? 1 : Math.min(3, list.length);
+    // The shape uses declared form factor, never a nickname, model or role.
+    var sizes = { phone: [12,22], tablet: [18,24], computer: [24,16], tv: [26,15], watch: [12,14], camera: [20,15] };
+    var size = one && Object.prototype.hasOwnProperty.call(sizes, v.device_type) ? sizes[v.device_type] : [18,18];
+    var dw = size[0], dh = size[1], shown = one ? 1 : Math.min(3, list.length);
     if (!one) { dw = 11; dh = 19; }
     g.devices.forEach(function (d, i) {
       var on = i < shown;
-      d.body.style.display = d.notch.style.display = on ? "" : "none";
+      d.body.style.display = on ? "" : "none";
+      d.notch.style.display = on && (v.device_type === "phone" || v.device_type === "tablet") ? "" : "none";
       if (!on) return;
       // Back phones up and to the right, the front one bottom left; the front one hides the lines behind it.
       var off = one ? 0 : (shown - 1 - i) * 3.5 - (shown - 1) * 1.75;
@@ -131,7 +144,7 @@
     g.appendChild(g.t0); g.appendChild(g.t1); g.appendChild(g.t2);
     // The phone in your hand, drawn as the tile (a satellite or portal viewing its hub): "This device" above its name.
     g.t0.textContent = one && v.self ? "This device" : "";
-    g.t1.textContent = one ? (v.kind || "iPhone") : list.length + " " + counts(list);
+    g.t1.textContent = one ? (v.description || v.kind || "Device") : list.length + " " + counts(list);
     // A stack has one caption line, level with the tile, so it stays clear of the Microphone label below.
     g.t2.textContent = one ? (v.sub || "Portal") : "";
     g.t1.setAttribute("y", one ? -3 : 4);
@@ -150,15 +163,28 @@
   // Tapping the centre hexagon opens the list of phones (details and switching), like a node tap does.
   function wireHub() {
     var core = $("core");
-    if (!core || core.dataset.portalTap) return;
+    if (!core) return;
+    // The Apple scene has interactive descendants. An SVG image role can hide
+    // their names from assistive technology, including the selected device.
+    var scene = $("scene");
+    if (scene) scene.setAttribute("role", "group");
+    var name = ["Device details", state.hub, state.typeLabel].filter(Boolean).join(", ");
+    core.setAttribute("aria-label", name);
+    if (core.dataset.portalTap) return;
     core.dataset.portalTap = "1";
     core.style.cursor = "pointer";
     core.setAttribute("role", "button");
-    core.setAttribute("aria-label", "Phone details and other phones");
-    core.addEventListener("click", function (e) {
+    core.setAttribute("tabindex", "0");
+    function openDevices(e) {
+      e.preventDefault();
       e.stopPropagation();
       if (window.BridgitHome) window.BridgitHome.open("phones");
-    }, true);
+    }
+    core.addEventListener("click", openDevices, true);
+    core.addEventListener("keydown", function (e) {
+      if ((e.key === "Enter" || e.key === " ") && !e.repeat) openDevices(e);
+    });
+
   }
 
   // The hexagon tap belongs to the iOS app, which names the phone with hub(); the APK never calls hub().
@@ -195,13 +221,23 @@
 
   window.BridgitPortal = {
     // other: true while this screen shows another phone (the star); the iOS app passes only the name.
-    hub: function (name, other) { state.hub = name; state.other = !!other; wireHub(); drawHub(); },
+    hub: function (name, other, typeLabel, sourceLabel) { state.hub = name; state.typeLabel = typeof typeLabel === "string" ? typeLabel : ""; state.sourceLabel = typeof sourceLabel === "string" ? sourceLabel : ""; state.other = !!other; wireHub(); drawHub(); },
     // viewer(null) removes the node and its link (the APK hides it when no iPhone/iPad is viewing).
     viewer: function (v) { state.viewers = v ? [v] : []; drawViewers(); },
     // Several connected phones, top to bottom: [{kind, sub, live, idle, self}]; self: the phone showing this screen. [] removes them all.
     viewers: function (list) { state.viewers = list || []; drawViewers(); },
     redraw: redraw
   };
+  // SMIL rotation must also stop when Reduce Motion changes while the page stays open.
+  var motion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  function motionChanged() {
+    var star = document.querySelector(".portal-star");
+    if (star) star.remove();
+    drawHub();
+  }
+  window.addEventListener("bridgitmotionchange", motionChanged);
+  if (motion && motion.addEventListener) motion.addEventListener("change", motionChanged);
+  else if (motion && motion.addListener) motion.addListener(motionChanged);
   window.addEventListener("resize", function () { setTimeout(redraw, 0); });
   if (window.ResizeObserver && $("stage")) new ResizeObserver(function () { setTimeout(redraw, 0); }).observe($("stage"));
 })();

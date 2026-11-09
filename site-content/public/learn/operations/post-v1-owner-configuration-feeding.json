@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Save current enrolled Pet monitor camera position, enable/disable eating-sound response or clear saved view; existing camera/audio grants and motion lease checks apply; explicit owner.configuration grant required; no per-change phone approval",

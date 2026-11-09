@@ -5,12 +5,25 @@ import Darwin
 import ImageIO
 import UniformTypeIdentifiers
 
+/// An owner table export never returns a partial snapshot when its row bound is exceeded.
+public struct OwnerTableExportLimitError: LocalizedError, Equatable, Sendable {
+    public init() {}
+    public var errorDescription: String? { "An export holds at most 10,000 rows." }
+}
+
 /// One shared SQLite database, partitioned by the registry's authenticated owner identifier.
 /// Each installed definition, its revision and its instance defaults commit in one statement.
 public actor LocalAppletLibrary {
     public struct Edition: Identifiable, Sendable {
         public let id: String // registry key, distinct even for publishers using the same package id
         let instanceID: String
+        /// Public host identity pins this installation, not its reusable registry key.
+        /// Reinstallation changes this ID so an old scoped grant or queued delete
+        /// cannot silently apply to the replacement. Fits the existing host ID grammar.
+        public var hostID: String {
+            "library-" + SHA256.hash(data: Data(("bridgit-library-instance-v1:" + instanceID).utf8))
+                .map { String(format: "%02x", $0) }.joined().prefix(56)
+        }
         public let revision: Int
         public let name: String
     }
@@ -21,11 +34,14 @@ public actor LocalAppletLibrary {
         fileprivate let configData: Data
         public let config: [String: JSONValue]
         public let data: Data
+        /// Absent table keys mean the original declaration order was not retained.
+        public let columnOrder: [String: [String]]
     }
 
     private let db: OpaquePointer
     private let batchLock: URL
     private let account: String
+    private let executionScope: String
 
     public init(database: URL, account: String) throws {
         guard account.range(of: #"\A[a-f0-9]{64}\z"#, options: .regularExpression) != nil else {
@@ -48,6 +64,7 @@ public actor LocalAppletLibrary {
         db = handle
         self.batchLock = database.appendingPathExtension("batch-lock")
         self.account = account
+        self.executionScope = database.resolvingSymlinksInPath().standardizedFileURL.path + ":" + account
     }
     deinit { sqlite3_close(db) }
 
@@ -74,7 +91,7 @@ public actor LocalAppletLibrary {
                 try exec("ALTER TABLE local_applets ADD COLUMN instance TEXT NOT NULL DEFAULT ''")
                 try exec("UPDATE local_applets SET instance=lower(hex(randomblob(16)))")
                 try exec("PRAGMA user_version=1")
-            case 1...9: break
+            case 1...11: break
             default: throw AppletRuntimeError.invalid("Unsupported local library version")
             }
             if version < 2 {
@@ -182,6 +199,19 @@ public actor LocalAppletLibrary {
                     PRAGMA user_version=9;
                     """)
             }
+            if version < 10 {
+                try exec("""
+                    CREATE TABLE IF NOT EXISTS applet_execution_control(instance TEXT PRIMARY KEY, paused INTEGER NOT NULL, generation INTEGER NOT NULL);
+                    CREATE TRIGGER IF NOT EXISTS remove_execution_control AFTER DELETE ON local_applets BEGIN
+                        DELETE FROM applet_execution_control WHERE instance=old.instance;
+                    END;
+                    PRAGMA user_version=10;
+                    """)
+            }
+            if version < 11 {
+                try exec("ALTER TABLE local_applets ADD COLUMN column_order BLOB")
+                try exec("PRAGMA user_version=11")
+            }
             try exec("DELETE FROM applet_rows WHERE expires <= unixepoch()")
             try exec(Self.collectPhotos)
             try exec("COMMIT")
@@ -250,11 +280,14 @@ public actor LocalAppletLibrary {
     private func installInTransaction(_ release: RegistryPackage, media:[String:Data]) throws {
         let entry = release.selection
         if release.package.definition["ui"]?["practices"] != nil { try AppletPractices.requireChange(release.package.definition) }
-        let config = try JSONEncoder().encode(release.package.configuration(preserving: [:]))
+        let configuration = try release.package.configuration(preserving: [:])
+        try release.package.validateFlows(configuration: configuration)
+        let config = try JSONEncoder().encode(configuration)
         try statement("""
-            INSERT INTO local_applets(account,key,revision,name,definition,config,instance) VALUES (?,?,?,?,?,?,lower(hex(randomblob(16))))
+            INSERT INTO local_applets(account,key,revision,name,definition,config,column_order,instance) VALUES (?,?,?,?,?,?,?,lower(hex(randomblob(16))))
             ON CONFLICT(account,key) DO NOTHING
-            """, [.text(account),.text(entry.key),.integer(entry.revision),.text(entry.name),.bytes(release.data),.bytes(config)]) { query in
+            """, [.text(account),.text(entry.key),.integer(entry.revision),.text(entry.name),.bytes(release.data),.bytes(config),
+                  .bytes(try JSONEncoder().encode(release.columnOrder))]) { query in
             guard sqlite3_step(query) == SQLITE_DONE else { throw failure() }
         }
         if sqlite3_changes(db) == 0 {
@@ -291,7 +324,7 @@ public actor LocalAppletLibrary {
     }
 
     public func open(_ edition: Edition) throws -> Instance {
-        try statement("SELECT definition,config FROM local_applets WHERE account=? AND key=? AND revision=? AND instance=?",
+        try statement("SELECT definition,config,column_order FROM local_applets WHERE account=? AND key=? AND revision=? AND instance=?",
                       [.text(account),.text(edition.id),.integer(edition.revision),.text(edition.instanceID)]) { query in
             switch sqlite3_step(query) {
             case SQLITE_ROW:
@@ -299,7 +332,8 @@ public actor LocalAppletLibrary {
                     Data(bytes: sqlite3_column_blob(query,column), count: Int(sqlite3_column_bytes(query,column)))
                 }
                 let data = bytes(0), configData = bytes(1)
-                return Instance(edition:edition, package: try AppletPackage(data: data), configData: configData, config: try JSONDecoder().decode([String: JSONValue].self, from: configData), data: data)
+                let order = sqlite3_column_type(query, 2) == SQLITE_NULL ? [:] : try JSONDecoder().decode([String: [String]].self, from: bytes(2))
+                return Instance(edition:edition, package: try AppletPackage(data: data), configData: configData, config: try JSONDecoder().decode([String: JSONValue].self, from: configData), data: data, columnOrder: order)
             case SQLITE_DONE: throw AppletRuntimeError.invalid("That revision is not installed for this account")
             default: throw failure()
             }
@@ -310,6 +344,7 @@ public actor LocalAppletLibrary {
     public func saveSettings(_ settings: [String:JSONValue], replacing snapshot: Instance) throws {
         let edition = snapshot.edition
         let checked = try snapshot.package.configuration(preserving:settings)
+        try snapshot.package.validateFlows(configuration: checked)
         let data = try JSONEncoder().encode(checked)
         guard data.count <= 131072 else { throw AppletRuntimeError.invalid("Settings exceed 128 KiB") }
         try statement("""
@@ -363,6 +398,7 @@ public actor LocalAppletLibrary {
             additions += next.columns.keys.filter { existing.columns[$0] == nil }.map { disclosure(name + "." + $0, in:next) }
         }
         let config = try incoming.configuration(preserving: old.config)
+        try incoming.validateFlows(configuration: config)
         func permissions(_ package: AppletPackage, _ field: String) -> [String] {
             if case .array(let entries)? = package.definition["permissions"]?[field] { return entries.compactMap(\.text) }
             return []
@@ -383,10 +419,10 @@ public actor LocalAppletLibrary {
     private func applyDefinition(_ update: Update) throws {
         let old = update.from, release = update.release
         try statement("""
-            UPDATE local_applets SET revision=?,name=?,definition=?,config=?
+            UPDATE local_applets SET revision=?,name=?,definition=?,config=?,column_order=?
             WHERE account=? AND key=? AND instance=? AND revision=? AND definition=? AND config=?
             """, [.integer(release.selection.revision),.text(release.package.definition["name"]?.text ?? release.selection.name),.bytes(release.data),
-                  .bytes(try JSONEncoder().encode(update.config)),.text(account),.text(old.id),.text(old.instanceID),
+                  .bytes(try JSONEncoder().encode(update.config)),.bytes(try JSONEncoder().encode(release.columnOrder)),.text(account),.text(old.id),.text(old.instanceID),
                   .integer(old.revision),.bytes(update.original.data),.bytes(update.original.configData)]) { query in
             guard sqlite3_step(query) == SQLITE_DONE else { throw failure() }
             guard sqlite3_changes(db) == 1 else { throw AppletRuntimeError.invalid("The installation changed. Review the current revision again.") }
@@ -516,7 +552,8 @@ extension LocalAppletLibrary {
     public typealias AnswerOwner = @Sendable (OwnerQuestion) async throws -> String
 
     /// The card cannot choose the caller identity, budget, or destination URL.
-    public func cardContext(_ request: JSONValue, in edition: Edition, decide: Decide) async throws -> JSONValue {
+    public func cardContext(_ request: JSONValue, in edition: Edition, decide: @escaping Decide) async throws -> JSONValue {
+        return try await withExecution(edition) { [self] in
         let package = try open(edition).package
         guard package.cardHTML != nil, case .array(let grants)? = package.definition["permissions"]?["required"],
               grants.contains(.string("judgment")), request["method"] == .string("POST"),
@@ -530,10 +567,12 @@ extension LocalAppletLibrary {
             throw AppletRuntimeError.invalid("Unsupported applet context request")
         }
         return try await cardDecision(.context,action:service,options:body,package:package,in:edition,decide:decide)
+            }
     }
 
     public func cardStory(_ request: JSONValue, in edition: Edition,
-                          capture: @escaping @Sendable (String) async throws -> Data, decide: Decide) async throws -> JSONValue {
+                          capture: @escaping @Sendable (String) async throws -> Data, decide: @escaping Decide) async throws -> JSONValue {
+        return try await withExecution(edition) { [self] in
         let package = try open(edition).package
         guard package.cardHTML != nil, case .array(let grants)? = package.definition["permissions"]?["required"],
               ["judgment","captures"].allSatisfy({ grants.contains(.string($0)) }),
@@ -561,9 +600,11 @@ extension LocalAppletLibrary {
             "portrait":portraitImage,"context":context],package:package,in:edition,decide:decide) {
             for id in references { _ = try await capture(id) }
         }
+            }
     }
 
-    public func cardIllustration(_ request: JSONValue, in edition: Edition, decide: Decide) async throws -> JSONValue {
+    public func cardIllustration(_ request: JSONValue, in edition: Edition, decide: @escaping Decide) async throws -> JSONValue {
+        return try await withExecution(edition) { [self] in
         let package = try open(edition).package
         guard package.cardHTML != nil, case .array(let grants)? = package.definition["permissions"]?["required"],
               ["judgment","interactions"].allSatisfy({ grants.contains(.string($0)) }),
@@ -577,9 +618,11 @@ extension LocalAppletLibrary {
         return try await cardDecision(.illustration,action:"illustrate",options:[
             "request_id":.string(id),"title":.string(title),"narration":.string(text)
         ],package:package,in:edition,decide:decide)
+            }
     }
 
-    public func cardSpeech(_ request: JSONValue, in edition: Edition, decide: Decide) async throws -> JSONValue {
+    public func cardSpeech(_ request: JSONValue, in edition: Edition, decide: @escaping Decide) async throws -> JSONValue {
+        return try await withExecution(edition) { [self] in
         let package = try open(edition).package
         guard package.cardHTML != nil, case .array(let grants)? = package.definition["permissions"]?["required"],
               grants.contains(.string("speaker")) else { throw AppletRuntimeError.unavailable("speaker") }
@@ -599,6 +642,7 @@ extension LocalAppletLibrary {
         let options: [String:JSONValue] = ["text":.string(text),"expected_model":.string(model),
                                            "allow_cloud":.bool(true),"language":.string(language)]
         return try await cardDecision(.speak,action:"narrate",options:options,package:package,in:edition,decide:decide)
+            }
     }
 
     private func cardDecision(_ service: DecisionService, action: String, options: [String:JSONValue], package: AppletPackage,
@@ -617,7 +661,8 @@ extension LocalAppletLibrary {
     }
 
     public func captureTranscript(_ item: JSONValue, in edition: Edition,
-                                  capture: @Sendable (Int) async throws -> String) async throws -> [String:JSONValue] {
+                                  capture: @escaping @Sendable (Int) async throws -> String) async throws -> [String:JSONValue] {
+        return try await withExecution(edition) { [self] in
         let instance = try open(edition)
         guard let button = instance.package.microphoneButton(item) else { throw AppletRuntimeError.unavailable("microphone card action") }
         let started = ISO8601DateFormatter().string(from: Date())
@@ -627,10 +672,12 @@ extension LocalAppletLibrary {
         try authorizeRun(edition)
         guard !text.isEmpty, text.utf8.count <= 65536 else { throw AppletRuntimeError.invalid("Missing or oversized transcript") }
         return [button.reply + ".transcript":.string(text), button.reply + ".recorded_at":.string(started)]
+            }
     }
 
     /// Selecting a file authorizes this scan. A saved gallery ID alone cannot read a photo.
     public func scanSelectedImage(_ data: Data, with item: JSONValue, replacing snapshot: Instance) async throws -> (Instance,[String:JSONValue]) {
+        return try await withExecution(snapshot.edition) { [self] in
         let edition = snapshot.edition
         guard try open(edition).configData == snapshot.configData else {
             throw AppletRuntimeError.invalid("Settings changed. Reopen the applet before scanning.")
@@ -661,6 +708,7 @@ extension LocalAppletLibrary {
             try? execute("ROLLBACK")
             throw error
         }
+            }
     }
 
     public func recordDraft(_ item: JSONValue, in edition: Edition, drafts: [String:String],
@@ -686,7 +734,8 @@ extension LocalAppletLibrary {
     }
 
     public func captureCardPhoto(_ item: JSONValue, in edition: Edition,
-                                 capture: @Sendable (String, AppletPackage.CameraSize) async throws -> ReviewedPhoto) async throws -> String {
+                                 capture: @escaping @Sendable (String, AppletPackage.CameraSize) async throws -> ReviewedPhoto) async throws -> String {
+        return try await withExecution(edition) { [self] in
         let package = try open(edition).package
         guard let button = package.cameraButton(item),
               case .array(let scopes)? = package.definition["permissions"]?["required"],
@@ -700,7 +749,7 @@ extension LocalAppletLibrary {
         try Task.checkCancellation()
         let reviewed = try await capture(button.lens,button.size)
         let effect = UUID().uuidString + ":camera"
-        _ = try await RunPhotos().store(reviewed,key:effect)
+        try RunPhotos.validate(reviewed, allowDefaultCamera: true)
         try Task.checkCancellation()
         let ref = "kept:" + Self.rowID(effect)
         row[button.photo] = .string(ref)
@@ -709,6 +758,7 @@ extension LocalAppletLibrary {
         }
         try writeRows(edition,table:table,writes:[(effect,row)],cameraPhoto:(ref,reviewed.jpeg))
         return Self.rowID(effect)
+            }
     }
 
     private struct BatchSource: Sendable {
@@ -722,6 +772,7 @@ extension LocalAppletLibrary {
     public func runCardBatch(_ item: JSONValue, in edition: Edition, ask: AnswerOwner? = nil,
                              capture: CapturePhoto? = nil, decide: Decide? = nil,
                              present: @escaping @Sendable (Notice) async throws -> Void) async throws -> Int {
+        return try await withExecution(edition) { [self] in
         let descriptor = Darwin.open(batchLock.path,O_CREAT | O_RDWR | O_CLOEXEC,S_IRUSR | S_IWUSR)
         guard descriptor >= 0 else { throw AppletRuntimeError.invalid("Cannot open batch lock") }
         defer { Darwin.close(descriptor) }
@@ -776,12 +827,14 @@ extension LocalAppletLibrary {
             if completed == batch.maximum { break }
         }
         return completed
+            }
     }
 
     /// Frames stay in memory. Each paid call still requires the host's foreground owner review.
     public func observeCooking(_ flow: String, in edition: Edition, camera: String, goals: String,
-                               capture: CapturePhoto, decide: Decide,
-                               observed: @Sendable (_ action: String, _ tip: String) async throws -> Void) async throws {
+                               capture: @escaping CapturePhoto, decide: @escaping Decide,
+                               observed: @escaping @Sendable (_ action: String, _ tip: String) async throws -> Void) async throws {
+        return try await withExecution(edition) { [self] in
         let instance = try open(edition)
         let package = instance.package
         let tables = try LocalRecordTable.declarations(package)
@@ -844,17 +897,20 @@ extension LocalAppletLibrary {
             try await observed(action,tip)
             try await ContinuousClock().sleep(until:min(deadline,ContinuousClock.now.advanced(by:.seconds(timing.interval))))
         }
+            }
     }
 
     public func runButton(_ name: String, in edition: Edition,
                           ask: AnswerOwner? = nil, capture: CapturePhoto? = nil, hear: Hear? = nil, decide: Decide? = nil,
                           present: @escaping @Sendable (Notice) async throws -> Void) async throws -> FlowOutcome {
+        return try await withExecution(edition) { [self] in
         let instance = try open(edition)
         guard let flow = instance.package.flows[name], instance.package.runButtons.contains(where: { $0.flow == name }) else {
             throw AppletRuntimeError.invalid("Choose a button-triggered flow")
         }
         return try await runFlow(name,flow:flow,instance:instance,in:edition,execution:UUID().uuidString,
                                  trigger:.object([:]),source:nil,ask:ask,capture:capture,hear:hear,decide:decide,present:present)
+            }
     }
 
     private func runFlow(_ name: String, flow: JSONValue, instance: Instance, in edition: Edition, execution: String,
@@ -939,7 +995,77 @@ extension LocalAppletLibrary {
             }
             guard Set(step.arguments.keys).isSubset(of:fields) else { throw AppletRuntimeError.unavailable(step.type + " options") }
         }
-        return try await FlowRuntime(host: host).run(instance: edition.id, steps: steps, execution:execution, trigger:trigger)
+        return try await FlowRuntime(host: host).run(instance: edition.id, steps: steps, execution:execution, trigger:trigger, onlyIf: try instance.package.flowCondition(for: name, configuration: instance.config))
+    }
+
+    private struct ExecutionLease: Sendable {
+        let account: String
+        let instance: String
+        let generation: Int64
+    }
+    @TaskLocal private static var executionLease: ExecutionLease?
+
+    private func executionState(_ edition: Edition) throws -> (paused: Bool, generation: Int64) {
+        try statement("SELECT paused,generation FROM applet_execution_control WHERE instance=?", [.text(edition.instanceID)]) { query in
+            switch sqlite3_step(query) {
+            case SQLITE_ROW: return (sqlite3_column_int(query, 0) != 0, sqlite3_column_int64(query, 1))
+            case SQLITE_DONE: return (false, 0)
+            default: throw failure()
+            }
+        }
+    }
+
+    public func isPaused(_ edition: Edition) throws -> Bool {
+        _ = try open(edition)
+        return try executionState(edition).paused
+    }
+
+    /// Changing pause state permanently invalidates earlier execution leases.
+    /// Saved-data access outside an execution retains normal installation checks.
+    public func setPaused(_ paused: Bool, in edition: Edition) throws {
+        _ = try open(edition)
+        let state = try executionState(edition)
+        guard state.paused != paused else {
+            if paused { ExecutionCancellation.shared.cancel(scope: executionScope + ":" + edition.instanceID) }
+            return
+        }
+        try execute("""
+            INSERT INTO applet_execution_control(instance,paused,generation) VALUES(?,?,1)
+            ON CONFLICT(instance) DO UPDATE SET paused=excluded.paused,generation=generation+1
+            """, [.text(edition.instanceID),.integer(paused ? 1 : 0)])
+        if paused { ExecutionCancellation.shared.cancel(scope: executionScope + ":" + edition.instanceID) }
+    }
+
+    private func lease(for edition: Edition) throws -> ExecutionLease {
+        try authorizeRun(edition)
+        if let current = Self.executionLease {
+            guard current.account == account, current.instance == edition.instanceID else { throw AppletRuntimeError.revoked }
+            return current
+        }
+        let state = try executionState(edition)
+        guard !state.paused else { throw AppletRuntimeError.paused }
+        return ExecutionLease(account: account, instance: edition.instanceID, generation: state.generation)
+    }
+
+    private func withExecution<T: Sendable>(_ edition: Edition, operation: @escaping () async throws -> T) async throws -> T {
+        let lease = try lease(for: edition)
+        if Self.executionLease != nil {
+            let value = try await operation()
+            try Task.checkCancellation(); try authorizeRun(edition)
+            return value
+        }
+        let id = UUID()
+        let task = Task {
+            try await Self.$executionLease.withValue(lease) {
+                try Task.checkCancellation(); try authorizeRun(edition)
+                let value = try await operation()
+                try Task.checkCancellation(); try authorizeRun(edition)
+                return value
+            }
+        }
+        ExecutionCancellation.shared.register(id, scope: executionScope + ":" + edition.instanceID) { task.cancel() }
+        defer { ExecutionCancellation.shared.remove(id) }
+        return try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
     }
 
     private func authorizeRun(_ edition: Edition) throws {
@@ -951,6 +1077,12 @@ extension LocalAppletLibrary {
             default: throw failure()
             }
         }
+        if let lease = Self.executionLease {
+            let state = try executionState(edition)
+            guard lease.account == account, lease.instance == edition.instanceID else { throw AppletRuntimeError.revoked }
+            guard !state.paused else { throw AppletRuntimeError.paused }
+            guard lease.generation == state.generation else { throw AppletRuntimeError.executionStopped }
+        }
     }
 
     private actor RunPhotos {
@@ -960,8 +1092,8 @@ extension LocalAppletLibrary {
         func image(_ reference: String) -> Data? { images[reference] }
         func kept(_ reference: String) -> String? { keptReferences[reference] }
         func associate(_ reference: String, _ kept: String) { keptReferences[reference] = kept }
-        static func validate(_ photo: ReviewedPhoto) throws {
-            guard ["front","rear"].contains(photo.camera), photo.jpeg.starts(with: [0xff, 0xd8]),
+        static func validate(_ photo: ReviewedPhoto, allowDefaultCamera: Bool = false) throws {
+            guard (["front","rear"].contains(photo.camera) || (allowDefaultCamera && photo.camera == "default")), photo.jpeg.starts(with: [0xff, 0xd8]),
                   photo.jpeg.count <= 2 * 1024 * 1024,
                   let source = CGImageSourceCreateWithData(photo.jpeg as CFData, nil),
                   (CGImageSourceGetType(source) as String?) == UTType.jpeg.identifier,
@@ -1431,6 +1563,8 @@ extension LocalAppletLibrary {
         row["id"] = .string(Self.rowID(effect))
         if effect.hasSuffix(":card") {
             row["by"] = .object(["type":.string("card")])
+        } else if effect.hasSuffix(":agent") {
+            row["by"] = .object(["type": .string("agent")])
         } else if effect.hasSuffix(":camera") {
             row["by"] = .object(["type":.string("camera"),"camera":.bool(true)])
         } else {
@@ -1439,8 +1573,100 @@ extension LocalAppletLibrary {
         return row
     }
 
+    /// The host must check its caller's applet write grant. Storage still enforces
+    /// the exact account/installation, declared schema, retention and shared write quotas.
+    /// Let a host run an already prepared effect under its authorization fence
+    /// on the same actor that owns the maintained SQLite connection.
+    public func withHostMutation<T: Sendable>(_ effect: @Sendable (isolated LocalAppletLibrary) throws -> T) rethrows -> T {
+        try effect(self)
+    }
+
+    public func writeAgentRow(_ values: [String: JSONValue], in edition: Edition, table name: String, updating id: String? = nil) throws -> [String: JSONValue] {
+        let package = try open(edition).package
+        guard let table = try LocalRecordTable.declarations(package)[name] else { throw AppletRuntimeError.missingReference(name) }
+        if let id {
+            try statement("SELECT 1 FROM applet_rows WHERE instance=? AND table_id=? AND expires>unixepoch() AND lower(replace(replace(effect,'-',''),':',''))=?",
+                          [.text(edition.instanceID), .text(name), .text(id)]) { query in
+                guard sqlite3_step(query) == SQLITE_ROW else { throw AppletRuntimeError.missingReference(id) }
+            }
+        }
+        let effect = UUID().uuidString + ":agent"
+        try writeRow(edition, table: table, row: values, effect: effect, updating: id, source: nil)
+        let rowID = id ?? Self.rowID(effect)
+        return try statement("SELECT payload,at,effect FROM applet_rows WHERE instance=? AND table_id=? AND lower(replace(replace(effect,'-',''),':',''))=?",
+                             [.text(edition.instanceID), .text(name), .text(rowID)]) { query in
+            guard sqlite3_step(query) == SQLITE_ROW else { throw AppletRuntimeError.missingReference(rowID) }
+            return try decodeRow(query)
+        }
+    }
+
+    public func deleteAgentRow(_ id: String, in edition: Edition, table name: String) throws {
+        try execute("BEGIN IMMEDIATE")
+        do {
+            let package = try open(edition).package
+            guard try LocalRecordTable.declarations(package)[name] != nil else { throw AppletRuntimeError.missingReference(name) }
+            try execute("DELETE FROM applet_rows WHERE instance=? AND table_id=? AND expires>unixepoch() AND lower(replace(replace(effect,'-',''),':',''))=?",
+                        [.text(edition.instanceID), .text(name), .text(id)])
+            guard sqlite3_changes(db) == 1 else { throw AppletRuntimeError.missingReference(id) }
+            try execute(Self.collectPhotos)
+            try execute("COMMIT")
+        } catch { try? execute("ROLLBACK"); throw error }
+    }
+
+    /// Owner-initiated deletion uses the same installation and declared-table boundaries as agent operations.
+    public func deleteOwnerRow(_ id: String, in edition: Edition, table name: String) throws {
+        let count = try deleteOwnerRows(in: edition, table: name, rowID: id)
+        guard count == 1 else { throw AppletRuntimeError.missingReference(id) }
+    }
+
+    /// Atomically deletes all live rows in one declared table and only photos exclusively referenced by them.
+    @discardableResult public func deleteOwnerRows(in edition: Edition, table name: String) throws -> Int {
+        try deleteOwnerRows(in: edition, table: name, rowID: nil)
+    }
+
+    private func deleteOwnerRows(in edition: Edition, table name: String, rowID: String?) throws -> Int {
+        try Task.checkCancellation()
+        try execute("BEGIN IMMEDIATE")
+        do {
+            let package = try open(edition).package
+            guard try LocalRecordTable.declarations(package)[name] != nil else { throw AppletRuntimeError.missingReference(name) }
+            let condition = rowID == nil ? "" : " AND lower(replace(replace(effect,'-',''),':',''))=?"
+            var rowValues: [Value] = [.text(edition.instanceID), .text(name)]
+            if let rowID { rowValues.append(.text(rowID)) }
+            var photoValues: [Value] = [.text(edition.instanceID)]
+            photoValues.append(contentsOf: rowValues)
+            let photos: [String] = try statement("""
+                SELECT DISTINCT reference FROM applet_row_photos WHERE instance=? AND effect IN
+                (SELECT effect FROM applet_rows WHERE instance=? AND table_id=? AND expires>unixepoch()\(condition))
+                """, photoValues) { query in
+                    var result: [String] = []
+                    while true {
+                        switch sqlite3_step(query) {
+                        case SQLITE_DONE: return result
+                        case SQLITE_ROW: result.append(String(cString: sqlite3_column_text(query, 0)))
+                        default: throw failure()
+                        }
+                    }
+                }
+            try execute("DELETE FROM applet_rows WHERE instance=? AND table_id=? AND expires>unixepoch()" + condition, rowValues)
+            let count = Int(sqlite3_changes(db))
+            if let rowID, count != 1 { throw AppletRuntimeError.missingReference(rowID) }
+            for ref in photos {
+                try Task.checkCancellation()
+                try execute("""
+                    DELETE FROM applet_photos WHERE instance=? AND reference=? AND NOT EXISTS
+                    (SELECT 1 FROM applet_row_photos WHERE instance=? AND reference=?)
+                    """, [.text(edition.instanceID), .text(ref), .text(edition.instanceID), .text(ref)])
+            }
+            try Task.checkCancellation()
+            try execute("COMMIT")
+            return count
+        } catch { try? execute("ROLLBACK"); throw error }
+    }
+
     /// Routes are scoped to the installed card principal. Never proxy a package-supplied path to the network.
     public func cardTableAction(_ request: JSONValue, in edition: Edition) throws -> JSONValue {
+        try Task.checkCancellation()
         let package = try open(edition).package
         guard package.cardHTML != nil,
               case .array(let grants)? = package.definition["permissions"]?["required"], grants.contains(.string("applet_data")),
@@ -1538,19 +1764,144 @@ extension LocalAppletLibrary {
         }
     }
 
+    public struct RowsPage: Sendable {
+        public let rows: [[String: JSONValue]]
+        public let next: String?
+    }
+    private struct RowsCursor: Codable {
+        let scope: String
+        let at: Int64
+        let sequence: Int64
+    }
     public func rows(in edition: Edition, table: String, limit: Int) throws -> [[String:JSONValue]] {
-        guard (1...500).contains(limit) else { throw AppletRuntimeError.invalid("Read 1–500 rows at once") }
-        return try statement("""
-            SELECT r.payload,r.at,r.effect FROM applet_rows r JOIN local_applets a ON a.instance=r.instance
-            WHERE a.account=? AND a.key=? AND a.revision=? AND a.instance=? AND r.table_id=? AND r.expires>unixepoch()
-            ORDER BY r.at DESC,r.rowid DESC LIMIT ?
-            """, [.text(account),.text(edition.id),.integer(edition.revision),.text(edition.instanceID),.text(table),.integer(limit)]) { query in
-            var result = [[String:JSONValue]]()
+        try readRowsPage(in: edition, table: table, limit: limit, before: nil, validateEdition: false).rows
+    }
+    /// Read the rows for an owner's declared CSV action from a single database snapshot.
+    public func csvRows(in edition: Edition, table: String, filter: CSVRowFilter? = nil) throws -> [[String: JSONValue]] {
+        try execute("BEGIN")
+        defer { try? execute("ROLLBACK") }
+        let package = try open(edition).package
+        guard package.csvButtons.contains(where: { $0.table == table && $0.filter == filter }) else {
+            throw AppletRuntimeError.unavailable("CSV export for " + table)
+        }
+        var records: [[String: JSONValue]] = []
+        var cursor: String?
+        repeat {
+            let page = try readRowsPage(in: edition, table: table, limit: 500, before: cursor, validateEdition: false)
+            records += page.rows
+            guard records.count <= 10_000 else { throw AppletRuntimeError.invalid("An export holds at most 10,000 rows.") }
+            cursor = page.next
+        } while cursor != nil
+        return records.reversed().filter { filter?.includes($0) ?? true }
+    }
+
+    /// Complete owner export for a declared table, independent of package-provided share actions.
+    public func ownerTableRows(in edition: Edition, table: String) throws -> [[String: JSONValue]] {
+        try Task.checkCancellation()
+        try execute("BEGIN")
+        defer { try? execute("ROLLBACK") }
+        let package = try open(edition).package
+        guard try LocalRecordTable.declarations(package)[table] != nil else { throw AppletRuntimeError.missingReference(table) }
+        var records: [[String: JSONValue]] = [], cursor: String?
+        repeat {
+            try Task.checkCancellation()
+            let page = try readRowsPage(in: edition, table: table, limit: 500, before: cursor, validateEdition: false)
+            records += page.rows
+            guard records.count <= 10_000 else { throw OwnerTableExportLimitError() }
+            cursor = page.next
+        } while cursor != nil
+        try Task.checkCancellation()
+        return records.reversed()
+    }
+
+    /// Read-only, atomic domain snapshot for the shared host data contract. Never
+    /// executes an applet, captures media or changes retention state.
+    public func savedDataSnapshot(in edition: Edition) throws -> Data {
+        try execute("BEGIN")
+        defer { try? execute("ROLLBACK") }
+        let instance = try open(edition)
+        let declarations = try LocalRecordTable.declarations(instance.package)
+        var tables: [[String: JSONValue]] = []
+        var references = Set<String>()
+        for table in declarations.values.sorted(by: { $0.id < $1.id }) {
+            var rows: [[String: JSONValue]] = [], cursor: String?
+            repeat {
+                let page = try readRowsPage(in: edition, table: table.id, limit: 500, before: cursor, validateEdition: false)
+                rows.append(contentsOf: page.rows); cursor = page.next
+            } while cursor != nil
+            for (column, schema) in table.columns where schema["type"] == .string("photo") {
+                for row in rows { if let ref = row[column]?.text { references.insert(ref) } }
+            }
+            var value = table.attributes
+            value["columns"] = .object(table.columns)
+            value["rows"] = .array(rows.map(JSONValue.object))
+            tables.append(value)
+        }
+        let photos: [[String: JSONValue]] = try statement("SELECT reference,length(jpeg) FROM applet_photos WHERE instance=?", [.text(edition.instanceID)]) { query in
+            var values: [[String: JSONValue]] = []
             while true {
                 switch sqlite3_step(query) {
-                case SQLITE_DONE: return result
+                case SQLITE_DONE: return values
                 case SQLITE_ROW:
-                    result.append(try decodeRow(query))
+                    let ref = String(cString: sqlite3_column_text(query, 0))
+                    if references.contains(ref) {
+                        values.append(["ref": .string(ref), "bytes": .number(Double(sqlite3_column_int64(query, 1))), "available": .bool(true), "mime": .string("image/jpeg")])
+                    }
+                default: throw failure()
+                }
+            }
+        }
+        var sources: [String: JSONValue] = [:]
+        if let history = try importedDogEpisodes(in: edition), !history.isEmpty {
+            sources["historical_episodes"] = .object(["supported": .bool(false), "count": .number(Double(history.count))])
+        }
+        let result: [String: JSONValue] = ["package": instance.package.definition,
+            "tables": .array(tables.map(JSONValue.object)), "photos": .array(photos.map(JSONValue.object)), "native_sources": .object(sources)]
+        let data = try JSONEncoder().encode(result)
+        try execute("COMMIT")
+        return data
+    }
+
+    /// Stable keyset pages remain valid if the cursor row is deleted. Cursors confer no access.
+    public func rowsPage(in edition: Edition, table: String, limit: Int = 500, before: String? = nil) throws -> RowsPage {
+        try readRowsPage(in: edition, table: table, limit: limit, before: before, validateEdition: true)
+    }
+    private func readRowsPage(in edition: Edition, table: String, limit: Int, before: String?, validateEdition: Bool) throws -> RowsPage {
+        try Task.checkCancellation()
+        guard (1...500).contains(limit) else { throw AppletRuntimeError.invalid("Read 1–500 rows at once") }
+        if validateEdition { _ = try open(edition) }
+        let identity = [account, edition.id, String(edition.revision), edition.instanceID, table].joined(separator: "\n")
+        let scope = SHA256.hash(data: Data(identity.utf8)).map { String(format: "%02x", $0) }.joined()
+        var cursor: RowsCursor?
+        if let before {
+            guard before.count <= 512, let data = Data(base64Encoded: before),
+                  let value = try? JSONDecoder().decode(RowsCursor.self, from: data), value.scope == scope,
+                  value.sequence > 0 else { throw AppletRuntimeError.invalid("Invalid table cursor") }
+            cursor = value
+        }
+        var values: [Value] = [.text(account),.text(edition.id),.integer(edition.revision),.text(edition.instanceID),.text(table)]
+        var predicate = ""
+        if let cursor {
+            guard let timestamp = Int(exactly: cursor.at), let sequence = Int(exactly: cursor.sequence) else { throw AppletRuntimeError.invalid("Invalid table cursor") }
+            predicate = " AND (r.at < ? OR (r.at = ? AND r.rowid < ?))"
+            values += [.integer(timestamp), .integer(timestamp), .integer(sequence)]
+        }
+        values.append(.integer(limit + 1))
+        return try statement("""
+            SELECT r.payload,r.at,r.effect,r.rowid FROM applet_rows r JOIN local_applets a ON a.instance=r.instance
+            WHERE a.account=? AND a.key=? AND a.revision=? AND a.instance=? AND r.table_id=? AND r.expires>unixepoch()
+            """ + predicate + " ORDER BY r.at DESC,r.rowid DESC LIMIT ?", values) { query in
+            var rows = [[String:JSONValue]](), last: RowsCursor?
+            while true {
+                try Task.checkCancellation()
+                switch sqlite3_step(query) {
+                case SQLITE_DONE: return RowsPage(rows: rows, next: nil)
+                case SQLITE_ROW:
+                    if rows.count == limit {
+                        return RowsPage(rows: rows, next: try last.map { try JSONEncoder().encode($0).base64EncodedString() })
+                    }
+                    rows.append(try decodeRow(query))
+                    last = RowsCursor(scope: scope, at: sqlite3_column_int64(query,1), sequence: sqlite3_column_int64(query,3))
                 default: throw failure()
                 }
             }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import cc.bridgit.app.core.Schema
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONArray
@@ -444,17 +445,20 @@ class InteractionStore(context: Context, private val clock: () -> Long = System:
             db.execSQL("CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, agent_id TEXT NOT NULL, type TEXT NOT NULL, at INTEGER NOT NULL, data TEXT NOT NULL)")
             db.execSQL("CREATE INDEX events_agent ON events(agent_id, id)")
         }
+        /** Upgrades only add what is missing, so a file a newer build wrote and an older one kept (onDowngrade) upgrades cleanly again. */
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-            if (oldVersion < 5) db.execSQL("ALTER TABLE interactions ADD COLUMN presentation TEXT NOT NULL DEFAULT 'standard'")
-            if (oldVersion < 4) db.execSQL("ALTER TABLE interactions ADD COLUMN follow_up INTEGER NOT NULL DEFAULT 0")
-            if (oldVersion < 3) db.execSQL("ALTER TABLE interactions ADD COLUMN no_takeover INTEGER NOT NULL DEFAULT 0")
+            if (oldVersion < 5) Schema.addColumn(db, "interactions", "presentation", "TEXT NOT NULL DEFAULT 'standard'")
+            if (oldVersion < 4) Schema.addColumn(db, "interactions", "follow_up", "INTEGER NOT NULL DEFAULT 0")
+            if (oldVersion < 3) Schema.addColumn(db, "interactions", "no_takeover", "INTEGER NOT NULL DEFAULT 0")
             if (oldVersion < 2) {
-                db.execSQL("ALTER TABLE interactions ADD COLUMN stack TEXT")
-                db.execSQL("ALTER TABLE interactions ADD COLUMN stack_index INTEGER")
-                db.execSQL("ALTER TABLE interactions ADD COLUMN swipe_json TEXT")
+                Schema.addColumn(db, "interactions", "stack", "TEXT")
+                Schema.addColumn(db, "interactions", "stack_index", "INTEGER")
+                Schema.addColumn(db, "interactions", "swipe_json", "TEXT")
                 db.execSQL(STACK_INDEX)
             }
         }
-        private companion object { const val STACK_INDEX = "CREATE INDEX interactions_stack ON interactions(agent_id, stack)" }
+        /** C0018: an older build installed over a newer one keeps the newer file; extra columns have defaults. Android's default throws and stops the app starting. */
+        override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
+        private companion object { const val STACK_INDEX = "CREATE INDEX IF NOT EXISTS interactions_stack ON interactions(agent_id, stack)" }
     }
 }

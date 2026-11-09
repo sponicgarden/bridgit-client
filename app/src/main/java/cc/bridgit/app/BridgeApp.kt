@@ -249,6 +249,8 @@ class BridgeApp : Application() {
         applyAppearance()
         // Existing Bridgit Portal pairings gain new read-only routes without re-pairing.
         runCatching { cc.bridgit.app.relay.RelayStore(this).upgradePortalRoutes() }
+        // ...and drop the old "Bridgit Portal" name (A0160).
+        runCatching { cc.bridgit.app.portal.PortalPairing.renameLegacy(this, cc.bridgit.app.relay.RelayStore(this)) }
     }
 
     fun speakerReady() = ::speaker.isInitialized

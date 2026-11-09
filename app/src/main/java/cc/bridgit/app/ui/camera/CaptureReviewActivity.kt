@@ -104,7 +104,7 @@ class CaptureReviewActivity:AppCompatActivity() {
         if(request.externalPhoto==null&&!request.reviewOnly&&androidx.core.content.ContextCompat.checkSelfPermission(this,android.Manifest.permission.CAMERA)!=android.content.pm.PackageManager.PERMISSION_GRANTED) throw ApiError(403,"permission_denied","Camera permission was revoked")
         val agent=app.agents.get(request.agent)
         val cap=if(request.externalPhoto!=null) "lan_camera" else if(request.video==null) "camera" else "video"
-        if(agent==null||agent.paused||!agent.allows(cap)||!app.settings.isOn(cap)) throw ApiError(403,"agent_not_allowed","Camera access was revoked")
+        if(agent==null||agent.suspended||!agent.allows(cap)||!app.settings.isOn(cap)) throw ApiError(403,"agent_not_allowed","Camera access was revoked")
         if(request.audio && (!app.settings.isOn("mic") || !agent.allows("mic") || androidx.core.content.ContextCompat.checkSelfPermission(this,android.Manifest.permission.RECORD_AUDIO)!=android.content.pm.PackageManager.PERMISSION_GRANTED)) throw ApiError(403,"agent_not_allowed","Microphone access was revoked")
         val inst=app.applets.forAgent(request.agent)
         if(inst!=null&&inst.optString("status")!="active") throw ApiError(403,"agent_not_allowed","The applet is paused or removed")

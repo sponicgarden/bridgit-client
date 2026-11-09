@@ -150,11 +150,11 @@ class AppletDataActivity : AppCompatActivity() {
             .setPositiveButton("Delete") { _, _ -> lifecycleScope.launch { withContext(Dispatchers.IO) { store.delete(agent, t.id, id) }; row = null; render() } }.show()
     }
 
-    /** Export (O1): every column, no grouping or totals, as a PDF or a CSV file, then the share sheet. */
+    /** Export (O1): every column, no grouping or totals, as a CSV file, then the share sheet. */
     private fun export(agent: String, t: AppletTables.Table) {
         MaterialAlertDialogBuilder(this).setTitle("Export ${t.label}")
-            .setItems(arrayOf("PDF report", "CSV file (for a spreadsheet)")) { _, which ->
-                val step = JSONObject().put("type", "share").put("table", t.id).put("as", if (which == 0) "pdf" else "csv")
+            .setItems(arrayOf("CSV file (for a spreadsheet)")) { _, _ ->
+                val step = JSONObject().put("type", "share").put("table", t.id).put("as", "csv")
                 lifecycleScope.launch {
                     try {
                         val built = withContext(Dispatchers.IO) { AppletExport.export(app, agent, step, t) }

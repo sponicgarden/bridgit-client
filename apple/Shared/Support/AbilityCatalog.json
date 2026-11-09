@@ -1,0 +1,705 @@
+[
+  {
+    "title": "Find and interact with network devices",
+    "anchor": "find-and-interact-with-network-devices",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Discover IP addresses and services on this Android device’s direct LAN, enroll supported devices, read OpenWrt router DHCP leases and switch Shelly Gen1 relays. Each permission stays under your control.",
+    "example": "Find a desk lamp on your home network and let your control agent switch its supported relay. Unknown devices stay observations; camera photos keep their separate permission.",
+    "options": [
+      "Find devices and services on this phone's local Wi-Fi or Ethernet network",
+      "Enroll supported devices using credentials you authorize",
+      "Read OpenWrt router information and DHCP leases; switch Shelly Gen1 relays",
+      "Connect supported Tapo cameras through the separate camera permissions",
+      "Discovery, enrollment and control each need your permission and a control agent grant",
+      "Finding a device does not mean Bridgit can control it"
+    ],
+    "reference": "/v1/lan/devices"
+  },
+  {
+    "title": "Add a control agent in a minute",
+    "anchor": "add-an-agent-in-a-minute",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Bridgit makes a setup prompt with the control agent's own key, the address and the rules. Paste it into any AI control agent and it can use the phone straight away.",
+    "example": "You add Claude: name it, copy the prompt, paste it into Claude. The screen turns to \"Claude connected\" as soon as it calls.",
+    "options": [],
+    "reference": "6.2"
+  },
+  {
+    "title": "One key per control agent",
+    "anchor": "one-key-per-agent",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Every control agent has its own key. Rotate it or remove the control agent in one tap; the old key stops at once and the control agent is told why.",
+    "example": "You pasted Grok's prompt into the wrong chat. Rotate Grok's key; the leaked one is dead in a second.",
+    "options": [],
+    "reference": "AGT-12"
+  },
+  {
+    "title": "Take a photo",
+    "anchor": "take-a-photo",
+    "technical": false,
+    "stage": "Available now",
+    "description": "A control agent can take a photo with the front or back camera. Android's green dot and a Bridgit notification show every time.",
+    "example": "From your laptop: \"Is the stove off?\" Your control agent takes a photo of the kitchen and tells you.",
+    "options": [
+      "Back or front camera",
+      "Zoom: 0.5× (ultra-wide) up to the phone's maximum (telephoto)",
+      "Flash on or off",
+      "Size: sized for AI (1568 px), thumbnail (512 px), large (2560 px) or original",
+      "Or an exact width or long edge, and JPEG quality",
+      "Full resolution, up to the 50 MP sensor",
+      "As JSON with the picture inside, or as plain JPEG bytes",
+      "Never saved to your gallery"
+    ],
+    "reference": "8.2"
+  },
+  {
+    "title": "Record a short clip",
+    "anchor": "record-a-short-clip",
+    "technical": false,
+    "stage": "Available now",
+    "description": "A control agent can record 1 to 120 seconds of audio and get it back as a file.",
+    "example": "\"Listen to the next 30 seconds of the meeting and give me the action items.\"",
+    "options": [
+      "Length: 1 to 120 whole seconds",
+      "Comes back as an M4A (AAC) audio file, 44.1 kHz mono",
+      "Not kept on the phone"
+    ],
+    "reference": "8.4"
+  },
+  {
+    "title": "Your latest screenshot or photo",
+    "anchor": "your-latest-screenshot-or-photo",
+    "technical": false,
+    "stage": "Available now",
+    "description": "One call returns the newest screenshot or camera photo, sized for an AI to read. It can also wait for the next one you take.",
+    "example": "You screenshot an error on your phone; your control agent already has it and explains the fix.",
+    "options": [
+      "Which: any image, the newest screenshot, or the newest camera photo",
+      "Wait up to 55 seconds for the next one you take",
+      "Size: sized for AI (default), thumbnail, large or original",
+      "As JSON or as plain JPEG bytes, with when it was taken and the album"
+    ],
+    "reference": "8.6"
+  },
+  {
+    "title": "Find photos in your gallery",
+    "anchor": "find-photos-in-your-gallery",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Control agents can list recent images and fetch one at the size they need. Bridgit never edits or deletes anything.",
+    "example": "\"Find the receipt photo from this morning and add it to my expenses.\"",
+    "options": [
+      "List the newest 1 to 100 images (no pictures, just details)",
+      "Fetch one image at any of the sizes",
+      "Works with full access or only the photos you picked"
+    ],
+    "reference": "8.5"
+  },
+  {
+    "title": "Everything is logged",
+    "anchor": "everything-is-logged",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Every request, switch change and control agent note is in Activity on the phone. Control agents can read and follow the log too, so they know what they did.",
+    "example": "Codex checks yesterday's log to see why a photo failed; you scroll Activity to see who did what.",
+    "options": [
+      "Filter by control agent, type, endpoint, result, level, time or text",
+      "Follow it live",
+      "Stats per control agent and endpoint",
+      "Export as JSONL or CSV",
+      "\"All entries\" or \"only their own\" for control agents"
+    ],
+    "reference": "10"
+  },
+  {
+    "title": "Control agent notes",
+    "anchor": "agent-notes",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Control agents can write short notes into the log.",
+    "example": "Your fridge-check control agent writes \"milk low\" so you see it in Activity.",
+    "options": [],
+    "reference": "LOG-11"
+  },
+  {
+    "title": "The API explains itself",
+    "anchor": "the-api-explains-itself",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Control agents read a live guide and an OpenAPI file that list what's switched on, every call and every error.",
+    "example": "A brand-new control agent reads the guide and learns everything without a manual.",
+    "options": [],
+    "reference": "API-09"
+  },
+  {
+    "title": "Control agents learn what's new",
+    "anchor": "agents-learn-what-s-new",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Every reply says which API revision Bridgit speaks. After an update, control agents are told there's something new until they read the list of changes, so they pick up new features by themselves.",
+    "example": "Bridgit gains camera zoom; the next time Grok calls, it reads what's new and starts using zoom.",
+    "options": [],
+    "reference": "API-14"
+  },
+  {
+    "title": "Report a bug or ask for a feature",
+    "anchor": "report-a-bug-or-ask-for-a-feature",
+    "technical": true,
+    "stage": "Available now",
+    "description": "From any screen: the last screen is attached, plus screenshots and the recent log. Control agents in Bridgit Fixer Mode read reports and mark them fixed; you confirm or say it's still broken.",
+    "example": "The app misbehaves; you report it in 10 seconds. Claude picks it up, fixes it and marks it fixed.",
+    "options": [
+      "Last screen, up to 5 screenshots and the recent log attached",
+      "Turn off \"Auto-fix\" to keep it for a person",
+      "Statuses: new, seen, in progress, fixed, won't fix, duplicate",
+      "You confirm a fix or say it's still broken"
+    ],
+    "reference": "11"
+  },
+  {
+    "title": "Check for updates",
+    "anchor": "check-for-updates",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Bridgit finds a new version, checks it really is Bridgit, and lets Android install it after you confirm.",
+    "example": "A fix ships; your phone offers the update the next time you open Bridgit.",
+    "options": [],
+    "reference": "12.14"
+  },
+  {
+    "title": "You stay in control",
+    "anchor": "you-stay-in-control",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Every feature starts off and has its own switch. Pause listening in one tap. Access shows each Android permission with one button to the right page.",
+    "example": "Going into a meeting: turn off Camera and Microphone from Home in two taps.",
+    "options": [],
+    "reference": "12.8"
+  },
+  {
+    "title": "Only over Tailscale",
+    "anchor": "only-over-tailscale",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Bridgit answers only on your private Tailscale network, never the open internet.",
+    "example": "Your control agents on your Mac and your server can reach the phone; nobody else can.",
+    "options": [],
+    "reference": "ARC-04"
+  },
+  {
+    "title": "Questions and notices to you",
+    "anchor": "questions-and-notices-to-you",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Control agents send you a notice, or a question with buttons, choices or a text reply, and get your answer within a second of your tap. They can also read it aloud.",
+    "example": "\"Pay this invoice? $11.99\" [Pay] [Not now]. You tap Pay on the notification; the control agent pays.",
+    "options": [
+      "A notice (one-way) or a question",
+      "Buttons (up to 6), a text reply, a choice list, or a link",
+      "An image with the message",
+      "Normal or urgent; read aloud if you allow it",
+      "Expires after 1 minute to 7 days",
+      "The control agent waits for your answer or gets a callback"
+    ],
+    "reference": "8.13"
+  },
+  {
+    "title": "Rich HTML cards",
+    "anchor": "rich-html-cards",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Instead of plain buttons, a control agent can send a small HTML page (charts, forms, choices) that runs safely on the phone with no internet access.",
+    "example": "Your travel control agent shows three flights as cards with prices and a map; you tap one to book.",
+    "options": [
+      "A small HTML page with its own layout, charts and forms",
+      "Runs on the phone with no internet access",
+      "Sends one answer back to the control agent (up to 16 KB of data)",
+      "Images inside the card only (data: images), up to 256 KB of HTML",
+      "Bridgit's own header shows which control agent sent it; you can always dismiss it"
+    ],
+    "reference": "CAP-34"
+  },
+  {
+    "title": "Live text panel",
+    "anchor": "live-text-panel",
+    "technical": false,
+    "stage": "Available now",
+    "description": "A control agent streams text into the lower half of the screen and it scrolls as it arrives, like the transcript of an AI session. Pause the scrolling or close it any time.",
+    "example": "Claude Code is fixing a bug on your laptop; you watch what it's doing on the phone while you make coffee.",
+    "options": [
+      "Lower half of the screen, scrolls as text arrives",
+      "Pause scrolling to read, then resume",
+      "The control agent marks it finished; you close it whenever you like",
+      "Keeps the last 200 KB of text"
+    ],
+    "reference": "D26"
+  },
+  {
+    "title": "Use Bridgit over MCP",
+    "anchor": "use-bridgit-over-mcp",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Control agents that speak MCP (Claude Code, Codex and others) add Bridgit as a tool server with their own key, and every feature appears as a tool.",
+    "example": "Add Bridgit to Claude Code once; from then on \"take a photo of my desk\" just works.",
+    "options": [
+      "Same key, same switches, same log as the normal API",
+      "Every endpoint the control agent may use becomes a tool, with its options",
+      "Photos and screenshots come back as images"
+    ],
+    "reference": "API-15"
+  },
+  {
+    "title": "Inbox",
+    "anchor": "inbox",
+    "technical": true,
+    "stage": "Available now",
+    "description": "One place for every question, notice, file and share between you and your control agents.",
+    "example": "See what Grok asked you this morning and what you answered.",
+    "options": [],
+    "reference": "12.6"
+  },
+  {
+    "title": "Send a screenshot",
+    "anchor": "send-a-screenshot",
+    "technical": false,
+    "stage": "Available now",
+    "description": "A control agent sees what's on your screen right now, with no prompt each time; a notification shows every capture.",
+    "example": "\"What does this error on my phone mean?\" The control agent takes a screenshot and reads it.",
+    "options": [
+      "A private copy: nothing is saved and there's no flash",
+      "Turn on Bridgit's screenshot service once (Hardware access), then Screenshots in Feature enablement",
+      "Same size choices as photos",
+      "At most one every 2 seconds and 60 an hour per control agent"
+    ],
+    "reference": "8.10"
+  },
+  {
+    "title": "Events and callbacks",
+    "anchor": "events-and-callbacks",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Control agents get told the moment something happens: a question answered, a new screenshot, a switch changed.",
+    "example": "Your control agent waits for your answer without asking again and again.",
+    "options": [],
+    "reference": "9"
+  },
+  {
+    "title": "Open a link or app",
+    "anchor": "open-a-link-or-app",
+    "technical": false,
+    "stage": "Available now",
+    "description": "A control agent can suggest a link or app; it opens when you tap it.",
+    "example": "\"Here's the boarding pass\" [Open in Wallet].",
+    "options": [
+      "Web links, maps, phone numbers (dialler only), email",
+      "Or open an app by name",
+      "Only when you tap it"
+    ],
+    "reference": "8.20"
+  },
+  {
+    "title": "Quick Settings tile",
+    "anchor": "quick-settings-tile",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Pause or resume Bridgit from the notification shade.",
+    "example": "Pull down, tap Bridgit, and control agents can't reach the phone until you tap again.",
+    "options": [],
+    "reference": "UI-23"
+  },
+  {
+    "title": "Phone status and context",
+    "anchor": "phone-status-and-context",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Battery (level, charging, health, temperature, battery saver), network, ringer, Do Not Disturb and screen/lock status. Control agents hear when the battery runs low or starts charging. An unlocked interactive screen is reported as in use.",
+    "example": "Before calling you, a control agent checks whether your phone is in use or on silent.",
+    "options": [
+      "Battery: level, charging and plug type, health, temperature, voltage, time to full, estimated time to empty while unplugged, battery saver",
+      "Low, critical, charging and battery saver alerts to control agents",
+      "Screen on/off and lock state",
+      "Ringer, Do Not Disturb and media volume",
+      "Wi-Fi/mobile transport and metered status",
+      "Context: in use when screen is interactive and unlocked; otherwise unknown"
+    ],
+    "reference": "8.7"
+  },
+  {
+    "title": "Location details",
+    "anchor": "location-details",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Where the phone is, on request only: latitude and longitude (x, y), altitude (z), accuracy, speed and heading, and how old the fix is. Address lookup if you turn it on. No tracking unless you choose it.",
+    "example": "\"How long until I'm home?\" The control agent checks where you are and the traffic.",
+    "options": [
+      "Latitude and longitude (x, y)",
+      "Altitude (z) in metres",
+      "Accuracy in metres, speed and heading",
+      "A fresh fix (up to 15 s) or the last known one at once",
+      "High accuracy or battery-friendly",
+      "Street address, if you turn on address lookup"
+    ],
+    "reference": "8.8"
+  },
+  {
+    "title": "Weather",
+    "anchor": "weather",
+    "technical": false,
+    "stage": "Available now",
+    "description": "The forecast where the phone is, or anywhere the control agent names: now, the next hours and today's low and high, from MET Norway. Your position is rounded to about 1 km first. Control agents can check it on a schedule.",
+    "example": "Every morning at 7 your control agent checks the weather and tells you to take an umbrella.",
+    "options": [
+      "Now: temperature, sky, rain, wind, humidity, cloud and pressure",
+      "The next 0 to 48 hours, a 12-hour outlook and the next 24 hours' low and high",
+      "Where the phone is (needs Location too), or any place the control agent names",
+      "Your position is rounded to about 1 km before it's sent; forecast from MET Norway",
+      "Can run on a schedule, e.g. every hour"
+    ],
+    "reference": "WTH-01"
+  },
+  {
+    "title": "Flash the light",
+    "anchor": "flash-the-light",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Turn the torch on for up to ten minutes, with automatic off and an owner Stop button.",
+    "example": "Your door-camera control agent flashes the light so you know someone is at the door.",
+    "options": [
+      "On for 1 second to 10 minutes; always turns itself off",
+      "Turn off now",
+      "Ask whether it's on"
+    ],
+    "reference": "CAP-21"
+  },
+  {
+    "title": "Phone controls",
+    "anchor": "phone-controls",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Do Not Disturb, ringer, volume, brightness, screen timeout and battery saver, put back as they were afterwards.",
+    "example": "Bedtime routine: your control agent turns on Do Not Disturb until 7 am.",
+    "options": [
+      "DND: off, priority, alarms or none; none can mute alarms",
+      "Ringer: normal, vibrate or silent; media/ring/alarm volumes",
+      "Brightness level or automatic brightness",
+      "Screen timeout, 15 seconds to 30 minutes",
+      "Battery saver on or off, after a one-time USB grant",
+      "Optional 1–1440 minute restoration; owner Undo",
+      "Later manual changes are preserved"
+    ],
+    "reference": "8.9"
+  },
+  {
+    "title": "App settings",
+    "anchor": "app-settings",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Every Bridgit setting and the phone's sound and display settings in one place. Any control agent can read them; control agents with Agent Super Powers can change them once you allow it. Control agents can never stop the listener, change their own permissions or turn this switch back on.",
+    "example": "\"Switch Bridgit to dark mode, keep the log for 90 days and turn the media volume down to 30%.\"",
+    "options": [
+      "Read every setting: feature switches, privacy, log, alerts, theme, speaker limit, notification channels, Android access and the phone's sound and display",
+      "Each setting says its type, allowed values and whether you may change it, and why not",
+      "Control agents with Super Powers change several at once once the owner allows it; one bad value changes nothing",
+      "Never by control agents: the App settings switch, the listener and port, internet callbacks, alert address, wake words, control agent permissions"
+    ],
+    "reference": "SET-01"
+  },
+  {
+    "title": "City tour",
+    "anchor": "city-tour",
+    "technical": false,
+    "stage": "Available now",
+    "description": "A guided walk: you pick the kind of tour, and every minute your control agent gets where you are, which way you face and the photos you just took. It tells you about what's around you, and you can ask it questions out loud.",
+    "example": "Pick \"Architecture\" and walk; when you photograph a church, your control agent tells you who built it and why it looks that way.",
+    "options": [
+      "History, architecture, environment, food, art, or anything interesting",
+      "Updates every 30 s, 1, 2 or 5 minutes",
+      "Location, heading (compass) and new photos each time",
+      "Ask out loud or type a question",
+      "Pause, skip, end; ends by itself after 4 hours"
+    ],
+    "reference": "8.25"
+  },
+  {
+    "title": "Find my phone",
+    "anchor": "find-my-phone",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Ring and vibrate for up to a minute, respecting your sound and Do Not Disturb settings.",
+    "example": "Phone lost in the sofa: ask any control agent to ring it.",
+    "options": [
+      "Ring and vibrate for 1–60 seconds",
+      "Respects Android sound and Do Not Disturb settings",
+      "Stop from Files and Android access or the ongoing notification"
+    ],
+    "reference": "8.14"
+  },
+  {
+    "title": "Sensors",
+    "anchor": "sensors",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Light, pressure, steps, motion and orientation, one reading each.",
+    "example": "A control agent notices it's dark and you're still, and holds non-urgent messages.",
+    "options": [
+      "Light, pressure and proximity where available",
+      "Steps since reboot (Physical activity grant)",
+      "Fresh rotation-vector orientation and accelerometer values",
+      "Unavailable or stale sensors are reported explicitly"
+    ],
+    "reference": "8.21"
+  },
+  {
+    "title": "Videos and downloads",
+    "anchor": "videos-and-downloads",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Find recent videos, take a frame from one, and pick a file from Downloads for a control agent.",
+    "example": "\"Get the frame at 0:12 from the video I just took.\"",
+    "options": [
+      "List accessible videos",
+      "Retrieve a video up to 40 MB, or a still frame",
+      "Choose individual Downloads files on the phone for one control agent"
+    ],
+    "reference": "8.5"
+  },
+  {
+    "title": "Files to your phone",
+    "anchor": "files-to-your-phone",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Control agents send PDFs, images and other files; they land in the Inbox and can be saved to Downloads.",
+    "example": "Your accounting control agent sends this month's invoice PDF to your phone.",
+    "options": [
+      "25 MB per file; 100 files / 100 MB total",
+      "Private storage, retained 30 days",
+      "Owner opens, exports to a selected location, or deletes",
+      "No automatic execution or automatic Downloads save"
+    ],
+    "reference": "8.11"
+  },
+  {
+    "title": "Share to a control agent",
+    "anchor": "share-to-an-agent",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Share a photo, link or text from any app straight to Grok or Claude.",
+    "example": "Share a restaurant link to your control agent: \"Book this for Friday.\"",
+    "options": [
+      "Selected content files, text and links from Android sharing",
+      "Choose which permitted control agent receives each share",
+      "Control agent reads its own transfer history",
+      "Up to ten selected files, each limited to 25 MB"
+    ],
+    "reference": "8.12"
+  },
+  {
+    "title": "Listen for any sounds",
+    "anchor": "listen-for-any-sounds",
+    "technical": false,
+    "stage": "Available now",
+    "description": "One control agent hears when the room gets loud, with up to 10 s of audio if you allow it. At most one every 30 s. Off by default.",
+    "example": "\"Tell me if the baby cries or someone knocks.\"",
+    "options": [],
+    "reference": "8.23"
+  },
+  {
+    "title": "Wake words",
+    "anchor": "wake-words",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Up to 10 words you choose, each sent to one control agent. Recognised offline on the phone; only what you say after one leaves it. Off by default.",
+    "example": "\"Hey Bridgit, remind me to water the plants.\"",
+    "options": [],
+    "reference": "8.23"
+  },
+  {
+    "title": "Short video clips",
+    "anchor": "short-video-clips",
+    "technical": false,
+    "stage": "Available now",
+    "description": "1 to 30 seconds of 720p or 1080p MP4. Audio is off by default and needs a microphone grant.",
+    "example": "\"Record the dishwasher noise so I can describe it to the repair shop.\"",
+    "options": [
+      "1 to 30 seconds",
+      "Back or front camera",
+      "With or without sound",
+      "720p or 1080p"
+    ],
+    "reference": "8.3"
+  },
+  {
+    "title": "Read text on the phone",
+    "anchor": "read-text-on-the-phone",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Bundled Latin-script text recognition runs on the phone; only the result leaves it.",
+    "example": "Read the serial number from a photo without uploading the picture.",
+    "options": [
+      "Bundled Latin-script recognition",
+      "From an accessible gallery image or supplied image bytes",
+      "Returns recognized text; no cloud recognition"
+    ],
+    "reference": "8.15"
+  },
+  {
+    "title": "Transcribe clips on the phone",
+    "anchor": "transcribe-clips-on-the-phone",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Request transcribe=true on a microphone clip. Requires Android on-device recognition and an installed offline language; no cloud fallback.",
+    "example": "Dictate a note for 20 seconds; the control agent gets the words.",
+    "options": [
+      "Transcript with the audio, or the transcript only"
+    ],
+    "reference": "CAP-08"
+  },
+  {
+    "title": "Screen sharing as a fallback",
+    "anchor": "screen-sharing-as-a-fallback",
+    "technical": false,
+    "stage": "Available now",
+    "description": "If you'd rather not turn on Accessibility, approve screen access once, for 1 hour or for 16 hours.",
+    "example": "Help your control agent debug an app for the next hour.",
+    "options": [
+      "Allow once, for 1 hour or for 16 hours, or deny",
+      "Stop any time from the status bar"
+    ],
+    "reference": "CAP-26b"
+  },
+  {
+    "title": "App usage",
+    "anchor": "app-usage",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Read foreground-time summaries after granting Android Usage access. Android buckets can extend past the requested interval.",
+    "example": "Weekly review: \"You spent 6 hours in email this week.\"",
+    "options": [
+      "Foreground-time summaries for up to seven days",
+      "Requires Android Usage access",
+      "Android buckets may extend outside the requested interval"
+    ],
+    "reference": "8.16"
+  },
+  {
+    "title": "Health Connect",
+    "anchor": "health-connect",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Read permitted steps, sleep and heart-rate source records. No health writes; maximum 100 records per query.",
+    "example": "Your coach control agent adjusts tomorrow's plan to last night's sleep.",
+    "options": [
+      "Read permitted steps, sleep sessions or heart-rate samples",
+      "No writes, background reads, workouts or retained health records",
+      "At most 100 source records and seven days per request",
+      "Source records may overlap; no deduplicated total claim"
+    ],
+    "reference": "8.17"
+  },
+  {
+    "title": "Read notifications",
+    "anchor": "read-notifications",
+    "technical": false,
+    "stage": "Available now",
+    "description": "Read up to 100 active notification texts received since the listener connected. Explicit notification access required; memory only.",
+    "example": "\"Summarise everything that pinged me during the meeting.\"",
+    "options": [
+      "Explicit feature switch and Android notification access",
+      "At most 100 active notifications since listener connection",
+      "RAM only; cleared when disabled, paused or disconnected",
+      "No notification-history archive or long-poll in this build"
+    ],
+    "reference": "8.18"
+  },
+  {
+    "title": "Copy to clipboard",
+    "anchor": "copy-to-clipboard",
+    "technical": false,
+    "stage": "Available now",
+    "description": "A control agent puts text on your clipboard after you approve it.",
+    "example": "Your control agent copies the 2-factor backup code so you can paste it.",
+    "options": [
+      "Up to 10000 characters of text",
+      "Every copy requires your foreground Copy tap",
+      "Five-minute approval expiry",
+      "Text is marked sensitive to suppress clipboard previews"
+    ],
+    "reference": "8.19"
+  },
+  {
+    "title": "Control agent permissions",
+    "anchor": "per-agent-permissions",
+    "technical": true,
+    "stage": "Available now",
+    "description": "Choose what each control agent may use, for example photos for Claude but not for Grok.",
+    "example": "Let your shopping control agent see the gallery but never the camera.",
+    "options": [],
+    "reference": "15"
+  },
+  {
+    "title": "Reach Bridgit without Tailscale (relay)",
+    "anchor": "reach-bridgit-without-tailscale-relay",
+    "technical": true,
+    "stage": "Later, or needs your decision",
+    "description": "Control agents that can't join Tailscale, like hosted assistants, leave jobs in an encrypted mailbox; a push wakes the phone.",
+    "example": "Muse, which runs on Meta's servers, takes a photo for you.",
+    "options": [],
+    "reference": "4.4, Q10"
+  },
+  {
+    "title": "Play an audio file",
+    "anchor": "play-an-audio-file",
+    "technical": false,
+    "stage": "Available now",
+    "description": "A control agent sends a sound, a voice message or text to read out, and the phone plays it on its speaker. Newer audio from the same control agent replaces what's waiting, so it keeps up with you.",
+    "example": "Your reminder control agent plays \"Time to leave for the airport\" in its own voice.",
+    "options": [
+      "An MP3, M4A, OGG, WAV or FLAC file (up to 25 MB), or a public https link",
+      "Or text read aloud with the phone's own voice: language, speed and pitch",
+      "Replace what's waiting, stop the current one, or queue",
+      "Never louder than your volume ceiling (default 70 %)",
+      "Silent when your phone is on silent, vibrate, Do Not Disturb or a call",
+      "Stop clears everything"
+    ],
+    "reference": "new idea"
+  },
+  {
+    "title": "Scheduled actions",
+    "anchor": "scheduled-actions",
+    "technical": false,
+    "stage": "Available now",
+    "description": "A control agent hands the phone a list of actions and when to run them, once. After you approve it, the phone runs them by itself, so the control agent doesn't have to wake up for each one.",
+    "example": "Every 7 minutes from 4:34, three times: take a photo and send it to the control agent's server.",
+    "options": [
+      "Any action the phone can take: photos, sounds, notices, downloads, and more",
+      "Once, at a list of times, every N minutes (with a start and a count), daily, or right after another action",
+      "Send results such as photos or recordings to a web address",
+      "You approve each new list once; pause or remove any time",
+      "Up to 100 actions; saved files 100 MB, 30 days"
+    ],
+    "reference": "CAP-57"
+  },
+  {
+    "title": "Messages, contacts, calendar, calls",
+    "anchor": "messages-contacts-calendar-calls",
+    "technical": false,
+    "stage": "Later, or needs your decision",
+    "description": "Read and, with your approval each time, send.",
+    "example": "\"Text Sam I'm 10 minutes late\" — you approve on the phone.",
+    "options": [],
+    "reference": "8.22, Q1"
+  },
+  {
+    "title": "Location history and places",
+    "anchor": "location-history-and-places",
+    "technical": false,
+    "stage": "Later, or needs your decision",
+    "description": "Optional history kept on the phone, and \"tell me when I get home\".",
+    "example": "Grok reminds you to water the plants when you arrive home.",
+    "options": [],
+    "reference": "CAP-20a, Q14"
+  }
+]

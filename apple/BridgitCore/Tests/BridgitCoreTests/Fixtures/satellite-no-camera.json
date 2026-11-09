@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "profile_revision": 12,
+  "observed_at": "2026-11-05T18:00:00Z",
+  "expires_at": "2026-11-05T18:01:00Z",
+  "device": {
+    "install_id": "bgi_fixture",
+    "name": "Fixture Mac",
+    "device_type": "computer",
+    "platform": "macos",
+    "os_version": "15.0",
+    "app_version": "fixture",
+    "api_revision": 100,
+    "services": [
+      "host",
+      "sensors"
+    ],
+    "hardware": {
+      "camera": "absent",
+      "microphone": "unknown"
+    }
+  },
+  "link": {
+    "id": "lnk_fixture",
+    "role": "satellite",
+    "target": "sat:fixture",
+    "allowed_services": [
+      "sensors"
+    ],
+    "state": "active"
+  },
+  "availability": {
+    "state": "online",
+    "in_foreground": false
+  },
+  "capabilities": {
+    "v1.camera": {
+      "runtime_id": "camera",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": false,
+      "agent_allowed": true,
+      "callable": false,
+      "blocked_reason": "no_hardware",
+      "constraints": {
+        "execution": [
+          "foreground",
+          "background_awake"
+        ]
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/v1/camera/snapshot"
+        }
+      ]
+    }
+  }
+}

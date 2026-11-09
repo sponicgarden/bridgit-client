@@ -1,9 +1,9 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
-  "summary": "The phone's agents and what each may use. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+  "summary": "The phone's agents and what each may use. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
   "method": "GET",
   "auth": true,
   "mcp_tool": "portal_agents",
@@ -21,7 +21,7 @@
   "idempotent": false,
   "path": "/v1/portal/agents",
   "capability": "portal",
-  "returns": "agents[{id, name, mode (connector|sealed for relay agents, direct otherwise), transport (direct|userspace|relay), last_used_at (ms, 0 = never), paused, all_access, grants[capability ids], model?}]",
+  "returns": "agents[{id, name, mode (connector|sealed for relay agents, direct otherwise), transport (direct|userspace|relay), last_used_at (ms, 0 = never), paused, api_access, all_access, grants[capability ids], model?}]",
   "mcp_input_schema": {
    "type": "object",
    "properties": {"client": {

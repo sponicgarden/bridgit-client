@@ -453,7 +453,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                     while (isActive) {
                         delay(200)
                         val live = app.agents.get(agent.id)
-                        if (live == null || live.keyHash != agent.keyHash || live.paused || !live.allows(spec.capability) || !sat.stillAllowed(agent.id)) {
+                        if (live == null || live.keyHash != agent.keyHash || live.suspended || !live.allows(spec.capability) || !sat.stillAllowed(agent.id)) {
                             revoked = true; okCall.cancel(); break
                         }
                     }
@@ -531,7 +531,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                     !app.platform.hasGrant(a.id, scope) || !cc.bridgit.app.platform.Capabilities.enabled(app, scope)
                 } ?: false
                 val linkStopped = !cc.bridgit.app.link.LinkPolicy.isPlumbing(req.spec) && app.links.isLinkAgent(a.id) && app.links.inBlocked(a.id)
-                val pausedNow = linkStopped || (live?.paused == true && !(cc.bridgit.app.link.LinkPolicy.isPlumbing(req.spec) && app.links.isLinkAgent(a.id)))
+                val pausedNow = linkStopped || (live?.suspended == true && !(cc.bridgit.app.link.LinkPolicy.isPlumbing(req.spec) && app.links.isLinkAgent(a.id)))
                 if (live == null || live.keyHash != a.keyHash || pausedNow || !live.allows(req.spec.capability) || switchedOff || scopeRevoked) {
                     work.cancel(); break
                 }
@@ -572,7 +572,9 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
         val live = app.agents.get(agent.id) ?: throw ErrorCatalog.error("unauthorized", "Agent removed.")
         if (live.keyHash != agent.keyHash) throw ErrorCatalog.error("unauthorized", "Agent key was rotated during the request.")
         // A paused link agent still makes the link's own calls (events, disconnect), so both sides stay in step.
-        if (live.paused && !(cc.bridgit.app.link.LinkPolicy.isPlumbing(spec) && app.links.isLinkAgent(live.id)))
+        val plumbing = cc.bridgit.app.link.LinkPolicy.isPlumbing(spec) && app.links.isLinkAgent(live.id)
+        if (!live.apiAccess && !plumbing) throw ApiAccess.refusal(live)
+        if (live.paused && !plumbing)
             throw ErrorCatalog.error("forbidden", "The owner paused ${live.name} on this phone. Wait until they resume you; don't retry before then.",
             mapOf("reason" to "agent_paused"))
         if (!live.allows(spec.capability)) throw ErrorCatalog.error("agent_not_allowed", "This agent does not have ${spec.capability} access. Ask the owner to update its permissions on the phone.")

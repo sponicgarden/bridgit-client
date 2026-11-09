@@ -11,7 +11,8 @@ import java.net.URLEncoder
  * shape of one log entry. Contract: docs/ios-portal-api.md.
  */
 object PortalData {
-    const val AGENT_NAME = "Bridgit Portal"
+    /** The relay agent each viewing iPhone, iPad or phone gets. The brand is Bridgit, not "Bridgit Portal" (A0160). */
+    const val AGENT_NAME = "Bridgit viewer"
     const val SCHEME = "bridgitportal"
     const val LINK_VERSION = 1
 

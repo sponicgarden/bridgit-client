@@ -54,7 +54,7 @@ object SettingsConfigurationApi {
     }
 
     fun requireWriter(app: BridgeApp, id: String?, expectedKeyHash: String? = null): Agent {
-        val live = id?.let(app.agents::get)?.takeUnless { it.paused }
+        val live = id?.let(app.agents::get)?.takeUnless { it.suspended }
             ?: throw ErrorCatalog.error("unauthorized", "Agent is no longer active")
         if (expectedKeyHash != null && live.keyHash != expectedKeyHash) throw ErrorCatalog.error("unauthorized", "Agent key changed")
         if (!app.settings.listenerEnabled || !app.settings.isOn("settings_api")) throw ErrorCatalog.error("capability_disabled", "App settings or the listener is off")

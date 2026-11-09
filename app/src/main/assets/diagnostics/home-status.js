@@ -1,7 +1,7 @@
 /* Horizontally scrollable applet strip. Text is always untrusted. */
 (function () {
   "use strict";
-  var emptyApplets = "No applets running";
+  var emptyApplets = window.BridgitReportedState ? "Applet status not reported" : "No applets running";
   var slot = { id: "appletStatus", items: [] };
   function drawApplets(slot) {
     var strip = document.getElementById(slot.id);
@@ -26,7 +26,7 @@
   }
   window.BridgitHomeStatus = {
     update: function (state) {
-      var items = state.applets || [], emptyText = state.emptyApplets || "No applets running";
+      var items = state.applets || [], emptyText = state.emptyApplets || (window.BridgitReportedState && !("applets" in state) ? "Applet status not reported" : "No applets running");
       var changed = JSON.stringify(items) !== JSON.stringify(slot.items) || emptyText !== emptyApplets;
       slot.items = items;
       emptyApplets = emptyText;

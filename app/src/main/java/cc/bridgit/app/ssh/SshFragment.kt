@@ -92,7 +92,7 @@ class SshFragment : Fragment() {
         }
     }
     private fun addConnection() {
-        val agents = app.agents.all().filter { !it.paused && it.allows("ssh") }
+        val agents = app.agents.all().filter { !it.suspended && it.allows("ssh") }
         if (agents.isEmpty()) { show("Choose a control agent first", "Add a control agent and grant it SSH connections access in its permissions, then return here."); return }
         val form = LinearLayout(requireContext()).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(20), dp(8), dp(20), 0) }
         fun field(hint: String, secret: Boolean = false, initial: String = "") = EditText(requireContext()).apply {
@@ -144,7 +144,7 @@ class SshFragment : Fragment() {
                     SshClient {
                         guard()
                         check(app.settings.isOn("ssh") && !Outbound.paused())
-                        val live = app.agents.get(selected.id); check(live != null && !live.paused && live.allows("ssh"))
+                        val live = app.agents.get(selected.id); check(live != null && !live.suspended && live.allows("ssh"))
                     }.verify(p)
                     guard()
                     app.sshProfiles.saveVerified(p, null)

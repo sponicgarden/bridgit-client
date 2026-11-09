@@ -3,12 +3,12 @@
 <resources>
     <string name="app_name">Bridgit</string>
     <!-- Full name (owner, 27 Oct 2026): shown on first run, under the Home title and in About. -->
-    <string name="app_tagline">Distributed sensorial applications, built by your favorite agent.</string>
+    <string name="app_tagline">Distributed sensorial applications — built by your favorite agent.</string>
     <!-- The same tagline on two lines, under the wordmark in the update box (owner, 5 Nov 2026). -->
-    <string name="app_tagline_two_lines">Distributed sensorial applications,\nbuilt by your favorite agent.</string>
-    <string name="app_tagline_unlock">Distributed sensorial applications,</string>
+    <string name="app_tagline_two_lines">Distributed sensorial applications —\nbuilt by your favorite agent.</string>
+    <string name="app_tagline_unlock">Distributed sensorial applications —</string>
     <string name="app_tagline_unleash">built by your favorite agent.</string>
-    <string name="app_full_name">Bridgit: Distributed sensorial applications, built by your favorite agent.</string>
+    <string name="app_full_name">Bridgit: Distributed sensorial applications — built by your favorite agent.</string>
 
     <!-- Notification channels (UI-21) -->
     <string name="channel_listener">Listener</string>
@@ -130,6 +130,11 @@
     <string name="cap_screen_desc">Control agents see your screen when they ask. Needs Bridgit\'s screenshot service (Access).</string>
     <string name="notif_screenshot">%1$s is taking a screenshot</string>
     <string name="screenshot_service_label">Bridgit screenshots</string>
+    <!-- Names Android lists; debug and test builds append their tag (app/build.gradle.kts systemLabels). -->
+    <string name="device_control_service_label">Bridgit private app control</string>
+    <string name="notification_access_label">Bridgit notification access</string>
+    <string name="share_to_bridgit_label">Share to Bridgit</string>
+    <string name="share_to_agent_label">Share to a control agent</string>
     <string name="screenshot_service_summary">Lets your control agents take a screenshot when they ask</string>
     <string name="screenshot_service_desc">Bridgit uses this only to take a screenshot when one of your control agents asks, and only while Screenshots is on in Bridgit\'s Features. It can\'t read, tap or type on your screen. Every screenshot shows a notification and is logged. Apps that block screenshots come out blank.</string>
     <string name="cap_log">Log</string>

@@ -47,6 +47,11 @@ class LogStore(context: Context, private val retention: () -> Retention) {
         append(LogEntry(ts = System.currentTimeMillis(), channel = channel, kind = kind, level = level,
             message = Redactor.string(message, 500), data = data))
 
+    /** An audit entry for a change an agent made through the API (A0119): attributed to it, like its requests. */
+    fun byAgent(agentId: String, agentName: String, kind: String, message: String, data: JSONObject? = null) =
+        append(LogEntry(ts = System.currentTimeMillis(), channel = "audit", kind = kind, agentId = agentId, agent = agentName,
+            message = Redactor.string(message, 500), data = data))
+
     fun query(q: LogQuery): List<LogEntry> {
         val (where, args) = q.where()
         return db.query("log", null, where, args, null, null, q.orderBy, q.limit.toString()).use { c -> rows(c) }

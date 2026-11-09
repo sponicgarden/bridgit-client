@@ -116,7 +116,7 @@ object HomeStates {
         // Both agents.all() and watches.tallies() are snapshots of in-memory collections, with no disk reads.
         val agents = controlAgents(app).sortedBy { it.createdAt }.map { agent ->
             statusEntry(app, agent.name, when {
-                agent.paused || paused -> "Paused"
+                agent.suspended || paused -> "Paused"
                 !listener.running -> "Starting"
                 listener.bindError != null || listener.boundTo.isEmpty() -> "Waiting for connection"
                 else -> "Listening"

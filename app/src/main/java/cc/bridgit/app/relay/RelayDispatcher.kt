@@ -16,6 +16,8 @@ class RelayDispatcher(private val app:BridgeApp,private val api:ApiServer) {
     private suspend fun dispatchEffective(config:JSONObject,request:JSONObject,deadline:Long,created:Long,relayJob:String,caller:JSONObject?):JSONObject {
         val id=config.getString("id");val agent=app.agents.get(id) ?: throw ApiError(401,"agent_revoked","Agent removed")
         if(!app.settings.listenerEnabled||!RelayStore(app).enabled||agent.keyHash!=config.getString("generation"))throw ApiError(403,"agent_revoked","Relay authority changed")
+        // A0120: API access off refuses every relay call; a linked Bridgit's own plumbing still runs, as when paused.
+        if(!agent.apiAccess&&!(app.links.isLinkAgent(id)&&request.optString("path") in cc.bridgit.app.link.LinkPolicy.PLUMBING.map { "/v1$it" }))throw cc.bridgit.app.api.ApiAccess.refusal(agent)
         if(!limiter.tryAcquire("relay:$id",300))throw ApiError(429,"rate_limited","At most 300 relay requests per minute")
         if(agent.caps==null)throw ApiError(403,"explicit_grants_required","Relay agents need explicit grants")
         if(deadline<=System.currentTimeMillis())throw ApiError(409,"deadline_expired","Job expired")
@@ -43,7 +45,7 @@ class RelayDispatcher(private val app:BridgeApp,private val api:ApiServer) {
             return JSONObject().put("status",r.first).put("content_type","application/json").put("body_base64",Sealed.b64(r.second.toString().toByteArray())).put("headers",JSONObject())
         }
         if(config.optLong("claim_until",0)>0&&System.currentTimeMillis()>config.optLong("claim_until"))
-            throw ApiError(403,"claim_required","This pairing link expired. Update Bridgit Portal and pair again with a new link")
+            throw ApiError(403,"claim_required","This pairing link expired. Update the Bridgit app and pair again with a new link")
         // Like direct calls: last used, request count, and Home sees which relay viewers are active.
         val place=placeOf(caller)
         app.agents.recordUse(id,caller?.optString("ip")?.takeIf { it.isNotEmpty() }?.let { "relay:$it" } ?: ("relay:"+config.getString("mode")))

@@ -245,7 +245,7 @@ final class PhoneLive: ObservableObject {
             scanNote = total == 0 ? "No advertised devices found. Check that devices share this network. Some devices do not advertise themselves, and guest Wi-Fi may block discovery."
                 : "\(total) devices in \(categories.count) categories · useful first" + ((d["complete"] as? Bool) == false ? "" : "")
         } catch RelayError.notAllowed {
-            scanNote = "The phone doesn't let this pairing run network scans. On the phone, allow Network discovery for Bridgit Portal."
+            scanNote = "The phone doesn't let this pairing run network scans. On the phone, allow Network discovery for this iPhone or iPad."
         } catch {
             scanNote = error.localizedDescription
         }
@@ -302,7 +302,7 @@ final class PhoneLive: ObservableObject {
     /// "iPhone 16 Pro · iOS 26.1 · Portal 1.4": the phone's Linked devices map names this device with it.
     nonisolated static var clientDevice: String {
         let app = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
-        return [DeviceModel.name, "iOS " + UIDevice.current.systemVersion, app.isEmpty ? "" : "Portal " + app]
+        return [DeviceModel.name, "iOS " + UIDevice.current.systemVersion, app.isEmpty ? "" : "Bridgit " + app]
             .filter { !$0.isEmpty }.joined(separator: " · ")
     }
 

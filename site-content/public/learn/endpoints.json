@@ -969,7 +969,7 @@
    "idempotent": false,
    "path": "/v1/owner/configuration/access",
    "capability": "settings",
-   "returns": "authority,approval_required=false,agents[{id,name,generation,key_created_at,capabilities,control_scopes,effective_control_scopes,paused,super_powers,fixer_mode,maximum_control}],features[{id,name,enabled,blockers}],capabilities; no keys or hashes",
+   "returns": "authority,approval_required=false,agents[{id,name,generation,key_created_at,capabilities,control_scopes,effective_control_scopes,paused,api_access,super_powers,fixer_mode,maximum_control,connection,created_at,last_used_at,request_count,model,harness,device_lock,notes}],features[{id,name,enabled,blockers}],capabilities; no keys or hashes",
    "errors": [],
    "requires": "super_powers"
   },
@@ -1031,6 +1031,24 @@
      "name": "paused",
      "description": "Pause/resume this paired control agent",
      "type": "boolean",
+     "required": false
+    },
+    {
+     "name": "api_access",
+     "description": "API access (on by default): false refuses every API call from this agent while it stays paired; true restores it",
+     "type": "boolean",
+     "required": false
+    },
+    {
+     "name": "name",
+     "description": "Rename the agent: 1-24 letters, numbers, spaces, - or _, unique on this phone",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "notes",
+     "description": "The owner's notes about the agent, up to 200 characters; \"\" clears",
+     "type": "string",
      "required": false
     },
     {
@@ -3448,7 +3466,7 @@
    "idempotent": false,
    "path": "/v1/health",
    "capability": "status",
-   "returns": "status, app, app_version, mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}",
+   "returns": "status, app, app_version, build_type (release, or debug for a test build), distribution (private or play), build_tag (null for the real app; debug or test claude <feature> for test builds), package (cc.bridgit.app is the real app), app_label (the name Android lists this build under), mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}",
    "errors": [],
    "requires": null
   },
@@ -3484,7 +3502,7 @@
    "idempotent": false,
    "path": "/v1/devices",
    "capability": "status",
-   "returns": "devices: host Android device, cameras visible to your lan_camera grant and your own LAN enrollments when lan_control is granted and enabled; SSH profiles when ssh is granted and enabled; ids, names, configured state, availability (not_checked until an action), advertised pan/tilt and exact action paths/bodies. No credentials. Inventory is passive and does not scan the LAN.",
+   "returns": "devices: host Android device, cameras visible to your lan_camera grant and your own LAN enrollments when lan_control is granted and enabled; SSH profiles when ssh is granted and enabled; ids, names, configured state, availability (not_checked until an action), advertised pan/tilt and exact action paths/bodies. No credentials. Inventory is passive and does not scan the LAN. lan_path: read-only status of the agent path for other LAN devices (speakers such as WiiM): discover, enroll and control steps with agent grant, owner switch, usable, endpoints and the number of this agent's enrolled devices; granting and approval stay with the owner.",
    "errors": [],
    "requires": null
   },
@@ -3731,6 +3749,24 @@
    "path": "/v1/openapi.json",
    "capability": "status",
    "returns": "application/json",
+   "errors": [],
+   "requires": null
+  },
+  {
+   "summary": "The API registry: every API group with its fixed name and number, its calls, and the one permission that governs them (API access, on by default, all-or-nothing for now)",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "registry",
+   "query": [],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/registry",
+   "idempotent": false,
+   "path": "/v1/registry",
+   "capability": "status",
+   "returns": "permission {id: api_access, name, default: true, granular: false, you}, count, calls, apis[number, id, name, permission, default, allowed, calls[\"METHOD /v1/path\" or \"tool <name>\"]]; numbers never change or get reused",
    "errors": [],
    "requires": null
   },
@@ -8905,7 +8941,7 @@
    "requires": null
   },
   {
-   "summary": "Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_snapshot",
@@ -8943,12 +8979,12 @@
    "idempotent": false,
    "path": "/v1/portal/snapshot",
    "capability": "portal",
-   "returns": "home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), updates (null, or the request an agent left for this Portal: {id, prompts?: boolean, prompt_now: boolean, at}; apply it, then POST /v1/portal/updates with ack: id), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for a Bridgit Portal pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay)",
+   "returns": "home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), updates (null, or the request an agent left for this Portal: {id, prompts?: boolean, prompt_now: boolean, at}; apply it, then POST /v1/portal/updates with ack: id), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for an iPhone or iPad viewer pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay)",
    "errors": ["invalid_parameter"],
    "requires": null
   },
   {
-   "summary": "The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_home",
@@ -8985,7 +9021,7 @@
    "requires": null
   },
   {
-   "summary": "Remembered devices on the phone's current network, the same payload as GET /v1/lan/discovered; no scan, no switch needed (like the phone's Network devices screen). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Remembered devices on the phone's current network, the same payload as GET /v1/lan/discovered; no scan, no switch needed (like the phone's Network devices screen). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_devices",
@@ -9011,7 +9047,7 @@
    "requires": null
   },
   {
-   "summary": "Enrolled devices for one approved applet card on this phone. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Enrolled devices for one approved applet card on this phone. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_applets_inventory",
@@ -9047,7 +9083,7 @@
    "requires": null
   },
   {
-   "summary": "Watch activity on the selected monitoring phone for one approved registry edition. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Watch activity on the selected monitoring phone for one approved registry edition. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_applets_watches",
@@ -9082,7 +9118,7 @@
    "requires": null
   },
   {
-   "summary": "A bundled manufacturer logo, as GET /v1/lan/brands/{id}/logo, without the Network discovery switch. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "A bundled manufacturer logo, as GET /v1/lan/brands/{id}/logo, without the Network discovery switch. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_brands_logo",
@@ -9113,7 +9149,7 @@
    "requires": null
   },
   {
-   "summary": "Agent activity from the phone's log, with the same redaction as remote view: no messages, parameters or results. Oldest first after since; the newest page without it. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Agent activity from the phone's log, with the same redaction as remote view: no messages, parameters or results. Oldest first after since; the newest page without it. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_logs",
@@ -9156,7 +9192,7 @@
    "requires": null
   },
   {
-   "summary": "The phone's agents and what each may use. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "The phone's agents and what each may use. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_agents",
@@ -9174,12 +9210,12 @@
    "idempotent": false,
    "path": "/v1/portal/agents",
    "capability": "portal",
-   "returns": "agents[{id, name, mode (connector|sealed for relay agents, direct otherwise), transport (direct|userspace|relay), last_used_at (ms, 0 = never), paused, all_access, grants[capability ids], model?}]",
+   "returns": "agents[{id, name, mode (connector|sealed for relay agents, direct otherwise), transport (direct|userspace|relay), last_used_at (ms, 0 = never), paused, api_access, all_access, grants[capability ids], model?}]",
    "errors": [],
    "requires": null
   },
   {
-   "summary": "The phone's applets (Pet monitor, City tour, live watches). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "The phone's applets (Pet monitor, City tour, live watches). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_applets",
@@ -9202,7 +9238,7 @@
    "requires": null
   },
   {
-   "summary": "The APK's design tokens, read from its own resources and Home scene, so the portal looks the same. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "The APK's design tokens, read from its own resources and Home scene, so the portal looks the same. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_theme",
@@ -9225,7 +9261,7 @@
    "requires": null
   },
   {
-   "summary": "Who checks a photo sent with POST /v1/portal/photo: each agent (usually an installed applet) with a watch that checks photos, and the owner's last pick on the phone's Camera tab. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Who checks a photo sent with POST /v1/portal/photo: each agent (usually an installed applet) with a watch that checks photos, and the owner's last pick on the phone's Camera tab. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "portal_photo_targets",
@@ -9643,7 +9679,7 @@
    "requires": null
   },
   {
-   "summary": "The linked Bridgits (the owner's other Bridgits) you may use through this one, with what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further.",
+   "summary": "This Bridgit's links to the owner's other Bridgits, from either end (hub or satellite), with which you may use through this one and what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further.",
    "method": "GET",
    "auth": true,
    "mcp_tool": "links",
@@ -9656,7 +9692,7 @@
    "idempotent": false,
    "path": "/v1/links",
    "capability": "status",
-   "returns": "links[{id (sat:\u2026 or name), target, link_id, name, bridgit_name, kind, platform, device_type, status (online|offline|unlinked|not_checked), state (on|waiting_for_target|waiting_for_user|paused|off), services[], last_seen, battery, cameras, capabilities, endpoints, how_to_call}], how_to_call. Only Bridgits the owner lets you use are listed; GET /v1/satellites is the same list.",
+   "returns": "links[{id (sat:\u2026 or name), target, link_id, name, bridgit_name, kind, role (hub: the other is this one's satellite | satellite: the other is this one's hub), reachable (you may target it), platform, device_type, status (online|offline|unlinked|not_checked), state (on|waiting_for_target|waiting_for_user|paused|off), services[], directions{in{state, services, about}, out{state, services, about}}, last_seen, battery, cameras, capabilities, endpoints, how_to_call}], how_to_call. battery, cameras, capabilities and endpoints only when reachable; an unreachable entry's how_to_call says how the owner lets you use it. GET /v1/satellites is the same list.",
    "errors": [],
    "requires": null
   },
@@ -11649,7 +11685,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 135,
- "count": 348,
+ "api_revision": 138,
+ "count": 349,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

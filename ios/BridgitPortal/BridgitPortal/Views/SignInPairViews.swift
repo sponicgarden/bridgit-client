@@ -21,7 +21,7 @@ struct SignInView: View {
                 // The wordmark, its tagline, then the accent line.
                 VStack(spacing: 10) {
                     PortalWordmark(height: 52)
-                    Text("Distributed sensorial applications,\nbuilt by your favorite agent.")
+                    Text("Distributed sensorial applications —\nbuilt by your favorite agent.")
                         .frostText(.section, weight: .medium).multilineTextAlignment(.center).foregroundStyle(B.onSurface)
                         .frame(maxWidth: .infinity)
                     AccentRule().padding(.top, 4)

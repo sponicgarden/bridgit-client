@@ -51,6 +51,8 @@ android {
         versionCode = allocated.getProperty("versionCode").toInt()
         versionName = allocated.getProperty("versionName")
         buildConfigField("int", "DEFAULT_PORT", "8734")
+        // Empty for release builds; debug and test builds set their tag (systemLabels below).
+        buildConfigField("String", "BUILD_TAG", "\"\"")
         buildConfigField("String", "GIT_COMMIT", "\"${gitCommit()}\"")
         buildConfigField("boolean", "DIRTY_BUILD", "${gitDirty()}")
         // FBK-14: the Bridgit team's feedback backend (source in /feedback). Empty turns uploads off.
@@ -113,8 +115,11 @@ android {
                     suffix.trimStart('.').lowercase().replace(Regex("[^a-z0-9]+"), "_").removePrefix("test_claude_").trim('_')
             }
             applicationIdSuffix = suffix
-            // Several test builds can sit on one phone: name each after its suffix ("bridgit test claude cam").
-            if (suffix != ".debug") resValue("string", "app_name", "bridgit " + suffix.trimStart('.').replace('_', ' '))
+            // Several test builds can sit on one phone beside the real app: tag every name Android lists with
+            // the build ("Bridgit (debug)", "Bridgit (test claude cam)", "Bridgit screenshots (debug)"...).
+            val tag = if (suffix == ".debug") "debug" else suffix.trimStart('.').replace('_', ' ')
+            systemLabels().forEach { (name, text) -> resValue("string", name, "$text ($tag)") }
+            buildConfigField("String", "BUILD_TAG", "\"$tag\"")
             // Debug builds listen on 8735 so they never clash with a release build on 8734.
             buildConfigField("int", "DEFAULT_PORT", bridgitProperty("DebugPort") ?: "8735")
         }
@@ -228,6 +233,23 @@ val writeProvenance by tasks.registering {
     }
 }
 tasks.named("preBuild") { dependsOn(copyHelper, copyDemo, copySamples, writeProvenance) }
+
+/**
+ * Every name Android shows for this app in its own lists: launcher and Settings > Apps (app_name), Quick
+ * Settings (tile_label), Accessibility (the two accessibility services), Notification access and the share
+ * sheet. These are the release texts, kept identical in app/src/main/res; debug and test builds get
+ * "<text> (<tag>)" so a test build can't pass for the real app when the owner grants it access (A0093).
+ * BuildLabelTest checks both.
+ */
+fun systemLabels(): Map<String, String> = linkedMapOf(
+    "app_name" to "Bridgit",
+    "tile_label" to "Bridgit",
+    "screenshot_service_label" to "Bridgit screenshots",
+    "device_control_service_label" to "Bridgit private app control",
+    "notification_access_label" to "Bridgit notification access",
+    "share_to_bridgit_label" to "Share to Bridgit",
+    "share_to_agent_label" to "Share to a control agent",
+)
 
 /** -Pbridgit<Name>, or the deprecated -Pbridget<Name> spelling older scripts still pass. */
 fun bridgitProperty(name: String): String? =

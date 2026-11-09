@@ -624,6 +624,16 @@ object ApiChanges {
             Item("Display geometry: size, density, aspect ratio, rotation and the full-screen and standard card canvases; health carries a short display block", "/v1/device/display"),
             Item("Device specs: a named Bridgit stores its static spec sheet (display, full-screen card size, cameras, CPU, memory, storage, sensors, model, OS) with Bridgit, on by default; ask GET <team backend>/v1/names/{name}/specs first for static specs, the phone only for live state. Read, switch off (which deletes the stored sheet) or refresh it", "/v1/owner/configuration/specs"),
         )),
+        Revision(136, "1.8.0", "2026-11-09", listOf(
+            Item("Links are listed from both ends: a hub lists its satellites too, and every link is listed with role, reachable (whether you may target it) and directions {in, out} with state and services; the other device's cameras, capabilities and endpoints only when reachable. GET /v1/satellites is the same list", "/v1/links"),
+        )),
+        Revision(137, "1.8.0", "2026-11-09", listOf(
+            Item("Health says which build answers: build_type, distribution, build_tag (null for the real app), package and app_label, the name Android lists it under. Test builds tag every name Android shows, e.g. \"Bridgit (debug)\" and \"Bridgit screenshots (debug)\"", "/v1/health"),
+        )),
+        Revision(138, "1.8.0", "2026-11-09", listOf(
+            Item("API registry: every API group with its fixed name and number, its calls, and the permission that governs it", "/v1/registry"),
+            Item("API access: one permission per agent over the whole API, on by default. Off refuses every call with forbidden, reason api_access_off, while the agent stays paired. Read it as api_access in owner configuration access; a Super agent changes it with api_access on access/agents/{agent}. Access changes made through the API are logged as the agent that made them", "/v1/owner/configuration/access/agents/{agent}"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

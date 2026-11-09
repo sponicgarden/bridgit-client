@@ -129,6 +129,56 @@ class LinkTest {
         assertFalse(app.agents.all().any { it.id == hubAgent && app.links.isControlAgent(it) })
     }
 
+    /** A0152: the hub lists its satellite even for an agent not in the user opt-in, with both directions; no duplicates. */
+    @Test fun theHubListsItsSatelliteLinks() {
+        val almusca = app.agents.add("Almusca", Connection.DIRECT).first
+        val p = SatelliteLink.Parsed("100.64.0.21", 18471, "", "Pixel 10", "bgi_dddddddddddddddddddddddd")
+        val manifest = JSONObject().put("name", "Pixel 10").put("cameras", JSONArray(listOf("rear")))
+            .put("capabilities", JSONArray().put(JSONObject().put("id", "camera").put("enabled", true)))
+        val s = app.satellites.add(p, "brg_" + "y".repeat(40), manifest)
+        // A hub-side record only: this device is the hub, no hub link of its own, and Almusca was never granted the satellite.
+        assertTrue(app.hubLinks.agents().isEmpty())
+        assertTrue(app.links.reachableBy(almusca).isEmpty())
+
+        val list = app.links.agentList(almusca)
+        assertEquals(1, list.length())
+        val e = list.getJSONObject(0)
+        val rec = app.links.all().single()
+        assertEquals("hub", e.getString("role")); assertEquals(rec.id, e.getString("link_id")); assertEquals(s.id, e.getString("target"))
+        assertFalse(e.getBoolean("reachable"))
+        assertEquals("on", e.getJSONObject("directions").getJSONObject("in").getString("state"))
+        assertEquals(listOf("view"), (0 until e.getJSONObject("directions").getJSONObject("in").getJSONArray("services").length()).map { e.getJSONObject("directions").getJSONObject("in").getJSONArray("services").getString(it) })
+        assertTrue(e.getJSONObject("directions").getJSONObject("out").has("state"))
+        assertTrue(e.getJSONObject("directions").getJSONObject("out").getJSONArray("services").toString().contains("camera"))
+        for (k in listOf("cameras", "capabilities", "endpoints", "battery")) assertFalse("no $k while not reachable", e.has(k))
+        assertTrue(e.getString("how_to_call").contains("/v1/owner/configuration/links/${rec.id}/directions/out"))
+
+        // Once granted, the same single entry is reachable and carries the satellite's manifest.
+        app.satellites.setAgent(s.id, almusca.id, true)
+        val granted = app.links.agentList(almusca)
+        assertEquals(1, granted.length())
+        val g = granted.getJSONObject(0)
+        assertTrue(g.getBoolean("reachable")); assertEquals("hub", g.getString("role")); assertEquals(rec.id, g.getString("link_id"))
+        assertEquals("${s.id}/rear", g.getJSONArray("cameras").getJSONObject(0).getString("id"))
+        assertTrue(g.getString("how_to_call").contains("X-Bridgit-Target: ${s.id}"))
+        assertTrue(g.has("directions"))
+    }
+
+    /** A0152: both ends list a link: the side a claim reached lists it too, for an agent that can't use it. */
+    @Test fun aClaimedLinkIsListedOnBothRoles() {
+        val (r, _) = claimed()
+        val other = app.agents.add("Bystander", Connection.DIRECT).first
+        val entries = app.links.agentList(other)
+        val ids = (0 until entries.length()).map { entries.getJSONObject(it).getString("link_id") }
+        assertEquals("one entry per link", ids.distinct(), ids)
+        val e = entries.getJSONObject(ids.indexOf(r.id))
+        assertEquals(r.role.wire, e.getString("role"))
+        assertFalse(e.getBoolean("reachable"))
+        val inbound = e.getJSONObject("directions").getJSONObject("in")
+        assertEquals("on", inbound.getString("state"))
+        assertTrue(inbound.getJSONArray("services").toString().contains("camera"))
+    }
+
     // ---- Codes (LNK-16) ----------------------------------------------------------------------------
 
     @Test fun codesNeedANameAndCountWrongTries() {

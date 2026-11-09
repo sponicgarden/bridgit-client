@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 119,
+ "api_revision": 138,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The API registry: every API group with its fixed name and number, its calls, and the one permission that governs them (API access, on by default, all-or-nothing for now)",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "registry",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/registry",
+  "idempotent": false,
+  "path": "/v1/registry",
+  "capability": "status",
+  "returns": "permission {id: api_access, name, default: true, granular: false, you}, count, calls, apis[number, id, name, permission, default, allowed, calls[\"METHOD /v1/path\" or \"tool <name>\"]]; numbers never change or get reused",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

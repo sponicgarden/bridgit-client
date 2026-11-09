@@ -31,7 +31,7 @@ private struct AgentsList: View {
                 if !viewers.isEmpty {
                     HStack(spacing: 10) {
                         Image(systemName: "ipad.and.iphone").foregroundStyle(B.primary)
-                        Text("Viewing through Bridgit Portal: " + (viewers.count == 1 ? PhoneLive.client : "iPhone/iPad"))
+                        Text("Viewing through Bridgit: " + (viewers.count == 1 ? PhoneLive.client : "iPhone/iPad"))
                             .frostText(.supporting).foregroundStyle(B.onSurface)
                     }
                     .padding(.horizontal, 4).padding(.top, 4)

@@ -500,7 +500,7 @@ class RemoteView(private val app: BridgeApp) {
             .put("clef", if (externalReady) "ready" else "off").put("weather", if (app.settings.externalCallsPaused) "off" else caps.optString("weather", "unknown"))
         val now = System.currentTimeMillis()
         val agents = cc.bridgit.app.ui.home.HomeStates.controlAgents(app) // portal viewers are not agents
-        val agentStatus = JSONArray(agents.take(20).map { a -> JSONObject().put("name", a.name).put("last_used_at", a.lastUsedAt).put("paused", a.paused) })
+        val agentStatus = JSONArray(agents.take(20).map { a -> JSONObject().put("name", a.name).put("last_used_at", a.lastUsedAt).put("paused", a.paused).put("api_access", a.apiAccess) })
         val applets = applets(agents)
         return JSONObject().put("caps", caps).put("listening", listening)
             .put("agents", JSONArray(agents.map { it.name })).put("app_version", app.appVersion())

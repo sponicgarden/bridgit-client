@@ -111,7 +111,7 @@ struct RootView: View {
             Button("Add \(p.name)") { model.addPairing(p); model.pendingPairing = nil }
             Button("Cancel", role: .cancel) { model.pendingPairing = nil }
         } message: { p in
-            Text("A link wants to add \"\(p.name)\" through \(p.base.host ?? "a relay"). Only add it if you just opened Bridgit Portal from that phone.")
+            Text("A link wants to add \"\(p.name)\" through \(p.base.host ?? "a relay"). Only add it if you just opened Bridgit from that phone.")
         }
     }
 
@@ -157,7 +157,7 @@ struct RootView: View {
                 }
             }
             .toolbar { ToolbarItem(placement: .principal) { BrandBar(compact: true) } }
-            .navigationTitle("Bridgit Portal")
+            .navigationTitle("Bridgit")
             .navigationBarTitleDisplayMode(.inline)
             .scrollContentBackground(.hidden)
             .background(B.surfaceLow)

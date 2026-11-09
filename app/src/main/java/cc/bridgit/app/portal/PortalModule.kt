@@ -30,7 +30,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 object PortalEndpoints {
-    private const val WHO = "For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only."
+    private const val WHO = "For the owner's Bridgit app on iPhone & iPad, over the relay; read-only."
     /** Accepted by every portal endpoint: which device is viewing, shown on the phone's Home. */
     val CLIENT = Param("client", "string", "Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it")
     /** Sent with snapshot and home: what the viewing device is, for the phone's Linked devices map. */
@@ -39,7 +39,7 @@ object PortalEndpoints {
     val CLIENT_TYPE = Param("client_type", "string", "Optional: the viewing device's kind: phone, tablet, computer, tv, watch or camera. Shown on the phone's Linked devices")
     val SNAPSHOT = EndpointSpec("GET", "/portal/snapshot", "portal", "Home, agents, applets and the newest log entries in one call (saves relay quota). $WHO",
         query = listOf(CLIENT, CLIENT_DEVICE, CLIENT_TYPE, Param("logs", "integer", "Newest log entries to include, 0-50 (default 20)")),
-        example = "GET /v1/portal/snapshot?logs=20", returns = "home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), updates (null, or the request an agent left for this Portal: {id, prompts?: boolean, prompt_now: boolean, at}; apply it, then POST /v1/portal/updates with ack: id), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for a Bridgit Portal pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay)",
+        example = "GET /v1/portal/snapshot?logs=20", returns = "home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), updates (null, or the request an agent left for this Portal: {id, prompts?: boolean, prompt_now: boolean, at}; apply it, then POST /v1/portal/updates with ack: id), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for an iPhone or iPad viewer pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay)",
         errors = listOf("invalid_parameter"))
     val HOME = EndpointSpec("GET", "/portal/home", "portal", "The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. $WHO",
         query = listOf(CLIENT, CLIENT_DEVICE, CLIENT_TYPE),
@@ -67,7 +67,7 @@ object PortalEndpoints {
         errors = listOf("invalid_parameter"))
     val AGENTS = EndpointSpec("GET", "/portal/agents", "portal", "The phone's agents and what each may use. $WHO",
         query = listOf(CLIENT),
-        example = "GET /v1/portal/agents", returns = "agents[{id, name, mode (connector|sealed for relay agents, direct otherwise), transport (direct|userspace|relay), last_used_at (ms, 0 = never), paused, all_access, grants[capability ids], model?}]")
+        example = "GET /v1/portal/agents", returns = "agents[{id, name, mode (connector|sealed for relay agents, direct otherwise), transport (direct|userspace|relay), last_used_at (ms, 0 = never), paused, api_access, all_access, grants[capability ids], model?}]")
     val APPLETS = EndpointSpec("GET", "/portal/applets", "portal", "The phone's applets (Pet monitor, City tour, live watches). $WHO",
         query = listOf(CLIENT),
         example = "GET /v1/portal/applets", returns = "applets[{id, name, kind (dog|tour|watch), running, last_at (ms, 0 = never), summary?, sensors, actions}]")
@@ -373,7 +373,7 @@ class PortalModule(app: BridgeApp) : Capability(app) {
         return JSONObject().put("agents", JSONArray(app.agents.all().sortedBy { it.createdAt }.map { a ->
             JSONObject().put("id", a.id).put("name", a.name)
                 .put("mode", if (a.connection == Connection.RELAY) relay[a.id]?.optString("mode")?.ifEmpty { null } ?: "connector" else "direct")
-                .put("transport", a.connection.id).put("last_used_at", a.lastUsedAt).put("paused", a.paused)
+                .put("transport", a.connection.id).put("last_used_at", a.lastUsedAt).put("paused", a.paused).put("api_access", a.apiAccess)
                 .put("all_access", a.caps == null).put("portal", a.id in portalIds)
                 .put("grants", JSONArray((a.caps?.toList() ?: all).sorted()))
                 .apply { a.model?.let { put("model", it) } }

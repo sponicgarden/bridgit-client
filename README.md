@@ -11,7 +11,7 @@ Grok, Codex or any agent that can make HTTP or MCP calls. With your OK, paired
 agents can take a photo, record a short clip, read the screen, send you
 questions and notices, and run small applets. Each agent has its own key, every
 feature switch starts off, the owner sets each agent's permissions on the
-device, and every request is logged with the agent's name. **Bridgit Portal**
+device, and every request is logged with the agent's name. **Bridgit for iPhone**
 (`ios/`) is the companion iPhone app; `apple/` holds the shared Apple code and the Mac app.
 
 - Website and download: https://bridgit.cc
@@ -27,7 +27,7 @@ rather than the full development history.
 | Folder | What it is |
 |---|---|
 | `app/` | The Android app (`cc.bridgit.app`) |
-| `ios/` | Bridgit Portal for iPhone |
+| `ios/` | Bridgit for iPhone and iPad |
 | `apple/` | Shared Apple code (BridgitCore, the applet runtime) and the Mac app |
 | `site-content/` | Content both apps bundle and bridgit.cc serves: agent docs, sample cards, applet recipes, the first-run tour |
 | `tools/bridgit` | The helper script agents can download from a device |

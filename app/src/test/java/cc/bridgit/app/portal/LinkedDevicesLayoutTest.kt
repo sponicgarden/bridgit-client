@@ -87,7 +87,7 @@ class LinkedDevicesLayoutTest {
     }
 
     @Test fun `an offline portal is still drawn`() {
-        val d = build(viewers = listOf(Peer("r1", "iPhone", false), Peer("r2", "Bridgit Portal 2", false)))
+        val d = build(viewers = listOf(Peer("r1", "iPhone", false), Peer("r2", "Bridgit viewer 2", false)))
         assertEquals(listOf("portal:r1", "portal:r2"), d.satellites.map { it.key })
         assertTrue(d.satellites.none { it.online })
     }

@@ -2,6 +2,17 @@ import XCTest
 @testable import BridgitAppletRuntime
 
 final class RegistryPackageTests: XCTestCase {
+    func testColumnOrderReadsEscapedKeysAndIgnoresNestedLookalikes() throws {
+        let response = Data(#"{"extra":{"definition":{"processing":{"tables":[]}}},"definition":{"processing":{"tables":[{"id":"notes","columns":{"z\u0065ta":{"type":"text","label":"Quote: \" [ }"},"alpha":{"type":"number","default":-1.5e2}}},{"id":"other","columns":{"value":{"type":"text"}}}]}}}"#.utf8)
+        _ = try JSONSerialization.jsonObject(with: response)
+        XCTAssertEqual(try RegistryColumnOrder.read(response), ["notes": ["zeta", "alpha"], "other": ["value"]])
+    }
+
+    func testColumnOrderRejectsAmbiguousDuplicateNames() {
+        let response = Data(#"{"definition":{"processing":{"tables":[{"id":"notes","columns":{"x":{},"x":{}}}]}}}"#.utf8)
+        XCTAssertThrowsError(try RegistryColumnOrder.read(response))
+    }
+
     private let row: [String: Any] = ["key":"tpl_owner", "id":"lamp", "revision":1, "name":"Lamp", "summary":"Check lamp"]
 
     private func page(_ rows: [[String: Any]], next: String? = nil) throws -> CatalogPage {

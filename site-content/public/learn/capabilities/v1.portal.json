@@ -8,7 +8,7 @@
  "combinations": [],
  "operations": [
   {
-   "summary": "Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/snapshot",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-snapshot.json",
@@ -18,7 +18,7 @@
    "tool": "portal_snapshot"
   },
   {
-   "summary": "The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/home",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-home.json",
@@ -28,7 +28,7 @@
    "tool": "portal_home"
   },
   {
-   "summary": "Remembered devices on the phone's current network, the same payload as GET /v1/lan/discovered; no scan, no switch needed (like the phone's Network devices screen). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Remembered devices on the phone's current network, the same payload as GET /v1/lan/discovered; no scan, no switch needed (like the phone's Network devices screen). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/devices",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-devices.json",
@@ -38,7 +38,7 @@
    "tool": "portal_devices"
   },
   {
-   "summary": "Enrolled devices for one approved applet card on this phone. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Enrolled devices for one approved applet card on this phone. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/applets/inventory",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-applets-inventory.json",
@@ -48,7 +48,7 @@
    "tool": "portal_applets_inventory"
   },
   {
-   "summary": "Watch activity on the selected monitoring phone for one approved registry edition. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Watch activity on the selected monitoring phone for one approved registry edition. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/applets/watches",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-applets-watches.json",
@@ -58,7 +58,7 @@
    "tool": "portal_applets_watches"
   },
   {
-   "summary": "A bundled manufacturer logo, as GET /v1/lan/brands/{id}/logo, without the Network discovery switch. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "A bundled manufacturer logo, as GET /v1/lan/brands/{id}/logo, without the Network discovery switch. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/brands/{id}/logo",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-brands-id-logo.json",
@@ -68,7 +68,7 @@
    "tool": "portal_brands_logo"
   },
   {
-   "summary": "Agent activity from the phone's log, with the same redaction as remote view: no messages, parameters or results. Oldest first after since; the newest page without it. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Agent activity from the phone's log, with the same redaction as remote view: no messages, parameters or results. Oldest first after since; the newest page without it. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/logs",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-logs.json",
@@ -78,7 +78,7 @@
    "tool": "portal_logs"
   },
   {
-   "summary": "The phone's agents and what each may use. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "The phone's agents and what each may use. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/agents",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-agents.json",
@@ -88,7 +88,7 @@
    "tool": "portal_agents"
   },
   {
-   "summary": "The phone's applets (Pet monitor, City tour, live watches). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "The phone's applets (Pet monitor, City tour, live watches). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/applets",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-applets.json",
@@ -98,7 +98,7 @@
    "tool": "portal_applets"
   },
   {
-   "summary": "The APK's design tokens, read from its own resources and Home scene, so the portal looks the same. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "The APK's design tokens, read from its own resources and Home scene, so the portal looks the same. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/theme",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-theme.json",
@@ -108,7 +108,7 @@
    "tool": "portal_theme"
   },
   {
-   "summary": "Who checks a photo sent with POST /v1/portal/photo: each agent (usually an installed applet) with a watch that checks photos, and the owner's last pick on the phone's Camera tab. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only.",
+   "summary": "Who checks a photo sent with POST /v1/portal/photo: each agent (usually an installed applet) with a watch that checks photos, and the owner's last pick on the phone's Camera tab. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",
    "path": "/v1/portal/photo/targets",
    "method": "GET",
    "documentation": "https://bridgit.cc/learn/operations/get-v1-portal-photo-targets.json",
@@ -138,8 +138,8 @@
    "tool": "portal_updates"
   }
  ],
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.portal",

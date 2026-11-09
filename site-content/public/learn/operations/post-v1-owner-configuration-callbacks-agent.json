@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Set/change callback URL and receiver-provisioned signing key; apply native network policy; URL required; omitted secret preserves existing; explicit owner.configuration grant required; no per-change phone approval",

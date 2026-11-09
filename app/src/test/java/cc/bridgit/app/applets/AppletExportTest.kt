@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 import java.io.File
 import java.time.ZoneOffset
 
-/** The share step (docs/applet-dev-experience.md O1): checking, CSV text, groups and totals, PDF pages, limits, the share sheet. */
+/** The share step (docs/applet-dev-experience.md O1): checking, CSV text, groups and totals, limits, the share sheet. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class AppletExportTest {
@@ -42,15 +42,8 @@ class AppletExportTest {
         "boxes" to AppletTables.Column("boxes", "boxes", "Boxes"),
     ))
     private fun row(n: Int, vararg p: Pair<String, Any?>) = o("id" to "r$n", "at" to 1_700_000_000_000L + n, "by" to JSONObject.NULL, *p)
-    private fun share(vararg p: Pair<String, Any?>) = o("type" to "share", "table" to "items", "as" to "pdf", *p)
+    private fun share(vararg p: Pair<String, Any?>) = o("type" to "share", "table" to "items", "as" to "csv", *p)
     private fun dir() = File(app.cacheDir, AppletExport.DIR).also { it.deleteRecursively() }
-    /**
-     * Robolectric has no native PdfDocument (startPage throws "document is closed!" in legacy and native graphics
-     * modes), so PDF tests check the laid-out pages and stub only the drawing.
-     */
-    private var drawn: List<List<AppletExport.Line>>? = null
-    private val stubPdf: (File, List<List<AppletExport.Line>>) -> Unit = { f, pages -> drawn = pages; f.writeText("%PDF-stub ${pages.size}") }
-
     // ---- CSV --------------------------------------------------------------------------------------------------
 
     @Test fun csvQuotesFormatsGuardsAndStartsWithABom() {
@@ -123,37 +116,6 @@ class AppletExportTest {
         assertEquals(1111.0, g.sums["new_usd"]!!, 1e-9)
         assertEquals(540.0, g.sums["used_usd"]!!, 1e-9)
 
-        val lines = AppletExport.lines(cols, g, true, listOf("new_usd", "used_usd"), { null }, false, utc)
-        val subs = lines.filterIsInstance<AppletExport.Line.Sub>()
-        assertEquals(listOf("Subtotal", "Subtotal", "Subtotal", "Total"), subs.map { it.label })
-        assertEquals("$1,111.00", subs.last().cells[cols.indexOfFirst { it.key == "new_usd" }])
-        assertEquals("Kitchen · 2 items", lines.filterIsInstance<AppletExport.Line.Heading>()[1].text)
-    }
-
-    // ---- PDF ----------------------------------------------------------------------------------------------------
-
-    @Test fun pdfOfNoRowsIsOnePage() {
-        val built = AppletExport.build(dir(), items, share("title" to "Home inventory"), emptyList(), { null }, paper = AppletExport.A4, zone = utc, drawPdf = stubPdf)
-        assertEquals(1, built.pages); assertEquals(0, built.rows)
-        assertTrue(drawn!!.single().single() is AppletExport.Line.Note)
-        assertTrue(built.file.exists()); assertTrue(built.file.name, built.file.name.startsWith("Home-inventory-") && built.file.name.endsWith(".pdf"))
-        assertEquals("application/pdf", built.mime)
-    }
-
-    @Test fun pdfOf300GroupedRowsPaginates() {
-        val cats = listOf("Kitchen", "Bedroom", "Garage", "")
-        val rows = (1..300).map { row(it, "label" to "Thing $it", "category" to cats[it % 4], "new_usd" to it, "used_usd" to it / 2.0, "insurable" to (it % 3 != 0)) }
-        val step = share("group_by" to "category", "totals" to a("new_usd", "used_usd"), "where" to o("column" to "insurable", "is" to true))
-        val built = AppletExport.build(dir(), items, step, rows, { null }, paper = AppletExport.LETTER, zone = utc, drawPdf = stubPdf)
-        assertEquals(200, built.rows)
-        val g = AppletExport.group(rows.filter { AppletExport.keep(it, step.getJSONObject("where")) }, AppletExport.columns(items, step)[1], listOf("new_usd", "used_usd"))
-        val lines = AppletExport.lines(AppletExport.columns(items, step), g, true, listOf("new_usd", "used_usd"), { null }, false, utc)
-        val pages = AppletExport.paginate(lines, AppletExport.LETTER)
-        assertEquals(pages.size, built.pages); assertEquals(pages.size, drawn!!.size)
-        assertTrue("${pages.size} pages", pages.size in 4..8)
-        assertEquals(lines.size, pages.sumOf { it.size })
-        assertTrue(pages.all { it.isNotEmpty() && it.last() !is AppletExport.Line.Heading })
-        assertTrue(built.file.exists())
     }
 
     // ---- limits -------------------------------------------------------------------------------------------------
@@ -162,12 +124,18 @@ class AppletExportTest {
         try { block(); fail("accepted") } catch (e: ApiError) { assertEquals("export_too_large", e.code); assertEquals(413, e.http) }
     }
 
-    @Test fun limitsRowsAndPhotos() {
-        tooLarge { AppletExport.build(dir(), items, share("as" to "csv"), (0..AppletExport.MAX_ROWS).map { row(it) }, { null }) }
-        val photos = (1..AppletExport.MAX_PHOTOS + 1).map { row(it, "photo" to "kept:p$it") }
-        tooLarge { AppletExport.build(dir(), items, share("photos" to "thumbs"), photos, { null }, drawPdf = stubPdf) }
-        // Without thumbnails the same rows are fine.
-        assertEquals(201, AppletExport.build(dir(), items, share("photos" to "none"), photos, { null }, drawPdf = stubPdf).rows)
+    @Test fun limitsRowsAndRejectsLegacyPdfBeforeCreatingFiles() {
+        tooLarge { AppletExport.build(dir(), items, share(), (0..AppletExport.MAX_ROWS).map { row(it) }) }
+        val target = dir()
+        val legacy = share("as" to "pdf", "photos" to "thumbs")
+        val original = legacy.toString()
+        AppletExport.check(legacy, "legacy share") { throw IllegalArgumentException(it) }
+        assertEquals(original, legacy.toString())
+        assertTrue(AppletExport.words(legacy).contains("unavailable"))
+        try { AppletExport.build(target, items, legacy, emptyList()); fail("PDF accepted") }
+        catch (e: ApiError) { assertEquals(422, e.http); assertEquals("invalid_export", e.code) }
+        assertTrue(!target.exists())
+        assertEquals(201, AppletExport.build(target, items, share(), (1..201).map { row(it, "photo" to "kept:p$it") }).rows)
     }
 
     @Test fun oldExportsAreCleanedUp() {
@@ -182,8 +150,8 @@ class AppletExportTest {
 
     @Test fun twoExportsWithTheSameNameNeverOverwriteEachOther() {
         val d = dir()
-        val first = AppletExport.build(d, items, share("as" to "csv", "title" to "Home inventory"), listOf(row(1, "label" to "Lamp")), { null }, zone = utc)
-        val second = AppletExport.build(d, items, share("as" to "csv", "title" to "Home inventory"), listOf(row(2, "label" to "Sofa")), { null }, zone = utc)
+        val first = AppletExport.build(d, items, share("as" to "csv", "title" to "Home inventory"), listOf(row(1, "label" to "Lamp")), zone = utc)
+        val second = AppletExport.build(d, items, share("as" to "csv", "title" to "Home inventory"), listOf(row(2, "label" to "Sofa")), zone = utc)
         assertEquals(first.file.name, second.file.name)
         assertTrue(first.file.absolutePath != second.file.absolutePath)
         assertTrue(first.file.readText().contains("Lamp")); assertTrue(second.file.readText().contains("Sofa"))
@@ -224,7 +192,7 @@ class AppletExportTest {
         val v = app.platform.workflows.validate(flow(share("title" to "Home inventory"), o("type" to "button")))
         assertEquals(setOf("workflows"), (0 until v.getJSONArray("required_scopes").length()).map { v.getJSONArray("required_scopes").getString(it) }.toSet())
         assertEquals(FlowSteps.BASE_RUN_SECONDS + AppletExport.RUN_SECONDS, v.getJSONObject("limits").getInt("max_run_seconds"))
-        assertTrue(v.getString("summary"), v.getString("summary").contains("share \"Home inventory\" as a PDF (you choose where it goes)"))
+        assertTrue(v.getString("summary"), v.getString("summary").contains("share \"Home inventory\" as a CSV file (you choose where it goes)"))
         refusedFlow(flow(share(), o("type" to "interval", "seconds" to 900)), "button trigger")
         refusedFlow(flow(share(), o("type" to "called")), "button trigger")
         refusedFlow(flow(share(), o("type" to "charging")), "button trigger")
@@ -253,7 +221,7 @@ class AppletExportTest {
     @Test fun aCardButtonMayShare() {
         val ok = card(o("step" to share("title" to "Home inventory", "group_by" to "category", "totals" to a("new_usd"))))
         CardPieces.check(ok, cardScope)
-        assertTrue(CardPieces.describe(ok, "Inventory"), CardPieces.describe(ok, "Inventory").contains("\"Share\" (makes a PDF of \"Home inventory\" for you to share when you tap it)"))
+        assertTrue(CardPieces.describe(ok, "Inventory"), CardPieces.describe(ok, "Inventory").contains("\"Share\" (makes a CSV file of \"Home inventory\" for you to share when you tap it)"))
         cardBad(card(o("step" to share("table" to "rooms"))), "isn't in processing.tables")
         cardBad(card(o("step" to share("totals" to a("used_usd")))), "has no column used_usd")
         cardBad(card(o("step" to o("type" to "notice", "title" to "Hi"))), "share step only")
@@ -264,7 +232,7 @@ class AppletExportTest {
     // ---- the share sheet -----------------------------------------------------------------------------------------
 
     @Test fun theShareIntentCarriesOnlyTheFile() {
-        val built = AppletExport.build(dir(), items, share("as" to "csv", "title" to "Home inventory"), listOf(row(1, "label" to "Lamp")), { null }, zone = utc)
+        val built = AppletExport.build(dir(), items, share("as" to "csv", "title" to "Home inventory"), listOf(row(1, "label" to "Lamp")), zone = utc)
         assertEquals("text/csv", built.mime)
         val chooser = AppletExport.intent(app, built)
         assertEquals(Intent.ACTION_CHOOSER, chooser.action)

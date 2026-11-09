@@ -100,7 +100,8 @@ class AppletAuthoringValidationTest {
         }
         val steps = JSONObject()
         FlowSteps.STEPS.forEach { (type, definition) ->
-            steps.put(type, JSONObject().put("fields", JSONArray(definition.first.toList().sorted()))
+            val fields = if (type == "share") AppletExport.AUTHORING_FIELDS else definition.first
+            steps.put(type, JSONObject().put("fields", JSONArray(fields.toList().sorted()))
                 .put("scope", definition.second ?: JSONObject.NULL))
         }
         File(out, "flow-contract.json").writeText(JSONObject().put("format", "bridgit-flow-authoring/1")

@@ -20,9 +20,9 @@ object LinkEndpoints {
     const val HOW = "Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further."
 
     val LINKS = EndpointSpec("GET", "/links", "status",
-        "The linked Bridgits (the owner's other Bridgits) you may use through this one, with what each lets you do. $HOW",
+        "This Bridgit's links to the owner's other Bridgits, from either end (hub or satellite), with which you may use through this one and what each lets you do. $HOW",
         example = "GET /v1/links",
-        returns = "links[{id (sat:… or name), target, link_id, name, bridgit_name, kind, platform, device_type, status (online|offline|unlinked|not_checked), state (on|waiting_for_target|waiting_for_user|paused|off), services[], last_seen, battery, cameras, capabilities, endpoints, how_to_call}], how_to_call. Only Bridgits the owner lets you use are listed; GET /v1/satellites is the same list.")
+        returns = "links[{id (sat:… or name), target, link_id, name, bridgit_name, kind, role (hub: the other is this one's satellite | satellite: the other is this one's hub), reachable (you may target it), platform, device_type, status (online|offline|unlinked|not_checked), state (on|waiting_for_target|waiting_for_user|paused|off), services[], directions{in{state, services, about}, out{state, services, about}}, last_seen, battery, cameras, capabilities, endpoints, how_to_call}], how_to_call. battery, cameras, capabilities and endpoints only when reachable; an unreachable entry's how_to_call says how the owner lets you use it. GET /v1/satellites is the same list.")
 
     val CLAIM = EndpointSpec("POST", "/link/claim", "status",
         "Device to device: a Bridgit claims this one's link code with the claim token derived from it (Authorization: Bearer rly_…). Not for agents: agents use POST /v1/owner/configuration/links/claims on their own Bridgit.",
@@ -57,7 +57,7 @@ object LinkEndpoints {
         with(route) {
             endpoint(LINKS) {
                 val a = agent!!
-                Reply.Json(JSONObject().put("links", JSONArray(app.links.reachableBy(a).map { app.links.agentEntry(it, a) })).put("how_to_call", HOW))
+                Reply.Json(JSONObject().put("links", app.links.agentList(a)).put("how_to_call", HOW))
             }
             endpoint(CLAIM) {
                 if (LinkPause.hubsPaused) throw ErrorCatalog.error("forbidden", LinkPause.HUBS_MESSAGE, mapOf("reason" to "hubs_paused"))

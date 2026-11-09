@@ -1,6 +1,6 @@
 {
  "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
- "api_revision": 135,
+ "api_revision": 138,
  "errors": [
   {
    "code": "model_unavailable",
@@ -116,8 +116,8 @@
   },
   {
    "code": "claim_required",
-   "you_should": "Update Bridgit Portal and pair again with a new link",
-   "meaning": "This Bridgit Portal pairing link expired before it was claimed (relay)",
+   "you_should": "Update the Bridgit app and pair again with a new link",
+   "meaning": "This pairing link expired before it was claimed (relay)",
    "http": 403,
    "returned_today": true
   },

@@ -69,7 +69,7 @@ class StatusModule(app: BridgeApp) : Capability(app) {
     override val titleRes = R.string.cap_status
     override val descriptionRes = R.string.cap_status_desc
     override val group = "status"
-    override val endpoints = listOf(Endpoints.SERVICES, Endpoints.SPEECH_MODELS, Endpoints.HEALTH, Endpoints.DEVICE_DISPLAY, Endpoints.DEVICES, Endpoints.CAPABILITIES, Endpoints.LIMITS, Endpoints.DISCOVER, Endpoints.DISCOVERY_REPORT, Endpoints.GUIDE, Endpoints.START, Endpoints.DEMO, Endpoints.SAMPLES, Endpoints.OPENAPI, Endpoints.CHANGES, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.PAIR, Endpoints.MCP, Endpoints.ME, Endpoints.OWNER_EMAIL, Endpoints.OWNER_EMAIL_SET) + cc.bridgit.app.satellite.SatelliteEndpoints.ALL
+    override val endpoints = listOf(Endpoints.SERVICES, Endpoints.SPEECH_MODELS, Endpoints.HEALTH, Endpoints.DEVICE_DISPLAY, Endpoints.DEVICES, Endpoints.CAPABILITIES, Endpoints.LIMITS, Endpoints.DISCOVER, Endpoints.DISCOVERY_REPORT, Endpoints.GUIDE, Endpoints.START, Endpoints.DEMO, Endpoints.SAMPLES, Endpoints.OPENAPI, Endpoints.REGISTRY, Endpoints.CHANGES, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.PAIR, Endpoints.MCP, Endpoints.ME, Endpoints.OWNER_EMAIL, Endpoints.OWNER_EMAIL_SET) + cc.bridgit.app.satellite.SatelliteEndpoints.ALL
 
     /** GET /v1/owner/email and the health block: where the owner's email verification stands. */
     private fun ownerEmailJson(): JSONObject {
@@ -102,6 +102,11 @@ class StatusModule(app: BridgeApp) : Capability(app) {
                 if (allowed) app.lanCameras.all() else emptyList(), allowed, app.settings.isOn("lan_camera"),
                 agent?.allows("lan_camera_audio")==true && app.settings.isOn("lan_camera_audio"),
                 agent?.allows("lan_camera_speaker")==true && app.settings.isOn("lan_camera_speaker"))
+            run {
+                val d = agent?.allows("lan_discovery") == true; val e = agent?.allows("lan_enrollment") == true; val c = agent?.allows("lan_control") == true
+                val n = if (c && app.settings.isOn("lan_control")) app.lanDevices.all().count { it.agentId == agent!!.id } else 0
+                inventory.put("lan_path", cc.bridgit.app.lancamera.DeviceInventory.lanPath(d, d && app.settings.isOn("lan_discovery"), e, e && app.settings.isOn("lan_enrollment"), c, c && app.settings.isOn("lan_control"), n))
+            }
             if (agent?.allows("lan_control") == true && app.settings.isOn("lan_control")) {
                 app.lanDevices.all().filter { it.agentId == agent!!.id }.forEach { inventory.getJSONArray("devices").put(it.publicJson()) }
             }
@@ -124,7 +129,11 @@ class StatusModule(app: BridgeApp) : Capability(app) {
             val bat = app.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
             val level = bat?.let { val l = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1); val s = it.getIntExtra(BatteryManager.EXTRA_SCALE, 100); if (l >= 0) l * 100 / s else null }
             val s = app.listener.value
-            Reply.Json(JSONObject().put("status", "ok").put("app", "Bridgit").put("app_version", app.appVersion()).put("mcp","/v1/mcp").put("agent_control",JSONObject().put("about","Second MCP server and /v2 routes for the agent control tools (using apps on screen, workflows, OCR and more): ${cc.bridgit.app.api.Learn.CONTROL_URL}").put("capabilities","/v2/capabilities").put("tools","/v2/tools").put("mcp","/mcp").put("mode",if(cc.bridgit.app.BuildConfig.PRIVATE_CONTROL) "private" else "limited"))
+            Reply.Json(JSONObject().put("status", "ok").put("app", "Bridgit").put("app_version", app.appVersion())
+                // A0093: which build answers (several can share a phone), the same name Android lists it under.
+                .put("build_type", cc.bridgit.app.BuildConfig.BUILD_TYPE).put("distribution", cc.bridgit.app.BuildConfig.FLAVOR)
+                .put("build_tag", cc.bridgit.app.BuildConfig.BUILD_TAG.ifEmpty { null } ?: JSONObject.NULL)
+                .put("package", app.packageName).put("app_label", app.getString(cc.bridgit.app.R.string.app_name)).put("mcp","/v1/mcp").put("agent_control",JSONObject().put("about","Second MCP server and /v2 routes for the agent control tools (using apps on screen, workflows, OCR and more): ${cc.bridgit.app.api.Learn.CONTROL_URL}").put("capabilities","/v2/capabilities").put("tools","/v2/tools").put("mcp","/mcp").put("mode",if(cc.bridgit.app.BuildConfig.PRIVATE_CONTROL) "private" else "limited"))
                 .put("agent", agentName).put("agent_id", agent?.id)
                 .put("model", agent?.let { app.agents.get(it.id) }?.model ?: JSONObject.NULL)
                 .put("listener_uptime_seconds", (System.currentTimeMillis() - s.startedAt) / 1000)
@@ -229,6 +238,11 @@ class StatusModule(app: BridgeApp) : Capability(app) {
             Reply.Json(JSONObject().put("account", account).put("phone", cc.bridgit.app.api.AccountLimits.phone(trust))
                 .put("watch_paid_checks_per_hour_in_effect", cc.bridgit.app.api.AccountLimits.watchPaidChecksPerHour(trust))
                 .put("relay", "Over Bridgit's relay, the phone's agents share a daily job pool set by the owner's plan: read the X-Relay-Quota-Limit, -Remaining and -Reset headers on each /jobs reply, or GET <relay address>/quota (uses no job). Tailscale has no daily job pool."))
+        }
+        endpoint(Endpoints.REGISTRY) {
+            val titles = app.registry.modules.associate { it.id to it.title }
+            val specs = Endpoints.all.filterNot { cc.bridgit.app.BuildConfig.PLAY_STORE && it.capability in Registry.PLAY_EXCLUDED }
+            Reply.Json(cc.bridgit.app.api.ApiAccess.registry(cc.bridgit.app.api.ApiAccess.groups(specs, titles, cc.bridgit.app.platform.Commands.all), agent))
         }
         endpoint(Endpoints.CHANGES) {
             val since = query("since")?.let { it.toIntOrNull()?.takeIf { n -> n >= 0 } ?: throw ErrorCatalog.error("invalid_parameter", "since must be an API revision number, e.g. 2.") } ?: 0
@@ -705,7 +719,7 @@ class LogModule(app: BridgeApp) : Capability(app) {
                 var n = 0
                 app.log.forEach(q) { e ->
                     val live = agent?.let { app.agents.get(it.id) }
-                    if (live == null || live.keyHash != agent?.keyHash || live.paused || !live.allows("log"))
+                    if (live == null || live.keyHash != agent?.keyHash || live.suspended || !live.allows("log"))
                         throw ErrorCatalog.error("forbidden", "Log access changed during export.")
                     val mine = allowed(this)
                     if (mine == null || e.agentId in mine) {

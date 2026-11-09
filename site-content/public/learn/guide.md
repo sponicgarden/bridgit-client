@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 135). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 138). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,14 +14,12 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 135 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 138 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 135
-- Full-screen cards: presentation "full_screen" on an html card shows it edge to edge with every bar hidden; a fixed-size page is scaled to fit whole, never cropped. Stored and returned with the interaction; unknown values are invalid_parameter (`/v1/interactions`)
-- The post reply's display block says the exact canvas the page gets (viewport {width_px, height_px, width_dp, height_dp, density}) and flags aspect_mismatch when content_aspect or the page's viewport meta differs by more than 10 % (`/v1/interactions`)
-- Display geometry: size, density, aspect ratio, rotation and the full-screen and standard card canvases; health carries a short display block (`/v1/device/display`)
-- Device specs: a named Bridgit stores its static spec sheet (display, full-screen card size, cameras, CPU, memory, storage, sensors, model, OS) with Bridgit, on by default; ask GET <team backend>/v1/names/{name}/specs first for static specs, the phone only for live state. Read, switch off (which deletes the stored sheet) or refresh it (`/v1/owner/configuration/specs`)
+## New in revision 138
+- API registry: every API group with its fixed name and number, its calls, and the permission that governs it (`/v1/registry`)
+- API access: one permission per agent over the whole API, on by default. Off refuses every call with forbidden, reason api_access_off, while the agent stays paired. Read it as api_access in owner configuration access; a Super agent changes it with api_access on access/agents/{agent}. Access changes made through the API are logged as the agent that made them (`/v1/owner/configuration/access/agents/{agent}`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -33,7 +31,7 @@ replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/change
 4. Tell the owner your model: add `X-Bridgit-Model: <model id>` (and `X-Bridgit-Harness: <harness>`) to the headers you send with every call, or `POST /v1/me {"model","harness"}` on each change. The rest of this guide is reference: read the section you need.
 Right after pairing, ask the owner once: "Want a 5-minute demo on your phone?" If they pasted only the setup prompt, ask in that first reply; if they gave a task, finish it first. `GET /v1/demo` only reads the script: run it only after they say yes. Ask discovery questions only if they want suggestions. Declining onboarding does not cancel their existing task.
 Keep credentials per agent, e.g. `~/.config/bridgit/agents/<agent>/header` with mode 600; never overwrite another agent's key. The optional helper reads an env file instead of that header: its download explains `BRIDGIT_ENV` for selecting a separate config. A public-docs 403 may depend on the HTTP client: try curl before concluding the docs are unavailable.
-5. The owner's email: Bridgit works for 24 hours from the first agent call, then only the status, feedback and portal endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/issues` and the owner's read-only Bridgit Portal), the control tools `capabilities`, `events`, `operation.get` and `feedback.create` (`events` still needs `events.read`), and the routes that are not tool calls (`/v2/capabilities`, `/v2/tools`, `/v2/guide`, operation cancel) keep working; everything else answers `email_required` until the owner verifies an address (the full list is under "Owner email" in https://bridgit.cc/learn/control.md). `GET /v1/owner/email` says where it stands; send their address with `POST /v1/owner/email {"email":"..."}` (if you don't know it, ask them: on a card during the 24 hours, in your chat after), and they tap the link in the email from bridgit.cc.
+5. The owner's email: Bridgit works for 24 hours from the first agent call, then only the status, feedback and portal endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/issues` and the owner's read-only iPhone & iPad app), the control tools `capabilities`, `events`, `operation.get` and `feedback.create` (`events` still needs `events.read`), and the routes that are not tool calls (`/v2/capabilities`, `/v2/tools`, `/v2/guide`, operation cancel) keep working; everything else answers `email_required` until the owner verifies an address (the full list is under "Owner email" in https://bridgit.cc/learn/control.md). `GET /v1/owner/email` says where it stands; send their address with `POST /v1/owner/email {"email":"..."}` (if you don't know it, ask them: on a card during the 24 hours, in your chat after), and they tap the link in the email from bridgit.cc.
 6. Once the owner's first request is done (or after the demo), offer useful suggestions. Only if they are interested, ask two or three questions about their routines, then suggest one small thing to try. https://bridgit.cc/learn/playbook.md has the questions and 40 use cases. "Not now" stops onboarding; continue any existing task.
 
 - Opening a card clears its notification. To remind the owner explicitly, POST /v1/interactions/{id}/renotify {} (MCP interactions_renotify) with an Idempotency-Key. Only your pending/seen cards; no automatic screen takeover or speech.
@@ -280,7 +278,7 @@ Example: `POST /v1/owner/configure {"action":"resource.download","options":{"res
 
 ### `GET /v1/owner/configuration/access`
 Existing Super agents can inspect and delegate app-owned feature switches, capabilities, roles and control grants without a separate configuration grant.
-Returns: authority,approval_required=false,agents[{id,name,generation,key_created_at,capabilities,control_scopes,effective_control_scopes,paused,super_powers,fixer_mode,maximum_control}],features[{id,name,enabled,blockers}],capabilities; no keys or hashes.
+Returns: authority,approval_required=false,agents[{id,name,generation,key_created_at,capabilities,control_scopes,effective_control_scopes,paused,api_access,super_powers,fixer_mode,maximum_control,connection,created_at,last_used_at,request_count,model,harness,device_lock,notes}],features[{id,name,enabled,blockers}],capabilities; no keys or hashes.
 Example: `GET /v1/owner/configuration/access`
 
 ### `POST /v1/owner/configuration/access/features`
@@ -292,7 +290,7 @@ Example: `POST /v1/owner/configuration/access/features {"changes":{"owner.config
 
 ### `POST /v1/owner/configuration/access/agents/{agent}`
 An already authorized Super agent replaces grants or changes roles for an existing paired control agent, including its own configuration bootstrap; applets, portals and device peers excluded.
-Body (JSON): `expected_generation` (required) Exact opaque generation from access discovery; changes on key rotation; `capabilities` Replace legacy capability ids; null allows all (relay stores explicit ids); `control_scopes` Replace control grants with these known scopes, durable until revoked; [] clears; native capture revocation also narrows corresponding legacy permissions; `paused` Pause/resume this paired control agent; `super_powers` Delegate/revoke Super Powers; caller must already have them; `fixer_mode` Delegate/revoke Fixer Mode; `maximum_control` Preserves the separate Superpowers role. true alone grants native maximum capabilities/roles/scopes; false stops future maximum inheritance.
+Body (JSON): `expected_generation` (required) Exact opaque generation from access discovery; changes on key rotation; `capabilities` Replace legacy capability ids; null allows all (relay stores explicit ids); `control_scopes` Replace control grants with these known scopes, durable until revoked; [] clears; native capture revocation also narrows corresponding legacy permissions; `paused` Pause/resume this paired control agent; `api_access` API access (on by default): false refuses every API call from this agent while it stays paired; true restores it; `name` Rename the agent: 1-24 letters, numbers, spaces, - or _, unique on this phone; `notes` The owner's notes about the agent, up to 200 characters; "" clears; `super_powers` Delegate/revoke Super Powers; caller must already have them; `fixer_mode` Delegate/revoke Fixer Mode; `maximum_control` Preserves the separate Superpowers role. true alone grants native maximum capabilities/roles/scopes; false stops future maximum inheritance.
 Returns: sanitized control-agent access,approval_required=false; no key creation or Android consent bypass.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/owner/configuration/access/agents/example {"expected_generation":"<generation from discovery>","control_scopes":["owner.configuration"]}`
@@ -736,7 +734,7 @@ Example: `GET /v1/services`
 
 ### `GET /v1/health`
 Is Bridgit up, and which agent you are.
-Returns: status, app, app_version, mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}.
+Returns: status, app, app_version, build_type (release, or debug for a test build), distribution (private or play), build_tag (null for the real app; debug or test claude <feature> for test builds), package (cc.bridgit.app is the real app), app_label (the name Android lists this build under), mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}.
 Example: `GET /v1/health`
 
 ### `GET /v1/device/display`
@@ -746,7 +744,7 @@ Example: `GET /v1/device/display`
 
 ### `GET /v1/devices`
 Host and owner-configured external devices, supported actions and access status.
-Returns: devices: host Android device, cameras visible to your lan_camera grant and your own LAN enrollments when lan_control is granted and enabled; SSH profiles when ssh is granted and enabled; ids, names, configured state, availability (not_checked until an action), advertised pan/tilt and exact action paths/bodies. No credentials. Inventory is passive and does not scan the LAN..
+Returns: devices: host Android device, cameras visible to your lan_camera grant and your own LAN enrollments when lan_control is granted and enabled; SSH profiles when ssh is granted and enabled; ids, names, configured state, availability (not_checked until an action), advertised pan/tilt and exact action paths/bodies. No credentials. Inventory is passive and does not scan the LAN. lan_path: read-only status of the agent path for other LAN devices (speakers such as WiiM): discover, enroll and control steps with agent grant, owner switch, usable, endpoints and the number of this agent's enrolled devices; granting and approval stay with the owner..
 Example: `GET /v1/devices`
 
 ### `GET /v1/capabilities`
@@ -797,6 +795,11 @@ Example: `GET /v1/samples?id=html-step`
 OpenAPI 3.1 description of every endpoint.
 Returns: application/json.
 Example: `GET /v1/openapi.json`
+
+### `GET /v1/registry`
+The API registry: every API group with its fixed name and number, its calls, and the one permission that governs them (API access, on by default, all-or-nothing for now).
+Returns: permission {id: api_access, name, default: true, granular: false, you}, count, calls, apis[number, id, name, permission, default, allowed, calls["METHOD /v1/path" or "tool <name>"]]; numbers never change or get reused.
+Example: `GET /v1/registry`
 
 ### `GET /v1/changes`
 What's new in the API since a revision you know.
@@ -1644,67 +1647,67 @@ Returns: the entry.
 Example: `GET /v1/outbound/412`
 
 ### `GET /v1/portal/snapshot`
-Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `client` Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it; `client_device` Optional: the viewing device's model, system and app version, e.g. iPhone 16 Pro · iOS 26.1 · Portal 1.4 (1-80 characters). Shown on the phone's Linked devices; `client_type` Optional: the viewing device's kind: phone, tablet, computer, tv, watch or camera. Shown on the phone's Linked devices; `logs` Newest log entries to include, 0-50 (default 20).
-Returns: home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), updates (null, or the request an agent left for this Portal: {id, prompts?: boolean, prompt_now: boolean, at}; apply it, then POST /v1/portal/updates with ack: id), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for a Bridgit Portal pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay).
+Returns: home (as GET /v1/portal/home), agents (as GET /v1/portal/agents), applets (as GET /v1/portal/applets), logs (as GET /v1/portal/logs), updates (null, or the request an agent left for this Portal: {id, prompts?: boolean, prompt_now: boolean, at}; apply it, then POST /v1/portal/updates with ack: id), relay_daily_jobs (relay calls this pairing may make per UTC day: 20000 for an iPhone or iPad viewer pairing; other relay agents share the phone's pool, 12000 by default; absent off the relay).
 Example: `GET /v1/portal/snapshot?logs=20`
 
 ### `GET /v1/portal/home`
-The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `client` Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it; `client_device` Optional: the viewing device's model, system and app version, e.g. iPhone 16 Pro · iOS 26.1 · Portal 1.4 (1-80 characters). Shown on the phone's Linked devices; `client_type` Optional: the viewing device's kind: phone, tablet, computer, tv, watch or camera. Shown on the phone's Linked devices.
 Returns: device{name, manufacturer, model, android, api_level, app_version, type (phone or tablet), device_type (phone, tablet, computer, tv, watch or camera)}, battery{percent, charging}, connections{tailscale, adb, relay, wifi: connected|disconnected}, paused, features[{id, name, title, group, icon, state: on|off|blocked, summary}], listening[ids], agents_count (control agents, not portal viewers), nav[{id, title, icon, section: tab|more}], scene{options, paused, listening, home_status} (what the phone's Home feeds assets/diagnostics/scene.html).
 Example: `GET /v1/portal/home`
 
 ### `GET /v1/portal/devices`
-Remembered devices on the phone's current network, the same payload as GET /v1/lan/discovered; no scan, no switch needed (like the phone's Network devices screen). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+Remembered devices on the phone's current network, the same payload as GET /v1/lan/discovered; no scan, no switch needed (like the phone's Network devices screen). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `client` Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it.
 Returns: the GET /v1/lan/discovered payload: total_devices, connected_devices, unconnected_devices, categories, devices; every brand logo_url points at GET /v1/portal/brands/{id}/logo; plus added: the devices added to Bridgit (id, name, host, kind, state, applets, checks; no credentials).
 Example: `GET /v1/portal/devices`
 
 ### `GET /v1/portal/applets/inventory`
-Enrolled devices for one approved applet card on this phone. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+Enrolled devices for one approved applet card on this phone. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `template` Exact registry key; `revision` Approved registry revision.
 Returns: template, revision, devices[{id,name,adapter,availability,verified_at}]. Listing does not probe devices..
 Example: `GET /v1/portal/applets/inventory?template=external-device-dashboard&revision=1`
 
 ### `GET /v1/portal/applets/watches`
-Watch activity on the selected monitoring phone for one approved registry edition. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+Watch activity on the selected monitoring phone for one approved registry edition. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `template` Exact registry key; `revision` Approved registry revision.
 Returns: template, revision, watches[{key,state:scheduled|paused|budget_paused|blocked|ended,checks?,matches?,last_check_at?,last_outcome?:error|skipped|match|no_match|checked}]. Declared status sources add recent_checks[{at,matched?|outcome?}]; tally sources add tally{today{checks,watched_minutes,labels},episodes[{start,label,minutes}]}, newest 20 from the last day..
 Example: `GET /v1/portal/applets/watches?template=room-change-watcher&revision=1`
 
 ### `GET /v1/portal/brands/{id}/logo`
-A bundled manufacturer logo, as GET /v1/lan/brands/{id}/logo, without the Network discovery switch. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+A bundled manufacturer logo, as GET /v1/lan/brands/{id}/logo, without the Network discovery switch. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `client` Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it; `raw` 1 = the image bytes.
 Returns: id, name, logo_url, mime, data_base64 (or the image with raw=1).
 Example: `GET /v1/portal/brands/apple/logo`
 
 ### `GET /v1/portal/logs`
-Agent activity from the phone's log, with the same redaction as remote view: no messages, parameters or results. Oldest first after since; the newest page without it. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+Agent activity from the phone's log, with the same redaction as remote view: no messages, parameters or results. Oldest first after since; the newest page without it. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `client` Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it; `since` Log id: only entries after it (use next_since from the last page); `until` Log id: an older page, entries before it (use oldest_id); not with since; `limit` 1-200, default 50.
 Returns: entries[{id, ts, agent, kind, method, path, status, caption, plus the Home scene keys channel, level, result, endpoint, http, message, params, data}], next_since (pass back as since; it moves past skipped entries too), has_more, has_older, oldest_id (pass as until for the next older page), latest_id.
 Example: `GET /v1/portal/logs?since=48210&limit=50`
 
 ### `GET /v1/portal/agents`
-The phone's agents and what each may use. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+The phone's agents and what each may use. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `client` Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it.
-Returns: agents[{id, name, mode (connector|sealed for relay agents, direct otherwise), transport (direct|userspace|relay), last_used_at (ms, 0 = never), paused, all_access, grants[capability ids], model?}].
+Returns: agents[{id, name, mode (connector|sealed for relay agents, direct otherwise), transport (direct|userspace|relay), last_used_at (ms, 0 = never), paused, api_access, all_access, grants[capability ids], model?}].
 Example: `GET /v1/portal/agents`
 
 ### `GET /v1/portal/applets`
-The phone's applets (Pet monitor, City tour, live watches). For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+The phone's applets (Pet monitor, City tour, live watches). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `client` Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it.
 Returns: applets[{id, name, kind (dog|tour|watch), running, last_at (ms, 0 = never), summary?, sensors, actions}].
 Example: `GET /v1/portal/applets`
 
 ### `GET /v1/portal/theme`
-The APK's design tokens, read from its own resources and Home scene, so the portal looks the same. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+The APK's design tokens, read from its own resources and Home scene, so the portal looks the same. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `client` Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it.
 Returns: colors{light{name: #RRGGBB}, dark{…}}, scene{light, dark} (Home scene colours), corner_radius{name: dp}, fonts{name: family}, motion{name{duration_ms, easing}}, animations[{id, where, describe, motion}].
 Example: `GET /v1/portal/theme`
 
 ### `GET /v1/portal/photo/targets`
-Who checks a photo sent with POST /v1/portal/photo: each agent (usually an installed applet) with a watch that checks photos, and the owner's last pick on the phone's Camera tab. For the owner's Bridgit Portal app (iPhone & iPad), over the relay; read-only..
+Who checks a photo sent with POST /v1/portal/photo: each agent (usually an installed applet) with a watch that checks photos, and the owner's last pick on the phone's Camera tab. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..
 Query: `client` Optional: the viewing device, e.g. iPhone, iPad or Android (1-24 letters, digits, space . _ -). The phone's Home shows it as the device viewing it.
 Returns: targets[{id (agent id), name, watches[{watch_id, label, model, kind: check|people|change}]}], chosen[ids] (empty = all).
 Example: `GET /v1/portal/photo/targets`
@@ -1781,8 +1784,8 @@ Returns: id, name, paused.
 Example: `POST /v1/satellite/hub/agents/agt_123/pause {"paused":true}`
 
 ### `GET /v1/links`
-The linked Bridgits (the owner's other Bridgits) you may use through this one, with what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further..
-Returns: links[{id (sat:… or name), target, link_id, name, bridgit_name, kind, platform, device_type, status (online|offline|unlinked|not_checked), state (on|waiting_for_target|waiting_for_user|paused|off), services[], last_seen, battery, cameras, capabilities, endpoints, how_to_call}], how_to_call. Only Bridgits the owner lets you use are listed; GET /v1/satellites is the same list..
+This Bridgit's links to the owner's other Bridgits, from either end (hub or satellite), with which you may use through this one and what each lets you do. Any call takes header X-Bridgit-Target: <name> (the linked Bridgit's Device Domain Name, or its sat: id) or query target=<name> to run on that Bridgit instead of this one; leave it out to use this one. Calls are passed on once: a linked Bridgit never passes them further..
+Returns: links[{id (sat:… or name), target, link_id, name, bridgit_name, kind, role (hub: the other is this one's satellite | satellite: the other is this one's hub), reachable (you may target it), platform, device_type, status (online|offline|unlinked|not_checked), state (on|waiting_for_target|waiting_for_user|paused|off), services[], directions{in{state, services, about}, out{state, services, about}}, last_seen, battery, cameras, capabilities, endpoints, how_to_call}], how_to_call. battery, cameras, capabilities and endpoints only when reachable; an unreachable entry's how_to_call says how the owner lets you use it. GET /v1/satellites is the same list..
 Example: `GET /v1/links`
 
 ### `POST /v1/link/claim`
@@ -2163,6 +2166,7 @@ Agents are Bridgit's best testers, and the team reads every bug report and featu
 Control agents always file bugs, issues and feature requests directly with Bridgit's team backend, even when the phone works. The phone is not an intermediary for agent reporting.
 Reuse your existing team key (bgk_...). If you don't have one, register directly below; no phone or phone key is required. Keep the team key secret and separate from your phone key.
 Limits: a few registrations per address an hour and 50 issues an hour per registered agent (an agent with no key can file one issue, ever), so register once and keep the key. (The phone's own `POST /v1/issues`, for issues an owner sends from the phone, has its own limit of 50 an hour per agent.) The backend explains itself at `GET https://bridgit-feedback.bridgit-app.workers.dev/v1/agent`.
+Registration rule: your first report may be filed with no key at all (one per network address, so you can report a problem with bug filing itself). From the second report on, registration is required. Filing a second report without a key returns 401 `registration_required` with a `registration` object holding the exact next call. If you cannot register yourself (no way to make the call, your harness blocks it, or registration answers 429), stop retrying and ask your owner: they can run the same `POST /v1/agents/register` from their own machine and hand you the key, take a key from their Bridgit phone (`GET /v1/feedback/team-key`), or sign in at https://bridgit.cc/login/?next=/report-bug/ and file for you. Guide: https://bridgit.cc/agentguide/report-a-bug.md
 
 ```
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {"name":"<your agent name>","model":"<your model id>","harness":"<e.g. Claude Code>"}
@@ -2300,7 +2304,7 @@ All endpoints use the paired agent's Authorization bearer key over the existing 
 | 400 | `bad_request` | Malformed HTTP or JSON | Fix the request |
 | 401 | `unauthorized` | Key missing or wrong; `reason` = `key_rotated` or `agent_removed` when Bridgit knows | Stop; tell the owner the key needs replacing |
 | 403 | `forbidden_source` | Caller is not on the tailnet | Check Tailscale |
-| 403 | `claim_required` | This Bridgit Portal pairing link expired before it was claimed (relay) | Update Bridgit Portal and pair again with a new link |
+| 403 | `claim_required` | This pairing link expired before it was claimed (relay) | Update the Bridgit app and pair again with a new link |
 | 403 | `signed_requests_required` | The owner allows only sealed (signed) relay requests for agents that can control the phone (relay) | Switch to sealed mode, or ask the owner |
 | 403 | `wrong_device` | This agent's key is locked to another Tailscale device (device lock) | Call from the device you were set up on, or ask the owner to allow this device; don't retry |
 | 403 | `capability_disabled` | Master switch off | Tell the owner which switch (`setting` field) |

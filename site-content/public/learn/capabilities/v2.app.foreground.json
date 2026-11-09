@@ -29,8 +29,8 @@
    "tool": "app.foreground.targets"
   }
  ],
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
  "examples_url": null,
  "id": "v2.app.foreground",

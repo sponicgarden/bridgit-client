@@ -46,7 +46,7 @@ struct MoreView: View {
                     ActionRow(icon: "person.crop.circle.badge.checkmark", title: "Sign in with Google") { Task { await model.signInWithBridgit() } }
                 }
                 SectionLabel(text: "About")
-                InfoRow(icon: "app.badge", title: "Bridgit Portal", detail: AppVersion.label)
+                InfoRow(icon: "app.badge", title: "Bridgit", detail: AppVersion.label)
                 Link(destination: URL(string: "https://bridgit.cc/privacy/")!) {
                     HStack(spacing: 18) {
                         Image(systemName: "hand.raised").frame(width: 28)
@@ -75,7 +75,7 @@ extension MoreView {
         guard let url = URL(string: "itms-beta://") else { return }
         UIApplication.shared.open(url) { opened in
             if !opened {
-                model.notice = .init(title: "Updates", message: "Bridgit Portal updates arrive through TestFlight. Install TestFlight from the App Store to get them.")
+                model.notice = .init(title: "Updates", message: "Bridgit updates arrive through TestFlight. Install TestFlight from the App Store to get them.")
             }
         }
     }

@@ -54,6 +54,7 @@ public struct RegistryPackage: Sendable {
     public let selection: CatalogEntry
     public let package: AppletPackage
     public let data: Data
+    public let columnOrder: [String: [String]]
 
     public init(response: Data, selection: CatalogEntry) throws {
         let pin = try CatalogRelease(response: response, selection: selection)
@@ -63,10 +64,11 @@ public struct RegistryPackage: Sendable {
         self = local
     }
 
-    fileprivate init(selection: CatalogEntry, package: AppletPackage, data: Data) {
+    fileprivate init(selection: CatalogEntry, package: AppletPackage, data: Data, columnOrder: [String: [String]]) {
         self.selection = selection
         self.package = package
         self.data = data
+        self.columnOrder = columnOrder
     }
 }
 
@@ -91,7 +93,8 @@ public enum CatalogRelease: Sendable {
         if package.definition["runtime"]?["adapter"] == .string("android.dog.v1") {
             self = .androidMonitor(package: package, data: data)
         } else {
-            self = .local(RegistryPackage(selection: selection, package: package, data: data))
+            self = .local(RegistryPackage(selection: selection, package: package, data: data,
+                                         columnOrder: try RegistryColumnOrder.read(response)))
         }
     }
 }

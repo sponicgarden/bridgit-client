@@ -59,7 +59,15 @@ data class Agent(
     val boundIps: List<String> = emptyList(),
     /** Networks a relay agent has called from ("AS13335 US"), so a new one can be reported. Newest last, capped. */
     val knownPlaces: List<String> = emptyList(),
+    /**
+     * API access (A0120): the one permission over the whole agent API, on by default. Off cuts the agent off from
+     * every API call while it stays registered and paired; the owner (or a Super agent) turns it back on.
+     */
+    val apiAccess: Boolean = true,
 ) {
+    /** Refused everywhere a paused agent is: paused by the owner, or its API access is off. */
+    val suspended: Boolean get() = paused || !apiAccess
+
     /** status and feedback are always allowed: an agent with trimmed permissions can still say what's wrong. */
     fun allows(capability: String): Boolean = capability in ALWAYS_ALLOWED || caps == null || capability in caps
 
@@ -77,6 +85,7 @@ data class Agent(
         .put("key_created_at", keyCreatedAt).put("known_api_revision", knownApiRevision).put("caps", caps?.let { JSONArray(it.sorted()) } ?: JSONObject.NULL)
         .put("model", model ?: JSONObject.NULL).put("harness", harness ?: JSONObject.NULL).put("model_reported_at", modelReportedAt)
         .put("paused", paused).put("bound_ips", JSONArray(boundIps)).put("known_places", JSONArray(knownPlaces))
+        .put("api_access", apiAccess)
 
     companion object {
         /** Capabilities no grant list can take away: the status check, and filing and following issues. */
@@ -104,6 +113,8 @@ data class Agent(
                 // Agents from before the device lock are locked to the Tailscale address they last used.
                 ?: listOfNotNull(o.optString("last_source_ip", "").takeIf { !o.isNull("last_source_ip") && Net.isTailnet(it) }?.let(Net::normalise)),
             knownPlaces = o.optJSONArray("known_places")?.let { a -> (0 until a.length()).map { a.getString(it) } } ?: emptyList(),
+            // Records from before A0120 had no switch: API access was on for everybody.
+            apiAccess = o.optBoolean("api_access", true),
         )
     }
 }

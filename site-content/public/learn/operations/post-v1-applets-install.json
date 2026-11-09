@@ -1,6 +1,6 @@
 {
- "documentation_revision": 115,
- "api_revision": 135,
+ "documentation_revision": 119,
+ "api_revision": 138,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Ask the owner to install an applet package. Nothing runs and nothing is granted until the owner approves it once on the phone; then the phone creates its watches, schedule, workflow and card itself and keeps them running without you",

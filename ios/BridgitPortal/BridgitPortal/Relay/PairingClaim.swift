@@ -8,7 +8,7 @@ enum PairingClaimError: LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .alreadyClaimed: "This pairing link was already used. On the phone, open Bridgit Portal pairing and make a new link."
+        case .alreadyClaimed: "This pairing link was already used. On the phone, make a new pairing link."
         case .expired: "This pairing link expired. Make a new one on the phone."
         }
     }

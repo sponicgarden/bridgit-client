@@ -15,7 +15,7 @@ object AppletCreators {
     )
 
     fun configured(agents: List<Agent>): List<Creator> = agents
-        .filter { !it.paused && it.connection != Connection.APPLET && it.lastUsedAt > 0L && it.lastUsedAt >= it.keyCreatedAt }
+        .filter { !it.suspended && it.connection != Connection.APPLET && it.lastUsedAt > 0L && it.lastUsedAt >= it.keyCreatedAt }
         .sortedByDescending { it.lastUsedAt }
         .mapNotNull { agent ->
             // A model name does not identify a receiving app; a known harness overrides a guessed name.

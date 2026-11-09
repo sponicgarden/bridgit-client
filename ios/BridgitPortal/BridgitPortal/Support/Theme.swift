@@ -162,28 +162,15 @@ enum Age {
     }
 }
 
-/// "portal" set like the "bridgit" wordmark: lowercase Bricolage Grotesque Bold (the website's brand/README.md),
-/// in a darker lavender-to-amber gradient. `size` is the wordmark image height it sits next to.
-struct PortalWord: View {
-    var size: CGFloat
-    static let light = [Color(hex: 0x6F3FD1), Color(hex: 0xC8620F)]
-    static let dark = [Color(hex: 0xBB8CF0), Color(hex: 0xFFBB70)]
-    @Environment(\.colorScheme) private var scheme
-    var body: some View {
-        // The wordmark's b is 61.6% of the image tall and Bricolage's ascender is 0.715 em, so this em matches it.
-        Text("portal")
-            .font(.custom("BricolageGrotesque-Bold", size: size * 0.861))
-            .kerning(-size * 0.012)
-            .foregroundStyle(LinearGradient(colors: scheme == .dark ? Self.dark : Self.light, startPoint: .leading, endPoint: .trailing))
-    }
-}
-
-/// The top bar on every main screen: the app icon, then "bridgit portal" as one wordmark.
+/// The top bar on every main screen: the app icon, then the "bridgit" wordmark. The brand is Bridgit, never
+/// "Bridgit Portal" (owner, A0160, 9 Nov 2026).
 struct BrandBar: View {
     var compact = false
     /// Measured on wordmark.png: letters' baseline at 74.3% of the image height, tops of b/d at 12.7%.
     static let baseline: CGFloat = 0.743
     static let letterTop: CGFloat = 0.127
+    /// The brand's accessible name.
+    static let label = "Bridgit"
 
     var body: some View {
         let mark: CGFloat = compact ? 36 : 44
@@ -198,27 +185,26 @@ struct BrandBar: View {
         }
         .fixedSize()
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Bridgit Portal")
+        .accessibilityLabel(Self.label)
     }
 }
 
-/// "bridgit portal": the wordmark image and "portal" on one baseline, a word space apart.
+/// The "bridgit" wordmark image, on the text baseline.
 struct PortalWordmark: View {
     var height: CGFloat
     var body: some View {
-        HStack(alignment: .lastTextBaseline, spacing: height * 0.09) {
+        HStack(alignment: .lastTextBaseline, spacing: 0) {
             Image("Wordmark").resizable().scaledToFit().frame(height: height)
                 .alignmentGuide(.lastTextBaseline) { d in d.height * BrandBar.baseline }
-            PortalWord(size: height)
         }
         .fixedSize()
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("bridgit portal")
+        .accessibilityLabel(BrandBar.label)
     }
 }
 
 extension View {
-    /// Puts the Bridgit Portal brand bar in the navigation bar of a main screen.
+    /// Puts the Bridgit brand bar in the navigation bar of a main screen.
     func brandBar() -> some View {
         toolbar { ToolbarItem(placement: .principal) { BrandBar(compact: true) } }
             .navigationBarTitleDisplayMode(.inline)

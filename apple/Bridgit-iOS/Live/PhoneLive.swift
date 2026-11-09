@@ -56,6 +56,16 @@ final class PhoneLive: ObservableObject {
     @Published var agents: [AgentRow] = []
     @Published var applets: [AppletRow] = []
     @Published private(set) var appletsReported = false
+    /// Why `applets` is missing when it is (A0244), from where the last read came from and whether it failed.
+    var appletGapReason: LinkedAppletGap.Reason { Self.appletGapReason(source: source, failed: liveError != nil) }
+    nonisolated static func appletGapReason(source: Source, failed: Bool) -> LinkedAppletGap.Reason {
+        if failed { return .unreachable }
+        switch source {
+        case .none: return .checking
+        case .live, .stale, .sample: return .notInReport
+        case .snapshot(let contact): return .noAccountReport(contact)
+        }
+    }
     @Published var liveError: String?
     @Published var busy = false
 

@@ -47,6 +47,22 @@ class SamplesTest {
         }
     }
 
+    /** A0027: styled HTML cards are the default, listed before the native fallbacks, and the guide says so. */
+    @Test fun htmlCardsAreTheDefaultAndNativeOnesTheFallback() {
+        val ids = samples.map { it.getString("id") }
+        val defaults = listOf("html-yes-no", "html-notice", "html-choice", "html-form", "html-connection-test")
+        val firstNative = ids.indexOfFirst { it.startsWith("question-") || it == "notice" }
+        for (id in defaults) {
+            assertTrue("$id is a sample", id in ids)
+            assertTrue("$id comes before the native samples", ids.indexOf(id) < firstNative)
+        }
+        val conventions = JSONObject(file).getJSONObject("conventions")
+        assertTrue(conventions.getString("default_card").contains("Default for every owner-facing interaction"))
+        val guide = File("../site-content/public/learn/guide.md").readText()
+        assertTrue(guide.contains("even a simple connection check"))
+        assertFalse(Regex("native questions? for (a )?simple choices?", RegexOption.IGNORE_CASE).containsMatchIn(guide))
+    }
+
     @Test fun questionAnswersMatchTheirControls() {
         for (s in samples.filter { it.getString("kind") == "question" }) {
             val draft = InteractionRules.parse(s.getJSONObject("request"))

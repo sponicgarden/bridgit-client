@@ -85,9 +85,9 @@ On-screen app control, notification access and peripherals exist only in the pri
 
 | The owner gets | Call | Runs |
 |---|---|---|
-| A quick choice or short form | `POST /v1/interactions` kind `question` (buttons, choice, text, links; up to 6 controls) | Phone |
+| A quick choice, yes/no or short form | `POST /v1/interactions` kind `html` from `GET /v1/samples` (`html-yes-no`, `html-choice`, `html-form`: styled, accessible, `Bridgit.respond`); fallback: kind `question` (buttons, choice, text, links; up to 6 controls) | Phone |
 | A custom page: checklist, chart, game, picker | kind `html` (offline, about 400 px wide, `Bridgit.respond`); stacks the owner swipes through | Phone |
-| A one-way update | kind `notice` | Phone |
+| A one-way update | kind `html` (`html-notice`); fallback: kind `notice` | Phone |
 | Live progress | kind `text` plus `POST /v1/text/stream` | Phone |
 | The answer | `GET /v1/interactions/{id}?wait=55`, or one loop on `GET /v1/events?since=<cursor>&wait=55` | Phone |
 | Something copied for them to paste | `POST /v1/clipboard` (they tap Copy), `GET /v1/clipboard/{id}` | Phone |
@@ -175,7 +175,7 @@ control tools or the team-key `/v1/jev` and `/v1/clef` routes, but they can call
 | A spoken request, a card answer, a loud sound | Events (`GET /v1/events` loop) or your callback | — |
 | A routine that must run with no agent | A flow (a workflow), started by its trigger, a watch rule or a schedule | It needs arbitrary calls or your own model: a schedule plus your server |
 | A status panel, a list, photos or a table | A pieces card (`kind: "pieces"`, `GET /v1/samples?id=pieces-status`) | A chart, game or unusual layout: HTML card |
-| A simple choice | Native question | A layout or game helps: pieces or HTML card |
+| A test, yes/no, simple choice, notice or form | A styled HTML card (`kind: "html"`: `GET /v1/samples?id=html-yes-no`, `html-choice`, `html-form`) | It is a live status panel, list or table: pieces. HTML cards unavailable: a native question |
 | Many small updates | One text panel | — |
 | Something irreversible (pay, send, book) | Ask on a card, act, then report the real outcome | A tap only records an answer; it does nothing by itself |
 
@@ -224,7 +224,7 @@ Each one: what starts it, the calls it chains, and what the owner sees. Treat th
 
 ### 4. Pantry to shopping list
 - **Starts:** the owner photographs the fridge and pantry.
-- **Chain:** `GET /v1/image/last` → Clef choice questions per staple (plenty / low / out) → pieces card listing what is low or out, then a native question with a text field to edit the list
+- **Chain:** `GET /v1/image/last` → Clef choice questions per staple (plenty / low / out) → pieces card listing what is low or out, then an HTML form card with a text field to edit the list
 - **Owner sees:** a shopping list they correct, then you send it where they shop.
 
 ### 5. Leaving-home check
@@ -300,7 +300,7 @@ Each one: what starts it, the calls it chains, and what the owner sees. Treat th
 
 ### 17. Voice note to tasks
 - **Starts:** "Turn what I'm about to say into tasks."
-- **Chain:** `POST /v1/mic/record {"transcribe":true,"return_audio":false}` → your model structures it → pieces card with the tasks, then a native question for anything to change
+- **Chain:** `POST /v1/mic/record {"transcribe":true,"return_audio":false}` → your model structures it → pieces card with the tasks, then an HTML form card for anything to change
 - **Owner sees:** a task list they can correct.
 
 ### 18. Don't interrupt me
@@ -379,7 +379,7 @@ Each one: what starts it, the calls it chains, and what the owner sees. Treat th
 
 ### 29. Big, simple choices
 - **Starts:** a decision with lots of fine print.
-- **Chain:** your model distils it → a native question with two or three large buttons and a "Tell me more" link
+- **Chain:** your model distils it → an HTML card with two or three large buttons and a "Tell me more" button
 - **Owner sees:** a decision they can make at a glance.
 
 ### 30. Find my phone
@@ -495,7 +495,7 @@ Two or three, not a survey. Pick the ones that fit:
 | Where it lives | "Will the phone stay somewhere, like a shelf, a window or the kitchen? Is there a spare phone or tablet we could use?" |
 | Quiet | "When should I never interrupt?" |
 
-In chat when they're talking to you there. On the phone, one card:
+In chat when they're talking to you there. On the phone, one styled HTML form card (`GET /v1/samples?id=html-form` with `area` as a choice field, `chore` as a text field and buttons Suggest one / Not now); the native fallback is:
 
 ```json
 {"kind":"question","title":"What could I help with?","text":"Pick an area and tell me one thing you'd like off your plate. I'll suggest one small thing to try.",
@@ -540,7 +540,7 @@ For complete history use `GET /v1/log` with `next_cursor`; direct HTTP `GET /v1/
 | The smallest capture and the cheapest tool that answers it | Send a full image when OCR text is enough |
 | Pick watch `data` explicitly | Leave the default and send location you didn't need |
 | Normal priority, `speak:false`, one text panel for progress | Urgent or spoken routine updates, a stream of notices |
-| Native questions for simple choices, specific labels ("Approve €24") | An HTML page for a yes/no, a vague "OK" |
+| A styled HTML card from the samples for every question, test and notice; specific labels ("Approve €24") | A bare native question, even for a connection test; a vague "OK" |
 | `Idempotency-Key` on endpoints that accept it; check `GET /v1/log?agent=me` after an unknown outcome | Retry a judgment or watch blindly (they don't take the key) |
 | Long-poll with `wait=55` and a 60 s timeout | Sleep loops |
 | Check the operation (control tools) and the real result | Call `awaiting_owner` done, or a draft "sent" |

@@ -370,5 +370,5 @@ AFTER YOU'RE CONNECTED
 POINTERS
 - Agent guide: https://bridgit.cc/agentguide/
 - Modify applets: https://bridgit.cc/learn/builder/modifying-applets.md (keep owner data; copy built-ins first).
-- Cards: GET /v1/samples?id=pieces-status; HTML: GET /v1/samples?id=html-connection-test.
+- Cards: default to a styled HTML card, even for a test or yes/no: GET /v1/samples?id=html-yes-no (also html-choice, html-form, html-connection-test). Live panels: GET /v1/samples?id=pieces-status. Native questions are the fallback.
 - https://bridgit.cc/learn/catalog-index.json (capability index), GET /v1/discover?id=<id>&detail=full (exact operations), https://bridgit.cc/learn/playbook.md (40 use cases). GET /v1/guide is the full reference: use it only when needed.

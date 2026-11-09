@@ -52,3 +52,36 @@ final class AccountAgentRosterTests: XCTestCase {
         XCTAssertEqual(second.current.map(\.name), ["Second"])
     }
 }
+
+/// A0244: a linked device's missing applet list always names a reason and a next step.
+final class LinkedAppletGapTests: XCTestCase {
+    func testEveryUnreportedStateNamesTheDeviceAndANextStep() {
+        let reasons: [LinkedAppletGap.Reason] = [.unreachable, .notInReport, .noAccountReport(nil), .noAccountReport(Date(timeIntervalSinceNow: -120))]
+        for reason in reasons {
+            let gap = LinkedAppletGap(device: "Garage", reason: reason)
+            XCTAssertTrue(gap.title.contains("Garage"), "\(reason)")
+            XCTAssertTrue(gap.detail?.contains("try again") == true, "\(reason)")
+            XCTAssertTrue(gap.canRetry, "\(reason)")
+            XCTAssertNotEqual(gap.title, "Applet status not reported")
+        }
+    }
+
+    func testCheckingAndPausedOfferNoRetry() {
+        XCTAssertFalse(LinkedAppletGap(device: "Garage", reason: .checking).canRetry)
+        XCTAssertNil(LinkedAppletGap(device: "Garage", reason: .checking).detail)
+        let paused = LinkedAppletGap(device: "Garage", reason: .paused)
+        XCTAssertFalse(paused.canRetry)
+        XCTAssertEqual(paused.detail, "Resume device views to read its applets.")
+    }
+
+    func testAccountReportShowsLastReportTime() {
+        let gap = LinkedAppletGap(device: "Garage", reason: .noAccountReport(Date(timeIntervalSinceNow: -120)))
+        XCTAssertTrue(gap.detail?.hasPrefix("Last report ") == true)
+        XCTAssertTrue(gap.detail?.contains("Open Bridgit on Garage") == true)
+        XCTAssertFalse(LinkedAppletGap(device: "Garage", reason: .noAccountReport(nil)).detail?.contains("Last report") == true)
+    }
+
+    func testOlderReportAsksForAnUpdate() {
+        XCTAssertEqual(LinkedAppletGap(device: "Garage", reason: .notInReport).detail, "Update Bridgit on Garage, then try again.")
+    }
+}

@@ -80,6 +80,16 @@ final class ParsingTests: XCTestCase {
         XCTAssertEqual(PhoneLive.mergingLogs(recent, page: [LogLine(raw: ["id": 2101])], limit: 2000).count, 2000)
     }
 
+    func testLinkedAppletGapReasonFollowsReadSource() {
+        let at = Date(timeIntervalSince1970: 1_000)
+        XCTAssertEqual(PhoneLive.appletGapReason(source: .none, failed: false), .checking)
+        XCTAssertEqual(PhoneLive.appletGapReason(source: .live(at), failed: true), .unreachable)
+        XCTAssertEqual(PhoneLive.appletGapReason(source: .none, failed: true), .unreachable)
+        XCTAssertEqual(PhoneLive.appletGapReason(source: .live(at), failed: false), .notInReport)
+        XCTAssertEqual(PhoneLive.appletGapReason(source: .snapshot(at), failed: false), .noAccountReport(at))
+        XCTAssertEqual(PhoneLive.appletGapReason(source: .snapshot(nil), failed: false), .noAccountReport(nil))
+    }
+
     @MainActor func testOlderActivityUsesStandardLogFallbackWithCursor() async throws {
         var calls: [(String, [String: String])] = []
         let response = try await PhoneLive.logPage(query: ["until": "42", "limit": "100"]) { path, query in

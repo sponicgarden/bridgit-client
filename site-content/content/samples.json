@@ -9,9 +9,645 @@
     "resubmission": "The owner can reopen an answered card and answer again: a new interaction.answered event with \"resubmission\": true and \"previous_answer\".",
     "html_cards": "An html card runs offline: inline CSS and JS only, pictures as data:image/* URLs, no forms, no network. Bridgit.respond(JSON string) answers once (window.Bridget on 1.6.269 and older) (16 KB max). Bridgit then fires bridgit:answered on document (cancelable; detail = {answer, close_after_ms}); calling preventDefault() lets the card show its own confirmation. The card closes about 5 s later. The CARD object at the top of each sample page holds all its text, so a new card is the same page with a different CARD object.",
     "progress": "A single card can't be swiped. Progress through a series is the text \"Step n of m\" (the pill in these samples), not Stories-style segment bars, which suggest a swipe that does nothing.",
-    "user_visible_tests": "Always present user-visible tests and connection checks as rich, attractive kind=html cards adapted from the supplied templates; start with html-connection-test for pairing checks. Keep native question samples for API compatibility testing only."
+    "user_visible_tests": "Every user-visible test and connection check is a styled kind=html card adapted from the supplied templates; start with html-connection-test for pairing checks. Never send a bare native question as a test; native question samples exist as a fallback and for API compatibility testing only.",
+    "default_card": "Default for every owner-facing interaction (tests, connection checks, yes/no, choices, notices, multi-field forms): a styled kind=html card that answers with Bridgit.respond. Start from html-yes-no (decisions, notices: action-card.html), html-choice or html-form (inputs: form-card.html), html-connection-test (tests). Only change the CARD object. Fall back to a native question or notice only when HTML cards are unavailable (older build, an MCP client that cannot show them) or for API compatibility tests; use pieces for live status panels, lists and tables.",
+    "html_answer_values": "Forms built from form-card.html answer {\"button\": \"submit\" or the secondary button id, \"values\": {<field id>: value}, ...card.data} inside answer.data.",
+    "html_accessibility": "The templates use one column, 16 px text, 52 px touch targets, labelled fieldsets, visible keyboard focus, text alongside colour for errors, aria-live status text and no network or form submission. Keep these when changing a template."
   },
   "samples": [
+    {
+      "id": "html-yes-no",
+      "kind": "html",
+      "title": "HTML card: yes / no question (the default for a simple question)",
+      "summary": "The default for a yes/no or a two-button decision: a styled card with a large primary button, specific labels and a visible confirmation. Use it instead of a native question.",
+      "html_file": "action-card.html",
+      "card": {
+        "pill": "Needs your OK",
+        "icon": "\ud83d\udca1",
+        "title": "Pay the electricity bill?",
+        "text": "EDP, 48.20 EUR, due Friday. Paid from the usual account.",
+        "list": [],
+        "buttons": [
+          {
+            "id": "pay",
+            "label": "Pay 48.20 EUR",
+            "style": "primary"
+          },
+          {
+            "id": "later",
+            "label": "Not now"
+          }
+        ],
+        "data": {
+          "topic": "electricity"
+        },
+        "sending": "Sending your answer\u2026",
+        "done_title": "Answer sent",
+        "done_text": "Your agent has your answer."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Pay the electricity bill?",
+        "html": "{{html}}",
+        "expires_in_seconds": 3600
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "pay",
+          "topic": "electricity"
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "Change pill, icon, title, text and buttons; keep a specific primary label and 2 or 3 buttons at most.",
+        "The tapped button id is data.button; anything in card.data comes back beside it."
+      ]
+    },
+    {
+      "id": "html-notice",
+      "kind": "html",
+      "title": "HTML card: notice with one acknowledge button",
+      "summary": "The default for telling the owner something: the same styled page with a single Got it button. Add a list for steps or details. Use a native notice only as a fallback.",
+      "html_file": "action-card.html",
+      "card": {
+        "pill": "Heads-up",
+        "icon": "\ud83d\ude86",
+        "title": "Your train leaves in 40 minutes",
+        "text": "Platform 4, coach C, seat 21. It's a 12-minute walk from where you are.",
+        "list": [],
+        "buttons": [
+          {
+            "id": "ok",
+            "label": "Got it",
+            "style": "primary"
+          }
+        ],
+        "data": {
+          "notice": "train"
+        },
+        "sending": "One moment\u2026",
+        "done_title": "Noted",
+        "done_text": "Your agent knows you saw it."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Your train leaves in 40 minutes",
+        "html": "{{html}}",
+        "expires_in_seconds": 3600
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "ok",
+          "notice": "train"
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "Add \"speak\": true to the request for urgent spoken notices (silent on silent mode). No answer is required: the agent may ignore data.button."
+      ]
+    },
+    {
+      "id": "html-choice",
+      "kind": "html",
+      "title": "HTML card: pick one option",
+      "summary": "The default for a pick-one question: large tappable options (radio group), a required check and a Send button. The answer is data.values.<field id>.",
+      "html_file": "form-card.html",
+      "card": {
+        "pill": "One question",
+        "icon": "\ud83c\udf7d\ufe0f",
+        "title": "Where should we eat tonight?",
+        "text": "Three places near you with a table at 8.",
+        "fields": [
+          {
+            "id": "place",
+            "type": "choice",
+            "label": "Pick one",
+            "required": true,
+            "options": [
+              "Taberna da Rua",
+              "Sushi Bar 7",
+              "Pizzeria Luzia"
+            ]
+          }
+        ],
+        "submit": "Book it",
+        "secondary": {
+          "id": "home",
+          "label": "Cook at home"
+        },
+        "data": {
+          "topic": "dinner"
+        },
+        "sending": "Sending your pick\u2026",
+        "done_title": "Picked",
+        "done_text": "Your agent has your choice."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Where should we eat tonight?",
+        "html": "{{html}}",
+        "expires_in_seconds": 3600
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "submit",
+          "values": {
+            "place": "Sushi Bar 7"
+          },
+          "topic": "dinner"
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "The optional secondary button answers with its own id and no values (here data.button is home); validation applies only to the main button.",
+        "2 to 8 options is comfortable; use multi for pick-several."
+      ]
+    },
+    {
+      "id": "html-form",
+      "kind": "html",
+      "title": "HTML card: multi-field form",
+      "summary": "The default for several questions at once: pick one, pick several, text, a longer note and a 1-10 slider, with required-field validation, a visible sending state and a confirmation. Values come back in data.values.",
+      "html_file": "form-card.html",
+      "card": {
+        "pill": "Quick questions",
+        "icon": "\ud83d\udcdd",
+        "title": "Plan the weekend",
+        "text": "A few answers and I will take care of the rest.",
+        "fields": [
+          {
+            "id": "day",
+            "type": "choice",
+            "label": "Which day?",
+            "required": true,
+            "options": [
+              "Saturday",
+              "Sunday"
+            ]
+          },
+          {
+            "id": "extras",
+            "type": "multi",
+            "label": "What to include",
+            "hint": "Pick any",
+            "options": [
+              "Breakfast out",
+              "A walk",
+              "Groceries"
+            ]
+          },
+          {
+            "id": "name",
+            "type": "text",
+            "label": "Booking name",
+            "required": true,
+            "placeholder": "Name on the table"
+          },
+          {
+            "id": "energy",
+            "type": "scale",
+            "label": "How busy a day?",
+            "min": 1,
+            "max": 10,
+            "value": 5,
+            "low": "Slow",
+            "high": "Packed"
+          },
+          {
+            "id": "note",
+            "type": "textarea",
+            "label": "Anything else?",
+            "placeholder": "Allergies, a birthday"
+          }
+        ],
+        "submit": "Send",
+        "secondary": {
+          "id": "skip",
+          "label": "Not now"
+        },
+        "data": {
+          "topic": "weekend"
+        },
+        "sending": "Sending your answers\u2026",
+        "done_title": "Sent",
+        "done_text": "Your agent has your answers."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Plan the weekend",
+        "html": "{{html}}",
+        "expires_in_seconds": 3600
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "submit",
+          "values": {
+            "day": "Saturday",
+            "extras": [
+              "A walk",
+              "Groceries"
+            ],
+            "name": "Ana",
+            "energy": 7,
+            "note": "One vegetarian"
+          },
+          "topic": "weekend"
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "Field types: choice (string), multi (list of strings), text and textarea (string, up to 2000 characters), scale (number). Empty optional fields are left out of values.",
+        "Required fields block sending until answered; the owner sees which one and focus moves to it."
+      ]
+    },
+    {
+      "id": "html-connection-test",
+      "kind": "html",
+      "title": "HTML card: connection test",
+      "summary": "The default connection check, and the pattern for every user-visible test: a polished card on the shared action-card template. No device action; the owner confirms the answer path.",
+      "html_file": "action-card.html",
+      "card": {
+        "pill": "Connection check",
+        "icon": "\u2728",
+        "title": "We\u2019re connected",
+        "text": "Your agent can reach Bridgit. Tap below to confirm your reply makes it back, too.",
+        "list": [],
+        "buttons": [
+          {
+            "id": "received",
+            "label": "Test received",
+            "style": "primary"
+          },
+          {
+            "id": "skip",
+            "label": "Skip"
+          }
+        ],
+        "data": {
+          "test": "connection"
+        },
+        "sending": "Sending your reply\u2026",
+        "done_title": "Reply sent",
+        "done_text": "Your agent can now confirm that the round trip worked."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Bridgit connection check",
+        "html": "{{html}}",
+        "expires_in_seconds": 900
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "received",
+          "test": "connection"
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "Use this HTML template for pairing checks and user-visible connection tests. Change the wording as needed; preserve the styling and response bridge.",
+        "Wait for the answer and verify data.button is received before reporting that the answer path passed. Skip is not a passing result."
+      ]
+    },
+    {
+      "id": "html-agenda",
+      "kind": "html",
+      "title": "HTML card: demo agenda",
+      "summary": "The action card page with a numbered list: the demo's opening card.",
+      "html_file": "action-card.html",
+      "card": {
+        "pill": "Bridgit demo",
+        "icon": "\u2728",
+        "title": "6 things, about 5 minutes",
+        "text": "A quick show of what I can do through your phone. Before each one you can tap Do it or Skip.",
+        "list": [
+          "Flash the light",
+          "Back photo: what I see",
+          "Front photo: how am I feeling?",
+          "Say \"Double\"",
+          "Game: Guess My Story",
+          "Rock paper scissors"
+        ],
+        "buttons": [
+          {
+            "id": "start",
+            "label": "Start",
+            "style": "primary"
+          },
+          {
+            "id": "later",
+            "label": "Not now",
+            "style": "quiet"
+          }
+        ],
+        "data": {
+          "step": 0
+        },
+        "sending": "Starting\u2026",
+        "done_title": "Here we go",
+        "done_text": "The first step is on its way."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Bridgit demo: 6 things, about 5 minutes",
+        "html": "{{html}}",
+        "expires_in_seconds": 3600
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "start",
+          "step": 0
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": []
+    },
+    {
+      "id": "html-step",
+      "kind": "html",
+      "title": "HTML card: step card",
+      "summary": "Step pill, icon medallion, info panel, gradient primary button, Skip and End demo, status line.",
+      "html_file": "action-card.html",
+      "card": {
+        "pill": "Step 1 of 6",
+        "icon": "\ud83d\udd26",
+        "title": "Flash the light",
+        "text": "I'll blink your phone's light three times. Look at it.",
+        "list": [],
+        "buttons": [
+          {
+            "id": "go",
+            "label": "Do it",
+            "style": "primary"
+          },
+          {
+            "id": "skip",
+            "label": "Skip"
+          },
+          {
+            "id": "end",
+            "label": "End demo",
+            "style": "quiet"
+          }
+        ],
+        "data": {
+          "step": 1
+        },
+        "sending": "Got it, one moment\u2026",
+        "done_title": "Watch the light",
+        "done_text": "Look at your phone."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Step 1 of 6: Flash the light",
+        "html": "{{html}}",
+        "expires_in_seconds": 900
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "go",
+          "step": 1
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "For another step change pill, icon, title, text and data.step. For a game round, change the buttons too (e.g. shoot / stop)."
+      ]
+    },
+    {
+      "id": "html-photo-check",
+      "kind": "html",
+      "title": "HTML card: photo with a guess",
+      "summary": "A photo, your guess, optional choice chips and text box, and buttons. Values come back in data.values.",
+      "html_file": "photo-card.html",
+      "card": {
+        "pill": "Step 2 of 6",
+        "image": "data:image/jpeg;base64,{{sample-photo.jpg}}",
+        "title": "Did I see that right?",
+        "text": "I think this is a blue mug on a wooden desk.",
+        "choice": null,
+        "input": {
+          "id": "actually",
+          "label": "What is it really?",
+          "placeholder": "Optional"
+        },
+        "buttons": [
+          {
+            "id": "yes",
+            "label": "Spot on",
+            "style": "primary"
+          },
+          {
+            "id": "no",
+            "label": "Not quite"
+          }
+        ],
+        "data": {
+          "step": 2
+        },
+        "sending": "Sending\u2026",
+        "done_text": "Your answer reached the agent.",
+        "done_title": "Thanks!"
+      },
+      "request": {
+        "kind": "html",
+        "title": "Did I see that right?",
+        "html": "{{html}}",
+        "expires_in_seconds": 900
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "no",
+          "values": {
+            "actually": "A teapot"
+          },
+          "step": 2
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "For a pick-one question set choice, e.g. {\"id\": \"feeling\", \"label\": \"How were you really feeling?\", \"options\": [\"Happy\", \"Surprised\", \"Sleepy\", \"Something else\"]}; the pick arrives as data.values.feeling."
+      ]
+    },
+    {
+      "id": "html-wrapup",
+      "kind": "html",
+      "title": "HTML card: wrap-up",
+      "summary": "The action card page as the demo's last card: what happened and what next.",
+      "html_file": "action-card.html",
+      "card": {
+        "pill": "That's the demo",
+        "icon": "\ud83c\udf89",
+        "title": "Want to see more?",
+        "text": "I flashed your light, saw your desk, read your face, came when you said Double, guessed your story and played a game with you.",
+        "list": [],
+        "buttons": [
+          {
+            "id": "more",
+            "label": "Show me more",
+            "style": "primary"
+          },
+          {
+            "id": "setup",
+            "label": "Set one idea up"
+          },
+          {
+            "id": "done",
+            "label": "That's enough",
+            "style": "quiet"
+          }
+        ],
+        "data": {
+          "step": "wrap-up"
+        },
+        "sending": "One moment\u2026",
+        "done_title": "Thanks!",
+        "done_text": "Your answer reached the agent."
+      },
+      "request": {
+        "kind": "html",
+        "title": "Want to see more?",
+        "html": "{{html}}"
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "more",
+          "step": "wrap-up"
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": []
+    },
+    {
+      "id": "html-checklist",
+      "kind": "html",
+      "title": "HTML card: checklist and slider mini app",
+      "summary": "Checkboxes, a 1-10 slider and a send button; the answer is structured data.",
+      "html_file": "checklist-card.html",
+      "card": {
+        "icon": "\ud83e\uddf3",
+        "title": "Packing for Lisbon",
+        "subtitle": "Tick what's in the bag already.",
+        "items": [
+          "Passport",
+          "Phone charger",
+          "Sunglasses",
+          "Rain jacket",
+          "Train tickets"
+        ],
+        "slider": {
+          "id": "ready",
+          "label": "How ready do you feel?",
+          "value": 5
+        },
+        "button": "Send to the agent",
+        "done_text": "Sent. The agent has your list.",
+        "done_title": "Sent"
+      },
+      "request": {
+        "kind": "html",
+        "title": "Packing for Lisbon",
+        "html": "{{html}}"
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "send",
+          "checked": [
+            "Passport",
+            "Sunglasses"
+          ],
+          "unchecked": [
+            "Phone charger",
+            "Rain jacket",
+            "Train tickets"
+          ],
+          "ready": 7
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": []
+    },
+    {
+      "id": "html-rps",
+      "kind": "html",
+      "title": "HTML card: rock paper scissors round",
+      "summary": "The demo's game page: Ready starts a 3, 2, 1, Shoot! countdown, the agent's hand appears as an icon at Shoot!, and the score and last round sit on top.",
+      "html_file": "rps-card.html",
+      "card": {
+        "me": "paper",
+        "history": [
+          {
+            "you": "scissors",
+            "me": "rock"
+          }
+        ],
+        "photo": "data:image/jpeg;base64,{{sample-photo.jpg}}",
+        "note": "",
+        "data": {
+          "step": 6
+        }
+      },
+      "request": {
+        "kind": "html",
+        "title": "Rock paper scissors: round 2 of 3",
+        "html": "{{html}}",
+        "expires_in_seconds": 300
+      },
+      "answer": {
+        "button": null,
+        "values": {},
+        "data": {
+          "button": "ready",
+          "round": 2,
+          "step": 6
+        }
+      },
+      "events": [
+        "interaction.answered"
+      ],
+      "notes": [
+        "The card answers on Ready and keeps counting down; the agent speaks the countdown and takes the photo right after Shoot! (see the demo script, Item 6)."
+      ]
+    },
     {
       "id": "pieces-status",
       "kind": "pieces",
@@ -91,46 +727,10 @@
       ]
     },
     {
-      "id": "notice",
-      "kind": "notice",
-      "title": "Notice with links, read aloud",
-      "summary": "One-way message. Only link controls (https:, geo:, tel:, mailto: or an app package). No answer.",
-      "request": {
-        "kind": "notice",
-        "title": "Your train leaves in 40 minutes",
-        "text": "Platform 4, coach C, seat 21. It's a 12-minute walk from where you are.",
-        "priority": "urgent",
-        "speak": true,
-        "controls": [
-          {
-            "type": "link",
-            "id": "ticket",
-            "label": "Open the ticket",
-            "url": "https://bridgit.cc/demo/"
-          },
-          {
-            "type": "link",
-            "id": "map",
-            "label": "Walk to the station",
-            "url": "geo:0,0?q=Lisboa+Santa+Apolonia"
-          }
-        ]
-      },
-      "answer": null,
-      "events": [
-        "interaction.seen when the owner opens it (GET then shows status seen and seen_at)",
-        "interaction.dismissed when they close it"
-      ],
-      "notes": [
-        "priority urgent shows a heads-up; speak reads the title and text aloud (silent when the phone is on silent).",
-        "At most 30 notices per hour per agent."
-      ]
-    },
-    {
       "id": "question-buttons",
       "kind": "question",
-      "title": "Yes / no question",
-      "summary": "One tap answers it. Up to 6 controls; style primary marks the main button.",
+      "title": "Native fallback: yes / no question",
+      "summary": "One tap answers it. Up to 6 controls; style primary marks the main button. Native fallback: use only when the owner's build lacks HTML cards, an app or tool cannot show them, or you are testing API compatibility.",
       "request": {
         "kind": "question",
         "title": "Pay the electricity bill?",
@@ -164,8 +764,8 @@
     {
       "id": "question-form",
       "kind": "question",
-      "title": "Choice, text box, link and buttons",
-      "summary": "Every control type in one question: choice (2-8 options), text, link and button.",
+      "title": "Native fallback: choice, text box, link and buttons",
+      "summary": "Every control type in one question: choice (2-8 options), text, link and button. Native fallback: use only when the owner's build lacks HTML cards, an app or tool cannot show them, or you are testing API compatibility.",
       "request": {
         "kind": "question",
         "title": "Where should we eat tonight?",
@@ -223,8 +823,8 @@
     {
       "id": "question-photo",
       "kind": "question",
-      "title": "Question with a photo",
-      "summary": "image.data_base64 (a JPEG or PNG, up to 2 MB) or image.gallery_id (from GET /v1/image/last).",
+      "title": "Native question with a photo (photo fallback)",
+      "summary": "image.data_base64 (a JPEG or PNG, up to 2 MB) or image.gallery_id (from GET /v1/image/last). Native fallback: use only when the owner's build lacks HTML cards, an app or tool cannot show them, or you are testing API compatibility.",
       "request": {
         "kind": "question",
         "title": "Did I see that right?",
@@ -267,376 +867,40 @@
       ]
     },
     {
-      "id": "html-agenda",
-      "kind": "html",
-      "title": "HTML card: demo agenda",
-      "summary": "The action card page with a numbered list: the demo's opening card.",
-      "html_file": "action-card.html",
-      "card": {
-        "pill": "Bridgit demo",
-        "icon": "✨",
-        "title": "6 things, about 5 minutes",
-        "text": "A quick show of what I can do through your phone. Before each one you can tap Do it or Skip.",
-        "list": [
-          "Flash the light",
-          "Back photo: what I see",
-          "Front photo: how am I feeling?",
-          "Say \"Double\"",
-          "Game: Guess My Story",
-          "Rock paper scissors"
-        ],
-        "buttons": [
+      "id": "notice",
+      "kind": "notice",
+      "title": "Native fallback: notice with links, read aloud",
+      "summary": "One-way message. Only link controls (https:, geo:, tel:, mailto: or an app package). No answer. Native fallback: use only when the owner's build lacks HTML cards, an app or tool cannot show them, or you are testing API compatibility.",
+      "request": {
+        "kind": "notice",
+        "title": "Your train leaves in 40 minutes",
+        "text": "Platform 4, coach C, seat 21. It's a 12-minute walk from where you are.",
+        "priority": "urgent",
+        "speak": true,
+        "controls": [
           {
-            "id": "start",
-            "label": "Start",
-            "style": "primary"
+            "type": "link",
+            "id": "ticket",
+            "label": "Open the ticket",
+            "url": "https://bridgit.cc/demo/"
           },
           {
-            "id": "later",
-            "label": "Not now",
-            "style": "quiet"
+            "type": "link",
+            "id": "map",
+            "label": "Walk to the station",
+            "url": "geo:0,0?q=Lisboa+Santa+Apolonia"
           }
-        ],
-        "data": {
-          "step": 0
-        },
-        "sending": "Starting…",
-        "done_title": "Here we go",
-        "done_text": "The first step is on its way."
+        ]
       },
-      "request": {
-        "kind": "html",
-        "title": "Bridgit demo: 6 things, about 5 minutes",
-        "html": "{{html}}",
-        "expires_in_seconds": 3600
-      },
-      "answer": {
-        "button": null,
-        "values": {},
-        "data": {
-          "button": "start",
-          "step": 0
-        }
-      },
+      "answer": null,
       "events": [
-        "interaction.answered"
-      ],
-      "notes": []
-    },
-    {
-      "id": "html-connection-test",
-      "kind": "html",
-      "title": "HTML card: connection test",
-      "summary": "A polished connection check using the shared action-card template. No device action; the owner confirms the answer path.",
-      "html_file": "action-card.html",
-      "card": {
-        "pill": "Connection check",
-        "icon": "✨",
-        "title": "We’re connected",
-        "text": "Your agent can reach Bridgit. Tap below to confirm your reply makes it back, too.",
-        "list": [],
-        "buttons": [
-          {
-            "id": "received",
-            "label": "Test received",
-            "style": "primary"
-          },
-          {
-            "id": "skip",
-            "label": "Skip"
-          }
-        ],
-        "data": {
-          "test": "connection"
-        },
-        "sending": "Sending your reply…",
-        "done_title": "Reply sent",
-        "done_text": "Your agent can now confirm that the round trip worked."
-      },
-      "request": {
-        "kind": "html",
-        "title": "Bridgit connection check",
-        "html": "{{html}}",
-        "expires_in_seconds": 900
-      },
-      "answer": {
-        "button": null,
-        "values": {},
-        "data": {
-          "button": "received",
-          "test": "connection"
-        }
-      },
-      "events": [
-        "interaction.answered"
+        "interaction.seen when the owner opens it (GET then shows status seen and seen_at)",
+        "interaction.dismissed when they close it"
       ],
       "notes": [
-        "Use this HTML template for pairing checks and user-visible connection tests. Change the wording as needed; preserve the styling and response bridge.",
-        "Wait for the answer and verify data.button is received before reporting that the answer path passed. Skip is not a passing result."
+        "priority urgent shows a heads-up; speak reads the title and text aloud (silent when the phone is on silent).",
+        "At most 30 notices per hour per agent."
       ]
-    },
-    {
-      "id": "html-step",
-      "kind": "html",
-      "title": "HTML card: step card",
-      "summary": "Step pill, icon medallion, info panel, gradient primary button, Skip and End demo, status line.",
-      "html_file": "action-card.html",
-      "card": {
-        "pill": "Step 1 of 6",
-        "icon": "🔦",
-        "title": "Flash the light",
-        "text": "I'll blink your phone's light three times. Look at it.",
-        "list": [],
-        "buttons": [
-          {
-            "id": "go",
-            "label": "Do it",
-            "style": "primary"
-          },
-          {
-            "id": "skip",
-            "label": "Skip"
-          },
-          {
-            "id": "end",
-            "label": "End demo",
-            "style": "quiet"
-          }
-        ],
-        "data": {
-          "step": 1
-        },
-        "sending": "Got it, one moment…",
-        "done_title": "Watch the light",
-        "done_text": "Look at your phone."
-      },
-      "request": {
-        "kind": "html",
-        "title": "Step 1 of 6: Flash the light",
-        "html": "{{html}}",
-        "expires_in_seconds": 900
-      },
-      "answer": {
-        "button": null,
-        "values": {},
-        "data": {
-          "button": "go",
-          "step": 1
-        }
-      },
-      "events": [
-        "interaction.answered"
-      ],
-      "notes": [
-        "For another step change pill, icon, title, text and data.step. For a game round, change the buttons too (e.g. shoot / stop)."
-      ]
-    },
-    {
-      "id": "html-photo-check",
-      "kind": "html",
-      "title": "HTML card: photo with a guess",
-      "summary": "A photo, your guess, optional choice chips and text box, and buttons. Values come back in data.values.",
-      "html_file": "photo-card.html",
-      "card": {
-        "pill": "Step 2 of 6",
-        "image": "data:image/jpeg;base64,{{sample-photo.jpg}}",
-        "title": "Did I see that right?",
-        "text": "I think this is a blue mug on a wooden desk.",
-        "choice": null,
-        "input": {
-          "id": "actually",
-          "label": "What is it really?",
-          "placeholder": "Optional"
-        },
-        "buttons": [
-          {
-            "id": "yes",
-            "label": "Spot on",
-            "style": "primary"
-          },
-          {
-            "id": "no",
-            "label": "Not quite"
-          }
-        ],
-        "data": {
-          "step": 2
-        },
-        "sending": "Sending…",
-        "done_text": "Your answer reached the agent.",
-        "done_title": "Thanks!"
-      },
-      "request": {
-        "kind": "html",
-        "title": "Did I see that right?",
-        "html": "{{html}}",
-        "expires_in_seconds": 900
-      },
-      "answer": {
-        "button": null,
-        "values": {},
-        "data": {
-          "button": "no",
-          "values": {
-            "actually": "A teapot"
-          },
-          "step": 2
-        }
-      },
-      "events": [
-        "interaction.answered"
-      ],
-      "notes": [
-        "For a pick-one question set choice, e.g. {\"id\": \"feeling\", \"label\": \"How were you really feeling?\", \"options\": [\"Happy\", \"Surprised\", \"Sleepy\", \"Something else\"]}; the pick arrives as data.values.feeling."
-      ]
-    },
-    {
-      "id": "html-rps",
-      "kind": "html",
-      "title": "HTML card: rock paper scissors round",
-      "summary": "The demo's game page: Ready starts a 3, 2, 1, Shoot! countdown, the agent's hand appears as an icon at Shoot!, and the score and last round sit on top.",
-      "html_file": "rps-card.html",
-      "card": {
-        "me": "paper",
-        "history": [
-          {
-            "you": "scissors",
-            "me": "rock"
-          }
-        ],
-        "photo": "data:image/jpeg;base64,{{sample-photo.jpg}}",
-        "note": "",
-        "data": {
-          "step": 6
-        }
-      },
-      "request": {
-        "kind": "html",
-        "title": "Rock paper scissors: round 2 of 3",
-        "html": "{{html}}",
-        "expires_in_seconds": 300
-      },
-      "answer": {
-        "button": null,
-        "values": {},
-        "data": {
-          "button": "ready",
-          "round": 2,
-          "step": 6
-        }
-      },
-      "events": [
-        "interaction.answered"
-      ],
-      "notes": [
-        "The card answers on Ready and keeps counting down; the agent speaks the countdown and takes the photo right after Shoot! (see the demo script, Item 6)."
-      ]
-    },
-    {
-      "id": "html-wrapup",
-      "kind": "html",
-      "title": "HTML card: wrap-up",
-      "summary": "The action card page as the demo's last card: what happened and what next.",
-      "html_file": "action-card.html",
-      "card": {
-        "pill": "That's the demo",
-        "icon": "🎉",
-        "title": "Want to see more?",
-        "text": "I flashed your light, saw your desk, read your face, came when you said Double, guessed your story and played a game with you.",
-        "list": [],
-        "buttons": [
-          {
-            "id": "more",
-            "label": "Show me more",
-            "style": "primary"
-          },
-          {
-            "id": "setup",
-            "label": "Set one idea up"
-          },
-          {
-            "id": "done",
-            "label": "That's enough",
-            "style": "quiet"
-          }
-        ],
-        "data": {
-          "step": "wrap-up"
-        },
-        "sending": "One moment…",
-        "done_title": "Thanks!",
-        "done_text": "Your answer reached the agent."
-      },
-      "request": {
-        "kind": "html",
-        "title": "Want to see more?",
-        "html": "{{html}}"
-      },
-      "answer": {
-        "button": null,
-        "values": {},
-        "data": {
-          "button": "more",
-          "step": "wrap-up"
-        }
-      },
-      "events": [
-        "interaction.answered"
-      ],
-      "notes": []
-    },
-    {
-      "id": "html-checklist",
-      "kind": "html",
-      "title": "HTML card: checklist and slider mini app",
-      "summary": "Checkboxes, a 1-10 slider and a send button; the answer is structured data.",
-      "html_file": "checklist-card.html",
-      "card": {
-        "icon": "🧳",
-        "title": "Packing for Lisbon",
-        "subtitle": "Tick what's in the bag already.",
-        "items": [
-          "Passport",
-          "Phone charger",
-          "Sunglasses",
-          "Rain jacket",
-          "Train tickets"
-        ],
-        "slider": {
-          "id": "ready",
-          "label": "How ready do you feel?",
-          "value": 5
-        },
-        "button": "Send to the agent",
-        "done_text": "Sent. The agent has your list.",
-        "done_title": "Sent"
-      },
-      "request": {
-        "kind": "html",
-        "title": "Packing for Lisbon",
-        "html": "{{html}}"
-      },
-      "answer": {
-        "button": null,
-        "values": {},
-        "data": {
-          "button": "send",
-          "checked": [
-            "Passport",
-            "Sunglasses"
-          ],
-          "unchecked": [
-            "Phone charger",
-            "Rain jacket",
-            "Train tickets"
-          ],
-          "ready": 7
-        }
-      },
-      "events": [
-        "interaction.answered"
-      ],
-      "notes": []
     },
     {
       "id": "text-panel",

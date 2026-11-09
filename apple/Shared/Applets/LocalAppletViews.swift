@@ -687,15 +687,70 @@ struct ReportedLinkedApplet: Identifiable {
             sensors: raw["sensors"] as? [String] ?? [])
     }
 }
+/// Why a linked device's applet list is missing, and the next step (A0244: never a bare "not reported").
+struct LinkedAppletGap: Equatable {
+    enum Reason: Equatable {
+        /// No read has finished yet.
+        case checking
+        /// This viewer's device views are paused.
+        case paused
+        /// The last read failed.
+        case unreachable
+        /// The device answered, but its report has no applet list (an older Bridgit).
+        case notInReport
+        /// Only the account copy is available and it has no applet list; the date is the device's last report.
+        case noAccountReport(Date?)
+    }
+    var device: String
+    var reason: Reason
+    var title: String {
+        switch reason {
+        case .checking: "Reading applets from \(device)…"
+        case .paused: "Device views are paused"
+        case .unreachable: "Couldn’t reach \(device)"
+        case .notInReport: "\(device) didn’t report its applets"
+        case .noAccountReport: "\(device) hasn’t reported its applets"
+        }
+    }
+    var detail: String? {
+        switch reason {
+        case .checking: nil
+        case .paused: "Resume device views to read its applets."
+        case .unreachable: "Check that \(device) is on and online, then try again."
+        case .notInReport: "Update Bridgit on \(device), then try again."
+        case .noAccountReport(let at):
+            (at.map { "Last report \(Age.text($0)). " } ?? "") + "Open Bridgit on \(device) while signed in to this account, then try again."
+        }
+    }
+    var canRetry: Bool { reason != .checking && reason != .paused }
+}
+
 struct LinkedAppletReadList: View {
     var rows: [ReportedLinkedApplet]
     var reported: Bool
+    var gap: LinkedAppletGap? = nil
+    var retry: (() async -> Void)? = nil
+    @State private var retrying = false
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if rows.isEmpty {
-                ContentUnavailableView(reported ? "No applets reported" : "Applet status not reported", systemImage: "square.grid.2x2")
+                if reported { ContentUnavailableView("No applets reported", systemImage: "square.grid.2x2") }
+                else if let gap { missing(gap) }
+                else { ContentUnavailableView("Applet status not reported", systemImage: "square.grid.2x2") }
             } else { ForEach(rows) { LinkedAppletReadRow(applet: $0) } }
         }.frame(maxWidth: .infinity, alignment: .leading)
+    }
+    private func missing(_ gap: LinkedAppletGap) -> some View {
+        ContentUnavailableView {
+            if gap.reason == .checking { ProgressView(); Text(gap.title) }
+            else { Label(gap.title, systemImage: gap.reason == .paused ? "pause.circle" : "square.grid.2x2") }
+        } description: {
+            if let detail = gap.detail { Text(detail) }
+        } actions: {
+            if gap.canRetry, let retry {
+                Button("Try again") { retrying = true; Task { await retry(); retrying = false } }.disabled(retrying)
+            }
+        }
     }
 }
 struct LinkedAppletReadRow: View {

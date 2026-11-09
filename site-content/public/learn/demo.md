@@ -166,6 +166,7 @@ Used for the agenda, the step cards, Guess My Story's rounds and the wrap-up. Ch
   button.primary { border: 0; color: #fff; background: linear-gradient(135deg, #ff8a3d, #ff3d77);
     box-shadow: 0 8px 22px rgba(255, 61, 119, .35); }
   button.quiet { border: 0; background: none; min-height: 40px; color: #b9b0dc; font-weight: 500; }
+  button:focus-visible { outline: 3px solid #8fd0ff; outline-offset: 2px; }
   button:disabled { opacity: .5; }
   button:active:not(:disabled) { transform: scale(.98); }
   .status { margin: 2px 0 0; min-height: 1.4em; font-size: 14px; color: #b9b0dc; }
@@ -485,7 +486,7 @@ var CARD = /*CARD*/{
 The snapshot's `data_base64` is a JPEG; it goes into `CARD.image` as `data:image/jpeg;base64,...`. The whole
 `html` field, embedded base64 images included, must fit 256 KiB (UTF-8 bytes): resize or recompress the photo you
 already have and check the final size before posting; don't take a new photo just to get a smaller copy. For a
-plain photo with buttons, a native question with its `image` field is simpler than an HTML card. The best guess
+plain photo with buttons, use `html-photo-check` (a native question with its `image` field is the fallback). The best guess
 names one specific detail they won't expect (a brand, the time on a clock, the words on a label). Item 5 uses
 this photo again.
 
@@ -898,12 +899,13 @@ The same address gets Bridgit's email alerts (a daily summary of what agents did
 - **Goal:** The owner's email is on its way to verified before the demo ends, so nothing stops working tomorrow.
 - **Owner does:** Types their address on a card (or confirms the one you already know), then taps the link in the email from bridgit.cc.
 - **Agent does:** `GET /owner/email`. If `status` is `verified`, skip this. If you already know their address from your own context, send it straight away; otherwise ask with a card (below). Then `POST /owner/email {"email":"<address>"}` and tell them in one line where the email went (the reply's `next`).
-- **Cards and spoken lines:** A question card: "Where should Bridgit send your verification email?" with a text field.
+- **Cards and spoken lines:** A styled html form card (`GET /v1/samples?id=html-form`): one required text field `email` "Where should Bridgit send your verification email?", submit "Send the link", secondary `later` "Not now". The address is in `data.values.email`.
 - **Done when:** `POST /owner/email` returns `state: "pending"`. `GET /owner/email` shows `verified` after they tap the link; there is no need to wait for it.
 - **Fallback:** They tap Not now: say "You can add it any time in Bridgit; it's needed within 24 hours" and stop. `rate_limited`: one was just sent; don't send another.
 - **Features shown:** `interactions`
 
 ```
+# Native fallback if HTML cards are unavailable:
 POST /interactions {"kind":"question","title":"Your email for Bridgit",
   "text":"Bridgit needs a verified email within 24 hours. We send one link; tap it to confirm.",
   "controls":[{"type":"text","id":"email","label":"Email address","placeholder":"you@example.com"},
@@ -937,7 +939,7 @@ buttons, a form and a photo, the four html cards above, a checklist mini app, an
 More demos, built from what's switched on right now: for when the owner taps **Show me more** at the end of the tour, or asks later. The goal: the owner finishes knowing the handful of things an agent can do through their phone that matter to *them*.
 
 ## 1. A few questions first
-All four go on one card; `GET /v1/interactions/{id}?wait=55` returns the answer. A control whose answer is already known can be left out.
+All four go on one styled HTML form card (start from `GET /v1/samples?id=html-form`: choice fields `where`, `help`, `length`, a text field `today`, submit "Show me"; the answers are in `data.values`); `GET /v1/interactions/{id}?wait=55` returns the answer. The native card below is the fallback if HTML cards are unavailable. A control whose answer is already known can be left out.
 
 ```
 POST /v1/interactions {"kind":"question","title":"A few quick questions","controls":[{"type":"choice","id":"where","label":"Where's the phone?","options":["In my hand","On the desk next to me","Somewhere else in the room"]},{"type":"choice","id":"help","label":"What would help you most?","options":["Quick decisions and approvals","Seeing and reading things","Hands-free voice and sound","Knowing what the phone is doing"]},{"type":"choice","id":"length","label":"How long?","options":["A quick taste (3 demos)","The full tour"]},{"type":"text","id":"today","label":"Anything on your plate today?","placeholder":"A decision, a trip, a task"},{"type":"button","id":"go","label":"Show me","style":"primary"}]}

@@ -32,7 +32,7 @@ Everything below is public, needs no key and no phone, and is rebuilt from the l
 
 ## Cards and demo
 
-- [Interaction samples](https://bridgit.cc/samples/samples.json): a tested request body for every card kind (pieces, notice, question, html, text), with the answer each produces
+- [Interaction samples](https://bridgit.cc/samples/samples.json): a tested request body for every card kind (html, pieces, question, notice, text), with the answer each produces
 - [Interaction examples](https://bridgit.cc/interactions/index.json): 34 everyday cards to copy and change
 - [Demo script](https://bridgit.cc/learn/demo.md): the five-minute first-run tour and the menu of more demos ([tour alone as a skill](https://bridgit.cc/demo/SKILL.md))
 

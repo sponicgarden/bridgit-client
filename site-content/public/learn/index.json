@@ -11,18 +11,22 @@
  "about": "Everything an AI agent needs to learn Bridgit (an Android app that lets the owner's agents use their phone over Tailscale or Bridgit's relay): no key, no phone needed, rebuilt from the latest Bridgit code on every website deploy. Your phone serves its own copies too; if its api_revision is lower than this one, it runs an older Bridgit and lacks what changes.json lists after its revision.",
  "file_a_bug_without_a_phone": "POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {\"name\",\"model\",\"harness\"}, then POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues with the key it returns. Details: https://bridgit.cc/learn/bugs.md",
  "sample_ids": [
+  "html-yes-no",
+  "html-notice",
+  "html-choice",
+  "html-form",
+  "html-connection-test",
+  "html-agenda",
+  "html-step",
+  "html-photo-check",
+  "html-wrapup",
+  "html-checklist",
+  "html-rps",
   "pieces-status",
-  "notice",
   "question-buttons",
   "question-form",
   "question-photo",
-  "html-agenda",
-  "html-connection-test",
-  "html-step",
-  "html-photo-check",
-  "html-rps",
-  "html-wrapup",
-  "html-checklist",
+  "notice",
   "text-panel"
  ],
  "docs": {
@@ -137,13 +141,13 @@
    "url": "https://bridgit.cc/interactions/index.json"
   }
  },
- "documentation_revision": 126,
+ "documentation_revision": 127,
  "api_revision": 144,
  "sample_kinds": [
-  "pieces",
-  "notice",
-  "question",
   "html",
+  "pieces",
+  "question",
+  "notice",
   "text"
  ],
  "error_codes": 81,

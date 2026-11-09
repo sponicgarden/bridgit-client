@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bridgit form card</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #f4f1ff;
+    background: radial-gradient(120% 80% at 50% 0%, #3b2a7a 0%, #1a1440 55%, #0c1a2a 100%);
+    min-height: 100vh;
+  }
+  .card { max-width: 440px; margin: 0 auto; padding: 28px 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+  .pill { margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(255, 196, 92, .16); color: #ffc45c;
+    font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .medal { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 34px;
+    background: radial-gradient(circle at 35% 30%, #ffd27a, #ff7a45 60%, #c2366b);
+    box-shadow: 0 10px 30px rgba(255, 122, 69, .35), inset 0 2px 6px rgba(255, 255, 255, .35); }
+  h1 { margin: 0; font-size: 26px; line-height: 1.2; font-weight: 750; }
+  .lead { margin: 0; color: #e4defa; }
+  .fields { display: flex; flex-direction: column; gap: 14px; }
+  fieldset.field { margin: 0; min-width: 0; padding: 14px 16px; border-radius: 18px;
+    background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); }
+  fieldset.field.invalid { border-color: #ff9a9a; }
+  legend { padding: 0 6px; font-weight: 700; color: #fff; }
+  .hint { margin: 0 0 8px; font-size: 14px; color: #b9b0dc; }
+  .opts { display: flex; flex-direction: column; gap: 8px; }
+  .opt { position: relative; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 10px 14px; border-radius: 14px; cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .05); }
+  .opt input { position: absolute; opacity: 0; width: 100%; height: 100%; left: 0; top: 0; margin: 0; cursor: pointer; }
+  .mark { flex: none; width: 22px; height: 22px; border: 2px solid #b9b0dc; display: grid; place-items: center; font-size: 14px; line-height: 1; color: transparent; }
+  .opt.radio .mark { border-radius: 50%; }
+  .opt.check .mark { border-radius: 6px; }
+  .opt.on { border-color: #ffc45c; background: rgba(255, 196, 92, .14); }
+  .opt.on .mark { border-color: #ffc45c; background: #ffc45c; color: #1a1440; }
+  .opt:focus-within { outline: 3px solid #8fd0ff; outline-offset: 2px; }
+  input[type=text], textarea { width: 100%; font: inherit; color: #fff; min-height: 52px; padding: 12px 14px; border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, .28); background: rgba(0, 0, 0, .25); }
+  textarea { min-height: 110px; resize: vertical; }
+  ::placeholder { color: #9a92c4; }
+  input[type=text]:focus-visible, textarea:focus-visible, input[type=range]:focus-visible { outline: 3px solid #8fd0ff; outline-offset: 2px; }
+  input[type=range] { width: 100%; height: 44px; accent-color: #ff8a3d; }
+  .scale { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; color: #b9b0dc; }
+  .scale output { font-size: 22px; font-weight: 750; color: #fff; }
+  .error { margin: 8px 0 0; font-size: 14px; color: #ff9a9a; }
+  .error:empty { display: none; }
+  .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  button { font: inherit; font-weight: 650; border-radius: 16px; min-height: 52px; padding: 12px 16px; cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .06); color: #f4f1ff; }
+  button.primary { border: 0; color: #fff; background: linear-gradient(135deg, #ff8a3d, #ff3d77); box-shadow: 0 8px 22px rgba(255, 61, 119, .35); }
+  button.quiet { border: 0; background: none; min-height: 44px; color: #b9b0dc; font-weight: 500; }
+  button:focus-visible { outline: 3px solid #8fd0ff; outline-offset: 2px; }
+  button:disabled { opacity: .5; }
+  button:active:not(:disabled) { transform: scale(.98); }
+  .status { margin: 2px 0 0; min-height: 1.4em; font-size: 14px; color: #b9b0dc; text-align: center; }
+  .status.error { color: #ff9a9a; }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { button:active:not(:disabled) { transform: none; } }
+</style>
+</head>
+<body>
+<main class="card">
+  <header class="head">
+    <p class="pill" id="pill"></p>
+    <div class="medal" id="icon" aria-hidden="true"></div>
+    <h1 id="title"></h1>
+    <p class="lead" id="text"></p>
+  </header>
+  <div class="fields" id="fields"></div>
+  <div class="actions" id="actions"></div>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+</main>
+<script>
+// The card's content. Change only this object; the script below draws it.
+// fields: choice (pick one), multi (pick several), text, textarea, scale (a slider). Mark must-answer fields "required".
+// Answers are sent once. The agent reads answer.data = {"button": <id>, "values": {<field id>: value}, ...data}.
+// A choice or text value is a string, multi is a list of strings, scale is a number; empty optional fields are left out.
+var CARD = /*CARD*/{
+  "pill": "Quick questions",
+  "icon": "📝",
+  "title": "A few details",
+  "text": "",
+  "fields": [],
+  "submit": "Send",
+  "secondary": {"id": "skip", "label": "Not now"},
+  "data": {},
+  "sending": "Sending…",
+  "done_title": "Sent",
+  "done_text": "Your answers reached the agent."
+}/*END CARD*/;
+
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var status = $('status');
+  var getters = {};
+  var controls = [];
+  $('pill').textContent = CARD.pill || '';
+  $('pill').hidden = !CARD.pill;
+  $('icon').textContent = CARD.icon || '';
+  $('icon').hidden = !CARD.icon;
+  $('title').textContent = CARD.title || '';
+  $('text').textContent = CARD.text || '';
+  $('text').hidden = !CARD.text;
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function say(text, isError) {
+    status.textContent = text;
+    status.className = isError ? 'status error' : 'status';
+  }
+  function lock(on) { controls.forEach(function (c) { c.disabled = on; }); }
+
+  // One fieldset per field, so a screen reader announces the label with the group.
+  (CARD.fields || []).forEach(function (f, n) {
+    var box = el('fieldset', 'field');
+    var errorId = 'err-' + n;
+    box.appendChild(el('legend', '', f.label + (f.required ? ' *' : '')));
+    if (f.hint) box.appendChild(el('p', 'hint', f.hint));
+    var error = el('p', 'error');
+    error.id = errorId;
+    error.setAttribute('role', 'alert');
+    var get, focusTarget;
+    if (f.type === 'choice' || f.type === 'multi') {
+      var multi = f.type === 'multi';
+      var list = el('div', 'opts');
+      var inputs = [];
+      (f.options || []).forEach(function (option) {
+        var row = el('label', 'opt ' + (multi ? 'check' : 'radio'));
+        var input = document.createElement('input');
+        input.type = multi ? 'checkbox' : 'radio';
+        input.name = 'f' + n;
+        input.value = option;
+        input.setAttribute('aria-describedby', errorId);
+        input.addEventListener('change', function () {
+          inputs.forEach(function (i) { i.parentNode.classList.toggle('on', i.checked); });
+          box.classList.remove('invalid');
+          error.textContent = '';
+        });
+        row.appendChild(input);
+        row.appendChild(el('span', 'mark', '✓'));
+        row.appendChild(el('span', '', option));
+        list.appendChild(row);
+        inputs.push(input);
+        controls.push(input);
+      });
+      box.appendChild(list);
+      focusTarget = inputs[0];
+      get = function () {
+        var picked = inputs.filter(function (i) { return i.checked; }).map(function (i) { return i.value; });
+        return multi ? picked : (picked.length ? picked[0] : '');
+      };
+    } else if (f.type === 'scale') {
+      var min = f.min != null ? f.min : 1, max = f.max != null ? f.max : 10;
+      var slider = document.createElement('input');
+      slider.type = 'range';
+      slider.min = min; slider.max = max; slider.step = 1;
+      slider.value = f.value != null ? f.value : Math.round((min + max) / 2);
+      slider.setAttribute('aria-label', f.label);
+      var readout = el('output', '', slider.value);
+      slider.addEventListener('input', function () { readout.textContent = slider.value; });
+      var ends = el('div', 'scale');
+      ends.appendChild(el('span', '', f.low || String(min)));
+      ends.appendChild(readout);
+      ends.appendChild(el('span', '', f.high || String(max)));
+      box.appendChild(slider);
+      box.appendChild(ends);
+      controls.push(slider);
+      focusTarget = slider;
+      get = function () { return Number(slider.value); };
+    } else {
+      var field = f.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
+      if (f.type !== 'textarea') field.type = 'text';
+      field.placeholder = f.placeholder || '';
+      field.maxLength = f.max_length || 2000;
+      field.setAttribute('aria-label', f.label);
+      field.setAttribute('aria-describedby', errorId);
+      field.addEventListener('input', function () { box.classList.remove('invalid'); error.textContent = ''; });
+      box.appendChild(field);
+      controls.push(field);
+      focusTarget = field;
+      get = function () { return field.value.trim(); };
+    }
+    box.appendChild(error);
+    $('fields').appendChild(box);
+    getters[f.id] = { get: get, field: f, box: box, error: error, focus: focusTarget };
+  });
+
+  // Validation: required fields need an answer. The first problem is announced and focused.
+  function collect() {
+    var values = {}, firstBad = null;
+    Object.keys(getters).forEach(function (id) {
+      var g = getters[id], v = g.get();
+      var empty = Array.isArray(v) ? v.length === 0 : v === '';
+      if (g.field.required && empty) {
+        g.box.classList.add('invalid');
+        g.error.textContent = 'Please answer this one.';
+        if (!firstBad) firstBad = g;
+      } else if (!empty) {
+        values[id] = v;
+      }
+    });
+    return { values: values, bad: firstBad };
+  }
+
+  // Bridgit's bridge object; Bridgit 1.6.269 and older only name it window.Bridget.
+  var bridge = window.Bridgit || window.Bridget;
+  var waiting = null;
+
+  function send(id, checked) {
+    var out = checked ? collect() : { values: {}, bad: null };
+    if (out.bad) { say('Some answers are missing.', true); out.bad.focus.focus(); return; }
+    if (!bridge || typeof bridge.respond !== 'function') {
+      say('Preview only: open this card in Bridgit to answer.', true);
+      return;
+    }
+    var answer = { button: id, values: out.values };
+    var extra = CARD.data || {};
+    for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) answer[k] = extra[k];
+    lock(true);
+    say(CARD.sending || 'Sending…');
+    // A JSON string works on every Bridgit build; Bridgit 1.6.269 and older drop plain objects.
+    bridge.respond(JSON.stringify(answer));
+    // No confirmation after 8 s: let the owner try again.
+    waiting = setTimeout(function () {
+      lock(false);
+      say('Not confirmed yet. Tap again, or close the card.', true);
+    }, 8000);
+  }
+
+  var submit = el('button', 'primary', CARD.submit || 'Send');
+  submit.type = 'button';
+  submit.addEventListener('click', function () { send('submit', true); });
+  $('actions').appendChild(submit);
+  controls.push(submit);
+  if (CARD.secondary) {
+    var second = el('button', 'quiet', CARD.secondary.label);
+    second.type = 'button';
+    second.addEventListener('click', function () { send(CARD.secondary.id, false); });
+    $('actions').appendChild(second);
+    controls.push(second);
+  }
+
+  // Bridgit fires bridgit:answered on document once the answer is saved. preventDefault() keeps
+  // Bridgit's own confirmation panel away so this card can show its own.
+  document.addEventListener('bridgit:answered', function (event) {
+    event.preventDefault();
+    clearTimeout(waiting);
+    lock(true);
+    $('icon').hidden = false;
+    $('icon').textContent = '✓';
+    $('title').textContent = CARD.done_title || 'Sent';
+    $('text').hidden = !CARD.done_text;
+    $('text').textContent = CARD.done_text || '';
+    $('fields').hidden = true;
+    $('actions').hidden = true;
+    var ms = event.detail && event.detail.close_after_ms;
+    say(ms ? 'Closing in ' + Math.round(ms / 1000) + ' s.' : '');
+    // Bridgit shrinks the card a moment after the answer; bring the confirmation back into view then.
+    setTimeout(function () { $('title').scrollIntoView({ block: 'center' }); }, 400);
+  });
+})();
+</script>
+</body>
+</html>

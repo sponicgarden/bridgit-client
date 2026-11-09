@@ -329,7 +329,7 @@ object Endpoints {
     val FEEDBACK_TEAM_KEY = legacy(ISSUES_TEAM_KEY, "/feedback/team-key")
     val FEEDBACK_LEGACY = listOf(FEEDBACK_LIST, FEEDBACK_TEAM_KEY, FEEDBACK_GET, FEEDBACK_STATUS, FEEDBACK_FOLLOWUP, FEEDBACK_POST)
 
-    val INTERACTION_CREATE = EndpointSpec("POST", "/interactions", "interactions", "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Prefer a native question for simple choices, normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
+    val INTERACTION_CREATE = EndpointSpec("POST", "/interactions", "interactions", "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
         idempotent = true, privateFields = setOf("text", "image", "html"),
         body = listOf(
             Param("kind", "string", "notice (one-way), question, html (a card you draw; answer comes from Bridgit.respond), pieces (a card the phone draws from pieces and sources; no HTML) or text (a live text panel you stream into with /v1/text/stream)",

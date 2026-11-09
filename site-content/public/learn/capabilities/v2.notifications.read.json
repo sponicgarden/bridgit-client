@@ -15,7 +15,7 @@
   "required_arguments": [],
   "tool": "notification.list"
  }],
- "documentation_revision": 126,
+ "documentation_revision": 127,
  "api_revision": 144,
  "boundaries": "Private build only; owner grants and session/transport requirements apply. See control guide.",
  "examples_url": null,

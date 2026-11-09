@@ -26,7 +26,8 @@ struct LinkedDeviceAppletsView: View {
                     .font(.footnote).foregroundStyle(B.onSurfaceVariant).padding(12)
             }
             ScrollView {
-                LinkedAppletReadList(rows: live.applets.map { .init(id: $0.id, name: $0.name, kind: $0.kind, summary: $0.summary, running: $0.runningReported ? $0.running : nil, lastAt: $0.lastAt, sensors: $0.sensors) }, reported: live.appletsReported)
+                LinkedAppletReadList(rows: live.applets.map { .init(id: $0.id, name: $0.name, kind: $0.kind, summary: $0.summary, running: $0.runningReported ? $0.running : nil, lastAt: $0.lastAt, sensors: $0.sensors) }, reported: live.appletsReported,
+                                     gap: .init(device: live.device.name, reason: live.appletGapReason), retry: { await live.refresh(force: true) })
                     .padding(16)
             }
         }

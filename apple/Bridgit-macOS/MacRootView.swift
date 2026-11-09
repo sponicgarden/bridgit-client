@@ -505,6 +505,18 @@ private struct MacLinkedDeviceAppletsView: View {
         }
         return ([], false, false)
     }
+    /// Why the list is missing, so the empty state names a reason and a next step (A0244).
+    private var gapReason: LinkedAppletGap.Reason {
+        if model.paused { return .paused }
+        if model.problem != nil { return .unreachable }
+        if model.configuredAttachment != device.id { return .checking }
+        if device.pairing != nil { return !model.snapshot.isEmpty ? .notInReport : model.busy ? .checking : .unreachable }
+        if let account { return .noAccountReport(account.status_at.map { Date(timeIntervalSince1970: $0 / 1000) }) }
+        return model.busy ? .checking : .noAccountReport(nil)
+    }
+    private func retry() async {
+        if device.pairing != nil { await model.refreshSelected() } else { await model.refreshAccount() }
+    }
     var body: some View {
         let projection = reported
         VStack(alignment: .leading, spacing: 12) {
@@ -514,7 +526,8 @@ private struct MacLinkedDeviceAppletsView: View {
             } else if let at = account?.status_at {
                 Text("Account snapshot · " + Age.text(ms: at)).font(.caption).foregroundStyle(B.onSurfaceVariant)
             }
-            LinkedAppletReadList(rows: projection.rows, reported: projection.known)
+            LinkedAppletReadList(rows: projection.rows, reported: projection.known,
+                                 gap: .init(device: device.name, reason: gapReason), retry: retry)
         }
         .task(id: device.id) {
             guard model.configuredAttachment == device.id else { return }

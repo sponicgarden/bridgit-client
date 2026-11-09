@@ -146,7 +146,7 @@ object Demos {
         sb.appendLine()
         sb.appendLine("## 1. A few questions first")
         if (cards) {
-            sb.appendLine("All four go on one card; `GET /v1/interactions/{id}?wait=55` returns the answer. " +
+            sb.appendLine("All four go on one styled HTML form card (start from `GET /v1/samples?id=html-form`: choice fields `where`, `help`, `length`, a text field `today`, submit \"Show me\"; the answers are in `data.values`); `GET /v1/interactions/{id}?wait=55` returns the answer. The native card below is the fallback if HTML cards are unavailable. " +
                 "A control whose answer is already known can be left out.")
             sb.appendLine()
             sb.appendLine("```")

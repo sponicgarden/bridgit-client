@@ -26,7 +26,6 @@ import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -125,6 +124,48 @@ object CameraBlock {
             else -> null
         }
     }
+
+    /**
+     * A0253: how long the camera may wait to open with no error before the photo gives up. When another app already
+     * holds the camera, Android marks it unavailable and CameraX waits in PENDING_OPEN without trying to open it, so no
+     * error code ever arrives. Normal opens pass through PENDING_OPEN too (the first state reported, a front/rear
+     * switch while the previous camera closes), but for well under a second, so only an unbroken wait this long counts.
+     */
+    const val HELD_MS = 5_000L
+
+    fun held(rear: Boolean): ApiError = ApiError(409, "sensor_busy",
+        "The ${if (rear) "rear" else "front"} camera didn't open: something else on the phone is holding it (for example " +
+            "another app's camera or a \"take a picture\" screen). Ask the owner to close it, then retry.",
+        mapOf("reason" to "camera_held"))
+
+    /** CameraX state names for logs and the capture_timeout reply. */
+    fun name(type: androidx.camera.core.CameraState.Type?): String = type?.name?.lowercase() ?: "unknown"
+
+    /**
+     * The camera states seen during one photo, fed by CameraX ([update]) and asked by the photo's watcher ([verdict]).
+     * Times are the caller's clock in ms.
+     */
+    class Watch(private val rear: Boolean) {
+        private var err: ApiError? = null
+        private var errorSince: Long? = null
+        private var pendingSince: Long? = null
+        @Volatile var last: androidx.camera.core.CameraState.Type? = null; private set
+
+        @Synchronized fun update(type: androidx.camera.core.CameraState.Type, code: Int?, now: Long) {
+            last = type
+            val e = error(code, rear)
+            if (e == null) { err = null; errorSince = null } else { if (errorSince == null) errorSince = now; err = e }
+            val waiting = e == null && type == androidx.camera.core.CameraState.Type.PENDING_OPEN
+            if (!waiting) pendingSince = null else if (pendingSince == null) pendingSince = now
+        }
+
+        /** The error to end the photo with now, or null to keep waiting. */
+        @Synchronized fun verdict(now: Long): ApiError? {
+            errorSince?.let { if (now - it >= GRACE_MS) return err }
+            pendingSince?.let { if (now - it >= HELD_MS) return held(rear) }
+            return null
+        }
+    }
 }
 
 class CameraCapture(private val context: Context, private val owner: LifecycleOwner) {
@@ -202,8 +243,13 @@ class CameraCapture(private val context: Context, private val owner: LifecycleOw
                     delay(400) // let focus and exposure settle at the new zoom
                 }
                 // take() yields Result: success, or the capture error. null here means timeout.
-                val outcome = unlessTaken(w.camera, rear) { withTimeoutOrNull(20_000) { take(w.capture, file) } }
-                    ?: throw ApiError(504, "capture_timeout", "Camera did not produce a photo in time")
+                val watch = CameraBlock.Watch(rear)
+                val outcome = unlessTaken(w.camera, watch) { withTimeoutOrNull(20_000) { take(w.capture, file) } }
+                    ?: run {
+                        val state = CameraBlock.name(watch.last)
+                        android.util.Log.w(TAG, "capture_timeout camera_state=$state")
+                        throw ApiError(504, "capture_timeout", "Camera did not produce a photo in time", mapOf("camera_state" to state))
+                    }
                 outcome.exceptionOrNull()?.let { throw ApiError(409, "sensor_busy", "Capture failed: ${it.message}") }
                 android.util.Log.i(TAG, "snapshot saved")
             } finally {
@@ -221,20 +267,24 @@ class CameraCapture(private val context: Context, private val owner: LifecycleOw
      * A0064: while another app (the Camera app, a video call) holds the camera, Android refuses Bridgit's open and
      * CameraX keeps retrying quietly, so the photo used to wait the full 20 s and end in capture_timeout. Runs [block]
      * but fails with [CameraBlock]'s error once the camera has reported it for [CameraBlock.GRACE_MS] (a brief
-     * hand-over between apps still gets its photo).
+     * hand-over between apps still gets its photo). A0253: also fails once the camera has waited to open, with no
+     * error, for [CameraBlock.HELD_MS] (another app opened it first, so Android never lets Bridgit try).
      */
-    private suspend fun <T> unlessTaken(camera: Camera, rear: Boolean, block: suspend () -> T): T {
-        val blocked = kotlinx.coroutines.flow.MutableStateFlow<ApiError?>(null)
+    private suspend fun <T> unlessTaken(camera: Camera, watch: CameraBlock.Watch, block: suspend () -> T): T {
         val live = camera.cameraInfo.cameraState
-        val obs = androidx.lifecycle.Observer<androidx.camera.core.CameraState> { st -> blocked.value = CameraBlock.error(st.error?.code, rear) }
+        val obs = androidx.lifecycle.Observer<androidx.camera.core.CameraState> { st ->
+            watch.update(st.type, st.error?.code, android.os.SystemClock.elapsedRealtime())
+        }
         withContext(Dispatchers.Main) { live.observeForever(obs) }
         try {
             return kotlinx.coroutines.coroutineScope {
                 val watcher = launch {
                     while (true) {
-                        blocked.first { it != null }
-                        delay(CameraBlock.GRACE_MS)
-                        blocked.value?.let { android.util.Log.w(TAG, "camera held by another app: ${it.code}"); throw it }
+                        delay(250)
+                        watch.verdict(android.os.SystemClock.elapsedRealtime())?.let {
+                            android.util.Log.w(TAG, "camera unavailable: ${it.extra["reason"]} state=${CameraBlock.name(watch.last)}")
+                            throw it
+                        }
                     }
                 }
                 try { block() } finally { watcher.cancel() }

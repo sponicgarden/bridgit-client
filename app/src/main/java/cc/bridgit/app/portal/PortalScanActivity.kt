@@ -64,6 +64,11 @@ class PortalScanActivity : AppCompatActivity() {
         }
         b.toolbar.setNavigationOnClickListener { finish() }
         b.usePasted.setOnClickListener { use(b.link.text?.toString().orEmpty().trim()) }
+        // Opened by a tapped or system-scanned bridgitportal://pair link: show the same confirm as a scan, no camera needed.
+        val incoming = intent.takeIf { it.action == android.content.Intent.ACTION_VIEW && !satelliteMode }?.dataString
+        if (incoming != null && PortalData.parsePairLink(incoming) != null) {
+            found.set(true); b.link.setText(incoming); use(incoming); return
+        }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) startCamera()
         else askCamera.launch(Manifest.permission.CAMERA)
     }

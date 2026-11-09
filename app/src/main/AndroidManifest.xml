@@ -104,7 +104,15 @@
         <activity android:name=".relay.RelayActivity" android:exported="false" />
         <activity android:name=".portal.PortalActivity" android:exported="false" />
         <activity android:name=".portal.PairDeviceActivity" android:exported="false" />
-        <activity android:name=".portal.PortalScanActivity" android:exported="false" />
+        <!-- A scanned or tapped bridgitportal://pair#… link (the pairing QR) opens the confirm dialog; nothing is saved until the owner agrees. -->
+        <activity android:name=".portal.PortalScanActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="bridgitportal" android:host="pair" />
+            </intent-filter>
+        </activity>
         <!-- Bridgit Satellites: the hub's screen; a tapped bridgit://satellite#… pairing link opens it (the owner confirms before anything is claimed). -->
         <activity android:name=".satellite.SatelliteActivity" android:exported="true">
             <intent-filter>

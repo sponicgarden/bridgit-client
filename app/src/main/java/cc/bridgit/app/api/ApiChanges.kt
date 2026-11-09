@@ -634,6 +634,9 @@ object ApiChanges {
             Item("API registry: every API group with its fixed name and number, its calls, and the permission that governs it", "/v1/registry"),
             Item("API access: one permission per agent over the whole API, on by default. Off refuses every call with forbidden, reason api_access_off, while the agent stays paired. Read it as api_access in owner configuration access; a Super agent changes it with api_access on access/agents/{agent}. Access changes made through the API are logged as the agent that made them", "/v1/owner/configuration/access/agents/{agent}"),
         )),
+        Revision(139, "1.8.0", "2026-11-09", listOf(
+            Item("Outlet flow log: every LAN device enroll, action (relay_on, relay_off, status, device-pack actions) and removal is logged as it happens: a started entry before anything reaches the device, any bind or retry step, and the outcome (ok, failed or unknown_outcome with the error), all sharing one op_id, with the trigger (agent, transport, request id) and the device. Read your own with GET /v1/lan/devices/log; the log grant also sees them in GET /v1/log?kind=lan", "/v1/lan/devices/log"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

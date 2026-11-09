@@ -1,6 +1,6 @@
 {
- "documentation_revision": 119,
- "api_revision": 138,
+ "documentation_revision": 120,
+ "api_revision": 139,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Who checks a photo sent with POST /v1/portal/photo: each agent (usually an installed applet) with a watch that checks photos, and the owner's last pick on the phone's Camera tab. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only.",

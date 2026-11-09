@@ -1,6 +1,6 @@
 {
- "documentation_revision": 119,
- "api_revision": 138,
+ "documentation_revision": 120,
+ "api_revision": 139,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Check the software manifest now instead of waiting for the daily check; engines in use update to their newest version (on Wi-Fi)",

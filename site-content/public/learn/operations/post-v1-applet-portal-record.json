@@ -1,6 +1,6 @@
 {
- "documentation_revision": 119,
- "api_revision": 138,
+ "documentation_revision": 120,
+ "api_revision": 139,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "From an installed applet's card: send one result to the applet's private web portal (the kind its package declares in ui.portal.records, e.g. a workout). Words and numbers only, never free text or pictures; it goes only while the owner has the applet's web portal on",

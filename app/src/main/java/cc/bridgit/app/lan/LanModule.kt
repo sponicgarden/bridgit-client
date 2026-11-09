@@ -4,6 +4,7 @@ import cc.bridgit.app.BridgeApp
 import cc.bridgit.app.R
 import cc.bridgit.app.api.*
 import cc.bridgit.app.capability.Capability
+import cc.bridgit.app.capability.isoAt
 import cc.bridgit.app.lancamera.LanCamera
 import cc.bridgit.app.lancamera.Onvif
 import cc.bridgit.app.lan.packs.DevicePackStore
@@ -66,6 +67,30 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
             } }
         } finally { operationLock.unlock() }
     }
+    /** A0100: the outlet flow's runtime log. One operation per enroll, action or removal; see [LanActionLog]. */
+    private fun lanOp(req: Req, op: String, action: String?, channel: Int?, params: JSONObject?) = LanActionLog.Op(
+        { app.log.append(it) },
+        LanActionLog.Trigger(req.agent?.id ?: "", req.agentName, req.invocation, req.requestId, req.spec.method, req.spec.fullPath),
+        op, action, channel, params)
+
+    /** Writes [op]'s started entry, runs [block], then its outcome; the error (or timeout) still reaches the caller. */
+    private suspend fun logged(op: LanActionLog.Op, result: (JSONObject) -> JSONObject? = { it.optJSONObject("result") }, block: suspend () -> Reply): Reply {
+        op.started()
+        try {
+            val reply = block()
+            op.ok((reply as? Reply.Json)?.body?.let(result))
+            return reply
+        } catch (e: TimeoutCancellationException) {
+            op.failed("timed_out", "The LAN operation reached its 25 s limit.", 504); throw e
+        } catch (e: CancellationException) {
+            op.failed("cancelled", "The request was cancelled.", 499); throw e
+        } catch (e: ApiError) {
+            op.failed(e.code, e.message ?: e.code, e.http); throw e
+        } catch (e: Exception) {
+            op.failed("internal", e.javaClass.simpleName, 500); throw e
+        }
+    }
+
     override fun Route.install(api: ApiServer) = with(api) {
         fun Route.lanEndpoint(spec: EndpointSpec, block: suspend Req.() -> Reply) {
             if (spec.capability == id) endpoint(spec, block = block)
@@ -89,6 +114,22 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
                 if (d.adapter in LanRules.adapters) d.publicJson() else d.publicJson(packs.installed(d.adapter)?.actions?.map { it.name }.orEmpty()) }))
                 .put("adapters", adapterSchemas(packs)).put("device_packs", PACKS.fullPath).put("camera_inventory", "/v1/lan-cameras"))
         }
+        lanEndpoint(ACTION_LOG) {
+            authorize(this)
+            fun text(name: String, max: Int) = query(name)?.takeIf { it.isNotEmpty() }?.also {
+                if (it.length > max) throw ErrorCatalog.error("invalid_parameter", "$name is too long.")
+            }
+            val limit = query("limit")?.let { it.toIntOrNull()?.takeIf { n -> n in 1..500 } ?: throw ErrorCatalog.error("invalid_parameter", "limit must be 1 to 500.") } ?: 100
+            val order = query("order") ?: "desc"
+            if (order != "asc" && order != "desc") throw ErrorCatalog.error("invalid_parameter", "order must be asc or desc.")
+            val since = query("since")?.let { it.toLongOrNull()?.takeIf { n -> n >= 0 } ?: throw ErrorCatalog.error("invalid_parameter", "since must be a log entry id.") }
+            val cursor = query("cursor")?.let { cc.bridgit.app.log.LogQuery.decodeCursor(it) ?: throw ErrorCatalog.error("invalid_parameter", "cursor is not valid.") }
+            val out = withContext(Dispatchers.IO) {
+                LanActionLog.read({ app.log.query(it) }, agent!!.id, text("device", 80), text("op_id", 40), since, limit, order == "asc", cursor, ::isoAt)
+            }
+            params.put("returned", out.getInt("count"))
+            Reply.Json(out)
+        }
         lanEndpoint(PACKS) {
             authorize(this)
             Reply.Json(withContext(Dispatchers.IO) { DevicePackStore.get(app).status() })
@@ -108,7 +149,10 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
         }
         lanEndpoint(ENROLL) {
             val req = this
-            operation(req) { lan ->
+            val op = lanOp(req, "enroll", null, null, JSONObject().put("host", body.optString("host")).put("adapter", body.optString("adapter"))
+                .put("name", body.optString("name")).put("allow_http", body.opt("allow_http") == true))
+                .device("new", body.optString("name").ifBlank { null }, body.optString("adapter").ifBlank { null }, body.optString("host").ifBlank { null })
+            logged(op, { it.optJSONObject("verification") }) { operation(req) { lan ->
                 val host = body.getString("host"); lan.check(host)
                 val adapter = body.getString("adapter")
                 val isPack = adapter !in LanRules.adapters
@@ -150,19 +194,28 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
                 }
                 try { app.lanDevices.save(device) }
                 catch (e: Exception) { camera?.let { app.lanCameras.remove(it.id) }; throw e }
+                op.device(device)
                 device.publicJson().put("availability", "online").put("verification", result)
-            }
+            } }
         }
         lanEndpoint(REMOVE) {
-            authorize(this)
-            val d = owned(body.getString("device"), agent!!.id)
-            app.lanDevices.remove(d.id)
-            app.appDevices.remove(d.id)
-            Reply.Json(JSONObject().put("removed", d.id).put("camera_note", "Existing Devices-tab entries are managed separately by the owner."))
+            val op = lanOp(this, "remove", null, null, JSONObject().put("device", body.optString("device")))
+            knownDevice(op, body.optString("device"), agent?.id)
+            logged(op, { null }) {
+                authorize(this)
+                val d = owned(body.getString("device"), agent!!.id)
+                app.lanDevices.remove(d.id)
+                app.appDevices.remove(d.id)
+                Reply.Json(JSONObject().put("removed", d.id).put("camera_note", "Existing Devices-tab entries are managed separately by the owner."))
+            }
         }
         lanEndpoint(ACTION) {
             val req = this
-            operation(req) { lan ->
+            val op = lanOp(req, "action", body.optString("action").ifEmpty { null }, (body.opt("channel") as? Number)?.toInt() ?: 0,
+                JSONObject().put("device", body.optString("device")).put("action", body.optString("action"))
+                    .put("channel", body.opt("channel") ?: JSONObject.NULL).put("params", body.opt("params") ?: JSONObject.NULL))
+            knownDevice(op, body.optString("device"), agent?.id)
+            logged(op) { operation(req) { lan ->
                 val d = owned(body.getString("device"), agent!!.id); lan.check(d.host)
                 val action = body.getString("action")
                 val channel = if (!body.has("channel")) 0 else {
@@ -174,14 +227,14 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
                 val params = if (!body.has("params")) JSONObject() else body.get("params") as? JSONObject
                     ?: throw PackEngine.PackError("params must be an object.", false)
                 if (!isPack && params.length() > 0) throw PackEngine.PackError("This adapter's actions take no params.", false)
-                val result = if (isPack) runPack(req, lan, d, action, params)
+                val result = if (isPack) runPack(req, lan, d, action, params, op)
                 else if (d.adapter == "tapo_onvif") {
                     val c = LanCamera("lan:probe", d.name, d.host, d.username, d.password)
                     cameraAuthorized(req)
                     val info = Onvif(c, app) { owned(d.id, agent!!.id); cameraAuthorized(req) }.info(); JSONObject().put("model", info.model).put("relative_ptz", info.ptz)
                 } else LanAdapters.adapter(d.adapter, LanAdapters.transport(lan, d) { owned(d.id, agent!!.id); authorize(req) }).execute(d, action, channel)
                 JSONObject().put("device", d.id).put("action", action).put("availability", "online").put("checked_at", System.currentTimeMillis()).put("result", result)
-            }
+            } }
         }
     }
     /**
@@ -189,7 +242,7 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
      * (it moved port after a restart) Bridgit finds it again by SSDP, checks it is the same device (UDN), saves the
      * new addresses and retries once. A timeout is not retried: the outcome is unknown.
      */
-    private fun runPack(req: Req, lan: HostLan, d: LanDevice, action: String, params: JSONObject): JSONObject {
+    private fun runPack(req: Req, lan: HostLan, d: LanDevice, action: String, params: JSONObject, op: LanActionLog.Op): JSONObject {
         val packs = DevicePackStore.get(app)
         val pack = packs.pack(d.adapter)
         val net = LanPackNet(lan) { owned(d.id, req.agent!!.id); authorize(req) }
@@ -200,15 +253,23 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
             return b
         }
         val stored = PackEngine.Bound.read(d.extra.optJSONObject("bound"))
-        val bound = if (stored == null || pack.describe.services.keys.any { it !in stored.controls }) rebind() else stored
+        val bound = if (stored == null || pack.describe.services.keys.any { it !in stored.controls }) {
+            op.step("bind", "looked up the device's control addresses (${pack.id} ${pack.version})"); rebind()
+        } else stored
         val out = try { PackEngine.run(pack, bound, action, params, net) }
             catch (e: cc.bridgit.app.core.SafeHttp.Failure) {
                 if (e.reason != cc.bridgit.app.core.SafeHttp.Reason.CONNECT) throw e
+                op.step("retry", "the device refused the connection; finding it again and retrying once")
                 PackEngine.run(pack, rebind(), action, params, net)
             }
         if (d.extra.optString("pack_version") != pack.version && bound === stored)
             app.lanDevices.save(d.with(JSONObject(d.extra.toString()).put("pack_version", pack.version)))
         return out.put("pack", pack.id).put("pack_version", pack.version)
+    }
+    /** Names the device in the log before the operation starts, when it is this agent's enrollment. */
+    private fun knownDevice(op: LanActionLog.Op, id: String, agentId: String?) {
+        val d = runCatching { app.lanDevices.all().firstOrNull { it.id == id && it.agentId == agentId } }.getOrNull()
+        if (d != null) op.device(d) else if (id.isNotEmpty()) op.device(id)
     }
     private fun owned(id: String, agentId: String) = app.lanDevices.all().firstOrNull { it.id == id && it.agentId == agentId }
         ?: throw ErrorCatalog.error("not_found", "No device enrolled for this agent. Use GET /v1/lan/devices.")
@@ -265,11 +326,17 @@ class LanModule(app: BridgeApp, override val id: String) : Capability(app) {
             body = listOf(Param("device", "string", "Enrolled device id", true), Param("action", "string", "Use this device's advertised actions (built-in: status, relay_on, relay_off, dhcp_leases; packs list theirs in GET /v1/lan/devices adapters)", true), Param("channel", "integer", "Shelly relay channel 0..3; must be advertised by device; default 0"),
                 Param("params", "object", "Device-pack action parameters, e.g. {\"url\":\"https://example.com/chime.mp3\"} for play or {\"level\":30} for volume_set")),
             example = "POST /v1/lan/devices/action {\"device\":\"net:example\",\"action\":\"volume_set\",\"params\":{\"level\":25}}", returns = "device, action, availability=online, checked_at, result; failures do not prove offline. Camera snapshots/move use existing lan_camera endpoints.")
+        val ACTION_LOG = EndpointSpec("GET", "/lan/devices/log", "lan_control", "The runtime log of this agent's device operations (outlet flow): every enroll, action and removal, in order, with trigger, device and outcome",
+            query = listOf(Param("device", "string", "Only this enrolled device id"), Param("op_id", "string", "Only the entries of one operation"),
+                Param("since", "integer", "Only entries after this log id"), Param("order", "string", "desc (newest first, default) or asc"),
+                Param("limit", "integer", "1..500, default 100"), Param("cursor", "string", "next_cursor from the previous page; keep the same filters")),
+            example = "GET /v1/lan/devices/log?device=net:example&order=asc",
+            returns = "entries[id,ts,op_id,op(enroll|action|remove),phase(started|bind|retry|ok|failed|unknown_outcome),outcome,action,channel,device{id,name,adapter,host},trigger{agent_id,agent,via,request_id,method,endpoint},params,result,error,error_message,duration_ms,level,message], count, next_cursor, order, retention. Each operation writes started before anything reaches the device and one final entry; unknown_outcome means the device may have changed. Only your own entries; no credentials; URLs keep no query. Owner log retention applies; the same entries are in GET /v1/log?kind=lan")
         val PACKS = EndpointSpec("GET", "/lan/packs", "lan_discovery", "Device packs: downloadable device-family support, its versions and update state; no network scan",
             example = "GET /v1/lan/packs", returns = "engine_version, channel, index{serial,published_at,checked_at,last_error}, auto_update, packs[id,title,latest_version,installed_version,state,reason,match_services,actions]")
         val PACKS_CHECK = EndpointSpec("POST", "/lan/packs/check", "lan_discovery", "Check for device-pack updates now (at most once a minute) and update installed packs", idempotent = true,
             example = "POST /v1/lan/packs/check {}", returns = "Same as GET /v1/lan/packs; a failed check keeps the last good list and installed packs")
-        val ALL = listOf(REMEMBERED, CATALOG, BRAND_LOGO, DISCOVER, INVENTORY, ENROLL, REMOVE, ACTION, PACKS, PACKS_CHECK)
+        val ALL = listOf(REMEMBERED, CATALOG, BRAND_LOGO, DISCOVER, INVENTORY, ENROLL, REMOVE, ACTION, ACTION_LOG, PACKS, PACKS_CHECK)
         fun adapterSchemas(packs: DevicePackStore) = JSONArray(LanRules.adapters.map { id -> JSONObject().put("id", id).put("actions", JSONArray(LanRules.actions(id)))
             .put("implemented", true).put("enrollment", ENROLL.fullPath)
             .put("limitations", when (id) { "shelly_gen1" -> "Gen1 HTTP Basic or no auth; relay devices only, 1..4 channels; MAC checked before control"

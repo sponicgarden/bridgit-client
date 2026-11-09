@@ -26,10 +26,20 @@
    "control_scope": null,
    "requires_power": null,
    "tool": "lan_devices_action"
+  },
+  {
+   "summary": "The runtime log of this agent's device operations (outlet flow): every enroll, action and removal, in order, with trigger, device and outcome",
+   "path": "/v1/lan/devices/log",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-devices-log.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-devices-log.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "lan_devices_log"
   }
  ],
- "documentation_revision": 119,
- "api_revision": 138,
+ "documentation_revision": 120,
+ "api_revision": 139,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.lan_control",

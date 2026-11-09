@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 138. Full index: https://bridgit.cc/learn/index.json.
+API revision 139. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -109,6 +109,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `lan_devices_enroll` | `POST /v1/lan/devices/enroll` | Verify a supported device with authorized credentials and enroll it for this agent |
 | `lan_devices_remove` | `POST /v1/lan/devices/remove` | Forget this agent's enrollment and stored credentials |
 | `lan_devices_action` | `POST /v1/lan/devices/action` | Run a fixed supported action on this agent's enrolled device |
+| `lan_devices_log` | `GET /v1/lan/devices/log` | The runtime log of this agent's device operations (outlet flow): every enroll, action and removal, in order, with trigger, device and outcome |
 | `lan_packs` | `GET /v1/lan/packs` | Device packs: downloadable device-family support, its versions and update state; no network scan |
 | `lan_packs_check` | `POST /v1/lan/packs/check` | Check for device-pack updates now (at most once a minute) and update installed packs |
 | `lan_cameras` | `GET /v1/lan-cameras` | Owner-configured local cameras (no credentials) |

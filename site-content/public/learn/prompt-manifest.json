@@ -8,7 +8,7 @@
  "inputs": {
   "app/build.gradle.kts": "b538e08ff422cc676cfc1e9475e63f555a1c511b2380469035a1303287933f5f",
   "tools/bridgit": "51cdb509b66428a147926f5d1a92aa6498d2a7514b45cdc04e7331243640333a",
-  "app/src/main/java/cc/bridgit/app/api/SelfDescription.kt": "15cd8bf9b273b1fb62bdbefea5cdc24863dcaeaeab1580112df3a9a1a2393208",
+  "app/src/main/java/cc/bridgit/app/api/SelfDescription.kt": "335d0ed0e9288dad6ce2d666296fe56237efe1f57cf60d528cd595bedcfe73e2",
   "app/src/main/java/cc/bridgit/app/adb/AdbSetupHelp.kt": "abc90047e9d71b9cc918a16de6790eae11558b91e4cd475174b4600749557a7e",
   "app/src/test/java/cc/bridgit/app/api/LearnTest.kt": "9aa584d5e21eea3a027bb8dd5f9be7034e3b0d8bdb2b25401d0758ceadc5923a",
   "app/src/main/java/cc/bridgit/app/api/Playbook.kt": "28d2aa0d5324cd5b09e4de7855dc71539851d3336c42eccb4742d9282172535a",

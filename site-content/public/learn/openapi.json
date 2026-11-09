@@ -1346,6 +1346,63 @@
    },
    "tags": ["adb"]
   }},
+  "/v1/lan/devices/log": {"get": {
+   "summary": "The runtime log of this agent's device operations (outlet flow): every enroll, action and removal, in order, with trigger, device and outcome",
+   "operationId": "getLanDevicesLog",
+   "responses": {
+    "200": {"description": "entries[id,ts,op_id,op(enroll|action|remove),phase(started|bind|retry|ok|failed|unknown_outcome),outcome,action,channel,device{id,name,adapter,host},trigger{agent_id,agent,via,request_id,method,endpoint},params,result,error,error_message,duration_ms,level,message], count, next_cursor, order, retention. Each operation writes started before anything reaches the device and one final entry; unknown_outcome means the device may have changed. Only your own entries; no credentials; URLs keep no query. Owner log retention applies; the same entries are in GET /v1/log?kind=lan"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "query",
+     "name": "device",
+     "description": "Only this enrolled device id",
+     "required": false
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "query",
+     "name": "op_id",
+     "description": "Only the entries of one operation",
+     "required": false
+    },
+    {
+     "schema": {"type": "integer"},
+     "in": "query",
+     "name": "since",
+     "description": "Only entries after this log id",
+     "required": false
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "query",
+     "name": "order",
+     "description": "desc (newest first, default) or asc",
+     "required": false
+    },
+    {
+     "schema": {"type": "integer"},
+     "in": "query",
+     "name": "limit",
+     "description": "1..500, default 100",
+     "required": false
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "query",
+     "name": "cursor",
+     "description": "next_cursor from the previous page; keep the same filters",
+     "required": false
+    }
+   ],
+   "tags": ["lan_control"]
+  }},
   "/v1/camera/pose/{id}": {"get": {
    "summary": "Read a body tracking session: its state and the frames since an index (each frame is the 33 points as [x, y, v, ...]: x and y fractions of the upright picture, v how sure the point is in view), plus the latest preview picture",
    "operationId": "getCameraPoseId",
@@ -12335,7 +12392,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 138,
+  "x-api-revision": 139,
   "title": "Bridgit",
   "version": "1.8.0"
  }

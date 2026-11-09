@@ -1,0 +1,90 @@
+{
+ "documentation_revision": 120,
+ "api_revision": 139,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "The runtime log of this agent's device operations (outlet flow): every enroll, action and removal, in order, with trigger, device and outcome",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "lan_devices_log",
+  "query": [
+   {
+    "name": "device",
+    "description": "Only this enrolled device id",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "op_id",
+    "description": "Only the entries of one operation",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "since",
+    "description": "Only entries after this log id",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "order",
+    "description": "desc (newest first, default) or asc",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "1..500, default 100",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "cursor",
+    "description": "next_cursor from the previous page; keep the same filters",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/lan/devices/log?device=net:example&order=asc",
+  "idempotent": false,
+  "path": "/v1/lan/devices/log",
+  "capability": "lan_control",
+  "returns": "entries[id,ts,op_id,op(enroll|action|remove),phase(started|bind|retry|ok|failed|unknown_outcome),outcome,action,channel,device{id,name,adapter,host},trigger{agent_id,agent,via,request_id,method,endpoint},params,result,error,error_message,duration_ms,level,message], count, next_cursor, order, retention. Each operation writes started before anything reaches the device and one final entry; unknown_outcome means the device may have changed. Only your own entries; no credentials; URLs keep no query. Owner log retention applies; the same entries are in GET /v1/log?kind=lan",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "cursor": {
+     "description": "next_cursor from the previous page; keep the same filters",
+     "type": "string"
+    },
+    "limit": {
+     "description": "1..500, default 100",
+     "type": "integer"
+    },
+    "op_id": {
+     "description": "Only the entries of one operation",
+     "type": "string"
+    },
+    "device": {
+     "description": "Only this enrolled device id",
+     "type": "string"
+    },
+    "since": {
+     "description": "Only entries after this log id",
+     "type": "integer"
+    },
+    "order": {
+     "description": "desc (newest first, default) or asc",
+     "type": "string"
+    }
+   },
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

@@ -2054,6 +2054,16 @@
      "control_scope": null,
      "requires_power": null,
      "tool": "lan_devices_action"
+    },
+    {
+     "summary": "The runtime log of this agent's device operations (outlet flow): every enroll, action and removal, in order, with trigger, device and outcome",
+     "path": "/v1/lan/devices/log",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-devices-log.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-devices-log.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "lan_devices_log"
     }
    ],
    "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
@@ -7313,6 +7323,16 @@
      "control_scope": null,
      "requires_power": null,
      "tool": "lan_devices_action"
+    },
+    {
+     "summary": "The runtime log of this agent's device operations (outlet flow): every enroll, action and removal, in order, with trigger, device and outcome",
+     "path": "/v1/lan/devices/log",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-lan-devices-log.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-lan-devices-log.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "lan_devices_log"
     }
    ],
    "boundaries": "Listing does not test devices: availability=not_checked is not online. Discovery is partial and unverified; enrollment is separate. No enrollment credentials are embedded. No relay switch, motor, light or other physical action is run by the template.",
@@ -7591,8 +7611,8 @@
   "kind": "source_generated",
   "released": "Check public updater manifest; source documentation is not release evidence."
  },
- "documentation_revision": 119,
- "api_revision": 138,
+ "documentation_revision": 120,
+ "api_revision": 139,
  "installed_api_revision": null,
  "categories": [
   "sense",

@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 138). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 139). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,12 +14,11 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 138 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 139 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 138
-- API registry: every API group with its fixed name and number, its calls, and the permission that governs it (`/v1/registry`)
-- API access: one permission per agent over the whole API, on by default. Off refuses every call with forbidden, reason api_access_off, while the agent stays paired. Read it as api_access in owner configuration access; a Super agent changes it with api_access on access/agents/{agent}. Access changes made through the API are logged as the agent that made them (`/v1/owner/configuration/access/agents/{agent}`)
+## New in revision 139
+- Outlet flow log: every LAN device enroll, action (relay_on, relay_off, status, device-pack actions) and removal is logged as it happens: a started entry before anything reaches the device, any bind or retry step, and the outcome (ok, failed or unknown_outcome with the error), all sharing one op_id, with the trigger (agent, transport, request id) and the device. Read your own with GET /v1/lan/devices/log; the log grant also sees them in GET /v1/log?kind=lan (`/v1/lan/devices/log`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -95,6 +94,7 @@ GET /v1/lan/discovered lists remembered devices on the current LAN without scann
 GET /v1/lan/devices returns this agent's enrolled devices, adapters and exact action bodies. POST /v1/lan/devices/enroll takes host, name, adapter and authorized local username/password. Credentials are encrypted privately with Android Keystore, excluded from backup and logs, and never returned. Enrollment verifies the protocol before saving. Default HTTPS uses normal certificate validation; allow_http=true explicitly permits cleartext LAN HTTP and credentials. No guessed passwords or authentication bypass. Device grants belong to the enrolling agent; other agents cannot list, control or remove them. POST /v1/lan/devices/remove forgets its enrollment and credentials; existing Cameras-tab records remain owner-managed.
 Adapters: shelly_gen1 supports authenticated HTTP Basic or unauthenticated Gen1 relay devices with status, relay_on and relay_off, channel 0..3 only when advertised; MAC identity is checked before control. openwrt_ubus logs into rpcd with authorized credentials, reads system.board (status) or dhcp.ipv4leases (dhcp_leases) and closes its short session; grant read-only ACLs. DHCP leases are not online evidence. No router configuration changes or arbitrary RPC. tapo_onvif verifies the existing fixed ONVIF port 2020 and RTSP stream1/2 camera integration, then adds it to Cameras. It also needs the existing lan_camera grant and switch. Camera snapshots, pan/tilt and capture policies remain at /v1/lan-cameras/snapshot and /move, never through the general control grant. General ONVIF control and Tapo cloud-service control, Shelly Gen2+, and other router brands are unsupported.
 POST /v1/lan/devices/action takes device, action and optional channel. Use advertised actions only; send Idempotency-Key on enrollment, removal and actions. Inventory availability is not_checked; successful actions report online at checked_at. A failure or silence does not establish offline state; a timed-out mutation may have unknown outcome. No operation claims that arbitrary discovered devices are controllable. HTTP and MCP share these endpoints and authorization.
+Every enrollment, action and removal is logged as it happens (the outlet flow log): a started entry before anything reaches the device, any bind or retry step, then ok, failed or unknown_outcome with the error, all with one op_id, the trigger (agent, transport, request id) and the device. GET /v1/lan/devices/log?device=<id>&order=asc reads your own entries; credentials are never logged and URLs lose their query. The owner sees the same entries on the Activity screen, and the log grant reads them with GET /v1/log?kind=lan.
 
 ## Endpoints
 
@@ -613,6 +613,12 @@ Body (JSON): `device` (required) Enrolled device id; `action` (required) Use thi
 Returns: device, action, availability=online, checked_at, result; failures do not prove offline. Camera snapshots/move use existing lan_camera endpoints..
 Accepts `Idempotency-Key`.
 Example: `POST /v1/lan/devices/action {"device":"net:example","action":"volume_set","params":{"level":25}}`
+
+### `GET /v1/lan/devices/log`
+The runtime log of this agent's device operations (outlet flow): every enroll, action and removal, in order, with trigger, device and outcome.
+Query: `device` Only this enrolled device id; `op_id` Only the entries of one operation; `since` Only entries after this log id; `order` desc (newest first, default) or asc; `limit` 1..500, default 100; `cursor` next_cursor from the previous page; keep the same filters.
+Returns: entries[id,ts,op_id,op(enroll|action|remove),phase(started|bind|retry|ok|failed|unknown_outcome),outcome,action,channel,device{id,name,adapter,host},trigger{agent_id,agent,via,request_id,method,endpoint},params,result,error,error_message,duration_ms,level,message], count, next_cursor, order, retention. Each operation writes started before anything reaches the device and one final entry; unknown_outcome means the device may have changed. Only your own entries; no credentials; URLs keep no query. Owner log retention applies; the same entries are in GET /v1/log?kind=lan.
+Example: `GET /v1/lan/devices/log?device=net:example&order=asc`
 
 ### `GET /v1/lan/packs`
 Device packs: downloadable device-family support, its versions and update state; no network scan.

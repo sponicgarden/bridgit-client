@@ -1,6 +1,6 @@
 {
- "documentation_revision": 119,
- "api_revision": 138,
+ "documentation_revision": 120,
+ "api_revision": 139,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Find things in a photo and get their boxes: \"the dog\", \"each dirty dish\", \"the face of each person\". Faces are found on the phone; anything else by a cheap cloud vision model (shares the Jev/Clef budget)",

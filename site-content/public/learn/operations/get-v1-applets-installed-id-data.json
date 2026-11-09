@@ -1,6 +1,6 @@
 {
- "documentation_revision": 119,
- "api_revision": 138,
+ "documentation_revision": 120,
+ "api_revision": 139,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Discover an applet's saved data without running it: uniform schemas, row counts, choice/status counts, batch outcomes, export and original-photo URLs. Works for existing and future templates; owner control keys need no extra approval",

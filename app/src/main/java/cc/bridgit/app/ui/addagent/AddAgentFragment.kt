@@ -318,16 +318,18 @@ class AddAgentFragment : Fragment() {
 
     private fun renderConnection() {
         val ctx = requireContext()
+        // The chat apps' connector picks never reach this step (Next goes straight to their setup).
+        b.cardClaude.isVisible = false
+        b.cardChatgpt.isVisible = false
         b.cardUserspace.isVisible = vm.connection != Connection.RELAY &&
             (vm.connectionAdvanced || vm.connection == Connection.USERSPACE)
         b.connectionAdvanced.isVisible = vm.connection != Connection.RELAY
         connectionCards().forEach { (card, choice) ->
             val on = vm.connection == choice.first && vm.connector == choice.second
             card.isChecked = on
-            card.strokeWidth = ctx.dp(if (on) 2 else 1)
-            card.strokeColor = ctx.themeColor(if (on) M.attr.colorPrimary else M.attr.colorOutlineVariant)
+            card.strokeWidth = 0
             card.setCardBackgroundColor(if (on) ctx.themeColor(M.attr.colorPrimaryContainer)
-                else ctx.themeColor(M.attr.colorSurface))
+                else android.graphics.Color.TRANSPARENT)
             // The checked card's own state layer greys the container in light mode; the fill and stroke show selection.
             card.setCardForegroundColor(android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT))
         }
@@ -414,13 +416,9 @@ class AddAgentFragment : Fragment() {
                 if (!vm.validateName()) { b.nameLayout.error = vm.nameError; return }
                 b.nameLayout.error = null
                 hideKeyboard()
-                vm.step.value = 2
+                if (vm.connector != null) openRelay() else vm.step.value = 2
             }
-            2 -> if (vm.connection == Connection.RELAY) {
-                startActivity(Intent(requireContext(), cc.bridgit.app.relay.RelayActivity::class.java)
-                    .putExtra("suggested_name", vm.name.trim())
-                    .putExtra(cc.bridgit.app.relay.RelayActivity.EXTRA_CONNECTOR, vm.connector?.name))
-            } else vm.step.value = 3
+            2 -> if (vm.connection == Connection.RELAY) openRelay() else vm.step.value = 3
             3 -> {
                 if (!vm.checks.value.canContinue) return
                 cc.bridgit.app.security.OwnerCheck.run(this, getString(R.string.settings_max_control)) {
@@ -434,6 +432,13 @@ class AddAgentFragment : Fragment() {
                 }
             }
         }
+    }
+
+    /** The relay screen: where Relay and the chat apps' connectors (Claude Duet, ChatGPT Dots) are set up. */
+    private fun openRelay() {
+        startActivity(Intent(requireContext(), cc.bridgit.app.relay.RelayActivity::class.java)
+            .putExtra("suggested_name", vm.name.trim())
+            .putExtra(cc.bridgit.app.relay.RelayActivity.EXTRA_CONNECTOR, vm.connector?.name))
     }
 
     private fun onBack() {
@@ -543,17 +548,28 @@ class AddAgentFragment : Fragment() {
     private fun renderPowers() {
         if (_b == null) return
         val panel = b.powers.root
+        val row = b.powersRow
         val id = vm.agentId
-        panel.isVisible = id != null
-        if (id != null) {
-            // Built once per agent, then refreshed in place so open groups stay open.
-            if (panel.tag != id || panel.childCount == 0) {
-                panel.tag = id
-                panel.removeAllViews()
-                panel.addView(cc.bridgit.app.ui.agents.AgentPermissionsDialog.content(this, id))
-            } else {
-                (panel.getChildAt(0).tag as? Runnable)?.run()
-            }
+        row.root.isVisible = id != null
+        (row.label.layoutParams as ViewGroup.MarginLayoutParams).marginStart = requireContext().dp(20)
+        if (id == null) { panel.isVisible = false; return }
+        // One row, "Permissions 51 of 51"; it opens the same switches in place.
+        val sum = cc.bridgit.app.ui.agents.PermissionHome.summary(cc.bridgit.app.ui.agents.AgentPermissionsDialog.agentPerms(app, app.agents.get(id) ?: return))
+        row.count.text = getString(R.string.agents_group_count, sum.granted, sum.total)
+        row.chevron.rotation = if (vm.powersOpen) 180f else 0f
+        row.root.contentDescription = getString(R.string.perm_pointer, sum.granted, sum.total) +
+            if (vm.powersOpen) ", expanded" else ", collapsed"
+        row.root.setOnClickListener { vm.powersOpen = !vm.powersOpen; renderPowers() }
+        panel.isVisible = vm.powersOpen
+        if (!vm.powersOpen) return
+        // Built once per agent, then refreshed in place so open groups stay open.
+        if (panel.tag != id || panel.childCount == 0) {
+            panel.tag = id
+            panel.removeAllViews()
+            panel.addView(cc.bridgit.app.ui.agents.AgentPermissionsDialog.content(this, id,
+                changed = { renderPowers() }))
+        } else {
+            (panel.getChildAt(0).tag as? Runnable)?.run()
         }
     }
 
@@ -567,8 +583,8 @@ class AddAgentFragment : Fragment() {
         b.doneFilled.isVisible = connected
         when (w.kind) {
             AddAgentViewModel.WaitKind.WAITING -> {
-                b.waitCard.setCardBackgroundColor(ctx.themeColor(M.attr.colorSecondaryContainer))
-                val on = ctx.themeColor(M.attr.colorOnSecondaryContainer)
+                b.waitCard.setCardBackgroundColor(ctx.themeColor(M.attr.colorSurfaceContainer))
+                val on = ctx.themeColor(M.attr.colorOnSurface)
                 b.waitTitle.setTextColor(on); b.waitSub.setTextColor(on)
                 b.waitTitle.text = getString(R.string.addagent_waiting, n)
                 b.waitSub.isVisible = false

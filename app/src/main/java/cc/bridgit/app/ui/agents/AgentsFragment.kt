@@ -83,11 +83,8 @@ class AgentsFragment : Fragment() {
             summary = { a -> PermissionHome.summary(AgentPermissionsDialog.agentPerms(app, a)) },
         )
         b.list.adapter = adapter
-        b.scroll.setOnScrollChangeListener { _: androidx.core.widget.NestedScrollView, _: Int, y: Int, _: Int, oldY: Int ->
-            val dy = y - oldY
+        b.scroll.setOnScrollChangeListener { _: androidx.core.widget.NestedScrollView, _: Int, y: Int, _: Int, _: Int ->
             b.toolbar.isVisible = y < (24 * resources.displayMetrics.density) // the ⋮ would sit over scrolled cards
-            if (dy > 4 && b.fab.isExtended) b.fab.shrink()
-            else if (dy < -4 && !b.fab.isExtended) b.fab.extend()
         }
         // Max Agentic Control off: the same confirm-then-guided-pass as the Settings switch.
         b.maxBannerEnable.setOnClickListener {
@@ -97,8 +94,7 @@ class AgentsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) { cc.bridgit.app.portal.PortalLinks(app).selected.collect { syncHub() } }
         }
-        b.fab.setOnClickListener { addAgent() }
-        b.emptyAdd.setOnClickListener { addAgent() }
+        b.addAgent.setOnClickListener { addAgent() }
         b.activityRow.setOnClickListener { findNavController().navigate(R.id.activity) }
         b.portalRow.setOnClickListener { startActivity(android.content.Intent(requireContext(), cc.bridgit.app.portal.PortalActivity::class.java)) }
 
@@ -287,28 +283,17 @@ class AgentsFragment : Fragment() {
     }
 
     /** Switched to the hub: its agents cover this phone's list, and Add agent goes away (agents are added on the hub). */
-    private fun syncHub() { val onHub = hubPanel?.sync() == true; _b?.fab?.isVisible = !onHub; _b?.toolbar?.isVisible = !onHub }
+    private fun syncHub() { val onHub = hubPanel?.sync() == true; _b?.addAgent?.isVisible = !onHub; _b?.toolbar?.isVisible = !onHub }
 
     /** Pinned at the top while Max Agentic Control is off; the same test as its switch in Settings. */
     private fun renderMaxBanner() {
         if (_b == null) return
         val missing = cc.bridgit.app.power.PowerAccess(app).missingAccess()
         b.maxBanner.isVisible = MaxControlBanner.visible(missing.complete)
+        // Without the banner the Agents heading is the first row, under the floating ⋮ menu: keep + Add agent clear of it.
+        val d = resources.displayMetrics.density
+        b.agentsHeader.updatePadding(right = ((if (b.maxBanner.isVisible) 16 else 56) * d).toInt())
         if (missing.complete) return
-        // Same headings and items as the Max Agentic Control dialog; the list scrolls in at most about a third
-        // of the screen, so the heading and the button always fit.
-        b.maxBannerScroll.maxHeightPx = (resources.displayMetrics.heightPixels * 0.3f).toInt()
-        val list = b.maxBannerList
-        list.removeAllViews()
-        val sheet = cc.bridgit.app.ui.power.MaxControlSheet
-        if (missing.permissions.isNotEmpty()) {
-            list.addView(sheet.header(requireContext(), getString(R.string.max_missing_access_title)))
-            list.addView(sheet.flow(requireContext(), missing.permissions, pending = true))
-        }
-        if (missing.settings.isNotEmpty()) {
-            list.addView(sheet.header(requireContext(), getString(R.string.max_missing_settings_title)))
-            list.addView(sheet.flow(requireContext(), missing.settings, pending = true))
-        }
         val count = missing.permissions.size + missing.settings.size
         b.maxBannerBody.text = resources.getQuantityString(R.plurals.max_missing_count, count, count)
     }
@@ -334,9 +319,12 @@ class AgentsFragment : Fragment() {
             s.running && s.boundTo.isEmpty() -> getString(R.string.agents_pause_all_tailscale_down)
             else -> getString(R.string.agents_pause_all_off)
         }
+        // Say something only when it needs attention; the default state is the switch itself.
+        b.pauseAgents.value.isVisible = paused || s.bindError != null || (s.running && s.boundTo.isEmpty())
         val ext = app.settings.externalCallsPaused
         b.pauseExternal.toggle.isChecked = !ext
-        b.pauseExternal.value.setText(if (ext) R.string.agents_pause_external_on else R.string.agents_pause_external_off)
+        b.pauseExternal.value.setText(R.string.agents_pause_external_on)
+        b.pauseExternal.value.isVisible = ext
     }
 
     private fun refresh() {
@@ -365,7 +353,7 @@ class AgentsFragment : Fragment() {
         b.empty.isVisible = empty
         b.list.isVisible = !empty
         // Switched to the hub, agents are added there: no Add agent over its list.
-        if (empty || cc.bridgit.app.portal.PortalLinks(app).selectedHub() != null) b.fab.hide() else b.fab.show()
+        b.addAgent.isVisible = cc.bridgit.app.portal.PortalLinks(app).selectedHub() == null
     }
 
     private var lastCalls: Map<ExternalTools.Id, ExternalTools.LastCall> = emptyMap()
@@ -434,12 +422,9 @@ class AgentsFragment : Fragment() {
                 else -> R.drawable.agents_dot_idle
             })
             val call = lastCalls[t.id]
+            // What it does, then only what the owner can act on: a failed last call, or when it last worked.
             val parts = mutableListOf(getString(t.detail))
-            if (service != null) parts += getString(R.string.tools_budget)
-            t.facts.ownKeys.firstOrNull()?.let { parts += getString(R.string.tools_own_key, t.facts.ownKeys.joinToString(", ")) }
-            // A tool this build doesn't have can't be called, so skip the "not called yet" tail.
-            if (state != ExternalTools.State.MISSING) parts += when {
-                call == null -> getString(R.string.tools_never)
+            if (state != ExternalTools.State.MISSING && call != null) parts += when {
                 call.ok -> getString(R.string.tools_last_call, Fmt.ago(call.at))
                 else -> getString(R.string.tools_last_failed, Fmt.ago(call.at))
             }
@@ -503,7 +488,7 @@ class AgentsFragment : Fragment() {
                 val app = ctx.applicationContext as BridgeApp
                 RelayStore(app).agents().firstOrNull { it.optString("id") == a.id }?.optString("mode")
             } else null
-            h.b.connection.text = if (a.connection == Connection.RELAY)
+            val model = if (a.connection == Connection.RELAY)
                 ctx.getString(if (relayMode == "connector") R.string.relay_connector_disclosure else if (relayMode == "sealed") R.string.relay_sealed_label else R.string.relay_setup_required)
             else a.modelText(ctx)
             val powers = when {
@@ -512,8 +497,7 @@ class AgentsFragment : Fragment() {
                 a.fixer -> ctx.getString(R.string.agents_badge_fixer)
                 else -> null
             }
-            h.b.developer.isVisible = powers != null
-            h.b.developer.text = powers
+            h.b.connection.text = listOfNotNull(model, powers).joinToString(" · ")
 
             val active = AgentStats.isActive(a, r.now)
             val rotated = AgentStats.waitingForNewPrompt(a, r.now)

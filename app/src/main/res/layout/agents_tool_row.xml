@@ -4,13 +4,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:background="@drawable/agents_bg_tool"
+    android:background="?attr/selectableItemBackground"
     android:focusable="true"
+    android:minHeight="56dp"
     android:orientation="vertical"
-    android:paddingStart="14dp"
+    android:paddingStart="16dp"
     android:paddingTop="10dp"
-    android:paddingEnd="14dp"
+    android:paddingEnd="16dp"
     android:paddingBottom="10dp">
 
     <LinearLayout
@@ -24,45 +24,39 @@
             android:id="@+id/dot"
             android:layout_width="8dp"
             android:layout_height="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="12dp"
             android:background="@drawable/agents_dot_idle" />
 
         <ImageView
             android:id="@+id/logo"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_marginEnd="8dp"
             android:importantForAccessibility="no"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/name"
+            style="@style/Widget.Bridgit.AppletTitle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ellipsize="end"
-            android:maxLines="1"
-            android:textAppearance="?attr/textAppearanceTitleSmall" />
+            android:maxLines="1" />
 
         <TextView
             android:id="@+id/state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:fontFamily="sans-serif-medium"
             android:maxLines="1"
-            android:textAppearance="?attr/textAppearanceLabelMedium" />
+            android:textSize="14sp" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="2dp"
-        android:importantForAccessibility="no"
-        android:maxLines="2"
+        style="@style/Widget.Bridgit.AppletSecondary"
+        android:layout_marginStart="20dp"
         android:ellipsize="end"
-        android:textAppearance="?attr/textAppearanceBodySmall"
-        android:textColor="?attr/colorOnSurfaceVariant" />
+        android:importantForAccessibility="no"
+        android:maxLines="2" />
 </LinearLayout>

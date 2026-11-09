@@ -1,98 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- A0116: one device on the Agents and Linked Devices tab: this device (its profile: type, model, purposes) or a
      linked device (portal, hub, satellite), with the same permission row and panel as an agent card. -->
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/Widget.Bridgit.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
-    app:contentPaddingBottom="10dp"
-    app:contentPaddingEnd="4dp"
-    app:contentPaddingStart="14dp"
-    app:contentPaddingTop="10dp"
-    app:strokeColor="?attr/colorOutlineVariant"
-    app:strokeWidth="1dp">
+    android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:id="@+id/header"
+        style="@style/Widget.Bridgit.AppletRow"
+        android:paddingEnd="8dp">
+
+        <ImageView
+            android:id="@+id/icon"
+            style="@style/Widget.Bridgit.AppletIcon"
+            android:src="@drawable/ic_nav_device" />
 
         <LinearLayout
-            android:id="@+id/header"
-            android:layout_width="match_parent"
+            android:id="@+id/info"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_mono_chip"
-                android:backgroundTint="?attr/colorSecondaryContainer"
-                android:importantForAccessibility="no"
-                android:padding="8dp"
-                android:src="@drawable/ic_nav_device"
-                app:tint="?attr/colorOnSecondaryContainer" />
+            <TextView
+                android:id="@+id/name"
+                style="@style/Widget.Bridgit.AppletTitle" />
 
-            <LinearLayout
-                android:id="@+id/info"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+            <TextView
+                android:id="@+id/line2"
+                style="@style/Widget.Bridgit.AppletSecondary" />
 
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceTitleMedium" />
-
-                <TextView
-                    android:id="@+id/line2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceBodySmall"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
-
-                <TextView
-                    android:id="@+id/purposes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textAppearance="?attr/textAppearanceBodySmall"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
-            </LinearLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/edit"
-                style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="4dp"
-                android:contentDescription="@string/device_profile_edit"
-                android:insetLeft="0dp"
-                android:insetTop="0dp"
-                android:insetRight="0dp"
-                android:insetBottom="0dp"
-                android:visibility="gone"
-                app:icon="@drawable/ic_applet_edit"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconSize="20dp"
-                app:iconTint="?attr/colorOnSurfaceVariant" />
+            <TextView
+                android:id="@+id/purposes"
+                style="@style/Widget.Bridgit.AppletSecondary" />
         </LinearLayout>
 
-        <include android:id="@+id/permissions" layout="@layout/permissions_summary_row" />
-
-        <FrameLayout
-            android:id="@+id/permissionsPanel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/edit"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="4dp"
+            android:contentDescription="@string/device_profile_edit"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:visibility="gone"
+            app:icon="@drawable/ic_applet_edit"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="24dp"
+            app:iconTint="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+
+    <include android:id="@+id/permissions" layout="@layout/permissions_summary_row" />
+
+    <FrameLayout
+        android:id="@+id/permissionsPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="68dp"
+        android:background="?attr/colorOutlineVariant" />
+</LinearLayout>

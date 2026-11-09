@@ -6,23 +6,23 @@
     android:id="@+id/row"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="4dp"
-    android:background="?attr/selectableItemBackground"
+        android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
-    android:minHeight="48dp"
+    android:minHeight="44dp"
     android:orientation="horizontal"
-    android:paddingEnd="8dp">
+    android:paddingEnd="16dp">
 
     <TextView
         android:id="@+id/label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
+        android:layout_marginStart="68dp"
         android:layout_weight="1"
         android:text="@string/agents_section_permissions"
-        android:textAppearance="?attr/textAppearanceLabelLarge" />
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/count"

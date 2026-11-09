@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Agents list (UI-12, ui-spec 5.3): the Control panel (pause every agent, pause external calls), then one card
-     per agent with its own status and pause button. The listener card left this screen on 2 Nov 2026: what
-     matters per agent is on its own card. -->
+<!-- Agents tab, flat like Applets › Config (design pass 9 Nov 2026, docs/design/agents-redesign): sections with
+     headings and plain rows, no panels or nested cards. Agents (pause all, one row per agent, Activity), Devices
+     (this device and linked ones), External tools. The setup banner is a title, a count and one button; its
+     checklist lives in the Finish setup dialog. The ⋮ menu floats at the top right and hides once scrolled. -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -25,127 +26,110 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="96dp">
+                android:paddingBottom="24dp">
 
-        <!-- Max Agentic Control is off: the first thing to do, pinned above everything else, in the look of the
-             Max Agentic Control dialog (power_confirm_dialog.xml): bolt badge and title, a short lead, then a
-             shaded list of what is still missing. The list scrolls inside a capped height so the button under it
-             always stays on screen. Hidden once it is on (AgentsFragment.renderMaxBanner). -->
-        <LinearLayout
-            android:id="@+id/max_banner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/home_bg_section"
-            android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingTop="14dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="14dp"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingEnd="28dp">
-
-                <FrameLayout
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="@drawable/design_bg_icon_bolt">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:importantForAccessibility="no"
-                        android:src="@drawable/ic_bolt"
-                        app:tint="@color/firstrun_amber" />
-                </FrameLayout>
-
+                <!-- Max Agentic Control is off: the one thing to finish, above everything else. -->
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/max_banner_heading"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:accessibilityHeading="true"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="-0.01"
-                        android:text="@string/max_missing_heading"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:id="@+id/max_banner_body"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
-                        android:text="@string/max_missing_intro"
-                        android:textAppearance="?attr/textAppearanceBodyMedium"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="14sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <cc.bridgit.app.ui.common.MaxHeightScrollView
-                android:id="@+id/max_banner_scroll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/max_banner_list_bg"
-                android:fadeScrollbars="false"
-                android:fadingEdgeLength="16dp"
-                android:requiresFadingEdge="vertical"
-                android:scrollbarStyle="insideOverlay"
-                android:scrollbars="vertical">
-
-                <LinearLayout
-                    android:id="@+id/max_banner_list"
+                    android:id="@+id/max_banner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/home_bg_section"
                     android:orientation="vertical"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:paddingBottom="10dp" />
-            </cc.bridgit.app.ui.common.MaxHeightScrollView>
+                    android:padding="16dp"
+                    android:visibility="gone">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/max_banner_enable"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:minHeight="48dp"
-                android:text="@string/max_missing_continue"
-                app:icon="@drawable/ic_bolt"
-                app:iconGravity="textStart"
-                app:iconSize="18dp" />
-        </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingEnd="32dp">
 
-                <!-- 1. Control agents: pause them all, then one card per agent. -->
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/design_bg_icon_bolt">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/ic_bolt"
+                                app:tint="@color/firstrun_amber" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/max_banner_heading"
+                                style="@style/Widget.Bridgit.AppletTitle"
+                                android:accessibilityHeading="true"
+                                android:text="@string/max_missing_heading" />
+
+                            <TextView
+                                android:id="@+id/max_banner_body"
+                                style="@style/Widget.Bridgit.AppletSecondary" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/max_banner_enable"
+                        style="?attr/bridgitPillStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/max_missing_continue"
+                        app:icon="@drawable/ic_bolt"
+                        app:iconGravity="textStart" />
+                </LinearLayout>
+
+                <!-- 1. Agents. -->
                 <LinearLayout
                     android:id="@+id/agentsPanel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/home_bg_section"
-                    android:orientation="vertical"
-                    android:paddingBottom="8dp">
+                    android:orientation="vertical">
 
-                    <TextView
-                        style="@style/AgentsSectionLabel"
+                    <LinearLayout
+                        android:id="@+id/agents_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingTop="12dp"
-                        android:text="@string/agents_section_list" />
+                        android:paddingTop="8dp"
+                        android:paddingEnd="16dp">
+
+                        <TextView
+                            style="@style/Widget.Bridgit.AppletHeading"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:paddingStart="0dp"
+                            android:paddingTop="0dp"
+                            android:paddingEnd="8dp"
+                            android:paddingBottom="0dp"
+                            android:text="@string/agents_section_list" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/add_agent"
+                            style="?attr/bridgitPillTextStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:text="@string/agents_add"
+                            app:icon="@drawable/ic_add" />
+                    </LinearLayout>
 
                     <include android:id="@+id/pauseAgents" layout="@layout/settings_switch_row" />
 
@@ -154,132 +138,95 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:nestedScrollingEnabled="false"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         tools:listitem="@layout/agents_row" />
 
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/empty"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:visibility="gone">
+                        style="@style/Widget.Bridgit.AppletSecondary"
+                        android:paddingStart="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="8dp"
+                        android:text="@string/agents_empty_title"
+                        android:visibility="gone" />
+
+                    <!-- What the agents did on this device: opens the Activity log. -->
+                    <LinearLayout
+                        android:id="@+id/activityRow"
+                        style="@style/Widget.Bridgit.AppletRow">
+
+                        <ImageView
+                            style="@style/Widget.Bridgit.AppletIcon"
+                            android:src="@drawable/ic_nav_activity" />
+
+                        <TextView
+                            style="@style/Widget.Bridgit.AppletTitle"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:text="@string/agents_activity_row" />
 
                         <ImageView
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:importantForAccessibility="no"
-                            android:src="@drawable/ic_nav_agents"
+                            android:padding="12dp"
+                            android:src="@drawable/ic_chevron"
                             app:tint="?attr/colorOnSurfaceVariant" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:accessibilityHeading="true"
-                            android:gravity="center"
-                            android:text="@string/agents_empty_title"
-                            android:textAppearance="?attr/textAppearanceTitleMedium" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:gravity="center"
-                            android:maxWidth="320dp"
-                            android:text="@string/agents_empty_body"
-                            android:textAppearance="?attr/textAppearanceBodyMedium"
-                            android:textColor="?attr/colorOnSurfaceVariant" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/empty_add"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:text="@string/agents_add"
-                            />
                     </LinearLayout>
-
-                    <!-- What the agents did on this device (owner, 5 Nov 2026): moved here from Applets › Portals,
-                         where "Agent activity" looked like an applet. Opens the Activity log. -->
-                    <TextView
-                        android:id="@+id/activityRow"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:drawablePadding="12dp"
-                        android:gravity="center_vertical"
-                        android:minHeight="48dp"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:text="@string/agents_activity_row"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        app:drawableEndCompat="@drawable/ic_chevron"
-                        app:drawableStartCompat="@drawable/ic_nav_activity"
-                        app:drawableTint="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
 
-                <!-- 2. Linked devices (A0115/A0116): this device with its profile, then every linked device, each with
-                     the same permission row and switches as an agent. -->
+                <!-- 2. Devices: this device with its profile, then every linked device. -->
                 <LinearLayout
                     android:id="@+id/devicesPanel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/home_bg_section"
-                    android:orientation="vertical"
-                    android:paddingBottom="8dp">
+                    android:orientation="vertical">
 
                     <TextView
-                        style="@style/AgentsSectionLabel"
-                        android:paddingStart="16dp"
-                        android:paddingTop="12dp"
+                        style="@style/Widget.Bridgit.AppletHeading"
                         android:text="@string/agents_section_devices" />
 
                     <LinearLayout
                         android:id="@+id/devices"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp" />
+                        android:orientation="vertical" />
 
-                    <!-- Pair, disconnect and trust tiers stay on the Linked devices screen; permissions are here (A0117). -->
-                    <TextView
+                    <!-- Pair, disconnect and trust tiers stay on the Linked devices screen. -->
+                    <LinearLayout
                         android:id="@+id/portalRow"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:drawablePadding="12dp"
-                        android:gravity="center_vertical"
-                        android:minHeight="48dp"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:text="@string/agents_manage_linked"
-                        android:textAppearance="?attr/textAppearanceBodyLarge"
-                        app:drawableEndCompat="@drawable/ic_chevron"
-                        app:drawableStartCompat="@drawable/ic_computer"
-                        app:drawableTint="?attr/colorOnSurfaceVariant" />
+                        style="@style/Widget.Bridgit.AppletRow">
 
+                        <ImageView
+                            style="@style/Widget.Bridgit.AppletIcon"
+                            android:src="@drawable/ic_computer" />
+
+                        <TextView
+                            style="@style/Widget.Bridgit.AppletTitle"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:text="@string/agents_manage_linked" />
+
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:importantForAccessibility="no"
+                            android:padding="12dp"
+                            android:src="@drawable/ic_chevron"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <!-- 3. External tools: what the phone calls off your network, with one pause for all of it. -->
+                <!-- 3. External tools: one pause for all of them. -->
                 <LinearLayout
                     android:id="@+id/toolsPanel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/home_bg_section"
-                    android:orientation="vertical"
-                    android:paddingBottom="8dp">
+                    android:orientation="vertical">
 
                     <TextView
-                        style="@style/AgentsSectionLabel"
-                        android:paddingStart="16dp"
-                        android:paddingTop="12dp"
+                        style="@style/Widget.Bridgit.AppletHeading"
                         android:text="@string/agents_section_tools" />
 
                     <include android:id="@+id/pauseExternal" layout="@layout/settings_switch_row" />
@@ -288,29 +235,13 @@
                         android:id="@+id/tools"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp" />
+                        android:orientation="vertical" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/agents_add"
-        android:text="@string/agents_add"
-        app:backgroundTint="?attr/colorPrimaryContainer"
-        app:iconTint="?attr/colorOnPrimaryContainer"
-        android:textColor="?attr/colorOnPrimaryContainer" />
-
-    <!-- Owner, 4 Nov 2026: no "Agents" title (the bottom bar already says it). The ⋮ menu (Report a bug) floats
-         at the top right over the first card's header, which keeps its right side clear, and hides while the
-         list is scrolled down (AgentsFragment). -->
+    <!-- The ⋮ menu (Report a bug) floats at the top right and hides while the list is scrolled down. -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="wrap_content"

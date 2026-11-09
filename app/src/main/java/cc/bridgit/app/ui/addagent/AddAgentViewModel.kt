@@ -45,6 +45,7 @@ class AddAgentViewModel(application: Application) : AndroidViewModel(application
     /** 1 Name, 2 Connection, 3 Check, 4 Setup prompt (and waiting, step 5). */
     val step = MutableStateFlow(1)
     var promptExpanded = false
+    var powersOpen = false
     var connectionAdvanced = false
     var name = ""
     var connection = Connection.DIRECT

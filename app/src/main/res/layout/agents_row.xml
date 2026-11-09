@@ -1,128 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One agent card (UI-12): name, extra powers, what it runs on, its own status line, its pause button and (A0115) its permissions.
-     This is the authorization audit list (A0140): the full name, connection and status always show, so every
-     text line wraps instead of ellipsizing, and the powers badge sits on its own line below the name so it
-     never crowds the name out. The card opens the agent; the button pauses or resumes it. -->
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- One agent row on the Agents tab (flat, like Applets › Config): brand icon, name, a model line and a status line,
+     its pause button, then its permissions summary. A0140: the full name, connection and status always show, so
+     every text line wraps instead of ellipsizing. The row opens the agent; the button pauses or resumes it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/Widget.Bridgit.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
+    android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    app:contentPaddingBottom="10dp"
-    app:contentPaddingEnd="4dp"
-    app:contentPaddingStart="14dp"
-    app:contentPaddingTop="10dp"
-    app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
-    app:strokeColor="?attr/colorOutlineVariant"
-    app:strokeWidth="1dp">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:gravity="center_vertical"
+        android:minHeight="64dp"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="12dp">
+
+        <cc.bridgit.app.ui.common.AgentAvatarView
+            android:id="@+id/avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:importantForAccessibility="no" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/info"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:importantForAccessibility="noHideDescendants"
+            android:orientation="vertical">
 
-            <cc.bridgit.app.ui.common.AgentAvatarView
-                android:id="@+id/avatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:importantForAccessibility="no" />
+            <TextView
+                android:id="@+id/name"
+                style="@style/Widget.Bridgit.AppletTitle"
+                android:breakStrategy="simple"
+                android:hyphenationFrequency="none" />
+
+            <TextView
+                android:id="@+id/connection"
+                style="@style/Widget.Bridgit.AppletSecondary" />
 
             <LinearLayout
-                android:id="@+id/info"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:importantForAccessibility="noHideDescendants"
-                android:orientation="vertical">
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/agents_dot_idle" />
 
                 <TextView
-                    android:id="@+id/name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:breakStrategy="simple"
-                    android:hyphenationFrequency="none"
-                    android:textAppearance="?attr/textAppearanceTitleMedium" />
-
-                <TextView
-                    android:id="@+id/developer"
-                    style="@style/Widget.Bridgit.MonoChip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginBottom="2dp"
-                    android:background="@drawable/bg_mono_chip"
-                    android:backgroundTint="?attr/colorPrimaryContainer"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/agents_badge_super"
-                    android:textAppearance="?attr/textAppearanceLabelSmall"
-                    android:textColor="?attr/colorOnPrimaryContainer" />
-
-                <TextView
-                    android:id="@+id/connection"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceBodySmall"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:id="@+id/dot"
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/agents_dot_idle" />
-
-                    <TextView
-                        android:id="@+id/line2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-                </LinearLayout>
+                    android:id="@+id/line2"
+                    style="@style/Widget.Bridgit.AppletSecondary"
+                    android:layout_width="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_weight="1" />
             </LinearLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/pause"
-                style="@style/Widget.Material3.Button.IconButton.Outlined"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="4dp"
-                android:insetLeft="0dp"
-                android:insetTop="0dp"
-                android:insetRight="0dp"
-                android:insetBottom="0dp"
-                app:icon="@drawable/agents_ic_pause"
-                app:iconSize="20dp"
-                app:iconTint="?attr/colorOnSurfaceVariant"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp" />
         </LinearLayout>
 
-        <!-- A0115: the agent's permissions in place, "12 of 20", expandable to the full panel with its switches. -->
-        <include android:id="@+id/permissions" layout="@layout/permissions_summary_row" />
-
-        <FrameLayout
-            android:id="@+id/permissionsPanel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/pause"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="4dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            app:icon="@drawable/agents_ic_pause"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="24dp"
+            app:iconTint="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+
+    <!-- A0115: the agent's permissions in place, "12 of 20", expandable to the full panel with its switches. -->
+    <include android:id="@+id/permissions" layout="@layout/permissions_summary_row" />
+
+    <FrameLayout
+        android:id="@+id/permissionsPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="68dp"
+        android:background="?attr/colorOutlineVariant" />
+</LinearLayout>

@@ -142,8 +142,8 @@
     <string name="max_missing_access_title">Android access still needed</string>
     <string name="max_missing_settings_title">Settings still off</string>
     <plurals name="max_missing_count">
-        <item quantity="one">%d item left to turn on every feature</item>
-        <item quantity="other">%d items left to turn on every feature</item>
+        <item quantity="one">%d item left</item>
+        <item quantity="other">%d items left</item>
     </plurals>
     <string name="max_missing_log">All log entries</string>
     <string name="max_missing_listener">Always on</string>

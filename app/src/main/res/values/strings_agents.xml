@@ -3,8 +3,8 @@
 <resources>
     <!-- Agents list (ui-spec 5.3) -->
     <string name="agents_title">Control agents</string>
-    <string name="agents_add">Add control agent</string>
-    <string name="agents_empty_title">No control agents yet</string>
+    <string name="agents_add">Add agent</string>
+    <string name="agents_empty_title">No agents yet</string>
     <string name="agents_empty_body">Each AI control agent gets its own key. Add one and paste the setup prompt into it.</string>
     <string name="agents_full">Bridgit holds up to 16 control agents. Remove one to add another.</string>
     <string name="agents_badge_fixer">Fixer</string>
@@ -36,30 +36,27 @@
     <string name="addagent_back">Back</string>
     <string name="addagent_next">Next</string>
     <string name="addagent_continue_anyway">Continue anyway</string>
-
-    <string name="addagent_name_heading">What do you call this control agent?</string>
     <string name="addagent_name_label">Name</string>
     <string name="addagent_name_helper">Letters, numbers, spaces, - and _. Up to 24.</string>
 
-    <string name="addagent_conn_heading">Use Tailscale for %1$s?</string>
-    <string name="addagent_conn_direct">Yes, use Tailscale</string>
-    <string name="addagent_conn_direct_desc">Recommended when the control agent runs on a computer connected to your Tailscale network. Just tap Next.</string>
-    <string name="addagent_conn_userspace">Tailscale on a restricted server</string>
-    <string name="addagent_conn_userspace_desc">Advanced: use this only when the control agent uses Tailscale in userspace mode.</string>
-    <string name="addagent_conn_explanation">Tailscale privately connects this device and the control agent’s computer. Both must be signed in to the same Tailscale network.</string>
-    <string name="addagent_conn_relay">No, the control agent cannot use Tailscale</string>
-    <string name="addagent_conn_relay_desc">For hosted control agents or computers without Tailscale. Next opens relay setup to connect over the internet.</string>
+    <string name="addagent_conn_heading">Connect over</string>
+    <string name="addagent_conn_direct">Tailscale</string>
+    <string name="addagent_conn_direct_desc">Its computer is on your Tailscale network.</string>
+    <string name="addagent_conn_userspace">Tailscale, restricted server</string>
+    <string name="addagent_conn_userspace_desc">Userspace mode.</string>
+    <string name="addagent_conn_relay">Relay</string>
+    <string name="addagent_conn_relay_desc">Over the internet.</string>
     <string name="addagent_conn_claude">Claude Duet or claude.ai</string>
     <string name="addagent_conn_claude_desc">Custom connector.</string>
     <string name="addagent_conn_chatgpt">ChatGPT Dots</string>
     <string name="addagent_conn_chatgpt_desc">Custom MCP server.</string>
-    <string name="addagent_conn_advanced">Advanced Tailscale options</string>
+    <string name="addagent_conn_advanced">Advanced</string>
     <string name="addagent_check_ready">This device is ready</string>
     <string name="addagent_prompt_expand">Expand</string>
     <string name="addagent_prompt_collapse">Collapse</string>
     <string name="addagent_conn_position">%1$d of %2$d</string>
 
-    <string name="addagent_check_heading">Preparing this device for %1$s</string>
+    <string name="addagent_check_heading">Checking this device</string>
     <string name="addagent_check_listener">Listener running</string>
     <string name="addagent_check_tailscale">Tailscale address (%1$s)</string>
     <string name="addagent_check_tailscale_none">Tailscale address</string>
@@ -75,7 +72,6 @@
     <string name="addagent_state_warn">warning</string>
 
     <string name="addagent_prompt_intro">Paste into %1$s.</string>
-    <string name="addagent_prompt_warning">This key gives control of your device. Share only with agents you trust to act safely and protect against malicious actors. Revoke access in Control agents.</string>
     <string name="addagent_prompt_risk">Pasting it into a hosted AI service is your call; you can rotate the key any time from the control agent\'s page.</string>
     <string name="addagent_trust_title">You\'re handing over this phone</string>
     <string name="addagent_trust_body">This key gives control of your phone. Share only with agents you trust to act safely and protect against malicious actors. Revoke access in Control agents.</string>
@@ -169,8 +165,8 @@
     <string name="revoke_super_done_title">Super Powers revoked</string>
     <string name="revoke_super_log">You revoked Super Powers: %1$s</string>
     <!-- Agents tab: Control panel and per-agent status (2 Nov 2026). -->
-        <string name="agents_section_list">Control agents</string>
-    <string name="agents_section_tools">External Tools and Budgets</string>
+        <string name="agents_section_list">Agents</string>
+    <string name="agents_section_tools">External tools</string>
     <string name="tools_jev">Jev by TypeSafe.ai</string>
     <string name="tools_jev_detail">Yes/no and pick-one decisions, via Bridgit</string>
     <string name="tools_clef">Clef by Cloudflare</string>
@@ -192,14 +188,14 @@
     <string name="tools_state_off">Off</string>
     <string name="tools_state_paused">Paused</string>
     <string name="tools_state_missing">Not in this build</string>
-    <string name="agents_pause_all">Pause all control agents</string>
+    <string name="agents_pause_all">Pause all agents</string>
     <string name="agents_pause_all_off">Every control agent can reach this phone</string>
     <string name="agents_pause_all_on">No control agent can reach this phone</string>
     <string name="agents_pause_all_tailscale_down">Tailscale is off, so control agents on Tailscale can\'t reach this phone</string>
     <string name="agents_pause_all_error">Bridgit can\'t listen on port %1$d. Restart Bridgit or change the port in Settings</string>
     <string name="agents_pause_external">External calls</string>
     <string name="agents_pause_external_off">On: Jev, Clef, bug reports, the relay and update checks work. Turn off to stop them</string>
-    <string name="agents_pause_external_on">Off: Jev, Clef, bug reports, relay and updates are refused</string>
+    <string name="agents_pause_external_on">Jev, Clef, reports, relay and updates are refused</string>
     <string name="agents_pause_external_on_log">You paused all external calls</string>
     <string name="agents_pause_external_off_log">You turned external calls back on</string>
     <string name="agents_status_tailscale">Tailscale</string>
@@ -255,8 +251,8 @@
     <string name="applet_agent_required">Your favorite agent can create an applet. Please Add and configure it first.</string>
     <!-- A0115-A0118: the one permission home, the Agents and Linked Devices tab. -->
     <string name="nav_agents_full">Agents and Linked Devices</string>
-    <string name="agents_section_devices">Linked devices</string>
-    <string name="agents_manage_linked">Pair and manage devices</string>
+    <string name="agents_section_devices">Devices</string>
+    <string name="agents_manage_linked">Pair devices</string>
     <string name="agents_this_device">This device</string>
     <string name="perm_layer_default">Default</string>
     <string name="perm_layer_super">Via Superpowers</string>

@@ -151,9 +151,17 @@ class GalleryVideoModule(app: BridgeApp) : Capability(app) {
             requireUsable()
             val limit = Rules.integer(query("limit"), "limit", 1, 100, 20)
             val out = JSONArray()
-            val args = android.os.Bundle().apply { putString(android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "date_added DESC, _id DESC"); putString(android.content.ContentResolver.QUERY_ARG_SQL_LIMIT, limit.toString()) }
-            app.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, arrayOf("_id", "display_name", "duration", "size", "mime_type", "date_added"), args, null)?.use { c ->
-                while (out.length() < limit && c.moveToNext()) out.put(JSONObject().put("id", c.getLong(0)).put("name", c.getString(1)).put("duration_ms", c.getLong(2)).put("size_bytes", c.getLong(3)).put("mime", c.getString(4)).put("added_at", isoAt(c.getLong(5) * 1000)))
+            // Over-fetch a little: rows still being recorded (is_pending=1) are skipped, never an error (A0256).
+            val args = android.os.Bundle().apply { putString(android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "date_added DESC, _id DESC"); putString(android.content.ContentResolver.QUERY_ARG_SQL_LIMIT, (limit + 5).toString()) }
+            val cols = arrayOf("_id", "display_name", "duration", "size", "mime_type", "date_added", "is_pending")
+            val rows = try { app.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cols, args, null) } catch (e: IllegalArgumentException) {
+                app.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cols.take(6).toTypedArray(), args, null)
+            }
+            rows?.use { c ->
+                while (out.length() < limit && c.moveToNext()) {
+                    val item = runCatching { Rules.galleryVideoItem(if (c.columnCount > 6) c.getInt(6) else 0, c.getLong(0), c.getString(1), c.getLong(2), c.getLong(3), c.getString(4), c.getLong(5), ::isoAt) }.getOrNull()
+                    if (item != null) out.put(item)
+                }
             }
             Reply.Json(JSONObject().put("items", out).put("access_mode", if (app.granted(Manifest.permission.READ_MEDIA_VIDEO)) "full" else "selected"))
         }

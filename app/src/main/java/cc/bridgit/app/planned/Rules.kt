@@ -4,6 +4,15 @@ import cc.bridgit.app.api.ErrorCatalog
 import org.json.JSONObject
 
 object Rules {
+    /**
+     * One gallery video row. A capture still being written (MediaStore IS_PENDING=1, or a row whose name/size is not
+     * filled in yet) is excluded (null) so listing never fails mid-recording (A0256). Null columns never throw.
+     */
+    fun galleryVideoItem(pending: Int, id: Long, name: String?, durationMs: Long, sizeBytes: Long, mime: String?, addedAtSeconds: Long, iso: (Long) -> String): JSONObject? {
+        if (pending != 0 || name.isNullOrEmpty() || sizeBytes <= 0) return null
+        return JSONObject().put("id", id).put("name", name).put("duration_ms", maxOf(0L, durationMs)).put("size_bytes", sizeBytes)
+            .put("mime", mime ?: "video/mp4").put("added_at", iso(maxOf(0L, addedAtSeconds) * 1000))
+    }
     /** BitmapFactory treats zero as one internally; callers must never divide by its zero default. */
     fun imageSampleSize(width: Int, height: Int, maxEdge: Int = 4096): Int {
         require(width > 0 && height > 0 && width.toLong() * height <= 100_000_000 && maxEdge > 0)

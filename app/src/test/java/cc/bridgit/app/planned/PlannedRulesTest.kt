@@ -9,6 +9,14 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PlannedRulesTest {
+    @Test fun galleryVideoListingSkipsCapturesStillRecording() {
+        val iso = { ms: Long -> "t$ms" }
+        assertNull(Rules.galleryVideoItem(1, 7, "a.mp4", 0, 0, "video/mp4", 5, iso))
+        assertNull(Rules.galleryVideoItem(0, 7, null, 0, 0, null, 0, iso))
+        assertNull(Rules.galleryVideoItem(0, 7, "a.mp4", 0, 0, "video/mp4", 5, iso))
+        val ok = Rules.galleryVideoItem(0, 7, "a.mp4", 1200, 99, null, 5, iso)!!
+        assertEquals("video/mp4", ok.getString("mime")); assertEquals("t5000", ok.getString("added_at")); assertEquals(99L, ok.getLong("size_bytes"))
+    }
     @Test fun ocrSampleStartsAtOneAndBoundsDecodedDimensions() {
         assertEquals(1, Rules.imageSampleSize(512, 256))
         assertEquals(1, Rules.imageSampleSize(4096, 4096))

@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-rotated-key",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "A key replaced by rotation is refused with reason key_rotated",
+  "step": "key",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ],
+        "rotated": true
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log"
+  },
+  "expect": {
+    "status": 401,
+    "error": "unauthorized",
+    "reason": "key_rotated"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

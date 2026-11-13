@@ -1,0 +1,49 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-wire-tools-list-shows-fixer-tool",
+  "service": "core.authority",
+  "door": "mcp",
+  "title": "tools/list shows a Fixer Mode tool to an agent with Fixer Mode",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ],
+        "fixer": true
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/mcp",
+    "wire": "mcp_rpc",
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "tools/list"
+    }
+  },
+  "expect": {
+    "status": 200,
+    "mcp": {
+      "tools_include": [
+        "log_device"
+      ]
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

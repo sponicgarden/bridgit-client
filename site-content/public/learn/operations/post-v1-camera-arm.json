@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Open the camera ahead of a photo, so your next snapshot fires in about 0.3 s",

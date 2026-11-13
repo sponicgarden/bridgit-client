@@ -1,0 +1,437 @@
+{
+  "$schema": "../schemas/vocab.schema.json",
+  "vocab": "media-sources",
+  "version": 1,
+  "source": {
+    "kind": "pack",
+    "path": "contracts/client-core/vocab/media-sources.json"
+  },
+  "copies": {
+    "android": "app/src/main/java/cc/bridgit/app/core/contract/ContractVocab.kt"
+  },
+  "rule": "Where a library item came from, best effort, and whether it has fully arrived. Rules are tried in order and the first match wins: a package rule matches the owner package exactly; a path rule matches the folder lowercased, with a slash added before and after it. No match is other, or unknown when neither the package nor the folder is known. app is the owner package and folder the relative path without its trailing slash, each left out when unknown (empty counts as unknown). complete is false when the item is marked pending, and for a sync item not marked pending (sync tools often write in place) while its last modification (modified_seconds_ago, from MediaStore date_modified) is less than limits.json media_sync_stable_ms from now either side; an unknown modification time skips that check. Lists add their own file checks (videos: an empty name or a size of 0).",
+  "data": {
+    "kinds": [
+      "camera",
+      "download",
+      "sync",
+      "screenshot",
+      "share",
+      "other",
+      "unknown"
+    ],
+    "rules": [
+      {
+        "kind": "screenshot",
+        "path_contains": [
+          "/screenshots/",
+          "/screen recordings/"
+        ]
+      },
+      {
+        "kind": "sync",
+        "packages": [
+          "com.google.android.apps.photos",
+          "com.google.android.apps.docs",
+          "com.dropbox.android",
+          "com.microsoft.skydrive",
+          "com.nutomic.syncthingandroid",
+          "com.github.catfriend1.syncthingandroid",
+          "com.nextcloud.client",
+          "com.owncloud.android",
+          "com.box.android",
+          "com.amazon.clouddrive.photos"
+        ]
+      },
+      {
+        "kind": "sync",
+        "path_contains": [
+          "/syncthing/",
+          "/sync/",
+          "/dropbox/",
+          "/onedrive/",
+          "/nextcloud/"
+        ]
+      },
+      {
+        "kind": "share",
+        "packages": [
+          "com.whatsapp",
+          "com.whatsapp.w4b",
+          "org.telegram.messenger",
+          "org.thoughtcrime.securesms",
+          "com.facebook.orca",
+          "com.google.android.apps.messaging",
+          "com.samsung.android.messaging",
+          "com.instagram.android",
+          "com.snapchat.android",
+          "com.discord",
+          "jp.naver.line.android",
+          "com.viber.voip"
+        ]
+      },
+      {
+        "kind": "share",
+        "path_contains": [
+          "/whatsapp/",
+          "/telegram/",
+          "/signal/"
+        ]
+      },
+      {
+        "kind": "download",
+        "packages": [
+          "com.android.providers.downloads",
+          "com.android.chrome",
+          "org.mozilla.firefox",
+          "com.brave.browser",
+          "com.sec.android.app.sbrowser",
+          "com.microsoft.emmx",
+          "com.opera.browser",
+          "com.duckduckgo.mobile.android"
+        ]
+      },
+      {
+        "kind": "download",
+        "path_prefixes": [
+          "/download/",
+          "/downloads/"
+        ]
+      },
+      {
+        "kind": "camera",
+        "packages": [
+          "com.google.android.GoogleCamera",
+          "com.sec.android.app.camera",
+          "com.android.camera",
+          "com.android.camera2",
+          "org.codeaurora.snapcam",
+          "com.oneplus.camera",
+          "com.oplus.camera",
+          "com.motorola.camera3",
+          "com.huawei.camera",
+          "net.sourceforge.opencamera"
+        ]
+      },
+      {
+        "kind": "camera",
+        "path_prefixes": [
+          "/dcim/camera/",
+          "/dcim/100andro/",
+          "/dcim/opencamera/"
+        ]
+      }
+    ],
+    "no_match": "other",
+    "nothing_known": "unknown"
+  },
+  "cases": [
+    {
+      "in": {
+        "owner_package": "com.google.android.GoogleCamera",
+        "relative_path": "DCIM/Camera/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "camera",
+          "app": "com.google.android.GoogleCamera",
+          "folder": "DCIM/Camera"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": null,
+        "relative_path": "DCIM/Camera/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "camera",
+          "folder": "DCIM/Camera"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.android.chrome",
+        "relative_path": "Download/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "download",
+          "app": "com.android.chrome",
+          "folder": "Download"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": null,
+        "relative_path": "Download/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "download",
+          "folder": "Download"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.android.systemui",
+        "relative_path": "Pictures/Screenshots/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "screenshot",
+          "app": "com.android.systemui",
+          "folder": "Pictures/Screenshots"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.samsung.android.app.smartcapture",
+        "relative_path": "DCIM/Screenshots/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "screenshot",
+          "app": "com.samsung.android.app.smartcapture",
+          "folder": "DCIM/Screenshots"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": null,
+        "relative_path": "DCIM/Syncthing/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "sync",
+          "folder": "DCIM/Syncthing"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": null,
+        "relative_path": "DCIM/Syncthing/",
+        "pending": false,
+        "modified_seconds_ago": 2
+      },
+      "out": {
+        "source": {
+          "kind": "sync",
+          "folder": "DCIM/Syncthing"
+        },
+        "complete": false
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.dropbox.android",
+        "relative_path": "Pictures/",
+        "pending": null,
+        "modified_seconds_ago": 2
+      },
+      "out": {
+        "source": {
+          "kind": "sync",
+          "app": "com.dropbox.android",
+          "folder": "Pictures"
+        },
+        "complete": false
+      }
+    },
+    {
+      "in": {
+        "owner_package": null,
+        "relative_path": "DCIM/Syncthing/",
+        "pending": false,
+        "modified_seconds_ago": 60
+      },
+      "out": {
+        "source": {
+          "kind": "sync",
+          "folder": "DCIM/Syncthing"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.google.android.GoogleCamera",
+        "relative_path": "DCIM/Camera/",
+        "pending": false,
+        "modified_seconds_ago": 2
+      },
+      "out": {
+        "source": {
+          "kind": "camera",
+          "app": "com.google.android.GoogleCamera",
+          "folder": "DCIM/Camera"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.github.catfriend1.syncthingandroid",
+        "relative_path": "Pictures/Trip/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "sync",
+          "app": "com.github.catfriend1.syncthingandroid",
+          "folder": "Pictures/Trip"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.google.android.apps.photos",
+        "relative_path": "DCIM/Camera/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "sync",
+          "app": "com.google.android.apps.photos",
+          "folder": "DCIM/Camera"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.whatsapp",
+        "relative_path": "Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Images/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "share",
+          "app": "com.whatsapp",
+          "folder": "Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Images"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.example.notes",
+        "relative_path": "Pictures/Notes/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "other",
+          "app": "com.example.notes",
+          "folder": "Pictures/Notes"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": null,
+        "relative_path": "Pictures/",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "other",
+          "folder": "Pictures"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": null,
+        "relative_path": null,
+        "pending": null
+      },
+      "out": {
+        "source": {
+          "kind": "unknown"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": "",
+        "relative_path": "",
+        "pending": false
+      },
+      "out": {
+        "source": {
+          "kind": "unknown"
+        },
+        "complete": true
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.google.android.apps.photos",
+        "relative_path": "DCIM/Camera/",
+        "pending": true
+      },
+      "out": {
+        "source": {
+          "kind": "sync",
+          "app": "com.google.android.apps.photos",
+          "folder": "DCIM/Camera"
+        },
+        "complete": false
+      }
+    },
+    {
+      "in": {
+        "owner_package": "com.google.android.GoogleCamera",
+        "relative_path": "DCIM/Camera/",
+        "pending": true
+      },
+      "out": {
+        "source": {
+          "kind": "camera",
+          "app": "com.google.android.GoogleCamera",
+          "folder": "DCIM/Camera"
+        },
+        "complete": false
+      }
+    },
+    {
+      "in": {
+        "owner_package": null,
+        "relative_path": null,
+        "pending": true
+      },
+      "out": {
+        "source": {
+          "kind": "unknown"
+        },
+        "complete": false
+      }
+    }
+  ]
+}

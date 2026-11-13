@@ -16,6 +16,7 @@ class OwnerSetupActivity:AppCompatActivity() {
         val target=intent.getStringExtra("target") ?: "permissions"
         val screen=OwnerScreen(this,"Finish setup")
         screen.note("Your control agent requested setup. Android and account sign-in may still need your confirmation.")
+        screen.row(getString(cc.bridgit.app.R.string.setup_steps_title)) { startActivity(Intent(this,cc.bridgit.app.ui.setup.SetupStepsActivity::class.java)) }
         screen.row("Open setup") {
             val next=when(target) {
                 "speech" -> Intent(Settings.ACTION_VOICE_INPUT_SETTINGS)

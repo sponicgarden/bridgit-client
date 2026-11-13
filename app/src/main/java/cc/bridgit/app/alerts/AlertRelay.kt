@@ -62,6 +62,13 @@ class AlertRelay(context: Context, private val base: String = BASE) : AlertSende
         resultFor(SafeHttp.post("$base/api/alerts/send", SafeHttp.Policy.PUBLIC, headers(json = true), body.toString().toByteArray(), DEADLINE_MS))
     } catch (e: Exception) { AlertSender.Result.RETRY }
 
+    /**
+     * One approver security event for the owner's email (core/authority/AuthoritySecurityMail builds [body] and
+     * reads the reply). Throws when bridgit.cc can't be reached or this install's token can't be read.
+     */
+    fun security(body: ByteArray): SafeHttp.Result =
+        SafeHttp.request("$base/api/alerts/security", SafeHttp.Policy.PUBLIC, "POST", headers(json = true), body, DEADLINE_MS, 64 * 1024, "$base/api/alerts/security")
+
     private fun headers(json: Boolean = false) = buildMap {
         put("Authorization", "Bearer ${installToken()}")
         put("Accept", "application/json")

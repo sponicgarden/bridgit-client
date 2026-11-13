@@ -1,0 +1,53 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-captures-grant-not-library",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "A captures grant does not reach the owner library",
+  "step": "grant.capability",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "captures",
+          "camera"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "photo",
+        "size": 4096,
+        "added_at": 1762800000,
+        "id": 5
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/recent"
+  },
+  "expect": {
+    "status": 403,
+    "error": "agent_not_allowed"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

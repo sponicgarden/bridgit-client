@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Applet-specific (A Sorta Fairytale About Me only; not a general platform service). Start a new presentation token for replaying a saved story; invalidates older presentation work",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "How long API calls take on this device, from receiving the request to sending the response: count, median, p95 and max per API, and the slow calls with the device context they ran in (network, battery, thermal, app build, screen, load). Every transport: HTTP, MCP, relay, cards, schedules and the control server. Kept in memory: the newest 5000 calls, at most 7 days, empty after a restart. Calls you may see follow the log's visibility",

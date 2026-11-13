@@ -1,0 +1,1563 @@
+{
+  "$schema": "./schemas/permissions.schema.json",
+  "contract": "client-core.permissions",
+  "generated_by": "bridgit-cloud tools/public-snapshot.mjs",
+  "source": "feedback/src/permission-vocabulary.mjs",
+  "source_sha256": "f099763422f38d7646ee034dac9c6394d537133a2d875db4007c7c6bb8b382dd",
+  "vocabulary": {
+    "version": 1,
+    "platforms": [
+      {
+        "id": "android",
+        "title": "Android"
+      },
+      {
+        "id": "macos",
+        "title": "macOS"
+      },
+      {
+        "id": "ios",
+        "title": "iOS"
+      },
+      {
+        "id": "ipados",
+        "title": "iPadOS"
+      }
+    ],
+    "groups": [
+      {
+        "id": "capture",
+        "title": "Capture"
+      },
+      {
+        "id": "photos",
+        "title": "Photos and screen"
+      },
+      {
+        "id": "talk",
+        "title": "Talk"
+      },
+      {
+        "id": "where",
+        "title": "Where"
+      },
+      {
+        "id": "status",
+        "title": "Status"
+      },
+      {
+        "id": "apps",
+        "title": "Applets"
+      },
+      {
+        "id": "files",
+        "title": "Files"
+      },
+      {
+        "id": "context",
+        "title": "Context"
+      },
+      {
+        "id": "private_context",
+        "title": "Private context"
+      },
+      {
+        "id": "controls",
+        "title": "Controls"
+      }
+    ],
+    "permissions": [
+      {
+        "id": "camera",
+        "title": "Camera",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "camera.snapshot"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "mic",
+        "title": "Microphone",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "mic.record",
+          "speech.hear"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "video",
+        "title": "Video",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "wakewords",
+        "title": "Voice words",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "sounds",
+        "title": "Sounds",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "captures",
+        "title": "Captures",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": true,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "app_device_access",
+        "title": "App devices",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "lan_discovery",
+        "title": "Network discovery",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "lan_discovery"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "lan_enrollment",
+        "title": "Network enrollment",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "lan_control",
+        "title": "Network control",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "lan_camera",
+        "title": "Network cameras",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "lan_camera_audio",
+        "title": "Network camera audio",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "lan_camera_speaker",
+        "title": "Network camera speaker",
+        "group": "capture",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "gallery",
+        "title": "Gallery",
+        "group": "photos",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "applets.media.read",
+          "applets.media.write"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "gallery_video",
+        "title": "Gallery video",
+        "group": "photos",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "screen",
+        "title": "Screenshots",
+        "group": "photos",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "iOS only lets an app capture its own screen."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "iPadOS only lets an app capture its own screen."
+          }
+        }
+      },
+      {
+        "id": "screen_share",
+        "title": "Screen sharing",
+        "group": "photos",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "iOS only lets an app share its own screen."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "iPadOS only lets an app share its own screen."
+          }
+        }
+      },
+      {
+        "id": "ocr",
+        "title": "Text in images",
+        "group": "photos",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "find_crop",
+        "title": "Find and crop",
+        "group": "photos",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "speaker",
+        "title": "Speaker",
+        "group": "talk",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "speech.speak"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "interactions",
+        "title": "Interactions",
+        "group": "talk",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "interactions.read",
+          "interactions.write"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "clipboard",
+        "title": "Clipboard",
+        "group": "talk",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "location",
+        "title": "Location",
+        "group": "where",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "weather",
+        "title": "Weather",
+        "group": "where",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "status",
+        "title": "Status",
+        "group": "status",
+        "baseline": "on",
+        "always_on": true,
+        "apple_operations": [
+          "device.read"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "log",
+        "title": "Log",
+        "group": "status",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "log"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "feedback",
+        "title": "Issues",
+        "group": "status",
+        "baseline": "on",
+        "always_on": true,
+        "apple_operations": [
+          "feedback"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "judgment",
+        "title": "Judgment",
+        "group": "status",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "watches",
+        "title": "Watches",
+        "group": "status",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "outbound",
+        "title": "Outbound calls",
+        "group": "status",
+        "baseline": "on",
+        "always_on": true,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "owner_features",
+        "title": "Owner features",
+        "group": "status",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "agents.admin"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "portal",
+        "title": "Portal",
+        "group": "status",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "applet_install",
+        "title": "Install applets",
+        "group": "apps",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "applets.install"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "applet_data",
+        "title": "Applet data",
+        "group": "apps",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "applets.read",
+          "applets.write"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "applet_portals",
+        "title": "Applet portals",
+        "group": "apps",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "budgets",
+        "title": "Budgets",
+        "group": "apps",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "connections",
+        "title": "Connections",
+        "group": "apps",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "connections"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "modes",
+        "title": "Modes",
+        "group": "apps",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "tour",
+        "title": "Tour",
+        "group": "apps",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "files",
+        "title": "Files",
+        "group": "files",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "files"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "shares",
+        "title": "Shares",
+        "group": "files",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "shares"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "downloads",
+        "title": "Downloads",
+        "group": "files",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "downloads"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "schedule",
+        "title": "Schedule",
+        "group": "files",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "workflows.run"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "phone",
+        "title": "Phone calls",
+        "group": "context",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Macs don't make phone calls."
+          },
+          "ios": {
+            "available": false,
+            "reason": "iOS doesn't let apps place calls or read the call log."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "iPads don't make phone calls."
+          }
+        }
+      },
+      {
+        "id": "sensors",
+        "title": "Sensors",
+        "group": "context",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "context",
+        "title": "Context",
+        "group": "private_context",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "notifications",
+        "title": "Notifications",
+        "group": "private_context",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "macOS doesn't let apps read other apps' notifications."
+          },
+          "ios": {
+            "available": false,
+            "reason": "iOS doesn't let apps read other apps' notifications."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "iPadOS doesn't let apps read other apps' notifications."
+          }
+        }
+      },
+      {
+        "id": "usage",
+        "title": "App usage",
+        "group": "private_context",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "macOS doesn't give apps other apps' usage."
+          },
+          "ios": {
+            "available": false,
+            "reason": "iOS doesn't give apps other apps' usage."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "iPadOS doesn't give apps other apps' usage."
+          }
+        }
+      },
+      {
+        "id": "health_connect",
+        "title": "Health",
+        "group": "private_context",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Macs have no health data."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Health Connect is Android's; Apple Health isn't connected."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "iPads have no health data."
+          }
+        }
+      },
+      {
+        "id": "settings",
+        "title": "App settings",
+        "group": "controls",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [
+          "settings.read",
+          "settings.write"
+        ],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": true
+          },
+          "ipados": {
+            "available": true
+          }
+        }
+      },
+      {
+        "id": "controls",
+        "title": "Phone controls",
+        "group": "controls",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "flashlight",
+        "title": "Flashlight",
+        "group": "controls",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Macs have no flashlight."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "iPads have no flashlight."
+          }
+        }
+      },
+      {
+        "id": "ring",
+        "title": "Ring",
+        "group": "controls",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "ssh",
+        "title": "SSH",
+        "group": "controls",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Not on macOS yet."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Not on iOS yet."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Not on iPadOS yet."
+          }
+        }
+      },
+      {
+        "id": "adb",
+        "title": "ADB",
+        "group": "controls",
+        "baseline": "on",
+        "always_on": false,
+        "apple_operations": [],
+        "platforms": {
+          "android": {
+            "available": true
+          },
+          "macos": {
+            "available": false,
+            "reason": "Android only."
+          },
+          "ios": {
+            "available": false,
+            "reason": "Android only."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "Android only."
+          }
+        }
+      },
+      {
+        "id": "computer_use",
+        "title": "Computer access control",
+        "group": "controls",
+        "baseline": "off",
+        "always_on": false,
+        "apple_operations": [
+          "screen.observe",
+          "screen.control"
+        ],
+        "platforms": {
+          "android": {
+            "available": false,
+            "reason": "Not built yet."
+          },
+          "macos": {
+            "available": true
+          },
+          "ios": {
+            "available": false,
+            "reason": "iOS doesn't let one app control others."
+          },
+          "ipados": {
+            "available": false,
+            "reason": "iPadOS doesn't let one app control others."
+          }
+        }
+      }
+    ],
+    "always_on": [
+      "status",
+      "feedback",
+      "captures",
+      "outbound"
+    ],
+    "layers": [
+      {
+        "id": "platform",
+        "title": "Unavailable on this platform"
+      },
+      {
+        "id": "specific",
+        "title": "Specifically on or off"
+      },
+      {
+        "id": "superpowers",
+        "title": "On via Superpowers"
+      },
+      {
+        "id": "default",
+        "title": "Inherited default"
+      }
+    ],
+    "device_types": [
+      "phone",
+      "tablet",
+      "computer",
+      "tv",
+      "watch",
+      "camera",
+      "other"
+    ],
+    "purposes": [
+      {
+        "id": "primary",
+        "title": "Primary device"
+      },
+      {
+        "id": "dedicated",
+        "title": "Dedicated device"
+      },
+      {
+        "id": "network_controller",
+        "title": "Network controller"
+      },
+      {
+        "id": "monitor",
+        "title": "Monitor"
+      },
+      {
+        "id": "shared",
+        "title": "Shared device"
+      }
+    ],
+    "purpose_pattern": "^[a-z][a-z0-9_]{1,31}$",
+    "max_purposes": 8,
+    "conflict_rule": "explicit_off_wins",
+    "builtin_defaults": [
+      {
+        "device_type": "computer",
+        "purpose": "dedicated",
+        "grants": {
+          "computer_use": "on"
+        }
+      },
+      {
+        "device_type": "computer",
+        "purpose": "primary",
+        "grants": {
+          "computer_use": "off"
+        }
+      },
+      {
+        "device_type": "phone",
+        "purpose": "network_controller",
+        "grants": {
+          "lan_discovery": "on",
+          "lan_enrollment": "on",
+          "lan_control": "on"
+        }
+      },
+      {
+        "device_type": "tablet",
+        "purpose": "network_controller",
+        "grants": {
+          "lan_discovery": "on",
+          "lan_enrollment": "on",
+          "lan_control": "on"
+        }
+      },
+      {
+        "device_type": "computer",
+        "purpose": "network_controller",
+        "grants": {
+          "lan_discovery": "on",
+          "lan_enrollment": "on",
+          "lan_control": "on"
+        }
+      }
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 {
  "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
- "api_revision": 148,
+ "api_revision": 153,
  "errors": [
   {
    "code": "model_unavailable",
@@ -595,6 +595,160 @@
    "you_should": "Retry later",
    "meaning": "(Relay) phone didn't pick up the job",
    "http": 504,
+   "returned_today": false
+  },
+  {
+   "code": "media_incomplete",
+   "you_should": "Wait a few seconds and retry",
+   "meaning": "That photo or video is still arriving (being recorded, downloaded or synced); list with include_pending=true to see it as complete:false",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "owner_email_required",
+   "you_should": "Set it with POST /v1/owner/email; the owner opens the link in that email, then retry",
+   "meaning": "A verified owner alert email is needed before an approver device is enrolled or an approver recovery starts",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "no_approver",
+   "you_should": "Ask the owner to enrol an approver device; don't retry until then",
+   "meaning": "This needs an owner authorization and no approver device that can give it is enrolled",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "no_screen_lock",
+   "you_should": "Ask the owner to set a screen lock on it, or use another device",
+   "meaning": "That device has no screen lock, so it can't be an approver device",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "approver_unverified",
+   "you_should": "Use an approver device that verified it; don't retry unchanged",
+   "meaning": "The approver asked hasn't itself verified that approver device's keys",
+   "http": 409,
+   "returned_today": false
+  },
+  {
+   "code": "approver_unreachable",
+   "you_should": "Retry later; the owner may need to open Bridgit on an approver device",
+   "meaning": "No approver device could be reached for a call that needs one",
+   "http": 503,
+   "returned_today": false
+  },
+  {
+   "code": "recovery_complete",
+   "you_should": "Don't retry; enrol a first approver device again",
+   "meaning": "The approver recovery already cleared the approver list, so it can't be cancelled",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "owner_authorization_required",
+   "you_should": "Don't retry; tell the owner what is waiting (`remaining_human_step`)",
+   "meaning": "Only the owner can decide this, on an approver device; an agent can ask, read and decline",
+   "http": 403,
+   "returned_today": true
+  },
+  {
+   "code": "platform_unsupported",
+   "you_should": "Don't retry; use a device whose profile offers it",
+   "meaning": "This platform can't do that (a named gap, for example approving on a desktop install)",
+   "http": 501,
+   "returned_today": true
+  },
+  {
+   "code": "cloud_unreachable",
+   "you_should": "Retry later; work that costs nothing still runs",
+   "meaning": "The Bridgit cloud couldn't be reached, and this spend is from an instrument only the cloud can use",
+   "http": 503,
+   "returned_today": false
+  },
+  {
+   "code": "offline",
+   "you_should": "Retry when the device is back online; work that needs no network still runs",
+   "meaning": "The device reaches no network, so something that needs one can't run now (a spend that needs its provider or the cloud, for example)",
+   "http": 503,
+   "returned_today": false
+  },
+  {
+   "code": "allowance_exhausted",
+   "you_should": "Wait for `resets_at`, or raise the budget or move a share to this device; don't retry unchanged",
+   "meaning": "The device's held allowance for this source has no room left for this spend in the current period (`reason`, `resets_at`)",
+   "http": 429,
+   "returned_today": false
+  },
+  {
+   "code": "allowance_expired",
+   "you_should": "Retry once the device has fetched a new allowance; an expired one never comes back",
+   "meaning": "The device's held allowance for this source has run out of time and no newer one has arrived",
+   "http": 409,
+   "returned_today": false
+  },
+  {
+   "code": "namespace_mismatch",
+   "you_should": "Leave `namespace` out or send the source's own; a sandbox source never spends live money, or the reverse",
+   "meaning": "A spend, a budget or a cap names another accounting namespace (`live` or `sandbox`) than its source or instrument has",
+   "http": 409,
+   "returned_today": true
+  },
+  {
+   "code": "transfer_not_for_recipient",
+   "you_should": "Give it to the device it names, or ask the sender for a new move; don't retry",
+   "meaning": "That move of budget room names another device as its recipient, so this one can't take it",
+   "http": 409,
+   "returned_today": false
+  },
+  {
+   "code": "spending_off",
+   "you_should": "Tell the owner which switch; an agent with the configuration grant can turn it back on with POST /v1/owner/configuration/spending. Don't retry unchanged",
+   "meaning": "Spending is switched off for this spend: outside calls are paused, or spending is off for the instrument class or the source (`rule` 1, `reason`)",
+   "http": 403,
+   "returned_today": false
+  },
+  {
+   "code": "spend_not_allowed",
+   "you_should": "Don't retry; ask the owner",
+   "meaning": "This agent or applet may not spend here: the device does not let it act, or a value transfer lacks `payments.request` (`rule` 2, `reason`)",
+   "http": 403,
+   "returned_today": false
+  },
+  {
+   "code": "spend_source_not_allowed",
+   "you_should": "Link the source (POST /v1/owner/configuration/spending/sources) or use an allowed route; don't retry unchanged",
+   "meaning": "The source is not linked on this device, or the model or route is not one that source allows (`rule` 3, `reason`)",
+   "http": 409,
+   "returned_today": false
+  },
+  {
+   "code": "spend_over_cap",
+   "you_should": "Ask for less, or raise the cap with POST /v1/owner/configuration/spending/rules; don't retry unchanged",
+   "meaning": "The spend is above the per-spend cap of its source or instrument (`rule` 4)",
+   "http": 403,
+   "returned_today": false
+  },
+  {
+   "code": "spend_bridgit_cap",
+   "you_should": "Wait for `resets_at`; an owner or an agent cannot raise a Bridgit-funded cap",
+   "meaning": "A Bridgit-funded cap has no room for this spend, as the cloud last reported it (`rule` 5, `resets_at`)",
+   "http": 429,
+   "returned_today": false
+  },
+  {
+   "code": "spend_over_budget",
+   "you_should": "Wait for `resets_at`, or top the budget up or raise it (POST /v1/owner/configuration/spending/budgets/{id}/topups); don't retry unchanged",
+   "meaning": "An owner budget has no room left in this device's portion for the period (`rule` 6, `resets_at`)",
+   "http": 429,
+   "returned_today": false
+  },
+  {
+   "code": "raise_the_ceiling_first",
+   "you_should": "Raise the ceiling first (POST /v1/owner/configuration/spending/budgets/{id}/gate), then raise the budget",
+   "meaning": "An owner's raise does not fit the room under the budget's agent ceiling that no headroom balance holds",
+   "http": 409,
    "returned_today": false
   }
  ]

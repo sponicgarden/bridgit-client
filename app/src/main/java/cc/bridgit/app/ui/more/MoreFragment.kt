@@ -63,6 +63,7 @@ class MoreFragment : Fragment() {
         }
         row(b.sshConnections, R.drawable.ic_computer, R.string.ssh_title) { findNavController().navigate(R.id.sshConnections) }
         row(b.networkDevices, R.drawable.ic_computer, R.string.network_devices_title) { findNavController().navigate(R.id.networkDevices) }
+        row(b.setupSteps, R.drawable.ic_settings, R.string.setup_steps_title) { startActivity(android.content.Intent(requireContext(), cc.bridgit.app.ui.setup.SetupStepsActivity::class.java)) }
         row(b.tailscaleSetup, R.drawable.ic_shield, R.string.more_tailscale_setup) { findNavController().navigate(R.id.tailscaleSetup) }
         if (cc.bridgit.app.BuildConfig.PRIVATE_CONTROL) row(b.adbSetup, R.drawable.ic_settings, R.string.more_adb_setup) { findNavController().navigate(R.id.adbSetup) }
         else b.adbSetup.root.isVisible = false

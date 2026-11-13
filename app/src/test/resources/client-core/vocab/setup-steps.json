@@ -1,0 +1,120 @@
+{
+  "$schema": "../schemas/vocab.schema.json",
+  "vocab": "setup-steps",
+  "version": 1,
+  "source": {
+    "kind": "pack",
+    "path": "contracts/client-core/vocab/setup-steps.json"
+  },
+  "copies": {
+    "android": "app/src/main/java/cc/bridgit/app/core/contract/ContractVocab.kt"
+  },
+  "rule": "The one set-up step list (architecture 4.8), in order. Each platform reports every step it has, with a state: done, waiting, needs_owner or blocked. A step a platform lacks is left out there. The alert email comes before any approver step. Labels shown to people are chosen in the design pass; ids are API values.",
+  "data": {
+    "states": [
+      "done",
+      "waiting",
+      "needs_owner",
+      "blocked"
+    ],
+    "steps": [
+      {
+        "id": "device_name",
+        "kind": "setting",
+        "where": "anywhere",
+        "api": {
+          "method": "POST",
+          "path": "/v1/owner/configuration/name"
+        },
+        "platforms": [
+          "android",
+          "apple"
+        ],
+        "done_when": "The Device Domain Name is registered (kept for good)."
+      },
+      {
+        "id": "reach",
+        "kind": "step",
+        "where": "this_device",
+        "platforms": [
+          "android",
+          "apple"
+        ],
+        "done_when": "Agents can reach the device: the tailnet listener is bound or the relay is on."
+      },
+      {
+        "id": "first_agent",
+        "kind": "step",
+        "where": "this_device",
+        "platforms": [
+          "android",
+          "apple"
+        ],
+        "done_when": "At least one agent is paired."
+      },
+      {
+        "id": "owner_email",
+        "kind": "setting",
+        "where": "anywhere",
+        "api": {
+          "method": "POST",
+          "path": "/v1/owner/email"
+        },
+        "platforms": [
+          "android",
+          "apple"
+        ],
+        "done_when": "The owner verified an alert email address (waiting while the link is unclicked)."
+      },
+      {
+        "id": "notifications",
+        "kind": "os",
+        "where": "this_device",
+        "platforms": [
+          "android",
+          "apple"
+        ],
+        "done_when": "The OS lets Bridgit show its capture notifications."
+      },
+      {
+        "id": "open_app",
+        "kind": "os",
+        "where": "this_device",
+        "platforms": [
+          "android"
+        ],
+        "done_when": "The service was started from the app, so Android gave it camera and microphone; after a boot or update start it is blocked until the app is opened once."
+      },
+      {
+        "id": "permissions",
+        "kind": "os",
+        "where": "this_device",
+        "platforms": [
+          "android",
+          "apple"
+        ],
+        "done_when": "Every feature the owner switched on has the OS permission it needs."
+      },
+      {
+        "id": "battery",
+        "kind": "os",
+        "where": "this_device",
+        "platforms": [
+          "android"
+        ],
+        "done_when": "Android does not restrict Bridgit in the background (battery optimisation off)."
+      },
+      {
+        "id": "diagnostic",
+        "kind": "step",
+        "where": "this_device",
+        "platforms": [
+          "android",
+          "apple"
+        ],
+        "done_when": "The end-of-set-up diagnostic ran."
+      }
+    ]
+  },
+  "cases": []
+}

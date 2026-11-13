@@ -1,0 +1,107 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Turn spending on or off for the namespace: the pause, per instrument class and per source. Off applies at once; nothing here changes today's live budgets; explicit owner.configuration grant required",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_set",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   },
+   {
+    "name": "paused",
+    "description": "true pauses every spend of the namespace",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "classes",
+    "description": "Instrument class to true or false, for example {\"metered\": false}",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "sources",
+    "description": "Source id to true or false",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "generation",
+    "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/spending {\"namespace\":\"sandbox\",\"paused\":true}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/spending",
+  "capability": "owner_features",
+  "returns": "the same as GET, plus changed",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "generation": {
+     "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+     "type": "integer"
+    },
+    "paused": {
+     "description": "true pauses every spend of the namespace",
+     "type": "boolean"
+    },
+    "sources": {
+     "description": "Source id to true or false",
+     "type": "object"
+    },
+    "classes": {
+     "description": "Instrument class to true or false, for example {\"metered\": false}",
+     "type": "object"
+    },
+    "namespace": {
+     "description": "live (the default) or sandbox. Only sandbox is available on this build",
+     "type": "string",
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "capability_disabled",
+   "platform_unsupported",
+   "conflict",
+   "not_found",
+   "namespace_mismatch",
+   "agents_may_not_change",
+   "over_ceiling",
+   "raise_the_ceiling_first",
+   "no_approver",
+   "owner_authorization_required",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

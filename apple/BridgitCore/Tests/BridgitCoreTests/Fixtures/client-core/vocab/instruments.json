@@ -1,0 +1,50 @@
+{
+  "$schema": "../schemas/vocab.schema.json",
+  "vocab": "instruments",
+  "version": 1,
+  "source": {
+    "kind": "pack",
+    "path": "docs/plans/client-core/spending-authority.md"
+  },
+  "copies": {
+    "android": "app/src/main/java/cc/bridgit/app/core/contract/ContractVocab.kt"
+  },
+  "rule": "The closed words of an instrument (spending authority G2.1) and the instrument rows that fix a namespace (G10.3 X10). classes, funders and custodies are G2.1's. caps says what bounds a source outside the app: provider (a limit the provider enforces on the credential) or core_only (none; the provider balance is the exposure). time_sources says what time an instrument's provider gives (G5.2 rule 1). marks are flags a row may carry; test_network means the row can never hold real value (G10.1). A row's namespace is fixed by the row and no request chooses it: provider sandbox is sandbox, and a provider with no row here is live. host and time_key of the sandbox row are null until the sandbox provider host exists (X8). A case asks for a provider id's namespace.",
+  "data": {
+    "namespaces": ["live", "sandbox"],
+    "default_namespace": "live",
+    "classes": ["metered", "stablecoin", "card", "subscription"],
+    "funders": ["bridgit", "owner"],
+    "custodies": ["cloud", "device", "approver", "device_via_cloud"],
+    "caps": ["provider", "core_only"],
+    "time_sources": ["none", "cloud_signed", "provider_date", "provider_signed", "chain_block"],
+    "usage_scopes": ["source", "account"],
+    "marks": ["test_network"],
+    "instruments": [
+      {
+        "id": "sandbox",
+        "class": "metered",
+        "namespace": "sandbox",
+        "unit": "USD-6",
+        "value_transfer": false,
+        "forms": [
+          {"funder": "owner", "custody": "device"},
+          {"funder": "bridgit", "custody": "cloud"}
+        ],
+        "caps": ["provider", "core_only"],
+        "time_source": "provider_signed",
+        "usage_read": {"scope": "source", "per_period": true, "pending_included": true},
+        "marks": [],
+        "host": null,
+        "time_key": null
+      }
+    ]
+  },
+  "cases": [
+    {"in": "sandbox", "out": "sandbox"},
+    {"in": "openrouter", "out": "live"},
+    {"in": "typesafe", "out": "live"},
+    {"in": "Sandbox", "out": "live"},
+    {"in": "", "out": "live"}
+  ]
+}

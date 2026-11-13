@@ -1,0 +1,49 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read how each budget is divided and what this device holds: portions and share kinds, headroom balances, the allowance each source last spent under, room in transit, the last time anchor and the journal's epoch",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_allowances",
+  "query": [{
+   "name": "namespace",
+   "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+   "type": "string",
+   "required": false,
+   "enum": [
+    "live",
+    "sandbox"
+   ]
+  }],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/spending/allowances?namespace=sandbox",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/spending/allowances",
+  "capability": "owner_features",
+  "returns": "budgets[{id, portions, this_device, increments, in_transit, taken, reclaim_holder, pending_cloud_room}], held{source: {id, issuer rules|cloud, seq, lines, expired}}, journal{epoch, whole, time{anchored, last_anchor_at, usable}}, read_at",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"namespace": {
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }},
+   "required": []
+  },
+  "errors": [
+   "forbidden",
+   "agent_not_allowed",
+   "platform_unsupported",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

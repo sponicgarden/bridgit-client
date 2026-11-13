@@ -385,6 +385,10 @@ class HomeFragment : Fragment() {
         val ctx = requireContext()
         val s = app.listener.value
         val out = mutableListOf<Banner>()
+        // The set-up banners below read the one set-up step list (Client Core 4.8), the list the Set-up screen and
+        // GET /v1/device/profile show; a banner appears while its step is blocked.
+        val setup = cc.bridgit.app.core.profile.AndroidProfile.osSteps(app)
+        fun stepBlocked(id: String) = setup[id]?.state == cc.bridgit.app.core.profile.SetupState.BLOCKED
         // Agent requests waiting for approval come first: they expire in minutes (A0145).
         approvals.singleOrNull()?.let { r ->
             val name = r.optJSONObject("identity")?.optString("name")?.ifBlank { null } ?: "Agent"
@@ -415,7 +419,7 @@ class HomeFragment : Fragment() {
             out += Banner("ts", getString(R.string.home_banner_tailscale), getString(R.string.home_banner_setup_tailscale), true) {
                 findNavController().navigate(R.id.tailscaleSetup)
             }
-        if (!app.captureNotificationsOn() && !DefaultAccess.isDismissed(ctx, DefaultAccess.Ask.NOTIFICATIONS))
+        if (stepBlocked("notifications") && !DefaultAccess.isDismissed(ctx, DefaultAccess.Ask.NOTIFICATIONS))
             out += Banner("notif", notificationsBannerText(), getString(R.string.home_banner_turn_on), false,
                 onDismiss = { DefaultAccess.dismiss(ctx, DefaultAccess.Ask.NOTIFICATIONS); renderBanners() }) {
                 if (android.os.Build.VERSION.SDK_INT >= 33 && !ctx.granted(Manifest.permission.POST_NOTIFICATIONS))
@@ -424,8 +428,7 @@ class HomeFragment : Fragment() {
                     UiActions.openAppNotificationSettings(ctx)
                 else UiActions.openChannelSettings(ctx, BridgeApp.CHANNEL_CAPTURE)
             }
-        if (s.running && s.startedInBackground &&
-            (ctx.granted(Manifest.permission.CAMERA) || ctx.granted(Manifest.permission.RECORD_AUDIO)))
+        if (stepBlocked("open_app"))
             out += Banner("once", getString(R.string.home_banner_open_once), getString(R.string.home_banner_fix_now), false) {
                 runCatching { BridgeService.start(ctx) }
             }
@@ -435,13 +438,13 @@ class HomeFragment : Fragment() {
             if (!m.enabled || reason?.startsWith("permission:") != true) null
             else PermissionBanners.Blocked(reason.removePrefix("permission:"), UiActions.permissionsFor(m).toList())
         }
-        for (g in PermissionBanners.group(blocked)) {
+        if (stepBlocked("permissions")) for (g in PermissionBanners.group(blocked)) {
             val title = UiActions.permissionTitle(ctx, g.kind)
             out += Banner("perm:${g.kind}", getString(R.string.home_banner_permission, title), getString(R.string.home_banner_grant), false) {
                 perms.request(*g.request.toTypedArray())
             }
         }
-        if (UiActions.batteryOptimised(ctx) && !DefaultAccess.isDismissed(ctx, DefaultAccess.Ask.BATTERY))
+        if (stepBlocked("battery") && !DefaultAccess.isDismissed(ctx, DefaultAccess.Ask.BATTERY))
             out += Banner("battery", getString(R.string.home_banner_battery), getString(R.string.home_banner_fix), false,
                 onDismiss = { DefaultAccess.dismiss(ctx, DefaultAccess.Ask.BATTERY); renderBanners() }) {
                 UiActions.requestBatteryExemption(ctx)

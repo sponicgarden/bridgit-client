@@ -1,0 +1,55 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Unlink a source and remove its key from this device. What it spent stays in the journal; an unknown hold of it can no longer be reconciled and keeps its hold. Its id is retired with it: a later link takes another id; explicit owner.configuration grant required",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_sources_unlink",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/owner/configuration/spending/sources/{id}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/spending/sources/{id}",
+  "capability": "owner_features",
+  "returns": "unlinked, id",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/spending/sources/{id}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "capability_disabled",
+   "platform_unsupported",
+   "conflict",
+   "not_found",
+   "namespace_mismatch",
+   "agents_may_not_change",
+   "over_ceiling",
+   "raise_the_ceiling_first",
+   "no_approver",
+   "owner_authorization_required",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

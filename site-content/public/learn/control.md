@@ -1,6 +1,6 @@
 # Bridgit agent control tools
 
-API revision 148. Full index: https://bridgit.cc/learn/index.json.
+API revision 153. Full index: https://bridgit.cc/learn/index.json.
 
 Bridgit has two sets of tools on the same phone, with the same key and the same Tailscale address:
 

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "This device in one answer, the same shape on every Bridgit platform: what it is, whether it is online, every capability with why it can or can't be called now, and the set-up steps with their state",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "device_profile",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/device/profile",
+  "idempotent": false,
+  "path": "/v1/device/profile",
+  "capability": "status",
+  "returns": "schema_version, profile_revision (goes up when anything here changes), observed_at, expires_at (60 s later; read again after), device {install_id, relay_device_id, name, device_type, platform, os_version, app_version, api_revision, services, hardware {camera, microphone, speaker, location: present, absent or unknown}}, link, availability {state, in_foreground}, capabilities {v1.<id>: {runtime_id, implemented, supported, enabled, ready, agent_allowed, callable, blocked_reason, constraints {execution}, operations [{method, path}]}}, setup {not_done, steps [{id, state (done, waiting, needs_owner or blocked), where (this_device, approver or anywhere), dependency {kind (os, platform, provider or step), name}, api {method, path} for a step an API completes}]}. A hint, never an authorization: calls are still checked when made",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

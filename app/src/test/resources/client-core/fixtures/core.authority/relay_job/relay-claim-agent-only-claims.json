@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "relay-claim-agent-only-claims",
+  "service": "core.authority",
+  "door": "relay_job",
+  "title": "A link code's claim-only relay agent may call nothing but the claim",
+  "step": "claim_agent",
+  "principal": {
+    "agent": "c",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "relay": {
+      "enabled": true,
+      "configs": []
+    },
+    "link_codes": [
+      {
+        "ref": "c",
+        "services": [
+          "camera"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/health"
+  },
+  "expect": {
+    "status": 403,
+    "error": "relay_route_excluded",
+    "body_paths": {
+      "message": "A link code's relay token only claims the link"
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

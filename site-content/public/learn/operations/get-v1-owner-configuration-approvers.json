@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read this device's approver devices (never keys), whether it can enrol itself as its own approver and why not, what its key store offers, and the recovery state. Off unless security.approvers_enabled is on; can_enable says whether this build can turn it on",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_approvers_list",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/approvers",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/approvers",
+  "capability": "owner_features",
+  "returns": "enabled, setting, can_enable, enable_blocked_reason (not_available_in_this_build: the published build can't turn approver devices on yet) or null, approvers[{id, name, self, added_at, last_used_at, can_approve, wait_ends_at}], can_enrol, blocked_reason (approvers_disabled|owner_email_required|no_screen_lock|platform_unsupported|recovery_pending|approver_listed), email_verified, capability{api_level, secure_lock_screen, strongbox, strong_biometric, per_use_credential_keys, readiness}, key_state (absent|ready|needs_setup), generation, enrolment{id, status, detail} or null, requests[{id, kind, purpose, requester, expires_at, check}], recovery{state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver)}, remaining_human_step{step, where, status} or null, waits{recovery_ms, approver_ms, request_ms}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

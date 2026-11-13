@@ -1,0 +1,72 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Link a source. This build links the sandbox instrument only: a sandbox key is made at the sandbox provider and stored on this device, write-only. It needs no namespace: the instrument fixes it; explicit owner.configuration grant required",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_sources_link",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "instrument",
+    "description": "sandbox",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "id",
+    "description": "A name for the source, 1 to 64 of a-z 0-9 . _ -; made up when left out",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/spending/sources {\"instrument\":\"sandbox\",\"id\":\"sandbox-1\"}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/spending/sources",
+  "capability": "owner_features",
+  "returns": "the source as in the list; conflict when the id is taken or was linked before (reason id_retired)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "instrument": {
+     "description": "sandbox",
+     "type": "string"
+    },
+    "id": {
+     "description": "A name for the source, 1 to 64 of a-z 0-9 . _ -; made up when left out",
+     "type": "string"
+    }
+   },
+   "required": [
+    "instrument",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "capability_disabled",
+   "platform_unsupported",
+   "conflict",
+   "not_found",
+   "namespace_mismatch",
+   "agents_may_not_change",
+   "over_ceiling",
+   "raise_the_ceiling_first",
+   "no_approver",
+   "owner_authorization_required",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

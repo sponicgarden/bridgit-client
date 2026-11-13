@@ -1,0 +1,45 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-configuration-listener-paused",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "A control scope is refused while the owner has the listener paused",
+  "step": "grant.control_scope",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": false,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "owner_features"
+        ]
+      }
+    ],
+    "control_grants": [
+      {
+        "agent": "a",
+        "scope": "owner.configuration"
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/owner/configuration"
+  },
+  "expect": {
+    "status": 403,
+    "error": "listener_paused"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

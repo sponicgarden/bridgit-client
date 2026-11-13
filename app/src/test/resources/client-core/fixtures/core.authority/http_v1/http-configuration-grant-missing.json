@@ -1,0 +1,39 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-configuration-grant-missing",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "Configuration needs the owner.configuration grant, not only the owner_features capability",
+  "step": "grant.control_scope",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "owner_features"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/owner/configuration"
+  },
+  "expect": {
+    "status": 403,
+    "error": "agent_not_allowed"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

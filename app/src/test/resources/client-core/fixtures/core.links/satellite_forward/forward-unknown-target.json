@@ -1,0 +1,42 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "forward-unknown-target",
+  "service": "core.links",
+  "door": "satellite_forward",
+  "title": "A target that is no linked device is refused as unknown",
+  "step": "target_known",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log",
+    "headers": {
+      "X-Bridgit-Target": "nowhere"
+    }
+  },
+  "expect": {
+    "status": 404,
+    "error": "unknown_target"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

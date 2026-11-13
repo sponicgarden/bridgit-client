@@ -1,0 +1,53 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-location-switched-off-during-wait",
+  "service": "core.dispatch",
+  "door": "http_v1",
+  "title": "A capture waiting for its fix ends with capability_disabled when the owner switches the capability off",
+  "step": "live_recheck",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "location"
+        ]
+      }
+    ],
+    "location_access": "precise",
+    "switches": {
+      "location": true
+    }
+  },
+  "during": {
+    "at": "wait",
+    "switches": {
+      "location": false
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/location",
+    "query": {
+      "fresh": "true",
+      "compass": "false"
+    }
+  },
+  "expect": {
+    "status": 403,
+    "error": "capability_disabled"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

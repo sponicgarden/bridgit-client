@@ -77,6 +77,10 @@ class BridgeApp : Application() {
     lateinit var transfers: cc.bridgit.app.planned.Transfers
     lateinit var schedules: cc.bridgit.app.schedule.Schedules
     lateinit var clipboardRequests: cc.bridgit.app.planned.ClipboardRequests
+    /** Approver devices (architecture §4.7), behind security.approvers_enabled; idle while that is off. */
+    val authority by lazy { cc.bridgit.app.core.authority.Authority(this) }
+    /** The spending core (spending authority G10.2), behind spending.core_enabled; nothing of it runs while that is off. */
+    val spending by lazy { cc.bridgit.app.core.spending.Spending(this) }
     val policy by lazy { Policy(this) }
     val audit by lazy { PlatformAudit(this) }
     val platform by lazy { cc.bridgit.app.platform.AgentPlatform(this) }
@@ -152,6 +156,7 @@ class BridgeApp : Application() {
         settings.onSwitch = { key, on ->
             usage.count("switch:$key:${if (on) "on" else "off"}")
             if(!on && key in setOf("mic","lan_camera","lan_camera_audio")) dog.revokeMicrophones(key)
+            authority.switchChanged(key, on) // a master switch raises the authority generation (no-op while approvers are off)
         }
         agents = AgentRegistry(settings.agentStorage(this))
         // A Bridgit Portal pairing only views the phone: its first call is not "an agent connected".
@@ -243,6 +248,9 @@ class BridgeApp : Application() {
             if (now != tileListening) { tileListening = now; cc.bridgit.app.ui.home.ListenerTile.requestUpdate(this) }
         }
         agents.addListener { platform.recheckCredentials(); resourceDownloads.stopRevoked() }
+        authority.attach()
+        cc.bridgit.app.ownerapi.ConfigurationApprovals.register(this)
+        platform.store.onGrantChange = authority::grantChanged
         settings.addListener { resourceDownloads.stopRevoked() }
         platform
         cc.bridgit.app.power.PowerAccess(this).reconcileMaximum()

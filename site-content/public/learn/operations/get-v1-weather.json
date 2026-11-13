@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Weather where the phone is (or at a lat/lon you give): conditions now, the next hours and the next 24 hours, from MET Norway. Schedule it like any call: {\"do\":{\"call\":\"GET /v1/weather\"}}",

@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-paused",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "A paused agent is refused with agent_paused",
+  "step": "grant.agent_paused",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ],
+        "paused": true
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log"
+  },
+  "expect": {
+    "status": 403,
+    "error": "forbidden",
+    "reason": "agent_paused"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

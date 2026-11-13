@@ -49,6 +49,8 @@ object SatelliteHub {
      */
     fun pushHubInfo(app: BridgeApp, id: String, hubName: String = cc.bridgit.app.platform.DeviceName.forLinks(app)) {
         if (LinkPause.satellites) return
+        // A link over the relay has no way back yet: the return agent is locked to a Tailscale address.
+        if (app.satellites.meta(id) == null || app.satellites.get(id)?.relay != null) return
         try {
             var s = app.satellites.get(id) ?: return
             val live = s.returnAgent?.let { app.agents.get(it) }
@@ -106,6 +108,9 @@ object SatelliteHub {
             app.satellites.update(id) { it.copy(manifest = m, lastSeen = System.currentTimeMillis(), lastError = null) }
                 .also { runCatching { app.links.noteManifest(id, m) }; pushHubInfo(app, id) }
         } catch (e: SatelliteClient.Failure) {
+            // Over the relay, a target from before relay manifests refuses the route but did answer: it is there.
+            if (s.relay != null && e.code == "relay_route_excluded")
+                return app.satellites.update(id) { it.copy(lastSeen = System.currentTimeMillis(), lastError = null) }
             if (e.code == "link_revoked") {
                 app.links.all().firstOrNull { it.role == cc.bridgit.app.link.Links.Role.HUB && it.ref == id }?.let { app.links.farRevoked(it, e.scope) }
                 return app.satellites.get(id)
@@ -122,11 +127,19 @@ object SatelliteHub {
     }
 
     @Volatile private var lastAll = 0L
+    private val relayRead = java.util.concurrent.ConcurrentHashMap<String, Long>()
+    private const val RELAY_MANIFEST_MS = 60 * 60_000L
 
     /** From the service's 5-minute check: every satellite, at most once a minute. */
     fun refreshAllIfDue(app: BridgeApp, now: Long = System.currentTimeMillis()) {
         if (now - lastAll < 60_000 || app.satellites.count() == 0 || LinkPause.satellites) return
         lastAll = now
-        app.satellites.all().forEach { runCatching { refresh(app, it.id) } }
+        app.satellites.all().forEach { s ->
+            // Each relay call counts against the relay's allowance and may wake the other device: a link over the relay
+            // reads its manifest hourly (its events sync keeps last seen current).
+            if (s.relay != null && s.manifest != null && now - (relayRead[s.id] ?: 0L) < RELAY_MANIFEST_MS) return@forEach
+            if (s.relay != null) relayRead[s.id] = now
+            runCatching { refresh(app, s.id) }
+        }
     }
 }

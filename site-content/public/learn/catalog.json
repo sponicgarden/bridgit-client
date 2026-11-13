@@ -3198,6 +3198,236 @@
      "control_scope": "owner.configuration",
      "requires_power": null,
      "tool": "owner_configuration_links_log"
+    },
+    {
+     "summary": "Read this device's approver devices (never keys), whether it can enrol itself as its own approver and why not, what its key store offers, and the recovery state. Off unless security.approvers_enabled is on; can_enable says whether this build can turn it on",
+     "path": "/v1/owner/configuration/approvers",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-approvers.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-approvers.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_approvers_list"
+    },
+    {
+     "summary": "Start enrolling this device as its own approver while the list is empty: makes the approver key and asks for the owner's screen-lock check on this device, which is the one human step. Needs a verified alert email and a screen lock; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/approvers",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-approvers.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-approvers.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_approvers_enrol"
+    },
+    {
+     "summary": "Read the approver recovery: its state, who started it, when the approver list is cleared and the time left",
+     "path": "/v1/owner/configuration/approvers/recovery",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-approvers-recovery.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-approvers-recovery.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_approvers_recovery_get"
+    },
+    {
+     "summary": "Start an approver recovery when the last approver is lost: the approver list is cleared after 72 hours of running time unless a listed approver cancels. Not available yet: refused with platform_unsupported and remaining_steps until alert email delivery and a cancel action on the approver device exist; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/approvers/recovery",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-approvers-recovery.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-approvers-recovery.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_approvers_recovery_start"
+    },
+    {
+     "summary": "Cancel a pending approver recovery: the agent that started it withdraws it at once; anyone else's cancel asks a listed approver for the owner's check; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/approvers/recovery",
+     "method": "DELETE",
+     "documentation": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-approvers-recovery.json",
+     "operation_url": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-approvers-recovery.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_approvers_recovery_cancel"
+    },
+    {
+     "summary": "Read the spending core: whether it is on (owner setting spending.core_enabled), which namespaces this build has, and for namespace=sandbox its switches, journal state and time anchor. With no namespace it answers for live, which is not available yet",
+     "path": "/v1/owner/configuration/spending",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_get"
+    },
+    {
+     "summary": "Turn spending on or off for the namespace: the pause, per instrument class and per source. Off applies at once; nothing here changes today's live budgets; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/spending",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_set"
+    },
+    {
+     "summary": "List the linked sources of a namespace: instrument, provider, custody, cap and whether the key is set. A key is never returned",
+     "path": "/v1/owner/configuration/spending/sources",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-sources.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-sources.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_sources_list"
+    },
+    {
+     "summary": "Link a source. This build links the sandbox instrument only: a sandbox key is made at the sandbox provider and stored on this device, write-only. It needs no namespace: the instrument fixes it; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/spending/sources",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-sources.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-sources.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_sources_link"
+    },
+    {
+     "summary": "Unlink a source and remove its key from this device. What it spent stays in the journal; an unknown hold of it can no longer be reconciled and keeps its hold. Its id is retired with it: a later link takes another id; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/spending/sources/{id}",
+     "method": "DELETE",
+     "documentation": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-spending-sources-id.json",
+     "operation_url": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-spending-sources-id.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_sources_unlink"
+    },
+    {
+     "summary": "Read the rule document of a namespace: generation, time zone, switches and per-spend caps, and who signed it",
+     "path": "/v1/owner/configuration/spending/rules",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-rules.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-rules.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_rules_get"
+    },
+    {
+     "summary": "Change the budget time zone or a per-spend cap (per instrument or per source). Lowering is open to any configuration agent; raising or removing a cap needs the Budgets capability. A zone change never resets a period; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/spending/rules",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-rules.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-rules.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_rules_set"
+    },
+    {
+     "summary": "List the owner budgets of a namespace with this device's portion, what it has used this period and when that resets, the change gate with who set it, and the raises applied",
+     "path": "/v1/owner/configuration/spending/budgets",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-budgets.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-budgets.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_budgets_list"
+    },
+    {
+     "summary": "Create an owner budget. This device is its executor and holds the whole amount as a standing share. Needs the Budgets capability; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/spending/budgets",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-budgets.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-budgets.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_budgets_create"
+    },
+    {
+     "summary": "Change a budget. A lower amount is a reduction and applies at once. A higher amount is a standing raise: an increment with an id, applied once, drawn from this device's headroom balance under an agent ceiling. A new scope or period never opens a period early. Needs the Budgets capability; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/spending/budgets/{id}",
+     "method": "PATCH",
+     "documentation": "https://bridgit.cc/learn/operations/patch-v1-owner-configuration-spending-budgets-id.json",
+     "operation_url": "https://bridgit.cc/learn/operations/patch-v1-owner-configuration-spending-budgets-id.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_budgets_update"
+    },
+    {
+     "summary": "Remove a budget. A reduction: it applies at once, unless the owner's gate stands on it. The namespace goes in the query; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/spending/budgets/{id}",
+     "method": "DELETE",
+     "documentation": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-spending-budgets-id.json",
+     "operation_url": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-spending-budgets-id.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_budgets_delete"
+    },
+    {
+     "summary": "Top a budget up for the current period only: an increment with an id that raises this device's portion by its amount, applied once per Idempotency-Key, and under an agent ceiling drawn from this device's headroom balance; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/spending/budgets/{id}/topups",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-budgets-id-topups.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-budgets-id-topups.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_budgets_topup"
+    },
+    {
+     "summary": "Set or change a budget's change gate: agents_may_change and the agent ceiling. Setting or tightening is open to any agent with the Budgets capability. Lifting one the owner set is the owner's: no_approver with remaining_human_step. A ceiling added to an existing budget starts with no headroom balance; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/spending/budgets/{id}/gate",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-budgets-id-gate.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-budgets-id-gate.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_budgets_gate"
+    },
+    {
+     "summary": "Read how each budget is divided and what this device holds: portions and share kinds, headroom balances, the allowance each source last spent under, room in transit, the last time anchor and the journal's epoch",
+     "path": "/v1/owner/configuration/spending/allowances",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-allowances.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-allowances.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_allowances"
+    },
+    {
+     "summary": "Read the spend journal of a namespace: entries of the current epoch (or another) in order, as entry/1. It answers from the device, with or without a network",
+     "path": "/v1/owner/configuration/spending/journal",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-journal.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-journal.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_journal"
+    },
+    {
+     "summary": "Acknowledge unreadable history: rows of an earlier journal epoch that can be tied to no request stop every spend until the owner or an agent takes that on. Nothing is given back by it; explicit owner.configuration grant required",
+     "path": "/v1/owner/configuration/spending/journal",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-journal.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-spending-journal.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_journal_acknowledge"
+    },
+    {
+     "summary": "Read what was spent in a namespace: per budget the portion, what is used and when it resets; per source the counts and amounts by state. It answers from the device's journal, with its age",
+     "path": "/v1/owner/configuration/spending/summary",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-summary.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-summary.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_summary"
+    },
+    {
+     "summary": "Read the Bridgit-funded limits as mirrored from the cloud, and the contract limits of the spending core. Nothing is mirrored on this build: no Bridgit-funded source exists on the device-held path",
+     "path": "/v1/owner/configuration/spending/limits",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-limits.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-spending-limits.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_spending_limits"
     }
    ],
    "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
@@ -4156,6 +4386,16 @@
      "control_scope": null,
      "requires_power": null,
      "tool": "health"
+    },
+    {
+     "summary": "This device in one answer, the same shape on every Bridgit platform: what it is, whether it is online, every capability with why it can or can't be called now, and the set-up steps with their state",
+     "path": "/v1/device/profile",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-device-profile.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-device-profile.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "device_profile"
     },
     {
      "summary": "This phone's display right now and the canvas a card's page gets: full screen (presentation full_screen) per orientation and the standard card frame. Static specs (screen size, cameras) are also stored with Bridgit: ask GET <team backend>/v1/names/{name}/specs first when the phone may be busy or offline",
@@ -7681,8 +7921,8 @@
   "kind": "source_generated",
   "released": "Check public updater manifest; source documentation is not release evidence."
  },
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "installed_api_revision": null,
  "categories": [
   "sense",

@@ -41,8 +41,12 @@ object InstallIdentity {
     private val keys get() = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
     private fun prefs(ctx: Context) = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
+    /** Test hook: Robolectric has no AndroidKeyStore, so unit tests that need an install set one here. */
+    @Volatile internal var testStatus: Status? = null
+
     /** The registered install, or null if this phone hasn't registered yet. */
     fun status(ctx: Context): Status? {
+        testStatus?.let { return it }
         val p = prefs(ctx)
         val id = p.getString("install_id", null) ?: return null
         if (!keys.containsAlias(ALIAS)) return null
@@ -96,6 +100,14 @@ object InstallIdentity {
     fun makeKeyForTest(challenge: ByteArray) { runCatching { keys.deleteEntry(ALIAS) }; makeKey(challenge) }
 
     private fun publicKey(): ByteArray = keys.getCertificate(ALIAS).publicKey.encoded
+
+    /** The registered install's public key (SPKI), or null before registration. For approver transcripts (architecture §4.7). */
+    fun publicKeySpki(ctx: Context): ByteArray? = if (status(ctx) == null) null else runCatching { publicKey() }.getOrNull()
+
+    /** r||s by the install key over [message] (SHA-256), or null before registration. It needs no owner check, so it is never an approval. */
+    fun sign(ctx: Context, message: ByteArray): ByteArray? = if (status(ctx) == null) null else runCatching {
+        InstallAuth.derToP1363(Signature.getInstance("SHA256withECDSA").apply { initSign(keys.getKey(ALIAS, null) as PrivateKey); update(message) }.sign())
+    }.getOrNull()
 
     private fun signedHeaders(id: String, method: String, pathAndQuery: String, body: ByteArray): Map<String, String> {
         val at = System.currentTimeMillis()

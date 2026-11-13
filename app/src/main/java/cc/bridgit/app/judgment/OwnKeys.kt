@@ -19,7 +19,8 @@ import javax.crypto.spec.GCMParameterSpec
  * Keys are typed in by the owner in Settings and kept encrypted with a non-exportable Android Keystore
  * AES-GCM key. Agents with App settings and Super Powers can replace or clear them through a write-only API. The log never shows them.
  *
- * To add a provider: add a [Provider] to [PROVIDERS] here and the same id to PROVIDERS in
+ * To add a provider: add it to contracts/client-core/vocab/own-key-providers.json (then run
+ * tools/client-core/gen.mjs), its strings to [TEXT] here, and the same id to PROVIDERS in
  * bridgit-cloud/feedback/src/ownkeys.mjs. Settings builds its rows from this list.
  */
 class OwnKeys(context: Context) {
@@ -99,22 +100,24 @@ class OwnKeys(context: Context) {
         /** The backend's answers that mean Bridgit's shared allowance is used up, so an own key may help. */
         val FALLBACK_REASONS = setOf("spend_cap", "rate_limited", "clef_quota")
 
-        private val ANY = Regex("^\\S{8,400}$")
-
-        val PROVIDERS: List<Provider> = listOf(
-            Provider("googlemaps", cc.bridgit.app.R.string.own_key_googlemaps, cc.bridgit.app.R.string.own_key_googlemaps_desc,
-                setOf("places","airquality","pollen","timezone","maps","streetview","weathergoogle"), emptySet(), listOf(Field(cc.bridgit.app.R.string.own_key_api_key,ANY))),
-            Provider("openmeteo", cc.bridgit.app.R.string.own_key_openmeteo, cc.bridgit.app.R.string.own_key_openmeteo_desc,
-                setOf("openmeteo"), emptySet(), listOf(Field(cc.bridgit.app.R.string.own_key_api_key,ANY))),
-            Provider("typesafe", cc.bridgit.app.R.string.own_key_typesafe, cc.bridgit.app.R.string.own_key_typesafe_desc,
-                setOf("jev"), setOf("jev"), listOf(Field(cc.bridgit.app.R.string.own_key_api_key, ANY))),
-            Provider("cloudflare", cc.bridgit.app.R.string.own_key_cloudflare, cc.bridgit.app.R.string.own_key_cloudflare_desc,
-                setOf("clef"), setOf("clef"), listOf(
-                    Field(cc.bridgit.app.R.string.own_key_cf_account, Regex("^[0-9a-fA-F]{32}$"), secret = false),
-                    Field(cc.bridgit.app.R.string.own_key_cf_token, ANY))),
-            Provider("openrouter", cc.bridgit.app.R.string.own_key_openrouter, cc.bridgit.app.R.string.own_key_openrouter_desc,
-                setOf("jev", "clef", "glm", "locate", "appraise", "story"), setOf("glm"), listOf(Field(cc.bridgit.app.R.string.own_key_api_key, ANY))),
+        /** Name and summary strings per provider id; the ids, routes and fields come from the contract pack. */
+        private val TEXT: Map<String, Pair<Int, Int>> = mapOf(
+            "googlemaps" to (cc.bridgit.app.R.string.own_key_googlemaps to cc.bridgit.app.R.string.own_key_googlemaps_desc),
+            "openmeteo" to (cc.bridgit.app.R.string.own_key_openmeteo to cc.bridgit.app.R.string.own_key_openmeteo_desc),
+            "typesafe" to (cc.bridgit.app.R.string.own_key_typesafe to cc.bridgit.app.R.string.own_key_typesafe_desc),
+            "cloudflare" to (cc.bridgit.app.R.string.own_key_cloudflare to cc.bridgit.app.R.string.own_key_cloudflare_desc),
+            "openrouter" to (cc.bridgit.app.R.string.own_key_openrouter to cc.bridgit.app.R.string.own_key_openrouter_desc),
         )
+        private val HINTS: Map<String, Int> = mapOf(
+            "api_key" to cc.bridgit.app.R.string.own_key_api_key, "account_id" to cc.bridgit.app.R.string.own_key_cf_account, "api_token" to cc.bridgit.app.R.string.own_key_cf_token,
+        )
+
+        /** Generated from contracts/client-core/vocab/own-key-providers.json; add a provider there (and in bridgit-cloud ownkeys.mjs). */
+        val PROVIDERS: List<Provider> = cc.bridgit.app.core.contract.ContractVocab.OWN_KEY_PROVIDERS.map { p ->
+            val (label, summary) = TEXT[p.id] ?: error("no strings for own-key provider ${p.id}")
+            Provider(p.id, label, summary, p.routes, p.ownRoutes,
+                p.fields.map { f -> Field(HINTS[f.id] ?: error("no hint for own-key field ${f.id}"), Regex(f.pattern), f.secret) })
+        }
 
         /** "jev" or "clef" for a backend route like "/v1/jev". Pure. */
         fun routeName(route: String): String = route.substringAfterLast('/')

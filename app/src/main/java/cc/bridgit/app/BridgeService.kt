@@ -50,6 +50,7 @@ class BridgeService : LifecycleService() {
     private var platformTick: Job? = null
     val relay by lazy { cc.bridgit.app.relay.RelayClient(this) }
     private var relayJob: Job? = null
+    private var authorityTick: Job? = null
     private var server: ApiServer? = null
     private var boundTo: List<String> = emptyList()
     private val reconnect = cc.bridgit.app.core.TailscaleReconnect()
@@ -92,6 +93,8 @@ class BridgeService : LifecycleService() {
         }
         if(platformTick==null) platformTick=lifecycleScope.launch(Dispatchers.IO) { while(isActive) { runCatching { app.platform.workflows.tick(); app.platform.delivery.tick() }; delay(1000) } }
         if(relayJob==null) relayJob=lifecycleScope.launch(Dispatchers.IO) { relay.run() }
+        // Approver devices: count running time and do a due recovery clear, now and about once a minute (nothing while off).
+        if(authorityTick==null) authorityTick=lifecycleScope.launch(Dispatchers.IO) { while(isActive) { runCatching { app.authority.checkpoint() }; delay(60_000) } }
         battery.start()
         running = this
         // An update or restart closes the service; monitoring that was on comes back with it.
@@ -293,6 +296,7 @@ class BridgeService : LifecycleService() {
         app.registry.cameraArm.releaseAll(this)
         app.registry.pose.stopAll()
         relayJob?.cancel(); relayJob=null
+        authorityTick?.cancel(); authorityTick=null
         app.platform.stopAll(); platformTick?.cancel(); platformTick=null
         app.hardware.stop()
         watcher?.cancel(); watcher = null
@@ -311,6 +315,7 @@ class BridgeService : LifecycleService() {
         app.registry.cameraArm.releaseAll(this)
         app.registry.pose.stopAll()
         relayJob?.cancel(); relayJob=null
+        authorityTick?.cancel(); authorityTick=null
         app.platform.interrupt(); platformTick?.cancel(); platformTick=null
         app.hardware.stop()
         server?.stop(); server = null

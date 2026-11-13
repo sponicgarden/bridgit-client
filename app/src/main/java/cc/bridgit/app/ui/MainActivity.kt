@@ -272,7 +272,7 @@ class MainActivity : AppCompatActivity() {
         val target=intent?.getStringExtra("owner_setup_target") ?: return
         intent.removeExtra("owner_setup_target")
         // "home": back from adding a phone to view (Bridgit Portal viewer), Home shows that phone.
-        when(target) { "add_agent" -> nav.navigate(R.id.addAgent); "cameras" -> nav.navigate(R.id.cameras); "settings" -> nav.navigate(R.id.settings); "network" -> nav.navigate(R.id.networkDevices); "home" -> b.bottomNav.selectedItemId = R.id.home }
+        when(target) { "add_agent" -> nav.navigate(R.id.addAgent); "cameras" -> nav.navigate(R.id.cameras); "settings" -> nav.navigate(R.id.settings); "network" -> nav.navigate(R.id.networkDevices); "tailscale" -> nav.navigate(R.id.tailscaleSetup); "home" -> b.bottomNav.selectedItemId = R.id.home }
     }
 
     private fun openDogFrom(intent: Intent?) {

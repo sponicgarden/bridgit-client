@@ -9,6 +9,7 @@ import cc.bridgit.app.core.Connection
 import cc.bridgit.app.core.Net
 import cc.bridgit.app.satellite.HubLinks
 import cc.bridgit.app.satellite.LinkPause
+import cc.bridgit.app.satellite.LinkRelayClient
 import cc.bridgit.app.satellite.SatelliteClient
 import cc.bridgit.app.satellite.SatelliteHub
 import cc.bridgit.app.satellite.SatelliteLink
@@ -473,9 +474,12 @@ class Links(private val app: BridgeApp) {
         }
     }
 
-    /** The relay routes of a link agent over the relay: the link's own calls, plus what its service list lets through. */
+    /**
+     * The relay routes of a link agent over the relay: the link's own calls (with the manifest and unlink a claiming
+     * Android device uses), plus what its service list lets through.
+     */
     fun relayRoutes(services: Set<String>): Set<String> =
-        LinkPolicy.PLUMBING.filter { it.startsWith("/link/") }.map { p -> cc.bridgit.app.api.Endpoints.all.first { it.path == p } }.map { "${it.method} ${it.fullPath}" }.toSet() +
+        LinkPolicy.PLUMBING.filter { it.startsWith("/link/") || it == "/satellite/manifest" || it == "/satellite/unlink" }.map { p -> cc.bridgit.app.api.Endpoints.all.first { it.path == p } }.map { "${it.method} ${it.fullPath}" }.toSet() +
         cc.bridgit.app.api.Endpoints.all.filter { LinkPolicy.mayCall(it, services) && !LinkPolicy.isPlumbing(it) }.map { "${it.method} ${it.fullPath}" }
 
     private fun syncAgent(agentId: String, services: Set<String>) {
@@ -627,24 +631,42 @@ class Links(private val app: BridgeApp) {
             throw ErrorCatalog.error("invalid_parameter", "That code is from this device. Claim it on the other Bridgit.")
         val keys = LinkCode.keys(code, targetName)
         // LNK-19: without an address from a link, the names backend gives it for a proof of the code.
-        val (host, port) = if (t.host != null && t.port != null) t.host to t.port
+        val reach = if (t.host != null && t.port != null) LinkResolver.Reach.Tailscale(t.host, t.port)
             else LinkResolver.resolve(app, targetName, keys.proof(targetName, own ?: throw ErrorCatalog.error("team_unavailable", "This device couldn't prove who it is to the names backend. Retry.")))
         val body = JSONObject().put("name", cc.bridgit.app.platform.DeviceName.forLinks(app))
             .put("bridgit_name", registeredName()).put("install", own ?: JSONObject.NULL).put("granter", granter.toJson())
-        val base = SatelliteClient.base(host, port)
-        val o = try { SatelliteClient.linkClaim(base, keys.claimToken, body) } catch (e: SatelliteClient.Failure) {
-            throw ErrorCatalog.error("target_offline", "$targetName didn't answer at $host. Check that Tailscale and Bridgit are on there, then retry with the same code.", mapOf("retry_after_s" to 30))
+        // Over Tailscale the target answers with a brg_ key for this device. Over the relay (§4.1) the claim token is
+        // the only bearer the relay takes for the code; this device makes its own rly_ token and sends only its hash,
+        // and the target makes that hash its link agent's relay credential.
+        // Over the relay the other device has no way back to this one yet, so it can't be offered this device's services.
+        if (reach is LinkResolver.Reach.Relay && reverseServices.isNotEmpty()) throw ErrorCatalog.error("invalid_parameter",
+            "$targetName can be reached only over the relay, where reverse_services doesn't work yet. Claim without reverse_services, or turn Tailscale on on both devices.")
+        val (o, key, base) = when (reach) {
+            is LinkResolver.Reach.Tailscale -> {
+                val base = SatelliteClient.base(reach.host, reach.port)
+                val o = try { SatelliteClient.linkClaim(base, keys.claimToken, body) } catch (e: SatelliteClient.Failure) {
+                    throw ErrorCatalog.error("target_offline", "$targetName didn't answer at ${reach.host}. Check that Tailscale and Bridgit are on there, then retry with the same code.", mapOf("retry_after_s" to 30))
+                }
+                Triple(o, o.optString("key").takeIf { it.startsWith("brg_") } ?: throw ErrorCatalog.error("upstream_failed", "The other Bridgit didn't send a key."), base)
+            }
+            is LinkResolver.Reach.Relay -> {
+                val token = LinkRelayClient.newToken()
+                Triple(relayLinkClaim(reach.base, keys.claimToken, targetName, body.put("token_hash", cc.bridgit.app.relay.RelayStore.hash(token)).put("platform", "android")), token, reach.base)
+            }
         }
-        val key = o.optString("key").takeIf { it.startsWith("brg_") } ?: throw ErrorCatalog.error("upstream_failed", "The other Bridgit didn't send a key.")
         val linkId = o.optString("link_id").takeIf { LinkIds.LINK_RE.matches(it) } ?: LinkIds.newLink()
         val peerName = cc.bridgit.app.feedback.DeviceNames.parse(o.text("bridgit_name")) ?: targetName
-        val p = SatelliteLink.Parsed(host, port, "", o.text("name").ifBlank { peerName ?: "Bridgit" }, o.text("install").takeIf { it.startsWith("bgi_") } ?: t.install)
+        val tailscale = reach as? LinkResolver.Reach.Tailscale
+        val p = SatelliteLink.Parsed(tailscale?.host ?: "", tailscale?.port ?: 0, "", o.text("name").ifBlank { peerName ?: "Bridgit" }, o.text("install").takeIf { it.startsWith("bgi_") } ?: t.install)
+        // A target from before relay manifests refuses this over the relay (relay_route_excluded): the link works without it.
         val manifest = runCatching { SatelliteClient.manifest(base, key, cc.bridgit.app.platform.DeviceName.forLinks(app)) }.getOrNull()
-        val s = try { app.satellites.add(p, key, manifest) } catch (e: Exception) { runCatching { SatelliteClient.unlink(base, key) }; throw e }
+        val s = try { app.satellites.add(p, key, manifest, relay = (reach as? LinkResolver.Reach.Relay)?.base) } catch (e: Exception) { runCatching { SatelliteClient.unlink(base, key) }; throw e }
         val now = System.currentTimeMillis()
         val services = runCatching { LinkModel.parseServices(o.optJSONArray("services")) }.getOrDefault(emptySet())
         val directions = o.optJSONArray("directions")?.let { a -> (0 until a.length()).map { a.optString(it) }.toSet() } ?: setOf("in")
         app.satellites.update(s.id) { it.copy(agents = agents) }
+        // A device linked over Tailscale before keeps no return link once it is linked over the relay.
+        if (s.relay != null && s.returnAgent != null) { app.agents.remove(s.returnAgent); app.satellites.update(s.id) { it.copy(returnAgent = null, returnKey = null) } }
         val old = all().firstOrNull { it.role == Role.HUB && it.ref == s.id }
         // A target from before tiers sends none: its codes were for the owner's own devices.
         val far = if (o.has("tier")) LinkTier.parseOrPublic(o.optString("tier")) else LinkTier.OWN
@@ -669,6 +691,30 @@ class Links(private val app: BridgeApp) {
         SatelliteHub.pushHubInfo(app, s.id)
         flushSoon(linkId)
         return json(get(linkId) ?: r)
+    }
+
+    /** Blocking. POST /v1/link/claim as a relay job with the code's [claimToken]. Errors keep the target's own code where it has one. */
+    private fun relayLinkClaim(base: String, claimToken: String, targetName: String, body: JSONObject): JSONObject {
+        if (LinkPause.satellites) throw ErrorCatalog.error("forbidden", LinkPause.SATELLITES_MESSAGE, mapOf("reason" to "satellites_paused"))
+        val (status, o) = try { LinkRelayClient.job(base, claimToken, "POST", "/v1/link/claim", body, readS = 20) } catch (e: SatelliteClient.Failure) {
+            throw when (e.code) {
+                // The relay no longer takes the code's token: the code was used, cancelled, voided or expired there.
+                "unauthorized" -> ErrorCatalog.error("code_used_up", "That link code no longer works (used, cancelled or expired). Make a new one on $targetName.")
+                "rate_limited" -> ErrorCatalog.error("rate_limited", "The relay is busy. Retry with the same code in a minute.", mapOf("retry_after_s" to 60))
+                else -> ErrorCatalog.error("target_offline", "$targetName isn't connected to the relay right now. Check that Bridgit is running there, then retry with the same code.", mapOf("retry_after_s" to 30))
+            }
+        }
+        if (status !in 200..299) {
+            val err = o.optString("error", "http_$status")
+            val msg = o.optString("message").ifEmpty { "$targetName answered $status." }
+            throw when (err) {
+                in RELAY_CLAIM_ERRORS -> ErrorCatalog.error(err, msg)
+                "rate_limited" -> ErrorCatalog.error("rate_limited", msg, mapOf("retry_after_s" to 60))
+                else -> ErrorCatalog.error("upstream_failed", msg, mapOf("service" to "linked Bridgit", "upstream_status" to status, "upstream_error" to err))
+            }
+        }
+        if (!LinkIds.LINK_RE.matches(o.optString("link_id"))) throw ErrorCatalog.error("upstream_failed", "$targetName didn't confirm the link.")
+        return o
     }
 
     // ---- Changing this device's half (LNK-45) ------------------------------------------------------
@@ -976,6 +1022,9 @@ class Links(private val app: BridgeApp) {
 
     // ---- Keeping both logs and both views in step (LNK-23) ----------------------------------------
 
+    /** Whether this device reaches the other one of [r] only over the relay (it claimed the link there). */
+    fun overRelay(r: Rec): Boolean = r.role == Role.HUB && app.satellites.get(r.ref)?.relay != null
+
     /** How this device reaches the other one for link calls: (base, key, whether that is "to a hub"). */
     private fun channel(r: Rec): Triple<String, String, Boolean>? = when (r.role) {
         Role.HUB -> app.satellites.get(r.ref)?.let { Triple(it.base, it.key, false) }
@@ -1009,6 +1058,8 @@ class Links(private val app: BridgeApp) {
         return try {
             val o = SatelliteClient.call(base, key, "POST", "/v1/link/events", body, toHub, readS)
             log.markDelivered(events.map { it.id }.toSet())
+            // Over the relay this sync is also how this device knows the other one is there (no frequent manifest reads).
+            if (overRelay(r)) app.satellites.update(r.ref) { it.copy(lastSeen = System.currentTimeMillis(), lastError = null) }
             o.optJSONArray("events")?.let { receiveEvents(get(r.id) ?: r, it) }
             o.optJSONObject("state")?.let { applyFar(r.id, it) }
             true
@@ -1120,7 +1171,8 @@ class Links(private val app: BridgeApp) {
         runCatching { expireDue(now) }
         if (now - lastFlush < 5 * 60_000L) return
         lastFlush = now
-        all().filter { log.undelivered(it.id).isNotEmpty() }.forEach { runCatching { flush(it.id) } }
+        // A link over the relay has no callback: its events and state arrive only in the reply, so it syncs every time.
+        all().filter { log.undelivered(it.id).isNotEmpty() || overRelay(it) }.forEach { runCatching { flush(it.id) } }
         notices.retry(now)
         runCatching { LinkRegistry.Backend.backfill(app, all(), now) }
         runCatching { LinkRegistry.Backend.sync(app) { id, state -> backendCut(id, state) } }
@@ -1191,6 +1243,8 @@ class Links(private val app: BridgeApp) {
         const val LINK_PREFIX = "bridgit://link#"
         /** The tombstone reason of a link agent removed by a disconnect: its key then answers link_revoked. */
         const val REVOKED_REASON = "link_disconnected"
+        /** A claim's own answers over the relay that keep their code (the rest are upstream_failed). */
+        private val RELAY_CLAIM_ERRORS = setOf("code_invalid", "code_expired", "code_used_up", "name_required", "conflict", "forbidden", "invalid_parameter")
         val changes = MutableStateFlow(0)
     }
 }

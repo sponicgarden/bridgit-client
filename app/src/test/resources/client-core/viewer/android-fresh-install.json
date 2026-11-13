@@ -1,0 +1,957 @@
+{
+  "$schema": "../schemas/viewer-case.schema.json",
+  "case": "android-fresh-install",
+  "source": "Recorded from the Android code (Robolectric, API 34) on 11 Nov 2026 through ApiServer.dispatch as a portal agent; request ids removed, agent ids and app version replaced.",
+  "responses": {
+    "home": {
+      "device": {
+        "name": "Robolectric robolectric",
+        "manufacturer": "robolectric",
+        "model": "robolectric",
+        "android": "14",
+        "api_level": 34,
+        "app_version": "1.8.0",
+        "type": "phone",
+        "device_type": "phone"
+      },
+      "battery": {
+        "percent": null,
+        "charging": false
+      },
+      "connections": {
+        "tailscale": "connected",
+        "adb": "disconnected",
+        "relay": "disconnected",
+        "wifi": "connected"
+      },
+      "paused": false,
+      "features": [
+        {
+          "id": "voicerec",
+          "name": "Voice Recognition",
+          "title": "Voice recognition, on the phone",
+          "group": "Senses",
+          "icon": "speech_to_text",
+          "state": "off",
+          "summary": "Hears your wake words and turns what you say next into text, all on the phone. Wake words use the Vosk small English (US) 0.15 model: 41 MB, downloaded once from alphacephei.com and checked against its fingerprint, then fully offline. Speech to text uses Vosk, or Android's own on-device recognizer on Android 13 and later."
+        },
+        {
+          "id": "mic",
+          "name": "Microphone",
+          "title": "Microphone",
+          "group": "Senses",
+          "icon": "mic",
+          "state": "off",
+          "summary": "Records clips of up to two minutes."
+        },
+        {
+          "id": "camera",
+          "name": "Camera",
+          "title": "Camera, front and back",
+          "group": "Senses",
+          "icon": "photo_camera",
+          "state": "off",
+          "summary": "The clearest picture of a control agent seeing the world. Flash can fire on a rear photo."
+        },
+        {
+          "id": "video",
+          "name": "Video",
+          "title": "Video clips",
+          "group": "Senses",
+          "icon": "videocam",
+          "state": "off",
+          "summary": "1 to 30 second clips from either camera."
+        },
+        {
+          "id": "screen",
+          "name": "Screen",
+          "title": "Sees your screen",
+          "group": "Senses",
+          "icon": "screenshot_monitor",
+          "state": "off",
+          "summary": "Screenshots on request (Android 11 and later, with Bridgit's accessibility service on)."
+        },
+        {
+          "id": "photos",
+          "name": "Photos",
+          "title": "Photo gallery and text in photos",
+          "group": "Senses",
+          "icon": "photo_library",
+          "state": "off",
+          "summary": "Finds your latest photo or screenshot, and reads the text in it on the phone with Google ML Kit text recognition (Latin script). The reader is built into the app: nothing is downloaded and no image is uploaded."
+        },
+        {
+          "id": "sounds",
+          "name": "Sound Alerts",
+          "title": "Sound alerts",
+          "group": "Senses",
+          "icon": "hearing",
+          "state": "off",
+          "summary": "Notices when the room gets loud."
+        },
+        {
+          "id": "battery",
+          "name": "Battery",
+          "title": "Battery",
+          "group": "Awareness",
+          "icon": "battery_charging_full",
+          "state": "off",
+          "summary": "Level, charging and temperature, with low-battery alerts."
+        },
+        {
+          "id": "location",
+          "name": "Location",
+          "title": "Location",
+          "group": "Awareness",
+          "icon": "location_on",
+          "state": "off",
+          "summary": "Everyone knows the map pin."
+        },
+        {
+          "id": "notifs",
+          "name": "Notifications",
+          "title": "Your notifications",
+          "group": "Awareness",
+          "icon": "notifications",
+          "state": "off",
+          "summary": "Reads notification text once you allow it."
+        },
+        {
+          "id": "motion",
+          "name": "Motion",
+          "title": "Motion and sensors",
+          "group": "Awareness",
+          "icon": "directions_walk",
+          "state": "off",
+          "summary": "Steps, compass heading, light and movement."
+        },
+        {
+          "id": "touch",
+          "name": "Touch",
+          "title": "Taps and types for you",
+          "group": "Controls",
+          "icon": "touch_app",
+          "state": "off",
+          "summary": "Taps, swipes and typing through ADB, for control agents you give Super Powers. The most dramatic beat."
+        },
+        {
+          "id": "speaker",
+          "name": "Speaker",
+          "title": "Speaks out loud",
+          "group": "Controls",
+          "icon": "volume_up",
+          "state": "off",
+          "summary": "Reads text aloud or plays a clip."
+        },
+        {
+          "id": "settings",
+          "name": "Settings",
+          "title": "Volume, Do Not Disturb, brightness",
+          "group": "Controls",
+          "icon": "tune",
+          "state": "off",
+          "summary": "The control agent can turn the dials and, if it asks to, set them back after a time it chooses. You can undo any time."
+        },
+        {
+          "id": "ring",
+          "name": "Find Phone",
+          "title": "Find my phone",
+          "group": "Controls",
+          "icon": "ring_volume",
+          "state": "off",
+          "summary": "Rings and vibrates the phone on request, for up to a minute."
+        },
+        {
+          "id": "torch",
+          "name": "Flashlight",
+          "title": "Flashlight",
+          "group": "Controls",
+          "icon": "flashlight_on",
+          "state": "off",
+          "summary": "Turns the torch on, then off again by itself (after a minute unless the control agent picks a time)."
+        },
+        {
+          "id": "ask",
+          "name": "Ask You",
+          "title": "Questions and cards",
+          "group": "Talks With You",
+          "icon": "forum",
+          "state": "off",
+          "summary": "The control agent asks you something with buttons, or shows a card."
+        },
+        {
+          "id": "bugs",
+          "name": "Bug Reports",
+          "title": "Bug reports",
+          "group": "Talks With You",
+          "icon": "bug_report",
+          "state": "on",
+          "summary": "Files a bug report (with a screenshot from you, or from a control agent in Fixer Mode), and you follow it to the fix."
+        },
+        {
+          "id": "tailscale",
+          "name": "Tailscale",
+          "title": "Tailscale private network",
+          "group": "Network",
+          "icon": "lan",
+          "state": "on",
+          "summary": "Control agents reach the phone only over your own Tailscale network. Not a feature you switch on; it is how every call arrives."
+        },
+        {
+          "id": "jev",
+          "name": "Jev",
+          "title": "Jev decisions (TypeSafe)",
+          "group": "Intelligence",
+          "icon": "psychology",
+          "state": "on",
+          "summary": "Typed yes/no and pick-one answers about text, each with a probability, through the Bridgit team backend."
+        },
+        {
+          "id": "clef",
+          "name": "Clef",
+          "title": "Clef decisions (Cloudflare Workers AI)",
+          "group": "Intelligence",
+          "icon": "cloud",
+          "state": "on",
+          "summary": "Decision models that also take photos, sound and video. They run on the Bridgit backend; in the app they power watches so far."
+        },
+        {
+          "id": "weather",
+          "name": "Weather",
+          "title": "Weather",
+          "group": "Information",
+          "icon": "partly_cloudy_day",
+          "state": "off",
+          "summary": "The forecast where the phone is, from MET Norway. Only a rounded location (about 1 km) leaves the phone, and it is in the outbound log."
+        }
+      ],
+      "listening": [],
+      "agents_count": 2,
+      "nav": [
+        {
+          "id": "interactions",
+          "title": "Home",
+          "icon": "home",
+          "section": "tab"
+        },
+        {
+          "id": "home",
+          "title": "Devices",
+          "icon": "smartphone",
+          "section": "tab"
+        },
+        {
+          "id": "camera",
+          "title": "Camera",
+          "icon": "photo_camera",
+          "section": "tab"
+        },
+        {
+          "id": "agents",
+          "title": "Agents",
+          "icon": "group",
+          "section": "tab"
+        },
+        {
+          "id": "more",
+          "title": "More",
+          "icon": "menu",
+          "section": "tab"
+        },
+        {
+          "id": "check_updates",
+          "title": "Check for updates",
+          "icon": "download",
+          "section": "more"
+        },
+        {
+          "id": "cameras",
+          "title": "Network device monitor",
+          "icon": "lan",
+          "section": "more"
+        },
+        {
+          "id": "activity",
+          "title": "Activity",
+          "icon": "show_chart",
+          "section": "more"
+        },
+        {
+          "id": "features",
+          "title": "Feature enablement",
+          "icon": "toggle_on",
+          "section": "more"
+        },
+        {
+          "id": "access",
+          "title": "Hardware access",
+          "icon": "verified_user",
+          "section": "more"
+        },
+        {
+          "id": "software_access",
+          "title": "Software access",
+          "icon": "verified_user",
+          "section": "more"
+        },
+        {
+          "id": "ssh_connections",
+          "title": "SSH connections",
+          "icon": "laptop",
+          "section": "more"
+        },
+        {
+          "id": "network_devices",
+          "title": "Network devices",
+          "icon": "laptop",
+          "section": "more"
+        },
+        {
+          "id": "tailscale_setup",
+          "title": "Tailscale setup",
+          "icon": "verified_user",
+          "section": "more"
+        },
+        {
+          "id": "adb_setup",
+          "title": "ADB setup",
+          "icon": "settings",
+          "section": "more"
+        },
+        {
+          "id": "relay",
+          "title": "Relay",
+          "icon": "verified_user",
+          "section": "more"
+        },
+        {
+          "id": "portal",
+          "title": "Linked devices",
+          "icon": "laptop",
+          "section": "more"
+        },
+        {
+          "id": "control_center",
+          "title": "Agent permissions",
+          "icon": "settings",
+          "section": "more"
+        },
+        {
+          "id": "link_web_view",
+          "title": "Web portal",
+          "icon": "laptop",
+          "section": "more"
+        },
+        {
+          "id": "settings",
+          "title": "Settings",
+          "icon": "settings",
+          "section": "more"
+        },
+        {
+          "id": "report_bug",
+          "title": "Report a bug",
+          "icon": "bug_report",
+          "section": "more"
+        },
+        {
+          "id": "request_feature",
+          "title": "Request a feature",
+          "icon": "lightbulb",
+          "section": "more"
+        },
+        {
+          "id": "my_reports",
+          "title": "My issues",
+          "icon": "history",
+          "section": "more"
+        },
+        {
+          "id": "about",
+          "title": "About",
+          "icon": "info",
+          "section": "more"
+        },
+        {
+          "id": "what_can",
+          "title": "What can Bridgit do?",
+          "icon": "lightbulb",
+          "section": "more"
+        }
+      ],
+      "scene": {
+        "options": {
+          "externalDevices": [],
+          "emailReminder": false,
+          "agent": "Bridgit viewer",
+          "called": false,
+          "agents": [
+            {
+              "name": "Bridgit viewer",
+              "called": false
+            },
+            {
+              "name": "Claude Opus",
+              "called": false
+            }
+          ],
+          "nodes": {
+            "voicerec": "off",
+            "mic": "off",
+            "camera": "off",
+            "video": "off",
+            "screen": "off",
+            "photos": "off",
+            "sounds": "off",
+            "battery": "off",
+            "location": "off",
+            "notifs": "off",
+            "motion": "off",
+            "touch": "off",
+            "speaker": "off",
+            "settings": "off",
+            "ring": "off",
+            "torch": "off",
+            "ask": "off",
+            "bugs": "on",
+            "tailscale": "on",
+            "jev": "on",
+            "clef": "on",
+            "agent": "off",
+            "weather": "off"
+          },
+          "checks": {
+            "voicerec": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Needs microphone"
+              ]
+            ],
+            "mic": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Needs microphone"
+              ]
+            ],
+            "camera": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Needs camera"
+              ]
+            ],
+            "video": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Needs camera"
+              ]
+            ],
+            "screen": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Accessibility off"
+              ]
+            ],
+            "photos": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Needs photos"
+              ]
+            ],
+            "sounds": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Needs microphone"
+              ]
+            ],
+            "battery": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "OK"
+              ]
+            ],
+            "location": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Needs location"
+              ]
+            ],
+            "notifs": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Notification access off"
+              ]
+            ],
+            "motion": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "OK"
+              ]
+            ],
+            "touch": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Developer options off"
+              ]
+            ],
+            "speaker": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "OK"
+              ]
+            ],
+            "settings": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "OK"
+              ]
+            ],
+            "ring": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "OK"
+              ]
+            ],
+            "torch": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "Needs camera"
+              ]
+            ],
+            "ask": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "OK"
+              ]
+            ],
+            "bugs": [
+              [
+                "Feature Switch",
+                "On"
+              ],
+              [
+                "Access",
+                "OK"
+              ]
+            ],
+            "tailscale": [
+              [
+                "Tailscale Address",
+                "100.83.104.121"
+              ],
+              [
+                "Listener Port",
+                "8735 Closed"
+              ]
+            ],
+            "weather": [
+              [
+                "Feature Switch",
+                "Off"
+              ],
+              [
+                "Access",
+                "OK"
+              ]
+            ],
+            "agent": [
+              [
+                "Private Tunnel",
+                "Open"
+              ],
+              [
+                "Key",
+                "Created"
+              ]
+            ]
+          }
+        },
+        "paused": false,
+        "listening": [],
+        "home_status": {
+          "agents": [
+            {
+              "name": "Bridgit viewer",
+              "state": "Starting",
+              "label": "Starting…",
+              "description": "Starting… · Bridgit viewer"
+            },
+            {
+              "name": "Claude Opus",
+              "state": "Starting",
+              "label": "Starting…",
+              "description": "Starting… · Claude Opus"
+            }
+          ],
+          "applets": [],
+          "emptyApplets": "No applets running",
+          "position": "{index} of {count}",
+          "rotate": true
+        }
+      }
+    },
+    "agents": {
+      "agents": [
+        {
+          "id": "agent_a",
+          "name": "Bridgit viewer",
+          "mode": "direct",
+          "transport": "direct",
+          "last_used_at": 0,
+          "paused": false,
+          "api_access": true,
+          "all_access": false,
+          "portal": false,
+          "grants": [
+            "lan_discovery",
+            "portal"
+          ]
+        },
+        {
+          "id": "agent_b",
+          "name": "Claude Opus",
+          "mode": "direct",
+          "transport": "direct",
+          "last_used_at": 0,
+          "paused": false,
+          "api_access": true,
+          "all_access": true,
+          "portal": false,
+          "grants": [
+            "adb",
+            "app_device_access",
+            "applet_data",
+            "applet_install",
+            "applet_portals",
+            "budgets",
+            "camera",
+            "captures",
+            "clipboard",
+            "connections",
+            "context",
+            "controls",
+            "downloads",
+            "feedback",
+            "files",
+            "find_crop",
+            "flashlight",
+            "gallery",
+            "gallery_video",
+            "health_connect",
+            "interactions",
+            "judgment",
+            "lan_camera",
+            "lan_camera_audio",
+            "lan_camera_speaker",
+            "lan_control",
+            "lan_discovery",
+            "lan_enrollment",
+            "location",
+            "log",
+            "mic",
+            "modes",
+            "notifications",
+            "ocr",
+            "outbound",
+            "owner_features",
+            "phone",
+            "portal",
+            "ring",
+            "schedule",
+            "screen",
+            "screen_share",
+            "sensors",
+            "settings",
+            "shares",
+            "sounds",
+            "speaker",
+            "ssh",
+            "status",
+            "tour",
+            "usage",
+            "video",
+            "wakewords",
+            "watches",
+            "weather"
+          ]
+        }
+      ]
+    },
+    "applets": {
+      "applets": [
+        {
+          "id": "dog",
+          "name": "Pet monitor",
+          "kind": "dog",
+          "running": false,
+          "last_at": 0,
+          "sensors": [
+            "camera"
+          ],
+          "actions": [
+            "pet_observation"
+          ]
+        }
+      ]
+    },
+    "logs": {
+      "entries": [],
+      "next_since": 4,
+      "has_more": false,
+      "has_older": false,
+      "oldest_id": 1,
+      "latest_id": 4
+    }
+  },
+  "model": {
+    "model": "viewer.model/1",
+    "device": {
+      "name": "Robolectric robolectric",
+      "model": "robolectric",
+      "manufacturer": "robolectric",
+      "device_type": "phone",
+      "os": {
+        "name": "android",
+        "version": "14"
+      },
+      "app_version": "1.8.0"
+    },
+    "battery": null,
+    "paused": false,
+    "connections": {
+      "adb": "disconnected",
+      "relay": "disconnected",
+      "tailscale": "connected",
+      "wifi": "connected"
+    },
+    "features": [
+      {
+        "id": "voicerec",
+        "name": "Voice Recognition",
+        "group": "Senses",
+        "state": "off"
+      },
+      {
+        "id": "mic",
+        "name": "Microphone",
+        "group": "Senses",
+        "state": "off"
+      },
+      {
+        "id": "camera",
+        "name": "Camera",
+        "group": "Senses",
+        "state": "off"
+      },
+      {
+        "id": "video",
+        "name": "Video",
+        "group": "Senses",
+        "state": "off"
+      },
+      {
+        "id": "screen",
+        "name": "Screen",
+        "group": "Senses",
+        "state": "off"
+      },
+      {
+        "id": "photos",
+        "name": "Photos",
+        "group": "Senses",
+        "state": "off"
+      },
+      {
+        "id": "sounds",
+        "name": "Sound Alerts",
+        "group": "Senses",
+        "state": "off"
+      },
+      {
+        "id": "battery",
+        "name": "Battery",
+        "group": "Awareness",
+        "state": "off"
+      },
+      {
+        "id": "location",
+        "name": "Location",
+        "group": "Awareness",
+        "state": "off"
+      },
+      {
+        "id": "notifs",
+        "name": "Notifications",
+        "group": "Awareness",
+        "state": "off"
+      },
+      {
+        "id": "motion",
+        "name": "Motion",
+        "group": "Awareness",
+        "state": "off"
+      },
+      {
+        "id": "touch",
+        "name": "Touch",
+        "group": "Controls",
+        "state": "off"
+      },
+      {
+        "id": "speaker",
+        "name": "Speaker",
+        "group": "Controls",
+        "state": "off"
+      },
+      {
+        "id": "settings",
+        "name": "Settings",
+        "group": "Controls",
+        "state": "off"
+      },
+      {
+        "id": "ring",
+        "name": "Find Phone",
+        "group": "Controls",
+        "state": "off"
+      },
+      {
+        "id": "torch",
+        "name": "Flashlight",
+        "group": "Controls",
+        "state": "off"
+      },
+      {
+        "id": "ask",
+        "name": "Ask You",
+        "group": "Talks With You",
+        "state": "off"
+      },
+      {
+        "id": "bugs",
+        "name": "Bug Reports",
+        "group": "Talks With You",
+        "state": "on"
+      },
+      {
+        "id": "tailscale",
+        "name": "Tailscale",
+        "group": "Network",
+        "state": "on"
+      },
+      {
+        "id": "jev",
+        "name": "Jev",
+        "group": "Intelligence",
+        "state": "on"
+      },
+      {
+        "id": "clef",
+        "name": "Clef",
+        "group": "Intelligence",
+        "state": "on"
+      },
+      {
+        "id": "weather",
+        "name": "Weather",
+        "group": "Information",
+        "state": "off"
+      }
+    ],
+    "agents": [
+      {
+        "id": "agent_a",
+        "name": "Bridgit viewer",
+        "transport": "direct",
+        "paused": false,
+        "last_used_at": null
+      },
+      {
+        "id": "agent_b",
+        "name": "Claude Opus",
+        "transport": "direct",
+        "paused": false,
+        "last_used_at": null
+      }
+    ],
+    "applets": [
+      {
+        "id": "dog",
+        "name": "Pet monitor",
+        "running": false,
+        "last_at": null
+      }
+    ],
+    "log": {
+      "entries": [],
+      "has_older": false
+    }
+  }
+}

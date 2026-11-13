@@ -182,48 +182,11 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
         var onBehalf: Pair<String, String>? = null
         val inFlight = app.latency.begin()
         try {
-            if (!Net.isTailnet(source)) throw ErrorCatalog.error("forbidden_source", "Only devices on the owner's Tailscale network may call Bridgit.")
-            if (spec.auth) {
-                val token = call.request.headers["Authorization"]?.takeIf { it.startsWith("Bearer ") }?.removePrefix("Bearer ")?.trim()
-                when (val r = app.agents.authenticate(token)) {
-                    is AuthResult.Ok -> {
-                        if(r.agent.connection == cc.bridgit.app.core.Connection.RELAY) throw ErrorCatalog.error("unauthorized", "Relay credentials require the relay transport.")
-                        agent = r.agent
-                    }
-                    else -> {
-                        // SEC-06: only requests without a valid key are blocked by the per-IP failure count.
-                        // tryAcquire checks and records in one step, so concurrent bad keys can't slip past.
-                        if (!limiter.tryAcquire("auth:$source", RateLimiter.AUTH_FAILS_PER_IP)) throw authBlockedError(source)
-                        if (r is AuthResult.Revoked && r.reason == cc.bridgit.app.link.Links.REVOKED_REASON) {
-                            // LNK-30: a link agent removed by a disconnect. The other device marks its side off.
-                            revokedReason = r.reason
-                            throw ErrorCatalog.error("link_revoked", "The link with this device was disconnected. Linking again needs a new link code.", mapOf("scope" to "link"))
-                        }
-                        if (r is AuthResult.Revoked) {
-                            revokedReason = r.reason
-                            throw ErrorCatalog.error("unauthorized",
-                                if (r.reason == "key_rotated") "${r.agentName}'s key was rotated. Ask the owner for the new setup prompt."
-                                else "${r.agentName} was removed from Bridgit. Ask the owner to add you again.",
-                                mapOf("reason" to r.reason))
-                        }
-                        throw ErrorCatalog.error("unauthorized", "Missing or wrong key. Send Authorization: Bearer <your key>.")
-                    }
-                }
-                requireDevice(agent!!, source)
-                // A link agent (docs/spec-linked-bridgits.md, LNK-11): the other Bridgit of a link, using this one.
-                if (app.links.isLinkAgent(agent!!.id)) onBehalf = linkAgentCall(spec, agent!!) { call.request.headers[it] }
-                requireGrant(agent!!, spec)
-                app.agents.recordUse(agent!!.id, source)
-                // Agents switch models: X-Bridgit-Model (and -Harness) on any call keeps the owner's card current.
-                call.request.headers["X-Bridgit-Model"]?.let { m ->
-                    app.agents.reportModel(agent!!.id, m, call.request.headers["X-Bridgit-Harness"])
-                        ?.let { app.log.system("audit", "agent", "${it.name} says it runs on ${it.modelLabel}") }
-                }
-                if (agent!!.knownApiRevision < ApiChanges.CURRENT)
-                    BrandHeaders.withLegacy(mapOf("X-Bridgit-Whats-New" to "/v1/changes?since=${agent!!.knownApiRevision}"))
-                        .forEach { (k, v) -> call.response.header(k, v) }
-                spec.power?.let { PowerGate.require(agent, it, spec.fullPath) }
-            }
+            val admitted = admitHttp(cc.bridgit.app.core.request.CoreRequest("http_v1", spec.method, spec.fullPath, source) { call.request.headers[it] },
+                spec, onAgent = { agent = it }, onLinkCaller = { onBehalf = it }, onRevoked = { revokedReason = it },
+                onHeader = { k, v -> call.response.header(k, v) })
+            agent = admitted.agent
+            onBehalf = admitted.onBehalf
             if (spec.idempotencyRequired && call.request.headers["Idempotency-Key"].isNullOrBlank())
                 throw ErrorCatalog.error("invalid_parameter", "Idempotency-Key is required for this operation")
             // Satellites (docs/spec-satellites.md, mode A): a target runs the call on a satellite instead of here.
@@ -231,10 +194,8 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 call.request.queryParameters[cc.bridgit.app.satellite.SatellitePolicy.TARGET_QUERY])
             if (target != null && !app.links.isSelf(target)) {
                 logParams.put("target", Redactor.string(target, 50))
-                val a = agent ?: throw ErrorCatalog.error("not_on_target", "${spec.fullPath} can't run on another device.")
-                // LNK-32: a call is passed on at most once; a link agent's key never forwards.
-                if (app.links.isLinkAgent(a.id)) throw ErrorCatalog.error("not_on_target", "A call that came over a link can't be passed on to another device. To use that device, link it directly.")
-                val f = forwardToSatellite(call, spec, a, source, target, rid)
+                val sat = forwardTarget(spec, agent, target)
+                val f = forwardToSatellite(call, spec, agent!!, source, target, sat, rid)
                 http = f.status; result = f.result; ranOn = target; forwardedOut = f.bytesOut; bytesIn = f.bytesIn
                 return
             }
@@ -432,13 +393,28 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
      * grants and limits to the hub's link key. Pausing or narrowing the agent, or taking the satellite away from it,
      * cancels the call (as [runGuarded] does for local work).
      */
+    /**
+     * Where a call naming another device goes, once the HTTP door's checks passed (satellite_forward door in
+     * contracts/client-core/doors/authorization.json): only a key's own agent forwards, a call is passed on at most once,
+     * and the target must be a linked device this agent may reach. DoorFixturesTest drives it directly.
+     */
+    internal fun forwardTarget(spec: EndpointSpec, agent: Agent?, target: String): cc.bridgit.app.link.Links.Reach {
+        val a = agent ?: throw ErrorCatalog.error("not_on_target", "${spec.fullPath} can't run on another device.")
+        // LNK-32: a call is passed on at most once; a link agent's key never forwards.
+        if (app.links.isLinkAgent(a.id)) throw ErrorCatalog.error("not_on_target", "A call that came over a link can't be passed on to another device. To use that device, link it directly.")
+        return app.links.reach(target, a)
+    }
+
     private suspend fun forwardToSatellite(call: ApplicationCall, spec: EndpointSpec, agent: Agent, source: String,
-                                           target: String, rid: String): Forwarded {
+                                           target: String, sat: cc.bridgit.app.link.Links.Reach, rid: String): Forwarded {
         val P = cc.bridgit.app.satellite.SatellitePolicy
         // sat: ids keep their satellite error codes (aliases, LNK-49); names use the link ones.
         val old = cc.bridgit.app.satellite.SatelliteLink.ID_RE.matches(target)
-        val sat = app.links.reach(target, agent)
         if (!P.forwardable(spec)) throw ErrorCatalog.error(if (old) "not_on_satellite" else "not_on_target", "${spec.method} ${spec.fullPath} can't run on a linked device yet. Leave target out to run it on this device.")
+        // Linked over the relay only (no Tailscale): the link itself works, but calls aren't forwarded over the relay yet.
+        if (cc.bridgit.app.satellite.LinkRelayClient.isRelay(sat.base)) throw ErrorCatalog.error(if (old) "not_on_satellite" else "not_on_target",
+            "${sat.name} is linked over the relay, and calls aren't passed to a linked device over the relay yet. Turn Tailscale on on both devices to use it, or leave target out to run it on this device.",
+            mapOf("reason" to "relay_only"))
         if (!limiter.tryAcquire("sat-fwd:${agent.id}", RateLimiter.SATELLITE_CALLS_PER_AGENT))
             throw ErrorCatalog.error("rate_limited", "At most ${RateLimiter.SATELLITE_CALLS_PER_AGENT} satellite calls per minute per agent.",
                 mapOf("retry_after_s" to limiter.retryAfterS("sat-fwd:${agent.id}")))
@@ -568,6 +544,68 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 throw ErrorCatalog.error("capability_disabled", "Capability was switched off during this capture.")
             throw ErrorCatalog.error("conflict", "Authorization changed while this request was running. Start a new request if it is still wanted.")
         } finally { watcher.cancel() }
+    }
+
+    /** What the HTTP door's checks let through: the calling agent (null for an open endpoint) and, for a link agent, who it acts for. */
+    class Admission(val agent: Agent?, val onBehalf: Pair<String, String>?)
+
+    /**
+     * The HTTP door's checks before the handler, in code order (contracts/client-core/doors/authorization.json, http_v1):
+     * source, key, relay credential, device lock, link agent, grant, power. The listener calls it for every request and
+     * DoorFixturesTest calls it directly, so the steps a socket used to hide are proved by fixtures (phase 1.6).
+     * The callbacks report as soon as each fact is known, so a refusal thrown by a later step is still logged with the
+     * agent and the revocation reason, as before the seam: [onAgent] once the key is accepted, [onLinkCaller] for a link
+     * agent, [onRevoked] before a revoked-key refusal, [onHeader] for reply headers.
+     */
+    internal suspend fun admitHttp(r: cc.bridgit.app.core.request.CoreRequest, spec: EndpointSpec, onAgent: (Agent) -> Unit = {},
+                           onLinkCaller: (Pair<String, String>) -> Unit = {}, onRevoked: (String) -> Unit = {},
+                           onHeader: (String, String) -> Unit = { _, _ -> }): Admission {
+        var agent: Agent? = null
+        var onBehalf: Pair<String, String>? = null
+        if (!Net.isTailnet(r.source)) throw ErrorCatalog.error("forbidden_source", "Only devices on the owner's Tailscale network may call Bridgit.")
+        if (spec.auth) {
+            val token = r.bearer
+            when (val a = app.agents.authenticate(token)) {
+                is AuthResult.Ok -> {
+                    if(a.agent.connection == cc.bridgit.app.core.Connection.RELAY) throw ErrorCatalog.error("unauthorized", "Relay credentials require the relay transport.")
+                    agent = a.agent
+                    onAgent(a.agent)
+                }
+                else -> {
+                    // SEC-06: only requests without a valid key are blocked by the per-IP failure count.
+                    // tryAcquire checks and records in one step, so concurrent bad keys can't slip past.
+                    if (!limiter.tryAcquire("auth:${r.source}", RateLimiter.AUTH_FAILS_PER_IP)) throw authBlockedError(r.source)
+                    if (a is AuthResult.Revoked && a.reason == cc.bridgit.app.link.Links.REVOKED_REASON) {
+                        // LNK-30: a link agent removed by a disconnect. The other device marks its side off.
+                        onRevoked(a.reason)
+                        throw ErrorCatalog.error("link_revoked", "The link with this device was disconnected. Linking again needs a new link code.", mapOf("scope" to "link"))
+                    }
+                    if (a is AuthResult.Revoked) {
+                        onRevoked(a.reason)
+                        throw ErrorCatalog.error("unauthorized",
+                            if (a.reason == "key_rotated") "${a.agentName}'s key was rotated. Ask the owner for the new setup prompt."
+                            else "${a.agentName} was removed from Bridgit. Ask the owner to add you again.",
+                            mapOf("reason" to a.reason))
+                    }
+                    throw ErrorCatalog.error("unauthorized", "Missing or wrong key. Send Authorization: Bearer <your key>.")
+                }
+            }
+            requireDevice(agent!!, r.source)
+            // A link agent (docs/spec-linked-bridgits.md, LNK-11): the other Bridgit of a link, using this one.
+            if (app.links.isLinkAgent(agent!!.id)) onBehalf = linkAgentCall(spec, agent!!) { r.header(it) }.also { it?.let(onLinkCaller) }
+            requireGrant(agent!!, spec)
+            app.agents.recordUse(agent!!.id, r.source)
+            // Agents switch models: X-Bridgit-Model (and -Harness) on any call keeps the owner's card current.
+            r.header("X-Bridgit-Model")?.let { m ->
+                app.agents.reportModel(agent!!.id, m, r.header("X-Bridgit-Harness"))
+                    ?.let { app.log.system("audit", "agent", "${it.name} says it runs on ${it.modelLabel}") }
+            }
+            if (agent!!.knownApiRevision < ApiChanges.CURRENT)
+                BrandHeaders.withLegacy(mapOf("X-Bridgit-Whats-New" to "/v1/changes?since=${agent!!.knownApiRevision}"))
+                    .forEach { (k, v) -> onHeader(k, v) }
+            spec.power?.let { PowerGate.require(agent, it, spec.fullPath) }
+        }
+        return Admission(agent, onBehalf)
     }
 
     /**

@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 148). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 153). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,25 +14,28 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 148 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 153 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 148
-- The Bridgit Interface Guide: this agent's full briefing, built live for this device; the setup prompt is now a few lines that point here (`/v1/welcome`)
+## New in revision 153
+- The published build can't turn security.approvers_enabled on yet: the write answers platform_unsupported with reason not_available_in_this_build and remaining_step, and nothing in that write is applied. GET /v1/owner/configuration/approvers and the setting's row in GET /v1/owner/configuration say can_enable and enable_blocked_reason. Turning it off is unchanged; test builds can turn it on (`/v1/owner/configuration/settings`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
-   `GET /v1/capabilities` (the table below, live): use a feature only when `agent_allowed`, `enabled` and `ready` are all true. `ready` is about the device, not your permission.
+2. `POST /v1/me`: `{"model","harness"}` tells the owner your model, on each change; or add `X-Bridgit-Model: <model id>` (and `X-Bridgit-Harness: <harness>`) to the headers you send with every call.
+3. `GET /v1/capabilities`: the table below, live; use a feature only when `agent_allowed`, `enabled` and `ready` are all true. `ready` is about the device, not your permission.
    Control tools use separate grants: check `GET /v2/capabilities` for `supported`, `enabled`, `granted`, `ready` and `blockers`, then read https://bridgit.cc/learn/control.md. Private app-control builds still require the owner's session approval.
    `GET /v1/devices` lists the host plus owner-configured external devices visible to your grants, with ids and action paths. Check availability separately; the inventory does not scan or claim a camera is online.
-2. Building an applet (anything that keeps running)? Install a package: https://bridgit.cc/learn/start.md stage 3 and https://bridgit.cc/learn/builder/applet-packages.md. Otherwise make the one call the owner's task needs. For the newest photo or screenshot use `GET /v1/image/last` (no list-then-fetch); for a new photo `POST /v1/camera/snapshot {"camera":"rear","size":"agent"}`.
-3. Need the owner? Send a styled HTML card (`POST /v1/interactions`, kind `html`, answered with `Bridgit.respond`) for every test, yes/no, choice, notice and form, even a simple connection check: copy `GET /v1/samples?id=html-yes-no`, `html-choice`, `html-form` or `html-connection-test` and change only its CARD text. Native `question` and `notice` cards are the fallback. Wait with `GET /v1/interactions/{id}?wait=55` until its status is `answered`, `dismissed`, `expired` or `cancelled` (a closed card returns at once: stop then).
-4. Tell the owner your model: add `X-Bridgit-Model: <model id>` (and `X-Bridgit-Harness: <harness>`) to the headers you send with every call, or `POST /v1/me {"model","harness"}` on each change. The rest of this guide is reference: read the section you need.
+4. `GET /v1/limits`: before planning anything paid (Jev, Clef, GLM).
+5. `GET /v1/start`: applet-building stages (https://bridgit.cc/learn/start.md).
+6. `GET /v1/discover`: `?q=<idea>` gives a recipe, `owner_must`, `first_calls` and `done_when`.
+7. Building an applet (anything that keeps running)? Install a package: https://bridgit.cc/learn/start.md stage 3 and https://bridgit.cc/learn/builder/applet-packages.md. Otherwise make the one call the owner's task needs. For the newest photo or screenshot use `GET /v1/image/last` (no list-then-fetch); for a new photo `POST /v1/camera/snapshot {"camera":"rear","size":"agent"}`.
+8. Need the owner? Send a styled HTML card (`POST /v1/interactions`, kind `html`, answered with `Bridgit.respond`) for every test, yes/no, choice, notice and form, even a simple connection check: copy `GET /v1/samples?id=html-yes-no`, `html-choice`, `html-form` or `html-connection-test` and change only its CARD text. Native `question` and `notice` cards are the fallback. Wait with `GET /v1/interactions/{id}?wait=55` until its status is `answered`, `dismissed`, `expired` or `cancelled` (a closed card returns at once: stop then). The rest of this guide is reference: read the section you need.
 Right after pairing, ask the owner once: "Want a 5-minute demo on your phone?" If they pasted only the setup prompt, ask in that first reply; if they gave a task, finish it first. `GET /v1/demo` only reads the script: run it only after they say yes. Ask discovery questions only if they want suggestions. Declining onboarding does not cancel their existing task.
 A call fails or gets no answer? Before retrying or filing a bug, run the connection ladder (https://bridgit.cc/learn/connection.md): network, transport, app, auth and capability, one read-only check each; `GET /v1/health` carries a `listener` block for it. Send its per-layer results with the bug report as `diagnosis`.
 Keep credentials per agent, e.g. `~/.config/bridgit/agents/<agent>/header` with mode 600; never overwrite another agent's key. The optional helper reads an env file instead of that header: its download explains `BRIDGIT_ENV` for selecting a separate config. A public-docs 403 may depend on the HTTP client: try curl before concluding the docs are unavailable.
-5. The owner's email: Bridgit works for 24 hours from the first agent call, then only the status, feedback and portal endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/issues` and the owner's read-only iPhone & iPad app), the control tools `capabilities`, `events`, `operation.get` and `feedback.create` (`events` still needs `events.read`), and the routes that are not tool calls (`/v2/capabilities`, `/v2/tools`, `/v2/guide`, operation cancel) keep working; everything else answers `email_required` until the owner verifies an address (the full list is under "Owner email" in https://bridgit.cc/learn/control.md). `GET /v1/owner/email` says where it stands; send their address with `POST /v1/owner/email {"email":"..."}` (if you don't know it, ask them: on a card during the 24 hours, in your chat after), and they tap the link in the email from bridgit.cc.
-6. Once the owner's first request is done (or after the demo), offer useful suggestions. Only if they are interested, ask two or three questions about their routines, then suggest one small thing to try. https://bridgit.cc/learn/playbook.md has the questions and 40 use cases. "Not now" stops onboarding; continue any existing task.
+9. The owner's email: Bridgit works for 24 hours from the first agent call, then only the status, feedback and portal endpoints (such as health, me, owner email, capabilities, guide, demo, samples, openapi, changes, `/v1/issues` and the owner's read-only iPhone & iPad app), the control tools `capabilities`, `events`, `operation.get` and `feedback.create` (`events` still needs `events.read`), and the routes that are not tool calls (`/v2/capabilities`, `/v2/tools`, `/v2/guide`, operation cancel) keep working; everything else answers `email_required` until the owner verifies an address (the full list is under "Owner email" in https://bridgit.cc/learn/control.md). `GET /v1/owner/email` says where it stands; send their address with `POST /v1/owner/email {"email":"..."}` (if you don't know it, ask them: on a card during the 24 hours, in your chat after), and they tap the link in the email from bridgit.cc.
+10. Once the owner's first request is done (or after the demo), offer useful suggestions. Only if they are interested, ask two or three questions about their routines, then suggest one small thing to try. https://bridgit.cc/learn/playbook.md has the questions and 40 use cases. "Not now" stops onboarding; continue any existing task.
 
 - Opening a card clears its notification. To remind the owner explicitly, POST /v1/interactions/{id}/renotify {} (MCP interactions_renotify) with an Idempotency-Key. Only your pending/seen cards; no automatic screen takeover or speech.
 Waiting: for one card, `GET /v1/interactions/{id}?wait=55`; for several, or ongoing events, one loop on `GET /v1/events?since=<next_cursor>&wait=55` with a 60 s client timeout. Process every event in a reply, keep the new `next_cursor`, wait again at once. Empty replies are normal; never add sleeps. Without `since` you get the newest 50; `since=0` reads from the start.
@@ -569,6 +572,152 @@ Query: `link` Only this link id; `direction` in, out or both; `granter` person, 
 Returns: events[{id, at, link_id, direction, event, before, after, granter{kind person|agent|rule|migrated, agent_id, agent_name, device}, device, code_id, reported_by, late}], next_before.
 Example: `GET /v1/owner/configuration/links/log`
 
+### `GET /v1/owner/configuration/approvers`
+Read this device's approver devices (never keys), whether it can enrol itself as its own approver and why not, what its key store offers, and the recovery state. Off unless security.approvers_enabled is on; can_enable says whether this build can turn it on.
+Returns: enabled, setting, can_enable, enable_blocked_reason (not_available_in_this_build: the published build can't turn approver devices on yet) or null, approvers[{id, name, self, added_at, last_used_at, can_approve, wait_ends_at}], can_enrol, blocked_reason (approvers_disabled|owner_email_required|no_screen_lock|platform_unsupported|recovery_pending|approver_listed), email_verified, capability{api_level, secure_lock_screen, strongbox, strong_biometric, per_use_credential_keys, readiness}, key_state (absent|ready|needs_setup), generation, enrolment{id, status, detail} or null, requests[{id, kind, purpose, requester, expires_at, check}], recovery{state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver)}, remaining_human_step{step, where, status} or null, waits{recovery_ms, approver_ms, request_ms}.
+Example: `GET /v1/owner/configuration/approvers`
+
+### `POST /v1/owner/configuration/approvers`
+Start enrolling this device as its own approver while the list is empty: makes the approver key and asks for the owner's screen-lock check on this device, which is the one human step. Needs a verified alert email and a screen lock; explicit owner.configuration grant required.
+Body (JSON): `self` (required) true: this device becomes its own approver. Another device is enrolled over a link (not built yet).
+Returns: enrolment{id, status waiting_owner|done|cancelled|failed, detail}, remaining_human_step{step owner_check, where, status}; read GET /v1/owner/configuration/approvers until status is done.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/approvers {"self":true}`
+
+### `GET /v1/owner/configuration/approvers/recovery`
+Read the approver recovery: its state, who started it, when the approver list is cleared and the time left.
+Returns: state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver).
+Example: `GET /v1/owner/configuration/approvers/recovery`
+
+### `POST /v1/owner/configuration/approvers/recovery`
+Start an approver recovery when the last approver is lost: the approver list is cleared after 72 hours of running time unless a listed approver cancels. Not available yet: refused with platform_unsupported and remaining_steps until alert email delivery and a cancel action on the approver device exist; explicit owner.configuration grant required.
+Returns: state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver).
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/approvers/recovery`
+
+### `DELETE /v1/owner/configuration/approvers/recovery`
+Cancel a pending approver recovery: the agent that started it withdraws it at once; anyone else's cancel asks a listed approver for the owner's check; explicit owner.configuration grant required.
+Returns: state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver), remaining_human_step when a listed approver has to confirm.
+Accepts `Idempotency-Key`.
+Example: `DELETE /v1/owner/configuration/approvers/recovery`
+
+### `GET /v1/owner/configuration/spending`
+Read the spending core: whether it is on (owner setting spending.core_enabled), which namespaces this build has, and for namespace=sandbox its switches, journal state and time anchor. With no namespace it answers for live, which is not available yet.
+Query: `namespace` live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported.
+Returns: enabled, setting, namespace, available, namespaces[], and for sandbox: switches{paused, device_paused, classes, sources}, payments_on, online, install, rules{generation, digest} or null, journal{epoch, origin, seq, whole, reset_reason, history_blocked, time{now, anchored, last_anchor_at, usable}}, read_at.
+Example: `GET /v1/owner/configuration/spending?namespace=sandbox`
+
+### `POST /v1/owner/configuration/spending`
+Turn spending on or off for the namespace: the pause, per instrument class and per source. Off applies at once; nothing here changes today's live budgets; explicit owner.configuration grant required.
+Body (JSON): `namespace` live (the default) or sandbox. Only sandbox is available on this build; `paused` true pauses every spend of the namespace; `classes` Instrument class to true or false, for example {"metered": false}; `sources` Source id to true or false; `generation` The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used.
+Returns: the same as GET, plus changed.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/spending {"namespace":"sandbox","paused":true}`
+
+### `GET /v1/owner/configuration/spending/sources`
+List the linked sources of a namespace: instrument, provider, custody, cap and whether the key is set. A key is never returned.
+Query: `namespace` live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported.
+Returns: sources[{id, instrument, provider, class, namespace, funder, custody, cap provider|core_only, configured, device, host, on, time_source, usage_read, available, linked_at}], instruments[].
+Example: `GET /v1/owner/configuration/spending/sources?namespace=sandbox`
+
+### `POST /v1/owner/configuration/spending/sources`
+Link a source. This build links the sandbox instrument only: a sandbox key is made at the sandbox provider and stored on this device, write-only. It needs no namespace: the instrument fixes it; explicit owner.configuration grant required.
+Body (JSON): `instrument` (required) sandbox; `id` A name for the source, 1 to 64 of a-z 0-9 . _ -; made up when left out.
+Returns: the source as in the list; conflict when the id is taken or was linked before (reason id_retired).
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/spending/sources {"instrument":"sandbox","id":"sandbox-1"}`
+
+### `DELETE /v1/owner/configuration/spending/sources/{id}`
+Unlink a source and remove its key from this device. What it spent stays in the journal; an unknown hold of it can no longer be reconciled and keeps its hold. Its id is retired with it: a later link takes another id; explicit owner.configuration grant required.
+Returns: unlinked, id.
+Accepts `Idempotency-Key`.
+Example: `DELETE /v1/owner/configuration/spending/sources/{id}`
+
+### `GET /v1/owner/configuration/spending/rules`
+Read the rule document of a namespace: generation, time zone, switches and per-spend caps, and who signed it.
+Query: `namespace` live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported.
+Returns: generation, digest, zone, switches, caps{instruments, sources}, executor, signed_by, actor, account; generation 0 when there is none yet.
+Example: `GET /v1/owner/configuration/spending/rules?namespace=sandbox`
+
+### `POST /v1/owner/configuration/spending/rules`
+Change the budget time zone or a per-spend cap (per instrument or per source). Lowering is open to any configuration agent; raising or removing a cap needs the Budgets capability. A zone change never resets a period; explicit owner.configuration grant required.
+Body (JSON): `namespace` live (the default) or sandbox. Only sandbox is available on this build; `zone` An IANA time zone, for example Europe/Warsaw; `caps` {instruments: {id: money or null}, sources: {id: money or null}}; null removes a cap. Money is {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar; `generation` The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used.
+Returns: the same as GET /rules, plus changed.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/spending/rules {"namespace":"sandbox","caps":{"instruments":{"sandbox":{"unit":"USD-6","atoms":500000}}}}`
+
+### `GET /v1/owner/configuration/spending/budgets`
+List the owner budgets of a namespace with this device's portion, what it has used this period and when that resets, the change gate with who set it, and the raises applied.
+Query: `namespace` live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported.
+Returns: generation, digest, budgets[{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}].
+Example: `GET /v1/owner/configuration/spending/budgets?namespace=sandbox`
+
+### `POST /v1/owner/configuration/spending/budgets`
+Create an owner budget. This device is its executor and holds the whole amount as a standing share. Needs the Budgets capability; explicit owner.configuration grant required.
+Body (JSON): `namespace` live (the default) or sandbox. Only sandbox is available on this build; `id` (required) 1 to 64 of a-z 0-9 . _ -; `scope` (required) {kind: account|device|instrument|service|applet|agent, id}. account and device need no id (device is this device); an instrument must be one of this namespace; `period` (required) hour, day, week or month, in the rule document's time zone; `amount` (required) The budget per period: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar; `rebalance` Rebalance shares between devices by use (default true); `gate` {agents_may_change: boolean, ceiling: money or null}. Under a ceiling this device's headroom balance is the whole room between the amount and the ceiling; `generation` The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used.
+Returns: budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}, generation.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/spending/budgets {"namespace":"sandbox","id":"sandbox-day","scope":{"kind":"instrument","id":"sandbox"},"period":"day","amount":{"unit":"USD-6","amount":"1.00"}}`
+
+### `PATCH /v1/owner/configuration/spending/budgets/{id}`
+Change a budget. A lower amount is a reduction and applies at once. A higher amount is a standing raise: an increment with an id, applied once, drawn from this device's headroom balance under an agent ceiling. A new scope or period never opens a period early. Needs the Budgets capability; explicit owner.configuration grant required.
+Body (JSON): `namespace` live (the default) or sandbox. Only sandbox is available on this build; `amount` The new standing amount: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar. Send it alone when it is a raise; `rebalance` Rebalance shares by use; `scope` {kind, id} as when creating; `period` hour, day, week or month; `generation` The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used.
+Returns: budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}, generation, increment{id, amount, lasts, replayed} when it was a raise; replayed: true when this Idempotency-Key already did it (nothing is worked out again).
+Accepts `Idempotency-Key`.
+Example: `PATCH /v1/owner/configuration/spending/budgets/{id} {"namespace":"sandbox","amount":{"unit":"USD-6","amount":"0.50"}}`
+
+### `DELETE /v1/owner/configuration/spending/budgets/{id}`
+Remove a budget. A reduction: it applies at once, unless the owner's gate stands on it. The namespace goes in the query; explicit owner.configuration grant required.
+Query: `namespace` live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported; `generation` The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used.
+Returns: removed, id, generation.
+Accepts `Idempotency-Key`.
+Example: `DELETE /v1/owner/configuration/spending/budgets/sandbox-day?namespace=sandbox`
+
+### `POST /v1/owner/configuration/spending/budgets/{id}/topups`
+Top a budget up for the current period only: an increment with an id that raises this device's portion by its amount, applied once per Idempotency-Key, and under an agent ceiling drawn from this device's headroom balance; explicit owner.configuration grant required.
+Body (JSON): `namespace` live (the default) or sandbox. Only sandbox is available on this build; `amount` (required) How much to add for this period: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar.
+Returns: increment{id, amount, lasts period, period, draws_headroom, replayed}, budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/spending/budgets/{id}/topups {"namespace":"sandbox","amount":{"unit":"USD-6","amount":"0.25"}}`
+
+### `POST /v1/owner/configuration/spending/budgets/{id}/gate`
+Set or change a budget's change gate: agents_may_change and the agent ceiling. Setting or tightening is open to any agent with the Budgets capability. Lifting one the owner set is the owner's: no_approver with remaining_human_step. A ceiling added to an existing budget starts with no headroom balance; explicit owner.configuration grant required.
+Body (JSON): `namespace` live (the default) or sandbox. Only sandbox is available on this build; `agents_may_change` false: agents may only reduce this budget; `ceiling` The most agents may raise the budget to, as money ({unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar), or null for none; `generation` The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used.
+Returns: budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}, generation.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/spending/budgets/{id}/gate {"namespace":"sandbox","ceiling":{"unit":"USD-6","amount":"2.00"}}`
+
+### `GET /v1/owner/configuration/spending/allowances`
+Read how each budget is divided and what this device holds: portions and share kinds, headroom balances, the allowance each source last spent under, room in transit, the last time anchor and the journal's epoch.
+Query: `namespace` live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported.
+Returns: budgets[{id, portions, this_device, increments, in_transit, taken, reclaim_holder, pending_cloud_room}], held{source: {id, issuer rules|cloud, seq, lines, expired}}, journal{epoch, whole, time{anchored, last_anchor_at, usable}}, read_at.
+Example: `GET /v1/owner/configuration/spending/allowances?namespace=sandbox`
+
+### `GET /v1/owner/configuration/spending/journal`
+Read the spend journal of a namespace: entries of the current epoch (or another) in order, as entry/1. It answers from the device, with or without a network.
+Query: `namespace` live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported; `after` Entries after this sequence number (default 0); `limit` 1 to 200 (default 50); `epoch` A journal epoch id; default the current one.
+Returns: epoch, epochs[], head{seq, hash, origin}, entries[entry/1], next_after, more, read_at.
+Example: `GET /v1/owner/configuration/spending/journal?namespace=sandbox`
+
+### `POST /v1/owner/configuration/spending/journal`
+Acknowledge unreadable history: rows of an earlier journal epoch that can be tied to no request stop every spend until the owner or an agent takes that on. Nothing is given back by it; explicit owner.configuration grant required.
+Body (JSON): `namespace` live (the default) or sandbox. Only sandbox is available on this build; `acknowledge_history` (required) true.
+Returns: acknowledged, journal{...}.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/spending/journal {"namespace":"sandbox","acknowledge_history":true}`
+
+### `GET /v1/owner/configuration/spending/summary`
+Read what was spent in a namespace: per budget the portion, what is used and when it resets; per source the counts and amounts by state. It answers from the device's journal, with its age.
+Query: `namespace` live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported.
+Returns: budgets[{id, unit, portion, used, remaining, resets_at, standing}], sources{id: {state: {count, counted[]}}}, last_entry_at, age_ms, online, read_at.
+Example: `GET /v1/owner/configuration/spending/summary?namespace=sandbox`
+
+### `GET /v1/owner/configuration/spending/limits`
+Read the Bridgit-funded limits as mirrored from the cloud, and the contract limits of the spending core. Nothing is mirrored on this build: no Bridgit-funded source exists on the device-held path.
+Query: `namespace` live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported.
+Returns: bridgit_funded[], mirrored_at, age_ms, contract{anchor_skew_ms}.
+Example: `GET /v1/owner/configuration/spending/limits?namespace=sandbox`
+
 ### `GET /v1/applet-devices`
 Read selectively assigned external devices for installed applets.
 Query: `applet` Optional applet id; returns only devices assigned to it.
@@ -769,8 +918,13 @@ Example: `GET /v1/services`
 
 ### `GET /v1/health`
 Is Bridgit up, and which agent you are.
-Returns: status, app, app_version, build_type (release, or debug for a test build), distribution (private or play), build_tag (null for the real app; debug or test claude <feature> for test builds), package (cc.bridgit.app is the real app), app_label (the name Android lists this build under), mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, listener {state (listening, rebinding, waiting_for_tailscale, bind_failed or stopped), binds (tailscale: Bridgit listens only on its Tailscale addresses, never the LAN), bound_to, port, tailscale_addresses (what the phone has now), on_tailnet, tailscale_installed, magic_dns, bind_error, ladder (what to do when a call fails)}, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}, resource_monitor {enabled, since, interval, level, cpu_percent, rss_mb, details: /v1/device/resources}.
+Returns: status, app, app_version, build_type (release, or debug for a test build), distribution (private or play), build_tag (null for the real app; debug or test claude <feature> for test builds), package (cc.bridgit.app is the real app), app_label (the name Android lists this build under), mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, listener {state (listening, rebinding, waiting_for_tailscale, bind_failed or stopped), binds (tailscale: Bridgit listens only on its Tailscale addresses, never the LAN), bound_to, port, tailscale_addresses (what the phone has now), on_tailnet, tailscale_installed, magic_dns, bind_error, ladder (what to do when a call fails)}, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), setup {not_done (set-up steps not done yet), profile (/v1/device/profile lists them)}, api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}, resource_monitor {enabled, since, interval, level, cpu_percent, rss_mb, details: /v1/device/resources}.
 Example: `GET /v1/health`
+
+### `GET /v1/device/profile`
+This device in one answer, the same shape on every Bridgit platform: what it is, whether it is online, every capability with why it can or can't be called now, and the set-up steps with their state.
+Returns: schema_version, profile_revision (goes up when anything here changes), observed_at, expires_at (60 s later; read again after), device {install_id, relay_device_id, name, device_type, platform, os_version, app_version, api_revision, services, hardware {camera, microphone, speaker, location: present, absent or unknown}}, link, availability {state, in_foreground}, capabilities {v1.<id>: {runtime_id, implemented, supported, enabled, ready, agent_allowed, callable, blocked_reason, constraints {execution}, operations [{method, path}]}}, setup {not_done, steps [{id, state (done, waiting, needs_owner or blocked), where (this_device, approver or anywhere), dependency {kind (os, platform, provider or step), name}, api {method, path} for a step an API completes}]}. A hint, never an authorization: calls are still checked when made.
+Example: `GET /v1/device/profile`
 
 ### `GET /v1/device/display`
 This phone's display right now and the canvas a card's page gets: full screen (presentation full_screen) per orientation and the standard card frame. Static specs (screen size, cameras) are also stored with Bridgit: ask GET <team backend>/v1/names/{name}/specs first when the phone may be busy or offline.
@@ -914,8 +1068,8 @@ Example: `POST /v1/mic/record {"duration_seconds":5}`
 
 ### `GET /v1/gallery/recent`
 Newest gallery images (metadata only).
-Query: `type` any, photo or screenshot; `album` Exact album name; `since` ISO-8601 UTC added-at lower bound; `until` ISO-8601 UTC upper bound; `limit` 1-100, default 20.
-Returns: access_mode, photos[id, taken_at, width_px, height_px, size_bytes, mime, album].
+Query: `type` any, photo or screenshot; `album` Exact album name; `since` ISO-8601 UTC added-at lower bound; `until` ISO-8601 UTC upper bound; `limit` 1-100, default 20; `include_pending` true also lists items still arriving (recording, downloading, syncing) with complete:false; default false.
+Returns: access_mode, photos[id, taken_at, width_px, height_px, size_bytes, mime, album, complete, source{kind, app, folder}].
 Example: `GET /v1/gallery/recent?limit=10`
 
 ### `GET /v1/gallery/photo/{id}`
@@ -1431,19 +1585,19 @@ Example: `POST /v1/camera/video/review`
 
 ### `GET /v1/gallery/videos/recent`
 Accessible videos and metadata.
-Query: `limit` 1–100, default 20.
-Returns: Accessible videos and metadata.
+Query: `limit` 1–100, default 20; `include_pending` true also lists items still arriving (recording, downloading, syncing) with complete:false; default false.
+Returns: access_mode, items[id, name, duration_ms, size_bytes, mime, added_at, complete, source{kind, app, folder} (source needs the gallery grant)].
 Example: `GET /v1/gallery/videos/recent`
 
 ### `GET /v1/gallery/video/{id}`
 Accessible video raw, or a JPEG frame.
-Query: `frame_at_s` Optional frame position in seconds.
+Query: `frame_at_s` Optional frame position in seconds; a video still arriving answers 409 media_incomplete.
 Returns: Accessible video raw, or a JPEG frame.
 Example: `GET /v1/gallery/video/{id}`
 
 ### `POST /v1/ocr`
 Recognize Latin-script text locally; no image upload.
-Body (JSON): `gallery_id` Accessible gallery image (also requires gallery grant); `data_base64` Image bytes instead of gallery_id.
+Body (JSON): `gallery_id` Accessible gallery image (also requires gallery grant); a photo still arriving answers 409 media_incomplete; `data_base64` Image bytes instead of gallery_id.
 Returns: Recognize Latin-script text locally; no image upload.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/ocr`
@@ -2224,13 +2378,15 @@ Registration rule: your first report may be filed with no key at all (one per ne
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register {"name":"<your agent name>","model":"<your model id>","harness":"<e.g. Claude Code>"}
   -> 201 with key (bgk_...). Keep it secret.
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues  (Authorization: Bearer <bgk_ key>)
-  {"kind":"bug"|"feature"|"applet","description","applet"?,"agent_info"?,"context"?,"diagnosis"?,"log"?,"images"?,"client_issue_id"?,"request_autofix"?,"no_autofix"?,"contacts"?,"parent"?,"links"?}
+  {"kind":"bug"|"feature"|"applet","description","applet"?,"agent_info"?,"context"?,"diagnosis"?,"log"?,"images"?,"client_issue_id"?,"request_autofix"?,"no_autofix"?,"contacts"?,"parent"?,"links"?,"urg"?}
+  urg: "low"|"medium"|"high", how urgent it is (default "medium"). High is picked up first; it never skips the team's approval.
   client_issue_id: your own positive integer (a number, not a string); sending the same one again returns the first issue with duplicate: true instead of filing twice.
   applet (kind applet only, every field optional): {"name"?,"what_it_does"?,"devices"?:[...],"data_used"?:[...],"portal_shows"?}
 GET  https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues?waiting=true   (or ?kind=applet, or /v1/agent/issues/{id})
 GET|PUT|PATCH|DELETE https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/applet  PUT {"applet":{...}} replaces it; PATCH {"applet":{"name":"...","devices":null}} merges, null clears a field; DELETE clears it
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/verify {"verdict":"works"|"still_broken"|"unverified","tested_version","note"}
 POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/request-autofix {"note"?}
+GET|PUT|PATCH|DELETE https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/urg  PUT {"urg":"high","note"?} changes it at any status (also {"urg"} on PATCH .../issues/{id}); DELETE puts it back to medium; lists take ?urg=high and ?order=urg
 GET|PUT|DELETE https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/diagnosis  PUT {"diagnosis":[{"layer","outcome","target"?,"ms"?,"detail"?,"at"?}]}
 GET|POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/contacts  {"kind":"email","email"} | {"kind":"webhook","url","format"?:"json"|"slack"|"discord"}, "notify_on"?
 GET|PATCH|DELETE https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues/{id}/contacts/{cid}  PATCH {"notify_on"?,"paused"?,"url"?}
@@ -2265,6 +2421,7 @@ Every agent and harness: whenever a Bridgit API call returns an error status, an
 
 - A call to the phone failed or got no answer? Run the connection ladder first (https://bridgit.cc/learn/connection.md) and send its per-layer results as `diagnosis`; start the description with the layer that failed ("Failing layer: transport"). The issue then shows `failing_layer`. The same layer names apply to any automatic error log.
 - One bug report per problem; include the `request_id` of the failing call. Add `"no_autofix":true` when it needs a person, or `"request_autofix":true` (or `POST .../request-autofix` later) to ask for an automatic fix. That is a request, not a promise: the team's switches, review, tests and budget decide.
+- Say how urgent it is with `"urg"`: `high` when someone is waiting on it right now, `low` when nobody is (polish, infrastructure), otherwise leave it at `medium`. Raise or lower it later with `PUT .../urg` as that changes.
 - When an issue is `waiting_for_retest`, install `fixed_in` or later, re-run the repro, then verify. Never tell anyone something is fixed until a re-test says `works`. `unverified` means you couldn't test it, not a guess at `still_broken`.
 - Issues never carry your Bridgit key, or anything private the owner hasn't agreed to share.
 
@@ -2436,3 +2593,11 @@ All endpoints use the paired agent's Authorization bearer key over the existing 
 | 410 | `code_expired` | That link code expired (codes last 10 minutes) | Ask for a new code |
 | 410 | `code_used_up` | That link code was already used, cancelled, or voided after 5 wrong tries | Ask for a new code |
 | 409 | `name_required` | This Bridgit needs a Device Domain Name first (the message has the naming advice) | Register one with POST /v1/owner/configuration/name, then retry |
+| 409 | `media_incomplete` | That photo or video is still arriving (being recorded, downloaded or synced); list with include_pending=true to see it as complete:false | Wait a few seconds and retry |
+| 409 | `owner_email_required` | A verified owner alert email is needed before an approver device is enrolled or an approver recovery starts | Set it with POST /v1/owner/email; the owner opens the link in that email, then retry |
+| 409 | `no_approver` | This needs an owner authorization and no approver device that can give it is enrolled | Ask the owner to enrol an approver device; don't retry until then |
+| 409 | `no_screen_lock` | That device has no screen lock, so it can't be an approver device | Ask the owner to set a screen lock on it, or use another device |
+| 409 | `recovery_complete` | The approver recovery already cleared the approver list, so it can't be cancelled | Don't retry; enrol a first approver device again |
+| 403 | `owner_authorization_required` | Only the owner can decide this, on an approver device; an agent can ask, read and decline | Don't retry; tell the owner what is waiting (`remaining_human_step`) |
+| 501 | `platform_unsupported` | This platform can't do that (a named gap, for example approving on a desktop install) | Don't retry; use a device whose profile offers it |
+| 409 | `namespace_mismatch` | A spend, a budget or a cap names another accounting namespace (`live` or `sandbox`) than its source or instrument has | Leave `namespace` out or send the source's own; a sandbox source never spends live money, or the reverse |

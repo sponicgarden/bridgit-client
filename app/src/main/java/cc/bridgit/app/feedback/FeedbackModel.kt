@@ -221,12 +221,8 @@ data class Issue(
  * A = an agent. Same rule as bridgit-cloud/feedback/src/ref.mjs.
  */
 object IssueRef {
-    fun letter(captureSource: String) = when (captureSource) {
-        "form" -> "M"
-        "agent", "agent_api" -> "A"
-        else -> "C"
-    }
-    fun of(captureSource: String, teamId: Long) = letter(captureSource) + teamId.toString().padStart(4, '0')
+    fun letter(captureSource: String) = cc.bridgit.app.core.contract.ContractVocab.let { it.ISSUE_REF_LETTERS[captureSource] ?: it.ISSUE_REF_OTHER_LETTER }
+    fun of(captureSource: String, teamId: Long) = letter(captureSource) + teamId.toString().padStart(cc.bridgit.app.core.contract.ContractVocab.ISSUE_REF_PAD, '0')
 }
 
 /** The name the Bridgit team's moves carry on the phone. */

@@ -118,6 +118,7 @@ class StatusModule(app: BridgeApp) : Capability(app) {
                 inventory.getJSONArray("devices").put(cc.bridgit.app.satellite.SatelliteEndpoints.publicJson(it).put("connection", "satellite")) } }
             Reply.Json(inventory)
         }
+        endpoint(Endpoints.DEVICE_PROFILE) { Reply.Json(cc.bridgit.app.core.profile.AndroidProfile.profile(app, agent?.let { app.agents.get(it.id) })) }
         endpoint(Endpoints.DEVICE_DISPLAY) {
             val g = cc.bridgit.app.interact.DisplayInfo.read(app)
             Reply.Json(cc.bridgit.app.interact.CardViewport.displayJson(g, cc.bridgit.app.interact.DisplayInfo.standard(g)))
@@ -160,6 +161,7 @@ class StatusModule(app: BridgeApp) : Capability(app) {
                 .put("base_url", app.address().baseUrl)
                 .put("bridgit_name", cc.bridgit.app.feedback.DeviceNames.hint(app, agent?.id))
                 .put("owner_email", ownerEmailJson())
+                .put("setup", cc.bridgit.app.core.profile.AndroidProfile.healthSetup(app))
                 .put("api_revision", cc.bridgit.app.api.ApiChanges.CURRENT)
                 .put("whats_new", cc.bridgit.app.api.ApiChanges.whatsNew(agent?.let { app.agents.get(it.id) }?.knownApiRevision ?: 0))
                 .put("links", cc.bridgit.app.api.ApiChanges.links())
@@ -601,10 +603,16 @@ class GalleryModule(app: BridgeApp) : Capability(app) {
             val since = query("since")?.let { cc.bridgit.app.planned.UsageModule.time(it, 0) }
             val until = query("until")?.let { cc.bridgit.app.planned.UsageModule.time(it, 0) }
             if (since != null && until != null && since > until) throw ErrorCatalog.error("invalid_parameter", "since must precede until.")
-            gallery.recent(limit, type, query("album"), since, until).forEach {
+            val includePending = cc.bridgit.app.planned.Rules.flag(query("include_pending"), "include_pending")
+            // The caller already holds the gallery grant here; the same rule as the video list keeps them in step.
+            val showSource = cc.bridgit.app.core.media.MediaScopes.showsSource(enabled) { agent!!.allows(it) }
+            gallery.recent(limit, type, query("album"), since, until, includePending).forEach {
+                val arrival = it.arrival
+                if (!arrival.complete && !includePending) return@forEach
                 arr.put(JSONObject().put("id", it.id.toString()).put("taken_at", isoAt(it.takenAt))
                     .put("width_px", it.width).put("height_px", it.height)
-                    .put("size_bytes", it.size).put("mime", it.mime).put("album", it.album ?: JSONObject.NULL))
+                    .put("size_bytes", it.size).put("mime", it.mime).put("album", it.album ?: JSONObject.NULL)
+                    .put("complete", arrival.complete).apply { if (showSource) put("source", arrival.source.toJson()) })
             }
             val out = JSONObject().put("access_mode", m).put("photos", arr)
             if (m == "selected") out.put("hint", "Only the photos the owner picked are visible. For new photos and screenshots, " +

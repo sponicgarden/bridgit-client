@@ -1,0 +1,49 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "List the linked sources of a namespace: instrument, provider, custody, cap and whether the key is set. A key is never returned",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_sources_list",
+  "query": [{
+   "name": "namespace",
+   "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+   "type": "string",
+   "required": false,
+   "enum": [
+    "live",
+    "sandbox"
+   ]
+  }],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/spending/sources?namespace=sandbox",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/spending/sources",
+  "capability": "owner_features",
+  "returns": "sources[{id, instrument, provider, class, namespace, funder, custody, cap provider|core_only, configured, device, host, on, time_source, usage_read, available, linked_at}], instruments[]",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"namespace": {
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }},
+   "required": []
+  },
+  "errors": [
+   "forbidden",
+   "agent_not_allowed",
+   "platform_unsupported",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,2414 @@
+{
+  "schema_version": 1,
+  "profile_revision": 1,
+  "observed_at": "2026-11-11T08:00:00Z",
+  "expires_at": "2026-11-11T08:01:00Z",
+  "device": {
+    "install_id": null,
+    "relay_device_id": null,
+    "name": "robolectric",
+    "device_type": "phone",
+    "platform": "android",
+    "os_version": "14",
+    "app_version": "1.8.0",
+    "api_revision": 0,
+    "services": [
+      "host"
+    ],
+    "hardware": {
+      "camera": "absent",
+      "location": "absent",
+      "microphone": "absent",
+      "speaker": "absent"
+    }
+  },
+  "link": null,
+  "availability": {
+    "state": "online",
+    "in_foreground": true
+  },
+  "capabilities": {
+    "v1.adb": {
+      "runtime_id": "adb",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/adb\/setup"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/adb\/status"
+        }
+      ]
+    },
+    "v1.app_device_access": {
+      "runtime_id": "app_device_access",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/applet-devices"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applet-devices"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/app-devices"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/app-devices"
+        }
+      ]
+    },
+    "v1.applet_data": {
+      "runtime_id": "applet_data",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/applet\/records"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applet\/records\/{key}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applet\/records\/{key}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/applet\/records\/{key}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applet\/portal\/record"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applet\/tables"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applet\/tables\/{table}\/rows"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applet\/tables\/{table}\/rows"
+        },
+        {
+          "method": "PATCH",
+          "path": "\/v1\/applet\/tables\/{table}\/rows\/{row}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/applet\/tables\/{table}\/rows\/{row}"
+        }
+      ]
+    },
+    "v1.applet_install": {
+      "runtime_id": "applet_install",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/catalog"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/installed\/{id}\/development"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/installed\/{id}\/template-policy"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/installed\/{id}\/template-upgrade"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/context"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/practices"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/validate"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/install"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/installed"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/installed\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/installed\/{id}\/update"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/installed\/{id}\/pause"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/applets\/installed\/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/installed\/{id}\/data"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/installed\/{id}\/records"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/installed\/{id}\/data\/export"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/installed\/{id}\/photos\/{photo}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows"
+        },
+        {
+          "method": "PATCH",
+          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows\/{row}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows\/{row}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/{id}\/budget"
+        }
+      ]
+    },
+    "v1.applet_portals": {
+      "runtime_id": "applet_portals",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/portals"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/{id}\/portal\/open"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/{id}\/portal"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/{id}\/portal\/call"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/{id}\/portal\/close"
+        }
+      ]
+    },
+    "v1.budgets": {
+      "runtime_id": "budgets",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "PUT",
+          "path": "\/v1\/applets\/{id}\/budget"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/applets\/{id}\/budget\/top-up"
+        },
+        {
+          "method": "PUT",
+          "path": "\/v1\/applets\/{id}\/actions\/{action}"
+        }
+      ]
+    },
+    "v1.camera": {
+      "runtime_id": "camera",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": true,
+      "callable": false,
+      "blocked_reason": "permission:CAMERA",
+      "constraints": {
+        "execution": [
+          "owner_present",
+          "while_open",
+          "background"
+        ]
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/camera\/snapshot"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/camera\/arm"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/camera\/pose\/start"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/camera\/pose\/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/camera\/pose\/{id}\/picture"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/camera\/pose\/{id}\/stop"
+        }
+      ]
+    },
+    "v1.captures": {
+      "runtime_id": "captures",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": true,
+      "callable": true,
+      "blocked_reason": null,
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/captures\/storage"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/captures\/storage"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/captures"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/captures\/{id}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/captures\/{id}"
+        }
+      ]
+    },
+    "v1.clipboard": {
+      "runtime_id": "clipboard",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/clipboard"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/clipboard\/{id}"
+        }
+      ]
+    },
+    "v1.connections": {
+      "runtime_id": "connections",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/connections"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/connections\/send"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/connections\/configure"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/connections\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/connections\/{id}\/rotate"
+        }
+      ]
+    },
+    "v1.context": {
+      "runtime_id": "context",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/context"
+        }
+      ]
+    },
+    "v1.controls": {
+      "runtime_id": "controls",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/phone\/dnd"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/phone\/sound"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/phone\/brightness"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/phone\/power"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/phone\/undo"
+        }
+      ]
+    },
+    "v1.downloads": {
+      "runtime_id": "downloads",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/downloads"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/downloads\/{id}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/downloads\/{id}"
+        }
+      ]
+    },
+    "v1.feedback": {
+      "runtime_id": "feedback",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": true,
+      "callable": true,
+      "blocked_reason": null,
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/issues"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/issues\/team-key"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/issues\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/issues\/{id}\/followup"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/issues"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/feedback"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/feedback\/team-key"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/feedback\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/feedback\/{id}\/followup"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/feedback"
+        }
+      ]
+    },
+    "v1.files": {
+      "runtime_id": "files",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/files"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/files\/{id}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/files\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/files"
+        }
+      ]
+    },
+    "v1.find_crop": {
+      "runtime_id": "find_crop",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/images\/find"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/images\/crop"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/images\/appraise"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/images\/engines"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/images\/engines\/check"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/images\/engines\/download"
+        }
+      ]
+    },
+    "v1.flashlight": {
+      "runtime_id": "flashlight",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/flashlight"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/flashlight"
+        }
+      ]
+    },
+    "v1.gallery": {
+      "runtime_id": "gallery",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/gallery\/recent"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/gallery\/photo\/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/image\/last"
+        }
+      ]
+    },
+    "v1.gallery_video": {
+      "runtime_id": "gallery_video",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/gallery\/videos\/recent"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/gallery\/video\/{id}"
+        }
+      ]
+    },
+    "v1.health_connect": {
+      "runtime_id": "health_connect",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/health\/records"
+        }
+      ]
+    },
+    "v1.interactions": {
+      "runtime_id": "interactions",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/interactions"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/interactions"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/interactions\/{id}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/interactions\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/interactions\/{id}\/renotify"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/events"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/text\/stream"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/callback\/test"
+        }
+      ]
+    },
+    "v1.judgment": {
+      "runtime_id": "judgment",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/judgment"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/images\/generations"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/images\/usage"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/services\/context"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/story"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/story\/generate"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/story\/stop"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/story\/image"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/story\/presentation"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/story\/reveal"
+        }
+      ]
+    },
+    "v1.lan_camera": {
+      "runtime_id": "lan_camera",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/lan-cameras"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/lan-cameras\/snapshot"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/lan-cameras\/move"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/lan-cameras\/probe"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/lan-cameras\/framing\/config"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/lan-cameras\/framing"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/lan-cameras\/framing"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/lan-cameras\/framing\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/lan-cameras\/framing\/{id}\/cancel"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/lan-cameras\/framing\/{id}\/photo"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/lan-cameras\/{id}\/controls"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/lan-cameras\/applet-views\/{instance}\/{view}"
+        }
+      ]
+    },
+    "v1.lan_camera_audio": {
+      "runtime_id": "lan_camera_audio",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/lan-cameras\/audio\/record"
+        }
+      ]
+    },
+    "v1.lan_camera_speaker": {
+      "runtime_id": "lan_camera_speaker",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/lan-cameras\/audio\/play"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/lan-cameras\/talk-account"
+        }
+      ]
+    },
+    "v1.lan_control": {
+      "runtime_id": "lan_control",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/lan\/devices"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/lan\/devices\/action"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/lan\/devices\/log"
+        }
+      ]
+    },
+    "v1.lan_discovery": {
+      "runtime_id": "lan_discovery",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/lan\/discovered"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/lan\/catalog"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/lan\/brands\/{id}\/logo"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/lan\/discover"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/lan\/packs"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/lan\/packs\/check"
+        }
+      ]
+    },
+    "v1.lan_enrollment": {
+      "runtime_id": "lan_enrollment",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/lan\/devices\/enroll"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/lan\/devices\/remove"
+        }
+      ]
+    },
+    "v1.location": {
+      "runtime_id": "location",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": [
+          "owner_present",
+          "while_open",
+          "background"
+        ]
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/location"
+        }
+      ]
+    },
+    "v1.log": {
+      "runtime_id": "log",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": true,
+      "callable": true,
+      "blocked_reason": null,
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/log"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/log\/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/log\/stats"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/log\/latency"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/log\/export"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/log"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/audit"
+        }
+      ]
+    },
+    "v1.mic": {
+      "runtime_id": "mic",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": [
+          "owner_present",
+          "while_open",
+          "background"
+        ]
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/speech\/hear"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/mic\/record"
+        }
+      ]
+    },
+    "v1.modes": {
+      "runtime_id": "modes",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/mode"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/mode"
+        }
+      ]
+    },
+    "v1.notifications": {
+      "runtime_id": "notifications",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/notifications"
+        }
+      ]
+    },
+    "v1.ocr": {
+      "runtime_id": "ocr",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/ocr"
+        }
+      ]
+    },
+    "v1.outbound": {
+      "runtime_id": "outbound",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": true,
+      "callable": true,
+      "blocked_reason": null,
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/outbound"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/outbound\/summary"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/outbound\/{id}"
+        }
+      ]
+    },
+    "v1.owner_features": {
+      "runtime_id": "owner_features",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/app\/foreground\/targets"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/app\/foreground"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/services\/models"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/services\/models\/{applet_id}\/{task_key}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/services\/budgets"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/features"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/dog-monitor"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/dog-monitor\/history"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/applets\/dog-monitor\/frame"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/resources"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/resource-jobs"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/resource-jobs\/{id}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/resource-jobs\/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/remote-view"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/callback"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/delivery"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/settings"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configure"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/approvals"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/approvals\/{kind}\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/approvals\/{kind}\/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/settings"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/actions"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/keys"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/keys\/{provider}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/owner\/configuration\/keys\/{provider}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/connections"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/connections"
+        },
+        {
+          "method": "PATCH",
+          "path": "\/v1\/owner\/configuration\/connections\/{id}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/owner\/configuration\/connections\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/connections\/{id}\/rotate"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/callbacks"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/callbacks\/{agent}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/owner\/configuration\/callbacks\/{agent}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/notifications\/{agent}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/notifications\/{agent}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/email"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/email"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/name"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/name"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/owner\/configuration\/name"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/specs"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/specs"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/feeding"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/feeding"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/modes"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/modes"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/listening"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/listening"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/permissions"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/permissions\/device"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/permissions\/linked\/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/links"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/links\/codes"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/owner\/configuration\/links\/codes\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/links\/claims"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/links\/{id}\/directions\/{direction}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/links\/{id}\/tier"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/links\/{id}\/undo"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/links\/pause-all"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/links\/log"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/approvers"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/approvers"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/approvers\/recovery"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/approvers\/recovery"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/owner\/configuration\/approvers\/recovery"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/spending"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/spending"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/spending\/sources"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/spending\/sources"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/owner\/configuration\/spending\/sources\/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/spending\/rules"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/spending\/rules"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/spending\/budgets"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/spending\/budgets"
+        },
+        {
+          "method": "PATCH",
+          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}\/topups"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}\/gate"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/spending\/allowances"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/spending\/journal"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/spending\/journal"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/spending\/summary"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/configuration\/spending\/limits"
+        }
+      ]
+    },
+    "v1.phone": {
+      "runtime_id": "phone",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/phone\/status"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/phone\/battery"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/phone\/context"
+        }
+      ]
+    },
+    "v1.portal": {
+      "runtime_id": "portal",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/snapshot"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/home"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/devices"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/applets\/inventory"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/applets\/watches"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/brands\/{id}\/logo"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/logs"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/agents"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/applets"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/theme"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/portal\/photo\/targets"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/portal\/photo"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/portal\/updates"
+        }
+      ]
+    },
+    "v1.ring": {
+      "runtime_id": "ring",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/phone\/ring"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/phone\/ring"
+        }
+      ]
+    },
+    "v1.schedule": {
+      "runtime_id": "schedule",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/schedule\/manifest"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/schedule"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/schedule"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/schedule\/run\/{id}"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/schedule\/pause"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/schedule"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/schedule\/assets"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/schedule\/assets\/{name}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/schedule\/assets\/{name}"
+        }
+      ]
+    },
+    "v1.screen": {
+      "runtime_id": "screen",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/screen\/capture"
+        }
+      ]
+    },
+    "v1.screen_share": {
+      "runtime_id": "screen_share",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": [
+          "owner_present",
+          "while_open",
+          "background"
+        ]
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/screen\/grant"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/screen\/grants"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/screen\/share\/capture"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/screen\/grant"
+        }
+      ]
+    },
+    "v1.sensors": {
+      "runtime_id": "sensors",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/sensors"
+        }
+      ]
+    },
+    "v1.settings": {
+      "runtime_id": "settings",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/settings"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/settings"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/settings\/modes"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/settings\/modes"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/settings\/ai-keys"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/settings\/ai-keys"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/settings\/capture-upload"
+        }
+      ]
+    },
+    "v1.shares": {
+      "runtime_id": "shares",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/shares"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/shares\/{id}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/shares\/{id}"
+        }
+      ]
+    },
+    "v1.sounds": {
+      "runtime_id": "sounds",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": [
+          "owner_present",
+          "while_open",
+          "background"
+        ]
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/sounds"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/sounds\/clip\/{id}"
+        }
+      ]
+    },
+    "v1.speaker": {
+      "runtime_id": "speaker",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/speech\/speak"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/speaker\/play"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/speaker\/say"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/speaker"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/speaker"
+        }
+      ]
+    },
+    "v1.ssh": {
+      "runtime_id": "ssh",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/ssh\/connections"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/ssh\/probe"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/ssh\/connections\/save"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/ssh\/connections\/remove"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/ssh\/test"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/ssh\/exec"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/ssh\/files"
+        }
+      ]
+    },
+    "v1.status": {
+      "runtime_id": "status",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": true,
+      "callable": true,
+      "blocked_reason": null,
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/agent\/profile"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/agent\/profile"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/speech\/models"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/services"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/health"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/device\/profile"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/device\/display"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/device\/resources"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/devices"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/capabilities"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/limits"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/discover"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/discover\/report"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/guide"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/start"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/welcome"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/demo"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/samples"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/openapi.json"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/registry"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/changes"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/tools\/bridgit"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/tools\/bridget"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/pair"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/mcp"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/me"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/owner\/email"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/email"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/satellites"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/satellite\/claim"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/satellite\/manifest"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/satellite\/hub-info"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/satellite\/hub"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/satellite\/hub\/photo"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/satellite\/hub\/portal-login"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/satellite\/unlink"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/satellite\/hub\/unlink"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/satellite\/hub\/agents"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/satellite\/hub\/agents\/{id}\/pause"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/links"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/link\/claim"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/link\/events"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/link\/peers"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/link\/disconnect"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/links\/{id}\/disconnect"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/links\/disconnect-all"
+        }
+      ]
+    },
+    "v1.tour": {
+      "runtime_id": "tour",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/tour"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/tour\/photo\/{n}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/tour"
+        }
+      ]
+    },
+    "v1.usage": {
+      "runtime_id": "usage",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/usage"
+        }
+      ]
+    },
+    "v1.video": {
+      "runtime_id": "video",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": [
+          "owner_present",
+          "while_open",
+          "background"
+        ]
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/camera\/video"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/camera\/video"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/camera\/video\/review"
+        }
+      ]
+    },
+    "v1.wakewords": {
+      "runtime_id": "wakewords",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": false,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": [
+          "owner_present",
+          "while_open",
+          "background"
+        ]
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/listen"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/listen\/clip\/{id}"
+        }
+      ]
+    },
+    "v1.watches": {
+      "runtime_id": "watches",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/watches"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/watches"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/watches\/{id}"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/watches\/{id}"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/watches\/{id}\/tally"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/watches\/{id}\/pause"
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/situations"
+        }
+      ]
+    },
+    "v1.weather": {
+      "runtime_id": "weather",
+      "implemented": true,
+      "supported": true,
+      "enabled": false,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "\/v1\/weather"
+        }
+      ]
+    }
+  },
+  "setup": {
+    "not_done": 4,
+    "steps": [
+      {
+        "id": "device_name",
+        "state": "needs_owner",
+        "where": "anywhere",
+        "api": {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/name"
+        }
+      },
+      {
+        "id": "reach",
+        "state": "needs_owner",
+        "where": "this_device"
+      },
+      {
+        "id": "first_agent",
+        "state": "done"
+      },
+      {
+        "id": "owner_email",
+        "state": "done",
+        "api": {
+          "method": "POST",
+          "path": "\/v1\/owner\/email"
+        }
+      },
+      {
+        "id": "notifications",
+        "state": "done"
+      },
+      {
+        "id": "open_app",
+        "state": "done"
+      },
+      {
+        "id": "permissions",
+        "state": "done"
+      },
+      {
+        "id": "battery",
+        "state": "blocked",
+        "where": "this_device",
+        "dependency": {
+          "kind": "os",
+          "name": "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+        }
+      },
+      {
+        "id": "diagnostic",
+        "state": "needs_owner",
+        "where": "this_device"
+      }
+    ]
+  }
+}

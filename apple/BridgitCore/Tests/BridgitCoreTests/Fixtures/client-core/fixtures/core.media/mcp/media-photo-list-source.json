@@ -1,0 +1,61 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-photo-list-source",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "Photo list items carry source and complete",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "photo",
+        "size": 4096,
+        "added_at": 1762800000,
+        "id": 5,
+        "owner_package": "com.android.chrome",
+        "relative_path": "Download/"
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/recent"
+  },
+  "expect": {
+    "status": 200,
+    "body_paths": {
+      "photos.0.id": "5",
+      "photos.0.complete": true,
+      "photos.0.source": {
+        "kind": "download",
+        "app": "com.android.chrome",
+        "folder": "Download"
+      }
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

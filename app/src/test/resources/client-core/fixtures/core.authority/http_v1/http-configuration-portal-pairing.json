@@ -1,0 +1,56 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-configuration-portal-pairing",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "An agent that holds a Portal pairing never gets configuration authority",
+  "step": "grant.control_scope",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "owner_features"
+        ]
+      }
+    ],
+    "control_grants": [
+      {
+        "agent": "a",
+        "scope": "owner.configuration"
+      }
+    ],
+    "relay": {
+      "configs": [
+        {
+          "agent": "a",
+          "mode": "connector",
+          "routes": [
+            "GET /v1/portal/home"
+          ]
+        }
+      ]
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/owner/configuration"
+  },
+  "expect": {
+    "status": 403,
+    "error": "forbidden"
+  },
+  "platforms": {
+    "android": "gap",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

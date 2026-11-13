@@ -25,12 +25,34 @@ data class Address(val magicDns: String?, val ip: String?, val port: Int) {
 data class DeviceIdentity(val domainName: String?, val friendlyName: String, val model: String, val owner: String?)
 
 /**
+ * The first calls, in order (spec-setup-prompt F18): one list in the Client Core pack (vocab/setup-prompt.json),
+ * rendered by the setup prompt, the guide's Start here and start.md stage 2, each with its own whys.
+ */
+object FirstCalls {
+    val CALLS: List<String> = cc.bridgit.app.core.contract.ContractVocab.SETUP_PROMPT_FIRST_CALLS
+
+    private fun check(why: Map<String, String>) = require(CALLS.containsAll(why.keys)) { "not a first call: ${why.keys - CALLS.toSet()}" }
+
+    /** "1. `call`: why" per line; [why] names every call. */
+    fun numbered(why: Map<String, String>): String {
+        check(why)
+        return CALLS.mapIndexed { i, c -> "${i + 1}. `$c`: ${why.getValue(c)}" }.joinToString("\n")
+    }
+
+    /** "`call` (why), ..." on one line; a call without a why is named alone. */
+    fun inline(why: Map<String, String> = emptyMap()): String {
+        check(why)
+        return CALLS.joinToString(", ") { c -> "`$c`" + (why[c]?.let { " ($it)" } ?: "") }
+    }
+}
+
+/**
  * The setup prompt (section 6.4, Appendix B). Plain text, sections in A0213 order; "most useful calls" built from the
  * switches that are on now (AGT-07).
  */
 object SetupPrompt {
-    /** Section order (A0213): identity first, then connection, rules, bootstrap, gotchas and pointers. */
-    val SECTIONS = listOf("IDENTITY", "CONNECTION", "RULES", "FIRST CALLS, IN ORDER", "GOTCHAS", "AFTER YOU'RE CONNECTED", "POINTERS")
+    /** Section order (A0213), from the Client Core pack (vocab/setup-prompt.json): identity first, then connection, rules, bootstrap, gotchas and pointers. */
+    val SECTIONS: List<String> = cc.bridgit.app.core.contract.ContractVocab.SETUP_PROMPT_SECTIONS
 
     /** Step 1's naming sentence: never asks a named device to register; an unnamed one only after the owner agrees (A0058, A0213). */
     fun naming(domainName: String?): String =
@@ -42,13 +64,14 @@ object SetupPrompt {
      * Each line names a path under /v1, so it reads the same whether the agent calls the phone or wraps the call in a relay job.
      */
     fun firstCalls(domainName: String? = null): String {
+        val c = FirstCalls.CALLS
         val sb = StringBuilder()
         sb.appendLine("FIRST CALLS, IN ORDER")
-        sb.appendLine("1. GET /v1/health: check agent, base_url and api_revision. ${naming(domainName)} owner_email.status not \"verified\"? Ask for their email, POST /v1/owner/email {\"email\":\"...\"}; after 24 hours Bridgit stops answering until it's verified.")
-        sb.appendLine("2. POST /v1/me {\"model\":\"<model id>\",\"harness\":\"<harness>\"}; repeat when your model changes.")
-        sb.appendLine("3. GET /v1/capabilities: use features with agent_allowed, enabled and ready; for a blocked one you need, ask once naming blocked_reason.")
-        sb.appendLine("4. GET /v1/limits before planning anything paid (Jev, Clef, GLM): limits and budgets.")
-        sb.appendLine("5. Read ${CapabilityCatalog.START_URL} (no web? GET /v1/start): applet-building stages. GET /v1/discover?q=<idea> gives a recipe, owner_must, first_calls and done_when.")
+        sb.appendLine("1. ${c[0]}: check agent, base_url and api_revision. ${naming(domainName)} owner_email.status not \"verified\"? Ask for their email, POST /v1/owner/email {\"email\":\"...\"}; after 24 hours Bridgit stops answering until it's verified.")
+        sb.appendLine("2. ${c[1]} {\"model\":\"<model id>\",\"harness\":\"<harness>\"}; repeat when your model changes.")
+        sb.appendLine("3. ${c[2]}: use features with agent_allowed, enabled and ready; for a blocked one you need, ask the owner once, naming blocked_reason.")
+        sb.appendLine("4. ${c[3]} before planning anything paid (Jev, Clef, GLM).")
+        sb.appendLine("5. Read ${CapabilityCatalog.START_URL} (no web? ${c[4]}): applet-building stages. ${c[5]}?q=<idea> gives a recipe, owner_must, first_calls and done_when.")
         sb.appendLine("Existing data: GET /v1/applets/installed, then data_url (don't reinstall or recapture). Linked Bridgits: GET /v1/links, then target=<name>.")
         return sb.toString()
     }
@@ -59,7 +82,7 @@ object SetupPrompt {
         appendLine("- Agent guide: ${Learn.AGENT_GUIDE_URL}")
         appendLine("- Modify applets: https://bridgit.cc/learn/builder/modifying-applets.md (keep owner data; copy built-ins first).")
         appendLine("- Cards: a styled HTML card by default, even for yes/no: GET /v1/samples?id=html-yes-no (all: GET /v1/samples).")
-        append("- Ideas: ${Learn.PLAYBOOK_URL} (${Playbook.USE_CASES} use cases); capabilities: ${CapabilityCatalog.INDEX_URL}, GET /v1/discover?id=<id>&detail=full. GET /v1/guide is the full reference: use it only when needed.")
+        append("- Ideas: ${Learn.PLAYBOOK_URL} (${Playbook.USE_CASES} use cases); capabilities: ${CapabilityCatalog.INDEX_URL}, GET /v1/discover?id=<id>&detail=full. GET /v1/guide is the full reference (300 KB): use it only when needed.")
     }
 
     /**
@@ -133,7 +156,7 @@ object SetupPrompt {
         if (caps.none { it.switchKey != null && it.id in on }) sb.appendLine("- No optional features ready and allowed; GET /v1/capabilities explains.")
         sb.appendLine("- A question you sent: GET /v1/interactions/{id}?wait=55 until its status is answered, dismissed, expired or cancelled. \"seen\" is not an answer.")
         sb.appendLine("- Events: loop GET /v1/events?since=<next_cursor>&wait=55; keep each new cursor, poll again even on empty replies, no sleeps; on rate_limited wait retry_after_s.")
-        sb.appendLine("- Idempotency-Key: a new <uuid> header on POST camera/snapshot, mic/record, interactions, speaker/play, speaker/say, screen/capture, applets/install (guide lists others); reuse it to retry. Watches take none: check GET /v1/log?agent=me first.")
+        sb.appendLine("- Idempotency-Key: a new <uuid> header on POST camera/snapshot, mic/record, interactions, speaker/play, speaker/say, screen/capture, applets/install (guide lists others); reuse it to retry. Watches and judgments take none: check GET /v1/log?agent=me first.")
         if (cc.bridgit.app.BuildConfig.PRIVATE_CONTROL) sb.appendLine("- ${cc.bridgit.app.adb.AdbSetupHelp.promptHint}")
         sb.appendLine()
         if (callbackSecret != null) {
@@ -178,7 +201,7 @@ object SetupPrompt {
     fun short(agentName: String, key: String, addr: Address, device: DeviceIdentity): String = buildString {
         val fallback = addr.ipBaseUrl?.takeIf { addr.magicDns != null }?.let { " (IP fallback: $it)" } ?: ""
         appendLine("Bridgit setup for $agentName on ${device.friendlyName} (${device.model}). Base URL: ${addr.baseUrl}$fallback. Key: $key")
-        appendLine("The key works only for this device. Save it only in \"~/.config/bridgit/agents/$agentName/header\" (mode 600) as one line, Authorization: Bearer <your key>, and never print it.")
+        appendLine("The key works only for this device. Save it only in \"~/.config/bridgit/agents/$agentName/header\" (mode 600) as one line, Authorization: Bearer <your key>, and never print it. No answer in 60 s? Ask the owner for Tailscale on both devices or the relay (More → Relay setup).")
         if (device.domainName == null) appendLine("Your first reply to the owner is only this, with one cute name of about 10 lowercase letters, digits or hyphens: \"Bridgit, a sensorial app development network, needs a friendly name to register your device. Can we call it '<name>'?\"")
         append("The Bridgit Interface Guide is here: curl -sS -m 60 -H @\"\$HOME/.config/bridgit/agents/$agentName/header\" ${addr.baseUrl}$WELCOME_PATH (public copy: $WELCOME_URL). Read it before anything else.")
     }
@@ -235,19 +258,25 @@ object Guide {
         ApiChanges.revisions.last().items.forEach { sb.appendLine("- ${it.what}" + (it.endpoint?.let { e -> " (`$e`)" } ?: "")) }
         sb.appendLine()
         sb.appendLine("## Start here")
-        sb.appendLine("1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with ${Learn.CHANGES_URL}; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.")
-        sb.appendLine("   `GET /v1/capabilities` (the table below, live): use a feature only when `agent_allowed`, `enabled` and `ready` are all true. `ready` is about the device, not your permission.")
-        sb.appendLine("   Control tools use separate grants: check `GET /v2/capabilities` for `supported`, `enabled`, `granted`, `ready` and `blockers`, then read ${Learn.CONTROL_URL}. Private app-control builds still require the owner's session approval.")
-        sb.appendLine("   `GET /v1/devices` lists the host plus owner-configured external devices visible to your grants, with ids and action paths. Check availability separately; the inventory does not scan or claim a camera is online.")
-        sb.appendLine("2. Building an applet (anything that keeps running)? Install a package: ${CapabilityCatalog.START_URL} stage 3 and https://bridgit.cc/learn/builder/applet-packages.md. Otherwise make the one call the owner's task needs. For the newest photo or screenshot use `GET /v1/image/last` (no list-then-fetch); for a new photo `POST /v1/camera/snapshot {\"camera\":\"rear\",\"size\":\"agent\"}`.")
-        sb.appendLine("3. Need the owner? Send a styled HTML card (`POST /v1/interactions`, kind `html`, answered with `Bridgit.respond`) for every test, yes/no, choice, notice and form, even a simple connection check: copy `GET /v1/samples?id=html-yes-no`, `html-choice`, `html-form` or `html-connection-test` and change only its CARD text. Native `question` and `notice` cards are the fallback. Wait with `GET /v1/interactions/{id}?wait=55` until its status is `answered`, `dismissed`, `expired` or `cancelled` (a closed card returns at once: stop then).")
-        sb.appendLine("4. Tell the owner your model: add `X-Bridgit-Model: <model id>` (and `X-Bridgit-Harness: <harness>`) to the headers you send with every call, or `POST /v1/me {\"model\",\"harness\"}` on each change. The rest of this guide is reference: read the section you need.")
+        val calls = FirstCalls.CALLS
+        sb.appendLine(FirstCalls.numbered(mapOf(
+            calls[0] to "confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with ${Learn.CHANGES_URL}; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.",
+            calls[1] to "`{\"model\",\"harness\"}` tells the owner your model, on each change; or add `X-Bridgit-Model: <model id>` (and `X-Bridgit-Harness: <harness>`) to the headers you send with every call.",
+            calls[2] to "the table below, live; use a feature only when `agent_allowed`, `enabled` and `ready` are all true. `ready` is about the device, not your permission.\n" +
+                "   Control tools use separate grants: check `GET /v2/capabilities` for `supported`, `enabled`, `granted`, `ready` and `blockers`, then read ${Learn.CONTROL_URL}. Private app-control builds still require the owner's session approval.\n" +
+                "   `GET /v1/devices` lists the host plus owner-configured external devices visible to your grants, with ids and action paths. Check availability separately; the inventory does not scan or claim a camera is online.",
+            calls[3] to "before planning anything paid (Jev, Clef, GLM).",
+            calls[4] to "applet-building stages (${CapabilityCatalog.START_URL}).",
+            calls[5] to "`?q=<idea>` gives a recipe, `owner_must`, `first_calls` and `done_when`.")))
+        val n = calls.size
+        sb.appendLine("${n + 1}. Building an applet (anything that keeps running)? Install a package: ${CapabilityCatalog.START_URL} stage 3 and https://bridgit.cc/learn/builder/applet-packages.md. Otherwise make the one call the owner's task needs. For the newest photo or screenshot use `GET /v1/image/last` (no list-then-fetch); for a new photo `POST /v1/camera/snapshot {\"camera\":\"rear\",\"size\":\"agent\"}`.")
+        sb.appendLine("${n + 2}. Need the owner? Send a styled HTML card (`POST /v1/interactions`, kind `html`, answered with `Bridgit.respond`) for every test, yes/no, choice, notice and form, even a simple connection check: copy `GET /v1/samples?id=html-yes-no`, `html-choice`, `html-form` or `html-connection-test` and change only its CARD text. Native `question` and `notice` cards are the fallback. Wait with `GET /v1/interactions/{id}?wait=55` until its status is `answered`, `dismissed`, `expired` or `cancelled` (a closed card returns at once: stop then). The rest of this guide is reference: read the section you need.")
         sb.appendLine("Right after pairing, ask the owner once: \"Want a 5-minute demo on your phone?\" If they pasted only the setup prompt, ask in that first reply; if they gave a task, finish it first. `GET /v1/demo` only reads the script: run it only after they say yes. Ask discovery questions only if they want suggestions. Declining onboarding does not cancel their existing task.")
         sb.appendLine("A call fails or gets no answer? Before retrying or filing a bug, run the connection ladder (${Learn.CONNECTION_URL}): network, transport, app, auth and capability, one read-only check each; `GET /v1/health` carries a `listener` block for it. Send its per-layer results with the bug report as `diagnosis`.")
         sb.appendLine("Keep credentials per agent, e.g. `~/.config/bridgit/agents/<agent>/header` with mode 600; never overwrite another agent's key. The optional helper reads an env file instead of that header: its download explains `BRIDGIT_ENV` for selecting a separate config. A public-docs 403 may depend on the HTTP client: try curl before concluding the docs are unavailable.")
-        sb.appendLine("5. The owner's email: Bridgit works for 24 hours from the first agent call, then only " + cc.bridgit.app.alerts.EmailGate.DOC_SUMMARY + " keep working; everything else answers `email_required` until the owner verifies an address (the full list is under \"Owner email\" in https://bridgit.cc/learn/control.md). " +
+        sb.appendLine("${n + 3}. The owner's email: Bridgit works for 24 hours from the first agent call, then only " + cc.bridgit.app.alerts.EmailGate.DOC_SUMMARY + " keep working; everything else answers `email_required` until the owner verifies an address (the full list is under \"Owner email\" in https://bridgit.cc/learn/control.md). " +
             "`GET /v1/owner/email` says where it stands; send their address with `POST /v1/owner/email {\"email\":\"...\"}` (if you don't know it, ask them: on a card during the 24 hours, in your chat after), and they tap the link in the email from bridgit.cc.")
-        sb.appendLine("6. Once the owner's first request is done (or after the demo), offer useful suggestions. Only if they are interested, ask two or three questions about their routines, then suggest one small thing to try. ${Learn.PLAYBOOK_URL} has the questions and ${Playbook.USE_CASES} use cases. \"Not now\" stops onboarding; continue any existing task.")
+        sb.appendLine("${n + 4}. Once the owner's first request is done (or after the demo), offer useful suggestions. Only if they are interested, ask two or three questions about their routines, then suggest one small thing to try. ${Learn.PLAYBOOK_URL} has the questions and ${Playbook.USE_CASES} use cases. \"Not now\" stops onboarding; continue any existing task.")
         sb.appendLine()
         sb.appendLine("- Opening a card clears its notification. To remind the owner explicitly, POST /v1/interactions/{id}/renotify {} (MCP interactions_renotify) with an Idempotency-Key. Only your pending/seen cards; no automatic screen takeover or speech.")
         sb.appendLine("Waiting: for one card, `GET /v1/interactions/{id}?wait=55`; for several, or ongoing events, one loop on `GET /v1/events?since=<next_cursor>&wait=55` with a 60 s client timeout. " +

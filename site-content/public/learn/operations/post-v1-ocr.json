@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Recognize Latin-script text locally; no image upload",
@@ -14,7 +14,7 @@
   "body": [
    {
     "name": "gallery_id",
-    "description": "Accessible gallery image (also requires gallery grant)",
+    "description": "Accessible gallery image (also requires gallery grant); a photo still arriving answers 409 media_incomplete",
     "type": "integer",
     "required": false
    },
@@ -42,13 +42,20 @@
      "type": "string"
     },
     "gallery_id": {
-     "description": "Accessible gallery image (also requires gallery grant)",
+     "description": "Accessible gallery image (also requires gallery grant); a photo still arriving answers 409 media_incomplete",
      "type": "integer"
     }
    },
    "required": []
   },
-  "errors": [],
+  "errors": [
+   "capability_disabled",
+   "permission_denied",
+   "invalid_parameter",
+   "photo_not_found",
+   "payload_too_large",
+   "media_incomplete"
+  ],
   "requires": null
  }
 }

@@ -1077,6 +1077,7 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
       if (agentName) await testExt(AGENT, my);
       await wait(500, my);
       finalCard();
+      if (A && A.completed) try { A.completed(); } catch (e) {}
     } catch (e) { if (e !== "stopped") throw e; }
   }
 
@@ -1086,6 +1087,8 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     if (!agentCalledReported) delete opts.called;
     reset(); run++; playing = false;
     if (was) print([["  … Skipped to the result", "dimt"]]);
+    // Skipping a run in progress jumps to the same finished result, so it counts as a completed diagnostic.
+    if (was && !quiet && A && A.completed) try { A.completed(); } catch (e) {}
     state = opts.nodes; reportedOnly = opts.reportedOnly === true; setAgents(opts);
     AGENT.t1.textContent = agentName || ""; agentLogo();
     core.setAttribute("opacity", 1); bridge.setAttribute("opacity", 1); band.setAttribute("opacity", 1);

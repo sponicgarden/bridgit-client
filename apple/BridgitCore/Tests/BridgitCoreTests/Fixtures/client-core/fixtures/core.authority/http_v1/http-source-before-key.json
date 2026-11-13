@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-source-before-key",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "The source is checked before the key",
+  "step": "source",
+  "principal": {
+    "agent": "a",
+    "source": "192.0.2.10",
+    "key": "wrong"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log"
+  },
+  "expect": {
+    "status": 403,
+    "error": "forbidden_source"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

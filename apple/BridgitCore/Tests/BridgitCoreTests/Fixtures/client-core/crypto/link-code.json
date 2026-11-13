@@ -1,0 +1,47 @@
+{
+  "$schema": "../schemas/crypto.schema.json",
+  "vectors": "link-code",
+  "version": 1,
+  "spec": "docs/spec-linked-bridgits.md §4.1; app link/LinkModel.kt",
+  "normalise": [
+    {
+      "in": "7kq2-m9xa",
+      "out": "7KQ2M9XA"
+    },
+    {
+      "in": "7KQ2 M9XA",
+      "out": "7KQ2M9XA"
+    },
+    {
+      "in": "IOLU1234",
+      "out": null
+    },
+    {
+      "in": "ILO23456",
+      "out": "11023456"
+    },
+    {
+      "in": "7KQ2M9X",
+      "out": null
+    },
+    {
+      "in": null,
+      "out": null
+    }
+  ],
+  "derive": [
+    {
+      "code": "7KQ2M9XA",
+      "name": "bright-otter-42",
+      "iterations": 100000,
+      "dk_hex": "961696ba8904c278e377f74c4d7956cd2490e9ce3b6f2e0e14dda06156c18fd94e8f60cf3ea1729c50ea7926e627a7764955bd462b0571b9624d7807bf6d1908",
+      "code_hash": "961696ba8904c278e377f74c4d7956cd2490e9ce3b6f2e0e14dda06156c18fd9",
+      "claim_token": "rly_4e8f60cf3ea1729c50ea7926e627a7764955bd462b0571b9624d7807bf6d1908",
+      "claim_token_sha256": "10c3babdf074d966c424d1748961eaefb72b551d8c8ec590d857ab5f2e4a36f0",
+      "proof": {
+        "claiming_install": "bgi_claimerfixture",
+        "out": "5d558dfc23573a43bf3d0f979bdfc327f7aafc583e718203880fe0754338df7c"
+      }
+    }
+  ]
+}

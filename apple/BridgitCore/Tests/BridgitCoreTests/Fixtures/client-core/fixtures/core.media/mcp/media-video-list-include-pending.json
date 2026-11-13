@@ -1,0 +1,69 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-video-list-include-pending",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "include_pending=true lists a video still arriving as complete:false",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery_video": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery_video"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "video",
+        "name": "clip.mp4",
+        "size": 2048,
+        "added_at": 1762800000,
+        "id": 1
+      },
+      {
+        "scope": "library",
+        "kind": "video",
+        "name": "clip.mp4",
+        "size": 2048,
+        "added_at": 1762800060,
+        "id": 2,
+        "pending": true
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/videos/recent",
+    "query": {
+      "include_pending": "true"
+    }
+  },
+  "expect": {
+    "status": 200,
+    "body_paths": {
+      "items.0.id": 2,
+      "items.0.complete": false,
+      "items.1.id": 1,
+      "items.1.complete": true
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

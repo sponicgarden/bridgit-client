@@ -1,0 +1,47 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "v2-rate-limited",
+  "service": "core.authority",
+  "door": "http_v2",
+  "title": "The 301st v2 call in a minute from one agent is rate limited",
+  "step": "rate",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "capabilities",
+      "arguments": {}
+    }
+  },
+  "prior_requests": 300,
+  "expect": {
+    "status": 429,
+    "error": "rate_limited",
+    "body_paths": {
+      "message": "At most 300 platform requests per agent per minute"
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

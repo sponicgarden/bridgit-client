@@ -1,0 +1,63 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-video-list-source-with-library-grant",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "Video list items carry source for an agent with the library grant",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery_video": true,
+      "gallery": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery_video",
+          "gallery"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "video",
+        "name": "clip.mp4",
+        "size": 2048,
+        "added_at": 1762800000,
+        "id": 3,
+        "owner_package": null,
+        "relative_path": "DCIM/Syncthing/"
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/videos/recent"
+  },
+  "expect": {
+    "status": 200,
+    "body_paths": {
+      "items.0.id": 3,
+      "items.0.complete": true,
+      "items.0.source": {
+        "kind": "sync",
+        "folder": "DCIM/Syncthing"
+      }
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

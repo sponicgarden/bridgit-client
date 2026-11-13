@@ -382,10 +382,15 @@ class Gallery(private val context: Context) {
 
     class Item(val id: Long, val takenAt: Long, val width: Int, val height: Int,
                val size: Long, val mime: String, val album: String?,
-               val addedAt: Long = 0, val relativePath: String? = null)
+               val addedAt: Long = 0, val relativePath: String? = null,
+               val ownerPackage: String? = null, val pending: Boolean? = null, val modifiedSeconds: Long? = null) {
+        /** Provenance and arrival (vocab/media-sources.json, A0270), checked against the clock when read. */
+        val arrival get() = cc.bridgit.app.core.media.MediaSources.classify(ownerPackage, relativePath, pending, modifiedSeconds,
+            cc.bridgit.app.core.media.MediaLibrary.nowSeconds())
+    }
 
     @SuppressLint("Range", "InlinedApi")
-    fun recent(limit: Int, type: String = "any", album: String? = null, since: Long? = null, until: Long? = null): List<Item> {
+    fun recent(limit: Int, type: String = "any", album: String? = null, since: Long? = null, until: Long? = null, includePending: Boolean = false): List<Item> {
         val args = Bundle().apply {
             // MediaStore ignores QUERY_ARG_SORT_COLUMNS here; the SQL sort string is honoured.
             // Newest-added first: received images (WhatsApp) often have no DATE_TAKEN.
@@ -399,7 +404,7 @@ class Gallery(private val context: Context) {
         if (since != null) { clauses += "date_added >= ?"; values += (since / 1000).toString() }
         if (until != null) { clauses += "date_added <= ?"; values += (until / 1000).toString() }
         if (clauses.isNotEmpty()) { args.putString(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION, clauses.joinToString(" AND ")); args.putStringArray(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, values.toTypedArray()) }
-        return query(args, limit)
+        return query(args, limit, includePending)
     }
 
     enum class Kind { ANY, SCREENSHOT, PHOTO }
@@ -450,25 +455,45 @@ class Gallery(private val context: Context) {
         context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
     }.getOrNull()
 
-    /** Android 10 ignores QUERY_ARG_SQL_LIMIT, so reading stops at [limit] here too. */
+    /**
+     * Android 10 ignores QUERY_ARG_SQL_LIMIT, so reading stops at [limit] here too. The provenance columns
+     * (owner_package_name, is_pending) are asked for first; a device that rejects owner_package_name still gets
+     * is_pending, and one that rejects both gets exactly the older projection, so listing, find and latest never
+     * fail because of them. [includePending] also returns rows
+     * still being written (MediaStore hides them by default).
+     */
     @SuppressLint("InlinedApi")
-    private fun query(args: Bundle, limit: Int = Int.MAX_VALUE): List<Item> {
+    private fun query(args: Bundle, limit: Int = Int.MAX_VALUE, includePending: Boolean = false): List<Item> {
         val proj = arrayOf(
             MediaStore.Images.Media._ID, MediaStore.Images.Media.DATE_TAKEN, MediaStore.Images.Media.DATE_ADDED,
             MediaStore.Images.Media.WIDTH, MediaStore.Images.Media.HEIGHT, MediaStore.Images.Media.SIZE,
             MediaStore.Images.Media.MIME_TYPE, MediaStore.Images.Media.ORIENTATION,
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME, MediaStore.Images.Media.RELATIVE_PATH
         )
-        val out = mutableListOf<Item>()
-        context.contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, args, null)?.use { c ->
-            while (out.size < limit && c.moveToNext()) {
-                val taken = c.getLong(1).takeIf { it > 0 } ?: (c.getLong(2) * 1000)
-                var w = c.getInt(3); var h = c.getInt(4)
-                if (c.getInt(7) % 180 != 0) { val t = w; w = h; h = t }
-                out += Item(c.getLong(0), taken, w, h, c.getLong(5), c.getString(6) ?: "image/jpeg", c.getString(8),
-                    c.getLong(2) * 1000, c.getString(9))
+        val uri = if (includePending) cc.bridgit.app.core.media.MediaLibrary.includePending(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, args)
+            else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val provenance = arrayOf(cc.bridgit.app.core.media.MediaLibrary.OWNER_PACKAGE, cc.bridgit.app.core.media.MediaLibrary.IS_PENDING)
+        // date_modified feeds the sync stability window (6.3); a device rejecting it gets the older rungs, window not applied.
+        val modified = cc.bridgit.app.core.media.MediaLibrary.DATE_MODIFIED
+        for (cols in listOf(proj + provenance + modified, proj + cc.bridgit.app.core.media.MediaLibrary.IS_PENDING + modified,
+                proj + provenance, proj + cc.bridgit.app.core.media.MediaLibrary.IS_PENDING, proj)) {
+            val cursor = (if (cols.size > proj.size) try { context.contentResolver.query(uri, cols, args, null) } catch (e: RuntimeException) { null }
+                else context.contentResolver.query(uri, cols, args, null)) ?: continue
+            val out = mutableListOf<Item>()
+            cursor.use { c ->
+                while (out.size < limit && c.moveToNext()) {
+                    val taken = c.getLong(1).takeIf { it > 0 } ?: (c.getLong(2) * 1000)
+                    var w = c.getInt(3); var h = c.getInt(4)
+                    if (c.getInt(7) % 180 != 0) { val t = w; w = h; h = t }
+                    out += Item(c.getLong(0), taken, w, h, c.getLong(5), c.getString(6) ?: "image/jpeg", c.getString(8),
+                        c.getLong(2) * 1000, c.getString(9),
+                        cc.bridgit.app.core.media.MediaLibrary.string(c, cc.bridgit.app.core.media.MediaLibrary.OWNER_PACKAGE),
+                        cc.bridgit.app.core.media.MediaLibrary.pending(c),
+                        cc.bridgit.app.core.media.MediaLibrary.long(c, modified))
+                }
             }
+            return out
         }
-        return out
+        return emptyList()
     }
 }

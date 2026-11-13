@@ -1,0 +1,42 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-idempotent-write",
+  "service": "core.dispatch",
+  "door": "mcp",
+  "title": "A well-formed Idempotency-Key lets a write through",
+  "step": "idempotency",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/log",
+    "body": {
+      "message": "fixture note"
+    },
+    "idempotency_key": "fixture-key-0001"
+  },
+  "expect": {
+    "status": 201
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

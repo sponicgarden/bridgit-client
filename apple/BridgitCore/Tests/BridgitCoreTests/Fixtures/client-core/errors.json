@@ -1,0 +1,4626 @@
+{
+  "$schema": "./schemas/errors.schema.json",
+  "contract": "client-core.errors",
+  "version": 1,
+  "shapes": {
+    "device": {
+      "required": [
+        "error",
+        "message"
+      ],
+      "optional": [
+        "request_id",
+        "reason",
+        "report_problems"
+      ],
+      "note": "Android adds request_id and report_problems to every error; Apple sends error, message and reason only. Extra fields the code names (setting, permission, retry_after_s and so on) ride beside them."
+    },
+    "backend": {
+      "required": [
+        "error",
+        "message"
+      ],
+      "optional": [],
+      "note": "The feedback Worker."
+    },
+    "relay": {
+      "required": [
+        "error"
+      ],
+      "optional": [],
+      "note": "The relay Worker."
+    }
+  },
+  "codes": {
+    "access_needed": {
+      "http": 403,
+      "guide": 23,
+      "meaning": "Android special access off (`setting` field)",
+      "agent_should": "Tell the owner; Bridgit also notifies them",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "accessibility_required": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "account_changed": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403,
+          409
+        ]
+      }
+    },
+    "account_required": {
+      "http": 403,
+      "guide": 2,
+      "meaning": "A verified linked account is required",
+      "agent_should": "Link this phone to the owner account",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "account_sign_in_required": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "ack_timeout": {
+      "http": 504,
+      "platforms": {
+        "apple": [
+          504
+        ]
+      }
+    },
+    "action_failed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "action_history_full": {
+      "http": 429,
+      "platforms": {
+        "apple": [
+          429
+        ]
+      }
+    },
+    "action_in_progress": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "action_outcome_unknown": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "agent_blocked": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "agent_changed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "agent_limit": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "agent_management_not_shared": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "agent_name_in_use": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "agent_not_allowed": {
+      "http": 403,
+      "guide": 29,
+      "meaning": "This agent lacks a capability grant",
+      "agent_should": "Ask the owner to change agent permissions",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          403
+        ]
+      }
+    },
+    "agent_not_found": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "agent_revoked": {
+      "http": 401,
+      "platforms": {
+        "android": [
+          401,
+          403
+        ],
+        "apple": [
+          403
+        ]
+      }
+    },
+    "agent_store_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "agent_unavailable": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "agents_may_not_change": {
+      "http": 403,
+      "guide": 43,
+      "meaning": "The owner turned off agent changes to this applet's budget",
+      "agent_should": "Ask the owner; don't retry",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "alert_closed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "alert_not_found": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404
+        ]
+      }
+    },
+    "allowance_exhausted": {
+      "http": 429,
+      "guide": 97,
+      "meaning": "The device's held allowance for this source has no room left for this spend in the current period (`reason`, `resets_at`)",
+      "agent_should": "Wait for `resets_at`, or raise the budget or move a share to this device; don't retry unchanged",
+      "built": false,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "allowance_expired": {
+      "http": 409,
+      "guide": 98,
+      "meaning": "The device's held allowance for this source has run out of time and no newer one has arrived",
+      "agent_should": "Retry once the device has fetched a new allowance; an expired one never comes back",
+      "built": false,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "already_claimed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "already_named": {
+      "http": 409,
+      "guide": 54,
+      "meaning": "This Bridgit already has its Device Domain Name for good (`name`)",
+      "agent_should": "Use that name; change only label or visible",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ],
+        "apple": [
+          409
+        ]
+      }
+    },
+    "ambiguous_target": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "answer_pending": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "answer_too_large": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "app_not_allowed": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403,
+          409
+        ]
+      }
+    },
+    "app_not_found": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404
+        ],
+        "apple": [
+          404
+        ]
+      }
+    },
+    "applet_budget": {
+      "http": 429,
+      "guide": 42,
+      "meaning": "An installed applet's budget is used up for this period on all the owner's phones (`applet`, `limit`, `resets_at`)",
+      "agent_should": "Don't retry before resets_at; an agent with Budgets can top it up or raise the limit (PUT /v1/applets/{id}/budget)",
+      "built": true,
+      "platforms": {
+        "android": [
+          429
+        ],
+        "apple": [
+          409
+        ]
+      }
+    },
+    "applet_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "applet_exists": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "applet_identity_conflict": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "applet_not_found": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "applet_paused": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "applet_permission_required": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "applet_run_stopped": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "applet_too_large": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "application_inactive": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "appraisal_outcome_unknown": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "approval_changed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "approval_declined": {
+      "http": 409,
+      "guide": 65,
+      "meaning": "The phone was locked and the owner denied, or didn't answer within 30 s, the Allow prompt for this photo (`reason`: declined or no_answer)",
+      "agent_should": "Don't retry automatically; ask the owner",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "approval_expired": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "approver_unreachable": {
+      "http": 503,
+      "guide": 91,
+      "meaning": "No approver device could be reached for a call that needs one",
+      "agent_should": "Retry later; the owner may need to open Bridgit on an approver device",
+      "built": false,
+      "platforms": {}
+    },
+    "approver_unverified": {
+      "http": 409,
+      "guide": 90,
+      "meaning": "The approver asked hasn't itself verified that approver device's keys",
+      "agent_should": "Use an approver device that verified it; don't retry unchanged",
+      "built": false,
+      "platforms": {}
+    },
+    "authority_changed": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "automatic_grants_refused": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "backend_off": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "bad_request": {
+      "http": 400,
+      "guide": 15,
+      "meaning": "Malformed HTTP or JSON",
+      "agent_should": "Fix the request",
+      "built": true,
+      "platforms": {
+        "android": [
+          400
+        ]
+      }
+    },
+    "bad_with": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          422
+        ]
+      }
+    },
+    "batch_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "batch_not_found": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "bluetooth_permission_required": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "bluetooth_unavailable": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "body_read_busy": {
+      "http": 429,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "body_read_timeout": {
+      "http": 408,
+      "platforms": {
+        "android": [
+          408
+        ]
+      }
+    },
+    "budget_reached": {
+      "http": 429,
+      "guide": 41,
+      "meaning": "An installed applet's own spending cap for cloud model calls is used up (day or month)",
+      "agent_should": "Wait for the next day or month, or ask the owner to raise the applet's limit in Installed applets",
+      "built": true,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "budget_unconfirmed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "callback_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "callback_changed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "callback_cleanup_pending": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "callback_failed": {
+      "http": 502,
+      "guide": 59,
+      "meaning": "Your callback URL didn't accept the test event (`http_status` or `reason` field)",
+      "agent_should": "Check the receiver; the owner sees the host in Activity",
+      "built": true,
+      "platforms": {
+        "android": [
+          502
+        ]
+      }
+    },
+    "callback_storage_invalid": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500,
+          503
+        ]
+      }
+    },
+    "callbacks_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "camera_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "camera_permission_required": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "camera_timeout": {
+      "http": 504,
+      "platforms": {
+        "apple": [
+          504
+        ]
+      }
+    },
+    "camera_unavailable": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404,
+          409
+        ],
+        "apple": [
+          409,
+          422
+        ]
+      }
+    },
+    "camera_view_changed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "camera_view_missing": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "camera_view_unconfirmed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "cancelled": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "capability_disabled": {
+      "http": 403,
+      "guide": 21,
+      "meaning": "Master switch off",
+      "agent_should": "Tell the owner which switch (`setting` field)",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          403
+        ]
+      }
+    },
+    "capture_cancelled": {
+      "http": 409,
+      "guide": 64,
+      "meaning": "The owner cancelled, deleted or closed the capture review",
+      "agent_should": "Wait for a new deliberate capture; do not retry automatically",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "capture_failed": {
+      "http": 500,
+      "platforms": {
+        "android": [
+          500
+        ],
+        "apple": [
+          409,
+          500
+        ]
+      }
+    },
+    "capture_stale": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "capture_stopped": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "capture_timeout": {
+      "http": 504,
+      "guide": 67,
+      "meaning": "Sensor didn't answer in time",
+      "agent_should": "Retry once",
+      "built": true,
+      "platforms": {
+        "android": [
+          504
+        ]
+      }
+    },
+    "claim_required": {
+      "http": 403,
+      "guide": 18,
+      "meaning": "This pairing link expired before it was claimed (relay)",
+      "agent_should": "Update the Bridgit app and pair again with a new link",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          403
+        ]
+      }
+    },
+    "cloud_unreachable": {
+      "http": 503,
+      "guide": 95,
+      "meaning": "The Bridgit cloud couldn't be reached, and this spend is from an instrument only the cloud can use",
+      "agent_should": "Retry later; work that costs nothing still runs",
+      "built": false,
+      "platforms": {
+        "android": [
+          503
+        ]
+      }
+    },
+    "code_expired": {
+      "http": 410,
+      "guide": 82,
+      "meaning": "That link code expired (codes last 10 minutes)",
+      "agent_should": "Ask for a new code",
+      "built": true,
+      "platforms": {
+        "android": [
+          410
+        ]
+      }
+    },
+    "code_invalid": {
+      "http": 403,
+      "guide": 81,
+      "meaning": "Wrong link code; 5 wrong tries void a code",
+      "agent_should": "Check the code with the owner; don't guess",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "code_used_up": {
+      "http": 410,
+      "guide": 83,
+      "meaning": "That link code was already used, cancelled, or voided after 5 wrong tries",
+      "agent_should": "Ask for a new code",
+      "built": true,
+      "platforms": {
+        "android": [
+          410
+        ]
+      }
+    },
+    "computer_use_off": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "computer_use_unsupported": {
+      "http": 501,
+      "platforms": {
+        "apple": [
+          501
+        ]
+      }
+    },
+    "configuration_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "conflict": {
+      "http": 409,
+      "guide": 50,
+      "meaning": "The interaction isn't in a state for this (for example a text panel that's closed or finished)",
+      "agent_should": "Read it with GET /v1/interactions/{id}; start a new one if needed",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "connection_address_blocked": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "connection_changed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "connection_dns_failed": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "connection_exists": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "connection_failed": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "connection_limit": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "connection_not_found": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404
+        ]
+      }
+    },
+    "connection_queue_invalid": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "connection_rate_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "connection_request_too_large": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "connection_response_invalid": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "connection_secret_invalid": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "connection_timeout": {
+      "http": 504,
+      "platforms": {
+        "apple": [
+          504
+        ]
+      }
+    },
+    "connection_unavailable": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "connections_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "consent_expired": {
+      "http": 403,
+      "guide": 26,
+      "meaning": "No active screen-sharing grant",
+      "agent_should": "Ask for a new owner-approved grant",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "controller_busy": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "deadline_expired": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ],
+        "apple": [
+          408,
+          409
+        ]
+      }
+    },
+    "delivery_cancelled": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ],
+        "apple": [
+          409
+        ]
+      }
+    },
+    "delivery_changed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "delivery_failed": {
+      "http": 503,
+      "platforms": {
+        "android": [
+          503
+        ]
+      }
+    },
+    "destination_address_blocked": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "destination_disabled": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "destination_limit": {
+      "http": 429,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "device_access_removed": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "device_busy": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ],
+        "apple": [
+          429
+        ]
+      }
+    },
+    "device_error": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "device_locked": {
+      "http": 409,
+      "guide": 34,
+      "meaning": "Needs the phone unlocked",
+      "agent_should": "Ask the owner to unlock",
+      "built": true,
+      "platforms": {
+        "android": [
+          409,
+          423
+        ]
+      }
+    },
+    "device_not_found": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404
+        ]
+      }
+    },
+    "device_unavailable": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "display_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "dnd_access_required": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "edition_changed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "edition_review_required": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "element_not_found": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "email_required": {
+      "http": 403,
+      "guide": 28,
+      "meaning": "The first 24 hours are over and the owner hasn't verified an email (`state`: none or pending)",
+      "agent_should": "Send the owner's address with POST /v1/owner/email, then ask them to tap the link in the email",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "encoding_failed": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "event_id_conflict": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "event_required": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "event_too_large": {
+      "http": 413,
+      "platforms": {
+        "android": [
+          413
+        ]
+      }
+    },
+    "explicit_grants_required": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          422
+        ]
+      }
+    },
+    "explicit_retry_required": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "export_too_large": {
+      "http": 413,
+      "guide": 37,
+      "meaning": "An export exceeds its row, photo or 20 MB size limit",
+      "agent_should": "Use paginated applet rows and individual saved photos, or filter a share report; don't retry unchanged",
+      "built": true,
+      "platforms": {
+        "android": [
+          413
+        ],
+        "apple": [
+          413
+        ]
+      }
+    },
+    "external_paused": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "feedback_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "feedback_upload_disabled": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "file_not_found": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404
+        ]
+      }
+    },
+    "file_quota": {
+      "http": 429,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "file_requires_chunks": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "fixture_failed": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "fixture_note_failed": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "fixture_path_invalid": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "fixture_rename_failed": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "fixture_store_busy": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "flow_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "flow_not_found": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "forbidden": {
+      "http": 403,
+      "guide": 48,
+      "meaning": "Not allowed for this agent (`reason`, for example `fixer_mode_off` or `super_powers_off`: the owner hasn't given you Bridgit Fixer Mode or Agent Super Powers; `agent_paused`: the owner paused you)",
+      "agent_should": "Don't retry; for `agent_paused`, wait until the owner resumes you",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "forbidden_source": {
+      "http": 403,
+      "guide": 17,
+      "meaning": "Caller is not on the tailnet",
+      "agent_should": "Check Tailscale",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          403
+        ]
+      }
+    },
+    "foreground_required": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ],
+        "apple": [
+          409
+        ]
+      }
+    },
+    "friendly_name_required": {
+      "http": 400,
+      "guide": 52,
+      "meaning": "Registering a Device Domain Name also needs the friendly name, in the same step",
+      "agent_should": "Send friendly_name (up to 40 characters, any style) with name",
+      "built": true,
+      "platforms": {
+        "android": [
+          400
+        ]
+      }
+    },
+    "friendly_name_taken": {
+      "http": 409,
+      "guide": 51,
+      "meaning": "Another of this owner's devices already has that friendly name (`friendly_name`, `held_by`)",
+      "agent_should": "Pick a different friendly name; nothing was registered",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "hardware_unavailable": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "heartbeat_timeout": {
+      "http": 504,
+      "platforms": {
+        "apple": [
+          504
+        ]
+      }
+    },
+    "host_not_connected": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "host_preparation_failed": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "host_unavailable": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409,
+          503
+        ]
+      }
+    },
+    "http_version": {
+      "http": 505,
+      "platforms": {
+        "apple": [
+          505
+        ]
+      }
+    },
+    "hub_return_changed": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "hub_return_unavailable": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "idempotency_conflict": {
+      "http": 409,
+      "guide": 6,
+      "meaning": "This image key was used for different parameters",
+      "agent_should": "Use identical parameters for retries",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ],
+        "apple": [
+          409
+        ]
+      }
+    },
+    "idempotency_expired": {
+      "http": 409,
+      "guide": 55,
+      "meaning": "Same `Idempotency-Key` already done, but its media result is no longer replayed (15 min)",
+      "agent_should": "Don't repeat; use a new key only if you really want a new capture",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "idempotency_key_required": {
+      "http": 400,
+      "platforms": {
+        "apple": [
+          400,
+          422
+        ]
+      }
+    },
+    "idempotency_required": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "idempotency_result_expired": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "identity_invalid": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "identity_locked": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "identity_mismatch": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "identity_unavailable": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500,
+          503
+        ]
+      }
+    },
+    "image_failed": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "image_in_progress": {
+      "http": 409,
+      "guide": 4,
+      "meaning": "Image request is pending or its outcome is unknown",
+      "agent_should": "Retry only with the same Idempotency-Key",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "image_outcome_unknown": {
+      "http": 502,
+      "guide": 8,
+      "meaning": "Image generation outcome could not be confirmed",
+      "agent_should": "Retry only with the same Idempotency-Key",
+      "built": true,
+      "platforms": {
+        "android": [
+          502
+        ]
+      }
+    },
+    "image_provider_failed": {
+      "http": 502,
+      "guide": 7,
+      "meaning": "Azure could not generate the image",
+      "agent_should": "Inspect provider_status; never retry an unknown outcome with a new key",
+      "built": true,
+      "platforms": {
+        "android": [
+          502
+        ]
+      }
+    },
+    "image_quota_exceeded": {
+      "http": 429,
+      "guide": 3,
+      "meaning": "The account used its 40 monthly images",
+      "agent_should": "Wait until quota.resets_at",
+      "built": true,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "image_refused": {
+      "http": 409,
+      "guide": 5,
+      "meaning": "Azure refused the request without using an image slot",
+      "agent_should": "Correct the request before starting a new generation",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "image_too_large": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "images_unavailable": {
+      "http": 503,
+      "guide": 9,
+      "meaning": "The configured Azure image task is unavailable",
+      "agent_should": "Check the configured model task and Azure deployment",
+      "built": true,
+      "platforms": {
+        "android": [
+          503
+        ]
+      }
+    },
+    "in_progress": {
+      "http": 409,
+      "guide": 49,
+      "meaning": "Same `Idempotency-Key` still running",
+      "agent_should": "Wait, then retry with the same key",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "inbox_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "inbox_full": {
+      "http": 429,
+      "platforms": {
+        "apple": [
+          429
+        ]
+      }
+    },
+    "input_failed": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "install_not_registered": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "interaction_closed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ],
+        "apple": [
+          409
+        ]
+      }
+    },
+    "interaction_limit": {
+      "http": 429,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "interaction_not_found": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "interaction_too_large": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "internal_error": {
+      "http": 500,
+      "guide": 60,
+      "meaning": "Bridgit bug",
+      "agent_should": "File a bug report directly with Bridgit servers (Issues Tracking): https://bridgit.cc/learn/bugs.md",
+      "built": true,
+      "platforms": {
+        "android": [
+          500
+        ]
+      }
+    },
+    "invalid_adapter": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "invalid_agent_grants": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_agent_name": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_agent_notes": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_agent_store": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "invalid_applet": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_applet_budget": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_challenge": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "invalid_connection": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_cursor": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_destination": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "invalid_device": {
+      "http": 400,
+      "platforms": {
+        "apple": [
+          400
+        ]
+      }
+    },
+    "invalid_envelope": {
+      "http": 400,
+      "platforms": {
+        "apple": [
+          400,
+          403
+        ]
+      }
+    },
+    "invalid_event": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "invalid_export": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_fixture": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "invalid_frame": {
+      "http": 400,
+      "platforms": {
+        "apple": [
+          400
+        ]
+      }
+    },
+    "invalid_image": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_images": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "invalid_job": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "invalid_json": {
+      "http": 400,
+      "platforms": {
+        "apple": [
+          400
+        ]
+      }
+    },
+    "invalid_lease": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_mapping": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "invalid_mode": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "invalid_model_response": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "invalid_pairing": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_parameter": {
+      "http": 422,
+      "guide": 38,
+      "meaning": "Bad value",
+      "agent_should": "Fix; never retry unchanged",
+      "built": true,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          400,
+          422
+        ]
+      }
+    },
+    "invalid_peer": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_photo": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          422,
+          500
+        ]
+      }
+    },
+    "invalid_photo_column": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_push_token": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_range": {
+      "http": 416,
+      "platforms": {
+        "apple": [
+          416
+        ]
+      }
+    },
+    "invalid_reference": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_relay": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_relay_response": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "invalid_report": {
+      "http": 400,
+      "platforms": {
+        "apple": [
+          400,
+          422
+        ]
+      }
+    },
+    "invalid_request": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          400
+        ]
+      }
+    },
+    "invalid_resolution": {
+      "http": 400,
+      "platforms": {
+        "apple": [
+          400
+        ]
+      }
+    },
+    "invalid_response": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500,
+          502
+        ]
+      }
+    },
+    "invalid_row": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_satellite_agents": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_satellite_key": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_satellite_manifest": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "invalid_satellite_reply": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "invalid_satellite_store": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "invalid_send": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "invalid_setting": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_share": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_share_size": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "invalid_source": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "invalid_step": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "invalid_token_hash": {
+      "http": 400,
+      "platforms": {
+        "apple": [
+          400,
+          422
+        ]
+      }
+    },
+    "invalid_transport": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "invalid_workflow": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "keychain_failed": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "lan_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "lan_changed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "lan_disabled": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "lan_discovery_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "lan_history_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "lan_probe_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "lan_timeout": {
+      "http": 504,
+      "platforms": {
+        "apple": [
+          504
+        ]
+      }
+    },
+    "lan_unavailable": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409,
+          503
+        ]
+      }
+    },
+    "link_approval_declined": {
+      "http": 409,
+      "guide": 79,
+      "meaning": "A device in the wild asked for something that needs the owner's Allow, and the owner denied it or didn't answer within 30 s (`reason`)",
+      "agent_should": "Don't retry automatically",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "link_expired": {
+      "http": 403,
+      "guide": 77,
+      "meaning": "That link's access ended: an associate's or a device in the wild's grant passed its end date (`link_id`, `tier`)",
+      "agent_should": "Don't retry; ask the owner to renew it or link again",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          410
+        ]
+      }
+    },
+    "link_paused": {
+      "http": 403,
+      "guide": 74,
+      "meaning": "The owner paused that link (`link_id`)",
+      "agent_should": "Wait until it is resumed; don't retry before then",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          403
+        ]
+      }
+    },
+    "link_revoked": {
+      "http": 403,
+      "guide": 73,
+      "meaning": "The link with that Bridgit was disconnected (`scope`: direction or link, `link_id`)",
+      "agent_should": "Don't retry; linking again needs a new link code",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "link_waiting": {
+      "http": 409,
+      "guide": 75,
+      "meaning": "Only one Bridgit has opted in to that direction so far (`waiting_for`: user or target)",
+      "agent_should": "Ask the other side's owner or agent to opt in; GET /v1/owner/configuration/links shows the states",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "listener_address_changed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "listener_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "listener_paused": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "listener_required": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "listener_starting": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "listener_timeout": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "listener_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "live_request_expired": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "location_disabled": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "location_timeout": {
+      "http": 504,
+      "platforms": {
+        "android": [
+          504
+        ]
+      }
+    },
+    "log_visibility_changed": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "mdns_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "media_incomplete": {
+      "http": 409,
+      "guide": 86,
+      "meaning": "That photo or video is still arriving (being recorded, downloaded or synced); list with include_pending=true to see it as complete:false",
+      "agent_should": "Wait a few seconds and retry",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "method_not_allowed": {
+      "http": 405,
+      "platforms": {
+        "apple": [
+          405
+        ]
+      }
+    },
+    "method_not_found": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404
+        ]
+      }
+    },
+    "migration_required": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "missing_satellite_key": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "mode_busy": {
+      "http": 429,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "model_consent_required": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "model_download_required": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "model_failed": {
+      "http": 502,
+      "platforms": {
+        "android": [
+          502
+        ]
+      }
+    },
+    "model_not_ready": {
+      "http": 503,
+      "guide": 62,
+      "meaning": "An on-phone engine you named isn't downloaded yet (`engine`, `state`: downloading, waiting_for_wifi or failed, `size_mb`, `retry_after_s`); the request started the download",
+      "agent_should": "Retry after retry_after_s; GET /v1/images/engines shows progress",
+      "built": true,
+      "platforms": {
+        "android": [
+          503
+        ]
+      }
+    },
+    "model_unavailable": {
+      "http": 503,
+      "guide": 1,
+      "meaning": "The selected registered model is unavailable or incompatible",
+      "agent_should": "Read the effective model preference; clear the override to inherit a valid default",
+      "built": true,
+      "platforms": {
+        "android": [
+          503
+        ]
+      }
+    },
+    "name_required": {
+      "http": 409,
+      "guide": 84,
+      "meaning": "This Bridgit needs a Device Domain Name first (the message has the naming advice)",
+      "agent_should": "Register one with POST /v1/owner/configuration/name, then retry",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "name_taken": {
+      "http": 409,
+      "guide": 53,
+      "meaning": "That Device Domain Name belongs to another Bridgit (`lookup`)",
+      "agent_should": "Suggest another name; don't retry unchanged",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ],
+        "apple": [
+          409
+        ]
+      }
+    },
+    "names_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "namespace_mismatch": {
+      "http": 409,
+      "guide": 99,
+      "meaning": "A spend, a budget or a cap names another accounting namespace (`live` or `sandbox`) than its source or instrument has",
+      "agent_should": "Leave `namespace` out or send the source's own; a sandbox source never spends live money, or the reverse",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "nfc_unavailable": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "no_action": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "no_active_window": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "no_approver": {
+      "http": 409,
+      "guide": 88,
+      "meaning": "This needs an owner authorization and no approver device that can give it is enrolled",
+      "agent_should": "Ask the owner to enrol an approver device; don't retry until then",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "no_fixture": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "no_frame": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "no_handler": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "no_person_found": {
+      "http": 422,
+      "guide": 11,
+      "meaning": "view people found nobody in the frame; nothing was returned or kept (source_width_px, source_height_px)",
+      "agent_should": "Reframe and retry, or ask for view full",
+      "built": true,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "no_screen_lock": {
+      "http": 409,
+      "guide": 89,
+      "meaning": "That device has no screen lock, so it can't be an approver device",
+      "agent_should": "Ask the owner to set a screen lock on it, or use another device",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "no_signing_secret": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "no_table": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404,
+          422
+        ]
+      }
+    },
+    "no_usb_device": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "not_dispatched": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "not_editable": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "not_found": {
+      "http": 404,
+      "guide": 30,
+      "meaning": "Unknown endpoint or id",
+      "agent_should": "Fix the request",
+      "built": true,
+      "platforms": {
+        "android": [
+          404
+        ],
+        "apple": [
+          404
+        ]
+      }
+    },
+    "not_implemented": {
+      "http": 501,
+      "platforms": {
+        "apple": [
+          501
+        ]
+      }
+    },
+    "not_on_satellite": {
+      "http": 403,
+      "guide": 70,
+      "meaning": "This endpoint can't run on a satellite (yet), or the satellite doesn't offer it",
+      "agent_should": "Leave out the target, or use another endpoint",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "not_on_target": {
+      "http": 403,
+      "guide": 76,
+      "meaning": "That call doesn't pass a link: the endpoint, the target's service list, or a call that already came over a link (calls pass on once)",
+      "agent_should": "Leave out the target, or link that Bridgit directly",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "not_ready": {
+      "http": 503,
+      "platforms": {
+        "android": [
+          503
+        ]
+      }
+    },
+    "not_shared": {
+      "http": 403,
+      "guide": 71,
+      "meaning": "The applet's package doesn't share that table with you (share_with_installer)",
+      "agent_should": "Read the applet's card on the phone instead, or ship a revision that shares it",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "not_supported": {
+      "http": 422,
+      "guide": 39,
+      "meaning": "Android doesn't allow this (for example Wi-Fi toggle)",
+      "agent_should": "Don't retry",
+      "built": true,
+      "platforms": {
+        "android": [
+          409,
+          422
+        ]
+      }
+    },
+    "not_your_report": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "notification_access_required": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "notification_app_not_allowed": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "notification_expired": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "notifications_required": {
+      "http": 403,
+      "guide": 47,
+      "meaning": "Bridgit's notifications are off, so captures are refused",
+      "agent_should": "Tell the owner to turn notifications on",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          403
+        ]
+      }
+    },
+    "offline": {
+      "http": 503,
+      "guide": 96,
+      "meaning": "The device reaches no network, so something that needs one can't run now (a spend that needs its provider or the cloud, for example)",
+      "agent_should": "Retry when the device is back online; work that needs no network still runs",
+      "built": false,
+      "platforms": {
+        "android": [
+          503
+        ],
+        "apple": [
+          503
+        ]
+      }
+    },
+    "on_device_speech_unavailable": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "operation_limit": {
+      "http": 429,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "origin_not_allowed": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "os_permission_required": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403,
+          409
+        ]
+      }
+    },
+    "out_of_range": {
+      "http": 400,
+      "guide": 45,
+      "meaning": "every_s is outside the action's min_s..max_s",
+      "agent_should": "Pick a value within min_s..max_s (GET /v1/applets/{id}/budget)",
+      "built": true,
+      "platforms": {
+        "android": [
+          400
+        ]
+      }
+    },
+    "outcome_unknown": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "over_ceiling": {
+      "http": 403,
+      "guide": 44,
+      "meaning": "The new limit (or limit plus top-ups) would pass the owner's ceiling for agents (`ceiling`)",
+      "agent_should": "Stay within the ceiling, or ask the owner to raise it",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "owner_authorization_required": {
+      "http": 403,
+      "guide": 93,
+      "meaning": "Only the owner can decide this, on an approver device; an agent can ask, read and decline",
+      "agent_should": "Don't retry; tell the owner what is waiting (`remaining_human_step`)",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "owner_email_required": {
+      "http": 409,
+      "guide": 87,
+      "meaning": "A verified owner alert email is needed before an approver device is enrolled or an approver recovery starts",
+      "agent_should": "Set it with POST /v1/owner/email; the owner opens the link in that email, then retry",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "owner_queue_full": {
+      "http": 429,
+      "platforms": {
+        "apple": [
+          429
+        ]
+      }
+    },
+    "package_id_mismatch": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "package_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "paid_cap": {
+      "http": 429,
+      "platforms": {
+        "android": [
+          429
+        ],
+        "apple": [
+          429
+        ]
+      }
+    },
+    "pairing_closed": {
+      "http": 403,
+      "guide": 24,
+      "meaning": "No pairing window open",
+      "agent_should": "Ask the owner to open one",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          409
+        ]
+      }
+    },
+    "payload_too_large": {
+      "http": 413,
+      "guide": 36,
+      "meaning": "Over 12 MB base64 (40 MB raw)",
+      "agent_should": "Ask for a smaller size (`photo_id` given)",
+      "built": true,
+      "platforms": {
+        "android": [
+          413
+        ],
+        "apple": [
+          413
+        ]
+      }
+    },
+    "peripheral_failed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "permission_denied": {
+      "http": 403,
+      "guide": 22,
+      "meaning": "Android permission not granted (`permission` field)",
+      "agent_should": "Tell the owner; More > Hardware access fixes it",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          403
+        ]
+      }
+    },
+    "permission_required": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "phone_unreachable": {
+      "http": 504,
+      "guide": 85,
+      "meaning": "(Relay) phone didn't pick up the job",
+      "agent_should": "Retry later",
+      "built": false,
+      "platforms": {}
+    },
+    "photo_gone": {
+      "http": 410,
+      "platforms": {
+        "android": [
+          410
+        ]
+      }
+    },
+    "photo_not_found": {
+      "http": 404,
+      "guide": 32,
+      "meaning": "Gallery item gone or outside access",
+      "agent_should": "Refresh the list",
+      "built": true,
+      "platforms": {
+        "android": [
+          404
+        ],
+        "apple": [
+          404
+        ]
+      }
+    },
+    "photo_not_supported": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          422
+        ]
+      }
+    },
+    "photo_requires_chunks": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "photo_storage_full": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "photo_too_large": {
+      "http": 413,
+      "platforms": {
+        "android": [
+          413
+        ],
+        "apple": [
+          413
+        ]
+      }
+    },
+    "platform_unsupported": {
+      "http": 501,
+      "guide": 94,
+      "meaning": "This platform can't do that (a named gap, for example approving on a desktop install)",
+      "agent_should": "Don't retry; use a device whose profile offers it",
+      "built": true,
+      "platforms": {
+        "android": [
+          501
+        ]
+      }
+    },
+    "private_build_required": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "protected_element": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "protected_window": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "push_not_supported": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "push_signing_required": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "push_topic_mismatch": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "queue_full": {
+      "http": 429,
+      "platforms": {
+        "android": [
+          429
+        ],
+        "apple": [
+          429
+        ]
+      }
+    },
+    "quota_exceeded": {
+      "http": 429,
+      "guide": 56,
+      "meaning": "Daily data, file storage or relay job quota used up (`limit`)",
+      "agent_should": "Remove old transfers or wait for retention",
+      "built": true,
+      "platforms": {
+        "android": [
+          429
+        ],
+        "apple": [
+          429
+        ]
+      }
+    },
+    "raise_the_ceiling_first": {
+      "http": 409,
+      "guide": 107,
+      "meaning": "An owner's raise does not fit the room under the budget's agent ceiling that no headroom balance holds",
+      "agent_should": "Raise the ceiling first (POST /v1/owner/configuration/spending/budgets/{id}/gate), then raise the budget",
+      "built": false,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "random_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "rate_limited": {
+      "http": 429,
+      "guide": 40,
+      "meaning": "Over a limit (`retry_after_s`)",
+      "agent_should": "Wait",
+      "built": true,
+      "platforms": {
+        "android": [
+          429
+        ],
+        "apple": [
+          429
+        ]
+      }
+    },
+    "record_not_found": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "recovery_complete": {
+      "http": 409,
+      "guide": 92,
+      "meaning": "The approver recovery already cleared the approver list, so it can't be cancelled",
+      "agent_should": "Don't retry; enrol a first approver device again",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "registration_failed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "relay_ack_failed": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "relay_route_excluded": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "relay_slot_limit": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "relay_tool_excluded": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "replay": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "replay_rejected": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "reply_not_supported": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "report_changed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "request_closed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "request_committing": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "request_not_committed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "request_not_found": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "request_too_large": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "resource_conflict": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "resource_not_found": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404
+        ]
+      }
+    },
+    "response_too_large": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "result_too_large": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "return_link_unavailable": {
+      "http": 501,
+      "platforms": {
+        "apple": [
+          501
+        ]
+      }
+    },
+    "row_not_found": {
+      "http": 404,
+      "guide": 31,
+      "meaning": "That row of the applet's table isn't there (deleted, or dropped past max_rows or keep_days)",
+      "agent_should": "Read the rows again; don't retry unchanged",
+      "built": true,
+      "platforms": {
+        "android": [
+          404
+        ],
+        "apple": [
+          404
+        ]
+      }
+    },
+    "row_too_large": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "sample_not_found": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "samples_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "satellite_already_linked": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "satellite_changed": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "satellite_grants": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "satellite_not_allowed": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "satellite_not_found": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "satellite_offline": {
+      "http": 503,
+      "guide": 72,
+      "meaning": "The satellite didn't answer (`last_seen`, `retry_after_s`)",
+      "agent_should": "Retry later; the owner may need to check the satellite's Tailscale",
+      "built": true,
+      "platforms": {
+        "android": [
+          503
+        ],
+        "apple": [
+          503
+        ]
+      }
+    },
+    "satellite_reply_too_large": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "satellite_return_missing": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "satellite_rollback_unconfirmed": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "satellite_scope": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "satellite_store_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "satellite_unavailable": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409,
+          501,
+          503
+        ]
+      }
+    },
+    "screen_denied": {
+      "http": 403,
+      "guide": 25,
+      "meaning": "The owner denied screen access",
+      "agent_should": "Don't ask again soon",
+      "built": false,
+      "platforms": {}
+    },
+    "screen_share_required": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "secure_settings_required": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "send_failed": {
+      "http": 502,
+      "platforms": {
+        "android": [
+          502
+        ]
+      }
+    },
+    "sensor_busy": {
+      "http": 409,
+      "guide": 33,
+      "meaning": "Sensor in use or capture running",
+      "agent_should": "Retry once after a few seconds",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "service_start_blocked": {
+      "http": 503,
+      "guide": 61,
+      "meaning": "Android hasn't given the service this sensor",
+      "agent_should": "Ask the owner to open Bridgit once",
+      "built": true,
+      "platforms": {
+        "android": [
+          503
+        ]
+      }
+    },
+    "session_inactive": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "setting_busy": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "setting_locked": {
+      "http": 403,
+      "guide": 27,
+      "meaning": "Agents can't change this setting (`key`, `reason`: gate, disconnects, owner_only, android or status)",
+      "agent_should": "Ask the owner to change it on the phone",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "setting_refused": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "settings_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "settings_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "share_access_revoked": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "share_already_delivered": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "share_container_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "share_exists": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "share_inbox_full": {
+      "http": 429,
+      "platforms": {
+        "apple": [
+          429
+        ]
+      }
+    },
+    "share_item_too_large": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "share_not_retryable": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "share_recipient_unavailable": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "share_replay_mismatch": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "share_storage_busy": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "share_storage_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "share_text_too_large": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "share_unavailable": {
+      "http": 409,
+      "guide": 35,
+      "meaning": "Android's share sheet couldn't open (Bridgit isn't on screen)",
+      "agent_should": "Ask the owner to open Bridgit and tap the button again",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "sharing_unavailable": {
+      "http": 503,
+      "platforms": {
+        "apple": [
+          503
+        ]
+      }
+    },
+    "signed_requests_required": {
+      "http": 403,
+      "guide": 19,
+      "meaning": "The owner allows only sealed (signed) relay requests for agents that can control the phone (relay)",
+      "agent_should": "Switch to sealed mode, or ask the owner",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "simulation_unsupported": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "source_changed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "speech_cloud_consent_required": {
+      "http": 403,
+      "guide": 13,
+      "meaning": "Selected speech model needs explicit cloud permission",
+      "agent_should": "Ask the owner before allow_cloud=true",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ],
+        "apple": [
+          403
+        ]
+      }
+    },
+    "speech_disabled": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "speech_model_changed": {
+      "http": 409,
+      "guide": 14,
+      "meaning": "Registry selection changed during this turn",
+      "agent_should": "Resolve again before a new turn",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "speech_no_match": {
+      "http": 422,
+      "guide": 10,
+      "meaning": "No speech was recognized during this bounded turn",
+      "agent_should": "Start a new turn when ready to speak",
+      "built": true,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "speech_recognition_failed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "speech_unavailable": {
+      "http": 503,
+      "guide": 12,
+      "meaning": "Selected speech engine or backend is unavailable",
+      "agent_should": "Check GET /v1/speech/models; no implicit fallback",
+      "built": true,
+      "platforms": {
+        "android": [
+          503
+        ]
+      }
+    },
+    "spend_bridgit_cap": {
+      "http": 429,
+      "guide": 105,
+      "meaning": "A Bridgit-funded cap has no room for this spend, as the cloud last reported it (`rule` 5, `resets_at`)",
+      "agent_should": "Wait for `resets_at`; an owner or an agent cannot raise a Bridgit-funded cap",
+      "built": false,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "spend_not_allowed": {
+      "http": 403,
+      "guide": 102,
+      "meaning": "This agent or applet may not spend here: the device does not let it act, or a value transfer lacks `payments.request` (`rule` 2, `reason`)",
+      "agent_should": "Don't retry; ask the owner",
+      "built": false,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "spend_over_budget": {
+      "http": 429,
+      "guide": 106,
+      "meaning": "An owner budget has no room left in this device's portion for the period (`rule` 6, `resets_at`)",
+      "agent_should": "Wait for `resets_at`, or top the budget up or raise it (POST /v1/owner/configuration/spending/budgets/{id}/topups); don't retry unchanged",
+      "built": false,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "spend_over_cap": {
+      "http": 403,
+      "guide": 104,
+      "meaning": "The spend is above the per-spend cap of its source or instrument (`rule` 4)",
+      "agent_should": "Ask for less, or raise the cap with POST /v1/owner/configuration/spending/rules; don't retry unchanged",
+      "built": false,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "spend_source_not_allowed": {
+      "http": 409,
+      "guide": 103,
+      "meaning": "The source is not linked on this device, or the model or route is not one that source allows (`rule` 3, `reason`)",
+      "agent_should": "Link the source (POST /v1/owner/configuration/spending/sources) or use an allowed route; don't retry unchanged",
+      "built": false,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "spending_off": {
+      "http": 403,
+      "guide": 101,
+      "meaning": "Spending is switched off for this spend: outside calls are paused, or spending is off for the instrument class or the source (`rule` 1, `reason`)",
+      "agent_should": "Tell the owner which switch; an agent with the configuration grant can turn it back on with POST /v1/owner/configuration/spending. Don't retry unchanged",
+      "built": false,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "stale_controller": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "stale_notification": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "stale_observation": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "step_failed": {
+      "http": 500,
+      "platforms": {
+        "android": [
+          500
+        ]
+      }
+    },
+    "storage_failed": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "storage_quota": {
+      "http": 429,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "storage_unavailable": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500,
+          503
+        ]
+      }
+    },
+    "storage_version_unsupported": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "stored_data_invalid": {
+      "http": 500,
+      "platforms": {
+        "apple": [
+          500
+        ]
+      }
+    },
+    "story_stopped": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "stream_not_found": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404
+        ]
+      }
+    },
+    "stream_stopped": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "superpowers_required": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "table_not_found": {
+      "http": 404,
+      "platforms": {
+        "apple": [
+          404
+        ]
+      }
+    },
+    "table_storage_full": {
+      "http": 413,
+      "platforms": {
+        "apple": [
+          413
+        ]
+      }
+    },
+    "tailnet_family_mismatch": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "tailnet_required": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403,
+          409,
+          422
+        ]
+      }
+    },
+    "target_changed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "target_not_granted": {
+      "http": 403,
+      "guide": 69,
+      "meaning": "The owner hasn't let this agent use that satellite",
+      "agent_should": "Ask the owner (Devices > the satellite > Agents)",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "target_offline": {
+      "http": 503,
+      "guide": 80,
+      "meaning": "The linked Bridgit didn't answer (`last_seen`, `retry_after_s`)",
+      "agent_should": "Retry later; its owner may need to check Tailscale or Bridgit on it",
+      "built": true,
+      "platforms": {
+        "android": [
+          503
+        ]
+      }
+    },
+    "team_key_busy": {
+      "http": 409,
+      "platforms": {
+        "apple": [
+          409
+        ]
+      }
+    },
+    "team_unavailable": {
+      "http": 503,
+      "guide": 63,
+      "meaning": "The Bridgit team backend can't be reached",
+      "agent_should": "Retry later, or register at the backend directly",
+      "built": true,
+      "platforms": {
+        "android": [
+          503
+        ],
+        "apple": [
+          503
+        ]
+      }
+    },
+    "text_required": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "tier_not_allowed": {
+      "http": 403,
+      "guide": 78,
+      "meaning": "That link's trust tier doesn't allow this call (`tier`: own, associate or public)",
+      "agent_should": "Use only what the link lists in services; ask the owner to change the tier",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "too_many_images": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "too_many_open": {
+      "http": 429,
+      "guide": 46,
+      "meaning": "Too many open questions/notices",
+      "agent_should": "Wait for answers or cancel some",
+      "built": true,
+      "platforms": {
+        "android": [
+          409,
+          429
+        ]
+      }
+    },
+    "too_many_waits": {
+      "http": 429,
+      "guide": 57,
+      "meaning": "Too many open `wait` requests",
+      "agent_should": "Close some waits",
+      "built": true,
+      "platforms": {
+        "android": [
+          429
+        ],
+        "apple": [
+          429
+        ]
+      }
+    },
+    "transfer_not_for_recipient": {
+      "http": 409,
+      "guide": 100,
+      "meaning": "That move of budget room names another device as its recipient, so this one can't take it",
+      "agent_should": "Give it to the device it names, or ask the sender for a new move; don't retry",
+      "built": false,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "transfer_timeout": {
+      "http": 504,
+      "platforms": {
+        "android": [
+          504
+        ]
+      }
+    },
+    "unauthorized": {
+      "http": 401,
+      "guide": 16,
+      "meaning": "Key missing or wrong; `reason` = `key_rotated` or `agent_removed` when Bridgit knows",
+      "agent_should": "Stop; tell the owner the key needs replacing",
+      "built": true,
+      "platforms": {
+        "android": [
+          401
+        ],
+        "apple": [
+          401
+        ]
+      }
+    },
+    "unconfirmed_hub_info": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "unconfirmed_unlink": {
+      "http": 502,
+      "platforms": {
+        "apple": [
+          502
+        ]
+      }
+    },
+    "unexpected_app": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "unknown_element": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "unknown_mode": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "unknown_outcome": {
+      "http": 502,
+      "platforms": {
+        "android": [
+          502
+        ]
+      }
+    },
+    "unknown_scope": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "unknown_target": {
+      "http": 404,
+      "guide": 68,
+      "meaning": "No linked Bridgit or satellite with that name or id (`target`); GET /v1/links lists them",
+      "agent_should": "Fix the target, or leave it out to use this phone",
+      "built": true,
+      "platforms": {
+        "android": [
+          404
+        ]
+      }
+    },
+    "unknown_tool": {
+      "http": 404,
+      "platforms": {
+        "android": [
+          404
+        ]
+      }
+    },
+    "unsupported_action": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_camera": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_capability": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_configuration": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_device": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "unsupported_endpoint": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "unsupported_execution_field": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_export": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_file": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_flow": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_language": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "unsupported_operation": {
+      "http": 501,
+      "platforms": {
+        "apple": [
+          501
+        ]
+      }
+    },
+    "unsupported_package_input": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_parameter": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422,
+          501
+        ]
+      }
+    },
+    "unsupported_protocol": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ]
+      }
+    },
+    "unsupported_satellite_return": {
+      "http": 501,
+      "platforms": {
+        "apple": [
+          501
+        ]
+      }
+    },
+    "unsupported_setting": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_share": {
+      "http": 422,
+      "platforms": {
+        "android": [
+          422
+        ],
+        "apple": [
+          413,
+          422
+        ]
+      }
+    },
+    "unsupported_step": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unsupported_target": {
+      "http": 422,
+      "platforms": {
+        "apple": [
+          422
+        ]
+      }
+    },
+    "unverified_outcome": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "upstream_failed": {
+      "http": 502,
+      "guide": 58,
+      "meaning": "A service Bridgit asks on your behalf (MET Norway for weather) failed and nothing was cached (`service`, `upstream_status` or `reason`)",
+      "agent_should": "Retry in a few minutes",
+      "built": true,
+      "platforms": {
+        "android": [
+          502
+        ],
+        "apple": [
+          502
+        ]
+      }
+    },
+    "usb_permission_required": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "viewer_read_only": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "viewer_required": {
+      "http": 403,
+      "platforms": {
+        "apple": [
+          403
+        ]
+      }
+    },
+    "viewfinder_required": {
+      "http": 409,
+      "guide": 66,
+      "meaning": "The visible camera viewfinder is required but cannot be shown for this action",
+      "agent_should": "Open Bridgit and use the visible capture/review flow; do not fall back to hidden capture",
+      "built": true,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "workflow_busy": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "workflow_changed": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "workflow_limit": {
+      "http": 429,
+      "platforms": {
+        "android": [
+          429
+        ]
+      }
+    },
+    "workflow_not_active": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "workflow_paused": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "workflow_skipped": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "workflow_state": {
+      "http": 409,
+      "platforms": {
+        "android": [
+          409
+        ]
+      }
+    },
+    "write_settings_required": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "wrong_controller": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "wrong_device": {
+      "http": 403,
+      "guide": 20,
+      "meaning": "This agent's key is locked to another Tailscale device (device lock)",
+      "agent_should": "Call from the device you were set up on, or ask the owner to allow this device; don't retry",
+      "built": true,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "wrong_transport": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    }
+  }
+}

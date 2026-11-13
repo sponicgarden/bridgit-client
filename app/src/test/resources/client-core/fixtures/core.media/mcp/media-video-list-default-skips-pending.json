@@ -1,0 +1,66 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-video-list-default-skips-pending",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "A video still arriving is left out of the default list",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery_video": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery_video"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "video",
+        "name": "clip.mp4",
+        "size": 2048,
+        "added_at": 1762800000,
+        "id": 1
+      },
+      {
+        "scope": "library",
+        "kind": "video",
+        "name": "clip.mp4",
+        "size": 2048,
+        "added_at": 1762800060,
+        "id": 2,
+        "pending": true
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/videos/recent"
+  },
+  "expect": {
+    "status": 200,
+    "body_paths": {
+      "items.0.id": 1
+    },
+    "body_lacks": [
+      "items.1"
+    ]
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

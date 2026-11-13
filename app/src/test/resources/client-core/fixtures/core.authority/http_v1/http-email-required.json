@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-email-required",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "After the 24-hour grace an unverified owner email holds agents to the exempt calls",
+  "step": "grant.email_gate",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": false,
+      "email_grace_expired": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log"
+  },
+  "expect": {
+    "status": 403,
+    "error": "email_required"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

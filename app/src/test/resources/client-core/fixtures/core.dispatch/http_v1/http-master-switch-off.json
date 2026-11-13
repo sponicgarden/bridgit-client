@@ -1,0 +1,43 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-master-switch-off",
+  "service": "core.dispatch",
+  "door": "http_v1",
+  "title": "A capability switched off on the phone refuses its endpoints",
+  "step": "master_switch",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "schedule"
+        ]
+      }
+    ],
+    "switches": {
+      "schedule": false
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/schedule",
+    "body": {}
+  },
+  "expect": {
+    "status": 403,
+    "error": "capability_disabled"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

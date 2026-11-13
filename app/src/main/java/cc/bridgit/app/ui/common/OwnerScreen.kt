@@ -198,6 +198,87 @@ class OwnerScreen(private val activity: AppCompatActivity, title: CharSequence) 
         return v
     }
 
+    /** The list-screen toolbar (docs/design/list-screens.md): 48dp high, 20sp medium title. Opt-in per screen. */
+    fun listToolbar() {
+        toolbar.minimumHeight = activity.dp(48)
+        toolbar.setTitleTextAppearance(activity, R.style.TextAppearance_Bridgit_ListTitle)
+    }
+
+    /**
+     * A status row (list-screen system): 40dp leading icon, 16sp title, a 16dp state mark before the 14sp state word,
+     * and the 48dp trailing slot, which holds a chevron only when [action] is set. Non-actionable rows are focusable
+     * status, not disabled controls. [stateSpoken] is what TalkBack says for the state.
+     */
+    fun statusRow(title: CharSequence, leadingIcon: Int, state: CharSequence, stateIcon: Int, stateColorAttr: Int,
+                  stateSpoken: CharSequence, actionLabel: CharSequence?, action: (() -> Unit)?): View {
+        val ctx = activity
+        val row = LinearLayout(ctx).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            minimumHeight = ctx.dp(64)
+            setPaddingRelative(ctx.dp(16), ctx.dp(12), 0, ctx.dp(12))
+        }
+        row.addView(android.widget.ImageView(ctx).apply {
+            setImageResource(leadingIcon)
+            imageTintList = android.content.res.ColorStateList.valueOf(ctx.themeColor(M.attr.colorOnSurfaceVariant))
+            scaleType = android.widget.ImageView.ScaleType.CENTER
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, LinearLayout.LayoutParams(ctx.dp(40), ctx.dp(40)).apply { marginEnd = ctx.dp(12) })
+        val text = LinearLayout(ctx).apply { orientation = LinearLayout.VERTICAL }
+        text.addView(TextView(ctx).apply {
+            this.text = title
+            textSize = 16f
+            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            setTextColor(ctx.themeColor(M.attr.colorOnSurface))
+            setLineSpacing(0f, 1f)
+            maxLines = 2
+        })
+        text.addView(TextView(ctx).apply {
+            this.text = state
+            textSize = 14f
+            setTextColor(ctx.themeColor(M.attr.colorOnSurfaceVariant))
+            val mark = androidx.core.content.ContextCompat.getDrawable(ctx, stateIcon)!!.mutate().apply {
+                setBounds(0, 0, ctx.dp(16), ctx.dp(16))
+                setTint(ctx.themeColor(stateColorAttr))
+            }
+            setCompoundDrawablesRelative(mark, null, null, null)
+            compoundDrawablePadding = ctx.dp(6)
+            gravity = Gravity.CENTER_VERTICAL
+            maxLines = 2
+        }, LinearLayout.LayoutParams(-2, -2).apply { topMargin = ctx.dp(2) })
+        row.addView(text, LinearLayout.LayoutParams(0, -2, 1f))
+        row.addView(android.widget.ImageView(ctx).apply {
+            if (action != null) {
+                setImageResource(R.drawable.ic_chevron)
+                imageTintList = android.content.res.ColorStateList.valueOf(ctx.themeColor(M.attr.colorOnSurfaceVariant))
+            }
+            scaleType = android.widget.ImageView.ScaleType.CENTER
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, LinearLayout.LayoutParams(ctx.dp(48), ctx.dp(48)))
+        row.contentDescription = title
+        androidx.core.view.ViewCompat.setStateDescription(row, stateSpoken)
+        row.isFocusable = true
+        if (action != null) {
+            val ripple = android.util.TypedValue().also { ctx.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true) }
+            row.setBackgroundResource(ripple.resourceId)
+            row.setOnClickListener { action() }
+            androidx.core.view.ViewCompat.replaceAccessibilityAction(row,
+                androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK, actionLabel, null)
+            androidx.core.view.ViewCompat.setAccessibilityDelegate(row, object : androidx.core.view.AccessibilityDelegateCompat() {
+                override fun onInitializeAccessibilityNodeInfo(host: View, info: androidx.core.view.accessibility.AccessibilityNodeInfoCompat) {
+                    super.onInitializeAccessibilityNodeInfo(host, info); info.className = android.widget.Button::class.java.name
+                }
+            })
+        }
+        list.addView(row)
+        return row
+    }
+
+    /** A 1dp list divider inset to the text start (68dp) and 16dp from the end; Card.divider() is for inside cards. */
+    fun listDivider(startInsetDp: Int = 68, endInsetDp: Int = 16) = list.addView(View(activity).apply {
+        setBackgroundColor(activity.themeColor(M.attr.colorOutlineVariant))
+    }, LinearLayout.LayoutParams(-1, 1.coerceAtLeast(activity.dp(1))).apply { marginStart = activity.dp(startInsetDp); marginEnd = activity.dp(endInsetDp) })
+
     /** Rounded shaded card, like an Interactions row. Waiting things are raised and carry an accent pill. */
     fun card(accent: Accent = Accent.NONE, build: Card.() -> Unit) {
         val ctx = activity

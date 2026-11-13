@@ -1,0 +1,49 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-link-expired",
+  "service": "core.links",
+  "door": "http_v1",
+  "title": "An associate link past its end date refuses the other device",
+  "step": "link_agent",
+  "principal": {
+    "agent": "hub",
+    "source": "100.64.0.40"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "hub"
+      }
+    ],
+    "links": [
+      {
+        "agent": "hub",
+        "tier": "associate",
+        "state": "expired",
+        "services": [
+          "interactions"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/health"
+  },
+  "expect": {
+    "status": 403,
+    "error": "link_expired",
+    "body_paths": {
+      "tier": "associate"
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

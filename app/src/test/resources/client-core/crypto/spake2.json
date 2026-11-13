@@ -1,0 +1,2030 @@
+{
+  "$schema": "../schemas/crypto.schema.json",
+  "vectors": "spake2",
+  "version": 1,
+  "spec": "RFC 9382 (https://www.rfc-editor.org/rfc/rfc9382.txt) section 6 and Appendix B; docs/plans/client-core/architecture.md 4.7 (bridgit-approver-enrol-v1); spending authority G10.3 X1, X3; written by tools/client-core/spake2-vectors.mjs",
+  "note": "constants and rfc9382 are the RFC's own values, read from its text by the script and never typed; hex, without the RFC's 0x and line breaks. Every platform recomputes each of them from w, x and y as side A and as side B. bad_shares are shares the named side must refuse (side is the receiver; it holds w and scalar): only the 65-byte uncompressed form of a point on the curve is a share, and a share that makes K the identity is refused. In enrolment the code's maker is side A and the claimer side B, the identities are the two install ids as UTF-8, there is no AAD, and w comes from the enrolment secret (password). enrol.runs: each side present is one device. It holds es, target_name, scalar and its own view of the transcript, receives the values in receives, and must reach expect: accepted, or the first failing check in enrol.reasons order. sends is what that device really sends: its share, RFC confirmation, enrolment confirmation and signatures, made from its own view by the keys in signs (ECDSA P-256 SHA-256, IEEE P1363 r||s, base64). Every received value is one some device in the file sent. In a view, install and approver keys name entries of keys and go into the transcript as SPKI; message and sealing keys go in as the 65-byte point. All keys, secrets, scalars and random values are synthetic.",
+  "suite": "SPAKE2-P256-SHA256-HKDF-HMAC",
+  "constants": {
+    "source": "RFC 9382 section 6, the values for P-256, compressed (SEC1)",
+    "M": "02886e2f97ace46e55ba9dd7242579f2993b64e16ef3dcab95afd497333d8fa12f",
+    "N": "03d8bbd6c639c62937b04d997f38c3770719c629d7014d49a24b4f98baa1292b49"
+  },
+  "rfc9382": [
+    {
+      "A": "server",
+      "B": "client",
+      "w": "2ee57912099d31560b3a44b1184b9b4866e904c49d12ac5042c97dca461b1a5f",
+      "x": "43dd0fd7215bdcb482879fca3220c6a968e66d70b1356cac18bb26c84a78d729",
+      "pA": "04a56fa807caaa53a4d28dbb9853b9815c61a411118a6fe516a8798434751470f9010153ac33d0d5f2047ffdb1a3e42c9b4e6be662766e1eeb4116988ede5f912c",
+      "y": "dcb60106f276b02606d8ef0a328c02e4b629f84f89786af5befb0bc75b6e66be",
+      "pB": "0406557e482bd03097ad0cbaa5df82115460d951e3451962f1eaf4367a420676d09857ccbc522686c83d1852abfa8ed6e4a1155cf8f1543ceca528afb591a1e0b7",
+      "K": "0412af7e89717850671913e6b469ace67bd90a4df8ce45c2af19010175e37eed69f75897996d539356e2fa6a406d528501f907e04d97515fbe83db277b715d3325",
+      "TT": "06000000000000007365727665720600000000000000636c69656e74410000000000000004a56fa807caaa53a4d28dbb9853b9815c61a411118a6fe516a8798434751470f9010153ac33d0d5f2047ffdb1a3e42c9b4e6be662766e1eeb4116988ede5f912c41000000000000000406557e482bd03097ad0cbaa5df82115460d951e3451962f1eaf4367a420676d09857ccbc522686c83d1852abfa8ed6e4a1155cf8f1543ceca528afb591a1e0b741000000000000000412af7e89717850671913e6b469ace67bd90a4df8ce45c2af19010175e37eed69f75897996d539356e2fa6a406d528501f907e04d97515fbe83db277b715d332520000000000000002ee57912099d31560b3a44b1184b9b4866e904c49d12ac5042c97dca461b1a5f",
+      "hash_TT": "0e0672dc86f8e45565d338b0540abe6915bdf72e2b35b5c9e5663168e960a91b",
+      "Ke": "0e0672dc86f8e45565d338b0540abe69",
+      "Ka": "15bdf72e2b35b5c9e5663168e960a91b",
+      "KcA": "00c12546835755c86d8c0db7851ae86f",
+      "KcB": "a9fa3406c3b781b93d804485430ca27a",
+      "conf_A": "58ad4aa88e0b60d5061eb6b5dd93e80d9c4f00d127c65b3b35b1b5281fee38f0",
+      "conf_B": "d3e2e547f1ae04f2dbdbf0fc4b79f8ecff2dff314b5d32fe9fcef2fb26dc459b"
+    },
+    {
+      "A": "",
+      "B": "client",
+      "w": "0548d8729f730589e579b0475a582c1608138ddf7054b73b5381c7e883e2efae",
+      "x": "403abbe3b1b4b9ba17e3032849759d723939a27a27b9d921c500edde18ed654b",
+      "pA": "04a897b769e681c62ac1c2357319a3d363f610839c4477720d24cbe32f5fd85f44fb92ba966578c1b712be6962498834078262caa5b441ecfa9d4a9485720e918a",
+      "y": "903023b6598908936ea7c929bd761af6039577a9c3f9581064187c3049d87065",
+      "pB": "04e0f816fd1c35e22065d5556215c097e799390d16661c386e0ecc84593974a61b881a8c82327687d0501862970c64565560cb5671f696048050ca66ca5f8cc7fc",
+      "K": "048f83ec9f6e4f87cc6f9dc740bdc2769725f923364f01c84148c049a39a735ebda82eac03e00112fd6a5710682767cff5361f7e819e53d8d3c3a2922e0d837aa6",
+      "TT": "00000000000000000600000000000000636c69656e74410000000000000004a897b769e681c62ac1c2357319a3d363f610839c4477720d24cbe32f5fd85f44fb92ba966578c1b712be6962498834078262caa5b441ecfa9d4a9485720e918a410000000000000004e0f816fd1c35e22065d5556215c097e799390d16661c386e0ecc84593974a61b881a8c82327687d0501862970c64565560cb5671f696048050ca66ca5f8cc7fc4100000000000000048f83ec9f6e4f87cc6f9dc740bdc2769725f923364f01c84148c049a39a735ebda82eac03e00112fd6a5710682767cff5361f7e819e53d8d3c3a2922e0d837aa620000000000000000548d8729f730589e579b0475a582c1608138ddf7054b73b5381c7e883e2efae",
+      "hash_TT": "642f05c473c2cd79909f9a841e2f30a70bf89b18180af97353ba198789c2b963",
+      "Ke": "642f05c473c2cd79909f9a841e2f30a7",
+      "Ka": "0bf89b18180af97353ba198789c2b963",
+      "KcA": "c6be376fc7cd1301fd0a13adf3e7bffd",
+      "KcB": "b7243f4ae60440a49b3f8cab3c1fba07",
+      "conf_A": "47d29e6666af1b7dd450d571233085d7a9866e4d49d2645e2df975489521232b",
+      "conf_B": "3313c5cefc361d27fb16847a91c2a73b766ffa90a4839122a9b70a2f6bd1d6df"
+    },
+    {
+      "A": "server",
+      "B": "",
+      "w": "626e0cdc7b14c9db3e52a0b1b3a768c98e37852d5db30febe0497b14eae8c254",
+      "x": "07adb3db6bc623d3399726bfdbfd3d15a58ea776ab8a308b00392621291f9633",
+      "pA": "04f88fb71c99bfffaea370966b7eb99cd4be0ff1a7d335caac4211c4afd855e2e15a873b298503ad8ba1d9cbb9a392d2ba309b48bfd7879aefd0f2cea6009763b0",
+      "y": "b6a4fc8dbb629d4ba51d6f91ed1532cf87adec98f25dd153a75accafafedec16",
+      "pB": "040c269d6be017dccb15182ac6bfcd9e2a14de019dd587eaf4bdfd353f031101e7cca177f8eb362a6e83e7d5e729c0732e1b528879c086f39ba0f31a9661bd34db",
+      "K": "0445ee233b8ecb51ebd6e7da3f307e88a1616bae2166121221fdc0dadb986afaf3ec8a988dc9c626fa3b99f58a7ca7c9b844bb3e8dd9554aafc5b53813504c1cbe",
+      "TT": "06000000000000007365727665720000000000000000410000000000000004f88fb71c99bfffaea370966b7eb99cd4be0ff1a7d335caac4211c4afd855e2e15a873b298503ad8ba1d9cbb9a392d2ba309b48bfd7879aefd0f2cea6009763b04100000000000000040c269d6be017dccb15182ac6bfcd9e2a14de019dd587eaf4bdfd353f031101e7cca177f8eb362a6e83e7d5e729c0732e1b528879c086f39ba0f31a9661bd34db41000000000000000445ee233b8ecb51ebd6e7da3f307e88a1616bae2166121221fdc0dadb986afaf3ec8a988dc9c626fa3b99f58a7ca7c9b844bb3e8dd9554aafc5b53813504c1cbe2000000000000000626e0cdc7b14c9db3e52a0b1b3a768c98e37852d5db30febe0497b14eae8c254",
+      "hash_TT": "005184ff460da2ce59062c87733c299c3521297d736598fc0a1127600efa1afb",
+      "Ke": "005184ff460da2ce59062c87733c299c",
+      "Ka": "3521297d736598fc0a1127600efa1afb",
+      "KcA": "f3da53604f0aeecea5a33be7bddf6edf",
+      "KcB": "9e3f86848736f159bd92b6e107ec6799",
+      "conf_A": "bc9f9bbe99f26d0b2260e6456e05a86196a3307ec6663a18bf6ac825736533b2",
+      "conf_B": "c2370e1bf813b086dff0d834e74425a06e6390f48f5411900276dcccc5a297ec"
+    },
+    {
+      "A": "",
+      "B": "",
+      "w": "7bf46c454b4c1b25799527d896508afd5fc62ef4ec59db1efb49113063d70cca",
+      "x": "8cef65df64bb2d0f83540c53632de911b5b24b3eab6cc74a97609fd659e95473",
+      "pA": "04a65b367a3f613cf9f0654b1b28a1e3a8a40387956c8ba6063e8658563890f46ca1ef6a676598889fc28de2950ab8120b79a5ef1ea4c9f44bc98f585634b46d66",
+      "y": "d7a66f64074a84652d8d623a92e20c9675c61cb5b4f6a0063e4648a2fdc02d53",
+      "pB": "04589f13218822710d98d8b2123a079041052d9941b9cf88c6617ddb2fcc0494662eea8ba6b64692dc318250030c6af045cb738bc81ba35b043c3dcb46adf6f58d",
+      "K": "041a3c03d51b452537ca2a1fea6110353c6d5ed483c4f0f86f4492ca3f378d40a994b4477f93c64d928edbbcd3e85a7c709b7ea73ee97986ce3d1438e135543772",
+      "TT": "00000000000000000000000000000000410000000000000004a65b367a3f613cf9f0654b1b28a1e3a8a40387956c8ba6063e8658563890f46ca1ef6a676598889fc28de2950ab8120b79a5ef1ea4c9f44bc98f585634b46d66410000000000000004589f13218822710d98d8b2123a079041052d9941b9cf88c6617ddb2fcc0494662eea8ba6b64692dc318250030c6af045cb738bc81ba35b043c3dcb46adf6f58d4100000000000000041a3c03d51b452537ca2a1fea6110353c6d5ed483c4f0f86f4492ca3f378d40a994b4477f93c64d928edbbcd3e85a7c709b7ea73ee97986ce3d1438e13554377220000000000000007bf46c454b4c1b25799527d896508afd5fc62ef4ec59db1efb49113063d70cca",
+      "hash_TT": "fc6374762ba5cf11f4b2caa08b2cd1b9907ae0e26e8d6234318d91583cd74c86",
+      "Ke": "fc6374762ba5cf11f4b2caa08b2cd1b9",
+      "Ka": "907ae0e26e8d6234318d91583cd74c86",
+      "KcA": "5dbd2f477166b7fb6d61febbd77a5563",
+      "KcB": "7689b4654407a5faeffdc8f18359d8a3",
+      "conf_A": "dfb4db8d48ae5a675963ea5e6c19d98d4ea028d8e898dad96ea19a80ade95dca",
+      "conf_B": "d0f0609d1613138d354f7e95f19fb556bf52d751947241e8c7118df5ef0ae175"
+    }
+  ],
+  "bad_shares": [
+    {
+      "name": "off_curve",
+      "why": "A valid share with the last bit of y changed",
+      "side": "A",
+      "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c",
+      "scalar": "a6cdecc2a6198e2562241be3cb440635f712e149a2b6da0da655d37f1ea83194",
+      "share": "0487870078e3a11d5e6b99817cdc301cb9542859bd1ae8c573ce843ac728f716476ae710ad4781224efc394c69047f2fd6a3bbc7a78d6436dd1ac9eab2d60b6467"
+    },
+    {
+      "name": "identity_encoding",
+      "why": "The one-byte encoding of the point at infinity",
+      "side": "A",
+      "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c",
+      "scalar": "a6cdecc2a6198e2562241be3cb440635f712e149a2b6da0da655d37f1ea83194",
+      "share": "00"
+    },
+    {
+      "name": "empty",
+      "why": "No bytes",
+      "side": "A",
+      "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c",
+      "scalar": "a6cdecc2a6198e2562241be3cb440635f712e149a2b6da0da655d37f1ea83194",
+      "share": ""
+    },
+    {
+      "name": "compressed",
+      "why": "A valid point in compressed form: only the 65-byte form is a share",
+      "side": "A",
+      "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c",
+      "scalar": "a6cdecc2a6198e2562241be3cb440635f712e149a2b6da0da655d37f1ea83194",
+      "share": "0287870078e3a11d5e6b99817cdc301cb9542859bd1ae8c573ce843ac728f71647"
+    },
+    {
+      "name": "hybrid",
+      "why": "A valid point in the hybrid form (06 or 07)",
+      "side": "A",
+      "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c",
+      "scalar": "a6cdecc2a6198e2562241be3cb440635f712e149a2b6da0da655d37f1ea83194",
+      "share": "0687870078e3a11d5e6b99817cdc301cb9542859bd1ae8c573ce843ac728f716476ae710ad4781224efc394c69047f2fd6a3bbc7a78d6436dd1ac9eab2d60b6466"
+    },
+    {
+      "name": "too_short",
+      "why": "A valid share with its last byte missing",
+      "side": "A",
+      "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c",
+      "scalar": "a6cdecc2a6198e2562241be3cb440635f712e149a2b6da0da655d37f1ea83194",
+      "share": "0487870078e3a11d5e6b99817cdc301cb9542859bd1ae8c573ce843ac728f716476ae710ad4781224efc394c69047f2fd6a3bbc7a78d6436dd1ac9eab2d60b64"
+    },
+    {
+      "name": "too_long",
+      "why": "A valid share with one byte added",
+      "side": "A",
+      "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c",
+      "scalar": "a6cdecc2a6198e2562241be3cb440635f712e149a2b6da0da655d37f1ea83194",
+      "share": "0487870078e3a11d5e6b99817cdc301cb9542859bd1ae8c573ce843ac728f716476ae710ad4781224efc394c69047f2fd6a3bbc7a78d6436dd1ac9eab2d60b646600"
+    },
+    {
+      "name": "x_not_below_p",
+      "why": "A point on the curve with p added to its x coordinate",
+      "side": "A",
+      "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c",
+      "scalar": "a6cdecc2a6198e2562241be3cb440635f712e149a2b6da0da655d37f1ea83194",
+      "share": "04ffffffff00000001000000000000000000000000ffffffffffffffffffffffff66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4"
+    },
+    {
+      "name": "identity_k",
+      "why": "The share w*N, sent to A: taking w*N off it leaves the identity, so K is the identity",
+      "side": "A",
+      "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c",
+      "scalar": "a6cdecc2a6198e2562241be3cb440635f712e149a2b6da0da655d37f1ea83194",
+      "share": "04aadf32e8c345672b75a17f11e51fc531df8ecb146fa8ca8ca7962b1b3ecb56f2d47482d9ee837f203b76335f85e2350c2a716e296d42468c2bab4cdf2e0327cc"
+    },
+    {
+      "name": "identity_k_for_b",
+      "why": "The share w*M, sent to B",
+      "side": "B",
+      "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c",
+      "scalar": "a6cdecc2a6198e2562241be3cb440635f712e149a2b6da0da655d37f1ea83194",
+      "share": "048ae60e1ffd8ed82c01967c230f83a57e933b408c1cec83bb13a7c8d0527d5eab23f5bf37c5c41564e87af81ae2c5af1f95ad827d4547726ae4467a790283c89c"
+    }
+  ],
+  "secret": {
+    "note": "The es field of an approver link: 16 bytes from a secure random source, base64url without padding, 22 characters. Only the spelling an encoder writes is a secret: the last character is one of A, Q, g, w. out_hex null means refused. Nothing is trimmed.",
+    "bytes": 16,
+    "parse": [
+      {
+        "in": "3BEH8p4cmTyLK2bqx5wkYw",
+        "out_hex": "dc1107f29e1c993c8b2b66eac79c2463"
+      },
+      {
+        "in": "Nl-40SHTO_5YYypOAEQt4A",
+        "out_hex": "365fb8d121d33bfe58632a4e00442de0"
+      },
+      {
+        "in": "-_-_-_-_-_-_-_-_-_-_-w",
+        "out_hex": "fbffbffbffbffbffbffbffbffbffbffb"
+      },
+      {
+        "in": "AAAAAAAAAAAAAAAAAAAAAA",
+        "out_hex": "00000000000000000000000000000000"
+      },
+      {
+        "in": "",
+        "out_hex": null
+      },
+      {
+        "in": "3BEH8p4cmTyLK2bqx5wkY",
+        "out_hex": null
+      },
+      {
+        "in": "3BEH8p4cmTyLK2bqx5wkYwA",
+        "out_hex": null
+      },
+      {
+        "in": "3BEH8p4cmTyLK2bqx5wkYw==",
+        "out_hex": null
+      },
+      {
+        "in": "3BEH8p4cmTyLK2bqx5wkYB",
+        "out_hex": null
+      },
+      {
+        "in": "3BEH8p4cmTyLK2bqx5wkYx",
+        "out_hex": null
+      },
+      {
+        "in": "+/+/+/+/+/+/+/+/+/+/+w",
+        "out_hex": null
+      },
+      {
+        "in": " 3BEH8p4cmTyLK2bqx5wkYw",
+        "out_hex": null
+      },
+      {
+        "in": "3BEH8p4cmTyLK2bqx5wkYw\n",
+        "out_hex": null
+      },
+      {
+        "in": "dc1107f29e1c993c8b2b66eac79c2463",
+        "out_hex": null
+      }
+    ]
+  },
+  "password": {
+    "note": "w is PBKDF2-HMAC-SHA256 of the secret's raw bytes (not its text), salt = label, a newline, the target's registered name (UTF-8), the iteration count of limits.json enrol_pbkdf2_iterations, 40 bytes out, read as a big-endian number and reduced mod the group order n. w is 32 bytes, big-endian.",
+    "label": "bridgit-approver-enrol-v1",
+    "iterations": 1000,
+    "cases": [
+      {
+        "es": "3BEH8p4cmTyLK2bqx5wkYw",
+        "name": "kitchen-tablet",
+        "salt_utf8": "bridgit-approver-enrol-v1\nkitchen-tablet",
+        "w": "f351480047e7c9e80b0f0124c85217e3409f28b6497f465d29948d72c08b5c9c"
+      },
+      {
+        "es": "Nl-40SHTO_5YYypOAEQt4A",
+        "name": "kitchen-tablet",
+        "salt_utf8": "bridgit-approver-enrol-v1\nkitchen-tablet",
+        "w": "4aa6fbbbd2c2bb01f250a3bf2705baab16dde9078f1afb108dd9eb62c3146340"
+      },
+      {
+        "es": "3BEH8p4cmTyLK2bqx5wkYw",
+        "name": "office-phone",
+        "salt_utf8": "bridgit-approver-enrol-v1\noffice-phone",
+        "w": "7550316e721292cae25916354be3d52f71ae737b4c75c86be0b24941c9f8631f"
+      }
+    ]
+  },
+  "keys": {
+    "maker_install": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "Dw/5TQ3dVoejDdNYj1Bv70yM3VY2gPbiooZIrdFb0xk=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIoQYPPUrBkgek6S8Dv7NOHQoWr1J1uWGdFI8AmnKTUlmWK42lh2OhCMktdTZISKTZ4He0mMRfw8FknFmsgQnvQ=="
+    },
+    "claimer_install": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "Y9SkqlR/EIIt8pxaoBDlfqqOlCGiPDpnaDs5gjmifPk=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE9ao00dFBrjQ6YAGh+kyzEIclmsmXRB4eJmnhmtQMhlA3ocuqCSrUFZZna9UU01bz4UkJO1mZMxkdVB7ZDvI8XQ=="
+    },
+    "maker_approver": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "GBqW7ZSBuYSoaBGqZHuOd3cJxVvhSxPo52MKXDTeHxM=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEkW7E1QGD5qjKbw8hPGioN/Mv0fkQtz/F9xkJaSFustxlbpLaZH7ImYICyPFTY7xqy1uYUsXYiE/VuVC99tJ9tQ=="
+    },
+    "claimer_approver": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "/s6IW3QPDPabx9l3NWOFrcW4+qGWqVa3oQgYBpepiZI=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEnazdh5AzMW+wN6OzqpWejSBObj72hwVGrVyWKWe7CEm02iB7Wg79LnYKwR8ijnsxVaGCd1/Brh7RKXEO1dpKaw=="
+    },
+    "maker_sealing": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "VMQum5OqZgF8u6O1xs0VhIJjR5Zndkdapju2yZYXOhY=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEh/UQaVDVb21M2zcTzVCGAsS4N5uJYbh95zGFQy5BDzG8tQWfkqYH402NxzDOM+j0kagRlRd8lHNCCzuwqn55+A=="
+    },
+    "claimer_sealing": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "JDpz1GQHQYbsVNZWBSJ6BUV50qFspO3GqvTeK/Xf9yM=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE5TZVn1QIa3Ebupxm7aGKJ5DKcdwXqo2TwOPvKC6upQNiF4PEYq3xGf76bckHHAqL5hQ8f31E7AdczdQ6sF3Lig=="
+    },
+    "maker_message": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "7KgEuyul49aimhnkyI1n+ihMtpiyxp67oEdaYUzjMMo=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEonMBuVEumiCu66DipEBREc94+S0nHEhAoXugyvRMEOtPRv2eEbjnL3MUPGMrZQ2mDRcU+Adm7jq90tO55C99wA=="
+    },
+    "claimer_message": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "t0IxPxpjKiFPMChinpIOyx+Kq62A3plPW2uVBuFe01Y=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEcWWi20PRZqgA3VhJJ5tkDaiUtZkl4HDTuEM+nBi+oPO7xDYIgOew6Yi2Fu+mpmWPWtcS+9zkWZlxr0RpYqqb4A=="
+    },
+    "stranger_install": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "WvpKK4KQqDHG0dH2C4hvNZuERdauKTKdSt9XJe6nikU=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmkDWdxqPs1myfjJn3TzTVhR66Vhi1VTFBIOD7lddV/zw6IquyRdexaeDcz52S3XKzoHXq2P7yKN6vRQUdLmGyQ=="
+    },
+    "stranger_approver": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "PwHYrlQL6hR0wAQhJWcUvJavYa4u5+vjlV9cfXQHuuA=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYKpwfUAmMSMNFkGpI0wosdGPoyPleFRYfj8BF+i0Jidjry1lIRoViUACdze7Ak0bWAqD45jKH+MtGp84DuJq/w=="
+    },
+    "stranger_sealing": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "hAjsmcZ9nIulISSRIuaZx8m/GCQUpHgRdZwMyFe3hts=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEahr2Vf4jkyVf/8bSC9UgvLkcMElOfycYBDRiih8K+6nmnS9dk+PxwlBDicIV6VEc/ldaXXrHqdgrjdqqiZTLTA=="
+    },
+    "stranger_message": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "SfUZAAvUe+gEXAYBoDBfyQgTfg+FwB8XrPtRBVL3+AI=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESfeKRdTO7v6BZN7YpiLKbwnhFGWid6HgcyMHdzMdaAWHpY7xNIRIKrD1XRWQH6exSbNHSDkw8HJEtx0klqjMnw=="
+    }
+  },
+  "enrol": {
+    "label": "bridgit-approver-enrol-v1",
+    "encoding": {
+      "note": "Transcript: the fields in this order, each behind a 4-byte big-endian length; text is UTF-8, generation is an 8-byte big-endian integer, the random values are 32 bytes, an absent attestation is zero bytes long. The transcript hash is its SHA-256. kex_hash is SHA-256 of \"bridgit-approver-enrol-v1 kex\", the maker's install id, the claimer's, pA and pB, each behind a 4-byte big-endian length; it is never Hash(TT), which is the key. The enrolment confirmation is HMAC-SHA256 of the transcript hash under the sender's half of HKDF-SHA256(Ke, no salt, info \"bridgit-approver-enrol-v1 confirm\", 64 bytes): the maker's 32 bytes, then the claimer's. An install key signs \"bridgit-approver-enrol-v1 proof\", its side (maker or claimer) and the transcript hash, each behind a 4-byte big-endian length. The approver key signs bridgit-owner-auth-v1 bytes: purpose approver_enrol, decision approve, target the other device's install id, approver its own install id, digest the transcript hash, nonce the link id, the transcript's generation, expiry 0.",
+      "length_prefix_bytes": 4,
+      "fields": [
+        "label",
+        "link_id",
+        "maker_install_id",
+        "maker_install_key",
+        "claimer_install_id",
+        "claimer_install_key",
+        "approver",
+        "approver_key",
+        "approver_sealing_key",
+        "approver_attestation",
+        "maker_message_key",
+        "claimer_message_key",
+        "kex_hash",
+        "generation",
+        "maker_nonce",
+        "claimer_nonce"
+      ],
+      "sides": [
+        "maker",
+        "claimer"
+      ],
+      "kex_label": "bridgit-approver-enrol-v1 kex",
+      "confirm_label": "bridgit-approver-enrol-v1 confirm",
+      "proof_label": "bridgit-approver-enrol-v1 proof",
+      "approver_purpose": "approver_enrol"
+    },
+    "reasons": [
+      "bad_share",
+      "key_confirmation_failed",
+      "install_id_mismatch",
+      "bad_confirmation",
+      "bad_install_signature",
+      "bad_approver_signature"
+    ],
+    "runs": [
+      {
+        "name": "ok_claimer_approver",
+        "proves": "The claimer becomes the approver; both sides hold the same transcript and every proof checks",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hex": "00000019627269646769742d617070726f7665722d656e726f6c2d76310000000f6c6e6b5f766563746f725f303030310000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000005b3059301306072a8648ce3d020106082a8648ce3d030107034200042284183cf52b06481e93a4bc0efecd3874285abd49d6e58674523c0269ca4d496658ae36961d8e842324b5d4d92122936781ded263117f0f05927166b20427bd0000001c6267695f6f72616d676b6c746265367065373432673733736a376b690000005b3059301306072a8648ce3d020106082a8648ce3d03010703420004f5aa34d1d141ae343a6001a1fa4cb31087259ac997441e1e2669e19ad40c865037a1cbaa092ad41596676bd514d356f3e149093b599933191d541ed90ef23c5d00000007636c61696d65720000005b3059301306072a8648ce3d020106082a8648ce3d030107034200049dacdd879033316fb037a3b3aa959e8d204e6e3ef6870546ad5c962967bb0849b4da207b5a0efd2e760ac11f228e7b3155a182775fc1ae1ed129710ed5da4a6b0000004104e536559f54086b711bba9c66eda18a2790ca71dc17aa8d93c0e3ef282eaea503621783c462adf119fefa6dc9071c0a8be6143c7f7d44ec075ccdd43ab05dcb8a000000000000004104a27301b9512e9a20aeeba0e2a4405111cf78f92d271c4840a17ba0caf44c10eb4f46fd9e11b8e72f73143c632b650da60d1714f80766ee3abdd2d3b9e42f7dc000000041047165a2db43d166a800dd5849279b640da894b59925e070d3b8433e9c18bea0f3bbc4360880e7b0e988b616efa6a6658f5ad712fbdce4599971af446962aa9be0000000200e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7000000080000000000000000000000203d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e00000020ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "KFI2Vf47bnLZEZDdsJbVVeGuoq1bLEy1ob0TzJjNO9dCJK/l4cT3oNGp30ZhDdMII3CLX2EzzIKKc02Q3Q7hVg=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "DsRNIMZRxrjquEhjAYdr+sra2mbLx39Qi1IfKepldTy/kNmRyEbPlS/Ya2Z7QMj80vgEvC9Wx+Q59gpCi0A9UA==",
+            "approver_signature_p1363": "5Pk89P2l5qPWgTzs+i4xJ8EkAwEV+JD+8l25WXxWv4MYi1PyH9LMdbxFywhaAvJwvxcgDd8SK1IhAoTw2oHHSA=="
+          },
+          "expect": "accepted"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "DsRNIMZRxrjquEhjAYdr+sra2mbLx39Qi1IfKepldTy/kNmRyEbPlS/Ya2Z7QMj80vgEvC9Wx+Q59gpCi0A9UA==",
+            "approver_signature_p1363": "5Pk89P2l5qPWgTzs+i4xJ8EkAwEV+JD+8l25WXxWv4MYi1PyH9LMdbxFywhaAvJwvxcgDd8SK1IhAoTw2oHHSA=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "KFI2Vf47bnLZEZDdsJbVVeGuoq1bLEy1ob0TzJjNO9dCJK/l4cT3oNGp30ZhDdMII3CLX2EzzIKKc02Q3Q7hVg=="
+          },
+          "expect": "accepted"
+        }
+      },
+      {
+        "name": "ok_maker_approver",
+        "proves": "The maker becomes the approver, with an attestation and a later authority generation",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "5a12ae53a6a96827c55419ab37bb770f594f55449cd854f2dcefcb96f854ffec",
+          "view": {
+            "link_id": "lnk_vector_0002",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "maker",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "c3ludGhldGljIGF0dGVzdGF0aW9uLCBub3QgYSByZWFsIGtleSBzdG9yZSBjaGFpbg==",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 4,
+            "maker_nonce_hex": "235ffdc69fba21d89762b015fb788ad71aef08ee5d511f5b11ab4fa229c6cb3a",
+            "claimer_nonce_hex": "ff9a53bb5c3fe8d42b97593ac1993855f18c78bd187d4afaec3f66e007020704"
+          },
+          "signs": {
+            "install": "maker_install",
+            "approver": "maker_approver"
+          },
+          "kex_hash_hex": "c24276a60d4df2990dbc7fc2069b8f0ef9b9dace17b06d858d11747cd81442b5",
+          "transcript_hex": "00000019627269646769742d617070726f7665722d656e726f6c2d76310000000f6c6e6b5f766563746f725f303030320000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000005b3059301306072a8648ce3d020106082a8648ce3d030107034200042284183cf52b06481e93a4bc0efecd3874285abd49d6e58674523c0269ca4d496658ae36961d8e842324b5d4d92122936781ded263117f0f05927166b20427bd0000001c6267695f6f72616d676b6c746265367065373432673733736a376b690000005b3059301306072a8648ce3d020106082a8648ce3d03010703420004f5aa34d1d141ae343a6001a1fa4cb31087259ac997441e1e2669e19ad40c865037a1cbaa092ad41596676bd514d356f3e149093b599933191d541ed90ef23c5d000000056d616b65720000005b3059301306072a8648ce3d020106082a8648ce3d03010703420004916ec4d50183e6a8ca6f0f213c68a837f32fd1f910b73fc5f7190969216eb2dc656e92da647ec8998202c8f15363bc6acb5b9852c5d8884fd5b950bdf6d27db5000000410487f5106950d56f6d4cdb3713cd508602c4b8379b8961b87de73185432e410f31bcb5059f92a607e34d8dc730ce33e8f491a81195177c9473420b3bb0aa7e79f80000003173796e746865746963206174746573746174696f6e2c206e6f742061207265616c206b65792073746f726520636861696e0000004104a27301b9512e9a20aeeba0e2a4405111cf78f92d271c4840a17ba0caf44c10eb4f46fd9e11b8e72f73143c632b650da60d1714f80766ee3abdd2d3b9e42f7dc000000041047165a2db43d166a800dd5849279b640da894b59925e070d3b8433e9c18bea0f3bbc4360880e7b0e988b616efa6a6658f5ad712fbdce4599971af446962aa9be000000020c24276a60d4df2990dbc7fc2069b8f0ef9b9dace17b06d858d11747cd81442b500000008000000000000000400000020235ffdc69fba21d89762b015fb788ad71aef08ee5d511f5b11ab4fa229c6cb3a00000020ff9a53bb5c3fe8d42b97593ac1993855f18c78bd187d4afaec3f66e007020704",
+          "transcript_hash_hex": "6610809ce9830a34caa3f833602ff014352caae045c378a3e049b61bf7cb50c4",
+          "sends": {
+            "share_hex": "0445cf8459304a11afe6e4c02cb019ccc3f7939a1a6f0f07b2ec4f70ebb414bb7455ebf2775dd41cf59e9a9c84e165c326b91c52bfe77ccdfa61bad54756225b8c",
+            "key_confirmation_hex": "a2e5e58e1fa17b171ae4caf47ad4a02d0fde01644778d28dac6cad952953c405",
+            "confirmation_hex": "79a712d96cfeaf0b6407981b23cbdaed5f564cec91c1ee3659e100015e7c0eb9",
+            "install_signature_p1363": "J2wbBdrB4OmBEhVTQRQjnvmClQUgScLRr0D6Y0qvvjgAwNPlETaTSo6SpEQkpq8yAhDRvdOEd2IwqILO0AXLuA==",
+            "approver_signature_p1363": "GZ4Unjdzh10ePkycgOfo/HEkNz/6RGaC4ME65pJBx08+SfKT03rcq608e0BjV1UowGOxhrHhmDS20rZRtEjahw=="
+          },
+          "receives": {
+            "share_hex": "04e8275e45d560e18dc990cbae1e2fb9d07f7ae8cbbc83e09947fd263cc5e8d90062d33384e2af1226be4b74bda7f6279cca1b0d4937935a38fd8c870342bc1ba5",
+            "key_confirmation_hex": "3645a0f9101cd3a4377fb1aa165d3b15d22eea82bac43c03451f1e180766ea83",
+            "confirmation_hex": "564e591dd50ad4c31ce91858c8eef305bceb1ed08279660398171703c853f76a",
+            "install_signature_p1363": "07woXZPNlhm4oVCroy5g93o7UpaXZylEAN98By8KXrVq0b0W5zmr7nUy+ZY+cGe64moW9f/lrgDjMEV7LK9GDw=="
+          },
+          "expect": "accepted"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "4b9c3ad6ebcc24d266a0525bd8913b6a0cf1747069914ecd9304afba8e1739bf",
+          "view": {
+            "link_id": "lnk_vector_0002",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "maker",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "c3ludGhldGljIGF0dGVzdGF0aW9uLCBub3QgYSByZWFsIGtleSBzdG9yZSBjaGFpbg==",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 4,
+            "maker_nonce_hex": "235ffdc69fba21d89762b015fb788ad71aef08ee5d511f5b11ab4fa229c6cb3a",
+            "claimer_nonce_hex": "ff9a53bb5c3fe8d42b97593ac1993855f18c78bd187d4afaec3f66e007020704"
+          },
+          "signs": {
+            "install": "claimer_install"
+          },
+          "kex_hash_hex": "c24276a60d4df2990dbc7fc2069b8f0ef9b9dace17b06d858d11747cd81442b5",
+          "transcript_hash_hex": "6610809ce9830a34caa3f833602ff014352caae045c378a3e049b61bf7cb50c4",
+          "sends": {
+            "share_hex": "04e8275e45d560e18dc990cbae1e2fb9d07f7ae8cbbc83e09947fd263cc5e8d90062d33384e2af1226be4b74bda7f6279cca1b0d4937935a38fd8c870342bc1ba5",
+            "key_confirmation_hex": "3645a0f9101cd3a4377fb1aa165d3b15d22eea82bac43c03451f1e180766ea83",
+            "confirmation_hex": "564e591dd50ad4c31ce91858c8eef305bceb1ed08279660398171703c853f76a",
+            "install_signature_p1363": "07woXZPNlhm4oVCroy5g93o7UpaXZylEAN98By8KXrVq0b0W5zmr7nUy+ZY+cGe64moW9f/lrgDjMEV7LK9GDw=="
+          },
+          "receives": {
+            "share_hex": "0445cf8459304a11afe6e4c02cb019ccc3f7939a1a6f0f07b2ec4f70ebb414bb7455ebf2775dd41cf59e9a9c84e165c326b91c52bfe77ccdfa61bad54756225b8c",
+            "key_confirmation_hex": "a2e5e58e1fa17b171ae4caf47ad4a02d0fde01644778d28dac6cad952953c405",
+            "confirmation_hex": "79a712d96cfeaf0b6407981b23cbdaed5f564cec91c1ee3659e100015e7c0eb9",
+            "install_signature_p1363": "J2wbBdrB4OmBEhVTQRQjnvmClQUgScLRr0D6Y0qvvjgAwNPlETaTSo6SpEQkpq8yAhDRvdOEd2IwqILO0AXLuA==",
+            "approver_signature_p1363": "GZ4Unjdzh10ePkycgOfo/HEkNz/6RGaC4ME65pJBx08+SfKT03rcq608e0BjV1UowGOxhrHhmDS20rZRtEjahw=="
+          },
+          "expect": "accepted"
+        }
+      },
+      {
+        "name": "wrong_secret",
+        "proves": "The claimer holds another enrolment secret: the RFC confirmation fails on both sides, and that costs one of the code's five tries",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "93dc72b1e41f97fe0d175a196a0aff03327f4baa171bf22f64445540e77a7e5a",
+          "transcript_hash_hex": "cdc80b74c39753bdf9a1d4d8d1c8ce1abe68c45e2c07bd5e6e5a1f77762cbe8d",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "9d838d7b6864f40f6cba1ba215b9ce525d8d2fadc203648aa29849cba01664b3",
+            "confirmation_hex": "6acf9c93175e997d4a9958692d1ee8af7c1feca04700cf632c95bde568667b2d",
+            "install_signature_p1363": "x2n4GyaMByIoOKpVil4H5lEbfqjV+y80oGprQVTbSxtSrgTSXs+2i5890uaPNQina1h9Qcmzi4hYZrKprIKZHA=="
+          },
+          "receives": {
+            "share_hex": "042e84e07295106ef77db4df5d75e7ad68afcc8fb028ef9abae7bbb51893b64176f004fc07658619ae36690ede77ddf880bb84ae688c99eed5257d4b53fde20683",
+            "key_confirmation_hex": "78ce9ba69258a5a60b83ffeb8e044c5b40e5548c3f89efd68d8803dd845b747b",
+            "confirmation_hex": "8ab3ca2ae7d09da9db569df70abd4c6acdde88c2b24e9667eb10b4376d8bc2fa",
+            "install_signature_p1363": "JUf3obCiCBx1Y+toz1ZorcV4OT8wyVw3xR33DK+pcJ5HMumX62X2j4AS88t/UQKRtiE8OIGHEQ3keptwNcSrWA==",
+            "approver_signature_p1363": "uhs4bZ1ayWKT/eIh1+wFa+Lsh5slL+4KA2MGxNkt+XrkMiGN8xbUOnlpH2/m4rssmlY3WTL8LGjwsVfx0IJX9Q=="
+          },
+          "expect": "key_confirmation_failed"
+        },
+        "claimer": {
+          "es": "Nl-40SHTO_5YYypOAEQt4A",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "93dc72b1e41f97fe0d175a196a0aff03327f4baa171bf22f64445540e77a7e5a",
+          "transcript_hash_hex": "cdc80b74c39753bdf9a1d4d8d1c8ce1abe68c45e2c07bd5e6e5a1f77762cbe8d",
+          "sends": {
+            "share_hex": "042e84e07295106ef77db4df5d75e7ad68afcc8fb028ef9abae7bbb51893b64176f004fc07658619ae36690ede77ddf880bb84ae688c99eed5257d4b53fde20683",
+            "key_confirmation_hex": "78ce9ba69258a5a60b83ffeb8e044c5b40e5548c3f89efd68d8803dd845b747b",
+            "confirmation_hex": "8ab3ca2ae7d09da9db569df70abd4c6acdde88c2b24e9667eb10b4376d8bc2fa",
+            "install_signature_p1363": "JUf3obCiCBx1Y+toz1ZorcV4OT8wyVw3xR33DK+pcJ5HMumX62X2j4AS88t/UQKRtiE8OIGHEQ3keptwNcSrWA==",
+            "approver_signature_p1363": "uhs4bZ1ayWKT/eIh1+wFa+Lsh5slL+4KA2MGxNkt+XrkMiGN8xbUOnlpH2/m4rssmlY3WTL8LGjwsVfx0IJX9Q=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "9d838d7b6864f40f6cba1ba215b9ce525d8d2fadc203648aa29849cba01664b3",
+            "confirmation_hex": "6acf9c93175e997d4a9958692d1ee8af7c1feca04700cf632c95bde568667b2d",
+            "install_signature_p1363": "x2n4GyaMByIoOKpVil4H5lEbfqjV+y80oGprQVTbSxtSrgTSXs+2i5890uaPNQina1h9Qcmzi4hYZrKprIKZHA=="
+          },
+          "expect": "key_confirmation_failed"
+        }
+      },
+      {
+        "name": "wrong_target_name",
+        "proves": "The claimer was given another registered name for the target: w differs, so the RFC confirmation fails",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "2d466ab04cb4363d7a5d1cb19a8bf21a8bb5e3be22363136f162198ad4adbed2",
+          "transcript_hash_hex": "598a8aba994c1d7f41079fa8c639cf8fa7ec04dfc4e7b46f8c4409c15020b9e7",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "846a890f9b9d194362e83e7c07ff2cf7b4135492559268faa3b72436659f3587",
+            "confirmation_hex": "ffe103c291023ef3d074470c00405e71536d5430f558f5757b2b8c6850fed2a2",
+            "install_signature_p1363": "iFAb8ceTheVI41RJ+zNVSDHX6uBVGWELbn8FmqKhumIAMm/BN/oamgU8iGUnvT9l3cWH/T8aRKQOe+1YIHErgA=="
+          },
+          "receives": {
+            "share_hex": "04a30a04327c1eb0d082f27d28b2e3950c1e142fe61a095bee5556e581bdf91b8aebf1d40dab28c3e3503ba52fe2a69cd13813e2a91b7abd2d15d8e21159b90d38",
+            "key_confirmation_hex": "7ee01a093853664b86368bebd8c199a66c400bd80d4b565d4837bda3cc64eb38",
+            "confirmation_hex": "4b8b5a44c5749ec84e21d627be86d00b301c2806500e23dbb88bc2083f53cd25",
+            "install_signature_p1363": "29Gl+b1AjU5FuCN6aTVnAJc/+hXG/Y0u+zyo/o+BL9Qrm04Z3wQM7N7JPZFs2b5h+veG7LH0gNQPKs/V58Tq+w==",
+            "approver_signature_p1363": "BAAFH0kqw0xc3TwJjxbWR9QunxixJxuqRe4RsfHKdAfT2eVNzIFGY5YXRxFAGJ3rjk7Q6lOLeVbMhPcLlZebbw=="
+          },
+          "expect": "key_confirmation_failed"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "office-phone",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "2d466ab04cb4363d7a5d1cb19a8bf21a8bb5e3be22363136f162198ad4adbed2",
+          "transcript_hash_hex": "598a8aba994c1d7f41079fa8c639cf8fa7ec04dfc4e7b46f8c4409c15020b9e7",
+          "sends": {
+            "share_hex": "04a30a04327c1eb0d082f27d28b2e3950c1e142fe61a095bee5556e581bdf91b8aebf1d40dab28c3e3503ba52fe2a69cd13813e2a91b7abd2d15d8e21159b90d38",
+            "key_confirmation_hex": "7ee01a093853664b86368bebd8c199a66c400bd80d4b565d4837bda3cc64eb38",
+            "confirmation_hex": "4b8b5a44c5749ec84e21d627be86d00b301c2806500e23dbb88bc2083f53cd25",
+            "install_signature_p1363": "29Gl+b1AjU5FuCN6aTVnAJc/+hXG/Y0u+zyo/o+BL9Qrm04Z3wQM7N7JPZFs2b5h+veG7LH0gNQPKs/V58Tq+w==",
+            "approver_signature_p1363": "BAAFH0kqw0xc3TwJjxbWR9QunxixJxuqRe4RsfHKdAfT2eVNzIFGY5YXRxFAGJ3rjk7Q6lOLeVbMhPcLlZebbw=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "846a890f9b9d194362e83e7c07ff2cf7b4135492559268faa3b72436659f3587",
+            "confirmation_hex": "ffe103c291023ef3d074470c00405e71536d5430f558f5757b2b8c6850fed2a2",
+            "install_signature_p1363": "iFAb8ceTheVI41RJ+zNVSDHX6uBVGWELbn8FmqKhumIAMm/BN/oamgU8iGUnvT9l3cWH/T8aRKQOe+1YIHErgA=="
+          },
+          "expect": "key_confirmation_failed"
+        }
+      },
+      {
+        "name": "relay_swaps_claimer_install_key",
+        "proves": "The maker was handed another install key for the claimer, under the claimer's id: the id is not that key's, and the claimer's proofs are over a transcript the maker does not hold",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "stranger_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "d70a4f5445f13eb9636e48c513b57d0bcd818a47c5586f89deb9ddd1a8717168",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "bb1d01d5bd64eebf56252849eb07de9cc57e4bd486e5735430a55faf459b8a0e",
+            "install_signature_p1363": "p/Y/pkkraJXcKFbUQ3ftLYpueyXk/gjJZiZgiIw4/QBFg/aA+dotXcwCpWUvHh+37wCh+v0Dwpm1CkRqd/ytYQ=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "vEygtGTJL4WM4C3FZtvQc8wfdTQet84IVl1Avv8X4uT97FyVtJT8OeupNwAWC6eXUx7joerEekjC49LUG9/dAA==",
+            "approver_signature_p1363": "HH5aFqREa8uf3HL86mIlQiw4T8XI9o0CB3SEx8R69I5NQM3YD0mbXVVj9EgmZ+C/TZvOyRAgqKI74JAiDsCRYQ=="
+          },
+          "expect": "install_id_mismatch"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "vEygtGTJL4WM4C3FZtvQc8wfdTQet84IVl1Avv8X4uT97FyVtJT8OeupNwAWC6eXUx7joerEekjC49LUG9/dAA==",
+            "approver_signature_p1363": "HH5aFqREa8uf3HL86mIlQiw4T8XI9o0CB3SEx8R69I5NQM3YD0mbXVVj9EgmZ+C/TZvOyRAgqKI74JAiDsCRYQ=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "bb1d01d5bd64eebf56252849eb07de9cc57e4bd486e5735430a55faf459b8a0e",
+            "install_signature_p1363": "p/Y/pkkraJXcKFbUQ3ftLYpueyXk/gjJZiZgiIw4/QBFg/aA+dotXcwCpWUvHh+37wCh+v0Dwpm1CkRqd/ytYQ=="
+          },
+          "expect": "bad_confirmation"
+        }
+      },
+      {
+        "name": "relay_swaps_maker_install_key",
+        "proves": "The claimer was handed another install key for the maker, under the maker's id",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "NCOMqfCmUJOmLwPgAfOfihhZJAzccDnUmBl4BopnUnIl+tqD4ODtFn+TxZ280B1ME8zJhddAWkrCoVJEe2RFNg=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3c21bbf4a6a78904daa9d04d7f77e54f9551289cd75567da0c7bc9b56d0e6bed",
+            "install_signature_p1363": "Ht0zQI9l4V0zDt1xfA/6MfDq35MznK9QKBdNmHculKf7WtwhqdvwXQvjaN/lZfmtel0gv7aaAqU5w0Rg+PKYAQ==",
+            "approver_signature_p1363": "NESkewLb4qOicL6YfEfLIMR70OVl0sAFzhSKIBRHqqJkbQS8A1yVdA3HcxmuyFeI4n7w88AnZ9sxldrOqFxinA=="
+          },
+          "expect": "bad_confirmation"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "stranger_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "2c1f230d1653dda733f2030a363f72cf0e01db3b0bd764827d0c12e216328841",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3c21bbf4a6a78904daa9d04d7f77e54f9551289cd75567da0c7bc9b56d0e6bed",
+            "install_signature_p1363": "Ht0zQI9l4V0zDt1xfA/6MfDq35MznK9QKBdNmHculKf7WtwhqdvwXQvjaN/lZfmtel0gv7aaAqU5w0Rg+PKYAQ==",
+            "approver_signature_p1363": "NESkewLb4qOicL6YfEfLIMR70OVl0sAFzhSKIBRHqqJkbQS8A1yVdA3HcxmuyFeI4n7w88AnZ9sxldrOqFxinA=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "NCOMqfCmUJOmLwPgAfOfihhZJAzccDnUmBl4BopnUnIl+tqD4ODtFn+TxZ280B1ME8zJhddAWkrCoVJEe2RFNg=="
+          },
+          "expect": "install_id_mismatch"
+        }
+      },
+      {
+        "name": "relay_swaps_install_key_and_id",
+        "proves": "The maker was handed another install key and its matching id for the claimer: the SPAKE2 identities differ, so the keys do",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_gruvnsnukvlsigt34jj6v4hx",
+            "claimer_install_key": "stranger_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "fd35dd2ed0c02349cf07ffcfbbcfa8bad65bee7590d92d4bc25ef1a8bb272e63",
+          "transcript_hash_hex": "4730566c8268d70cc31369b0181934cbb384328636d9dcd5b5abf62d4f2543bc",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "16da17d616f62cdf2c5175c1e23b857047710c33be57b4919fa10fac1a0a97b8",
+            "confirmation_hex": "49fc5c03c841fbbaebaaa9825ac55aa396ddae4c26cb636b23a86817e43965e6",
+            "install_signature_p1363": "R6GpqL7AZqROj2ia42CeTRM5Q0gb+Soa6d818g2uNugnFQwLToCXHHAiNCa4luSOmxBipbobwYlOEA8vPJSUSw=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "Xn9jwkQbruhhHtyUi05cxFsS2uphcVAHk0JYYInaD3gdnbDOpwqzw55xJE6ajONNowm4+9bLv4hYhUugYmhiDQ==",
+            "approver_signature_p1363": "c+HBEobGE6+BqPhvn1qoVrawrOi77T2jIlU+19SWUrCNl0JT3vLcU3uVY0b9lDb4DVkTaabfwsxwcD3km8PA7Q=="
+          },
+          "expect": "key_confirmation_failed"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "Xn9jwkQbruhhHtyUi05cxFsS2uphcVAHk0JYYInaD3gdnbDOpwqzw55xJE6ajONNowm4+9bLv4hYhUugYmhiDQ==",
+            "approver_signature_p1363": "c+HBEobGE6+BqPhvn1qoVrawrOi77T2jIlU+19SWUrCNl0JT3vLcU3uVY0b9lDb4DVkTaabfwsxwcD3km8PA7Q=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "16da17d616f62cdf2c5175c1e23b857047710c33be57b4919fa10fac1a0a97b8",
+            "confirmation_hex": "49fc5c03c841fbbaebaaa9825ac55aa396ddae4c26cb636b23a86817e43965e6",
+            "install_signature_p1363": "R6GpqL7AZqROj2ia42CeTRM5Q0gb+Soa6d818g2uNugnFQwLToCXHHAiNCa4luSOmxBipbobwYlOEA8vPJSUSw=="
+          },
+          "expect": "key_confirmation_failed"
+        }
+      },
+      {
+        "name": "relay_swaps_approver_key",
+        "proves": "The maker was handed another approver key: the transcripts differ and nothing is stored",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "stranger_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "37e83fc1bb6177078e594746e017e8d4edd88749dc9ae34e1adf94ca370d6571",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "ca61b3c66011781b6ed25e83f5e3f49df091cd93fa98ff0382759472a11915ea",
+            "install_signature_p1363": "5nl2XmNRIhukOwWv4L5OUUnbDvKK5QkFpuxHxBTqUl8QDcTjPTL7KjyGeRZIc5Z90CH/H1j9+vns4C+dj6syXw=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "7OWlwTmTKHGj+ZZqh5zHFflfw0T79BX9H2VqUnIaBx3LQl1KShEWoj1ID5hkhH8kMx/xg2LagegdFGJ6V1HPEQ==",
+            "approver_signature_p1363": "BiU0Ftw4rv1tlaSz0pepz8dgftdF3oWmp/r/V3D4M09AQRx8p2kiWtYpFP3ys9FpphAZR/8cL63DEF9GVPQkRQ=="
+          },
+          "expect": "bad_confirmation"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "7OWlwTmTKHGj+ZZqh5zHFflfw0T79BX9H2VqUnIaBx3LQl1KShEWoj1ID5hkhH8kMx/xg2LagegdFGJ6V1HPEQ==",
+            "approver_signature_p1363": "BiU0Ftw4rv1tlaSz0pepz8dgftdF3oWmp/r/V3D4M09AQRx8p2kiWtYpFP3ys9FpphAZR/8cL63DEF9GVPQkRQ=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "ca61b3c66011781b6ed25e83f5e3f49df091cd93fa98ff0382759472a11915ea",
+            "install_signature_p1363": "5nl2XmNRIhukOwWv4L5OUUnbDvKK5QkFpuxHxBTqUl8QDcTjPTL7KjyGeRZIc5Z90CH/H1j9+vns4C+dj6syXw=="
+          },
+          "expect": "bad_confirmation"
+        }
+      },
+      {
+        "name": "relay_swaps_sealing_key",
+        "proves": "The maker was handed another sealing key for the approver",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "stranger_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "b17a58db365fa31cb6a95bc23f6d9d3f5194238791d2c0e037894f953bfa0580",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "259bb4fd83dc44e133ef57ef3046933d501d0d6d670c75220c9dc70d4ea7f540",
+            "install_signature_p1363": "0b1WxrBJQj+ZbPpBWVVlV4d5VIPNM7XM5MmUlMacYhIpywLjkCEAYTZX2lYvGI/1wACNAlFZytNSEJ1LfSyUOQ=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "KKS2DIdNoi29LPQovg9KtlEmL+VKJUMBBvWL+FAbN+xo1D2H8sPQYj+Sogu9WFmB6+gUL/MMQRLy9PlYVm6aZg==",
+            "approver_signature_p1363": "S7b7LUHH8/9mh35mFIc04AhthsQbhkUVpT3F7jClNSejXKfhU+XWKp/O4EypGL9R5Subvjt6Vug544Ux0UtEGw=="
+          },
+          "expect": "bad_confirmation"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "KKS2DIdNoi29LPQovg9KtlEmL+VKJUMBBvWL+FAbN+xo1D2H8sPQYj+Sogu9WFmB6+gUL/MMQRLy9PlYVm6aZg==",
+            "approver_signature_p1363": "S7b7LUHH8/9mh35mFIc04AhthsQbhkUVpT3F7jClNSejXKfhU+XWKp/O4EypGL9R5Subvjt6Vug544Ux0UtEGw=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "259bb4fd83dc44e133ef57ef3046933d501d0d6d670c75220c9dc70d4ea7f540",
+            "install_signature_p1363": "0b1WxrBJQj+ZbPpBWVVlV4d5VIPNM7XM5MmUlMacYhIpywLjkCEAYTZX2lYvGI/1wACNAlFZytNSEJ1LfSyUOQ=="
+          },
+          "expect": "bad_confirmation"
+        }
+      },
+      {
+        "name": "relay_swaps_message_key",
+        "proves": "The claimer was handed another message key for the maker",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "o703Gw+RWPW2BK91+KITWZJQxL07fniy5cV1SIRTdkUZeRSqcAZJjFa/l/kvTNB8foBdsr8Es99o9QS+/O9bRg=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "06771681abae7d608678dc7563c48fa7fdc8ddfe154a993663d635213dc73fac",
+            "install_signature_p1363": "9mqUE3RjvW2mfC6ZAywHqj+//BZzF5tMhqJUkQwYWXlKYSzHrN2wV6favoXQC+Eam4JMG86U7TR3U7hRQ/jxig==",
+            "approver_signature_p1363": "ubIOy6ZBZldxwbD5QcalDX87XNPzWdXUjv6pDCWh8F2c79qNDw0t3XaO+0lJevr9U+Vyc1lLLlC4+NrX7tedDg=="
+          },
+          "expect": "bad_confirmation"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "stranger_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "43a80e0666e9715c46e1a1ef95737848aee6877ca2702d41780842dd60fe0c6c",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "06771681abae7d608678dc7563c48fa7fdc8ddfe154a993663d635213dc73fac",
+            "install_signature_p1363": "9mqUE3RjvW2mfC6ZAywHqj+//BZzF5tMhqJUkQwYWXlKYSzHrN2wV6favoXQC+Eam4JMG86U7TR3U7hRQ/jxig==",
+            "approver_signature_p1363": "ubIOy6ZBZldxwbD5QcalDX87XNPzWdXUjv6pDCWh8F2c79qNDw0t3XaO+0lJevr9U+Vyc1lLLlC4+NrX7tedDg=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "o703Gw+RWPW2BK91+KITWZJQxL07fniy5cV1SIRTdkUZeRSqcAZJjFa/l/kvTNB8foBdsr8Es99o9QS+/O9bRg=="
+          },
+          "expect": "bad_confirmation"
+        }
+      },
+      {
+        "name": "sides_disagree_on_approver",
+        "proves": "Each side believes it is the approver and names its own approver key",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "maker",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install",
+            "approver": "maker_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "6aacaa6f39e140346a224d9edbf18d464912c5c35244a5c6d8020c404849dde1",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "766c2934deb78376b901c9b7adc7a13997d98ac96eaf779d90a34352b8284f8e",
+            "install_signature_p1363": "U/XdWH035ELpUXu/Xt/9fokFM/of8inmPsxiT23fygN96d9toQCQMIpP8fxJqLZrKhOhT3NXljCoqTN9w35NqQ==",
+            "approver_signature_p1363": "avtY03wnY6ode8NWp+fOdzeoxhvSWOaJ+TJ/8fNOm8Z2DnA73glFwSvvS9B5RPlV9wXs3q/1ZWN6Ov8CfvaeaA=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "0RCVIKbjFYhr3l3ZLKyV7hnlkjCjU7YUF1SW5/ETd1SKs8s60Oq20h0/sr8rthQ1rdtFBPYxPrP/JGH5Z82FGA==",
+            "approver_signature_p1363": "7ceQQczQQ1BHexFYIBMx0DyTuPk/ej89yT+oZ0tW25qNBycgeAgje9VikdGC7FFQWhQKWsDmPJlzX63gElNEBw=="
+          },
+          "expect": "bad_confirmation"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "0RCVIKbjFYhr3l3ZLKyV7hnlkjCjU7YUF1SW5/ETd1SKs8s60Oq20h0/sr8rthQ1rdtFBPYxPrP/JGH5Z82FGA==",
+            "approver_signature_p1363": "7ceQQczQQ1BHexFYIBMx0DyTuPk/ej89yT+oZ0tW25qNBycgeAgje9VikdGC7FFQWhQKWsDmPJlzX63gElNEBw=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "766c2934deb78376b901c9b7adc7a13997d98ac96eaf779d90a34352b8284f8e",
+            "install_signature_p1363": "U/XdWH035ELpUXu/Xt/9fokFM/of8inmPsxiT23fygN96d9toQCQMIpP8fxJqLZrKhOhT3NXljCoqTN9w35NqQ==",
+            "approver_signature_p1363": "avtY03wnY6ode8NWp+fOdzeoxhvSWOaJ+TJ/8fNOm8Z2DnA73glFwSvvS9B5RPlV9wXs3q/1ZWN6Ov8CfvaeaA=="
+          },
+          "expect": "bad_confirmation"
+        }
+      },
+      {
+        "name": "generations_disagree",
+        "proves": "The claimer was told an older authority generation",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 1,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "20e903495e5b90933ba027ff6726cc97abd372898c9578eb9188b319b4184845",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "26961f24007abcf4a61638739765884c3f35d64973b7e235e3384b90f73f2ea3",
+            "install_signature_p1363": "k2rq7gfYhyRenjw/K6p9Q4KdsUq8IuH6HKu71K7Dd9EjKP3/QSzbvDWXOb9TE73p5YfBcsfIRnAFKk1t3bsqYA=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "JnfpJ2ss9c4GyoVP9K24T8I/BpeK00iw8h/zZC4YQ/UMgNwHpa04kHeX+bkEHCrqumfw1k1tlzcr9YRyDbqoIg==",
+            "approver_signature_p1363": "cmQSbuqt5V2T3w+aEEw73BwVaDvq7UtNFoU0xzuBd6tSL4Z6pMMQHPrum7apxOQXb4s5zlxu7mol54OakbLG+g=="
+          },
+          "expect": "bad_confirmation"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "JnfpJ2ss9c4GyoVP9K24T8I/BpeK00iw8h/zZC4YQ/UMgNwHpa04kHeX+bkEHCrqumfw1k1tlzcr9YRyDbqoIg==",
+            "approver_signature_p1363": "cmQSbuqt5V2T3w+aEEw73BwVaDvq7UtNFoU0xzuBd6tSL4Z6pMMQHPrum7apxOQXb4s5zlxu7mol54OakbLG+g=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "26961f24007abcf4a61638739765884c3f35d64973b7e235e3384b90f73f2ea3",
+            "install_signature_p1363": "k2rq7gfYhyRenjw/K6p9Q4KdsUq8IuH6HKu71K7Dd9EjKP3/QSzbvDWXOb9TE73p5YfBcsfIRnAFKk1t3bsqYA=="
+          },
+          "expect": "bad_confirmation"
+        }
+      },
+      {
+        "name": "replayed_run",
+        "proves": "Everything the maker sent in ok_claimer_approver, replayed to a claimer in a new run with the same secret: the claimer's share is fresh, so the old RFC confirmation is for another key",
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "cf8dc014bf80fe34b65695324e57a757696ab3c84289ca478d97c01d07d42e7a",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "efb28fdaf3a5f410c269e172ea055fbbf6a4afad6cb3cc3d729539fd26764fae"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "3c0f57373a1cb74b3d2b342811e79fb4164cea3d0cef4014f02652fbada92845",
+          "transcript_hash_hex": "24191a70f6b625a785533b2150024978063a502191a8b15a41dabbd176742f4a",
+          "sends": {
+            "share_hex": "04b50a7184108f99b9f50f7b02eee9fc05832883a1c533f1604ec920478c913e2feca21bf965a4b02a074b422c9ce3be087427504c53e02f50397abcb1e3011cda",
+            "key_confirmation_hex": "9802ac490069ee5e7a56123d7ded5e098d890282d48ecf6d8d5bee9bcd896de0",
+            "confirmation_hex": "17ff0c14aecf9e0771bc22a5859d43c6667588ce10e0c047960650e724641b76",
+            "install_signature_p1363": "oXndRDm31Rw2aLdLe27xhaQ31pI2S2XpzpU5kFjhSQ9naw8fA+DcJN5yiH/KHTuncHVt+AT7lb5m8HYX0Xwt3w==",
+            "approver_signature_p1363": "+ERTnTTCbCxTkkMTg3YTh6S6SqZvBUx35WrzL9ttPe7oC6NXIJX3j7gYIWcRl0/CTFThNqRaAYGVnN3DGIhPgQ=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "KFI2Vf47bnLZEZDdsJbVVeGuoq1bLEy1ob0TzJjNO9dCJK/l4cT3oNGp30ZhDdMII3CLX2EzzIKKc02Q3Q7hVg=="
+          },
+          "expect": "key_confirmation_failed"
+        }
+      },
+      {
+        "name": "replayed_proofs",
+        "proves": "The same key exchange as ok_claimer_approver, but the claimer's random value is fresh: the maker's earlier proofs are for the earlier transcript",
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "efb28fdaf3a5f410c269e172ea055fbbf6a4afad6cb3cc3d729539fd26764fae"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "8a7f829ffaf7975cab4b1a5c4553636851467fb0a22958b280a3142bc7b0583c",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "acc7c588b819f656baf68c45dbec532b367a79af216ba8eb2c7bc0680977d96a",
+            "install_signature_p1363": "P9cokra7KFFmcB7ZxO+muEnIoSQbwKrQ1ek5xpN8o8/2pV9DCbXQNlPCIKIYQf6dF5IuBHbfu7k8+A2h1fYMYA==",
+            "approver_signature_p1363": "+qhRdq0vlJn4rHnhigRoK1ASurzSj3r+A7JR4TgFv0m9B+ktT3I0WW2L9T0+45f1QrbpW/CfOPCmDJnnppy/Pg=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "KFI2Vf47bnLZEZDdsJbVVeGuoq1bLEy1ob0TzJjNO9dCJK/l4cT3oNGp30ZhDdMII3CLX2EzzIKKc02Q3Q7hVg=="
+          },
+          "expect": "bad_confirmation"
+        }
+      },
+      {
+        "name": "install_key_not_held",
+        "proves": "The claimer names its install key but signs with another: the maker refuses; the claimer cannot tell",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "h/9/nKNO+bQgvPDT81+TIm+rsxyBV6dgp6oywbSnTB6DXF2j8okTkcCdwr+VvNNbHfZr4AZj+5/3wowfqAU2QA=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "I34c+CXMocgGYI07mhhZZGpxS+GDX9ypYFnyGq+YI+ENiyQXq8O3VcMZdx84fgfPRKomleDc4OoHb8dvqOrmdA==",
+            "approver_signature_p1363": "aJxuDakehZGzfIA8W+poaHzgcSEHHmBzK3b9mKFZxXkquyC4wCAqZf1LkvU5RwOVzhFYCOglqz6dxIJ6ESPI5A=="
+          },
+          "expect": "bad_install_signature"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "stranger_install",
+            "approver": "claimer_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "I34c+CXMocgGYI07mhhZZGpxS+GDX9ypYFnyGq+YI+ENiyQXq8O3VcMZdx84fgfPRKomleDc4OoHb8dvqOrmdA==",
+            "approver_signature_p1363": "aJxuDakehZGzfIA8W+poaHzgcSEHHmBzK3b9mKFZxXkquyC4wCAqZf1LkvU5RwOVzhFYCOglqz6dxIJ6ESPI5A=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "h/9/nKNO+bQgvPDT81+TIm+rsxyBV6dgp6oywbSnTB6DXF2j8okTkcCdwr+VvNNbHfZr4AZj+5/3wowfqAU2QA=="
+          },
+          "expect": "accepted"
+        }
+      },
+      {
+        "name": "approver_key_not_held",
+        "proves": "The claimer names an approver key but signs with another",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "Sc6I1bHRzS2MceXZ8Ta5ftVwnhUH0D+Bo6Vn6S+caRromTrh04yREU+h/HJdFHuL7HHd8Yn1fjDlYQNNppLZVQ=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "8OjjAGV3NMZ0r35zIBafbzOPkoosFSrEWWi3tRoxDDTc+tx3F5RP/Rz3MZKRMkGK5L9mgMLSOhNfDRFOib+U4w==",
+            "approver_signature_p1363": "+vzSf6jUUG8OaygrbB+wA7+d/CBqf6JRJUfElzZPkC/HLTM/Mgz84FCD7uI5v3K5QvZuEvBK1jXZphtUA7ctcA=="
+          },
+          "expect": "bad_approver_signature"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "stranger_approver"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "8OjjAGV3NMZ0r35zIBafbzOPkoosFSrEWWi3tRoxDDTc+tx3F5RP/Rz3MZKRMkGK5L9mgMLSOhNfDRFOib+U4w==",
+            "approver_signature_p1363": "+vzSf6jUUG8OaygrbB+wA7+d/CBqf6JRJUfElzZPkC/HLTM/Mgz84FCD7uI5v3K5QvZuEvBK1jXZphtUA7ctcA=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "Sc6I1bHRzS2MceXZ8Ta5ftVwnhUH0D+Bo6Vn6S+caRromTrh04yREU+h/HJdFHuL7HHd8Yn1fjDlYQNNppLZVQ=="
+          },
+          "expect": "accepted"
+        }
+      },
+      {
+        "name": "approver_signature_missing",
+        "proves": "The approver sends no approver-key signature: the owner's check did not happen",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "kIInWV2RT2/zdAL8z+nD16ReOjzEe/VQaT74Tinjt23wB5HCGq2eHoPUn8i5oarQF+vxrS4EcHOdVlIZWTbTlw=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "Z7cu0i/qQfv0e/VeT4ieUkUaKcC/DaP1f3zGjrEaHySoumDUGBaMwnGlM0Itqkoo2mtZixzO+mhTsi/0NW1Aug=="
+          },
+          "expect": "bad_approver_signature"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": null
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "Z7cu0i/qQfv0e/VeT4ieUkUaKcC/DaP1f3zGjrEaHySoumDUGBaMwnGlM0Itqkoo2mtZixzO+mhTsi/0NW1Aug=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "kIInWV2RT2/zdAL8z+nD16ReOjzEe/VQaT74Tinjt23wB5HCGq2eHoPUn8i5oarQF+vxrS4EcHOdVlIZWTbTlw=="
+          },
+          "expect": "accepted"
+        }
+      },
+      {
+        "name": "approver_signature_for_another_purpose",
+        "proves": "The approver key signed the same fields for approver_add: not an enrolment",
+        "maker": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "b8ee6f6d3d4eccaf78e8a90671e91e469a8b5e49ad1a3e4b1dc4072b761e75f2",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "maker_install"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "VLoV9MpKHlwsDxUKyuu3qDlZH8OrrEu8hWesU/9UOphcPZWxKSbfiQxox2AkPvQlJNKYXzvi1cBfMBPVR89cMw=="
+          },
+          "receives": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "atLiCMj+3q2cWXEUqTA/E8v8HFhB3/CRMeN58jo/ouBHY1is7zYU682AnXjdScSLfrNB37mFi7f3k1AYClPAYQ==",
+            "approver_signature_p1363": "NGLbxRkfUoN9bleBYyyV+NZfJ2BueJaATu5f94Ej6Aug95Ot05rHzn9S2wubl/5OR5pXgqd2890gHRwR56ap8A=="
+          },
+          "expect": "bad_approver_signature"
+        },
+        "claimer": {
+          "es": "3BEH8p4cmTyLK2bqx5wkYw",
+          "target_name": "kitchen-tablet",
+          "scalar_hex": "f225714ceb5134079ee2de0ef5d1c05501a2fc9cdf71d78fd29496952a43dd01",
+          "view": {
+            "link_id": "lnk_vector_0001",
+            "maker_install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "maker_install_key": "maker_install",
+            "claimer_install_id": "bgi_oramgkltbe6pe742g73sj7ki",
+            "claimer_install_key": "claimer_install",
+            "approver": "claimer",
+            "approver_key": "claimer_approver",
+            "approver_sealing_key": "claimer_sealing",
+            "approver_attestation_b64": "",
+            "maker_message_key": "maker_message",
+            "claimer_message_key": "claimer_message",
+            "generation": 0,
+            "maker_nonce_hex": "3d58a3ecba4a4f4c061d019e1985629fe4bec86664ed2719e53ff915a20da30e",
+            "claimer_nonce_hex": "ffee91262199b955017d2a78a66c91ece04df0219410a06b7d8681894a683ce2"
+          },
+          "signs": {
+            "install": "claimer_install",
+            "approver": "claimer_approver",
+            "approver_purpose": "approver_add"
+          },
+          "kex_hash_hex": "0e49a10d3726a132067edd8385a0484e38f18b1114cf67ae328d753f8be5dad7",
+          "transcript_hash_hex": "da9f6e9137e3f7b4b1872781f36ec95c7cba9cc3d8300b7f74be2097f58755ae",
+          "sends": {
+            "share_hex": "0480763ed7fc6c186cd8815937f387fc0b549c5e9cc8004281526776ab81e9b6210be2c13a80c6798ee0f2a5b578817f5f428689d84d4e2131af4fd296c72031ca",
+            "key_confirmation_hex": "762a10fa606bead64c98360088b56d43c496e3c2c305fe8e3d0f9973a8ec2899",
+            "confirmation_hex": "3bdeded616fbe08b8282b1508ccfd5f3ea9a2f5346f76cafe933bbead8563db2",
+            "install_signature_p1363": "atLiCMj+3q2cWXEUqTA/E8v8HFhB3/CRMeN58jo/ouBHY1is7zYU682AnXjdScSLfrNB37mFi7f3k1AYClPAYQ==",
+            "approver_signature_p1363": "NGLbxRkfUoN9bleBYyyV+NZfJ2BueJaATu5f94Ej6Aug95Ot05rHzn9S2wubl/5OR5pXgqd2890gHRwR56ap8A=="
+          },
+          "receives": {
+            "share_hex": "043891ed583dbffd15a49c7edd6d8363b239e89155d4e505ef360c8af53aeb05a7da814fe1e33c3102c2868c9678f2322e317613375c1394d7fbbea0fe1525f957",
+            "key_confirmation_hex": "56872caf8decbbbb35381c4a1f7125c23d77765e4736c60fa703ebdee591f5b9",
+            "confirmation_hex": "80215cd7d40db23f507feb0b0bc8b431f8a9ed39405ec4fc739176c3720b1b5c",
+            "install_signature_p1363": "VLoV9MpKHlwsDxUKyuu3qDlZH8OrrEu8hWesU/9UOphcPZWxKSbfiQxox2AkPvQlJNKYXzvi1cBfMBPVR89cMw=="
+          },
+          "expect": "accepted"
+        }
+      }
+    ],
+    "self": {
+      "note": "A device enrolling itself as its own approver (spending authority G10.3 X5): the same sixteen fields, encoded the same way, for one install. link_id and kex_hash are zero bytes long; the install id, the install key, the message key and the one 32-byte random value each stand in both the maker's and the claimer's place; approver is \"self\". There is no key exchange and no confirmation. The install key signs the install proof bytes with side \"self\". The new approver key signs owner-authorization bytes for approver_enrol: target and approver are both the install id, the digest is the transcript hash, the nonce is the random value in lowercase hex and the expiry is 0. A device stores itself as approver only when its own check of both signatures ends accepted; the reasons are a subset of enrol.reasons, in the same order.",
+      "side": "self",
+      "cases": [
+        {
+          "name": "ok",
+          "proves": "The device signs its own transcript with its install key and, after the owner's check, with the new approver key",
+          "view": {
+            "install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "install_key": "maker_install",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "",
+            "message_key": "maker_message",
+            "generation": 0,
+            "nonce_hex": "391c3efb79194c2630fe9898305f085f10a79e65b6a1da930e5a540b5757fa37"
+          },
+          "signs": {
+            "install": "maker_install",
+            "install_side": "self",
+            "approver": "maker_approver",
+            "approver_purpose": "approver_enrol"
+          },
+          "transcript_hex": "00000019627269646769742d617070726f7665722d656e726f6c2d7631000000000000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000005b3059301306072a8648ce3d020106082a8648ce3d030107034200042284183cf52b06481e93a4bc0efecd3874285abd49d6e58674523c0269ca4d496658ae36961d8e842324b5d4d92122936781ded263117f0f05927166b20427bd0000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000005b3059301306072a8648ce3d020106082a8648ce3d030107034200042284183cf52b06481e93a4bc0efecd3874285abd49d6e58674523c0269ca4d496658ae36961d8e842324b5d4d92122936781ded263117f0f05927166b20427bd0000000473656c660000005b3059301306072a8648ce3d020106082a8648ce3d03010703420004916ec4d50183e6a8ca6f0f213c68a837f32fd1f910b73fc5f7190969216eb2dc656e92da647ec8998202c8f15363bc6acb5b9852c5d8884fd5b950bdf6d27db5000000410487f5106950d56f6d4cdb3713cd508602c4b8379b8961b87de73185432e410f31bcb5059f92a607e34d8dc730ce33e8f491a81195177c9473420b3bb0aa7e79f8000000000000004104a27301b9512e9a20aeeba0e2a4405111cf78f92d271c4840a17ba0caf44c10eb4f46fd9e11b8e72f73143c632b650da60d1714f80766ee3abdd2d3b9e42f7dc00000004104a27301b9512e9a20aeeba0e2a4405111cf78f92d271c4840a17ba0caf44c10eb4f46fd9e11b8e72f73143c632b650da60d1714f80766ee3abdd2d3b9e42f7dc00000000000000008000000000000000000000020391c3efb79194c2630fe9898305f085f10a79e65b6a1da930e5a540b5757fa3700000020391c3efb79194c2630fe9898305f085f10a79e65b6a1da930e5a540b5757fa37",
+          "transcript_hash_hex": "6d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "install_proof_hex": "0000001f627269646769742d617070726f7665722d656e726f6c2d76312070726f6f660000000473656c66000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "approver_proof_hex": "00000015627269646769742d6f776e65722d617574682d76310000000e617070726f7665725f656e726f6c00000007617070726f76650000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000001c6267695f3762333374367a77736f34327a716a3232763769696a796f000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f00000004033393163336566623739313934633236333066653938393833303566303835663130613739653635623661316461393330653561353430623537353766613337000000080000000000000000000000080000000000000000",
+          "install_signature_p1363": "Azmm2tjrSxME+I5PP31iPZKo9yQygfQqUmvRIg9+9072CkbwFyE7GscUpTzZ/gx4Yd3UUk516J4BbHC2FrgVJA==",
+          "approver_signature_p1363": "yEbsoc3fr6cvgrtuuqyhR7ZuD8nwFp4H0wDKQOl0cBaacZDevlbAobnQ8M7U1qAq291OX4JYnjS/+PO4ynDNZQ==",
+          "expect": "accepted"
+        },
+        {
+          "name": "ok_attested_later_generation",
+          "proves": "With an attestation and a later authority generation (an enrolment after a recovery)",
+          "view": {
+            "install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "install_key": "maker_install",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "c3ludGhldGljIGF0dGVzdGF0aW9uLCBub3QgYSByZWFsIGtleSBzdG9yZSBjaGFpbg==",
+            "message_key": "maker_message",
+            "generation": 7,
+            "nonce_hex": "1a2f38fc81039afd7aef47fefd42fd8b3f36ef8366863f17fb6a75c681f5f2f9"
+          },
+          "signs": {
+            "install": "maker_install",
+            "install_side": "self",
+            "approver": "maker_approver",
+            "approver_purpose": "approver_enrol"
+          },
+          "transcript_hex": "00000019627269646769742d617070726f7665722d656e726f6c2d7631000000000000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000005b3059301306072a8648ce3d020106082a8648ce3d030107034200042284183cf52b06481e93a4bc0efecd3874285abd49d6e58674523c0269ca4d496658ae36961d8e842324b5d4d92122936781ded263117f0f05927166b20427bd0000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000005b3059301306072a8648ce3d020106082a8648ce3d030107034200042284183cf52b06481e93a4bc0efecd3874285abd49d6e58674523c0269ca4d496658ae36961d8e842324b5d4d92122936781ded263117f0f05927166b20427bd0000000473656c660000005b3059301306072a8648ce3d020106082a8648ce3d03010703420004916ec4d50183e6a8ca6f0f213c68a837f32fd1f910b73fc5f7190969216eb2dc656e92da647ec8998202c8f15363bc6acb5b9852c5d8884fd5b950bdf6d27db5000000410487f5106950d56f6d4cdb3713cd508602c4b8379b8961b87de73185432e410f31bcb5059f92a607e34d8dc730ce33e8f491a81195177c9473420b3bb0aa7e79f80000003173796e746865746963206174746573746174696f6e2c206e6f742061207265616c206b65792073746f726520636861696e0000004104a27301b9512e9a20aeeba0e2a4405111cf78f92d271c4840a17ba0caf44c10eb4f46fd9e11b8e72f73143c632b650da60d1714f80766ee3abdd2d3b9e42f7dc00000004104a27301b9512e9a20aeeba0e2a4405111cf78f92d271c4840a17ba0caf44c10eb4f46fd9e11b8e72f73143c632b650da60d1714f80766ee3abdd2d3b9e42f7dc000000000000000080000000000000007000000201a2f38fc81039afd7aef47fefd42fd8b3f36ef8366863f17fb6a75c681f5f2f9000000201a2f38fc81039afd7aef47fefd42fd8b3f36ef8366863f17fb6a75c681f5f2f9",
+          "transcript_hash_hex": "72a9aecc85c02e0de0e631961f73bd3a8a7fcb866f76645f10a30832fb0404b8",
+          "install_proof_hex": "0000001f627269646769742d617070726f7665722d656e726f6c2d76312070726f6f660000000473656c660000002072a9aecc85c02e0de0e631961f73bd3a8a7fcb866f76645f10a30832fb0404b8",
+          "approver_proof_hex": "00000015627269646769742d6f776e65722d617574682d76310000000e617070726f7665725f656e726f6c00000007617070726f76650000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000002072a9aecc85c02e0de0e631961f73bd3a8a7fcb866f76645f10a30832fb0404b80000004031613266333866633831303339616664376165663437666566643432666438623366333665663833363638363366313766623661373563363831663566326639000000080000000000000007000000080000000000000000",
+          "install_signature_p1363": "jj/yQjSgV+Yhv6qo7YlhQH4jSZj5USw+uaj7Ks+67A/sTlEERVd4dZ8BQ/DGhg2rVxyOtMv1i4YwEMcTSFqjXQ==",
+          "approver_signature_p1363": "85bYZFUUzs1DWTzX/o/rLMtV2fROsw+JerPdoJzoi1Lt3QewGM9MOCpBto9hY8t3hXA5OzXkHkQPBs+7Q0erUg==",
+          "expect": "accepted"
+        },
+        {
+          "name": "install_id_of_another_key",
+          "proves": "The install id is not the install key's",
+          "view": {
+            "install_id": "bgi_gruvnsnukvlsigt34jj6v4hx",
+            "install_key": "maker_install",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "",
+            "message_key": "maker_message",
+            "generation": 0,
+            "nonce_hex": "391c3efb79194c2630fe9898305f085f10a79e65b6a1da930e5a540b5757fa37"
+          },
+          "signs": {
+            "install": "maker_install",
+            "install_side": "self",
+            "approver": "maker_approver",
+            "approver_purpose": "approver_enrol"
+          },
+          "transcript_hash_hex": "d497f9d408998e419522ee584aa2e9c8aef110e8baaa0f66008f2769c10f8089",
+          "install_proof_hex": "0000001f627269646769742d617070726f7665722d656e726f6c2d76312070726f6f660000000473656c6600000020d497f9d408998e419522ee584aa2e9c8aef110e8baaa0f66008f2769c10f8089",
+          "approver_proof_hex": "00000015627269646769742d6f776e65722d617574682d76310000000e617070726f7665725f656e726f6c00000007617070726f76650000001c6267695f677275766e736e756b766c7369677433346a6a36763468780000001c6267695f677275766e736e756b766c7369677433346a6a367634687800000020d497f9d408998e419522ee584aa2e9c8aef110e8baaa0f66008f2769c10f80890000004033393163336566623739313934633236333066653938393833303566303835663130613739653635623661316461393330653561353430623537353766613337000000080000000000000000000000080000000000000000",
+          "install_signature_p1363": "e6e+r9QO7ZVUtg3JkWVNyb3gqPgT0MEDFqz4Za21FWzRzmZQNcemtfJ2oCOT07WluHBKq54MVEX2LiwzkbfiDQ==",
+          "approver_signature_p1363": "E5+dSiBXYR+MThiGAnazdNR24CdyP0V3KcCIxjWaHckBtLR9MIpGRsqb15qT7NTgw0ctQVTfoXbql21bWFfXsw==",
+          "expect": "install_id_mismatch"
+        },
+        {
+          "name": "install_key_not_held",
+          "proves": "The transcript names the install key but another key signed",
+          "view": {
+            "install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "install_key": "maker_install",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "",
+            "message_key": "maker_message",
+            "generation": 0,
+            "nonce_hex": "391c3efb79194c2630fe9898305f085f10a79e65b6a1da930e5a540b5757fa37"
+          },
+          "signs": {
+            "install": "stranger_install",
+            "install_side": "self",
+            "approver": "maker_approver",
+            "approver_purpose": "approver_enrol"
+          },
+          "transcript_hash_hex": "6d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "install_proof_hex": "0000001f627269646769742d617070726f7665722d656e726f6c2d76312070726f6f660000000473656c66000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "approver_proof_hex": "00000015627269646769742d6f776e65722d617574682d76310000000e617070726f7665725f656e726f6c00000007617070726f76650000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000001c6267695f3762333374367a77736f34327a716a3232763769696a796f000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f00000004033393163336566623739313934633236333066653938393833303566303835663130613739653635623661316461393330653561353430623537353766613337000000080000000000000000000000080000000000000000",
+          "install_signature_p1363": "cU6lK/FI67VXBHlKLpKv4HfvECdQSsbXTZs3nKdKePtEBYOynd0WRgJbInTCd3WB1fEtJHnSBAIkZS1jby2cqQ==",
+          "approver_signature_p1363": "LK9bQbxKHQZ7X7NXqYjYxOLLCJaSo+Kr8LW9rFoOvEvpJ5w5MMTEnVnahuNpACOG1GWJTb+wfm/qg0qXFLuhMQ==",
+          "expect": "bad_install_signature"
+        },
+        {
+          "name": "install_proof_of_the_two_device_form",
+          "proves": "The install key signed as side maker: a proof made for a two-device enrolment is not a self-enrolment",
+          "view": {
+            "install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "install_key": "maker_install",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "",
+            "message_key": "maker_message",
+            "generation": 0,
+            "nonce_hex": "391c3efb79194c2630fe9898305f085f10a79e65b6a1da930e5a540b5757fa37"
+          },
+          "signs": {
+            "install": "maker_install",
+            "install_side": "maker",
+            "approver": "maker_approver",
+            "approver_purpose": "approver_enrol"
+          },
+          "transcript_hash_hex": "6d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "install_proof_hex": "0000001f627269646769742d617070726f7665722d656e726f6c2d76312070726f6f660000000473656c66000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "approver_proof_hex": "00000015627269646769742d6f776e65722d617574682d76310000000e617070726f7665725f656e726f6c00000007617070726f76650000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000001c6267695f3762333374367a77736f34327a716a3232763769696a796f000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f00000004033393163336566623739313934633236333066653938393833303566303835663130613739653635623661316461393330653561353430623537353766613337000000080000000000000000000000080000000000000000",
+          "install_signature_p1363": "I09nqd+7c9+evnFd16ku3j3eZ2OuZNuTO0pF0m1+2ifsokKDYykX3PWllXKQNfs/6s+pkz+2BwG89+YGQvjmsg==",
+          "approver_signature_p1363": "+BWU07XKf2EeekLRbl5S0SFc2/9Z2Cqb1wFNNapoOFYYCy6jBNXGmIjYFATeWZMihVk/eW9VpUYg67KAtXU7JA==",
+          "expect": "bad_install_signature"
+        },
+        {
+          "name": "approver_key_not_held",
+          "proves": "The transcript names an approver key but another key signed",
+          "view": {
+            "install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "install_key": "maker_install",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "",
+            "message_key": "maker_message",
+            "generation": 0,
+            "nonce_hex": "391c3efb79194c2630fe9898305f085f10a79e65b6a1da930e5a540b5757fa37"
+          },
+          "signs": {
+            "install": "maker_install",
+            "install_side": "self",
+            "approver": "stranger_approver",
+            "approver_purpose": "approver_enrol"
+          },
+          "transcript_hash_hex": "6d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "install_proof_hex": "0000001f627269646769742d617070726f7665722d656e726f6c2d76312070726f6f660000000473656c66000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "approver_proof_hex": "00000015627269646769742d6f776e65722d617574682d76310000000e617070726f7665725f656e726f6c00000007617070726f76650000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000001c6267695f3762333374367a77736f34327a716a3232763769696a796f000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f00000004033393163336566623739313934633236333066653938393833303566303835663130613739653635623661316461393330653561353430623537353766613337000000080000000000000000000000080000000000000000",
+          "install_signature_p1363": "/tERIKoMPAwJ3X34YqfW9RmlBamsjj5I3PLksb5dtBx7XWxOZ27oRBJddgQ6QuhPoJUjXxcm4yWece9TnyzXMg==",
+          "approver_signature_p1363": "4Un/nOBiYg4HhSza1eaMfvCJgFGczUaOxSwZOksX31Vi5zxWoOtbQkH+oIdWUgx/0zZAWGC4JmkEjUDDKEre3w==",
+          "expect": "bad_approver_signature"
+        },
+        {
+          "name": "approver_signature_missing",
+          "proves": "No approver-key signature: the owner's check did not happen",
+          "view": {
+            "install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "install_key": "maker_install",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "",
+            "message_key": "maker_message",
+            "generation": 0,
+            "nonce_hex": "391c3efb79194c2630fe9898305f085f10a79e65b6a1da930e5a540b5757fa37"
+          },
+          "signs": {
+            "install": "maker_install",
+            "install_side": "self",
+            "approver": null,
+            "approver_purpose": "approver_enrol"
+          },
+          "transcript_hash_hex": "6d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "install_proof_hex": "0000001f627269646769742d617070726f7665722d656e726f6c2d76312070726f6f660000000473656c66000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "approver_proof_hex": "00000015627269646769742d6f776e65722d617574682d76310000000e617070726f7665725f656e726f6c00000007617070726f76650000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000001c6267695f3762333374367a77736f34327a716a3232763769696a796f000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f00000004033393163336566623739313934633236333066653938393833303566303835663130613739653635623661316461393330653561353430623537353766613337000000080000000000000000000000080000000000000000",
+          "install_signature_p1363": "4FuVIpj+YivKQ5p6/vEh3j+j4tSe48TLkKKGKOLIg1AgkSsgqISrLE3M8ayN5f9PsCE2HiUSBGwFBckljcgITQ==",
+          "expect": "bad_approver_signature"
+        },
+        {
+          "name": "approver_signature_for_another_purpose",
+          "proves": "The approver key signed the same fields for approver_add: not an enrolment",
+          "view": {
+            "install_id": "bgi_7b33t6zwso42zqj22v7iijyo",
+            "install_key": "maker_install",
+            "approver_key": "maker_approver",
+            "approver_sealing_key": "maker_sealing",
+            "approver_attestation_b64": "",
+            "message_key": "maker_message",
+            "generation": 0,
+            "nonce_hex": "391c3efb79194c2630fe9898305f085f10a79e65b6a1da930e5a540b5757fa37"
+          },
+          "signs": {
+            "install": "maker_install",
+            "install_side": "self",
+            "approver": "maker_approver",
+            "approver_purpose": "approver_add"
+          },
+          "transcript_hash_hex": "6d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "install_proof_hex": "0000001f627269646769742d617070726f7665722d656e726f6c2d76312070726f6f660000000473656c66000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f0",
+          "approver_proof_hex": "00000015627269646769742d6f776e65722d617574682d76310000000e617070726f7665725f656e726f6c00000007617070726f76650000001c6267695f3762333374367a77736f34327a716a3232763769696a796f0000001c6267695f3762333374367a77736f34327a716a3232763769696a796f000000206d6dc492f47d9d9b818b7303c5abf883c2df29c73655d45286150196224966f00000004033393163336566623739313934633236333066653938393833303566303835663130613739653635623661316461393330653561353430623537353766613337000000080000000000000000000000080000000000000000",
+          "install_signature_p1363": "II9fZ1kgt1bO6EZChgltlJ+EdhBnNzCW3dwplEbS64oiZLDBbYv7rkGNFpgzERsTxr8+TyK2/avMbFLYLzDvsQ==",
+          "approver_signature_p1363": "3M1673cwKAozgKNldY01RqK0USWRTnFlL5WQk6KIrYcpzS9ZARphjKxeh/Fhy5gFOG4Cwe6J7kI0U/hnV+YkxQ==",
+          "expect": "bad_approver_signature"
+        }
+      ]
+    }
+  }
+}

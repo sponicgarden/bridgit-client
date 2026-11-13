@@ -158,8 +158,8 @@
    "tool": "lan_cameras_applet_views_delete"
   }
  ],
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.lan_camera",

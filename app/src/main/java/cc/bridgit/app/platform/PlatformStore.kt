@@ -22,8 +22,10 @@ class PlatformStore(context: Context, name: String = "agent-platform.db") : SQLi
     @Synchronized fun setting(key: String, fallback: String = ""): String = readableDatabase.rawQuery("SELECT value FROM settings WHERE key=?", arrayOf(key)).use { if (it.moveToFirst()) it.getString(0) else fallback }
     @Synchronized fun setting(key: String, value: String, write: Boolean) { require(write); writableDatabase.execSQL("INSERT OR REPLACE INTO settings VALUES(?,?)", arrayOf(key, value)) }
     val deviceId: String get() = synchronized(this) { setting("device_id").ifEmpty { UUID.randomUUID().toString().also { setting("device_id", it, true) } } }
-    @Synchronized fun grant(agent: String, scope: String, expires: Long) { writableDatabase.execSQL("INSERT OR REPLACE INTO grants VALUES(?,?,?)", arrayOf(agent, scope, expires)) }
-    @Synchronized fun revoke(agent: String, scope: String? = null) { if (scope == null) writableDatabase.delete("grants", "agent=?", arrayOf(agent)) else writableDatabase.delete("grants", "agent=? AND scope=?", arrayOf(agent,scope)) }
+    /** Told after a grant is stored (true) or taken away (false): the authority generation follows (architecture §4.7). Must not block. */
+    @Volatile var onGrantChange: ((agent: String, scope: String?, granted: Boolean) -> Unit)? = null
+    @Synchronized fun grant(agent: String, scope: String, expires: Long) { writableDatabase.execSQL("INSERT OR REPLACE INTO grants VALUES(?,?,?)", arrayOf(agent, scope, expires)); onGrantChange?.invoke(agent, scope, true) }
+    @Synchronized fun revoke(agent: String, scope: String? = null) { if (scope == null) writableDatabase.delete("grants", "agent=?", arrayOf(agent)) else writableDatabase.delete("grants", "agent=? AND scope=?", arrayOf(agent,scope)); onGrantChange?.invoke(agent, scope, false) }
     @Synchronized fun allowed(agent: String, scope: String, now: Long = System.currentTimeMillis()): Boolean = readableDatabase.rawQuery("SELECT expires FROM grants WHERE agent=? AND scope=?", arrayOf(agent, scope)).use { it.moveToFirst() && it.getLong(0) > now }
     @Synchronized fun grants(agent: String): JSONObject = JSONObject().also { result -> readableDatabase.rawQuery("SELECT scope,expires FROM grants WHERE agent=?", arrayOf(agent)).use { c -> while(c.moveToNext()) result.put(c.getString(0),c.getLong(1)) } }
     @Synchronized fun save(agent: String, kind: String, value: JSONObject): JSONObject {

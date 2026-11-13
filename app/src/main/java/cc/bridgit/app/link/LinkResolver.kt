@@ -4,6 +4,7 @@ import cc.bridgit.app.BridgeApp
 import cc.bridgit.app.api.ErrorCatalog
 import cc.bridgit.app.core.Net
 import cc.bridgit.app.feedback.DeviceNames
+import cc.bridgit.app.satellite.LinkRelayClient
 import org.json.JSONObject
 
 /**
@@ -14,6 +15,14 @@ import org.json.JSONObject
 object LinkResolver {
     /** Test hook: unit tests never call the names backend. */
     @Volatile internal var enabled = true
+    /** Test hook: a fake names backend (method, path, body) -> (status, reply), used even when [enabled] is off. */
+    @Volatile internal var names: ((String, String, JSONObject?) -> Pair<Int, JSONObject>)? = null
+
+    /** Where a claim goes: the target's Tailscale address, or its relay base (https://…/d/{device}). */
+    sealed class Reach {
+        data class Tailscale(val host: String, val port: Int) : Reach()
+        data class Relay(val base: String) : Reach()
+    }
 
     /** Blocking. Registers an offer for a new code; returns its id. Throws when the backend refuses or can't be reached. */
     fun offer(app: BridgeApp, codeHash: String, expiresAt: Long): String {
@@ -34,15 +43,38 @@ object LinkResolver {
         DeviceNames.call(app, "DELETE", "/v1/names/me/offers/$id", null)
     }
 
-    /** Blocking. The target's Tailscale address and port for [name], given a [proof] of its code. Errors keep the backend's code. */
-    fun resolve(app: BridgeApp, name: String, proof: String): Pair<String, Int> {
-        if (!enabled) throw ErrorCatalog.error("team_unavailable", "Names backend off (test)")
-        val (code, o) = DeviceNames.call(app, "POST", "/v1/names/$name/resolve", JSONObject().put("code_proof", proof))
+    /**
+     * Blocking. Where to claim [name], given a [proof] of its code. Errors keep the backend's code. Tailscale when the
+     * target offers it and this device is on Tailscale too; otherwise the relay (§4.1). Chosen before anything is
+     * sent: the code works once, so a claim is never retried on the other transport.
+     */
+    fun resolve(app: BridgeApp, name: String, proof: String): Reach {
+        val fake = names
+        if (!enabled && fake == null) throw ErrorCatalog.error("team_unavailable", "Names backend off (test)")
+        val body = JSONObject().put("code_proof", proof)
+        val (code, o) = fake?.invoke("POST", "/v1/names/$name/resolve", body) ?: DeviceNames.call(app, "POST", "/v1/names/$name/resolve", body)
         if (code !in 200..299) throw mapped(code, o)
-        val ts = o.optJSONObject("reach")?.optJSONObject("tailscale")
-            ?: throw ErrorCatalog.error("target_offline", "$name can be reached only over the relay, which this version of Bridgit doesn't use for linking yet. Turn Tailscale on on both devices and make a new code.")
-        val port = ts.optInt("port").takeIf { it in 1..65535 } ?: throw ErrorCatalog.error("upstream_failed", "The names backend sent no port.")
-        return tailnetHost(ts.optString("host"), name) to port
+        // This device's own Tailscale addresses, whether or not its listener is bound right now.
+        val onTailnet = cc.bridgit.app.BridgeService.tailscaleAddresses().isNotEmpty() || app.listener.value.boundTo.any { Net.isTailnet(Net.normalise(it)) }
+        return choose(o.optJSONObject("reach"), name, onTailnet)
+    }
+
+    /** Picks the transport from the backend's reach. Pure apart from MagicDNS lookups, so tests pin it down. */
+    fun choose(reach: JSONObject?, name: String, onTailnet: Boolean): Reach {
+        val relay = reach?.optJSONObject("relay")?.let { r -> LinkRelayClient.base(r.optString("origin"), r.optString("device")) }
+        val ts = reach?.optJSONObject("tailscale")
+        if (ts != null && (onTailnet || relay == null)) {
+            val port = ts.optInt("port").takeIf { it in 1..65535 }
+            val host = runCatching { tailnetHost(ts.optString("host"), name) }
+            if (port != null && host.isSuccess) return Reach.Tailscale(host.getOrThrow(), port)
+            if (relay == null) {
+                if (port == null) throw ErrorCatalog.error("upstream_failed", "The names backend sent no port.")
+                throw host.exceptionOrNull()!!
+            }
+        }
+        if (relay != null) return Reach.Relay(relay)
+        if (reach?.has("relay") == true) throw ErrorCatalog.error("upstream_failed", "The names backend gave a relay address this device can't use for $name.")
+        throw ErrorCatalog.error("target_offline", "$name gave no address. Check that Bridgit is running there, then make a new code.")
     }
 
     /** A Tailscale address for [host] (an address, or a MagicDNS name that resolves to one). */

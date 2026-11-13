@@ -17,32 +17,20 @@ object PortalViewer {
 
     /** "Galaxy Tab A9 · Android 15 · Bridgit 1.8.1786 · 82%" from a /v1/portal/home reply; empty parts are left out. */
     fun summary(home: JSONObject?): String {
-        val d = home?.optJSONObject("device") ?: return ""
-        val b = home.optJSONObject("battery")
-        return listOfNotNull(
-            d.optString("model").takeIf { it.isNotEmpty() },
-            d.optString("android").takeIf { it.isNotEmpty() }?.let { "Android $it" },
-            d.optString("app_version").takeIf { it.isNotEmpty() }?.let { "Bridgit $it" },
-            b?.takeIf { it.has("percent") && !it.isNull("percent") }?.let { "${it.optInt("percent")}%" + if (it.optBoolean("charging")) " charging" else "" },
-        ).joinToString(" · ")
+        if (home?.optJSONObject("device") == null) return ""
+        val model = cc.bridgit.app.core.session.ViewerModel.from(home)
+        val b = cc.bridgit.app.core.session.ViewerModel.battery(model)
+        return listOfNotNull(cc.bridgit.app.core.session.ViewerModel.details(model).takeIf { it.isNotEmpty() },
+            b?.let { (p, charging) -> "$p%" + if (charging) " charging" else "" }).joinToString(" · ")
     }
 
     /** "Galaxy Tab A9 · Android 15 · Bridgit 1.8.1786": [summary] without the battery, for the phone chooser's cards. */
-    fun details(home: JSONObject?): String {
-        val d = home?.optJSONObject("device") ?: return ""
-        return listOfNotNull(
-            d.optString("model").takeIf { it.isNotEmpty() },
-            d.optString("android").takeIf { it.isNotEmpty() }?.let { "Android $it" },
-            d.optString("app_version").takeIf { it.isNotEmpty() }?.let { "Bridgit $it" },
-        ).joinToString(" · ")
-    }
+    fun details(home: JSONObject?): String =
+        if (home?.optJSONObject("device") == null) "" else cc.bridgit.app.core.session.ViewerModel.details(cc.bridgit.app.core.session.ViewerModel.from(home))
 
     /** Battery percent and whether it is charging, or null when the reply has none. */
-    fun battery(home: JSONObject?): Pair<Int, Boolean>? {
-        val b = home?.optJSONObject("battery") ?: return null
-        if (!b.has("percent") || b.isNull("percent")) return null
-        return b.optInt("percent") to b.optBoolean("charging")
-    }
+    fun battery(home: JSONObject?): Pair<Int, Boolean>? =
+        home?.let { cc.bridgit.app.core.session.ViewerModel.battery(cc.bridgit.app.core.session.ViewerModel.from(it)) }
 
     /** "just now", "3 min ago", "2 h ago", or "not reached yet". */
     fun freshness(at: Long?, now: Long = System.currentTimeMillis()): String {

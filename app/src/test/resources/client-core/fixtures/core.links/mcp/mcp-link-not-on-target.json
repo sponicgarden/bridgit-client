@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-link-not-on-target",
+  "service": "core.links",
+  "door": "mcp",
+  "title": "A link agent's tool calls reach only what the link shares",
+  "step": "link_agent",
+  "principal": {
+    "agent": "hub",
+    "source": "100.64.0.40"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "hub"
+      }
+    ],
+    "links": [
+      {
+        "agent": "hub",
+        "tier": "own",
+        "state": "active",
+        "services": [
+          "view"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log"
+  },
+  "expect": {
+    "status": 403,
+    "error": "not_on_target"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

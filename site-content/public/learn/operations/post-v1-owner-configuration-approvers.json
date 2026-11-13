@@ -1,0 +1,58 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Start enrolling this device as its own approver while the list is empty: makes the approver key and asks for the owner's screen-lock check on this device, which is the one human step. Needs a verified alert email and a screen lock; explicit owner.configuration grant required",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_approvers_enrol",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "self",
+   "description": "true: this device becomes its own approver. Another device is enrolled over a link (not built yet)",
+   "type": "boolean",
+   "required": true
+  }],
+  "example": "POST /v1/owner/configuration/approvers {\"self\":true}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/approvers",
+  "capability": "owner_features",
+  "returns": "enrolment{id, status waiting_owner|done|cancelled|failed, detail}, remaining_human_step{step owner_check, where, status}; read GET /v1/owner/configuration/approvers until status is done",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "self": {
+     "description": "true: this device becomes its own approver. Another device is enrolled over a link (not built yet)",
+     "type": "boolean"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": [
+    "self",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "capability_disabled",
+   "conflict",
+   "rate_limited",
+   "owner_email_required",
+   "no_screen_lock",
+   "platform_unsupported",
+   "no_approver",
+   "recovery_complete",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "profile_revision": 3,
+  "observed_at": "2026-11-11T08:00:00Z",
+  "expires_at": "2026-11-11T08:01:00Z",
+  "device": {
+    "install_id": "bgi_fixturetablet",
+    "relay_device_id": null,
+    "name": "Fixture tablet",
+    "device_type": "tablet",
+    "platform": "android",
+    "os_version": "15",
+    "app_version": "1.8.0",
+    "api_revision": 149,
+    "services": [
+      "host"
+    ],
+    "hardware": {
+      "camera": "present",
+      "location": "present",
+      "microphone": "present",
+      "speaker": "present"
+    }
+  },
+  "link": null,
+  "availability": {
+    "state": "online",
+    "in_foreground": false
+  },
+  "capabilities": {
+    "v1.camera": {
+      "runtime_id": "camera",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": false,
+      "agent_allowed": true,
+      "callable": false,
+      "blocked_reason": "permission:android.permission.CAMERA",
+      "constraints": {
+        "execution": [
+          "owner_present",
+          "while_open",
+          "background"
+        ]
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "/v1/camera/snapshot"
+        }
+      ]
+    },
+    "v1.status": {
+      "runtime_id": "status",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": true,
+      "callable": true,
+      "blocked_reason": null,
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/v1/health"
+        }
+      ]
+    }
+  },
+  "setup": {
+    "not_done": 4,
+    "steps": [
+      {
+        "id": "device_name",
+        "state": "done",
+        "api": {
+          "method": "POST",
+          "path": "/v1/owner/configuration/name"
+        }
+      },
+      {
+        "id": "reach",
+        "state": "done"
+      },
+      {
+        "id": "first_agent",
+        "state": "done"
+      },
+      {
+        "id": "owner_email",
+        "state": "needs_owner",
+        "where": "anywhere",
+        "api": {
+          "method": "POST",
+          "path": "/v1/owner/email"
+        }
+      },
+      {
+        "id": "notifications",
+        "state": "blocked",
+        "where": "this_device",
+        "dependency": {
+          "kind": "os",
+          "name": "android.permission.POST_NOTIFICATIONS"
+        }
+      },
+      {
+        "id": "open_app",
+        "state": "done"
+      },
+      {
+        "id": "permissions",
+        "state": "blocked",
+        "where": "this_device",
+        "dependency": {
+          "kind": "os",
+          "name": "android.permission.CAMERA"
+        }
+      },
+      {
+        "id": "battery",
+        "state": "blocked",
+        "where": "this_device",
+        "dependency": {
+          "kind": "os",
+          "name": "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+        }
+      },
+      {
+        "id": "diagnostic",
+        "state": "done"
+      }
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-idempotency-cache-full",
+  "service": "core.dispatch",
+  "door": "mcp",
+  "title": "A new Idempotency-Key is refused while the key cache is full",
+  "step": "idempotency",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ],
+    "idempotency": {
+      "full": true
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/log",
+    "body": {
+      "message": "fixture note"
+    },
+    "idempotency_key": "fixture-key-0002"
+  },
+  "expect": {
+    "status": 429,
+    "error": "rate_limited"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

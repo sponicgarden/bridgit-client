@@ -1,0 +1,47 @@
+{
+  "$schema": "../schemas/vocab.schema.json",
+  "vocab": "setup-prompt",
+  "version": 1,
+  "source": {
+    "kind": "pack",
+    "path": "contracts/client-core/vocab/setup-prompt.json"
+  },
+  "copies": {
+    "android": "app/src/main/java/cc/bridgit/app/core/contract/ContractVocab.kt"
+  },
+  "rule": "The setup prompt keeps the current design (owner, 11 Nov 2026): the pasted short form, then the Bridgit Interface Guide at GET /v1/welcome with these sections in this order, the IDENTITY fields in this order, and these first calls in this order. Changing any of them is a contract change that needs the owner. Whole-text fixtures are in setup-prompt/.",
+  "data": {
+    "sections": [
+      "IDENTITY",
+      "CONNECTION",
+      "RULES",
+      "FIRST CALLS, IN ORDER",
+      "GOTCHAS",
+      "AFTER YOU'RE CONNECTED",
+      "POINTERS"
+    ],
+    "identity_fields": [
+      "Device domain name",
+      "Friendly name",
+      "Model",
+      "Agent name",
+      "Owner"
+    ],
+    "first_calls": [
+      "GET /v1/health",
+      "POST /v1/me",
+      "GET /v1/capabilities",
+      "GET /v1/limits",
+      "GET /v1/start",
+      "GET /v1/discover"
+    ],
+    "short_form": [
+      "address_and_key",
+      "key_storage",
+      "connection_help",
+      "naming_reply_if_unnamed",
+      "interface_guide"
+    ]
+  },
+  "cases": []
+}

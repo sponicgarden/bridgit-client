@@ -1,18 +1,26 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Accessible videos and metadata",
   "method": "GET",
   "auth": true,
   "mcp_tool": "gallery_videos_recent",
-  "query": [{
-   "name": "limit",
-   "description": "1\u2013100, default 20",
-   "type": "integer",
-   "required": false
-  }],
+  "query": [
+   {
+    "name": "limit",
+    "description": "1\u2013100, default 20",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "include_pending",
+    "description": "true also lists items still arriving (recording, downloading, syncing) with complete:false; default false",
+    "type": "boolean",
+    "required": false
+   }
+  ],
   "control_scope": null,
   "developer_only": false,
   "capture": false,
@@ -21,13 +29,19 @@
   "idempotent": false,
   "path": "/v1/gallery/videos/recent",
   "capability": "gallery_video",
-  "returns": "Accessible videos and metadata",
+  "returns": "access_mode, items[id, name, duration_ms, size_bytes, mime, added_at, complete, source{kind, app, folder} (source needs the gallery grant)]",
   "mcp_input_schema": {
    "type": "object",
-   "properties": {"limit": {
-    "description": "1\u2013100, default 20",
-    "type": "integer"
-   }},
+   "properties": {
+    "limit": {
+     "description": "1\u2013100, default 20",
+     "type": "integer"
+    },
+    "include_pending": {
+     "description": "true also lists items still arriving (recording, downloading, syncing) with complete:false; default false",
+     "type": "boolean"
+    }
+   },
    "required": []
   },
   "errors": [],

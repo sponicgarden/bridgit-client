@@ -97,7 +97,29 @@
        "code_expired",
        "code_used_up",
        "name_required",
-       "phone_unreachable"
+       "phone_unreachable",
+       "media_incomplete",
+       "owner_email_required",
+       "no_approver",
+       "no_screen_lock",
+       "approver_unverified",
+       "approver_unreachable",
+       "recovery_complete",
+       "owner_authorization_required",
+       "platform_unsupported",
+       "cloud_unreachable",
+       "offline",
+       "allowance_exhausted",
+       "allowance_expired",
+       "namespace_mismatch",
+       "transfer_not_for_recipient",
+       "spending_off",
+       "spend_not_allowed",
+       "spend_source_not_allowed",
+       "spend_over_cap",
+       "spend_bridgit_cap",
+       "spend_over_budget",
+       "raise_the_ceiling_first"
       ]
      },
      "message": {"type": "string"},
@@ -634,7 +656,7 @@
       "type": "string"
      },
      "gallery_id": {
-      "description": "Accessible gallery image (also requires gallery grant)",
+      "description": "Accessible gallery image (also requires gallery grant); a photo still arriving answers 409 media_incomplete",
       "type": "integer"
      }
     },
@@ -647,7 +669,23 @@
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
     },
-    "401": {"description": "unauthorized"}
+    "401": {"description": "unauthorized"},
+    "413": {
+     "description": "payload_too_large",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "403": {
+     "description": "capability_disabled, permission_denied",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "photo_not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "media_incomplete",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
    },
    "parameters": [{
     "schema": {"type": "string"},
@@ -1399,6 +1437,19 @@
     }
    },
    "tags": ["adb"]
+  }},
+  "/v1/device/profile": {"get": {
+   "summary": "This device in one answer, the same shape on every Bridgit platform: what it is, whether it is online, every capability with why it can or can't be called now, and the set-up steps with their state",
+   "operationId": "getDeviceProfile",
+   "responses": {
+    "200": {"description": "schema_version, profile_revision (goes up when anything here changes), observed_at, expires_at (60 s later; read again after), device {install_id, relay_device_id, name, device_type, platform, os_version, app_version, api_revision, services, hardware {camera, microphone, speaker, location: present, absent or unknown}}, link, availability {state, in_foreground}, capabilities {v1.<id>: {runtime_id, implemented, supported, enabled, ready, agent_allowed, callable, blocked_reason, constraints {execution}, operations [{method, path}]}}, setup {not_done, steps [{id, state (done, waiting, needs_owner or blocked), where (this_device, approver or anywhere), dependency {kind (os, platform, provider or step), name}, api {method, path} for a step an API completes}]}. A hint, never an authorization: calls are still checked when made"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "tags": ["status"]
   }},
   "/v1/lan/devices/log": {"get": {
    "summary": "The runtime log of this agent's device operations (outlet flow): every enroll, action and removal, in order, with trigger, device and outcome",
@@ -3045,6 +3096,104 @@
    }],
    "tags": ["mic"]
   }},
+  "/v1/owner/configuration/approvers/recovery": {
+   "post": {
+    "summary": "Start an approver recovery when the last approver is lost: the approver list is cleared after 72 hours of running time unless a listed approver cancels. Not available yet: refused with platform_unsupported and remaining_steps until alert email delivery and a cancel action on the approver device exist; explicit owner.configuration grant required",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "postOwnerConfigurationApproversRecovery",
+    "responses": {
+     "200": {"description": "state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver)"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed, capability_disabled",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "502": {
+      "description": "upstream_failed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "429": {
+      "description": "rate_limited",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict, owner_email_required, no_screen_lock, no_approver, recovery_complete",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   },
+   "get": {
+    "summary": "Read the approver recovery: its state, who started it, when the approver list is cleared and the time left",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "getOwnerConfigurationApproversRecovery",
+    "responses": {
+     "200": {"description": "state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver)"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"}
+    },
+    "tags": ["owner_features"]
+   },
+   "delete": {
+    "summary": "Cancel a pending approver recovery: the agent that started it withdraws it at once; anyone else's cancel asks a listed approver for the owner's check; explicit owner.configuration grant required",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "deleteOwnerConfigurationApproversRecovery",
+    "responses": {
+     "200": {"description": "state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver), remaining_human_step when a listed approver has to confirm"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed, capability_disabled",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "502": {
+      "description": "upstream_failed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "429": {
+      "description": "rate_limited",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict, owner_email_required, no_screen_lock, no_approver, recovery_complete",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   }
+  },
   "/v1/applets/installed/{id}/tables/{table}/rows": {
    "post": {
     "summary": "Add a table row, checked against its columns. Owner control agents can act on any applet; applet principals need installer sharing",
@@ -3621,6 +3770,10 @@
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
     },
     "401": {"description": "unauthorized"},
+    "501": {
+     "description": "platform_unsupported",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
     "403": {
      "description": "forbidden, agent_not_allowed",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -3781,7 +3934,8 @@
         "phone",
         "android",
         "agent",
-        "device"
+        "device",
+        "spending"
        ]
       },
       "in": "query",
@@ -4614,7 +4768,23 @@
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
     },
-    "401": {"description": "unauthorized"}
+    "401": {"description": "unauthorized"},
+    "413": {
+     "description": "payload_too_large",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "403": {
+     "description": "capability_disabled, permission_denied",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "media_incomplete",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
    },
    "parameters": [
     {
@@ -4627,7 +4797,7 @@
      "schema": {"type": "number"},
      "in": "query",
      "name": "frame_at_s",
-     "description": "Optional frame position in seconds",
+     "description": "Optional frame position in seconds; a video still arriving answers 409 media_incomplete",
      "required": false
     }
    ],
@@ -5470,6 +5640,41 @@
    }],
    "tags": ["ssh"]
   }},
+  "/v1/owner/configuration/spending/summary": {"get": {
+   "summary": "Read what was spent in a namespace: per budget the portion, what is used and when it resets; per source the counts and amounts by state. It answers from the device's journal, with its age",
+   "x-bridgit-control-scope": "owner.configuration",
+   "operationId": "getOwnerConfigurationSpendingSummary",
+   "responses": {
+    "200": {"description": "budgets[{id, unit, portion, used, remaining, resets_at, standing}], sources{id: {state: {count, counted[]}}}, last_entry_at, age_ms, online, read_at"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "501": {
+     "description": "platform_unsupported",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "403": {
+     "description": "forbidden, agent_not_allowed",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [{
+    "schema": {
+     "type": "string",
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    "in": "query",
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "required": false
+   }],
+   "tags": ["owner_features"]
+  }},
   "/v1/lan/discover": {"post": {
    "summary": "Network Diagnostics: bounded discovery on the Android host's direct local network",
    "requestBody": {"content": {"application/json": {"schema": {
@@ -5819,6 +6024,285 @@
     "tags": ["owner_features"]
    }
   },
+  "/v1/owner/configuration/spending/budgets/{id}": {
+   "patch": {
+    "summary": "Change a budget. A lower amount is a reduction and applies at once. A higher amount is a standing raise: an increment with an id, applied once, drawn from this device's headroom balance under an agent ceiling. A new scope or period never opens a period early. Needs the Budgets capability; explicit owner.configuration grant required",
+    "x-bridgit-control-scope": "owner.configuration",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {
+      "generation": {
+       "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+       "type": "integer"
+      },
+      "rebalance": {
+       "description": "Rebalance shares by use",
+       "type": "boolean"
+      },
+      "amount": {
+       "description": "The new standing amount: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar. Send it alone when it is a raise",
+       "type": "object"
+      },
+      "period": {
+       "description": "hour, day, week or month",
+       "type": "string",
+       "enum": [
+        "hour",
+        "day",
+        "week",
+        "month"
+       ]
+      },
+      "scope": {
+       "description": "{kind, id} as when creating",
+       "type": "object"
+      },
+      "namespace": {
+       "description": "live (the default) or sandbox. Only sandbox is available on this build",
+       "type": "string",
+       "enum": [
+        "live",
+        "sandbox"
+       ]
+      }
+     },
+     "required": []
+    }}}},
+    "operationId": "patchOwnerConfigurationSpendingBudgetsId",
+    "responses": {
+     "200": {"description": "budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}, generation, increment{id, amount, lasts, replayed} when it was a raise; replayed: true when this Idempotency-Key already did it (nothing is worked out again)"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed, capability_disabled, agents_may_not_change, over_ceiling, owner_authorization_required",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "503": {
+      "description": "team_unavailable",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict, namespace_mismatch, raise_the_ceiling_first, no_approver",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [
+     {
+      "schema": {"type": "string"},
+      "in": "path",
+      "name": "id",
+      "required": true
+     },
+     {
+      "schema": {"type": "string"},
+      "in": "header",
+      "name": "Idempotency-Key",
+      "description": "Any UUID; a repeat within 24 h returns the first result",
+      "required": true
+     }
+    ],
+    "tags": ["owner_features"]
+   },
+   "delete": {
+    "summary": "Remove a budget. A reduction: it applies at once, unless the owner's gate stands on it. The namespace goes in the query; explicit owner.configuration grant required",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "deleteOwnerConfigurationSpendingBudgetsId",
+    "responses": {
+     "200": {"description": "removed, id, generation"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed, capability_disabled, agents_may_not_change, over_ceiling, owner_authorization_required",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "503": {
+      "description": "team_unavailable",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict, namespace_mismatch, raise_the_ceiling_first, no_approver",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [
+     {
+      "schema": {"type": "string"},
+      "in": "path",
+      "name": "id",
+      "required": true
+     },
+     {
+      "schema": {
+       "type": "string",
+       "enum": [
+        "live",
+        "sandbox"
+       ]
+      },
+      "in": "query",
+      "name": "namespace",
+      "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+      "required": false
+     },
+     {
+      "schema": {"type": "integer"},
+      "in": "query",
+      "name": "generation",
+      "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+      "required": false
+     },
+     {
+      "schema": {"type": "string"},
+      "in": "header",
+      "name": "Idempotency-Key",
+      "description": "Any UUID; a repeat within 24 h returns the first result",
+      "required": true
+     }
+    ],
+    "tags": ["owner_features"]
+   }
+  },
+  "/v1/owner/configuration/spending/journal": {
+   "post": {
+    "summary": "Acknowledge unreadable history: rows of an earlier journal epoch that can be tied to no request stop every spend until the owner or an agent takes that on. Nothing is given back by it; explicit owner.configuration grant required",
+    "x-bridgit-control-scope": "owner.configuration",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {
+      "acknowledge_history": {
+       "description": "true",
+       "type": "boolean"
+      },
+      "namespace": {
+       "description": "live (the default) or sandbox. Only sandbox is available on this build",
+       "type": "string",
+       "enum": [
+        "live",
+        "sandbox"
+       ]
+      }
+     },
+     "required": ["acknowledge_history"]
+    }}}},
+    "operationId": "postOwnerConfigurationSpendingJournal",
+    "responses": {
+     "200": {"description": "acknowledged, journal{...}"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed, capability_disabled, agents_may_not_change, over_ceiling, owner_authorization_required",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "503": {
+      "description": "team_unavailable",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict, namespace_mismatch, raise_the_ceiling_first, no_approver",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   },
+   "get": {
+    "summary": "Read the spend journal of a namespace: entries of the current epoch (or another) in order, as entry/1. It answers from the device, with or without a network",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "getOwnerConfigurationSpendingJournal",
+    "responses": {
+     "200": {"description": "epoch, epochs[], head{seq, hash, origin}, entries[entry/1], next_after, more, read_at"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [
+     {
+      "schema": {
+       "type": "string",
+       "enum": [
+        "live",
+        "sandbox"
+       ]
+      },
+      "in": "query",
+      "name": "namespace",
+      "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+      "required": false
+     },
+     {
+      "schema": {"type": "integer"},
+      "in": "query",
+      "name": "after",
+      "description": "Entries after this sequence number (default 0)",
+      "required": false
+     },
+     {
+      "schema": {"type": "integer"},
+      "in": "query",
+      "name": "limit",
+      "description": "1 to 200 (default 50)",
+      "required": false
+     },
+     {
+      "schema": {"type": "string"},
+      "in": "query",
+      "name": "epoch",
+      "description": "A journal epoch id; default the current one",
+      "required": false
+     }
+    ],
+    "tags": ["owner_features"]
+   }
+  },
   "/v1/log/{id}": {"get": {
    "summary": "One log entry",
    "operationId": "getLogId",
@@ -5997,6 +6481,114 @@
    }],
    "tags": ["applet_install"]
   }},
+  "/v1/owner/configuration/spending": {
+   "post": {
+    "summary": "Turn spending on or off for the namespace: the pause, per instrument class and per source. Off applies at once; nothing here changes today's live budgets; explicit owner.configuration grant required",
+    "x-bridgit-control-scope": "owner.configuration",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {
+      "generation": {
+       "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+       "type": "integer"
+      },
+      "paused": {
+       "description": "true pauses every spend of the namespace",
+       "type": "boolean"
+      },
+      "sources": {
+       "description": "Source id to true or false",
+       "type": "object"
+      },
+      "classes": {
+       "description": "Instrument class to true or false, for example {\"metered\": false}",
+       "type": "object"
+      },
+      "namespace": {
+       "description": "live (the default) or sandbox. Only sandbox is available on this build",
+       "type": "string",
+       "enum": [
+        "live",
+        "sandbox"
+       ]
+      }
+     },
+     "required": []
+    }}}},
+    "operationId": "postOwnerConfigurationSpending",
+    "responses": {
+     "200": {"description": "the same as GET, plus changed"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed, capability_disabled, agents_may_not_change, over_ceiling, owner_authorization_required",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "503": {
+      "description": "team_unavailable",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict, namespace_mismatch, raise_the_ceiling_first, no_approver",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   },
+   "get": {
+    "summary": "Read the spending core: whether it is on (owner setting spending.core_enabled), which namespaces this build has, and for namespace=sandbox its switches, journal state and time anchor. With no namespace it answers for live, which is not available yet",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "getOwnerConfigurationSpending",
+    "responses": {
+     "200": {"description": "enabled, setting, namespace, available, namespaces[], and for sandbox: switches{paused, device_paused, classes, sources}, payments_on, online, install, rules{generation, digest} or null, journal{epoch, origin, seq, whole, reset_reason, history_blocked, time{now, anchored, last_anchor_at, usable}}, read_at"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {
+      "type": "string",
+      "enum": [
+       "live",
+       "sandbox"
+      ]
+     },
+     "in": "query",
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+     "required": false
+    }],
+    "tags": ["owner_features"]
+   }
+  },
   "/v1/applets/installed/{id}/pause": {"post": {
    "summary": "Pause or resume an applet monitoring task and its device work; manual actions remain available once paused",
    "requestBody": {"content": {"application/json": {"schema": {
@@ -7297,6 +7889,55 @@
    }],
    "tags": ["lan_enrollment"]
   }},
+  "/v1/owner/configuration/spending/sources/{id}": {"delete": {
+   "summary": "Unlink a source and remove its key from this device. What it spent stays in the journal; an unknown hold of it can no longer be reconciled and keeps its hold. Its id is retired with it: a later link takes another id; explicit owner.configuration grant required",
+   "x-bridgit-control-scope": "owner.configuration",
+   "operationId": "deleteOwnerConfigurationSpendingSourcesId",
+   "responses": {
+    "200": {"description": "unlinked, id"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "501": {
+     "description": "platform_unsupported",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "403": {
+     "description": "forbidden, agent_not_allowed, capability_disabled, agents_may_not_change, over_ceiling, owner_authorization_required",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict, namespace_mismatch, raise_the_ceiling_first, no_approver",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }
+   ],
+   "tags": ["owner_features"]
+  }},
   "/v1/lan-cameras/{id}/controls": {"get": {
    "summary": "Probe controls for this camera's active ONVIF video profile",
    "operationId": "getLanCamerasIdControls",
@@ -7400,6 +8041,108 @@
     "401": {"description": "unauthorized"}
    },
    "tags": ["wakewords"]
+  }},
+  "/v1/owner/configuration/spending/allowances": {"get": {
+   "summary": "Read how each budget is divided and what this device holds: portions and share kinds, headroom balances, the allowance each source last spent under, room in transit, the last time anchor and the journal's epoch",
+   "x-bridgit-control-scope": "owner.configuration",
+   "operationId": "getOwnerConfigurationSpendingAllowances",
+   "responses": {
+    "200": {"description": "budgets[{id, portions, this_device, increments, in_transit, taken, reclaim_holder, pending_cloud_room}], held{source: {id, issuer rules|cloud, seq, lines, expired}}, journal{epoch, whole, time{anchored, last_anchor_at, usable}}, read_at"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "501": {
+     "description": "platform_unsupported",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "403": {
+     "description": "forbidden, agent_not_allowed",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [{
+    "schema": {
+     "type": "string",
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    "in": "query",
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "required": false
+   }],
+   "tags": ["owner_features"]
+  }},
+  "/v1/owner/configuration/spending/budgets/{id}/topups": {"post": {
+   "summary": "Top a budget up for the current period only: an increment with an id that raises this device's portion by its amount, applied once per Idempotency-Key, and under an agent ceiling drawn from this device's headroom balance; explicit owner.configuration grant required",
+   "x-bridgit-control-scope": "owner.configuration",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "amount": {
+      "description": "How much to add for this period: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar",
+      "type": "object"
+     },
+     "namespace": {
+      "description": "live (the default) or sandbox. Only sandbox is available on this build",
+      "type": "string",
+      "enum": [
+       "live",
+       "sandbox"
+      ]
+     }
+    },
+    "required": ["amount"]
+   }}}},
+   "operationId": "postOwnerConfigurationSpendingBudgetsIdTopups",
+   "responses": {
+    "200": {"description": "increment{id, amount, lasts period, period, draws_headroom, replayed}, budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "501": {
+     "description": "platform_unsupported",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "403": {
+     "description": "forbidden, agent_not_allowed, capability_disabled, agents_may_not_change, over_ceiling, owner_authorization_required",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict, namespace_mismatch, raise_the_ceiling_first, no_approver",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }
+   ],
+   "tags": ["owner_features"]
   }},
   "/v1/lan-cameras/framing": {
    "post": {
@@ -8500,6 +9243,81 @@
    },
    "tags": ["applet_install"]
   }},
+  "/v1/owner/configuration/spending/budgets/{id}/gate": {"post": {
+   "summary": "Set or change a budget's change gate: agents_may_change and the agent ceiling. Setting or tightening is open to any agent with the Budgets capability. Lifting one the owner set is the owner's: no_approver with remaining_human_step. A ceiling added to an existing budget starts with no headroom balance; explicit owner.configuration grant required",
+   "x-bridgit-control-scope": "owner.configuration",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "generation": {
+      "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+      "type": "integer"
+     },
+     "ceiling": {
+      "description": "The most agents may raise the budget to, as money ({unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar), or null for none",
+      "type": "object"
+     },
+     "agents_may_change": {
+      "description": "false: agents may only reduce this budget",
+      "type": "boolean"
+     },
+     "namespace": {
+      "description": "live (the default) or sandbox. Only sandbox is available on this build",
+      "type": "string",
+      "enum": [
+       "live",
+       "sandbox"
+      ]
+     }
+    },
+    "required": []
+   }}}},
+   "operationId": "postOwnerConfigurationSpendingBudgetsIdGate",
+   "responses": {
+    "200": {"description": "budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}, generation"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "501": {
+     "description": "platform_unsupported",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "403": {
+     "description": "forbidden, agent_not_allowed, capability_disabled, agents_may_not_change, over_ceiling, owner_authorization_required",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "404": {
+     "description": "not_found",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "503": {
+     "description": "team_unavailable",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "409": {
+     "description": "conflict, namespace_mismatch, raise_the_ceiling_first, no_approver",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [
+    {
+     "schema": {"type": "string"},
+     "in": "path",
+     "name": "id",
+     "required": true
+    },
+    {
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }
+   ],
+   "tags": ["owner_features"]
+  }},
   "/v1/interactions/{id}": {
    "get": {
     "summary": "One of your interactions; with wait, holds until the owner answers or closes it",
@@ -9042,6 +9860,110 @@
     "tags": ["owner_features"]
    }
   },
+  "/v1/owner/configuration/spending/rules": {
+   "post": {
+    "summary": "Change the budget time zone or a per-spend cap (per instrument or per source). Lowering is open to any configuration agent; raising or removing a cap needs the Budgets capability. A zone change never resets a period; explicit owner.configuration grant required",
+    "x-bridgit-control-scope": "owner.configuration",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {
+      "generation": {
+       "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+       "type": "integer"
+      },
+      "zone": {
+       "description": "An IANA time zone, for example Europe/Warsaw",
+       "type": "string"
+      },
+      "namespace": {
+       "description": "live (the default) or sandbox. Only sandbox is available on this build",
+       "type": "string",
+       "enum": [
+        "live",
+        "sandbox"
+       ]
+      },
+      "caps": {
+       "description": "{instruments: {id: money or null}, sources: {id: money or null}}; null removes a cap. Money is {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar",
+       "type": "object"
+      }
+     },
+     "required": []
+    }}}},
+    "operationId": "postOwnerConfigurationSpendingRules",
+    "responses": {
+     "200": {"description": "the same as GET /rules, plus changed"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed, capability_disabled, agents_may_not_change, over_ceiling, owner_authorization_required",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "503": {
+      "description": "team_unavailable",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict, namespace_mismatch, raise_the_ceiling_first, no_approver",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   },
+   "get": {
+    "summary": "Read the rule document of a namespace: generation, time zone, switches and per-spend caps, and who signed it",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "getOwnerConfigurationSpendingRules",
+    "responses": {
+     "200": {"description": "generation, digest, zone, switches, caps{instruments, sources}, executor, signed_by, actor, account; generation 0 when there is none yet"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {
+      "type": "string",
+      "enum": [
+       "live",
+       "sandbox"
+      ]
+     },
+     "in": "query",
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+     "required": false
+    }],
+    "tags": ["owner_features"]
+   }
+  },
   "/v1/images/usage": {"get": {
    "summary": "Read this linked account's shared monthly image allowance without generating an image",
    "operationId": "getImagesUsage",
@@ -9055,6 +9977,98 @@
    },
    "tags": ["judgment"]
   }},
+  "/v1/owner/configuration/spending/sources": {
+   "post": {
+    "summary": "Link a source. This build links the sandbox instrument only: a sandbox key is made at the sandbox provider and stored on this device, write-only. It needs no namespace: the instrument fixes it; explicit owner.configuration grant required",
+    "x-bridgit-control-scope": "owner.configuration",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {
+      "instrument": {
+       "description": "sandbox",
+       "type": "string"
+      },
+      "id": {
+       "description": "A name for the source, 1 to 64 of a-z 0-9 . _ -; made up when left out",
+       "type": "string"
+      }
+     },
+     "required": ["instrument"]
+    }}}},
+    "operationId": "postOwnerConfigurationSpendingSources",
+    "responses": {
+     "200": {"description": "the source as in the list; conflict when the id is taken or was linked before (reason id_retired)"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed, capability_disabled, agents_may_not_change, over_ceiling, owner_authorization_required",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "503": {
+      "description": "team_unavailable",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict, namespace_mismatch, raise_the_ceiling_first, no_approver",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   },
+   "get": {
+    "summary": "List the linked sources of a namespace: instrument, provider, custody, cap and whether the key is set. A key is never returned",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "getOwnerConfigurationSpendingSources",
+    "responses": {
+     "200": {"description": "sources[{id, instrument, provider, class, namespace, funder, custody, cap provider|core_only, configured, device, host, on, time_source, usage_read, available, linked_at}], instruments[]"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {
+      "type": "string",
+      "enum": [
+       "live",
+       "sandbox"
+      ]
+     },
+     "in": "query",
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+     "required": false
+    }],
+    "tags": ["owner_features"]
+   }
+  },
   "/v1/satellite/hub/agents": {"get": {
    "summary": "Phone to phone: the hub's control agents, so a satellite switched to its hub can see and pause them (only for a satellite's return key, while the hub hasn't paused that satellite). Not for agents.",
    "operationId": "getSatelliteHubAgents",
@@ -9149,6 +10163,137 @@
      },
      "401": {"description": "unauthorized"}
     },
+    "tags": ["owner_features"]
+   }
+  },
+  "/v1/owner/configuration/spending/budgets": {
+   "post": {
+    "summary": "Create an owner budget. This device is its executor and holds the whole amount as a standing share. Needs the Budgets capability; explicit owner.configuration grant required",
+    "x-bridgit-control-scope": "owner.configuration",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {
+      "generation": {
+       "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+       "type": "integer"
+      },
+      "rebalance": {
+       "description": "Rebalance shares between devices by use (default true)",
+       "type": "boolean"
+      },
+      "period": {
+       "description": "hour, day, week or month, in the rule document's time zone",
+       "type": "string",
+       "enum": [
+        "hour",
+        "day",
+        "week",
+        "month"
+       ]
+      },
+      "amount": {
+       "description": "The budget per period: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar",
+       "type": "object"
+      },
+      "scope": {
+       "description": "{kind: account|device|instrument|service|applet|agent, id}. account and device need no id (device is this device); an instrument must be one of this namespace",
+       "type": "object"
+      },
+      "namespace": {
+       "description": "live (the default) or sandbox. Only sandbox is available on this build",
+       "type": "string",
+       "enum": [
+        "live",
+        "sandbox"
+       ]
+      },
+      "id": {
+       "description": "1 to 64 of a-z 0-9 . _ -",
+       "type": "string"
+      },
+      "gate": {
+       "description": "{agents_may_change: boolean, ceiling: money or null}. Under a ceiling this device's headroom balance is the whole room between the amount and the ceiling",
+       "type": "object"
+      }
+     },
+     "required": [
+      "id",
+      "scope",
+      "period",
+      "amount"
+     ]
+    }}}},
+    "operationId": "postOwnerConfigurationSpendingBudgets",
+    "responses": {
+     "200": {"description": "budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}, generation"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed, capability_disabled, agents_may_not_change, over_ceiling, owner_authorization_required",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "503": {
+      "description": "team_unavailable",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict, namespace_mismatch, raise_the_ceiling_first, no_approver",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   },
+   "get": {
+    "summary": "List the owner budgets of a namespace with this device's portion, what it has used this period and when that resets, the change gate with who set it, and the raises applied",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "getOwnerConfigurationSpendingBudgets",
+    "responses": {
+     "200": {"description": "generation, digest, budgets[{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}]"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {
+      "type": "string",
+      "enum": [
+       "live",
+       "sandbox"
+      ]
+     },
+     "in": "query",
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+     "required": false
+    }],
     "tags": ["owner_features"]
    }
   },
@@ -9445,7 +10590,7 @@
    "summary": "Newest gallery images (metadata only)",
    "operationId": "getGalleryRecent",
    "responses": {
-    "200": {"description": "access_mode, photos[id, taken_at, width_px, height_px, size_bytes, mime, album]"},
+    "200": {"description": "access_mode, photos[id, taken_at, width_px, height_px, size_bytes, mime, album, complete, source{kind, app, folder}]"},
     "401": {"description": "unauthorized"},
     "403": {
      "description": "capability_disabled, permission_denied",
@@ -9486,6 +10631,13 @@
      "in": "query",
      "name": "limit",
      "description": "1-100, default 20",
+     "required": false
+    },
+    {
+     "schema": {"type": "boolean"},
+     "in": "query",
+     "name": "include_pending",
+     "description": "true also lists items still arriving (recording, downloading, syncing) with complete:false; default false",
      "required": false
     }
    ],
@@ -10890,6 +12042,71 @@
    }],
    "tags": ["owner_features"]
   }},
+  "/v1/owner/configuration/approvers": {
+   "post": {
+    "summary": "Start enrolling this device as its own approver while the list is empty: makes the approver key and asks for the owner's screen-lock check on this device, which is the one human step. Needs a verified alert email and a screen lock; explicit owner.configuration grant required",
+    "x-bridgit-control-scope": "owner.configuration",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {"self": {
+      "description": "true: this device becomes its own approver. Another device is enrolled over a link (not built yet)",
+      "type": "boolean"
+     }},
+     "required": ["self"]
+    }}}},
+    "operationId": "postOwnerConfigurationApprovers",
+    "responses": {
+     "200": {"description": "enrolment{id, status waiting_owner|done|cancelled|failed, detail}, remaining_human_step{step owner_check, where, status}; read GET /v1/owner/configuration/approvers until status is done"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "501": {
+      "description": "platform_unsupported",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "403": {
+      "description": "forbidden, agent_not_allowed, capability_disabled",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "502": {
+      "description": "upstream_failed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "429": {
+      "description": "rate_limited",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict, owner_email_required, no_screen_lock, no_approver, recovery_complete",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   },
+   "get": {
+    "summary": "Read this device's approver devices (never keys), whether it can enrol itself as its own approver and why not, what its key store offers, and the recovery state. Off unless security.approvers_enabled is on; can_enable says whether this build can turn it on",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "getOwnerConfigurationApprovers",
+    "responses": {
+     "200": {"description": "enabled, setting, can_enable, enable_blocked_reason (not_available_in_this_build: the published build can't turn approver devices on yet) or null, approvers[{id, name, self, added_at, last_used_at, can_approve, wait_ends_at}], can_enrol, blocked_reason (approvers_disabled|owner_email_required|no_screen_lock|platform_unsupported|recovery_pending|approver_listed), email_verified, capability{api_level, secure_lock_screen, strongbox, strong_biometric, per_use_credential_keys, readiness}, key_state (absent|ready|needs_setup), generation, enrolment{id, status, detail} or null, requests[{id, kind, purpose, requester, expires_at, check}], recovery{state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver)}, remaining_human_step{step, where, status} or null, waits{recovery_ms, approver_ms, request_ms}"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"}
+    },
+    "tags": ["owner_features"]
+   }
+  },
   "/v1/screen/grants": {"get": {
    "summary": "Your screen requests and active grant",
    "operationId": "getScreenGrants",
@@ -11030,7 +12247,7 @@
    "summary": "Is Bridgit up, and which agent you are",
    "operationId": "getHealth",
    "responses": {
-    "200": {"description": "status, app, app_version, build_type (release, or debug for a test build), distribution (private or play), build_tag (null for the real app; debug or test claude <feature> for test builds), package (cc.bridgit.app is the real app), app_label (the name Android lists this build under), mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, listener {state (listening, rebinding, waiting_for_tailscale, bind_failed or stopped), binds (tailscale: Bridgit listens only on its Tailscale addresses, never the LAN), bound_to, port, tailscale_addresses (what the phone has now), on_tailnet, tailscale_installed, magic_dns, bind_error, ladder (what to do when a call fails)}, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}, resource_monitor {enabled, since, interval, level, cpu_percent, rss_mb, details: /v1/device/resources}"},
+    "200": {"description": "status, app, app_version, build_type (release, or debug for a test build), distribution (private or play), build_tag (null for the real app; debug or test claude <feature> for test builds), package (cc.bridgit.app is the real app), app_label (the name Android lists this build under), mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, listener {state (listening, rebinding, waiting_for_tailscale, bind_failed or stopped), binds (tailscale: Bridgit listens only on its Tailscale addresses, never the LAN), bound_to, port, tailscale_addresses (what the phone has now), on_tailnet, tailscale_installed, magic_dns, bind_error, ladder (what to do when a call fails)}, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), setup {not_done (set-up steps not done yet), profile (/v1/device/profile lists them)}, api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}, resource_monitor {enabled, since, interval, level, cpu_percent, rss_mb, details: /v1/device/resources}"},
     "422": {
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
@@ -11515,20 +12732,29 @@
    "summary": "Accessible videos and metadata",
    "operationId": "getGalleryVideosRecent",
    "responses": {
-    "200": {"description": "Accessible videos and metadata"},
+    "200": {"description": "access_mode, items[id, name, duration_ms, size_bytes, mime, added_at, complete, source{kind, app, folder} (source needs the gallery grant)]"},
     "422": {
      "description": "invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
     },
     "401": {"description": "unauthorized"}
    },
-   "parameters": [{
-    "schema": {"type": "integer"},
-    "in": "query",
-    "name": "limit",
-    "description": "1\u2013100, default 20",
-    "required": false
-   }],
+   "parameters": [
+    {
+     "schema": {"type": "integer"},
+     "in": "query",
+     "name": "limit",
+     "description": "1\u2013100, default 20",
+     "required": false
+    },
+    {
+     "schema": {"type": "boolean"},
+     "in": "query",
+     "name": "include_pending",
+     "description": "true also lists items still arriving (recording, downloading, syncing) with complete:false; default false",
+     "required": false
+    }
+   ],
    "tags": ["gallery_video"]
   }},
   "/v1/applets/portals": {"get": {
@@ -11903,6 +13129,41 @@
     "tags": ["owner_features"]
    }
   },
+  "/v1/owner/configuration/spending/limits": {"get": {
+   "summary": "Read the Bridgit-funded limits as mirrored from the cloud, and the contract limits of the spending core. Nothing is mirrored on this build: no Bridgit-funded source exists on the device-held path",
+   "x-bridgit-control-scope": "owner.configuration",
+   "operationId": "getOwnerConfigurationSpendingLimits",
+   "responses": {
+    "200": {"description": "bridgit_funded[], mirrored_at, age_ms, contract{anchor_skew_ms}"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"},
+    "501": {
+     "description": "platform_unsupported",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "403": {
+     "description": "forbidden, agent_not_allowed",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "parameters": [{
+    "schema": {
+     "type": "string",
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    "in": "query",
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "required": false
+   }],
+   "tags": ["owner_features"]
+  }},
   "/v1/images/find": {"post": {
    "summary": "Find things in a photo and get their boxes: \"the dog\", \"each dirty dish\", \"the face of each person\". Faces are found on the phone; anything else by a cheap cloud vision model (shares the Jev/Clef budget)",
    "requestBody": {"content": {"application/json": {"schema": {
@@ -12791,7 +14052,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 148,
+  "x-api-revision": 153,
   "title": "Bridgit",
   "version": "1.8.0"
  }

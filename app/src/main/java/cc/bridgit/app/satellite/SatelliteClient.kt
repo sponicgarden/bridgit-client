@@ -60,6 +60,7 @@ object SatelliteClient {
     fun newCall(base: String, key: String, method: String, path: String, query: List<Pair<String, String>>,
                 headers: List<Pair<String, String>>, body: RequestBody?, toHub: Boolean = false): Call {
         paused(toHub)
+        require(!LinkRelayClient.isRelay(base)) { "Forwarded calls don't go over the relay yet" }
         val url = base.toHttpUrl().newBuilder().encodedPath(path).apply { query.forEach { (k, v) -> addQueryParameter(k, v) } }.build()
         val b = Request.Builder().url(url).header("Authorization", "Bearer $key")
         headers.forEach { (k, v) -> b.addHeader(k, v) }
@@ -90,6 +91,7 @@ object SatelliteClient {
 
     /** Blocking. The satellite's manifest (GET /v1/satellite/manifest). */
     fun manifest(base: String, key: String, hubName: String): JSONObject {
+        if (LinkRelayClient.isRelay(base)) { paused(false); return LinkRelayClient.call(base, key, "GET", "/v1/satellite/manifest", null) }
         val (code, o) = exec(newCall(base, key, "GET", "/v1/satellite/manifest", emptyList(),
             listOf(SatellitePolicy.HUB_NAME_HEADER to hubName.filter { it.code in 0x20..0x7e }.take(40)), null))
         if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code, o.optString("scope").takeIf { it.isNotEmpty() })
@@ -98,6 +100,7 @@ object SatelliteClient {
 
     /** Blocking. Tells the satellite what this hub offers and how to call back (POST /v1/satellite/hub-info). */
     fun hubInfo(base: String, key: String, hubName: String, body: JSONObject) {
+        if (LinkRelayClient.isRelay(base)) throw Failure("not_supported", "A link over the relay has no way back yet.")
         val (code, o) = exec(newCall(base, key, "POST", "/v1/satellite/hub-info", emptyList(),
             listOf(SatellitePolicy.HUB_NAME_HEADER to hubName.filter { it.code in 0x20..0x7e }.take(40)), body.toString().toRequestBody(JSON)))
         if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code, o.optString("scope").takeIf { it.isNotEmpty() })
@@ -105,6 +108,7 @@ object SatelliteClient {
 
     /** Blocking. Tells the satellite this hub removed it (POST /v1/satellite/unlink), so it drops its hub link too. */
     fun unlink(base: String, key: String) {
+        if (LinkRelayClient.isRelay(base)) { paused(false); LinkRelayClient.call(base, key, "POST", "/v1/satellite/unlink", null); return }
         val (code, o) = exec(newCall(base, key, "POST", "/v1/satellite/unlink", emptyList(), emptyList(), null))
         if (code !in 200..299) throw Failure(o.optString("error", "http_$code"), o.optString("message").ifEmpty { "HTTP $code" }, code, o.optString("scope").takeIf { it.isNotEmpty() })
     }
@@ -114,6 +118,7 @@ object SatelliteClient {
      * (this device is the other one's satellite), so the owner's pause pills apply to the right side.
      */
     fun call(base: String, key: String, method: String, path: String, body: JSONObject?, toHub: Boolean, readS: Long = 15): JSONObject {
+        if (LinkRelayClient.isRelay(base)) { paused(toHub); return LinkRelayClient.call(base, key, method, path, body, readS) }
         val c = http.newBuilder().readTimeout(readS, TimeUnit.SECONDS).callTimeout(readS + CONNECT_S + 5, TimeUnit.SECONDS).build()
             .newCall(newCall(base, key, method, path, emptyList(), emptyList(), body?.toString()?.toRequestBody(JSON), toHub = toHub).request())
         val (code, o) = exec(c)

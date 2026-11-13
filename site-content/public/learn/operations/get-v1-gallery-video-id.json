@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Accessible video raw, or a JPEG frame",
@@ -9,7 +9,7 @@
   "mcp_tool": "gallery_video",
   "query": [{
    "name": "frame_at_s",
-   "description": "Optional frame position in seconds",
+   "description": "Optional frame position in seconds; a video still arriving answers 409 media_incomplete",
    "type": "number",
    "required": false
   }],
@@ -30,13 +30,20 @@
      "type": "string"
     },
     "frame_at_s": {
-     "description": "Optional frame position in seconds",
+     "description": "Optional frame position in seconds; a video still arriving answers 409 media_incomplete",
      "type": "number"
     }
    },
    "required": ["id"]
   },
-  "errors": [],
+  "errors": [
+   "capability_disabled",
+   "permission_denied",
+   "invalid_parameter",
+   "not_found",
+   "payload_too_large",
+   "media_incomplete"
+  ],
   "requires": null
  }
 }

@@ -590,4 +590,13 @@
     <string name="more_search">Search More and settings</string>
     <string name="more_search_empty">No results</string>
     <string name="more_search_setting">Settings · %1$s</string>
+    <string name="approver_check_enrol">Make this device an approver</string>
+    <string name="approver_check_approve">Approve</string>
+    <string name="approver_check_off">Turn off approver devices</string>
+    <string name="approver_alert_added">Approver added</string>
+    <string name="approver_alert_removed">Approver removed</string>
+    <string name="approver_alert_recovery_started">Approver recovery started</string>
+    <string name="approver_alert_recovery_cancelled">Approver recovery cancelled</string>
+    <string name="approver_alert_recovery_cleared">Approvers cleared</string>
+    <string name="approver_alert_recovery_late">Approver recovery already finished</string>
 </resources>

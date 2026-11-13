@@ -101,6 +101,10 @@
         </activity>
         <activity android:name=".context.ContextActivity" android:exported="false" />
         <activity android:name=".ownerapi.OwnerSetupActivity" android:exported="false" />
+        <activity android:name=".security.OwnerCheckActivity" android:exported="false" android:theme="@style/Theme.Bridgit.OwnerCheck"
+            android:excludeFromRecents="true" android:taskAffinity="" android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|uiMode|density|fontScale|locale|layoutDirection" />
+        <activity android:name=".ui.setup.SetupStepsActivity" android:exported="false" />
         <activity android:name=".relay.RelayActivity" android:exported="false" />
         <activity android:name=".portal.PortalActivity" android:exported="false" />
         <activity android:name=".portal.PairDeviceActivity" android:exported="false" />

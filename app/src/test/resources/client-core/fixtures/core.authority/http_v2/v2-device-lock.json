@@ -1,0 +1,47 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "v2-device-lock",
+  "service": "core.authority",
+  "door": "http_v2",
+  "title": "A locked key used from another tailnet device is refused",
+  "step": "device_lock",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true,
+      "device_lock": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "status"
+        ],
+        "devices": [
+          "100.64.0.3"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "capabilities",
+      "arguments": {}
+    }
+  },
+  "expect": {
+    "status": 403,
+    "error": "wrong_device"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

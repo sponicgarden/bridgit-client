@@ -305,4 +305,13 @@ class OutboundLogicTest {
         }
         assertEquals(problems.joinToString("\n"), 0, problems.size)
     }
+
+    @Test fun theApproverSecurityMailHasItsOwnRule() {
+        val security = Classifier.classify("bridgit.cc", "/api/alerts/security", "POST")
+        assertEquals("Bridgit email alerts", security.service)
+        assertTrue(security.purpose.contains("approver"))
+        assertFalse(security.categories.contains(Categories.ALERT_TEXT))
+        assertEquals("Send an email alert to the owner", Classifier.classify("bridgit.cc", "/api/alerts/send", "POST").purpose)
+        assertEquals("Email alert subscription", Classifier.classify("bridgit.cc", "/api/alerts/status", "GET").purpose)
+    }
 }

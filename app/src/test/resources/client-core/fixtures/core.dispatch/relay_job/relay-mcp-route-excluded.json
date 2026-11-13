@@ -1,0 +1,56 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "relay-mcp-route-excluded",
+  "service": "core.dispatch",
+  "door": "relay_job",
+  "title": "The v1 MCP route never runs as a relay job",
+  "step": "route_allowed",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "relay": {
+      "enabled": true,
+      "configs": [
+        {
+          "agent": "a",
+          "mode": "connector",
+          "routes": [
+            "POST /v1/mcp"
+          ],
+          "tools": [
+            "phone.status"
+          ]
+        }
+      ]
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "connection": "relay",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/mcp",
+    "body": {}
+  },
+  "expect": {
+    "status": 403,
+    "error": "relay_route_excluded"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

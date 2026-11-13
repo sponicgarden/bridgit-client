@@ -40,7 +40,7 @@ object SettingsCatalog {
     const val GATE_SWITCH = "settings_api"
 
     val SECTIONS = listOf("features", "listener", "privacy", "log", "alerts", "appearance", "speaker", "listening", "captures", "security",
-        "notifications", "phone", "android", "agent", "device")
+        "notifications", "phone", "android", "agent", "device", "spending")
 
     val DND_MODES = listOf("off", "priority", "alarms", "none")
     val RINGER_MODES = listOf("normal", "vibrate", "silent")
@@ -86,7 +86,9 @@ object SettingsCatalog {
         b("security.device_lock", "Each direct agent's key works only from the Tailscale device(s) it is locked to (bridgit.cc/security)", SettingLock.OWNER),
         b("security.new_place_alerts", "The owner is notified when an agent's key is used from a new device or network", SettingLock.OWNER),
         b("security.biometric", "Super Powers, approvals and allowing a new device need the owner's fingerprint, face or screen lock", SettingLock.OWNER),
+        b("security.approvers_enabled", "Approver devices: this device keeps an approver list, and an enrolled approver device can decide approvals with the owner's screen-lock check (off, the default: nothing changes). The published build can't turn it on yet (platform_unsupported, reason not_available_in_this_build; can_enable in the approver list); test builds can. Owner-only; owner configuration agents set it with POST /v1/owner/configuration/settings and read the list at GET /v1/owner/configuration/approvers", SettingLock.OWNER),
         b("security.relay_signed_only", "Relay agents that can control the phone must use sealed (signed) mode; portals exempt", SettingLock.OWNER),
+        b("spending.core_enabled", "The spending core: budgets, holds and the spend journal run on this device, for the sandbox namespace only in this build (off, the default: nothing changes, and today's budgets are untouched either way). Owner-only; owner configuration agents set it with POST /v1/owner/configuration/settings and read it at GET /v1/owner/configuration/spending", SettingLock.OWNER),
         SettingDef("captures.owner_upload_url", "string", "The owner's upload URL for every capture, or null (shown only as set or not)", lock = SettingLock.OWNER),
         e("phone.dnd", "Do Not Disturb (needs android.dnd_access; none also mutes alarms)", DND_MODES),
         e("phone.ringer_mode", "Ringer (needs android.dnd_access)", RINGER_MODES),

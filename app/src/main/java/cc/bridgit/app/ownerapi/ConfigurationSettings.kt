@@ -23,7 +23,7 @@ class ConfigurationSettings(private val app: BridgeApp, caller: Agent) {
     companion object {
     private val appOwned = setOf("listener.enabled", "listener.port", "listener.allow_internet_callbacks",
         "privacy.pause_external_calls", "captures.agent_files", "captures.agent_upload", "captures.max_keep_minutes",
-        "captures.any_agent_can_fetch", "captures.owner_files", "captures.owner_upload_url", "captures.locked_camera_approval")
+        "captures.any_agent_can_fetch", "captures.owner_files", "captures.owner_upload_url", "captures.locked_camera_approval", "security.approvers_enabled", "spending.core_enabled")
 
     fun supported(def: SettingDef) = def.writable || def.key in appOwned || def.section == "features"
     fun pathFor(def: SettingDef): String? = when {
@@ -43,6 +43,9 @@ class ConfigurationSettings(private val app: BridgeApp, caller: Agent) {
                     remove("locked_reason"); remove("why")
                     controller.blocker(it)?.let { reason -> put("locked_reason", reason).put("why", controller.blockerWhy(reason)) }
                     if (it.key == "captures.owner_upload_url") put("write_only", true)
+                    if (it.key == cc.bridgit.app.core.authority.Authority.SETTING) app.authority.enableBlocker().let { reason ->
+                        put("can_enable", reason == null).put("enable_blocked_reason", reason ?: JSONObject.NULL)
+                    }
                 }
         })).put("scope", "owner.configuration").put("approval_required", false)
     }
@@ -63,7 +66,10 @@ class ConfigurationSettings(private val app: BridgeApp, caller: Agent) {
                 return@associateWith url
             }
             when (val parsed = SettingsCatalog.parse(def, changes.opt(key))) {
-                is SettingsCatalog.Parsed.Ok -> parsed.value
+                // Refused here, before any key of the write is applied: a published build can't turn approver devices on yet.
+                is SettingsCatalog.Parsed.Ok -> parsed.value.also {
+                    if (key == cc.bridgit.app.core.authority.Authority.SETTING && it == true && !app.authority.enabled) app.authority.requireCanEnable()
+                }
                 is SettingsCatalog.Parsed.Bad -> throw ErrorCatalog.error("invalid_parameter", parsed.message)
             }
         }
@@ -74,6 +80,14 @@ class ConfigurationSettings(private val app: BridgeApp, caller: Agent) {
         ConfigurationAccess.only(body, "changes")
         val changes = body.optJSONObject("changes") ?: throw ErrorCatalog.error("invalid_parameter", "changes must be an object")
         val values = checked(changes)
+        // Turning approver devices off while an approver is enrolled is the owner's decision, as removing one is (architecture §4.7).
+        if (values[cc.bridgit.app.core.authority.Authority.SETTING] == false && withContext(Dispatchers.IO) { app.authority.offNeedsOwner() }) {
+            val live = access.require()
+            val asked = withContext(Dispatchers.IO) { app.authority.requestOff(live.id) }
+            access.audit("settings: security.approvers_enabled (asked the owner on an approver device)")
+            throw ErrorCatalog.error("owner_authorization_required", "Turning approver devices off needs the owner's check on an approver device (request ${asked.request}; its state is in GET /v1/owner/configuration/approvers); nothing in this request was changed",
+                mapOf("remaining_human_step" to JSONObject(asked.remainingHumanStep), "owner_request_id" to asked.request))
+        }
         withContext(Dispatchers.Main) {
             val live = access.require()
             checked(changes) // platform access and available definitions may have changed during dispatch
@@ -89,6 +103,8 @@ class ConfigurationSettings(private val app: BridgeApp, caller: Agent) {
                     "captures.any_agent_can_fetch" -> app.settings.capturesShareAll = value as Boolean
                     "captures.owner_files" -> app.settings.capturesOwnerFiles = value as Boolean
                     "captures.locked_camera_approval" -> app.settings.capturesLockedCameraApproval = value as Boolean
+                    "security.approvers_enabled" -> app.authority.setEnabled(value as Boolean, live.name)
+                    "spending.core_enabled" -> app.spending.setEnabled(value as Boolean, live.name)
                     "captures.owner_upload_url" -> app.settings.capturesOwnerUploadUrl = (value as String).ifEmpty { null }
                     else -> controller.apply(key, value, live.name)
                 }

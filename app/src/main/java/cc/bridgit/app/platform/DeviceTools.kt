@@ -97,7 +97,12 @@ class DeviceTools(private val app:BridgeApp) {
     private suspend fun image(agent:String,name:String,args:JSONObject):JSONObject {
         val data=when {
             args.has("file_id") -> { runtime.authorize(agent,"files"); runtime.files.file(agent,args.text("file_id")).readBytes() }
-            args.has("gallery_id") -> { runtime.authorize(agent,"gallery.read"); Gallery(app).read(args.text("gallery_id").toLongOrNull() ?: throw ApiError(422,"invalid_parameter","Invalid gallery ID")) ?: throw ApiError(404,"photo_not_found","No such image") }
+            args.has("gallery_id") -> {
+                runtime.authorize(agent,"gallery.read")
+                val id=args.text("gallery_id").toLongOrNull() ?: throw ApiError(422,"invalid_parameter","Invalid gallery ID")
+                cc.bridgit.app.core.media.MediaScopes.requireComplete(cc.bridgit.app.core.media.MediaLibrary.complete(app,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,id))
+                Gallery(app).read(id) ?: throw ApiError(404,"photo_not_found","No such image")
+            }
             else -> try { Base64.decode(args.text("image_base64",720_000),Base64.NO_WRAP) } catch(e:Exception) { throw ApiError(422,"invalid_parameter","Invalid image") }
         }
         if(data.size>4*1024*1024) throw ApiError(413,"payload_too_large","Downsize the image first")

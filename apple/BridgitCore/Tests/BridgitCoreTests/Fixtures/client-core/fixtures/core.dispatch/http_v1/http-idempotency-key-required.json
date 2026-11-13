@@ -1,0 +1,42 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-idempotency-key-required",
+  "service": "core.dispatch",
+  "door": "http_v1",
+  "title": "An endpoint that requires an Idempotency-Key refuses a request without one",
+  "step": "idempotency_required",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "ssh"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/ssh/connections/save",
+    "body": {
+      "host": "192.0.2.10"
+    }
+  },
+  "expect": {
+    "status": 422,
+    "error": "invalid_parameter"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

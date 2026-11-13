@@ -1,0 +1,59 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-link-disconnecting-during-wait",
+  "service": "core.dispatch",
+  "door": "http_v1",
+  "title": "A long wait ends with conflict when the owner disconnects the link while it waits",
+  "step": "live_recheck",
+  "principal": {
+    "agent": "hub",
+    "source": "100.64.0.40"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "hub"
+      }
+    ],
+    "links": [
+      {
+        "agent": "hub",
+        "tier": "own",
+        "state": "active",
+        "services": [
+          "interactions"
+        ]
+      }
+    ]
+  },
+  "during": {
+    "at": "wait",
+    "links": [
+      {
+        "agent": "hub",
+        "state": "disconnecting"
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/events",
+    "query": {
+      "since": "0",
+      "wait": "55"
+    }
+  },
+  "expect": {
+    "status": 409,
+    "error": "conflict"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

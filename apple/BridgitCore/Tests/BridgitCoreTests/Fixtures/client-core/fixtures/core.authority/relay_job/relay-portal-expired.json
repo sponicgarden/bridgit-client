@@ -1,0 +1,57 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "relay-portal-expired",
+  "service": "core.authority",
+  "door": "relay_job",
+  "title": "A Portal pairing past its end date is refused as link_expired",
+  "step": "portal_tier",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "relay": {
+      "enabled": true,
+      "configs": [
+        {
+          "agent": "a",
+          "mode": "connector",
+          "routes": [
+            "GET /v1/portal/home"
+          ],
+          "tools": [],
+          "portal_tier": {
+            "tier": "associate",
+            "expires_at": 1
+          }
+        }
+      ]
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "connection": "relay",
+        "caps": [
+          "portal"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/portal/home"
+  },
+  "expect": {
+    "status": 403,
+    "error": "link_expired"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

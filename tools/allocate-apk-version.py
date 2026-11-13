@@ -10,6 +10,19 @@ import tempfile
 MAX_CODE = 2_100_000_000
 MAX_PART = 2_147_483_647
 MINIMUM = (18, (1, 6, 1))
+LINE_FILE = Path(__file__).resolve().parents[1] / 'version.properties'
+
+
+def release_line(path=LINE_FILE):
+    """The (major, minor) floor from version.properties, or None when the file is absent."""
+    if not path.exists():
+        return None
+    values = dict(line.strip().split('=', 1) for line in path.read_text().splitlines()
+                  if '=' in line and not line.lstrip().startswith('#'))
+    line = (int(values['major']), int(values['minor']))
+    if any(part < 0 or part > MAX_PART for part in line):
+        raise ValueError(f'Invalid release line: {path}')
+    return line
 
 
 def read_counter(path):
@@ -74,7 +87,7 @@ def consume_reservation(counter, output, reservation):
         return contents
 
 
-def reserve(counter, output, floor=None):
+def reserve(counter, output, floor=None, line_file=LINE_FILE):
     repo = counter.parent
     common = Path(git(repo, 'rev-parse', '--path-format=absolute', '--git-common-dir')).resolve(strict=True)
     # Never fall back to a checkout-local lock: that could duplicate an allocation.
@@ -95,6 +108,10 @@ def reserve(counter, output, floor=None):
                     observed.append(read_counter(sibling))
         code = max(item[0] for item in observed) + 1
         version = max(item[1] for item in observed)
+        # A raised major/minor moves the line up; the build part keeps counting so names never repeat.
+        wanted = release_line(Path(line_file)) if line_file is not None else None
+        if wanted is not None and wanted > version[:2]:
+            version = (*wanted, version[2])
         version = (*version[:2], version[2] + 1)
         if code > MAX_CODE or version[2] > MAX_PART:
             raise ValueError('APK version overflow; explicitly advance the release scheme before building')

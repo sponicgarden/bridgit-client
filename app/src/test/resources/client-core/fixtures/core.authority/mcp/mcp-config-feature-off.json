@@ -1,0 +1,50 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-config-feature-off",
+  "service": "core.authority",
+  "door": "mcp",
+  "title": "Owner configuration with its feature turned off answers feature_disabled",
+  "step": "grant.control_scope",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "owner_features"
+        ]
+      }
+    ],
+    "control_grants": [
+      {
+        "agent": "a",
+        "scope": "owner.configuration"
+      }
+    ],
+    "control_features": {
+      "owner.configuration": false
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/owner/configuration"
+  },
+  "expect": {
+    "status": 403,
+    "body_paths": {
+      "error": "feature_disabled"
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "../schemas/vocab.schema.json",
+  "vocab": "owner-auth-purposes",
+  "version": 1,
+  "source": {
+    "kind": "pack",
+    "path": "docs/plans/client-core/architecture.md"
+  },
+  "copies": {
+    "android": "app/src/main/java/cc/bridgit/app/core/contract/ContractVocab.kt"
+  },
+  "rule": "The closed list of purposes an owner authorization (bridgit-owner-auth-v1, architecture 4.7) can name, and its two decisions. An approval kind is spelled approval.<kind>. origin says which design adds the purpose. status proposed means the purpose is reserved and refused until the owner decides it (spend_setting, spending authority Q3). Anything not listed is refused. A case asks whether an id is a purpose.",
+  "data": {
+    "label": "bridgit-owner-auth-v1",
+    "decisions": [
+      "approve",
+      "decline"
+    ],
+    "purposes": [
+      {"id": "approval.applet", "origin": "core", "status": "decided"},
+      {"id": "approval.schedule", "origin": "core", "status": "decided"},
+      {"id": "approval.workflow", "origin": "core", "status": "decided"},
+      {"id": "approval.operation", "origin": "core", "status": "decided"},
+      {"id": "approval.session", "origin": "core", "status": "decided"},
+      {"id": "setting", "origin": "core", "status": "decided"},
+      {"id": "approver_enrol", "origin": "core", "status": "decided"},
+      {"id": "approver_add", "origin": "core", "status": "decided"},
+      {"id": "approver_remove", "origin": "core", "status": "decided"},
+      {"id": "recovery_cancel", "origin": "core", "status": "decided"},
+      {"id": "payment", "origin": "payments", "status": "decided"},
+      {"id": "payment_setting", "origin": "payments", "status": "decided"},
+      {"id": "spend_setting", "origin": "spending", "status": "proposed"}
+    ]
+  },
+  "cases": [
+    {"in": "payment", "out": true},
+    {"in": "approval.applet", "out": true},
+    {"in": "spend_setting", "out": true},
+    {"in": "approval", "out": false},
+    {"in": "approval.payment", "out": false},
+    {"in": "Payment", "out": false},
+    {"in": "refund", "out": false}
+  ]
+}

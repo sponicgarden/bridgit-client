@@ -1,0 +1,83 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read the spend journal of a namespace: entries of the current epoch (or another) in order, as entry/1. It answers from the device, with or without a network",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_journal",
+  "query": [
+   {
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   },
+   {
+    "name": "after",
+    "description": "Entries after this sequence number (default 0)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "limit",
+    "description": "1 to 200 (default 50)",
+    "type": "integer",
+    "required": false
+   },
+   {
+    "name": "epoch",
+    "description": "A journal epoch id; default the current one",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/spending/journal?namespace=sandbox",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/spending/journal",
+  "capability": "owner_features",
+  "returns": "epoch, epochs[], head{seq, hash, origin}, entries[entry/1], next_after, more, read_at",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "namespace": {
+     "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+     "type": "string",
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    "limit": {
+     "description": "1 to 200 (default 50)",
+     "type": "integer"
+    },
+    "epoch": {
+     "description": "A journal epoch id; default the current one",
+     "type": "string"
+    },
+    "after": {
+     "description": "Entries after this sequence number (default 0)",
+     "type": "integer"
+    }
+   },
+   "required": []
+  },
+  "errors": [
+   "forbidden",
+   "agent_not_allowed",
+   "platform_unsupported",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

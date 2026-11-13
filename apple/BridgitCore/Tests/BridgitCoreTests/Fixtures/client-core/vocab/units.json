@@ -1,0 +1,35 @@
+{
+  "$schema": "../schemas/vocab.schema.json",
+  "vocab": "units",
+  "version": 1,
+  "source": {
+    "kind": "pack",
+    "path": "docs/plans/client-core/spending-authority.md"
+  },
+  "copies": {
+    "android": "app/src/main/java/cc/bridgit/app/core/contract/ContractVocab.kt"
+  },
+  "rule": "Money is {unit, atoms}: a unit id from this list and a whole number of that unit's smallest part, never a floating-point number (spending authority G2.2). decimals says how many decimal places of the currency one atom is. A case turns a plain decimal amount (digits, at most one point, no sign, no exponent) into atoms as a string of digits. Digits past the unit's decimals round up, against the spender. An unknown unit, a malformed amount or one past a signed 64-bit count gives null.",
+  "data": {
+    "units": [
+      {"id": "USD-6", "currency": "USD", "decimals": 6}
+    ]
+  },
+  "cases": [
+    {"in": {"unit": "USD-6", "amount": "1.5"}, "out": "1500000"},
+    {"in": {"unit": "USD-6", "amount": "0.000001"}, "out": "1"},
+    {"in": {"unit": "USD-6", "amount": "0.0000001"}, "out": "1"},
+    {"in": {"unit": "USD-6", "amount": "2.0000010"}, "out": "2000001"},
+    {"in": {"unit": "USD-6", "amount": "2.00000101"}, "out": "2000002"},
+    {"in": {"unit": "USD-6", "amount": "0"}, "out": "0"},
+    {"in": {"unit": "USD-6", "amount": "9223372036854.775807"}, "out": "9223372036854775807"},
+    {"in": {"unit": "USD-6", "amount": "9223372036854.7758071"}, "out": null},
+    {"in": {"unit": "USD-6", "amount": "9223372036854.775808"}, "out": null},
+    {"in": {"unit": "USD-6", "amount": "-1"}, "out": null},
+    {"in": {"unit": "USD-6", "amount": "1e3"}, "out": null},
+    {"in": {"unit": "USD-6", "amount": ".5"}, "out": null},
+    {"in": {"unit": "USD-6", "amount": "1."}, "out": null},
+    {"in": {"unit": "USD", "amount": "1"}, "out": null},
+    {"in": {"unit": "usd-6", "amount": "1"}, "out": null}
+  ]
+}

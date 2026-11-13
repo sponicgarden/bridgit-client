@@ -1,0 +1,63 @@
+{
+  "$schema": "../schemas/crypto.schema.json",
+  "vectors": "install-identity",
+  "version": 1,
+  "spec": "docs/spec-client-identity.md (CID-02, CID-20)",
+  "key": {
+    "note": "Synthetic test key only; never registered",
+    "private_scalar": "XUyd7o1Uam/fuzoqVUQHhCGjimm9IOLGQEUzZBjZ1zc=",
+    "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYX9jjGpS9T5gzIsquimtPrbPtnB4mOsFc1oEa7k4LynDdZVax4PZaLoRMxzIB8S+5V/uJoonlq+2eoQznHiZ7Q=="
+  },
+  "base32": [
+    {
+      "in_utf8": "",
+      "out": ""
+    },
+    {
+      "in_utf8": "f",
+      "out": "my"
+    },
+    {
+      "in_utf8": "foobar",
+      "out": "mzxw6ytboi"
+    }
+  ],
+  "install_id": [
+    {
+      "spki_utf8": "abc",
+      "out": "bgi_xj4bnp4pahh6uqkbidpf3lrc"
+    },
+    {
+      "spki_b64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYX9jjGpS9T5gzIsquimtPrbPtnB4mOsFc1oEa7k4LynDdZVax4PZaLoRMxzIB8S+5V/uJoonlq+2eoQznHiZ7Q==",
+      "out": "bgi_dtyrv6jmyoewibaeqfera3xx"
+    }
+  ],
+  "signing_text": [
+    {
+      "install_id": "bgi_x",
+      "method": "post",
+      "path_and_query": "/v1/issues/updates?since=5",
+      "at": 1700000000000,
+      "nonce": "n-1",
+      "body_utf8": "{}",
+      "out": "bridgit-install-v1\nbgi_x\nPOST\n/v1/issues/updates?since=5\n1700000000000\nn-1\n44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "install_id": "bgi_dtyrv6jmyoewibaeqfera3xx",
+      "method": "GET",
+      "path_and_query": "/v1/names/me",
+      "at": 1800000000000,
+      "nonce": "nonce-2",
+      "body_utf8": "",
+      "out": "bridgit-install-v1\nbgi_dtyrv6jmyoewibaeqfera3xx\nGET\n/v1/names/me\n1800000000000\nnonce-2\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "signature_p1363": "Vb3Ednsgqnn0XQnjreCFDPnY4dvXFZem3quqhOXXwA24xBAn1/49Dl4CRrjDoWHaeh17ls+9LG/KrQfmz1lGOQ==",
+      "header": "at=1800000000000,nonce=nonce-2,sig=Vb3Ednsgqnn0XQnjreCFDPnY4dvXFZem3quqhOXXwA24xBAn1/49Dl4CRrjDoWHaeh17ls+9LG/KrQfmz1lGOQ=="
+    }
+  ],
+  "der_to_p1363": [
+    {
+      "der_hex": "300702010102020080",
+      "p1363_hex": "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000080"
+    }
+  ]
+}

@@ -107,6 +107,8 @@ class SettingsController(private val app: BridgeApp) {
                 "captures.any_agent_can_fetch" -> s.capturesShareAll
                 "captures.owner_files" -> s.capturesOwnerFiles
                 "captures.locked_camera_approval" -> s.capturesLockedCameraApproval
+                "security.approvers_enabled" -> s.approversEnabled
+                "spending.core_enabled" -> s.spendingCoreEnabled
                 "security.device_lock" -> s.securityDeviceLock
                 "security.new_place_alerts" -> s.securityPlaceAlerts
                 "security.biometric" -> s.securityBiometric

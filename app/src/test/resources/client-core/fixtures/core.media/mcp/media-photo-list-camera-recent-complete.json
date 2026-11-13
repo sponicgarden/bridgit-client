@@ -1,0 +1,57 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-photo-list-camera-recent-complete",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "A camera photo modified 2 s ago is complete: only sync items wait for the stability window",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "photo",
+        "size": 4096,
+        "added_at": 1762800000,
+        "id": 12,
+        "owner_package": "com.google.android.GoogleCamera",
+        "relative_path": "DCIM/Camera/",
+        "modified_seconds_ago": 2
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/recent"
+  },
+  "expect": {
+    "status": 200,
+    "body_paths": {
+      "photos.0.id": "12",
+      "photos.0.complete": true
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

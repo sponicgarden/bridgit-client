@@ -674,6 +674,32 @@ object ApiChanges {
         Revision(148, "1.8.0", "2026-11-09", listOf(
             Item("The Bridgit Interface Guide: this agent's full briefing, built live for this device; the setup prompt is now a few lines that point here", "/v1/welcome"),
         )),
+        Revision(149, "1.8.0", "2026-11-11", listOf(
+            Item("This device in one answer, the same shape on every Bridgit platform: capabilities with why each can or can't be called, and the set-up steps with their state (done, waiting, needs_owner, blocked)", "/v1/device/profile"),
+            Item("setup {not_done, profile}: how many set-up steps are left, and where to read them", "/v1/health"),
+        )),
+        Revision(150, "1.8.0", "2026-11-11", listOf(
+            Item("Photo list items say complete and, with the gallery grant, source {kind: camera, download, sync, screenshot, share, other or unknown; app; folder}: where the item came from. include_pending=true also lists photos still arriving as complete:false", "/v1/gallery/recent"),
+            Item("The same complete, source (only with the gallery grant) and include_pending on gallery videos. Fixed: the list came back empty because it asked MediaStore for column names it rejects", "/v1/gallery/videos/recent"),
+            Item("New error media_incomplete (409): frame_at_s or OCR on an item still being recorded, downloaded or synced; wait and retry", "/v1/gallery/video/{id}"),
+        )),
+        Revision(151, "1.8.0", "2026-11-12", listOf(
+            Item("Approver devices, off unless the owner setting security.approvers_enabled is on (set it with POST /v1/owner/configuration/settings). Read the approver list (never keys), whether this device can enrol itself and why not, what its key store offers, waiting requests and the recovery state", "/v1/owner/configuration/approvers"),
+            Item("POST {\"self\": true} starts enrolling this device as its own approver: it needs a verified alert email (owner_email_required) and a screen lock (no_screen_lock), and the one human step is the owner's screen-lock check on the device (remaining_human_step); read the list until enrolment.status is done. Asking too often, or soon after the owner closed the prompt, is rate_limited with retry_after_s", "/v1/owner/configuration/approvers"),
+            Item("Once an approver is enrolled, turning security.approvers_enabled off is the owner's decision: the write answers owner_authorization_required with remaining_human_step and owner_request_id, and the setting goes off when the owner passes the check on the approver", "/v1/owner/configuration/settings"),
+            Item("Approver recovery state: GET reads it. Starting one is not available yet (platform_unsupported with remaining_steps)", "/v1/owner/configuration/approvers/recovery"),
+        )),
+        Revision(152, "1.8.0", "2026-11-12", listOf(
+            Item("The spending core, off unless the owner setting spending.core_enabled is on (set it with POST /v1/owner/configuration/settings), and for the sandbox namespace only: synthetic money at a test provider, in its own journal. Reads take ?namespace= and making writes carry namespace, live by default; live is not available yet and answers platform_unsupported, so send sandbox. Today's budgets and paid calls are unchanged", "/v1/owner/configuration/spending"),
+            Item("Link and unlink a sandbox source (its key is made at the sandbox provider and never returned); read each source's custody, cap and what the provider says is left", "/v1/owner/configuration/spending/sources"),
+            Item("Budgets in the device's rule document: create, lower, raise (a raise is an increment with an id, applied once), remove, top up for the current period, and set the change gate and agent ceiling. Money is {unit, atoms} or {unit, amount} as text, never a fraction. Budget changes need the Budgets capability; a gate the owner set answers no_approver with remaining_human_step", "/v1/owner/configuration/spending/budgets"),
+            Item("Spending switches (pause, per instrument class, per source), the budget time zone and per-spend caps. A change names the generation it replaces and is signed with the install key, with the calling agent as its actor", "/v1/owner/configuration/spending/rules"),
+            Item("Read-only: portions, headroom balances, held allowances, room in transit and the last time anchor; the spend journal (entry/1) and a summary with its age; mirrored Bridgit-funded limits (none yet). They answer from the device with or without a network", "/v1/owner/configuration/spending/allowances"),
+            Item("New error raise_the_ceiling_first, and the codes a refused spend will carry with its rule and resets_at (spending_off, spend_not_allowed, spend_source_not_allowed, spend_over_cap, spend_bridgit_cap, spend_over_budget; not returned by any call yet). namespace_mismatch is now returned when a sandbox budget or cap names a live instrument", "/v1/owner/configuration/spending/budgets"),
+        )),
+        Revision(153, "1.8.0", "2026-11-12", listOf(
+            Item("The published build can't turn security.approvers_enabled on yet: the write answers platform_unsupported with reason not_available_in_this_build and remaining_step, and nothing in that write is applied. GET /v1/owner/configuration/approvers and the setting's row in GET /v1/owner/configuration say can_enable and enable_blocked_reason. Turning it off is unchanged; test builds can turn it on", "/v1/owner/configuration/settings"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

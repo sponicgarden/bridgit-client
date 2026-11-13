@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_steps_title">Set-up</string>
+    <string name="setup_step_device_name">Device name</string>
+    <string name="setup_step_reach">Connection</string>
+    <string name="setup_step_first_agent">Agent</string>
+    <string name="setup_step_owner_email">Alert email</string>
+    <string name="setup_step_notifications">Notifications</string>
+    <string name="setup_step_open_app">Camera and microphone</string>
+    <string name="setup_step_permissions">Permissions</string>
+    <string name="setup_step_battery">Battery</string>
+    <string name="setup_step_diagnostic">Check</string>
+    <string name="setup_state_done">Done</string>
+    <string name="setup_state_waiting">Waiting</string>
+    <string name="setup_state_needs_owner">Needs you</string>
+    <string name="setup_state_android_permission">Android permission</string>
+    <string name="setup_open">Open %1$s</string>
+    <string name="setup_state_blocked">Blocked</string>
+</resources>

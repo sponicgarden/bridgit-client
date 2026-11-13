@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Legacy phone-local issue filing (any agent; images only in Bridgit Fixer Mode). Control agents should file issues directly with Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one",

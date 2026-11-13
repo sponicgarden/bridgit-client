@@ -1,0 +1,59 @@
+{
+  "$schema": "../schemas/vocab.schema.json",
+  "vocab": "issue-refs",
+  "version": 1,
+  "source": {
+    "kind": "backend",
+    "path": "bridgit-cloud/feedback/src/ref.mjs"
+  },
+  "copies": {
+    "android": "app/src/main/java/cc/bridgit/app/core/contract/ContractVocab.kt"
+  },
+  "rule": "One letter for where the issue came from, then the team issue id zero-padded to 4 digits.",
+  "data": {
+    "letters": {
+      "form": "M",
+      "agent": "A",
+      "agent_api": "A"
+    },
+    "other_letter": "C",
+    "pad": 4
+  },
+  "cases": [
+    {
+      "in": {
+        "capture_source": "form",
+        "team_id": 23
+      },
+      "out": "M0023"
+    },
+    {
+      "in": {
+        "capture_source": "agent",
+        "team_id": 7
+      },
+      "out": "A0007"
+    },
+    {
+      "in": {
+        "capture_source": "agent_api",
+        "team_id": 299
+      },
+      "out": "A0299"
+    },
+    {
+      "in": {
+        "capture_source": "sentry",
+        "team_id": 12345
+      },
+      "out": "C12345"
+    },
+    {
+      "in": {
+        "capture_source": "",
+        "team_id": 1
+      },
+      "out": "C0001"
+    }
+  ]
+}

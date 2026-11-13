@@ -1,0 +1,60 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "relay-mcp-unknown-method",
+  "service": "core.dispatch",
+  "door": "relay_job",
+  "title": "An unsupported JSON-RPC method on the relay MCP route is refused",
+  "step": "route_allowed",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "relay": {
+      "enabled": true,
+      "configs": [
+        {
+          "agent": "a",
+          "mode": "connector",
+          "routes": [
+            "GET /v1/health"
+          ],
+          "tools": [
+            "phone.status"
+          ]
+        }
+      ]
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "connection": "relay",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/relay/mcp",
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "resources/list"
+    }
+  },
+  "expect": {
+    "status": 404,
+    "error": "method_not_found"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

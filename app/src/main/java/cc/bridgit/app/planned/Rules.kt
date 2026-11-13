@@ -1,6 +1,7 @@
 package cc.bridgit.app.planned
 
 import cc.bridgit.app.api.ErrorCatalog
+import cc.bridgit.app.core.media.MediaSources
 import org.json.JSONObject
 
 object Rules {
@@ -8,13 +9,21 @@ object Rules {
     fun newestVideosFirst(items: List<JSONObject>): List<JSONObject> =
         items.sortedWith(compareByDescending<JSONObject> { it.optString("added_at") }.thenByDescending { it.optLong("id") })
     /**
-     * One gallery video row. A capture still being written (MediaStore IS_PENDING=1, or a row whose name/size is not
-     * filled in yet) is excluded (null) so listing never fails mid-recording (A0256). Null columns never throw.
+     * One gallery video row. A video still arriving (MediaStore IS_PENDING=1, or a row whose name/size is not filled in
+     * yet) is excluded (null) so listing never fails mid-recording (A0256); with [includePending] it is listed with
+     * complete:false (A0270); so is a sync item whose [modifiedSeconds] (date_modified, null when not returned) is within
+     * the stability window of [nowSeconds] ([MediaSources.arrived]). [pending] null means the device didn't return the column. `source` (vocab/media-sources.json)
+     * is added only when [showSource] (the caller holds the library grant). Null columns never throw.
      */
-    fun galleryVideoItem(pending: Int, id: Long, name: String?, durationMs: Long, sizeBytes: Long, mime: String?, addedAtSeconds: Long, iso: (Long) -> String): JSONObject? {
-        if (pending != 0 || name.isNullOrEmpty() || sizeBytes <= 0) return null
-        return JSONObject().put("id", id).put("name", name).put("duration_ms", maxOf(0L, durationMs)).put("size_bytes", sizeBytes)
+    fun galleryVideoItem(pending: Boolean?, id: Long, name: String?, durationMs: Long, sizeBytes: Long, mime: String?, addedAtSeconds: Long, iso: (Long) -> String,
+                         ownerPackage: String? = null, relativePath: String? = null, includePending: Boolean = false, showSource: Boolean = false,
+                         modifiedSeconds: Long? = null, nowSeconds: Long = 0): JSONObject? {
+        val arrival = MediaSources.classify(ownerPackage, relativePath, pending, modifiedSeconds, nowSeconds)
+        val complete = MediaSources.arrived(pending, name, sizeBytes, true, arrival.source.kind, modifiedSeconds, nowSeconds) != false
+        if (!complete && !includePending) return null
+        return JSONObject().put("id", id).put("name", name?.takeIf { it.isNotEmpty() } ?: JSONObject.NULL).put("duration_ms", maxOf(0L, durationMs)).put("size_bytes", maxOf(0L, sizeBytes))
             .put("mime", mime ?: "video/mp4").put("added_at", iso(maxOf(0L, addedAtSeconds) * 1000))
+            .put("complete", complete).apply { if (showSource) put("source", arrival.source.toJson()) }
     }
     /** BitmapFactory treats zero as one internally; callers must never divide by its zero default. */
     fun imageSampleSize(width: Int, height: Int, maxEdge: Int = 4096): Int {
@@ -45,6 +54,12 @@ object Rules {
         val n = (value as? Number)?.toDouble()
         if (n == null || !n.isFinite() || n !in min..max) throw ErrorCatalog.error("invalid_parameter", "$name must be $min to $max.")
         return n
+    }
+    /** A query flag: absent is false; true/1 or false/0. */
+    fun flag(value: String?, name: String): Boolean = when (value?.lowercase()) {
+        null, "false", "0" -> false
+        "true", "1" -> true
+        else -> throw ErrorCatalog.error("invalid_parameter", "$name must be true or false.")
     }
     fun bool(b: JSONObject, name: String, default: Boolean): Boolean =
         if (!b.has(name)) default else b.opt(name) as? Boolean ?: throw ErrorCatalog.error("invalid_parameter", "$name must be true or false.")

@@ -1,0 +1,51 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-config-portal-agent-forbidden",
+  "service": "core.authority",
+  "door": "mcp",
+  "title": "A paired portal may not use owner configuration",
+  "step": "grant.control_scope",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "owner_features"
+        ],
+        "connection": "relay"
+      }
+    ],
+    "relay": {
+      "configs": [
+        {
+          "agent": "a",
+          "mode": "connector",
+          "routes": [
+            "GET /v1/portal/home"
+          ]
+        }
+      ]
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/owner/configuration"
+  },
+  "expect": {
+    "status": 403,
+    "error": "forbidden"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

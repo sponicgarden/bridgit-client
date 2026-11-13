@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Commands + ToolSchemas + PlatformApi.openApi",
  "operation": {
   "path": "/v2/call",
@@ -44,7 +44,17 @@
        "GET /v1/owner/configuration/listening",
        "GET /v1/owner/configuration/permissions",
        "GET /v1/owner/configuration/links",
-       "GET /v1/owner/configuration/links/log"
+       "GET /v1/owner/configuration/links/log",
+       "GET /v1/owner/configuration/approvers",
+       "GET /v1/owner/configuration/approvers/recovery",
+       "GET /v1/owner/configuration/spending",
+       "GET /v1/owner/configuration/spending/sources",
+       "GET /v1/owner/configuration/spending/rules",
+       "GET /v1/owner/configuration/spending/budgets",
+       "GET /v1/owner/configuration/spending/allowances",
+       "GET /v1/owner/configuration/spending/journal",
+       "GET /v1/owner/configuration/spending/summary",
+       "GET /v1/owner/configuration/spending/limits"
       ]
      },
      "parameters": {
@@ -88,7 +98,17 @@
          "GET /v1/owner/configuration/listening",
          "GET /v1/owner/configuration/permissions",
          "GET /v1/owner/configuration/links",
-         "GET /v1/owner/configuration/links/log"
+         "GET /v1/owner/configuration/links/log",
+         "GET /v1/owner/configuration/approvers",
+         "GET /v1/owner/configuration/approvers/recovery",
+         "GET /v1/owner/configuration/spending",
+         "GET /v1/owner/configuration/spending/sources",
+         "GET /v1/owner/configuration/spending/rules",
+         "GET /v1/owner/configuration/spending/budgets",
+         "GET /v1/owner/configuration/spending/allowances",
+         "GET /v1/owner/configuration/spending/journal",
+         "GET /v1/owner/configuration/spending/summary",
+         "GET /v1/owner/configuration/spending/limits"
         ]
        },
        "parameters": {
@@ -135,7 +155,17 @@
       "GET /v1/owner/configuration/listening",
       "GET /v1/owner/configuration/permissions",
       "GET /v1/owner/configuration/links",
-      "GET /v1/owner/configuration/links/log"
+      "GET /v1/owner/configuration/links/log",
+      "GET /v1/owner/configuration/approvers",
+      "GET /v1/owner/configuration/approvers/recovery",
+      "GET /v1/owner/configuration/spending",
+      "GET /v1/owner/configuration/spending/sources",
+      "GET /v1/owner/configuration/spending/rules",
+      "GET /v1/owner/configuration/spending/budgets",
+      "GET /v1/owner/configuration/spending/allowances",
+      "GET /v1/owner/configuration/spending/journal",
+      "GET /v1/owner/configuration/spending/summary",
+      "GET /v1/owner/configuration/spending/limits"
      ]
     },
     "parameters": {

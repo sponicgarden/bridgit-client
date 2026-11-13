@@ -223,6 +223,16 @@ class Settings(context: Context) {
      * Owner decision, 7 Nov 2026 (report A0049): agents' camera photos work while the phone is locked. On: each such
      * photo first waits for the owner's Allow on the lock screen. Off by default.
      */
+    /** Approver devices (architecture §4.7), off by default. While off nothing of core.authority runs. */
+    var approversEnabled: Boolean
+        get() = prefs.getBoolean("approvers_enabled", false)
+        set(v) { prefs.edit().putBoolean("approvers_enabled", v).apply(); changed() }
+
+    /** The spending core (spending authority G10.2), off by default. While off nothing of core.spending runs. */
+    var spendingCoreEnabled: Boolean
+        get() = prefs.getBoolean("spending_core_enabled", false)
+        set(v) { prefs.edit().putBoolean("spending_core_enabled", v).apply(); changed() }
+
     var capturesLockedCameraApproval: Boolean
         get() = prefs.getBoolean("captures_locked_camera_approval", false)
         set(v) { prefs.edit().putBoolean("captures_locked_camera_approval", v).apply(); changed() }

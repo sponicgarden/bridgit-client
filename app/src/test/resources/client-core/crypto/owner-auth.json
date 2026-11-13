@@ -1,0 +1,1589 @@
+{
+  "$schema": "../schemas/crypto.schema.json",
+  "vectors": "owner-auth",
+  "version": 1,
+  "spec": "docs/plans/client-core/architecture.md 4.7 (bridgit-owner-auth-v1); written by tools/client-core/owner-auth-vectors.mjs",
+  "note": "The signed bytes are the label, purpose, decision, target, approver, request digest, nonce, authority generation and expiry, in that order, each behind a 4-byte big-endian length. Text is UTF-8, the digest is 32 raw bytes, generation and expiry (ms since 1970) are 8-byte big-endian. Signatures are P-256 ECDSA SHA-256, IEEE P1363 r||s, base64. In every case the signature is a real one over signed.fields by signed.key; the verifier gets record, answer, now, used_nonces and the state (a case's state fields replace the top-level ones) and must answer expect, with reason when refused. It rebuilds the bytes from its record and never reads signed. Where signed.damaged is set, the answer's signature is the real one (signed.signature_p1363) damaged as described. state.generation is the device's current authority generation: the verifier does not read it, the signed generation is the record's. bad_keys are public keys a verifier must itself reject (off the curve, the point at infinity, another curve) and r or s outside 1..n-1 must be rejected the same way, not left to the crypto provider.",
+  "encoding": {
+    "label": "bridgit-owner-auth-v1",
+    "length_prefix_bytes": 4,
+    "integer_bytes": 8,
+    "fields": [
+      "label",
+      "purpose",
+      "decision",
+      "target",
+      "approver",
+      "digest",
+      "nonce",
+      "generation",
+      "expiry"
+    ]
+  },
+  "keys": {
+    "operating_install": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "8Ekk7vPH6YKMjrbdM3jGwue9lutYR+xOHO8c8877OVY=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEpUxTw9kLTIDTQgXuHpQBTp4wfsAb7MoqQ2AEx1akLAozMyH82TcEHy1oZmw6cPzb5x+uWXhYjbLrQ+bLIhTLsg=="
+    },
+    "approver": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "ML9V5+tKlUMOs/Y8tPtgS0z7rvfaPLlvf9prxauz8H4=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFV+LHZ1+at9VRIFKegT2uDtJxTZzDyvvOF1iFSZxC4p0ZQPkPwAVuGpi9Y7VK9KXJco0YLShvQw2kYh9wnzp1w=="
+    },
+    "approver_install": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "KmRBVyDc71QuMV+NTP/s5rh5mg3Asj/3qiuKI92Qg98=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEH3sxNykE9FH5589uds867vwaYNjL8+9BII9gwj+6R3Dxji2UOmECGXfgbE6jeaCI3l5WoXZW3Q2jYpmm45vcVA=="
+    },
+    "waiting_approver": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "W4YeYsSM9ZgJ89V/j3Pk/X2vDwJ3P1hxIMLaNpaEqD0=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8TjlJB/wLi7okcan7zAxP1cCIPwYZijkrgXYzkhkUI8tbLLPnF2rThTedZm8CJZEvgtkOPwYQUV9RNE8uVWYCw=="
+    },
+    "waiting_install": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "nprvoWj6uFHf1bLXFd6BpoMHBn9DfCw1yiLNU51h+ZU=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEvuku47L8Rt9oKYqMbyeVGwJ0cPpKChbjWhFV2nCXZp5ggOdIWAuRCcHZHUFT6sy0AlONnGV/NDXeGPNXWWcWbQ=="
+    },
+    "stranger": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "FPiEnRvQh9jJFmXKL/p17a3WWBSQUoggsI+QwrCOHfc=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEI6pIafM/QNT7wv3Fzo2+95kXkBOxGjj9rpwDSQmQUazFV+kZ0Ne/nAxVffgr9gnSvLggzzPYOIQIb6sdFEWoJA=="
+    },
+    "other_install": {
+      "note": "Synthetic test key only; never enrolled",
+      "private_scalar": "f+ErWQEJ6CJAn5z/iXrTEeLSSKMk9dsmxGAxssiL8UI=",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEWs5J5UC1aXhoVufgw5pqzlksqkZT0JITU4m7JL8c1fxZSRclF8EIuaKoFlIbly70NLYhWRUItVcUYjCvfR9m9A=="
+    }
+  },
+  "bad_keys": {
+    "off_curve": {
+      "note": "Synthetic test key only; malformed on purpose",
+      "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFV+LHZ1+at9VRIFKegT2uDtJxTZzDyvvOF1iFSZxC4p0ZQPkPwAVuGpi9Y7VK9KXJco0YLShvQw2kYh9wnzp1g=="
+    },
+    "infinity": {
+      "note": "Synthetic test key only; malformed on purpose",
+      "public_spki": "MBkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDAgAA"
+    },
+    "p384": {
+      "note": "Synthetic test key only; malformed on purpose",
+      "public_spki": "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAED/0nYzkP7OOPQTHlOd73GiUFJOcowNXpRlOOm6nQrr8eyKTTEBlG68Sg6TjyxD+vC6kfeY+mJvJkgJ1V4FW+zNd/HXnhlufObviuHSd6l3Gmwk4jsWjbkGFMweIUqhnr"
+    }
+  },
+  "state": {
+    "self": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+    "generation": 7,
+    "enabled_proposed": [
+      "spend_setting"
+    ],
+    "approvers": [
+      {
+        "id": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "approver_key": "approver",
+        "install_key": "approver_install",
+        "past_wait": true
+      },
+      {
+        "id": "bgi_zoponi77isrfnhdhjlkiekvx",
+        "approver_key": "waiting_approver",
+        "install_key": "waiting_install",
+        "past_wait": false
+      }
+    ]
+  },
+  "bytes": [
+    {
+      "name": "approve payment",
+      "fields": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000,
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+      },
+      "out_hex": "00000015627269646769742d6f776e65722d617574682d7631000000077061796d656e7400000007617070726f76650000001c6267695f7a6c766e33353267347969367470356a7a627571377267360000001c6267695f6f6d6570346b666e67706b36796e6d6f3436646d6d74616100000020496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be0000000f7265715f766563746f725f3030303100000008000000000000000700000008000001a318933e80"
+    },
+    {
+      "name": "decline applet approval, shortest values",
+      "fields": {
+        "purpose": "approval.applet",
+        "decision": "decline",
+        "target": "a",
+        "approver": "b",
+        "digest_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+        "nonce": "n",
+        "generation": 0,
+        "expiry": 0
+      },
+      "out_hex": "00000015627269646769742d6f776e65722d617574682d76310000000f617070726f76616c2e6170706c6574000000076465636c696e6500000001610000000162000000200000000000000000000000000000000000000000000000000000000000000000000000016e000000080000000000000000000000080000000000000000"
+    },
+    {
+      "name": "non-ASCII nonce, large integers",
+      "fields": {
+        "purpose": "recovery_cancel",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "żądanie-1",
+        "generation": 4294967296,
+        "expiry": 9007199254740991,
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+      },
+      "out_hex": "00000015627269646769742d6f776e65722d617574682d76310000000f7265636f766572795f63616e63656c00000007617070726f76650000001c6267695f7a6c766e33353267347969367470356a7a627571377267360000001c6267695f6f6d6570346b666e67706b36796e6d6f3436646d6d74616100000020496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be0000000bc5bcc48564616e69652d3100000008000000010000000000000008001fffffffffffff"
+    }
+  ],
+  "cases": [
+    {
+      "name": "approve",
+      "proves": "An approval under an enrolled approver key that is past its wait",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "TD7dyTqqtbXVlP0q91FuBIBU1GHUtVNRl/nYghJrw2L26aNw2V+IYPzqzfzFraBluql7DBzgd317v4yqARe0FA=="
+      },
+      "expect": "approved"
+    },
+    {
+      "name": "approve_last_ms",
+      "proves": "One millisecond before the expiry still counts",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800003599999,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "S1S73HUZ2K1ybdzHb4Sk5GhVmZvf6XYrRAgA9PnoBONGBs07ocAUwzPEd7cXaF5MXwbGkeUsFm6SrqRfiBIH8A=="
+      },
+      "expect": "approved"
+    },
+    {
+      "name": "decline",
+      "proves": "A decline is the same bytes with decline, under the approver device's install key",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver_install",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "decline",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "decline",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "tjty6TCaFPe4Pn0KEKYuqtbO+up5IzKLfMLBQ6Joij7YqrCJ4Vg0zlRhOncslEEX/VKY4VilyRElmHLkb8lv0w=="
+      },
+      "expect": "declined"
+    },
+    {
+      "name": "decline_from_waiting_approver",
+      "proves": "Any listed approver device can decline, also inside its wait",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "waiting_install",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "decline",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_zoponi77isrfnhdhjlkiekvx"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "decline",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_zoponi77isrfnhdhjlkiekvx",
+        "signature_p1363": "tsZqfIe8i02XVqxG2e6rEO5kzBlmRX6lA3aFMDNAKIndIoV8V8dxTQpo6O2NAB6I5zDjJhUTc5ACm16YIr2itg=="
+      },
+      "expect": "declined"
+    },
+    {
+      "name": "decline_presented_as_approval",
+      "proves": "A real decline signature, re-presented with approve",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver_install",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "decline",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "GXnrftczHC4WX+xgiETQVRL31H8Mb21v7A3W9pwJzlDktZwrqF9XsXZbMzJxgNdtrmCrER/R2a1EmAmSK/Fm/Q=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "approval_presented_as_decline",
+      "proves": "A real approval signature, re-presented with decline",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "decline",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "JqwQeI97TdFEBsja4Q7sI5JITOuVp2j/2F4M1ZC44O3Gaq72jfhXnQ6DkSTENA2BpOKZexFCYM2KyJAdR/Bo+A=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "install_key_signs_approve",
+      "proves": "No install-key signature is ever an approval",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver_install",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "MVl7PgyL8TIxEDn6vQo4hffY5rUv+1nYN5xvNl+QTQGMLk+VOgzMNjJcUwiNJ0P+x48XR3iu2XC0oMSJMq+BSA=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "approver_key_signs_decline",
+      "proves": "No decline is ever under an approver key",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "decline",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "decline",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "op3HfzxaQxJ1iapkoCzBqVM5Dqda8vXXlAQBRODLOhEX7ANdi28N5WZsdkunP31ZrSZVrRSP3Y37gR6DO9KUAA=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "wrong_target",
+      "proves": "The right signature for another operating device, presented here with this device named",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_jsv6iz3kh2ukppdsfv4ifqbz",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "YlenDCllk8UYNNiAXw4dFyzoIGbXZawqOsBBfjZbyzQA1/D3r4AVDUxtdo8BNsGglCvcwrfF1itwNSAXnIarSw=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "wrong_target_stated",
+      "proves": "An answer that names another operating device",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_jsv6iz3kh2ukppdsfv4ifqbz",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_jsv6iz3kh2ukppdsfv4ifqbz",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "UEpyBwS+trXcLdWm1sVtYYqFlqUKNWirJ/SJx73eCdJyIUYl16byh0E1o7iSxggvW5PnR92ygOTU1H8CMf7bKA=="
+      },
+      "expect": "refused",
+      "reason": "wrong_target"
+    },
+    {
+      "name": "changed_digest",
+      "proves": "The record changed after the owner saw it",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "ce6f03297589e453c516614e84f78bd21c5e2df1f38a09c2eee71a21f25a1c43",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "YNLEHQZiDGb70tDvm7Htulnm8WHlTTohWyoift75LEjUjjhfgCokmXw2U3y/ap+jiyETLL5ogMY4DgKqtsxJew=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "reused_nonce",
+      "proves": "The same answer presented a second time",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "used_nonces": [
+        "req_vector_0001"
+      ],
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "mDEgFnnPkPtL12tC3b4Y6rmQBh92bBwCC0Q2s0Yw4CJyqsy9NlZVmR7OH9P9H7pfr+zmgYaityQQp+CRA+V4sQ=="
+      },
+      "expect": "refused",
+      "reason": "nonce_reused"
+    },
+    {
+      "name": "nonce_of_another_request",
+      "proves": "A signature for an earlier request, presented for a new one",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0000",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "7VHD14E0Dc+36gx0c7Pp96D+uiAC+IMBorgLgFQmjsAlwi60Bz0YH3PpiIqVx41hBw0HQUehRtUFk52DSnLvTQ=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "old_generation_signature",
+      "proves": "A signature made under an older authority generation",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 6,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "GOFs/0x59Vk3idYXt/ZEA6YAq0FxewJLWy1ndvkKDlbEqa3AE4i2npcT24qX6NtMDdi/g7jdS1oqqfM8ey2sTQ=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "generation_rose_since_request",
+      "proves": "The device's authority generation rose after the request was made, for an unrelated change. The signature is checked against the record's generation and still holds; whether the request is still allowed is the execution-time check's question",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "state": {
+        "generation": 8
+      },
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "DAI4sNY+Nf1WjAvHUJd+bjwFsjEMzVv4aBuybvEAt6+pAJ4J29Zpxb6AtY+3ShdNdB3O542PIDNhjoa0wKB3ww=="
+      },
+      "expect": "approved"
+    },
+    {
+      "name": "decline_after_generation_rose",
+      "proves": "A decline still counts after an unrelated generation change",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "state": {
+        "generation": 8
+      },
+      "signed": {
+        "key": "approver_install",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "decline",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "decline",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "tYtTHPM6fw41o/a/BlA1w3mYnr7oGr9n7uFY/hmDltB2PgRqu1VEPpMY6jt1aYe6trM6YizLfrFdCl4HX2sf4g=="
+      },
+      "expect": "declined"
+    },
+    {
+      "name": "new_generation_signature",
+      "proves": "A signature that names the device's newer generation, not the record's",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "state": {
+        "generation": 8
+      },
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 8,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "4ET0Xge/vOdJ2RHQe/wsnLabYJlSF+Ze25hSFwq26TsFhejWYG8JoxqLfAZPGF5VqFPi0LJK69VBoBD0wY7Jeg=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "expired",
+      "proves": "A valid signature that arrives at the expiry",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800003600000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "5X/D7UlLjhiBntXMwZKt8HMoCa8LXILXTwgqPsNRgC8lI3QEXknfNSxy4mysfBOD38HqUDwIf2XmxtFaigoIyA=="
+      },
+      "expect": "refused",
+      "reason": "expired"
+    },
+    {
+      "name": "expiry_extended",
+      "proves": "A signature over a later expiry than the record has",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800090000000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "4NTTwO0UT7E7bBBUGyEyPdMLLFjakvrqvT6NCGmvD/uV5nI2XedB0Utf0Xy+K5vSdXxEiT1ZKeFk5V6u3ggNMw=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "purpose_stated_differs",
+      "proves": "A setting signature that says so, presented for a payment",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "setting",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "setting",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "rVbV++mvv/7BIkyZYllG5p0fofwgT7ABwMt0wBHFfT9ROgElKEltTEBgNG1vFExRPFYGwlNdADJGUke6G3uerQ=="
+      },
+      "expect": "refused",
+      "reason": "purpose_mismatch"
+    },
+    {
+      "name": "unknown_purpose",
+      "proves": "A purpose outside the closed list (a bare approval names no kind)",
+      "record": {
+        "purpose": "approval.applet",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "approval",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "approval",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "1/8Bt5UtxcqnG7vERKjs/TY8g+tE9UKG7R2a+Fum5SnvrPwaGqkOOQrUQJihLLoB2rIn0M4qUHWfftDfFKt8lw=="
+      },
+      "expect": "refused",
+      "reason": "unknown_purpose"
+    },
+    {
+      "name": "proposed_purpose_not_enabled",
+      "proves": "spend_setting is reserved until the owner decides it",
+      "record": {
+        "purpose": "spend_setting",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "state": {
+        "enabled_proposed": []
+      },
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "spend_setting",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "spend_setting",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "/H/BPYbHVrxJWnFMPLrkAen9bBxlY+v6FVhjNshTPLav3AMckBXIkOCc3iIzazNZ23KYBcz//DNextn77+JlJA=="
+      },
+      "expect": "refused",
+      "reason": "purpose_not_enabled"
+    },
+    {
+      "name": "unknown_label",
+      "proves": "Another label or version",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+          "label": "bridgit-owner-auth-v2"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v2",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "etoruBSo4h21VSdY/SjqKM/mB5r4YTPMpxo0pJhI02u9rEqJjiwDHImCWI7cyImTedCmboYVgb0QrvBBH2u7FQ=="
+      },
+      "expect": "refused",
+      "reason": "unknown_label"
+    },
+    {
+      "name": "label_swapped",
+      "proves": "A signature over another version's bytes, presented as this version",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+          "label": "bridgit-owner-auth-v2"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "wIfPfUsXrwkansuStCgwV5uFNvg1nzRYcuo6mBsS7gykwHuVwq7VJlWWH+ZawGTxPmJufUhV97636HhQ5J285g=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "unknown_decision",
+      "proves": "A decision that is neither approve nor decline",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "maybe",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "maybe",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "xHytMJzIVlZRwVbHvBDLarr87mPe3c+8Qo5bkDQbJotQaMEnWkBQE/VDt18ExV+5eWyBHMn/7FZdeHIS9XUmUw=="
+      },
+      "expect": "refused",
+      "reason": "unknown_decision"
+    },
+    {
+      "name": "unknown_approver",
+      "proves": "A key that was never enrolled",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "stranger",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_k4rxhzpmzjfx3cp4cctbtgqp"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_k4rxhzpmzjfx3cp4cctbtgqp",
+        "signature_p1363": "T9yr6Bp31Sh3NhF/0OweXIwDO/VNJK39GIH96z5bJkdvC1XXvh8L4SRD+/DE2NHObtX0bDiLhxc/AJYDorjYpw=="
+      },
+      "expect": "refused",
+      "reason": "unknown_approver"
+    },
+    {
+      "name": "approver_waiting",
+      "proves": "An enrolled approver still inside its 24-hour wait cannot approve",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "waiting_approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_zoponi77isrfnhdhjlkiekvx"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_zoponi77isrfnhdhjlkiekvx",
+        "signature_p1363": "9+fBQ9J3hiDl1eRPlKRVtDDNRY41MovCO4YoVOePRE3zbdTlU0fabK8YIAqfjL2xjuLVvJ/C+OL9UDSrLswD3Q=="
+      },
+      "expect": "refused",
+      "reason": "approver_waiting"
+    },
+    {
+      "name": "another_approvers_key",
+      "proves": "A waiting approver signs in the name of one that is past its wait",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "waiting_approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "8XvLaczTjsjIzQJbif7/l2ZIexLJONina/jwNwzKG023wNKgj/ieG9Gu+PRPRAM9B2/b1r4mWIrFOYHVBr4IvA=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "approver_field_swapped",
+      "proves": "A signature that names another approver, presented under this one",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_zoponi77isrfnhdhjlkiekvx"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "N71/95MWQDgsYtGRzfoDsk9Gt4RYZw4WBy1+JfBw0RlAP1NAeq4mJD8gfnsnE8qFsQcXNrW4mp6HwTSkVisl8w=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "enrolled_key_off_curve",
+      "proves": "The stored approver key is not a point on P-256",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "state": {
+        "approvers": [
+          {
+            "id": "bgi_omep4kfngpk6ynmo46dmmtaa",
+            "approver_key": "off_curve",
+            "install_key": "approver_install",
+            "past_wait": true
+          }
+        ]
+      },
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "VKhX2YObruCpN5GpklzK+vTPrS6imDQF3ojgR4J5nKziO0VI+umfTHhMHKoBb8ECj0Zhp0jHABNLcCze6I52nA=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "enrolled_key_infinity",
+      "proves": "The stored approver key is the point at infinity",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "state": {
+        "approvers": [
+          {
+            "id": "bgi_omep4kfngpk6ynmo46dmmtaa",
+            "approver_key": "infinity",
+            "install_key": "approver_install",
+            "past_wait": true
+          }
+        ]
+      },
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "YUuhdbifq3oviJz7WsKHiwdCZakmeqK9t4czVYeafGLX2SlBwRLdj8nQuQgf6xQZbt3y9tvp+0IqpH26gTfx8Q=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "enrolled_key_other_curve",
+      "proves": "The stored approver key is on P-384",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "state": {
+        "approvers": [
+          {
+            "id": "bgi_omep4kfngpk6ynmo46dmmtaa",
+            "approver_key": "p384",
+            "install_key": "approver_install",
+            "past_wait": true
+          }
+        ]
+      },
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        }
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "lvHD2+ZqeVxqb+7w8fxECPcDhx2CPJIEVbWUxgPl51kjtZ7D9XEY9pH9HPYi4Z1NNPcqJS+dFeWbcZ2lFsIuDA=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "signature_r_zero",
+      "proves": "r must be 1 to n-1",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        },
+        "damaged": "r set to zero",
+        "signature_p1363": "Enj8mqX/o5PdO60QkyLCPDa3NyV9Y9Vfmq6VFilGJ1od2OUPRT17aFvq3A55z1au4uPZp8dqVzeKiHD3U5NcsQ=="
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAd2OUPRT17aFvq3A55z1au4uPZp8dqVzeKiHD3U5NcsQ=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "signature_s_zero",
+      "proves": "s must be 1 to n-1",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        },
+        "damaged": "s set to zero",
+        "signature_p1363": "sw77dUqiznA3QHIoYDEsd5L6nvW+SnZ9pNqPIQmDEVuG/CveVioOQbd6O0kAtcknGJB39o1jzqXz3/JodVbsVg=="
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "sw77dUqiznA3QHIoYDEsd5L6nvW+SnZ9pNqPIQmDEVsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "signature_r_is_n",
+      "proves": "r must be 1 to n-1",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        },
+        "damaged": "r set to the group order n",
+        "signature_p1363": "9zgHPjdtRh/grMy98t9AJWAk1PGS0Q4nM5kr3vEWkkeXuyF2VtWWsILcLBDeSSJZ2FyknXAznAW3eH2lb2u9rQ=="
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "/////wAAAAD//////////7zm+q2nF56E87nKwvxjJVGXuyF2VtWWsILcLBDeSSJZ2FyknXAznAW3eH2lb2u9rQ=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "signature_s_is_n",
+      "proves": "s must be 1 to n-1",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        },
+        "damaged": "s set to the group order n",
+        "signature_p1363": "vgAUvJSCf2PEMyg+TUkAWoro7Ob4fRdmKlvNVJKqY6vgkaWbHd+QObuxyclMtyllCM0lpIDf2qXz5/WFXKkZrw=="
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "vgAUvJSCf2PEMyg+TUkAWoro7Ob4fRdmKlvNVJKqY6v/////AAAAAP//////////vOb6racXnoTzucrC/GMlUQ=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "signature_s_all_ones",
+      "proves": "s must be 1 to n-1",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        },
+        "damaged": "s set to 2^256-1",
+        "signature_p1363": "SUDJ7sksCJDgEGCC0Sx2POAMahasypjvaNisbVM++TCsp/nILLPx61X5eDfOGXgY6UhEGSSSXHi95Onn/hp4iw=="
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "SUDJ7sksCJDgEGCC0Sx2POAMahasypjvaNisbVM++TD//////////////////////////////////////////w=="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "signature_too_long",
+      "proves": "A signature is exactly 64 bytes",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        },
+        "damaged": "one zero byte added in front",
+        "signature_p1363": "zA9CQkb3Q8eVc5Dwy9K+JbhijnohUMdhYbzQtExtpoPwSNs4Cf+bMcxIJ8Ktm8bTZxCbCXyvEUc5ECWdB1L/PA=="
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "AMwPQkJG90PHlXOQ8MvSviW4Yo56IVDHYWG80LRMbaaD8EjbOAn/mzHMSCfCrZvG02cQmwl8rxFHORAlnQdS/zw="
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    },
+    {
+      "name": "signature_too_short",
+      "proves": "A signature is exactly 64 bytes",
+      "record": {
+        "purpose": "payment",
+        "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+        "nonce": "req_vector_0001",
+        "generation": 7,
+        "expiry": 1800003600000
+      },
+      "now": 1800000000000,
+      "signed": {
+        "key": "approver",
+        "fields": {
+          "purpose": "payment",
+          "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+          "nonce": "req_vector_0001",
+          "generation": 7,
+          "expiry": 1800003600000,
+          "decision": "approve",
+          "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+          "approver": "bgi_omep4kfngpk6ynmo46dmmtaa"
+        },
+        "damaged": "last byte dropped",
+        "signature_p1363": "tYYy+pIJmgRtjW2iBLmqLQpFsYMBXK96Kj1vI+wYy8F/05YHqp6RCf+TVOuaQ+GpJxTR0CogV4Ro6L9nUcyBqQ=="
+      },
+      "answer": {
+        "label": "bridgit-owner-auth-v1",
+        "purpose": "payment",
+        "decision": "approve",
+        "target": "bgi_zlvn352g4yi6tp5jzbuq7rg6",
+        "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+        "signature_p1363": "tYYy+pIJmgRtjW2iBLmqLQpFsYMBXK96Kj1vI+wYy8F/05YHqp6RCf+TVOuaQ+GpJxTR0CogV4Ro6L9nUcyB"
+      },
+      "expect": "refused",
+      "reason": "bad_signature"
+    }
+  ],
+  "cross_purpose": {
+    "note": "One approval signature per purpose over the same record. Presented for a record of the same purpose it is approved; for every other purpose it is refused with bad_signature (the answer states the record's purpose).",
+    "record": {
+      "digest_hex": "496df330a76f427d52e12da85125694540e90be14d7e57f47bf156b04b0f49be",
+      "nonce": "req_vector_0001",
+      "generation": 7,
+      "expiry": 1800003600000
+    },
+    "now": 1800000000000,
+    "key": "approver",
+    "approver": "bgi_omep4kfngpk6ynmo46dmmtaa",
+    "state": {},
+    "signatures": {
+      "approval.applet": "yFWBa/9MEk6VCEsiHDGP0dFEFSFeoD+w1GUCCzoFgCZr7AtMKH5C1nVvI0k8manqyXqno7Gqqatb4U7fLRDhTw==",
+      "approval.schedule": "LwdnqdAlANfOke5EQIBVTX5fvxZaaRlnr7uqVoML1BqJxPsaGfUPe3w6UnOIgrC6x9O58YTSDVJoOUAoX+WObQ==",
+      "approval.workflow": "NAgT285pbj9EvwfQRznLoXJmrV7JV1kQ9+JZmpphVZ/0h+G54RLJW9iKqJbF0MjiTU04GzM6nLtq0Evt1oh2Kw==",
+      "approval.operation": "I40qyFzH1M22oHKFdt57o6nNLlZL6rEcMwsqWsjRF+nxTgqW2+skWcQOSVV0UT2XctGh8m/ZYjhnHFP9F4/d1g==",
+      "approval.session": "NnSGGJX5xOKsTOH5ilxTOQdmmT27p0WjMuxan93MYLEaMyQvZ6TgoQabmbrMttYbR4VXGWnAQSpterdYcWNWTA==",
+      "setting": "hK8+scV5Z6N43AQQAElzMETuhcT/+2VdSSC+4kOJupUp6BCQi+G9M9ZTSNfJzyUtkWz02DjbzzMU3QEScWZ3MQ==",
+      "approver_enrol": "2dS7L/7GcZSd1k8F6DCa62ujBGfw9JZBLTGf1/0TXturS3sgEoveWjVPnFWBd01/Ye4y1RwaAISYcyijJ3AlEg==",
+      "approver_add": "qI/y02OLEZvXkTJoV2y3VJhlMUf28cThcVoV6muaZlzY0cprZAYLNqD4vUbsD07vamiMme7yslE+fgig+kw27A==",
+      "approver_remove": "uLIXBBbO+00aJ8XGhdit5cpzwGpeaLSDt7+5NHdqXw8+XWmZSBUmDeO0m6np4J/Fp5NfSephN/AfApfQLG8+xA==",
+      "recovery_cancel": "fh1BPi5sj5rxe/0cLQ5CT4GDcleh1ohpcTUsZDkaMrqa2F6RGMe1kF62PItT1tq+lNqj+PkC/Va/bl8deEXq5Q==",
+      "payment": "IIVbdmqLpSYp4KMUwzh6VuTOSdENkHsAuNZY8QaLR5vQLJMnBnP/YC26IwsAoxtPbBmuRjg7gZzQaDW0Q6Qz3g==",
+      "payment_setting": "Rn9nHJBlJwPKFLCXEWKmZ9eklCQwIXM9OTOdjbncrBxpiXz4P90npDku1TXmgHlYowN/eNXwGjwGxntNgkPozA==",
+      "spend_setting": "mIjCJbMSFbFP6v0jEHVtIZn3Kx23X1TdpdCpMtrAmTFKy/mLNP5WSDCM4JypzjhSttgfQeXk31HQnR610nLJTw=="
+    }
+  }
+}

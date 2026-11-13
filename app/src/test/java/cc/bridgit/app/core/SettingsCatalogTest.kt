@@ -30,7 +30,7 @@ class SettingsCatalogTest {
         assertNull(def("features.camera").lock)
         mapOf("alerts.email" to SettingLock.OWNER,
             "listening.wake_words" to SettingLock.OWNER, "listening.sounds" to SettingLock.OWNER,
-            "agent.fixer_mode" to SettingLock.OWNER, "agent.super_powers" to SettingLock.OWNER, "captures.owner_upload_url" to SettingLock.OWNER, "captures.locked_camera_approval" to SettingLock.OWNER, "security.device_lock" to SettingLock.OWNER,
+            "agent.fixer_mode" to SettingLock.OWNER, "agent.super_powers" to SettingLock.OWNER, "captures.owner_upload_url" to SettingLock.OWNER, "captures.locked_camera_approval" to SettingLock.OWNER, "security.device_lock" to SettingLock.OWNER, "security.approvers_enabled" to SettingLock.OWNER, "spending.core_enabled" to SettingLock.OWNER,
             "security.relay_signed_only" to SettingLock.OWNER, "security.biometric" to SettingLock.OWNER, "agent.capabilities" to SettingLock.OWNER, "agent.name" to SettingLock.OWNER,
             "alerts.state" to SettingLock.STATUS, "notifications.questions" to SettingLock.ANDROID,
             "android.permission.CAMERA" to SettingLock.ANDROID, "android.modify_system_settings" to SettingLock.ANDROID,
@@ -85,7 +85,7 @@ class SettingsCatalogTest {
             "soundsConfig" to "listening.sounds", "capturesAgentFiles" to "captures.agent_files",
             "capturesAgentUpload" to "captures.agent_upload", "capturesMaxKeepMinutes" to "captures.max_keep_minutes",
             "capturesShareAll" to "captures.any_agent_can_fetch", "capturesOwnerFiles" to "captures.owner_files",
-            "capturesOwnerUploadUrl" to "captures.owner_upload_url", "capturesLockedCameraApproval" to "captures.locked_camera_approval",
+            "capturesOwnerUploadUrl" to "captures.owner_upload_url", "capturesLockedCameraApproval" to "captures.locked_camera_approval", "approversEnabled" to "security.approvers_enabled", "spendingCoreEnabled" to "spending.core_enabled",
             "securityDeviceLock" to "security.device_lock", "securityPlaceAlerts" to "security.new_place_alerts",
             "securityBiometric" to "security.biometric", "securityRelaySignedOnly" to "security.relay_signed_only",
             "externalCallsPaused" to "privacy.pause_external_calls",

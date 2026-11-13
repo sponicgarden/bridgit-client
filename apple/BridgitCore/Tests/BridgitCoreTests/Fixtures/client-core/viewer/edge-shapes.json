@@ -1,0 +1,142 @@
+{
+  "$schema": "../schemas/viewer-case.schema.json",
+  "case": "edge-shapes",
+  "source": "Hand-written: an Apple-style device block, a charging battery, a paused relay agent, unknown fields, a null connection, a feature with no name or state, and a log entry.",
+  "responses": {
+    "home": {
+      "device": {
+        "name": "Kitchen Mac",
+        "model": "MacBookPro18,1",
+        "os_name": "macos",
+        "os_version": "15.1",
+        "app_version": "0.2.0",
+        "device_type": "computer",
+        "future_field": 1
+      },
+      "battery": {
+        "percent": 81,
+        "charging": true
+      },
+      "connections": {
+        "relay": "connected",
+        "tailscale": null
+      },
+      "features": [
+        {
+          "id": "camera",
+          "name": "Camera",
+          "group": "Senses",
+          "state": "on"
+        },
+        {
+          "id": "speaker"
+        }
+      ]
+    },
+    "agents": {
+      "agents": [
+        {
+          "id": "agent_a",
+          "name": "Claude Opus",
+          "mode": "relay",
+          "last_used_at": 1800000000000,
+          "paused": true
+        }
+      ]
+    },
+    "applets": {
+      "applets": [
+        {
+          "id": "dog",
+          "name": "Pet monitor",
+          "running": true,
+          "last_at": 1800000000500
+        }
+      ]
+    },
+    "logs": {
+      "entries": [
+        {
+          "id": 7,
+          "ts": 1800000000000,
+          "level": "warn",
+          "agent": "Claude Opus",
+          "endpoint": "/v1/camera/snapshot",
+          "http": 403,
+          "message": "Claude Opus: camera off",
+          "params": {
+            "x": 1
+          }
+        }
+      ],
+      "has_older": true
+    }
+  },
+  "model": {
+    "model": "viewer.model/1",
+    "device": {
+      "name": "Kitchen Mac",
+      "model": "MacBookPro18,1",
+      "manufacturer": null,
+      "device_type": "computer",
+      "os": {
+        "name": "macos",
+        "version": "15.1"
+      },
+      "app_version": "0.2.0"
+    },
+    "battery": {
+      "percent": 81,
+      "charging": true
+    },
+    "paused": false,
+    "connections": {
+      "relay": "connected"
+    },
+    "features": [
+      {
+        "id": "camera",
+        "name": "Camera",
+        "group": "Senses",
+        "state": "on"
+      },
+      {
+        "id": "speaker",
+        "name": "speaker",
+        "group": null,
+        "state": "unknown"
+      }
+    ],
+    "agents": [
+      {
+        "id": "agent_a",
+        "name": "Claude Opus",
+        "transport": "relay",
+        "paused": true,
+        "last_used_at": 1800000000000
+      }
+    ],
+    "applets": [
+      {
+        "id": "dog",
+        "name": "Pet monitor",
+        "running": true,
+        "last_at": 1800000000500
+      }
+    ],
+    "log": {
+      "entries": [
+        {
+          "id": 7,
+          "ts": 1800000000000,
+          "level": "warn",
+          "agent": "Claude Opus",
+          "endpoint": "/v1/camera/snapshot",
+          "http": 403,
+          "message": "Claude Opus: camera off"
+        }
+      ],
+      "has_older": true
+    }
+  }
+}

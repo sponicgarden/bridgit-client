@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-viewfinder-card-capture",
+  "service": "core.dispatch",
+  "door": "mcp",
+  "title": "A capture a person starts from a chat card must use the visible flow",
+  "step": "viewfinder",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "camera"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/camera/arm",
+    "body": {},
+    "via": "mcp_app"
+  },
+  "expect": {
+    "status": 409,
+    "error": "viewfinder_required"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

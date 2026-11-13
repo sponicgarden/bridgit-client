@@ -1,0 +1,4 @@
+Bridgit setup for claude-fixture on Kitchen tablet (Fixture Tab). Base URL: http://fixture-tablet.example.invalid:8734/v1 (IP fallback: http://100.64.0.9:8734/v1). Key: brg_fixtureNotARealKey0000
+The key works only for this device. Save it only in "~/.config/bridgit/agents/claude-fixture/header" (mode 600) as one line, Authorization: Bearer <your key>, and never print it. No answer in 60 s? Ask the owner for Tailscale on both devices or the relay (More → Relay setup).
+Your first reply to the owner is only this, with one cute name of about 10 lowercase letters, digits or hyphens: "Bridgit, a sensorial app development network, needs a friendly name to register your device. Can we call it '<name>'?"
+The Bridgit Interface Guide is here: curl -sS -m 60 -H @"$HOME/.config/bridgit/agents/claude-fixture/header" http://fixture-tablet.example.invalid:8734/v1/welcome (public copy: https://bridgit.cc/learn/welcome.md). Read it before anything else.

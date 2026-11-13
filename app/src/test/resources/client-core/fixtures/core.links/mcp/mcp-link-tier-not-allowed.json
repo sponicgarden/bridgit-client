@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-link-tier-not-allowed",
+  "service": "core.links",
+  "door": "mcp",
+  "title": "An associate link's tool calls may not use the paths kept for the owner's own satellites",
+  "step": "link_agent",
+  "principal": {
+    "agent": "hub",
+    "source": "100.64.0.40"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "hub"
+      }
+    ],
+    "links": [
+      {
+        "agent": "hub",
+        "tier": "associate",
+        "state": "active",
+        "services": [
+          "view"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/satellite/hub"
+  },
+  "expect": {
+    "status": 403,
+    "error": "tier_not_allowed"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

@@ -1,0 +1,84 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Remove a budget. A reduction: it applies at once, unless the owner's gate stands on it. The namespace goes in the query; explicit owner.configuration grant required",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_budgets_delete",
+  "query": [
+   {
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   },
+   {
+    "name": "generation",
+    "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/owner/configuration/spending/budgets/sandbox-day?namespace=sandbox",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/spending/budgets/{id}",
+  "capability": "owner_features",
+  "returns": "removed, id, generation",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "generation": {
+     "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+     "type": "integer"
+    },
+    "namespace": {
+     "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+     "type": "string",
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/spending/budgets/{id}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "capability_disabled",
+   "platform_unsupported",
+   "conflict",
+   "not_found",
+   "namespace_mismatch",
+   "agents_may_not_change",
+   "over_ceiling",
+   "raise_the_ceiling_first",
+   "no_approver",
+   "owner_authorization_required",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

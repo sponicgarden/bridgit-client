@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Newest gallery images (metadata only)",
@@ -37,6 +37,12 @@
     "description": "1-100, default 20",
     "type": "integer",
     "required": false
+   },
+   {
+    "name": "include_pending",
+    "description": "true also lists items still arriving (recording, downloading, syncing) with complete:false; default false",
+    "type": "boolean",
+    "required": false
    }
   ],
   "control_scope": null,
@@ -47,7 +53,7 @@
   "idempotent": false,
   "path": "/v1/gallery/recent",
   "capability": "gallery",
-  "returns": "access_mode, photos[id, taken_at, width_px, height_px, size_bytes, mime, album]",
+  "returns": "access_mode, photos[id, taken_at, width_px, height_px, size_bytes, mime, album, complete, source{kind, app, folder}]",
   "mcp_input_schema": {
    "type": "object",
    "properties": {
@@ -66,6 +72,10 @@
     "type": {
      "description": "any, photo or screenshot",
      "type": "string"
+    },
+    "include_pending": {
+     "description": "true also lists items still arriving (recording, downloading, syncing) with complete:false; default false",
+     "type": "boolean"
     },
     "since": {
      "description": "ISO-8601 UTC added-at lower bound",

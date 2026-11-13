@@ -54,6 +54,7 @@ object Capabilities {
         require(all.any { it.id == id }); val legacy = legacy(id)
         if (legacy != null) app.policy.setEnabled(legacy,on) else app.platform.store.setting("enabled:$id",on.toString(),true)
         if (!on) app.platform.invalidateScope(id)
+        if (legacy == null) app.authority.switchChanged(id, on) // legacy switches report through Settings.onSwitch
     }
     fun blockers(app: BridgeApp, cap: DeviceCapability): List<String> = buildList {
         if (cap.privateOnly && !BuildConfig.PRIVATE_CONTROL) add("private_build_required")

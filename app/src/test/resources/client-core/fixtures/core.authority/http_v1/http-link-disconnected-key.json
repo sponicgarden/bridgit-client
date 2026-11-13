@@ -1,0 +1,49 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-link-disconnected-key",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "The key of a link agent removed by a disconnect answers link_revoked for the whole link",
+  "step": "key",
+  "principal": {
+    "agent": "hub",
+    "source": "100.64.0.40"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "hub"
+      }
+    ],
+    "links": [
+      {
+        "agent": "hub",
+        "tier": "own",
+        "state": "disconnected",
+        "services": [
+          "interactions"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/health"
+  },
+  "expect": {
+    "status": 403,
+    "error": "link_revoked",
+    "body_paths": {
+      "scope": "link"
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

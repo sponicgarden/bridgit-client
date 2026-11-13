@@ -1,0 +1,74 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-video-list-sync-settling",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "include_pending=true lists a sync video modified 2 s ago as complete:false, one modified 60 s ago as complete",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery_video": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery_video"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "video",
+        "name": "old.mp4",
+        "size": 2048,
+        "added_at": 1762800000,
+        "id": 1,
+        "owner_package": "com.dropbox.android",
+        "relative_path": "Movies/Dropbox/",
+        "modified_seconds_ago": 60
+      },
+      {
+        "scope": "library",
+        "kind": "video",
+        "name": "new.mp4",
+        "size": 2048,
+        "added_at": 1762800060,
+        "id": 2,
+        "owner_package": "com.dropbox.android",
+        "relative_path": "Movies/Dropbox/",
+        "modified_seconds_ago": 2
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/videos/recent",
+    "query": {
+      "include_pending": "true"
+    }
+  },
+  "expect": {
+    "status": 200,
+    "body_paths": {
+      "items.0.id": 2,
+      "items.0.complete": false,
+      "items.1.id": 1,
+      "items.1.complete": true
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

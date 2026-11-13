@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "v2-browser-origin",
+  "service": "core.authority",
+  "door": "http_v2",
+  "title": "A v2 call carrying a browser Origin header is refused",
+  "step": "origin",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "capabilities",
+      "arguments": {}
+    },
+    "headers": {
+      "Origin": "https://example.com"
+    }
+  },
+  "expect": {
+    "status": 403,
+    "error": "origin_not_allowed"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-video-frame-sync-settling-incomplete",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "A frame from a sync video modified 2 s ago (not marked pending) answers media_incomplete",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery_video": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery_video"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "video",
+        "name": "clip.mp4",
+        "size": 2048,
+        "added_at": 1762800000,
+        "id": 13,
+        "owner_package": "com.dropbox.android",
+        "relative_path": "Movies/Dropbox/",
+        "modified_seconds_ago": 2
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/video/13",
+    "query": {
+      "frame_at_s": "1"
+    }
+  },
+  "expect": {
+    "status": 409,
+    "error": "media_incomplete"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

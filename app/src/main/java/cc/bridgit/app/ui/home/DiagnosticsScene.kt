@@ -122,6 +122,12 @@ class DiagnosticsScene(
         @JavascriptInterface fun line(id: Int, json: String) = keepLine(id, json)
         /** The Rerun button: read the phone's state again and play the full run from the start. */
         @JavascriptInterface fun rerun() = main.post { if (!released) play() }.let { }
+        /** The scene played every check to the end (set-up step "diagnostic"). */
+        @JavascriptInterface fun completed() {
+            // Only this device's own scene counts; the same view also plays a paired phone's Home.
+            if (released || remote != null) return
+            cc.bridgit.app.core.profile.AndroidProfile.diagnosticCompleted(app)
+        }
     }
 
     private fun onReady() {

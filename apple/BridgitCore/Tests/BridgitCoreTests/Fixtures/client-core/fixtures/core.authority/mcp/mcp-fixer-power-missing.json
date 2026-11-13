@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-fixer-power-missing",
+  "service": "core.authority",
+  "door": "mcp",
+  "title": "An endpoint that needs Fixer Mode refuses an agent without it",
+  "step": "power",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log/device"
+  },
+  "expect": {
+    "status": 403,
+    "error": "forbidden",
+    "reason": "fixer_mode_off"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

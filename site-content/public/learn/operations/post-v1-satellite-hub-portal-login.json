@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Phone to phone: a one-use bridgit.cc sign-in code for the hub's account, so a satellite's Portals tab opens the hub's portals signed in (only for a satellite's return key). Not for agents.",

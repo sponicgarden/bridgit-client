@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Change this device's profile (purposes, device type, model; same rules as the tab and the team backend) and its own permission switches: true/false sets one specifically, \"default\" returns it to the inherited (type, purpose) default; explicit owner.configuration grant required; no per-change phone approval",

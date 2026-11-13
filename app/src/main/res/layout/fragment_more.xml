@@ -119,6 +119,7 @@
                     <include android:id="@+id/software_access" layout="@layout/more_row" />
                     <include android:id="@+id/ssh_connections" layout="@layout/more_row" />
                     <include android:id="@+id/network_devices" layout="@layout/more_row" />
+                    <include android:id="@+id/setup_steps" layout="@layout/more_row" />
                     <include android:id="@+id/tailscale_setup" layout="@layout/more_row" />
                     <include android:id="@+id/adb_setup" layout="@layout/more_row" />
                     <include android:id="@+id/relay" layout="@layout/more_row" />

@@ -1,0 +1,56 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-wire-card-act-viewfinder",
+  "service": "core.dispatch",
+  "door": "mcp",
+  "title": "card_act of a capture over MCP answers viewfinder_required",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "camera"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/mcp",
+    "wire": "mcp_rpc",
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "tools/call",
+      "params": {
+        "name": "card_act",
+        "arguments": {
+          "method": "POST",
+          "path": "/v1/camera/arm",
+          "body": {}
+        }
+      }
+    }
+  },
+  "expect": {
+    "status": 200,
+    "body_paths": {
+      "structuredContent.status": 409,
+      "structuredContent.error": "viewfinder_required",
+      "structuredContent.body.error": "viewfinder_required"
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

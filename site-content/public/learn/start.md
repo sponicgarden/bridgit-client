@@ -1,6 +1,6 @@
 # Start here: build a Bridgit applet
 
-Bridgit turns the owner's Android phone into a device you program: it sees, hears, decides, shows cards and acts, and keeps running after you set it up. An applet is one file (a package) that the owner approves once; the phone then builds and runs every part itself. Your job is to choose what to sense, how to decide and what to do. The phone draws the card in its own style, so you usually write no HTML or CSS. Build one in four stages. Reading these pages needs no phone or key; a phone also serves this page as GET /v1/start.
+Bridgit turns the owner's Android phone into a device you program: it sees, hears, decides, shows cards and acts. An applet is one file (a package) that the owner approves once; the phone then builds and runs every part itself. Your job is to choose what to sense, how to decide and what to do. The phone draws the card in its own style, so you usually write no HTML or CSS. Build one in four stages. Reading these pages needs no phone or key.
 
 **Reviewing or exporting existing applet data?** Start with `GET /v1/applets/installed`, then follow its `data_url`. Your paired control key with `applet_install` already authorizes all installed applets; no new approval or installer sharing flag is needed. The standard data contract gives schemas, paginated rows, saved photos, processing status and JSON/ZIP export. Do not run, reinstall or modify an applet to read its saved data.
 
@@ -28,7 +28,7 @@ Bridgit turns the owner's Android phone into a device you program: it sees, hear
 
 **You decide:** nothing; the phone tells you.
 
-**Run:** `GET /v1/capabilities` and `GET /v1/limits`.
+**Run:** `GET /v1/health`, `POST /v1/me`, `GET /v1/capabilities`, `GET /v1/limits`, `GET /v1/start`, `GET /v1/discover`.
 
 **Done when:** each capability the recipe needs shows `agent_allowed`, `enabled` and `ready` true. If not, ask the owner once, naming each switch: "Please turn on Camera and Watches for me in Bridgit." Limits differ per account: size `max_paid_per_hour` from `GET /v1/limits`.
 

@@ -1,0 +1,136 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Change a budget. A lower amount is a reduction and applies at once. A higher amount is a standing raise: an increment with an id, applied once, drawn from this device's headroom balance under an agent ceiling. A new scope or period never opens a period early. Needs the Budgets capability; explicit owner.configuration grant required",
+  "method": "PATCH",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_budgets_update",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   },
+   {
+    "name": "amount",
+    "description": "The new standing amount: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar. Send it alone when it is a raise",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "rebalance",
+    "description": "Rebalance shares by use",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "scope",
+    "description": "{kind, id} as when creating",
+    "type": "object",
+    "required": false
+   },
+   {
+    "name": "period",
+    "description": "hour, day, week or month",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "hour",
+     "day",
+     "week",
+     "month"
+    ]
+   },
+   {
+    "name": "generation",
+    "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+    "type": "integer",
+    "required": false
+   }
+  ],
+  "example": "PATCH /v1/owner/configuration/spending/budgets/{id} {\"namespace\":\"sandbox\",\"amount\":{\"unit\":\"USD-6\",\"amount\":\"0.50\"}}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/spending/budgets/{id}",
+  "capability": "owner_features",
+  "returns": "budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}, generation, increment{id, amount, lasts, replayed} when it was a raise; replayed: true when this Idempotency-Key already did it (nothing is worked out again)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "generation": {
+     "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+     "type": "integer"
+    },
+    "rebalance": {
+     "description": "Rebalance shares by use",
+     "type": "boolean"
+    },
+    "amount": {
+     "description": "The new standing amount: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar. Send it alone when it is a raise",
+     "type": "object"
+    },
+    "period": {
+     "description": "hour, day, week or month",
+     "type": "string",
+     "enum": [
+      "hour",
+      "day",
+      "week",
+      "month"
+     ]
+    },
+    "scope": {
+     "description": "{kind, id} as when creating",
+     "type": "object"
+    },
+    "namespace": {
+     "description": "live (the default) or sandbox. Only sandbox is available on this build",
+     "type": "string",
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/owner/configuration/spending/budgets/{id}",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "capability_disabled",
+   "platform_unsupported",
+   "conflict",
+   "not_found",
+   "namespace_mismatch",
+   "agents_may_not_change",
+   "over_ceiling",
+   "raise_the_ceiling_first",
+   "no_approver",
+   "owner_authorization_required",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

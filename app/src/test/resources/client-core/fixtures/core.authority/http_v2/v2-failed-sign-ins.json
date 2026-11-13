@@ -1,0 +1,48 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "v2-failed-sign-ins",
+  "service": "core.authority",
+  "door": "http_v2",
+  "title": "After five failed sign-ins from an address, the next try is rate limited",
+  "step": "failed_sign_ins",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2",
+    "key": "wrong"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "capabilities",
+      "arguments": {}
+    }
+  },
+  "prior_requests": 5,
+  "expect": {
+    "status": 429,
+    "error": "rate_limited",
+    "body_paths": {
+      "message": "Too many failed sign-ins"
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "$schema": "../schemas/vocab.schema.json",
+  "vocab": "friendly-names",
+  "version": 1,
+  "source": {
+    "kind": "backend",
+    "path": "bridgit-cloud/feedback/src/names.mjs"
+  },
+  "copies": {
+    "android": "app/src/main/java/cc/bridgit/app/core/contract/ContractVocab.kt"
+  },
+  "rule": "Inner whitespace collapses to one space and the ends are trimmed; 1 to 40 characters after that; no control characters; anything over 120 characters before trimming is refused. Uniqueness among the owner's devices compares the lowercase form.",
+  "data": {
+    "max_chars": 40,
+    "max_input_chars": 120
+  },
+  "cases": [
+    {
+      "in": "Kitchen tablet",
+      "out": {
+        "name": "Kitchen tablet",
+        "key": "kitchen tablet"
+      }
+    },
+    {
+      "in": "  Hall \t  phone ",
+      "out": {
+        "name": "Hall phone",
+        "key": "hall phone"
+      }
+    },
+    {
+      "in": "",
+      "out": null
+    },
+    {
+      "in": "   ",
+      "out": null
+    },
+    {
+      "in": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "out": {
+        "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "key": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    },
+    {
+      "in": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "out": null
+    },
+    {
+      "in": "bell\u0007",
+      "out": null
+    },
+    {
+      "in": "del",
+      "out": null
+    },
+    {
+      "in": "                                                                                                    ok",
+      "out": {
+        "name": "ok",
+        "key": "ok"
+      }
+    },
+    {
+      "in": "                                                                                                                       ok",
+      "out": null
+    },
+    {
+      "in": "Żółw",
+      "out": {
+        "name": "Żółw",
+        "key": "żółw"
+      }
+    }
+  ]
+}

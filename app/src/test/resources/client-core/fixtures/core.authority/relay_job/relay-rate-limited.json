@@ -1,0 +1,59 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "relay-rate-limited",
+  "service": "core.authority",
+  "door": "relay_job",
+  "title": "The 301st relay job in a minute from one agent is rate limited",
+  "step": "rate",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "relay": {
+      "enabled": true,
+      "configs": [
+        {
+          "agent": "a",
+          "mode": "connector",
+          "routes": [
+            "GET /v1/health"
+          ],
+          "tools": [
+            "phone.status"
+          ]
+        }
+      ]
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "connection": "relay",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/health"
+  },
+  "prior_requests": 300,
+  "expect": {
+    "status": 429,
+    "error": "rate_limited",
+    "body_paths": {
+      "message": "At most 300 relay requests per minute"
+    }
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

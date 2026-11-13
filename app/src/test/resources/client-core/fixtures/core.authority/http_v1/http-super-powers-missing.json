@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-super-powers-missing",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "An endpoint needing Super Powers refuses an agent without them",
+  "step": "power",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "settings"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/owner/configuration/access"
+  },
+  "expect": {
+    "status": 403,
+    "error": "forbidden",
+    "reason": "super_powers_off"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

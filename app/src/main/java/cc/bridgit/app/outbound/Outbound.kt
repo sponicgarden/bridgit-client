@@ -300,6 +300,7 @@ object Classifier {
             if (host == "bridgit.cc" || host == "www.bridgit.cc") return when {
                 path.startsWith("/api/usage") -> Rule("Bridgit website", "Daily anonymous feature-use counts", listOf(USAGE_COUNTS, APP_VERSION))
                 path.startsWith("/api/alerts/send") -> Rule("Bridgit email alerts", "Send an email alert to the owner", listOf(ALERT_TEXT))
+                path.startsWith("/api/alerts/security") -> Rule("Bridgit email alerts", "Email the owner about an approver device change: what kind and when, nothing else", listOf(INSTALL_ID))
                 path.startsWith("/api/alerts") -> Rule("Bridgit email alerts", "Email alert subscription", listOf(INSTALL_ID))
                 else -> Rule("Bridgit website", "Website request", emptyList())
             }

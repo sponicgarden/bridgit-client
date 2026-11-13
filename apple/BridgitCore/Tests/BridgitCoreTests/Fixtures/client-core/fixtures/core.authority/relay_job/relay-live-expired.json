@@ -1,0 +1,62 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "relay-live-expired",
+  "service": "core.authority",
+  "door": "relay_job",
+  "title": "A tool needing a live job is refused when the job is older than five seconds",
+  "step": "live_job",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "relay": {
+      "enabled": true,
+      "configs": [
+        {
+          "agent": "a",
+          "mode": "connector",
+          "routes": [
+            "GET /v1/health"
+          ],
+          "tools": [
+            "phone.context"
+          ]
+        }
+      ]
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "connection": "relay",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "phone.context",
+      "arguments": {}
+    }
+  },
+  "job": {
+    "age_ms": 6000
+  },
+  "expect": {
+    "status": 409,
+    "error": "live_request_expired"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

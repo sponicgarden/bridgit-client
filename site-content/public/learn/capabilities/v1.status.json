@@ -58,6 +58,16 @@
    "tool": "health"
   },
   {
+   "summary": "This device in one answer, the same shape on every Bridgit platform: what it is, whether it is online, every capability with why it can or can't be called now, and the set-up steps with their state",
+   "path": "/v1/device/profile",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-device-profile.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-device-profile.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "device_profile"
+  },
+  {
    "summary": "This phone's display right now and the canvas a card's page gets: full screen (presentation full_screen) per orientation and the standard card frame. Static specs (screen size, cameras) are also stored with Bridgit: ask GET <team backend>/v1/names/{name}/specs first when the phone may be busy or offline",
    "path": "/v1/device/display",
    "method": "GET",
@@ -458,8 +468,8 @@
    "tool": "owner_configuration_links_disconnect_all"
   }
  ],
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.status",

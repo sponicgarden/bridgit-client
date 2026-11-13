@@ -19,6 +19,9 @@ import cc.bridgit.app.core.Connection
  * email=<address> to set one; confirmed lets long test runs skip email verification).
  * software_manifest_url (test manifest URL on Bridgit's download host, or "default").
  * device_tools ("workflows,decisions": Device tools features on; "-id" turns one off).
+ * sandbox_spend, sandbox_host, sandbox_reconcile, sandbox_anchor, sandbox_online, sandbox_calls_per_hour, sandbox_gate: the spending core's
+ * sandbox instrument (see DebugSandbox); the answer is the result data and a "sandbox {...}" line under BridgitDebug. Send them in a
+ * broadcast of their own: one that carries a sandbox extra does nothing else.
  * Result data is the pairing code for a new agent (never the key); the test
  * redeems it with POST /v1/pair, the same way an agent would.
  */
@@ -35,6 +38,18 @@ class DebugSetupReceiver : BroadcastReceiver() {
 
     private fun handle(context: Context, intent: Intent) {
         val app = context.applicationContext as BridgeApp
+        // sandbox_*: the spending core's sandbox instrument (DebugSandbox). Off the main thread: it opens the journal and may register the install.
+        // Such a broadcast does nothing else: its answer is the result, which the rest of this function could no longer set.
+        if (DebugSandbox.EXTRAS.any(intent::hasExtra)) {
+            val pending = goAsync()
+            Thread {
+                val out = runCatching { DebugSandbox.handle(app, intent).toString() }.getOrElse { "error: $it" }
+                android.util.Log.i("BridgitDebug", "sandbox $out")
+                runCatching { pending.resultData = out }
+                pending.finish()
+            }.start()
+            return
+        }
         if (intent.hasExtra("port")) {
             app.settings.port = intent.getIntExtra("port", BuildConfig.DEFAULT_PORT).also { require(it in 1024..65535) }
             BridgeService.running?.poke("test port changed")
@@ -145,7 +160,7 @@ class DebugSetupReceiver : BroadcastReceiver() {
         }
         intent.getStringExtra("satellite_remove")?.let { id -> cc.bridgit.app.satellite.SatelliteHub.remove(app, id) }
         // Linked Bridgits: link_resolve=<name>|<code> asks the names backend for that name's address with a proof of the
-        // code (spec-linked-bridgits §14.4) and logs "link_resolve ok <host>:<port>" or "link_resolve failed <error>".
+        // code (spec-linked-bridgits §14.4) and logs "link_resolve ok <host>:<port>" (or "ok relay") or "link_resolve failed <error>".
         intent.getStringExtra("link_resolve")?.let { spec ->
             val (n, c) = spec.split('|', limit = 2).let { it[0] to it.getOrElse(1) { "" } }
             Thread {
@@ -153,7 +168,9 @@ class DebugSetupReceiver : BroadcastReceiver() {
                     val own = cc.bridgit.app.feedback.InstallIdentity.status(app)?.installId ?: error("no install id")
                     val code = cc.bridgit.app.link.LinkCode.normalise(c) ?: error("not a code")
                     cc.bridgit.app.link.LinkResolver.resolve(app, n, cc.bridgit.app.link.LinkCode.keys(code, n).proof(n, own))
-                }.onSuccess { android.util.Log.i("BridgitDebug", "link_resolve ok ${it.first}:${it.second}") }
+                }.onSuccess { r -> android.util.Log.i("BridgitDebug", "link_resolve ok " + when (r) {
+                    is cc.bridgit.app.link.LinkResolver.Reach.Tailscale -> "${r.host}:${r.port}"
+                    is cc.bridgit.app.link.LinkResolver.Reach.Relay -> "relay" }) }
                     .onFailure { android.util.Log.w("BridgitDebug", "link_resolve failed ${(it as? cc.bridgit.app.api.ApiError)?.code ?: it.javaClass.simpleName} ${it.message}") }
             }.start()
         }

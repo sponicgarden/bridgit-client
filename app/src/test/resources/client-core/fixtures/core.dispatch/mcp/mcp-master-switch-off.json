@@ -1,0 +1,43 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-master-switch-off",
+  "service": "core.dispatch",
+  "door": "mcp",
+  "title": "A capability whose switch is off refuses inside the handler",
+  "step": "master_switch",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery": false
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/recent"
+  },
+  "expect": {
+    "status": 403,
+    "error": "capability_disabled"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

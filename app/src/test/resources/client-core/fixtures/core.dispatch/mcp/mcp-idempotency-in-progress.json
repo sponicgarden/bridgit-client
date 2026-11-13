@@ -1,0 +1,53 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-idempotency-in-progress",
+  "service": "core.dispatch",
+  "door": "mcp",
+  "title": "A key whose first request is still running is refused",
+  "step": "idempotency",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ],
+    "idempotency": {
+      "entries": [
+        {
+          "agent": "a",
+          "key": "fixture-key-0003",
+          "route": "POST /v1/log",
+          "state": "running"
+        }
+      ]
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/log",
+    "body": {
+      "message": "fixture note"
+    },
+    "idempotency_key": "fixture-key-0003"
+  },
+  "expect": {
+    "status": 409,
+    "error": "in_progress"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

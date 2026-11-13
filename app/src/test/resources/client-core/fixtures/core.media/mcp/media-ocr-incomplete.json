@@ -1,0 +1,59 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-ocr-incomplete",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "OCR on a photo still arriving answers media_incomplete",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery": true,
+      "ocr": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "ocr",
+          "gallery"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "photo",
+        "size": 4096,
+        "added_at": 1762800000,
+        "id": 7,
+        "owner_package": "com.google.android.apps.photos",
+        "relative_path": "DCIM/Camera/",
+        "pending": true
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/ocr",
+    "body": {
+      "gallery_id": "7"
+    }
+  },
+  "expect": {
+    "status": 409,
+    "error": "media_incomplete"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

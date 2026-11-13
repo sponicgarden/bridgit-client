@@ -1,0 +1,393 @@
+{
+  "$schema": "./schemas/limits.schema.json",
+  "contract": "client-core.limits",
+  "version": 1,
+  "note": "Device-side limits only. Backend limits stay authoritative at GET /v1/limits; abuse thresholds stay in the backend and never appear here.",
+  "limits": {
+    "auth_failures_per_address_per_minute": {
+      "value": 5,
+      "unit": "count",
+      "meaning": "Wrong keys from one address before refusal (SEC-06)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "const": "AUTH_FAILS_PER_IP"
+        }
+      }
+    },
+    "captures_per_agent_per_minute": {
+      "value": 10,
+      "unit": "count",
+      "meaning": "Captures per agent per minute (SEC-07)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "const": "CAPTURES_PER_AGENT"
+        }
+      }
+    },
+    "captures_per_address_per_minute": {
+      "value": 30,
+      "unit": "count",
+      "meaning": "Captures per address per minute (SEC-07)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "const": "CAPTURES_PER_IP"
+        }
+      }
+    },
+    "lan_actions_per_agent_per_minute": {
+      "value": 30,
+      "unit": "count",
+      "meaning": "LAN device actions per agent per minute (A0212)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "const": "DEVICE_ACTIONS_PER_AGENT"
+        }
+      }
+    },
+    "lan_actions_per_address_per_minute": {
+      "value": 60,
+      "unit": "count",
+      "meaning": "LAN device actions per address per minute (A0212)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "const": "DEVICE_ACTIONS_PER_IP"
+        }
+      }
+    },
+    "notes_per_agent_per_minute": {
+      "value": 60,
+      "unit": "count",
+      "meaning": "Log notes per agent per minute (LOG-11)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "const": "NOTES_PER_AGENT"
+        }
+      }
+    },
+    "satellite_calls_per_agent_per_minute": {
+      "value": 60,
+      "unit": "count",
+      "meaning": "Forwarded calls per hub agent per minute (SAT-37)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "const": "SATELLITE_CALLS_PER_AGENT"
+        }
+      }
+    },
+    "open_waits_per_agent": {
+      "value": 4,
+      "unit": "count",
+      "meaning": "Open wait requests per agent (SEC-08a)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "match": "class WaitGate\\(private val perAgent: Int = (\\d+)"
+        }
+      }
+    },
+    "open_waits_total": {
+      "value": 32,
+      "unit": "count",
+      "meaning": "Open wait requests in total (SEC-08a)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "match": "class WaitGate\\([^)]*total: Int = (\\d+)"
+        }
+      }
+    },
+    "idempotency_keep_ms": {
+      "value": 86400000,
+      "unit": "ms",
+      "meaning": "How long a successful Idempotency-Key result is kept (API-13)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "match": "\\bkeepMs: Long = ([0-9_L* ]+),"
+        }
+      }
+    },
+    "idempotency_media_keep_ms": {
+      "value": 900000,
+      "unit": "ms",
+      "meaning": "How long a media body is replayed for a repeated key",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/Limits.kt",
+          "match": "mediaKeepMs: Long = ([0-9_L* ]+),"
+        }
+      }
+    },
+    "media_sync_stable_ms": {
+      "value": 10000,
+      "unit": "ms",
+      "meaning": "How long a sync-tool library item not marked pending stays incomplete after its last modification (architecture 6.3)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/core/media/MediaSources.kt",
+          "const": "SYNC_STABLE_MS"
+        }
+      }
+    },
+    "agent_pairing_window_ms": {
+      "value": 300000,
+      "unit": "ms",
+      "meaning": "How long an agent pairing window stays open",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/BridgeApp.kt",
+          "const": "WINDOW_MS"
+        }
+      }
+    },
+    "agent_pairing_wrong_tries": {
+      "value": 5,
+      "unit": "count",
+      "meaning": "Wrong pairing codes before the window closes",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/BridgeApp.kt",
+          "match": "wrongAttempts >= (\\d+)"
+        }
+      }
+    },
+    "link_code_length": {
+      "value": 8,
+      "unit": "count",
+      "meaning": "Characters in a link code (LNK-16)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/link/LinkModel.kt",
+          "const": "LENGTH"
+        }
+      }
+    },
+    "link_code_valid_ms": {
+      "value": 600000,
+      "unit": "ms",
+      "meaning": "How long a link code can be claimed",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/link/LinkModel.kt",
+          "const": "VALID_MS"
+        }
+      }
+    },
+    "link_code_tries": {
+      "value": 5,
+      "unit": "count",
+      "meaning": "Wrong tries that void a link code",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/link/LinkModel.kt",
+          "const": "MAX_TRIES"
+        }
+      }
+    },
+    "request_payload_base64_bytes": {
+      "value": 12582912,
+      "unit": "bytes",
+      "meaning": "Largest base64 body a request may carry",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/ApiServer.kt",
+          "const": "MAX_PAYLOAD"
+        }
+      }
+    },
+    "request_payload_raw_bytes": {
+      "value": 41943040,
+      "unit": "bytes",
+      "meaning": "Largest raw media a request may carry",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/api/ApiServer.kt",
+          "const": "MAX_RAW"
+        }
+      }
+    },
+    "applet_package_bytes": {
+      "value": 131072,
+      "unit": "bytes",
+      "meaning": "Largest applet package file",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/applets/AppletPackage.kt",
+          "const": "MAX_BYTES"
+        }
+      }
+    },
+    "applet_export_bytes": {
+      "value": 20971520,
+      "unit": "bytes",
+      "meaning": "Largest applet export",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/applets/AppletExport.kt",
+          "const": "MAX_BYTES"
+        }
+      }
+    },
+    "applet_tables": {
+      "value": 3,
+      "unit": "count",
+      "meaning": "Tables per applet",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/applets/AppletTables.kt",
+          "const": "MAX_TABLES"
+        }
+      }
+    },
+    "applet_table_columns": {
+      "value": 16,
+      "unit": "count",
+      "meaning": "Columns per applet table",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/applets/AppletTables.kt",
+          "const": "MAX_COLUMNS"
+        }
+      }
+    },
+    "applet_table_rows_max": {
+      "value": 10000,
+      "unit": "count",
+      "meaning": "Largest max_rows an applet table may declare",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/applets/AppletTables.kt",
+          "const": "MAX_ROWS"
+        }
+      }
+    },
+    "applet_row_bytes": {
+      "value": 4096,
+      "unit": "bytes",
+      "meaning": "One row's values in UTF-8 bytes (a photo counts as its ref)",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/applets/AppletTables.kt",
+          "const": "MAX_ROW_BYTES"
+        }
+      }
+    },
+    "applet_kept_photos": {
+      "value": 1000,
+      "unit": "count",
+      "meaning": "Photos kept per applet",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/applets/AppletTables.kt",
+          "const": "MAX_KEPT_PHOTOS"
+        }
+      }
+    },
+    "applet_kept_photo_bytes": {
+      "value": 524288000,
+      "unit": "bytes",
+      "meaning": "Bytes of photos kept per applet",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/applets/AppletTables.kt",
+          "const": "MAX_KEPT_PHOTO_BYTES"
+        }
+      }
+    },
+    "applet_keep_days_max": {
+      "value": 3650,
+      "unit": "days",
+      "meaning": "Longest keep_days an applet table may declare",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/applets/AppletTables.kt",
+          "const": "MAX_KEEP_DAYS"
+        }
+      }
+    },
+    "relay_claim_ms": {
+      "value": 86400000,
+      "unit": "ms",
+      "meaning": "How long a relay pairing link can be claimed",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/relay/RelayStore.kt",
+          "const": "CLAIM_MS"
+        }
+      }
+    },
+    "approver_recovery_wait_ms": {
+      "value": 259200000,
+      "unit": "ms",
+      "meaning": "Running time before an approver recovery clears the approver list (72 hours; architecture 4.7, D16b). Contract data, not a setting",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/core/authority/AuthorityLimits.kt",
+          "const": "RECOVERY_WAIT_MS"
+        }
+      }
+    },
+    "approver_wait_ms": {
+      "value": 86400000,
+      "unit": "ms",
+      "meaning": "Running time before an approver enrolled after first set-up, or after a recovery, can approve (24 hours; architecture 4.7, D16c). Contract data, not a setting",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/core/authority/AuthorityLimits.kt",
+          "const": "APPROVER_WAIT_MS"
+        }
+      }
+    },
+    "owner_request_lifetime_ms": {
+      "value": 600000,
+      "unit": "ms",
+      "meaning": "How long a request for the owner's decision on an approver device can be answered before it expires (10 minutes; architecture 4.7). Contract data, not a setting",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/core/authority/AuthorityLimits.kt",
+          "const": "REQUEST_LIFETIME_MS"
+        }
+      }
+    },
+    "enrol_secret_bytes": {
+      "value": 16,
+      "unit": "bytes",
+      "meaning": "Length of the enrolment secret an approver link carries in its es field (128 bits; spending authority G10.3 X1). The SPAKE2 password of approver enrolment comes from it, never from the link code. Contract data, not a setting",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/core/authority/AuthorityLimits.kt",
+          "const": "ENROL_SECRET_BYTES"
+        }
+      }
+    },
+    "enrol_pbkdf2_iterations": {
+      "value": 1000,
+      "unit": "count",
+      "meaning": "PBKDF2-HMAC-SHA256 rounds that turn the enrolment secret into the SPAKE2 value w (spending authority G10.3 X1). Small on purpose: the strength is in the 128-bit secret, not in the hash. Contract data, not a setting",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/core/authority/AuthorityLimits.kt",
+          "const": "ENROL_PBKDF2_ITERATIONS"
+        }
+      }
+    },
+    "spend_anchor_skew_ms": {
+      "value": 300000,
+      "unit": "ms",
+      "meaning": "The most a time anchor and the device's wall clock may differ for the anchor to count (5 minutes; spending authority G5.2 rule 2). An anchor further off starts no period, and a device whose own clock is wrong fails closed until it is right. The design names this limit and gives no value: 5 minutes is the first build's proposal, for the owner to confirm. Contract data, not a setting",
+      "sources": {
+        "android": {
+          "file": "app/src/main/java/cc/bridgit/app/core/spending/SpendSigning.kt",
+          "const": "ANCHOR_SKEW_MS"
+        }
+      }
+    }
+  }
+}

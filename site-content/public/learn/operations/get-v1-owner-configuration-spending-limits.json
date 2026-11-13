@@ -1,0 +1,49 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read the Bridgit-funded limits as mirrored from the cloud, and the contract limits of the spending core. Nothing is mirrored on this build: no Bridgit-funded source exists on the device-held path",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_limits",
+  "query": [{
+   "name": "namespace",
+   "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+   "type": "string",
+   "required": false,
+   "enum": [
+    "live",
+    "sandbox"
+   ]
+  }],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/spending/limits?namespace=sandbox",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/spending/limits",
+  "capability": "owner_features",
+  "returns": "bridgit_funded[], mirrored_at, age_ms, contract{anchor_skew_ms}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"namespace": {
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }},
+   "required": []
+  },
+  "errors": [
+   "forbidden",
+   "agent_not_allowed",
+   "platform_unsupported",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

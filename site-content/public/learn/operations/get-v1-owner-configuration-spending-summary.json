@@ -1,0 +1,49 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read what was spent in a namespace: per budget the portion, what is used and when it resets; per source the counts and amounts by state. It answers from the device's journal, with its age",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_summary",
+  "query": [{
+   "name": "namespace",
+   "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+   "type": "string",
+   "required": false,
+   "enum": [
+    "live",
+    "sandbox"
+   ]
+  }],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/spending/summary?namespace=sandbox",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/spending/summary",
+  "capability": "owner_features",
+  "returns": "budgets[{id, unit, portion, used, remaining, resets_at, standing}], sources{id: {state: {count, counted[]}}}, last_entry_at, age_ms, online, read_at",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"namespace": {
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }},
+   "required": []
+  },
+  "errors": [
+   "forbidden",
+   "agent_not_allowed",
+   "platform_unsupported",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-video-frame-incomplete",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "A frame from a video still arriving answers media_incomplete",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery_video": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery_video"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "video",
+        "name": "clip.mp4",
+        "size": 0,
+        "added_at": 1762800000,
+        "id": 9,
+        "pending": true
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/video/9",
+    "query": {
+      "frame_at_s": "1"
+    }
+  },
+  "expect": {
+    "status": 409,
+    "error": "media_incomplete"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

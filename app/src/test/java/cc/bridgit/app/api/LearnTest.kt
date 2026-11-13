@@ -210,6 +210,19 @@ class LearnTest {
         assertTrue(calls.size > 30)
     }
 
+    /** F18: the prompt's FIRST CALLS, the guide's Start here and start.md stage 2 name the vocab's calls in its order. */
+    @Test fun firstCallsAreOneList() {
+        val vocab = cc.bridgit.app.core.contract.ContractVocab.SETUP_PROMPT_FIRST_CALLS
+        fun order(text: String) = Regex("""(GET|POST) /v1/[a-z_]+""").findAll(text).map { it.value }
+            .filter { it in vocab }.distinct().toList()
+        fun section(text: String, from: String, to: String) = text.substring(text.indexOf(from), text.indexOf(to, text.indexOf(from)))
+        val prompt = section(files.getValue("learn/pairing-direct.txt"), "FIRST CALLS, IN ORDER", "\nGOTCHAS")
+        val guide = section(files.getValue("learn/guide.md"), "## Start here", "## Good phone manners")
+        val start = section(files.getValue("learn/start.md"), "## 2. ", "## 3. ")
+        for ((name, text) in listOf("relay first calls" to SetupPrompt.firstCalls(), "prompt" to prompt,"guide Start here" to guide, "start.md stage 2" to start))
+            assertEquals(name, vocab, order(text))
+    }
+
     @Test fun interactionExampleCountIsCurrent() {
         val index = JSONObject(File("../site-content/content/interactions/index.json").readText())
         assertEquals(index.getJSONArray("interactions").length(), Learn.INTERACTION_EXAMPLES)

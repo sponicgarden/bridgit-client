@@ -1,0 +1,80 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Acknowledge unreadable history: rows of an earlier journal epoch that can be tied to no request stop every spend until the owner or an agent takes that on. Nothing is given back by it; explicit owner.configuration grant required",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_spending_journal_acknowledge",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   },
+   {
+    "name": "acknowledge_history",
+    "description": "true",
+    "type": "boolean",
+    "required": true
+   }
+  ],
+  "example": "POST /v1/owner/configuration/spending/journal {\"namespace\":\"sandbox\",\"acknowledge_history\":true}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/spending/journal",
+  "capability": "owner_features",
+  "returns": "acknowledged, journal{...}",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "acknowledge_history": {
+     "description": "true",
+     "type": "boolean"
+    },
+    "namespace": {
+     "description": "live (the default) or sandbox. Only sandbox is available on this build",
+     "type": "string",
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    }
+   },
+   "required": [
+    "acknowledge_history",
+    "idempotency_key"
+   ]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "capability_disabled",
+   "platform_unsupported",
+   "conflict",
+   "not_found",
+   "namespace_mismatch",
+   "agents_may_not_change",
+   "over_ceiling",
+   "raise_the_ceiling_first",
+   "no_approver",
+   "owner_authorization_required",
+   "team_unavailable"
+  ],
+  "requires": null
+ }
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-failed-sign-ins-limit",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "An address with five failed sign-ins in the last minute is refused before its key is checked",
+  "step": "key",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2",
+    "key": "wrong"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ],
+    "failed_sign_ins": {
+      "100.64.0.2": 5
+    }
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log"
+  },
+  "expect": {
+    "status": 429,
+    "error": "rate_limited"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read the approver recovery: its state, who started it, when the approver list is cleared and the time left",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_approvers_recovery_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/approvers/recovery",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/approvers/recovery",
+  "capability": "owner_features",
+  "returns": "state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver)",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

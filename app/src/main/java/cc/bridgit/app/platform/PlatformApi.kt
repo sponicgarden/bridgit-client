@@ -30,12 +30,7 @@ class PlatformApi(private val app: BridgeApp, private val v1: cc.bridgit.app.api
             get("/v2/streams/{id}/frame") { serve(call) { a -> app.platform.read(a.id,"stream.frame",JSONObject().put("id",call.parameters["id"])) } }
             post("/v2/applets/events") { serve(call) { a -> app.platform.mutate(a.id,"applet.event",body(call),key(call),a.hash) } }
             post("/v2/applications/events") { serve(call) { a -> app.platform.mutate(a.id,"application.event",body(call),key(call),a.hash) } }
-            post("/v2/call") { val audit=JSONObject(); serve(call,audit) { a ->
-                val b=body(call); b.only("tool","arguments"); val tool=b.text("tool",64); val args=b.optJSONObject("arguments") ?: JSONObject()
-                audit.put("tool",tool)
-                if(tool in Commands.immediate) cc.bridgit.app.ownerapi.ConfigurationTools.call(app, v1 ?: throw ApiError(503,"not_ready","Configuration dispatcher is unavailable"), a.id, a.hash, tool, args, call.request.headers["Idempotency-Key"])
-                else if(tool in Commands.reads) app.platform.read(a.id,tool,args,a.hash) else if(tool in Commands.mutations) app.platform.mutate(a.id,tool,args,key(call),a.hash) else throw ApiError(404,"unknown_tool","Unknown tool")
-            } }
+            post("/v2/call") { val audit=JSONObject(); serve(call,audit) { a -> callTool(a,body(call),call.request.headers["Idempotency-Key"],audit) } }
             get("/v2/viewer/streams/{id}") {
                 try {
                     if(!cc.bridgit.app.core.Net.isTailnet(call.request.local.remoteAddress) || call.request.headers["Origin"]!=null) throw ApiError(403,"forbidden_source","Private viewer transport only")
@@ -56,23 +51,35 @@ class PlatformApi(private val app: BridgeApp, private val v1: cc.bridgit.app.api
     }
     private fun query(call: ApplicationCall): JSONObject = JSONObject().apply { call.request.queryParameters.entries().forEach { (k,v) -> v.firstOrNull()?.let { put(k,it.toIntOrNull() ?: it) } } }
     private fun key(call: ApplicationCall) = call.request.headers["Idempotency-Key"] ?: ""
-    private fun authenticate(call: ApplicationCall): Policy.Agent {
-        if (!cc.bridgit.app.core.Net.isTailnet(call.request.local.remoteAddress)) throw ApiError(403,"forbidden_source","Private network only")
-        val origin=call.request.headers["Origin"]
+    private fun authenticate(call: ApplicationCall): Policy.Agent = admit(call.request.local.remoteAddress) { call.request.headers[it] }
+    /**
+     * The door's own checks, in order, for a request from socket peer [source] with request headers [header].
+     * [authenticate] runs it for every call; the Client Core door fixtures (DoorFixturesTest) drive it directly.
+     */
+    internal fun admit(source: String, header: (String) -> String?): Policy.Agent {
+        if (!cc.bridgit.app.core.Net.isTailnet(source)) throw ApiError(403,"forbidden_source","Private network only")
+        val origin=header("Origin")
         if(origin != null) throw ApiError(403,"origin_not_allowed","Browser origins cannot call the agent API")
-        val src=call.request.local.remoteAddress
+        val src=source
         if(limiter.count("platform_auth:$src")>=5) throw ApiError(429,"rate_limited","Too many failed sign-ins")
-        val token=call.request.headers["Authorization"]?.takeIf { it.startsWith("Bearer ") }?.substring(7)?.trim()
+        val token=header("Authorization")?.takeIf { it.startsWith("Bearer ") }?.substring(7)?.trim()
         val a=app.policy.authenticate(token) ?: run { limiter.record("platform_auth:$src"); throw ApiError(401,"unauthorized","Missing or invalid token") }
         if(!limiter.tryAcquire("platform_calls:${a.id}",300)) throw ApiError(429,"rate_limited","At most 300 platform requests per agent per minute")
         requireDevice(a.id,src)
         cc.bridgit.app.api.ApiAccess.require(app.agents.get(a.id))
         app.agents.recordUse(a.id,src)
-        call.request.headers["X-Bridgit-Model"]?.let { m ->
-            app.agents.reportModel(a.id, m, call.request.headers["X-Bridgit-Harness"])
+        header("X-Bridgit-Model")?.let { m ->
+            app.agents.reportModel(a.id, m, header("X-Bridgit-Harness"))
                 ?.let { app.log.system("audit", "agent", "${it.name} says it runs on ${it.modelLabel}") }
         }
         return a
+    }
+    /** POST /v2/call for admitted agent [a] with request body [b]; [audit] records which tool ran. */
+    internal suspend fun callTool(a: Policy.Agent, b: JSONObject, idempotency: String?, audit: JSONObject): JSONObject {
+        b.only("tool","arguments"); val tool=b.text("tool",64); val args=b.optJSONObject("arguments") ?: JSONObject()
+        audit.put("tool",tool)
+        return if(tool in Commands.immediate) cc.bridgit.app.ownerapi.ConfigurationTools.call(app, v1 ?: throw ApiError(503,"not_ready","Configuration dispatcher is unavailable"), a.id, a.hash, tool, args, idempotency)
+        else if(tool in Commands.reads) app.platform.read(a.id,tool,args,a.hash) else if(tool in Commands.mutations) app.platform.mutate(a.id,tool,args,idempotency ?: "",a.hash) else throw ApiError(404,"unknown_tool","Unknown tool")
     }
     /** Device lock, as on v1 (ApiServer.requireDevice): the key works only from the device(s) it is locked to. */
     private fun requireDevice(id:String,src:String) {

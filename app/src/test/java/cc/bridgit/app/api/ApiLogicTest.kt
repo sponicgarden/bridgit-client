@@ -160,7 +160,7 @@ class ApiLogicTest {
         assertTrue("connected sentence", p.contains("means you're connected; nothing else proves it."))
         assertTrue("timeout fallback", p.contains("run the connection ladder first") && p.contains("More → Relay"))
         assertTrue(p.contains("/v1/camera/snapshot") && p.contains("/v1/image/last"))
-        assertTrue(p.contains("GET /v1/guide is the full reference: use it only when needed"))
+        assertTrue(p.contains("GET /v1/guide is the full reference (300 KB): use it only when needed"))
         assertTrue(p.contains("GET /v1/demo"))
         assertTrue("points bug reports at the servers", p.contains("Report every bug") && p.contains(Learn.BUGS_URL))
         assertTrue("states the job", p.contains("Your job: build and improve applets"))

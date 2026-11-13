@@ -28,9 +28,11 @@ class SatelliteStore(context: Context) {
         val returnAgent: String? = null, val returnKey: String? = null,
         /** When this hub last told the satellite its applets ([SatelliteHub.pushHubInfo]), and why the last try failed. */
         val sharedAt: Long = 0, val shareError: String? = null,
+        /** A linked Bridgit reached only over the relay: https://{relay}/d/{device} (host is then empty, and [key] is an rly_ token). */
+        val relay: String? = null,
     ) {
-        /** The satellite's API, through the Tailscale-only name [SatelliteClient] resolves. */
-        val base: String get() = SatelliteClient.base(host, port)
+        /** The satellite's API: through the Tailscale-only name [SatelliteClient] resolves, or the relay ([LinkRelayClient]). */
+        val base: String get() = relay ?: SatelliteClient.base(host, port)
         fun online(now: Long = System.currentTimeMillis()) = lastError == null && lastSeen > 0 && now - lastSeen <= ONLINE_MS
     }
 
@@ -70,14 +72,18 @@ class SatelliteStore(context: Context) {
     fun get(id: String): Satellite? = all().firstOrNull { it.id == id }
     fun count(): Int = runCatching { JSONArray(prefs.getString("satellites", "[]")).length() }.getOrDefault(0)
 
-    /** Adds a satellite from a claimed link and its [key] (replacing one with the same install id or address). Returns it. */
-    @Synchronized fun add(p: SatelliteLink.Parsed, key: String, manifest: JSONObject?, now: Long = System.currentTimeMillis()): Satellite {
+    /**
+     * Adds a satellite from a claimed link and its [key] (replacing one with the same install id or address). [relay]:
+     * its relay base, for a linked Bridgit reached only over the relay. Returns it.
+     */
+    @Synchronized fun add(p: SatelliteLink.Parsed, key: String, manifest: JSONObject?, now: Long = System.currentTimeMillis(), relay: String? = null): Satellite {
         val existing = all()
-        val same = existing.firstOrNull { (p.install != null && it.install == p.install) || (it.host == p.host && it.port == p.port) }
+        val same = existing.firstOrNull { (p.install != null && it.install == p.install) ||
+            if (relay != null) it.relay == relay else it.relay == null && it.host == p.host && it.port == p.port }
         val name = manifest?.optString("name")?.takeIf { it.isNotBlank() }?.take(60) ?: p.name
         val id = same?.id ?: SatelliteLink.newId(name, existing.map { it.id }.toSet())
         val s = Satellite(id, name, p.host, p.port, key, p.install, same?.addedAt ?: now, if (manifest != null) now else 0, null,
-            manifest, same?.agents ?: emptySet(), same?.returnAgent, same?.returnKey, same?.sharedAt ?: 0, same?.shareError)
+            manifest, same?.agents ?: emptySet(), same?.returnAgent, same?.returnKey, same?.sharedAt ?: 0, same?.shareError, relay)
         save(existing.filter { it.id != id } + s)
         return s
     }
@@ -124,6 +130,7 @@ class SatelliteStore(context: Context) {
             .put("key_iv", b64(c.iv)).put("key_ct", b64(c.doFinal(s.key.toByteArray())))
             .put("shared_at", s.sharedAt).put("share_error", s.shareError ?: JSONObject.NULL)
             .put("return_agent", s.returnAgent ?: JSONObject.NULL).put("return_key", s.returnKey?.let { seal(it) } ?: JSONObject.NULL)
+            .put("relay", s.relay ?: JSONObject.NULL)
     }
 
     private fun decode(o: JSONObject): Satellite {
@@ -135,7 +142,8 @@ class SatelliteStore(context: Context) {
             o.optLong("added_at"), o.optLong("last_seen"), o.optString("last_error").takeIf { it.isNotEmpty() && !o.isNull("last_error") },
             o.optJSONObject("manifest"), agents, o.optString("return_agent").takeIf { it.isNotEmpty() && !o.isNull("return_agent") },
             o.optJSONObject("return_key")?.let { open(it) }, o.optLong("shared_at"),
-            o.optString("share_error").takeIf { it.isNotEmpty() && !o.isNull("share_error") })
+            o.optString("share_error").takeIf { it.isNotEmpty() && !o.isNull("share_error") },
+            o.optString("relay").takeIf { !o.isNull("relay") && LinkRelayClient.isRelay(it) })
     }
 
     companion object {

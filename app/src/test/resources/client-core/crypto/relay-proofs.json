@@ -1,0 +1,41 @@
+{
+  "$schema": "../schemas/crypto.schema.json",
+  "vectors": "relay-proofs",
+  "version": 1,
+  "spec": "docs/spec-relay.md; app relay/RelayStore.kt",
+  "key": {
+    "note": "Synthetic test key only; never registered",
+    "private_scalar": "XUyd7o1Uam/fuzoqVUQHhCGjimm9IOLGQEUzZBjZ1zc=",
+    "public_spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYX9jjGpS9T5gzIsquimtPrbPtnB4mOsFc1oEa7k4LynDdZVax4PZaLoRMxzIB8S+5V/uJoonlq+2eoQznHiZ7Q=="
+  },
+  "note": "Each proof signs context, device id, nonce and time joined by newlines, P-256 ECDSA SHA-256, IEEE P1363 r||s, base64.",
+  "proofs": [
+    {
+      "purpose": "challenge",
+      "context": "bridgit-relay-challenge-v1",
+      "device": "dev_fixture",
+      "nonce": "n-c",
+      "at": 1800000000000,
+      "text": "bridgit-relay-challenge-v1\ndev_fixture\nn-c\n1800000000000",
+      "signature_p1363": "Vpw25A5fyMVbUMryufnriS63I38r/Y+xPJ8AExZZSyRF9QlWffjNK5b+SzPoTa2adUETlpfcqjdu6KeiNmmVMQ=="
+    },
+    {
+      "purpose": "enroll",
+      "context": "bridgit-relay-enroll-v1",
+      "device": "dev_fixture",
+      "nonce": "n-e",
+      "at": 1800000000000,
+      "text": "bridgit-relay-enroll-v1\ndev_fixture\nn-e\n1800000000000",
+      "signature_p1363": "3Z746zg75PdhO17poOQ3LraS6DqTCMu0s5Xlf207VbIAqczkzHGzdZ3h8t5rZLV4QEAye6Tdn7NvK9Tfs+8CWg=="
+    },
+    {
+      "purpose": "socket",
+      "context": "bridgit-relay-v1",
+      "device": "dev_fixture",
+      "nonce": "n-s",
+      "until": 1800000600000,
+      "text": "bridgit-relay-v1\ndev_fixture\nn-s\n1800000600000",
+      "signature_p1363": "2d4z9tYVmlAWWL5G3oSresakNi7rkG0G6kq0aOFjslOGME41BJo+NU60zkkPzbntElODXnLActleybugAWzPFQ=="
+    }
+  ]
+}

@@ -1196,7 +1196,8 @@
     "agent_not_allowed",
     "not_found",
     "conflict",
-    "upstream_failed"
+    "upstream_failed",
+    "platform_unsupported"
    ],
    "requires": null
   },
@@ -2642,6 +2643,1009 @@
    "requires": null
   },
   {
+   "summary": "Read this device's approver devices (never keys), whether it can enrol itself as its own approver and why not, what its key store offers, and the recovery state. Off unless security.approvers_enabled is on; can_enable says whether this build can turn it on",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_approvers_list",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/approvers",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/approvers",
+   "capability": "owner_features",
+   "returns": "enabled, setting, can_enable, enable_blocked_reason (not_available_in_this_build: the published build can't turn approver devices on yet) or null, approvers[{id, name, self, added_at, last_used_at, can_approve, wait_ends_at}], can_enrol, blocked_reason (approvers_disabled|owner_email_required|no_screen_lock|platform_unsupported|recovery_pending|approver_listed), email_verified, capability{api_level, secure_lock_screen, strongbox, strong_biometric, per_use_credential_keys, readiness}, key_state (absent|ready|needs_setup), generation, enrolment{id, status, detail} or null, requests[{id, kind, purpose, requester, expires_at, check}], recovery{state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver)}, remaining_human_step{step, where, status} or null, waits{recovery_ms, approver_ms, request_ms}",
+   "errors": [],
+   "requires": null
+  },
+  {
+   "summary": "Start enrolling this device as its own approver while the list is empty: makes the approver key and asks for the owner's screen-lock check on this device, which is the one human step. Needs a verified alert email and a screen lock; explicit owner.configuration grant required",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_approvers_enrol",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [{
+    "name": "self",
+    "description": "true: this device becomes its own approver. Another device is enrolled over a link (not built yet)",
+    "type": "boolean",
+    "required": true
+   }],
+   "example": "POST /v1/owner/configuration/approvers {\"self\":true}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/approvers",
+   "capability": "owner_features",
+   "returns": "enrolment{id, status waiting_owner|done|cancelled|failed, detail}, remaining_human_step{step owner_check, where, status}; read GET /v1/owner/configuration/approvers until status is done",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "conflict",
+    "rate_limited",
+    "owner_email_required",
+    "no_screen_lock",
+    "platform_unsupported",
+    "no_approver",
+    "recovery_complete",
+    "upstream_failed"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Read the approver recovery: its state, who started it, when the approver list is cleared and the time left",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_approvers_recovery_get",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/approvers/recovery",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/approvers/recovery",
+   "capability": "owner_features",
+   "returns": "state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver)",
+   "errors": [],
+   "requires": null
+  },
+  {
+   "summary": "Start an approver recovery when the last approver is lost: the approver list is cleared after 72 hours of running time unless a listed approver cancels. Not available yet: refused with platform_unsupported and remaining_steps until alert email delivery and a cancel action on the approver device exist; explicit owner.configuration grant required",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_approvers_recovery_start",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "POST /v1/owner/configuration/approvers/recovery",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/approvers/recovery",
+   "capability": "owner_features",
+   "returns": "state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver)",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "conflict",
+    "rate_limited",
+    "owner_email_required",
+    "no_screen_lock",
+    "platform_unsupported",
+    "no_approver",
+    "recovery_complete",
+    "upstream_failed"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Cancel a pending approver recovery: the agent that started it withdraws it at once; anyone else's cancel asks a listed approver for the owner's check; explicit owner.configuration grant required",
+   "method": "DELETE",
+   "auth": true,
+   "mcp_tool": "owner_configuration_approvers_recovery_cancel",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "DELETE /v1/owner/configuration/approvers/recovery",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/approvers/recovery",
+   "capability": "owner_features",
+   "returns": "state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver), remaining_human_step when a listed approver has to confirm",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "conflict",
+    "rate_limited",
+    "owner_email_required",
+    "no_screen_lock",
+    "platform_unsupported",
+    "no_approver",
+    "recovery_complete",
+    "upstream_failed"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Read the spending core: whether it is on (owner setting spending.core_enabled), which namespaces this build has, and for namespace=sandbox its switches, journal state and time anchor. With no namespace it answers for live, which is not available yet",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_get",
+   "query": [{
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/spending?namespace=sandbox",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/spending",
+   "capability": "owner_features",
+   "returns": "enabled, setting, namespace, available, namespaces[], and for sandbox: switches{paused, device_paused, classes, sources}, payments_on, online, install, rules{generation, digest} or null, journal{epoch, origin, seq, whole, reset_reason, history_blocked, time{now, anchored, last_anchor_at, usable}}, read_at",
+   "errors": [
+    "forbidden",
+    "agent_not_allowed",
+    "platform_unsupported",
+    "invalid_parameter"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Turn spending on or off for the namespace: the pause, per instrument class and per source. Off applies at once; nothing here changes today's live budgets; explicit owner.configuration grant required",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_set",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    {
+     "name": "paused",
+     "description": "true pauses every spend of the namespace",
+     "type": "boolean",
+     "required": false
+    },
+    {
+     "name": "classes",
+     "description": "Instrument class to true or false, for example {\"metered\": false}",
+     "type": "object",
+     "required": false
+    },
+    {
+     "name": "sources",
+     "description": "Source id to true or false",
+     "type": "object",
+     "required": false
+    },
+    {
+     "name": "generation",
+     "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+     "type": "integer",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/owner/configuration/spending {\"namespace\":\"sandbox\",\"paused\":true}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/spending",
+   "capability": "owner_features",
+   "returns": "the same as GET, plus changed",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "platform_unsupported",
+    "conflict",
+    "not_found",
+    "namespace_mismatch",
+    "agents_may_not_change",
+    "over_ceiling",
+    "raise_the_ceiling_first",
+    "no_approver",
+    "owner_authorization_required",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "List the linked sources of a namespace: instrument, provider, custody, cap and whether the key is set. A key is never returned",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_sources_list",
+   "query": [{
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/spending/sources?namespace=sandbox",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/spending/sources",
+   "capability": "owner_features",
+   "returns": "sources[{id, instrument, provider, class, namespace, funder, custody, cap provider|core_only, configured, device, host, on, time_source, usage_read, available, linked_at}], instruments[]",
+   "errors": [
+    "forbidden",
+    "agent_not_allowed",
+    "platform_unsupported",
+    "invalid_parameter"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Link a source. This build links the sandbox instrument only: a sandbox key is made at the sandbox provider and stored on this device, write-only. It needs no namespace: the instrument fixes it; explicit owner.configuration grant required",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_sources_link",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "instrument",
+     "description": "sandbox",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "id",
+     "description": "A name for the source, 1 to 64 of a-z 0-9 . _ -; made up when left out",
+     "type": "string",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/owner/configuration/spending/sources {\"instrument\":\"sandbox\",\"id\":\"sandbox-1\"}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/spending/sources",
+   "capability": "owner_features",
+   "returns": "the source as in the list; conflict when the id is taken or was linked before (reason id_retired)",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "platform_unsupported",
+    "conflict",
+    "not_found",
+    "namespace_mismatch",
+    "agents_may_not_change",
+    "over_ceiling",
+    "raise_the_ceiling_first",
+    "no_approver",
+    "owner_authorization_required",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Unlink a source and remove its key from this device. What it spent stays in the journal; an unknown hold of it can no longer be reconciled and keeps its hold. Its id is retired with it: a later link takes another id; explicit owner.configuration grant required",
+   "method": "DELETE",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_sources_unlink",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "DELETE /v1/owner/configuration/spending/sources/{id}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/spending/sources/{id}",
+   "capability": "owner_features",
+   "returns": "unlinked, id",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "platform_unsupported",
+    "conflict",
+    "not_found",
+    "namespace_mismatch",
+    "agents_may_not_change",
+    "over_ceiling",
+    "raise_the_ceiling_first",
+    "no_approver",
+    "owner_authorization_required",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Read the rule document of a namespace: generation, time zone, switches and per-spend caps, and who signed it",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_rules_get",
+   "query": [{
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/spending/rules?namespace=sandbox",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/spending/rules",
+   "capability": "owner_features",
+   "returns": "generation, digest, zone, switches, caps{instruments, sources}, executor, signed_by, actor, account; generation 0 when there is none yet",
+   "errors": [
+    "forbidden",
+    "agent_not_allowed",
+    "platform_unsupported",
+    "invalid_parameter"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Change the budget time zone or a per-spend cap (per instrument or per source). Lowering is open to any configuration agent; raising or removing a cap needs the Budgets capability. A zone change never resets a period; explicit owner.configuration grant required",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_rules_set",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    {
+     "name": "zone",
+     "description": "An IANA time zone, for example Europe/Warsaw",
+     "type": "string",
+     "required": false
+    },
+    {
+     "name": "caps",
+     "description": "{instruments: {id: money or null}, sources: {id: money or null}}; null removes a cap. Money is {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar",
+     "type": "object",
+     "required": false
+    },
+    {
+     "name": "generation",
+     "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+     "type": "integer",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/owner/configuration/spending/rules {\"namespace\":\"sandbox\",\"caps\":{\"instruments\":{\"sandbox\":{\"unit\":\"USD-6\",\"atoms\":500000}}}}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/spending/rules",
+   "capability": "owner_features",
+   "returns": "the same as GET /rules, plus changed",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "platform_unsupported",
+    "conflict",
+    "not_found",
+    "namespace_mismatch",
+    "agents_may_not_change",
+    "over_ceiling",
+    "raise_the_ceiling_first",
+    "no_approver",
+    "owner_authorization_required",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "List the owner budgets of a namespace with this device's portion, what it has used this period and when that resets, the change gate with who set it, and the raises applied",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_budgets_list",
+   "query": [{
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/spending/budgets?namespace=sandbox",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/spending/budgets",
+   "capability": "owner_features",
+   "returns": "generation, digest, budgets[{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}]",
+   "errors": [
+    "forbidden",
+    "agent_not_allowed",
+    "platform_unsupported",
+    "invalid_parameter"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Create an owner budget. This device is its executor and holds the whole amount as a standing share. Needs the Budgets capability; explicit owner.configuration grant required",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_budgets_create",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    {
+     "name": "id",
+     "description": "1 to 64 of a-z 0-9 . _ -",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "scope",
+     "description": "{kind: account|device|instrument|service|applet|agent, id}. account and device need no id (device is this device); an instrument must be one of this namespace",
+     "type": "object",
+     "required": true
+    },
+    {
+     "name": "period",
+     "description": "hour, day, week or month, in the rule document's time zone",
+     "type": "string",
+     "required": true,
+     "enum": [
+      "hour",
+      "day",
+      "week",
+      "month"
+     ]
+    },
+    {
+     "name": "amount",
+     "description": "The budget per period: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar",
+     "type": "object",
+     "required": true
+    },
+    {
+     "name": "rebalance",
+     "description": "Rebalance shares between devices by use (default true)",
+     "type": "boolean",
+     "required": false
+    },
+    {
+     "name": "gate",
+     "description": "{agents_may_change: boolean, ceiling: money or null}. Under a ceiling this device's headroom balance is the whole room between the amount and the ceiling",
+     "type": "object",
+     "required": false
+    },
+    {
+     "name": "generation",
+     "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+     "type": "integer",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/owner/configuration/spending/budgets {\"namespace\":\"sandbox\",\"id\":\"sandbox-day\",\"scope\":{\"kind\":\"instrument\",\"id\":\"sandbox\"},\"period\":\"day\",\"amount\":{\"unit\":\"USD-6\",\"amount\":\"1.00\"}}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/spending/budgets",
+   "capability": "owner_features",
+   "returns": "budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}, generation",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "platform_unsupported",
+    "conflict",
+    "not_found",
+    "namespace_mismatch",
+    "agents_may_not_change",
+    "over_ceiling",
+    "raise_the_ceiling_first",
+    "no_approver",
+    "owner_authorization_required",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Change a budget. A lower amount is a reduction and applies at once. A higher amount is a standing raise: an increment with an id, applied once, drawn from this device's headroom balance under an agent ceiling. A new scope or period never opens a period early. Needs the Budgets capability; explicit owner.configuration grant required",
+   "method": "PATCH",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_budgets_update",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    {
+     "name": "amount",
+     "description": "The new standing amount: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar. Send it alone when it is a raise",
+     "type": "object",
+     "required": false
+    },
+    {
+     "name": "rebalance",
+     "description": "Rebalance shares by use",
+     "type": "boolean",
+     "required": false
+    },
+    {
+     "name": "scope",
+     "description": "{kind, id} as when creating",
+     "type": "object",
+     "required": false
+    },
+    {
+     "name": "period",
+     "description": "hour, day, week or month",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "hour",
+      "day",
+      "week",
+      "month"
+     ]
+    },
+    {
+     "name": "generation",
+     "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+     "type": "integer",
+     "required": false
+    }
+   ],
+   "example": "PATCH /v1/owner/configuration/spending/budgets/{id} {\"namespace\":\"sandbox\",\"amount\":{\"unit\":\"USD-6\",\"amount\":\"0.50\"}}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/spending/budgets/{id}",
+   "capability": "owner_features",
+   "returns": "budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}, generation, increment{id, amount, lasts, replayed} when it was a raise; replayed: true when this Idempotency-Key already did it (nothing is worked out again)",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "platform_unsupported",
+    "conflict",
+    "not_found",
+    "namespace_mismatch",
+    "agents_may_not_change",
+    "over_ceiling",
+    "raise_the_ceiling_first",
+    "no_approver",
+    "owner_authorization_required",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Remove a budget. A reduction: it applies at once, unless the owner's gate stands on it. The namespace goes in the query; explicit owner.configuration grant required",
+   "method": "DELETE",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_budgets_delete",
+   "query": [
+    {
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    {
+     "name": "generation",
+     "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+     "type": "integer",
+     "required": false
+    }
+   ],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "DELETE /v1/owner/configuration/spending/budgets/sandbox-day?namespace=sandbox",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/spending/budgets/{id}",
+   "capability": "owner_features",
+   "returns": "removed, id, generation",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "platform_unsupported",
+    "conflict",
+    "not_found",
+    "namespace_mismatch",
+    "agents_may_not_change",
+    "over_ceiling",
+    "raise_the_ceiling_first",
+    "no_approver",
+    "owner_authorization_required",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Top a budget up for the current period only: an increment with an id that raises this device's portion by its amount, applied once per Idempotency-Key, and under an agent ceiling drawn from this device's headroom balance; explicit owner.configuration grant required",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_budgets_topup",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    {
+     "name": "amount",
+     "description": "How much to add for this period: {unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar",
+     "type": "object",
+     "required": true
+    }
+   ],
+   "example": "POST /v1/owner/configuration/spending/budgets/{id}/topups {\"namespace\":\"sandbox\",\"amount\":{\"unit\":\"USD-6\",\"amount\":\"0.25\"}}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/spending/budgets/{id}/topups",
+   "capability": "owner_features",
+   "returns": "increment{id, amount, lasts period, period, draws_headroom, replayed}, budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "platform_unsupported",
+    "conflict",
+    "not_found",
+    "namespace_mismatch",
+    "agents_may_not_change",
+    "over_ceiling",
+    "raise_the_ceiling_first",
+    "no_approver",
+    "owner_authorization_required",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Set or change a budget's change gate: agents_may_change and the agent ceiling. Setting or tightening is open to any agent with the Budgets capability. Lifting one the owner set is the owner's: no_approver with remaining_human_step. A ceiling added to an existing budget starts with no headroom balance; explicit owner.configuration grant required",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_budgets_gate",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    {
+     "name": "agents_may_change",
+     "description": "false: agents may only reduce this budget",
+     "type": "boolean",
+     "required": false
+    },
+    {
+     "name": "ceiling",
+     "description": "The most agents may raise the budget to, as money ({unit, atoms} (a whole number of the unit's smallest part) or {unit, amount} (plain decimal text); USD-6 is millionths of a dollar), or null for none",
+     "type": "object",
+     "required": false
+    },
+    {
+     "name": "generation",
+     "description": "The rule document generation this change replaces (from a read); a change against an older one is refused with conflict. Left out, the current one is used",
+     "type": "integer",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/owner/configuration/spending/budgets/{id}/gate {\"namespace\":\"sandbox\",\"ceiling\":{\"unit\":\"USD-6\",\"amount\":\"2.00\"}}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/spending/budgets/{id}/gate",
+   "capability": "owner_features",
+   "returns": "budget{id, scope{kind,id}, period, unit, amount (what stands for good), base, total (with this period's top-ups), rebalance, gate{agents_may_change, ceiling, set_by, gate_strength agent|grants|approver}, portions{cloud, devices{install:{portion, kind, headroom}}}, this_device{portion, headroom, used, remaining, period_id, resets_at, standing current|unanchored|not_open, frozen, holds_reclaim}, increments[], in_transit[], taken[]}, generation",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "platform_unsupported",
+    "conflict",
+    "not_found",
+    "namespace_mismatch",
+    "agents_may_not_change",
+    "over_ceiling",
+    "raise_the_ceiling_first",
+    "no_approver",
+    "owner_authorization_required",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Read how each budget is divided and what this device holds: portions and share kinds, headroom balances, the allowance each source last spent under, room in transit, the last time anchor and the journal's epoch",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_allowances",
+   "query": [{
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/spending/allowances?namespace=sandbox",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/spending/allowances",
+   "capability": "owner_features",
+   "returns": "budgets[{id, portions, this_device, increments, in_transit, taken, reclaim_holder, pending_cloud_room}], held{source: {id, issuer rules|cloud, seq, lines, expired}}, journal{epoch, whole, time{anchored, last_anchor_at, usable}}, read_at",
+   "errors": [
+    "forbidden",
+    "agent_not_allowed",
+    "platform_unsupported",
+    "invalid_parameter"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Read the spend journal of a namespace: entries of the current epoch (or another) in order, as entry/1. It answers from the device, with or without a network",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_journal",
+   "query": [
+    {
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    {
+     "name": "after",
+     "description": "Entries after this sequence number (default 0)",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "limit",
+     "description": "1 to 200 (default 50)",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "epoch",
+     "description": "A journal epoch id; default the current one",
+     "type": "string",
+     "required": false
+    }
+   ],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/spending/journal?namespace=sandbox",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/spending/journal",
+   "capability": "owner_features",
+   "returns": "epoch, epochs[], head{seq, hash, origin}, entries[entry/1], next_after, more, read_at",
+   "errors": [
+    "forbidden",
+    "agent_not_allowed",
+    "platform_unsupported",
+    "invalid_parameter"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Acknowledge unreadable history: rows of an earlier journal epoch that can be tied to no request stop every spend until the owner or an agent takes that on. Nothing is given back by it; explicit owner.configuration grant required",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_journal_acknowledge",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "namespace",
+     "description": "live (the default) or sandbox. Only sandbox is available on this build",
+     "type": "string",
+     "required": false,
+     "enum": [
+      "live",
+      "sandbox"
+     ]
+    },
+    {
+     "name": "acknowledge_history",
+     "description": "true",
+     "type": "boolean",
+     "required": true
+    }
+   ],
+   "example": "POST /v1/owner/configuration/spending/journal {\"namespace\":\"sandbox\",\"acknowledge_history\":true}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/spending/journal",
+   "capability": "owner_features",
+   "returns": "acknowledged, journal{...}",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "capability_disabled",
+    "platform_unsupported",
+    "conflict",
+    "not_found",
+    "namespace_mismatch",
+    "agents_may_not_change",
+    "over_ceiling",
+    "raise_the_ceiling_first",
+    "no_approver",
+    "owner_authorization_required",
+    "team_unavailable"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Read what was spent in a namespace: per budget the portion, what is used and when it resets; per source the counts and amounts by state. It answers from the device's journal, with its age",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_summary",
+   "query": [{
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/spending/summary?namespace=sandbox",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/spending/summary",
+   "capability": "owner_features",
+   "returns": "budgets[{id, unit, portion, used, remaining, resets_at, standing}], sources{id: {state: {count, counted[]}}}, last_entry_at, age_ms, online, read_at",
+   "errors": [
+    "forbidden",
+    "agent_not_allowed",
+    "platform_unsupported",
+    "invalid_parameter"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Read the Bridgit-funded limits as mirrored from the cloud, and the contract limits of the spending core. Nothing is mirrored on this build: no Bridgit-funded source exists on the device-held path",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_spending_limits",
+   "query": [{
+    "name": "namespace",
+    "description": "live (the default) or sandbox. Only sandbox is available on this build; live is refused with platform_unsupported",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "live",
+     "sandbox"
+    ]
+   }],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/spending/limits?namespace=sandbox",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/spending/limits",
+   "capability": "owner_features",
+   "returns": "bridgit_funded[], mirrored_at, age_ms, contract{anchor_skew_ms}",
+   "errors": [
+    "forbidden",
+    "agent_not_allowed",
+    "platform_unsupported",
+    "invalid_parameter"
+   ],
+   "requires": null
+  },
+  {
    "summary": "Read selectively assigned external devices for installed applets",
    "method": "GET",
    "auth": true,
@@ -3734,7 +4738,25 @@
    "idempotent": false,
    "path": "/v1/health",
    "capability": "status",
-   "returns": "status, app, app_version, build_type (release, or debug for a test build), distribution (private or play), build_tag (null for the real app; debug or test claude <feature> for test builds), package (cc.bridgit.app is the real app), app_label (the name Android lists this build under), mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, listener {state (listening, rebinding, waiting_for_tailscale, bind_failed or stopped), binds (tailscale: Bridgit listens only on its Tailscale addresses, never the LAN), bound_to, port, tailscale_addresses (what the phone has now), on_tailnet, tailscale_installed, magic_dns, bind_error, ladder (what to do when a call fails)}, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}, resource_monitor {enabled, since, interval, level, cpu_percent, rss_mb, details: /v1/device/resources}",
+   "returns": "status, app, app_version, build_type (release, or debug for a test build), distribution (private or play), build_tag (null for the real app; debug or test claude <feature> for test builds), package (cc.bridgit.app is the real app), app_label (the name Android lists this build under), mcp (this API's MCP server, /v1/mcp), agent_control (the second MCP server /mcp and /v2 routes for the control tools, with mode private or limited), agent, agent_id, model (what you last told POST /v1/me, or null), listener_uptime_seconds, battery_level, battery_runtime (estimated remaining/lower/upper seconds while unplugged, status and observed_seconds; learning until 10 minutes and 2% drain), charging, bind_address, port, listener {state (listening, rebinding, waiting_for_tailscale, bind_failed or stopped), binds (tailscale: Bridgit listens only on its Tailscale addresses, never the LAN), bound_to, port, tailscale_addresses (what the phone has now), on_tailnet, tailscale_installed, magic_dns, bind_error, ladder (what to do when a call fails)}, base_url (the address to use for every call), owner_email (the same status as GET /v1/owner/email), setup {not_done (set-up steps not done yet), profile (/v1/device/profile lists them)}, api_revision, whats_new (API changes since the revision you last saw), links (where to read more), display {width_px, height_px, aspect_ratio, orientation, full_screen_card {portrait, landscape}, details: /v1/device/display}, resource_monitor {enabled, since, interval, level, cpu_percent, rss_mb, details: /v1/device/resources}",
+   "errors": [],
+   "requires": null
+  },
+  {
+   "summary": "This device in one answer, the same shape on every Bridgit platform: what it is, whether it is online, every capability with why it can or can't be called now, and the set-up steps with their state",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "device_profile",
+   "query": [],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/device/profile",
+   "idempotent": false,
+   "path": "/v1/device/profile",
+   "capability": "status",
+   "returns": "schema_version, profile_revision (goes up when anything here changes), observed_at, expires_at (60 s later; read again after), device {install_id, relay_device_id, name, device_type, platform, os_version, app_version, api_revision, services, hardware {camera, microphone, speaker, location: present, absent or unknown}}, link, availability {state, in_foreground}, capabilities {v1.<id>: {runtime_id, implemented, supported, enabled, ready, agent_allowed, callable, blocked_reason, constraints {execution}, operations [{method, path}]}}, setup {not_done, steps [{id, state (done, waiting, needs_owner or blocked), where (this_device, approver or anywhere), dependency {kind (os, platform, provider or step), name}, api {method, path} for a step an API completes}]}. A hint, never an authorization: calls are still checked when made",
    "errors": [],
    "requires": null
   },
@@ -4611,6 +5633,12 @@
      "description": "1-100, default 20",
      "type": "integer",
      "required": false
+    },
+    {
+     "name": "include_pending",
+     "description": "true also lists items still arriving (recording, downloading, syncing) with complete:false; default false",
+     "type": "boolean",
+     "required": false
     }
    ],
    "control_scope": null,
@@ -4621,7 +5649,7 @@
    "idempotent": false,
    "path": "/v1/gallery/recent",
    "capability": "gallery",
-   "returns": "access_mode, photos[id, taken_at, width_px, height_px, size_bytes, mime, album]",
+   "returns": "access_mode, photos[id, taken_at, width_px, height_px, size_bytes, mime, album, complete, source{kind, app, folder}]",
    "errors": [
     "capability_disabled",
     "permission_denied"
@@ -6913,7 +7941,8 @@
       "phone",
       "android",
       "agent",
-      "device"
+      "device",
+      "spending"
      ]
     },
     {
@@ -7736,12 +8765,20 @@
    "method": "GET",
    "auth": true,
    "mcp_tool": "gallery_videos_recent",
-   "query": [{
-    "name": "limit",
-    "description": "1\u2013100, default 20",
-    "type": "integer",
-    "required": false
-   }],
+   "query": [
+    {
+     "name": "limit",
+     "description": "1\u2013100, default 20",
+     "type": "integer",
+     "required": false
+    },
+    {
+     "name": "include_pending",
+     "description": "true also lists items still arriving (recording, downloading, syncing) with complete:false; default false",
+     "type": "boolean",
+     "required": false
+    }
+   ],
    "control_scope": null,
    "developer_only": false,
    "capture": false,
@@ -7750,7 +8787,7 @@
    "idempotent": false,
    "path": "/v1/gallery/videos/recent",
    "capability": "gallery_video",
-   "returns": "Accessible videos and metadata",
+   "returns": "access_mode, items[id, name, duration_ms, size_bytes, mime, added_at, complete, source{kind, app, folder} (source needs the gallery grant)]",
    "errors": [],
    "requires": null
   },
@@ -7761,7 +8798,7 @@
    "mcp_tool": "gallery_video",
    "query": [{
     "name": "frame_at_s",
-    "description": "Optional frame position in seconds",
+    "description": "Optional frame position in seconds; a video still arriving answers 409 media_incomplete",
     "type": "number",
     "required": false
    }],
@@ -7774,7 +8811,14 @@
    "path": "/v1/gallery/video/{id}",
    "capability": "gallery_video",
    "returns": "Accessible video raw, or a JPEG frame",
-   "errors": [],
+   "errors": [
+    "capability_disabled",
+    "permission_denied",
+    "invalid_parameter",
+    "not_found",
+    "payload_too_large",
+    "media_incomplete"
+   ],
    "requires": null
   },
   {
@@ -7789,7 +8833,7 @@
    "body": [
     {
      "name": "gallery_id",
-     "description": "Accessible gallery image (also requires gallery grant)",
+     "description": "Accessible gallery image (also requires gallery grant); a photo still arriving answers 409 media_incomplete",
      "type": "integer",
      "required": false
     },
@@ -7805,7 +8849,14 @@
    "path": "/v1/ocr",
    "capability": "ocr",
    "returns": "Recognize Latin-script text locally; no image upload",
-   "errors": [],
+   "errors": [
+    "capability_disabled",
+    "permission_denied",
+    "invalid_parameter",
+    "photo_not_found",
+    "payload_too_large",
+    "media_incomplete"
+   ],
    "requires": null
   },
   {
@@ -12119,7 +13170,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 148,
- "count": 357,
+ "api_revision": 153,
+ "count": 381,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

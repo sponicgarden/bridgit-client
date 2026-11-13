@@ -1,0 +1,39 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-forbidden-source",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "A caller off the tailnet is refused before anything else",
+  "step": "source",
+  "principal": {
+    "agent": "a",
+    "source": "192.0.2.10"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log"
+  },
+  "expect": {
+    "status": 403,
+    "error": "forbidden_source"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

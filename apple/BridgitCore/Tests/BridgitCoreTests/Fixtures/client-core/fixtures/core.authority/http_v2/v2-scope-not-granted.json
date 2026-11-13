@@ -1,0 +1,43 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "v2-scope-not-granted",
+  "service": "core.authority",
+  "door": "http_v2",
+  "title": "A tool whose scope the agent was never granted is refused",
+  "step": "scope_granted",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "phone.status",
+      "arguments": {}
+    }
+  },
+  "expect": {
+    "status": 403,
+    "error": "agent_not_allowed"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

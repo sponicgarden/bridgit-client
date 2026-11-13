@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read a body tracking session: its state and the frames since an index (each frame is the 33 points as [x, y, v, ...]: x and y fractions of the upright picture, v how sure the point is in view), plus the latest preview picture",

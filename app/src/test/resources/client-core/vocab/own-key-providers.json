@@ -1,0 +1,110 @@
+{
+  "$schema": "../schemas/vocab.schema.json",
+  "vocab": "own-key-providers",
+  "version": 1,
+  "source": {
+    "kind": "backend",
+    "path": "bridgit-cloud/feedback/src/ownkeys.mjs"
+  },
+  "copies": {
+    "android": "app/src/main/java/cc/bridgit/app/core/contract/ContractVocab.kt"
+  },
+  "rule": "Providers whose keys the owner can add. routes: backend routes the provider can answer. own_routes: routes it answers first (its own model). fields: what the owner types, in order; secret fields are write-only.",
+  "data": {
+    "providers": [
+      {
+        "id": "googlemaps",
+        "routes": [
+          "places",
+          "airquality",
+          "pollen",
+          "timezone",
+          "maps",
+          "streetview",
+          "weathergoogle"
+        ],
+        "own_routes": [],
+        "fields": [
+          {
+            "id": "api_key",
+            "pattern": "^\\S{8,400}$",
+            "secret": true
+          }
+        ]
+      },
+      {
+        "id": "openmeteo",
+        "routes": [
+          "openmeteo"
+        ],
+        "own_routes": [],
+        "fields": [
+          {
+            "id": "api_key",
+            "pattern": "^\\S{8,400}$",
+            "secret": true
+          }
+        ]
+      },
+      {
+        "id": "typesafe",
+        "routes": [
+          "jev"
+        ],
+        "own_routes": [
+          "jev"
+        ],
+        "fields": [
+          {
+            "id": "api_key",
+            "pattern": "^\\S{8,400}$",
+            "secret": true
+          }
+        ]
+      },
+      {
+        "id": "cloudflare",
+        "routes": [
+          "clef"
+        ],
+        "own_routes": [
+          "clef"
+        ],
+        "fields": [
+          {
+            "id": "account_id",
+            "pattern": "^[0-9a-fA-F]{32}$",
+            "secret": false
+          },
+          {
+            "id": "api_token",
+            "pattern": "^\\S{8,400}$",
+            "secret": true
+          }
+        ]
+      },
+      {
+        "id": "openrouter",
+        "routes": [
+          "jev",
+          "clef",
+          "glm",
+          "locate",
+          "appraise",
+          "story"
+        ],
+        "own_routes": [
+          "glm"
+        ],
+        "fields": [
+          {
+            "id": "api_key",
+            "pattern": "^\\S{8,400}$",
+            "secret": true
+          }
+        ]
+      }
+    ]
+  },
+  "cases": []
+}

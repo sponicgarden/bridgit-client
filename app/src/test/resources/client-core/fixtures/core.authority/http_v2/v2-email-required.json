@@ -1,0 +1,44 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "v2-email-required",
+  "service": "core.authority",
+  "door": "http_v2",
+  "title": "After the 24-hour grace without a verified email, a non-exempt tool is refused",
+  "step": "email_gate",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": false,
+      "email_grace_expired": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "phone.status",
+      "arguments": {}
+    }
+  },
+  "expect": {
+    "status": 403,
+    "error": "email_required"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

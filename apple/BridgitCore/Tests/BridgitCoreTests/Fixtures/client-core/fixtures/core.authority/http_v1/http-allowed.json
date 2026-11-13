@@ -1,0 +1,38 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-allowed",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "A tailnet caller with a valid key and the grant is answered",
+  "step": "grant.capability",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log"
+  },
+  "expect": {
+    "status": 200
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

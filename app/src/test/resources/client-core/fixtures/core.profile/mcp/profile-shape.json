@@ -1,0 +1,48 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "profile-shape",
+  "service": "core.profile",
+  "door": "mcp",
+  "title": "The device profile answers in the shared shape with the set-up block",
+  "step": "grant.capability",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "camera"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/device/profile"
+  },
+  "expect": {
+    "status": 200,
+    "body_has": [
+      "schema_version",
+      "profile_revision",
+      "observed_at",
+      "expires_at",
+      "device",
+      "availability",
+      "capabilities",
+      "setup"
+    ]
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

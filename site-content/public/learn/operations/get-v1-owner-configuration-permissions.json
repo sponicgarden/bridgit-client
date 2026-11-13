@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read the permission home (A0115-A0118): every control agent, this device (profile: purposes, type, model; its own switches) and every linked device, each with granted/total and the layer that decided each permission",

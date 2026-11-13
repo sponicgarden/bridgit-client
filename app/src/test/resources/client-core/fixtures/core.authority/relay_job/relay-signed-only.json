@@ -1,0 +1,56 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "relay-signed-only",
+  "service": "core.authority",
+  "door": "relay_job",
+  "title": "With signed requests only, a connector (unsealed) job is refused",
+  "step": "signed_only",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true,
+      "relay_signed_only": true
+    },
+    "relay": {
+      "enabled": true,
+      "configs": [
+        {
+          "agent": "a",
+          "mode": "connector",
+          "routes": [
+            "GET /v1/health"
+          ],
+          "tools": [
+            "phone.status"
+          ]
+        }
+      ]
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "connection": "relay",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/health"
+  },
+  "expect": {
+    "status": 403,
+    "error": "signed_requests_required"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

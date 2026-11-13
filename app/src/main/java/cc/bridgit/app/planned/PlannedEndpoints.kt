@@ -11,6 +11,8 @@ object PlannedEndpoints {
         example = "POST /v1$path", returns = summary, body = body, media = media, capture = capture, idempotent = true,
         privateFields = setOf("text", "data_base64"))
     private fun delete(path: String, cap: String, summary: String) = EndpointSpec("DELETE", path, cap, summary, example = "DELETE /v1$path", returns = summary)
+    /** A0270: list rows still arriving too, as complete:false. */
+    val INCLUDE_PENDING = Param("include_pending", "boolean", "true also lists items still arriving (recording, downloading, syncing) with complete:false; default false")
     private val duration = Param("duration_minutes", "integer", "Optional timed restoration, 1–1440 minutes; null leaves the change in place")
     val STATUS = get("/phone/status", "phone", "Battery, network, screen and sound status, with as_of")
     val BATTERY = get("/phone/battery", "phone", "Full battery report: percent, status, plug type, health, temperature, voltage, cycles, current, time to full, estimated_runtime (time to empty at recent usage while unplugged; status, remaining/lower/upper seconds, observation window and drain rate; learning until 10 minutes and 2% drain), battery saver, which power settings agents may change, and the battery.* events")
@@ -34,9 +36,12 @@ object PlannedEndpoints {
     val VIDEO = post("/camera/video", "video", "Record an MP4, returned raw (HTTP: 40 MB maximum; MCP: 6 MB, may stop early)", listOf(Param("camera", "string", "rear or front"), Param("duration_seconds", "integer", "1–30, default 10"), Param("audio", "boolean", "false by default; true also requires microphone grant"), Param("resolution", "string", "720p or 1080p"), Param("viewfinder","boolean","Opt into visible capture and review; always enforced for card/portal/MCP-App actions"), Param("instructions","string","Short framing instructions above the live preview, up to 240 characters"), Param("countdown_seconds","integer","0–10, starts after the owner presses the visible shutter"), Param("extract_frames","integer","0 (raw video, default) or 1–8: record then extract spaced JPEG frames into caller-owned capture memory and return JSON frames[{capture_id,...}]; person-started captures retain video_capture_id for optional replay/delete; automatic captures delete the video")), media = true, capture = true)
     val VIDEO_REVIEW = post("/camera/video/review","video","Review your kept video without recording anything; Play/Pause, Done and Delete",listOf(Param("capture_id","string","Caller-accessible video/mp4 capture id",true)))
     val VIDEO_STOP = EndpointSpec("DELETE","/camera/video","video","Stop this caller's active video recording",example="DELETE /v1/camera/video",returns="stopped")
-    val VIDEOS = get("/gallery/videos/recent", "gallery_video", "Accessible videos and metadata", listOf(Param("limit", "integer", "1–100, default 20")))
-    val GALLERY_VIDEO = get("/gallery/video/{id}", "gallery_video", "Accessible video raw, or a JPEG frame", listOf(Param("frame_at_s", "number", "Optional frame position in seconds")), media = true)
-    val OCR = post("/ocr", "ocr", "Recognize Latin-script text locally; no image upload", listOf(Param("gallery_id", "integer", "Accessible gallery image (also requires gallery grant)"), Param("data_base64", "string", "Image bytes instead of gallery_id")))
+    val VIDEOS = get("/gallery/videos/recent", "gallery_video", "Accessible videos and metadata", listOf(Param("limit", "integer", "1–100, default 20"), INCLUDE_PENDING))
+        .copy(returns = "access_mode, items[id, name, duration_ms, size_bytes, mime, added_at, complete, source{kind, app, folder} (source needs the gallery grant)]")
+    val GALLERY_VIDEO = get("/gallery/video/{id}", "gallery_video", "Accessible video raw, or a JPEG frame", listOf(Param("frame_at_s", "number", "Optional frame position in seconds; a video still arriving answers 409 media_incomplete")), media = true)
+        .copy(errors = listOf("capability_disabled", "permission_denied", "invalid_parameter", "not_found", "payload_too_large", "media_incomplete"))
+    val OCR = post("/ocr", "ocr", "Recognize Latin-script text locally; no image upload", listOf(Param("gallery_id", "integer", "Accessible gallery image (also requires gallery grant); a photo still arriving answers 409 media_incomplete"), Param("data_base64", "string", "Image bytes instead of gallery_id")))
+        .copy(errors = listOf("capability_disabled", "permission_denied", "invalid_parameter", "photo_not_found", "payload_too_large", "media_incomplete"))
     val transfers = listOf("files", "shares", "downloads").flatMap { cap -> buildList {
         add(get("/$cap", cap, "Your $cap transfers, retained 30 days on the phone"))
         add(get("/$cap/{id}", cap, "Read your selected transfer bytes", media = true))

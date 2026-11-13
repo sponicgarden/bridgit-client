@@ -1,0 +1,53 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-idempotency-expired",
+  "service": "core.dispatch",
+  "door": "mcp",
+  "title": "A used key whose result is no longer kept is refused",
+  "step": "idempotency",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ],
+    "idempotency": {
+      "entries": [
+        {
+          "agent": "a",
+          "key": "fixture-key-0004",
+          "route": "POST /v1/log",
+          "state": "expired"
+        }
+      ]
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/log",
+    "body": {
+      "message": "fixture note"
+    },
+    "idempotency_key": "fixture-key-0004"
+  },
+  "expect": {
+    "status": 409,
+    "error": "idempotency_expired"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

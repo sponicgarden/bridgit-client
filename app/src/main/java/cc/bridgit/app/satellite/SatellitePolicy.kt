@@ -12,7 +12,7 @@ object SatellitePolicy {
     val PHASE1_CAPS = setOf("camera", "mic", "speaker", "interactions", "location", "gallery", "sounds")
 
     /** Read-only status calls that also pass, so an agent can check a satellite before using it. */
-    private val STATUS_GETS = setOf("/health", "/capabilities")
+    private val STATUS_GETS = setOf("/health", "/capabilities", "/device/profile")
 
     /** The only calls a satellite's return link may make on its hub (SatelliteHub.pushHubInfo). */
     val RETURN_PATHS = setOf("/satellite/hub", "/satellite/hub/photo", "/satellite/hub/portal-login", "/portal/home", "/portal/logs", "/portal/devices", "/satellite/hub/unlink",

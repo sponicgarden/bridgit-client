@@ -1,0 +1,37 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-empty-grants-are-not-everything",
+  "service": "core.authority",
+  "door": "mcp",
+  "title": "An empty grant set never means everything",
+  "step": "grant.capability",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": []
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log"
+  },
+  "expect": {
+    "status": 403,
+    "error": "agent_not_allowed"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

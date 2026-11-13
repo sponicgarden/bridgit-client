@@ -7,14 +7,14 @@ package cc.bridgit.app.feedback
  * Mirrors feedback/src/names.mjs parseFriendly in the backend, which decides uniqueness.
  */
 object FriendlyName {
-    const val MAX = 40
+    const val MAX = cc.bridgit.app.core.contract.ContractVocab.FRIENDLY_NAME_MAX_CHARS
 
     const val ADVICE = "Also give this Bridgit a friendly name (friendly_name, up to 40 characters, any style, unique among this owner's devices). " +
         "People see the friendly name everywhere; the domain name is only for telling devices apart on the network."
 
     /** [text] as the backend stores it (inner spaces collapsed, trimmed); null when empty, too long or with control characters. */
     fun parse(text: String?): String? {
-        if (text == null || text.length > MAX * 3) return null
+        if (text == null || text.length > cc.bridgit.app.core.contract.ContractVocab.FRIENDLY_NAME_MAX_INPUT_CHARS) return null
         val name = text.replace(Regex("\\s+"), " ").trim()
         return name.takeIf { it.isNotEmpty() && it.length <= MAX && name.none { c -> c.code < 32 || c.code == 127 } }
     }

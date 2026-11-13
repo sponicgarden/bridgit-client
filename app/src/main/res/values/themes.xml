@@ -284,4 +284,12 @@
     <style name="TextAppearance.Bridgit.TitleLarge" parent="TextAppearance.Material3.TitleLarge"><item name="android:textSize">24sp</item></style>
     <style name="TextAppearance.Bridgit.TitleMedium" parent="TextAppearance.Material3.TitleMedium"><item name="android:textSize">18sp</item></style>
     <style name="TextAppearance.Bridgit.TitleSmall" parent="TextAppearance.Material3.TitleSmall"><item name="android:textSize">16sp</item></style>
+    <!-- Hosts only the system's owner-check prompt (security/OwnerCheckActivity): no window content of its own. -->
+    <style name="Theme.Bridgit.OwnerCheck" parent="Theme.Bridgit">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>

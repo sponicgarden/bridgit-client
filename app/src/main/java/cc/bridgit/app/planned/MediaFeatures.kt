@@ -27,6 +27,8 @@ import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import cc.bridgit.app.core.Compat
+import cc.bridgit.app.core.media.MediaLibrary
+import cc.bridgit.app.core.media.MediaScopes
 
 object AppletVideoSessions {
     private val active = mutableMapOf<String, Recording>()
@@ -150,24 +152,44 @@ class GalleryVideoModule(app: BridgeApp) : Capability(app) {
         endpoint(PlannedEndpoints.VIDEOS) {
             requireUsable()
             val limit = Rules.integer(query("limit"), "limit", 1, 100, 20)
+            val includePending = Rules.flag(query("include_pending"), "include_pending")
+            val showSource = MediaScopes.showsSource(app.settings.isOn(MediaScopes.PROVENANCE_GRANT)) { agent!!.allows(it) }
             val out = JSONArray()
-            // Rows still being recorded (is_pending=1) are skipped, never an error (A0256). Some Android builds reject the
-            // SQL sort/limit args or the is_pending column (IllegalArgumentException), so fall back step by step, finally
+            // Rows still arriving (is_pending=1) are skipped, never an error (A0256), unless include_pending=true lists them
+            // with complete:false (A0270). Some Android builds reject the SQL sort/limit args or the is_pending,
+            // owner_package_name or relative_path columns (IllegalArgumentException), so fall back step by step, finally
             // to the bare query sorted here; the listing never answers 500 because of how MediaStore was asked.
-            val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-            val base = arrayOf("_id", "display_name", "duration", "size", "mime_type", "date_added")
-            val sorted = android.os.Bundle().apply { putString(android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "date_added DESC, _id DESC"); putString(android.content.ContentResolver.QUERY_ARG_SQL_LIMIT, (limit + 5).toString()) }
-            val attempts: List<Pair<Array<String>, android.os.Bundle?>> = listOf(base + "is_pending" to sorted, base to sorted, base to null)
+            val collection = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            // MediaStore's real names are _display_name and _size; display_name and size are rejected (checked on a device), which emptied this list.
+            val base = arrayOf(MediaStore.Video.Media._ID, MediaStore.Video.Media.DISPLAY_NAME, MediaStore.Video.Media.DURATION, MediaStore.Video.Media.SIZE, MediaStore.Video.Media.MIME_TYPE, MediaStore.Video.Media.DATE_ADDED)
+            fun args(sorted: Boolean): Pair<android.net.Uri, android.os.Bundle?> {
+                val b = android.os.Bundle()
+                if (sorted) { b.putString(android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "date_added DESC, _id DESC"); b.putString(android.content.ContentResolver.QUERY_ARG_SQL_LIMIT, (limit + 5).toString()) }
+                val uri = if (includePending) MediaLibrary.includePending(collection, b) else collection
+                return uri to b.takeIf { !it.isEmpty }
+            }
+            val provenance = arrayOf(MediaLibrary.IS_PENDING, MediaLibrary.OWNER_PACKAGE, MediaLibrary.RELATIVE_PATH)
+            // date_modified feeds the sync stability window (6.3); a device rejecting it gets the older rungs, window not applied.
+            val stable = provenance + MediaLibrary.DATE_MODIFIED
+            // A device that rejects only the sort/limit args still gets the pending and provenance columns unsorted.
+            val attempts: List<Pair<Array<String>, Boolean>> = listOf(base + stable to true, base + provenance to true, base + MediaLibrary.IS_PENDING to true, base to true,
+                base + stable to false, base + provenance to false, base + MediaLibrary.IS_PENDING to false, base to false)
+            val now = MediaLibrary.nowSeconds()
             val items = ArrayList<JSONObject>()
-            for ((cols, args) in attempts) {
-                val cursor = (try { app.contentResolver.query(uri, cols, args, null) } catch (e: RuntimeException) { null }) ?: continue
+            for ((cols, sorted) in attempts) {
+                val (uri, queryArgs) = args(sorted)
+                val cursor = (try { app.contentResolver.query(uri, cols, queryArgs, null) } catch (e: RuntimeException) { null }) ?: continue
                 items.clear()
                 try {
                     cursor.use { c ->
                         while (c.moveToNext()) {
-                            val item = runCatching { Rules.galleryVideoItem(if (cols.size > 6) c.getInt(6) else 0, c.getLong(0), c.getString(1), c.getLong(2), c.getLong(3), c.getString(4), c.getLong(5), ::isoAt) }.getOrNull()
+                            val item = runCatching {
+                                Rules.galleryVideoItem(MediaLibrary.pending(c), c.getLong(0), c.getString(1), c.getLong(2), c.getLong(3), c.getString(4), c.getLong(5), ::isoAt,
+                                    MediaLibrary.string(c, MediaLibrary.OWNER_PACKAGE), MediaLibrary.string(c, MediaLibrary.RELATIVE_PATH), includePending, showSource,
+                                    MediaLibrary.long(c, MediaLibrary.DATE_MODIFIED), now)
+                            }.getOrNull()
                             if (item != null) items.add(item)
-                            if (args != null && items.size >= limit) break
+                            if (sorted && items.size >= limit) break
                         }
                     }
                 } catch (e: RuntimeException) { continue }
@@ -184,6 +206,7 @@ class GalleryVideoModule(app: BridgeApp) : Capability(app) {
                 val frame = query("frame_at_s")
                 if (frame != null) {
                     val at = frame.toDoubleOrNull()?.takeIf { it.isFinite() && it >= 0 && it < 86400 } ?: throw ErrorCatalog.error("invalid_parameter", "frame_at_s must be 0–86399 seconds.")
+                    MediaScopes.requireComplete(MediaLibrary.complete(app, MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id, checkFile = true))
                     val retriever = MediaMetadataRetriever()
                     try {
                         retriever.setDataSource(app, uri)
@@ -214,6 +237,7 @@ class OcrModule(app: BridgeApp) : Capability(app) {
         val bytes = if (body.has("gallery_id")) {
             if (!app.settings.isOn("gallery") || !app.agents.get(agent!!.id)!!.allows("gallery")) throw ErrorCatalog.error("capability_disabled", "Enable this agent's gallery access first.")
             val id = body.optString("gallery_id").toLongOrNull()?.takeIf { it > 0 } ?: throw ErrorCatalog.error("invalid_parameter", "gallery_id must be a positive image ID.")
+            MediaScopes.requireComplete(MediaLibrary.complete(app, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id))
             val uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
             val raw = try { app.contentResolver.openInputStream(uri)?.use { Compat.readAtMost(it, 16 * 1024 * 1024 + 1) } }
                 catch (e: SecurityException) { throw ErrorCatalog.error("permission_denied", "This photo is outside your media grant.") }

@@ -1,0 +1,67 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-photo-list-default-skips-sync-settling",
+  "service": "core.media",
+  "door": "mcp",
+  "title": "A sync photo modified 2 s ago is left out of the default list",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery"
+        ]
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "photo",
+        "size": 4096,
+        "added_at": 1762800000,
+        "id": 10,
+        "relative_path": "DCIM/Camera/"
+      },
+      {
+        "scope": "library",
+        "kind": "photo",
+        "size": 4096,
+        "added_at": 1762800060,
+        "id": 11,
+        "owner_package": "com.nutomic.syncthingandroid",
+        "relative_path": "DCIM/Syncthing/",
+        "modified_seconds_ago": 2
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/gallery/recent"
+  },
+  "expect": {
+    "status": 200,
+    "body_paths": {
+      "photos.0.id": "10"
+    },
+    "body_lacks": [
+      "photos.1"
+    ]
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

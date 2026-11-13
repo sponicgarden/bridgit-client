@@ -1,0 +1,42 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "v2-allowed",
+  "service": "core.authority",
+  "door": "http_v2",
+  "title": "A tailnet agent with a valid key gets an answer from a tool without a scope",
+  "step": "api_access",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "capabilities",
+      "arguments": {}
+    }
+  },
+  "expect": {
+    "status": 200
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

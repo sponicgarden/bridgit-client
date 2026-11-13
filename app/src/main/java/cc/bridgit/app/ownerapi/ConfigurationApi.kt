@@ -18,6 +18,7 @@ object ConfigurationEndpoints {
     val SETTINGS = write("POST", "/settings", "Set app-owned settings, listener/callback policy, captures and feature switches; secrets never returned; listener disable/port change needs reconnection",
         listOf(Param("changes", "object", "1-50 keys from GET /v1/owner/configuration settings; captures.owner_upload_url accepts text or null to clear. OS/security/agent authority fields refused", true)),
         "{\"changes\":{\"captures.agent_files\":true}}", "changed key names, listener {enabled,port,reconnect_required}; read values through discovery; upload URL is write-only")
+        .let { it.copy(errors = it.errors + "platform_unsupported") } // security.approvers_enabled can't be turned on in the published build yet
     val ACTION = write("POST", "/actions", "Apply an allowlisted app-owned configuration action with existing feature/capture grants",
         listOf(Param("action", "string", "Configuration action", true, ConfigurationResources.ACTIONS.sorted()), Param("options", "object", "Same exact options as GET /v1/owner/features; credential fields refused here, use dedicated write-only routes", true)),
         "{\"action\":\"updates.offers\",\"options\":{\"enabled\":true}}", "native configuration result, approval_required=false; account linking may still require sign-in")
@@ -105,7 +106,7 @@ object ConfigurationEndpoints {
         "{\"capabilities\":[\"portal\"]}", "the linked device as in GET plus changed; forbidden beyond can_be_given")
     val ALL = listOf(ACCESS, ACCESS_FEATURES, ACCESS_AGENT, APPROVALS, APPROVAL, APPROVAL_DECIDE, INDEX, SETTINGS, ACTION, KEYS, KEY_SET, KEY_DELETE, CONNECTIONS, CONNECTION_CREATE, CONNECTION_UPDATE, CONNECTION_DELETE, CONNECTION_ROTATE,
         CALLBACKS, CALLBACK_SET, CALLBACK_DELETE, NOTIFICATIONS, NOTIFICATIONS_SET, EMAIL, EMAIL_SET, NAME, NAME_SET, NAME_DELETE, SPECS, SPECS_SET, FEEDING, FEEDING_SET, MODES, MODES_SET, LISTENING, LISTENING_SET, PERMISSIONS, PERMISSIONS_DEVICE, PERMISSIONS_LINKED) +
-        ConfigurationLinks.CONFIG
+        ConfigurationLinks.CONFIG + ConfigurationApprovers.ALL + ConfigurationSpending.ALL
 }
 
 fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
@@ -116,7 +117,7 @@ fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
             .put("actions_url", "/v1/owner/configuration/actions").put("keys_url", "/v1/owner/configuration/keys")
             .put("connections_url", "/v1/owner/configuration/connections").put("callbacks_url", "/v1/owner/configuration/callbacks")
             .put("notifications_url", "/v1/owner/configuration/notifications/{agent}").put("feeding_url", "/v1/owner/configuration/feeding")
-            .put("email_url", "/v1/owner/configuration/email").put("name_url", "/v1/owner/configuration/name").put("specs_url", "/v1/owner/configuration/specs").put("links_url", "/v1/owner/configuration/links").put("modes_url", "/v1/owner/configuration/modes")
+            .put("email_url", "/v1/owner/configuration/email").put("name_url", "/v1/owner/configuration/name").put("specs_url", "/v1/owner/configuration/specs").put("links_url", "/v1/owner/configuration/links").put("approvers_url", "/v1/owner/configuration/approvers").put("spending_url", "/v1/owner/configuration/spending").put("modes_url", "/v1/owner/configuration/modes")
             .put("listening_url", "/v1/owner/configuration/listening").put("permissions_url", "/v1/owner/configuration/permissions").put("human_authority", JSONArray(listOf("first Super Powers authority and initial key pairing", "OS consent", "account sign-in/verification", "biometric/security controls"))))
     }
     endpoint(ConfigurationEndpoints.ACCESS) { Reply.Json(SuperAgentAccess(app, agent!!).get()) }
@@ -161,4 +162,6 @@ fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
     endpoint(ConfigurationEndpoints.PERMISSIONS_DEVICE) { Reply.Json(ConfigurationPermissions(app, agent!!).device(body)) }
     endpoint(ConfigurationEndpoints.PERMISSIONS_LINKED) { Reply.Json(ConfigurationPermissions(app, agent!!).linked(path("id").orEmpty(), body)) }
     ConfigurationLinks.install(this@installConfiguration, api, app)
+    ConfigurationApprovers.install(this@installConfiguration, api, app)
+    ConfigurationSpending.install(this@installConfiguration, api, app)
 }

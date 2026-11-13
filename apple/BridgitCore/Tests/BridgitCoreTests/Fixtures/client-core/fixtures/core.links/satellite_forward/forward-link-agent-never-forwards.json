@@ -1,0 +1,49 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "forward-link-agent-never-forwards",
+  "service": "core.links",
+  "door": "satellite_forward",
+  "title": "A call that came over a link is not passed on to another device",
+  "step": "forward_once",
+  "principal": {
+    "agent": "hub",
+    "source": "100.64.0.40"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "hub"
+      }
+    ],
+    "links": [
+      {
+        "agent": "hub",
+        "tier": "own",
+        "state": "active",
+        "services": [
+          "interactions"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/health",
+    "query": {
+      "target": "garage-phone"
+    }
+  },
+  "expect": {
+    "status": 403,
+    "error": "not_on_target"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

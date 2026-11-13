@@ -1,0 +1,44 @@
+{
+ "documentation_revision": 137,
+ "api_revision": 153,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Cancel a pending approver recovery: the agent that started it withdraws it at once; anyone else's cancel asks a listed approver for the owner's check; explicit owner.configuration grant required",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "owner_configuration_approvers_recovery_cancel",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/owner/configuration/approvers/recovery",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/approvers/recovery",
+  "capability": "owner_features",
+  "returns": "state (none|pending|cancelled|cleared), started_by, started_at, clear_at, time_left_ms, ended_by, ended_at, can_start, blocked_reason (not_available|owner_email_required|no_approver), remaining_human_step when a listed approver has to confirm",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {"idempotency_key": {
+    "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+    "type": "string"
+   }},
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "capability_disabled",
+   "conflict",
+   "rate_limited",
+   "owner_email_required",
+   "no_screen_lock",
+   "platform_unsupported",
+   "no_approver",
+   "recovery_complete",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

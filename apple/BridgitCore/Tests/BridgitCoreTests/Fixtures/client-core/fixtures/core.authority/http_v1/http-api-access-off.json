@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "http-api-access-off",
+  "service": "core.authority",
+  "door": "http_v1",
+  "title": "API access off is refused after the key and device checks",
+  "step": "grant.api_access",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ],
+        "api_access": false
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/v1/log"
+  },
+  "expect": {
+    "status": 403,
+    "error": "forbidden",
+    "reason": "api_access_off"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 131,
- "api_revision": 148,
+ "documentation_revision": 137,
+ "api_revision": 153,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read an installed applet's existing free-form key/value records with an owner control key; no installer ownership or extra approval. Complements typed tables for older/custom applets",

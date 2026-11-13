@@ -1,0 +1,43 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-idempotency-key-malformed",
+  "service": "core.dispatch",
+  "door": "mcp",
+  "title": "A malformed Idempotency-Key is refused before the handler runs",
+  "step": "idempotency",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/log",
+    "body": {
+      "message": "fixture note"
+    },
+    "idempotency_key": "bad"
+  },
+  "expect": {
+    "status": 422,
+    "error": "invalid_parameter"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

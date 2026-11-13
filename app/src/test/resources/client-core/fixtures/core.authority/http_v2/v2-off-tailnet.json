@@ -1,0 +1,43 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "v2-off-tailnet",
+  "service": "core.authority",
+  "door": "http_v2",
+  "title": "A v2 call from off the tailnet is refused",
+  "step": "source",
+  "principal": {
+    "agent": "a",
+    "source": "192.0.2.10"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "status"
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "capabilities",
+      "arguments": {}
+    }
+  },
+  "expect": {
+    "status": 403,
+    "error": "forbidden_source"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

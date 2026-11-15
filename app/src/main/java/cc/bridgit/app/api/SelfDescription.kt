@@ -54,10 +54,10 @@ object SetupPrompt {
     /** Section order (A0213), from the Client Core pack (vocab/setup-prompt.json): identity first, then connection, rules, bootstrap, gotchas and pointers. */
     val SECTIONS: List<String> = cc.bridgit.app.core.contract.ContractVocab.SETUP_PROMPT_SECTIONS
 
-    /** Step 1's naming sentence: never asks a named device to register; an unnamed one only after the owner agrees (A0058, A0213). */
+    /** Step 1's naming sentence: never asks a named device to register; an unnamed one suggests one friendly name for the owner to know it by, offers it and waits for their answer before setting anything (A0058, A0213, A0276). */
     fun naming(domainName: String?): String =
         if (domainName != null) "This device's domain name is $domainName, registered for good (bridgit_name.name confirms it): never register another name."
-        else "Domain name: if bridgit_name.status is \"registered\", bridgit_name.name is this device's domain name for good: never register another. Only if it is \"unregistered\": ask the owner which name they want (bridgit_name.advice, ${Learn.NAMES_URL}) as your whole first reply, nothing else: \"Bridgit, a sensorial app development network, needs a friendly name to register your device. Can we call it '<name>'?\" with one cute name of about 10 characters; then register it (bridgit_name.how)."
+        else "Domain name: if bridgit_name.status is \"registered\", bridgit_name.name is its domain name for good: never register another. Only if it is \"unregistered\": suggest one name the owner will know this device by (bridgit_name.advice, ${Learn.NAMES_URL}) as your whole first reply: \"Bridgit, a sensorial app development network, needs a friendly name to register your device. Can we call it '<name>'?\" Then wait: set nothing until they answer; register their pick (bridgit_name.how)."
 
     /**
      * The ordered first calls, shared by the setup prompt and the relay connector text (one source, no drift).
@@ -202,7 +202,7 @@ object SetupPrompt {
         val fallback = addr.ipBaseUrl?.takeIf { addr.magicDns != null }?.let { " (IP fallback: $it)" } ?: ""
         appendLine("Bridgit setup for $agentName on ${device.friendlyName} (${device.model}). Base URL: ${addr.baseUrl}$fallback. Key: $key")
         appendLine("The key works only for this device. Save it only in \"~/.config/bridgit/agents/$agentName/header\" (mode 600) as one line, Authorization: Bearer <your key>, and never print it. No answer in 60 s? Ask the owner for Tailscale on both devices or the relay (More → Relay setup).")
-        if (device.domainName == null) appendLine("Your first reply to the owner is only this, with one cute name of about 10 lowercase letters, digits or hyphens: \"Bridgit, a sensorial app development network, needs a friendly name to register your device. Can we call it '<name>'?\"")
+        if (device.domainName == null) appendLine("Your first reply to the owner is only this, offering one friendly name they will easily know this device by (about 10 lowercase letters, digits or hyphens): \"Bridgit, a sensorial app development network, needs a friendly name to register your device. Can we call it '<name>'?\" Then wait: register nothing until they answer.")
         append("The Bridgit Interface Guide is here: curl -sS -m 60 -H @\"\$HOME/.config/bridgit/agents/$agentName/header\" ${addr.baseUrl}$WELCOME_PATH (public copy: $WELCOME_URL). Read it before anything else.")
     }
 

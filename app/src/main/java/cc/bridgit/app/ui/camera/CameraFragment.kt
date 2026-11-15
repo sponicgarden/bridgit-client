@@ -70,8 +70,36 @@ class CameraFragment : Fragment() {
             bind()
         }
         b.sendTo.setOnClickListener { choose() }
+        requireActivity().let { a ->
+            a.addOnPictureInPictureModeChangedListener(pipModeListener)
+            // Recreated straight into the PiP window (Android relaunches the activity when its size changes).
+            if (a.isInPictureInPictureMode) { b.top.isVisible = false; b.bottom.isVisible = false }
+        }
         return b.root
     }
+
+    /** A0504: true while the preview is bound, so leaving Bridgit can shrink it into a picture-in-picture window. */
+    val previewLive get() = capture != null && _b != null
+
+    /** The preview's on-screen size and place, for the PiP window's shape and its opening animation. */
+    fun previewBounds(): android.graphics.Rect? = _b?.preview?.let { v ->
+        android.graphics.Rect().takeIf { v.isLaidOut && v.getGlobalVisibleRect(it) }
+    }
+
+    /** In the PiP window only the preview shows: no chips, shutter or flip button (they can't be tapped there). */
+    private val pipModeListener = androidx.core.util.Consumer<androidx.core.app.PictureInPictureModeChangedInfo> { info ->
+        _b?.let { it.top.isVisible = !info.isInPictureInPictureMode; it.bottom.isVisible = !info.isInPictureInPictureMode }
+        // Should the preview have closed on the way in (pause reported before the PiP mode), open it again.
+        if (info.isInPictureInPictureMode) openInPip()
+    }
+
+    /** In the PiP window the activity is paused, not resumed, so onResume won't open the camera there. */
+    private fun openInPip() {
+        if (_b == null || activity?.isInPictureInPictureMode != true || previewLive) return
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) open()
+    }
+
+    override fun onStart() { super.onStart(); openInPip() }
 
     override fun onSaveInstanceState(out: Bundle) { super.onSaveInstanceState(out); out.putBoolean(KEY_REAR, rear) }
 
@@ -92,11 +120,20 @@ class CameraFragment : Fragment() {
 
     override fun onPause() {
         _b?.connected?.let { it.removeCallbacks(fadeConnected); it.animate().cancel(); it.isVisible = false }
-        close()
+        // A0504: in the picture-in-picture window the preview keeps running; it closes when that window does (onStop).
+        if (activity?.isInPictureInPictureMode != true) close()
         super.onPause()
     }
 
-    override fun onDestroyView() { _b = null; super.onDestroyView() }
+    override fun onStop() {
+        close()
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
+        requireActivity().removeOnPictureInPictureModeChangedListener(pipModeListener)
+        _b = null; super.onDestroyView()
+    }
 
     private fun requestCamera() { askCamera.launch(Manifest.permission.CAMERA) }
 
@@ -134,6 +171,7 @@ class CameraFragment : Fragment() {
             p.bindToLifecycle(viewLifecycleOwner, if (rear) CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA, preview, shot)
             capture = shot
         }.onFailure { showMessage(getString(R.string.camera_failed, it.message ?: it.javaClass.simpleName)) }
+        notifyPip()
     }
 
     private fun close() {
@@ -142,7 +180,11 @@ class CameraFragment : Fragment() {
         provider = null
         capture = null
         if (locked) { locked = false; runCatching { app.registry.cameraLock.unlock() } }
+        notifyPip()
     }
+
+    /** Tells the activity the preview started or stopped, so Android knows whether Home may open the PiP window. */
+    private fun notifyPip() { (activity as? cc.bridgit.app.ui.MainActivity)?.updatePip() }
 
     private fun take() {
         val shot = capture ?: return

@@ -135,7 +135,13 @@
             android:name="cc.bridgit.app.ui.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
+            android:supportsPictureInPicture="true"
+            android:resizeableActivity="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize">
+            <!-- A0504: the live Camera tab shrinks into a picture-in-picture window on Home (MainActivity.updatePip).
+                 configChanges: entering and leaving that window only resizes this activity instead of recreating it,
+                 so the camera preview keeps running (rotation still recreates it, as before). -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

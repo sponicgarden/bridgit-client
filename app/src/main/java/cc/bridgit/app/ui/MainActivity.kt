@@ -2,9 +2,13 @@ package cc.bridgit.app.ui
 
 import android.app.KeyguardManager
 import android.content.ClipboardManager
+import android.app.PictureInPictureParams
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.util.Rational
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
@@ -36,6 +40,8 @@ import cc.bridgit.app.interact.IStatus
 import cc.bridgit.app.interact.Interaction
 import cc.bridgit.app.interact.InteractionNotifier
 import cc.bridgit.app.interact.MainActivityState
+import cc.bridgit.app.ui.camera.CameraFragment
+import cc.bridgit.app.ui.camera.CameraPip
 import cc.bridgit.app.ui.interactions.InteractionUi
 import cc.bridgit.app.ui.interactions.TextPanel
 import cc.bridgit.app.update.UpdateDialog
@@ -83,9 +89,10 @@ class MainActivity : AppCompatActivity() {
             runCatching { app.usage.count("screen:" + resources.getResourceEntryName(dest.id)) }
             if (dest.id in TOP_LEVEL) runCatching { LastTab.save(this, resources.getResourceEntryName(dest.id)) }
             hubBar?.onDestination(dest.id in HUB_TABS, dest.id !in NO_DEVICE_BAR, home = dest.id == R.id.home)
-            b.bottomNav.isVisible = dest.id in TOP_LEVEL
+            b.bottomNav.isVisible = dest.id in TOP_LEVEL && !isInPictureInPictureMode
             applyPanelInset()
             lifecycleScope.launch { refreshPanel() }
+            updatePip()
         }
         ViewCompat.setOnApplyWindowInsetsListener(b.bottomNav) { v, insets ->
             navInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
@@ -94,6 +101,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) { route(); openIssueFrom(intent); val arrival = wakeFor(intent); openInteractionFrom(intent, arrival); openTourFrom(intent); openDogFrom(intent); openOwnerSetupFrom(intent); openAgentFrom(intent); openPortalFrom(intent); openForegroundScreen(intent); reopenLastTab(launchBranding) }
         watchInteractionsBadge()
         watchTextPanel()
+        if (isInPictureInPictureMode) applyPipChrome(true)
         if (launchBranding && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) showLaunchBranding()
     }
 
@@ -136,7 +144,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun refreshPanel() {
-        if (!::panel.isInitialized) return
+        if (!::panel.isInitialized || isInPictureInPictureMode) return
         // Not over first run or an unfinished setup prompt.
         if (nav.currentDestination?.id in SETUP) { panel.show(null); MainActivityState.textPanelId = null; return }
         val chosen = panelChosen
@@ -390,6 +398,69 @@ class MainActivity : AppCompatActivity() {
         // The secret's Copy button closes a dialog, which refocuses this window at once: wait until the owner has been away.
         if (label == CLIP_LABEL_SECRET && leftApp) runCatching { cm.clearPrimaryClip() }
     }
+
+    /** A0504: the device supports picture-in-picture (some Android Go and car builds don't). */
+    private val pipSupported by lazy { packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE) }
+
+    /** The Camera tab when it is the screen shown, else null. */
+    private fun cameraTab(): CameraFragment? = if (nav.currentDestination?.id != R.id.camera) null else
+        (supportFragmentManager.findFragmentById(R.id.nav_host) as? NavHostFragment)?.childFragmentManager?.primaryNavigationFragment as? CameraFragment
+
+    private fun liveCamera(): CameraFragment? = cameraTab()?.takeIf {
+        CameraPip.shouldEnter(pipSupported, onCameraTab = true, previewLive = it.previewLive, inPip = isInPictureInPictureMode, finishing = isFinishing)
+    }
+
+    private fun pipParams(camera: CameraFragment?): PictureInPictureParams {
+        val p = PictureInPictureParams.Builder()
+        camera?.previewBounds()?.let { r ->
+            val (w, h) = CameraPip.aspect(r.width(), r.height())
+            p.setAspectRatio(Rational(w, h))
+            p.setSourceRectHint(r)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) p.setAutoEnterEnabled(camera != null).setSeamlessResizeEnabled(false)
+        return p.build()
+    }
+
+    /**
+     * A0504: keeps Android's picture-in-picture settings in step with the screen. On Android 12+ Home then shrinks
+     * the live Camera tab into a PiP window by itself (auto-enter); older versions enter in [onUserLeaveHint].
+     * Called on every screen change and when the camera preview starts or stops.
+     */
+    fun updatePip() {
+        if (!pipSupported || Build.VERSION.SDK_INT < Build.VERSION_CODES.S || !::nav.isInitialized || isInPictureInPictureMode) return
+        runCatching { setPictureInPictureParams(pipParams(liveCamera())) }
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) return // auto-enter, set by updatePip()
+        val camera = liveCamera() ?: return
+        runCatching { enterPictureInPictureMode(pipParams(camera)) }
+    }
+
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        applyPipChrome(isInPictureInPictureMode)
+    }
+
+    /**
+     * In the PiP window only the camera preview shows; leaving it restores the bars this screen had. Also run from
+     * onCreate: Android recreates this activity on entering and leaving PiP (its size changes).
+     */
+    private fun applyPipChrome(inPip: Boolean) {
+        if (inPip) {
+            val shown = listOfNotNull(hubBar?.view, b.textPanel.root, b.bottomNav).filter { it.isVisible }
+            shown.forEach { it.isVisible = false }
+            pipHidden = (pipHidden + shown).distinct()
+        } else {
+            pipHidden.forEach { it.isVisible = true }
+            pipHidden = emptyList()
+            b.bottomNav.isVisible = nav.currentDestination?.id in TOP_LEVEL
+            lifecycleScope.launch { refreshPanel() }
+            updatePip()
+        }
+    }
+    private var pipHidden: List<View> = emptyList()
 
     fun showBottomBar(show: Boolean) { b.bottomNav.visibility = if (show) View.VISIBLE else View.GONE }
 

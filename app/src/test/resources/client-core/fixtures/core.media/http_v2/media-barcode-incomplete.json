@@ -1,0 +1,70 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-barcode-incomplete",
+  "service": "core.media",
+  "door": "http_v2",
+  "title": "Barcode reading of a photo still arriving answers media_incomplete",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery"
+        ]
+      }
+    ],
+    "control_grants": [
+      {
+        "agent": "a",
+        "scope": "images.barcode"
+      },
+      {
+        "agent": "a",
+        "scope": "gallery.read"
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "photo",
+        "size": 4096,
+        "added_at": 1762800000,
+        "id": 7,
+        "owner_package": "com.google.android.apps.photos",
+        "relative_path": "DCIM/Camera/",
+        "pending": true
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "images.barcode",
+      "arguments": {
+        "gallery_id": "7"
+      }
+    }
+  },
+  "expect": {
+    "status": 409,
+    "error": "media_incomplete"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

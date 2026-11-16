@@ -1,0 +1,70 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "media-barcode-sync-settling-incomplete",
+  "service": "core.media",
+  "door": "http_v2",
+  "title": "Barcode reading of a sync photo modified 2 s ago (not marked pending) answers media_incomplete",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "switches": {
+      "gallery": true
+    },
+    "media_access": "full",
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "gallery"
+        ]
+      }
+    ],
+    "control_grants": [
+      {
+        "agent": "a",
+        "scope": "images.barcode"
+      },
+      {
+        "agent": "a",
+        "scope": "gallery.read"
+      }
+    ],
+    "media": [
+      {
+        "scope": "library",
+        "kind": "photo",
+        "size": 4096,
+        "added_at": 1762800000,
+        "id": 11,
+        "owner_package": "com.nutomic.syncthingandroid",
+        "relative_path": "DCIM/Syncthing/",
+        "modified_seconds_ago": 2
+      }
+    ]
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v2/call",
+    "body": {
+      "tool": "images.barcode",
+      "arguments": {
+        "gallery_id": "11"
+      }
+    }
+  },
+  "expect": {
+    "status": 409,
+    "error": "media_incomplete"
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

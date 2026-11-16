@@ -96,6 +96,8 @@
   "core.links/satellite_forward/forward-link-agent-never-forwards.json",
   "core.links/satellite_forward/forward-link-agent-runs-here.json",
   "core.links/satellite_forward/forward-unknown-target.json",
+  "core.media/http_v2/media-barcode-incomplete.json",
+  "core.media/http_v2/media-barcode-sync-settling-incomplete.json",
   "core.media/mcp/media-captures-grant-not-library.json",
   "core.media/mcp/media-ocr-incomplete.json",
   "core.media/mcp/media-ocr-sync-settling-incomplete.json",

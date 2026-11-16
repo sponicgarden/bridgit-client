@@ -299,6 +299,7 @@ class ShareReceiveActivity:AppCompatActivity() {
             try {
                 val a=agents[index]; app.platform.authorize(a.id,"files")
                 val uri=androidx.core.content.IntentCompat.getParcelableExtra(intent,Intent.EXTRA_STREAM,Uri::class.java)
+                if(uri!=null && uri.scheme=="content" && ShareOrigin.isRefused(this,uri)) throw ApiError(422,"unsupported_share","Bridgit's own files can't be shared")
                 if(uri!=null && uri.scheme=="content") app.platform.files.import(a.id,uri)
                 else { val text=intent.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()?.take(32768) ?: throw ApiError(422,"unsupported_share","Share text or a supported document"); app.platform.files.put(a.id,JSONObject().put("name","Shared text.txt").put("mime","text/plain").put("data_base64",android.util.Base64.encodeToString(text.toByteArray(),android.util.Base64.NO_WRAP))) }
                 Toast.makeText(this,"Shared with ${a.name}",Toast.LENGTH_SHORT).show()

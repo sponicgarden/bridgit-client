@@ -189,7 +189,7 @@ class ShareActivity : AppCompatActivity() {
         val uris = if (intent.action == Intent.ACTION_SEND_MULTIPLE) IntentCompat.getParcelableArrayListExtra(intent, Intent.EXTRA_STREAM, Uri::class.java).orEmpty()
             else listOfNotNull(IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java))
         val sharedText = intent.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()
-        if (uris.size > 10 || uris.any { it.scheme != "content" || it.authority == "$packageName.fileprovider" } || (uris.isEmpty() && sharedText.isNullOrBlank()) || (sharedText?.length ?: 0) > 200_000) { fail("Share up to ten content files or 200 KB of text."); return }
+        if (uris.size > 10 || uris.any { cc.bridgit.app.platform.ShareOrigin.isRefused(this, it) } || (uris.isEmpty() && sharedText.isNullOrBlank()) || (sharedText?.length ?: 0) > 200_000) { fail("Share up to ten content files or 200 KB of text."); return }
         val view = TextView(this).apply { text = "Choose which control agent receives this share. It may retain a copy on its own servers."; setPadding(32, 48, 32, 32) }; setContentView(view)
         lifecycleScope.launch {
             val preview = withContext(Dispatchers.IO) { runCatching {

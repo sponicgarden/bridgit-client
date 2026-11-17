@@ -6568,7 +6568,7 @@
     },
     {
      "name": "no_autofix",
-     "description": "true = leave it for a person (features and applet requests always are)",
+     "description": "AutoFix is on by default; true turns it off and needs autofix_off_reason (owner_manual_defer with autofix_revisit_at, owner_product_decision, do_not_implement or spec_for_review), otherwise it is switched on and the answer says autofix_flipped (applet requests are always off)",
      "type": "boolean",
      "required": false
     },
@@ -6847,7 +6847,7 @@
     },
     {
      "name": "no_autofix",
-     "description": "true = leave it for a person (features and applet requests always are)",
+     "description": "AutoFix is on by default; true turns it off and needs autofix_off_reason (owner_manual_defer with autofix_revisit_at, owner_product_decision, do_not_implement or spec_for_review), otherwise it is switched on and the answer says autofix_flipped (applet requests are always off)",
      "type": "boolean",
      "required": false
     },

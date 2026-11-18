@@ -58,6 +58,7 @@
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/kinds"
+                android:tag="pills:kind"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp" />
@@ -119,6 +120,7 @@
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/intervals"
+                android:tag="pills:interval"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:selectionRequired="true"

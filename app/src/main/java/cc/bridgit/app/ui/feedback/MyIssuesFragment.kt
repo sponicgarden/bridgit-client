@@ -27,7 +27,6 @@ import cc.bridgit.app.databinding.FragmentMyIssuesBinding
 import cc.bridgit.app.feedback.FeedbackStatusSync
 import cc.bridgit.app.feedback.Issue
 import cc.bridgit.app.feedback.IssueKind
-import cc.bridgit.app.feedback.IssueStatus
 import cc.bridgit.app.feedback.StatusMachine
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -35,8 +34,8 @@ import java.util.Locale
 
 /**
  * My issues (FBK-09, UI-20, ui-spec 5.12): every issue, newest first, with kind,
- * first line, date, who last updated it and a status chip. Filters All · Bugs ·
- * Features · Open ("Open" = anything not yet confirmed closed).
+ * first line, date, who last updated it and a status chip. Two pill groups (A0405): kind
+ * (All · Bugs · Features) and status (Open = anything not yet confirmed closed); see [IssueFilter].
  */
 class MyIssuesFragment : Fragment() {
     private var _b: FragmentMyIssuesBinding? = null
@@ -58,9 +57,10 @@ class MyIssuesFragment : Fragment() {
         }
         b.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         b.list.adapter = adapter
-        b.filters.setOnCheckedStateChangeListener { _, _ -> show() }
-        if (savedInstanceState == null) b.filters.check(if (arguments?.getString("issueKind") == IssueKind.FEATURE.id) R.id.filter_features else R.id.filter_bugs)
-        b.newReport.setOnClickListener { openReport(this, if (b.filters.checkedChipId == R.id.filter_features) IssueKind.FEATURE else IssueKind.BUG, "My issues") }
+        b.kindFilters.setOnCheckedStateChangeListener { _, _ -> show() }
+        b.statusFilters.setOnCheckedStateChangeListener { _, _ -> show() }
+        if (savedInstanceState == null) b.kindFilters.check(if (arguments?.getString("issueKind") == IssueKind.FEATURE.id) R.id.filter_features else R.id.filter_bugs)
+        b.newReport.setOnClickListener { openReport(this, reportKind(), "My issues") }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 app.feedback.changed.collect { load() }
@@ -79,18 +79,26 @@ class MyIssuesFragment : Fragment() {
 
     private fun show() {
         val bb = _b ?: return
-        bb.newReport.setText(if (bb.filters.checkedChipId == R.id.filter_features) R.string.feedback_menu_request_feature else R.string.feedback_menu_report_bug)
-        val shown = when (bb.filters.checkedChipId) {
-            R.id.filter_bugs -> all.filter { it.kind == IssueKind.BUG }
-            R.id.filter_features -> all.filter { it.kind == IssueKind.FEATURE }
-            R.id.filter_open -> all.filter { it.status != IssueStatus.CONFIRMED }
-            else -> all
-        }
+        bb.newReport.setText(if (reportKind() == IssueKind.FEATURE) R.string.feedback_menu_request_feature else R.string.feedback_menu_report_bug)
+        val shown = filter().apply(all)
         adapter.submitList(shown)
         bb.empty.isVisible = shown.isEmpty()
         bb.empty.setText(if (all.isEmpty()) R.string.feedback_empty else R.string.feedback_empty_filtered)
         bb.list.isVisible = shown.isNotEmpty()
     }
+
+    /** Chip state as data: the kind group and the status group combine. */
+    private fun filter(): IssueFilter {
+        val kind = when (b.kindFilters.checkedChipId) {
+            R.id.filter_bugs -> IssueKind.BUG
+            R.id.filter_features -> IssueKind.FEATURE
+            else -> null
+        }
+        return IssueFilter(kind, b.filterOpen.isChecked)
+    }
+
+    /** "New report" follows the kind group only; All files a bug. */
+    private fun reportKind() = if (b.kindFilters.checkedChipId == R.id.filter_features) IssueKind.FEATURE else IssueKind.BUG
 
     private class Adapter(private val onClick: (Issue) -> Unit) : ListAdapter<Issue, Adapter.Holder>(DIFF) {
         class Holder(val b: FeedbackIssueRowBinding) : RecyclerView.ViewHolder(b.root)

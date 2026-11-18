@@ -69,71 +69,88 @@
         android:paddingHorizontal="16dp"
         android:scrollbars="none">
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chips"
+        <!-- A0405: one type per pill group. Filters (Agent, Type, Errors, Level) and the Live mode are separate groups. -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:chipSpacingHorizontal="8dp"
-            app:singleLine="true">
+            android:orientation="horizontal">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_agent"
-                app:chipBackgroundColor="@color/activity_filter_chip_bg"
-                style="@style/Widget.Bridgit.FilterChip"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chips"
+                android:tag="pills:filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checkable="true"
-                app:checkedIconVisible="false"
-                android:text="@string/activity_chip_agent"
-                app:closeIcon="@drawable/activity_ic_drop"
-                app:closeIconVisible="true" />
+                app:chipSpacingHorizontal="8dp"
+                app:singleLine="true">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_type"
-                app:chipBackgroundColor="@color/activity_filter_chip_bg"
-                style="@style/Widget.Bridgit.FilterChip"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_agent"
+                    app:chipBackgroundColor="@color/activity_filter_chip_bg"
+                    style="@style/Widget.Bridgit.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    app:checkedIconVisible="false"
+                    android:text="@string/activity_chip_agent"
+                    app:closeIcon="@drawable/activity_ic_drop"
+                    app:closeIconVisible="true" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_type"
+                    app:chipBackgroundColor="@color/activity_filter_chip_bg"
+                    style="@style/Widget.Bridgit.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    app:checkedIconVisible="false"
+                    android:text="@string/activity_chip_type"
+                    app:closeIcon="@drawable/activity_ic_drop"
+                    app:closeIconVisible="true" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_errors"
+                    app:chipBackgroundColor="@color/activity_filter_chip_bg"
+                    style="@style/Widget.Bridgit.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/activity_chip_errors" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_level"
+                    app:chipBackgroundColor="@color/activity_filter_chip_bg"
+                    style="@style/Widget.Bridgit.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    app:checkedIconVisible="false"
+                    android:text="@string/activity_chip_level"
+                    android:visibility="gone"
+                    app:closeIcon="@drawable/activity_ic_drop"
+                    app:closeIconVisible="true" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/mode_chips"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checkable="true"
-                app:checkedIconVisible="false"
-                android:text="@string/activity_chip_type"
-                app:closeIcon="@drawable/activity_ic_drop"
-                app:closeIconVisible="true" />
+                android:layout_marginStart="16dp"
+                android:tag="pills:mode"
+                app:singleLine="true">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_errors"
-                app:chipBackgroundColor="@color/activity_filter_chip_bg"
-                style="@style/Widget.Bridgit.FilterChip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/activity_chip_errors" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_level"
-                app:chipBackgroundColor="@color/activity_filter_chip_bg"
-                style="@style/Widget.Bridgit.FilterChip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                app:checkedIconVisible="false"
-                android:text="@string/activity_chip_level"
-                android:visibility="gone"
-                app:closeIcon="@drawable/activity_ic_drop"
-                app:closeIconVisible="true" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_live"
-                style="@style/Widget.Bridgit.FilterChip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/activity_chip_live"
-                app:checkedIconVisible="false"
-                app:chipBackgroundColor="@color/activity_live_chip_bg"
-                app:chipIcon="@drawable/activity_dot_gold"
-                app:chipIconSize="8dp"
-                app:chipIconVisible="true"
-                app:iconStartPadding="8dp" />
-        </com.google.android.material.chip.ChipGroup>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_live"
+                    style="@style/Widget.Bridgit.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/activity_chip_live"
+                    app:checkedIconVisible="false"
+                    app:chipBackgroundColor="@color/activity_live_chip_bg"
+                    app:chipIcon="@drawable/activity_dot_gold"
+                    app:chipIconSize="8dp"
+                    app:chipIconVisible="true"
+                    app:iconStartPadding="8dp" />
+            </com.google.android.material.chip.ChipGroup>
+        </LinearLayout>
     </HorizontalScrollView>
 
     <com.google.android.material.progressindicator.LinearProgressIndicator

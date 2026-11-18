@@ -154,11 +154,12 @@ class InteractionsFragment : Fragment() {
         }).attachToRecyclerView(b.list)
 
         b.chips.setOnCheckedStateChangeListener { _, ids -> lastFilter = ids.firstOrNull() ?: R.id.chip_all; render() }
+        b.statusChips.setOnCheckedStateChangeListener { _, _ -> render() }
         b.cardsMode.addOnButtonCheckedListener { _, id, checked ->
             if (checked) { val lib = id == R.id.cards_mode_library; if (library != lib) { library = lib; showCardsMode() } }
         }
         b.emptyAction.setOnClickListener {
-            if (all.isEmpty()) { library = true; showCardsMode() } else b.chips.check(R.id.chip_all)
+            if (all.isEmpty()) { library = true; showCardsMode() } else { b.chips.check(R.id.chip_all); b.chipOpen.isChecked = false }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -252,25 +253,27 @@ class InteractionsFragment : Fragment() {
     private fun render() {
         val bb = _b ?: return
         val rows = grouped(all)
-        val shown = when (lastFilter) {
-            R.id.chip_questions -> rows.filter { InteractionUi.isQuestion(it) }
-            R.id.chip_notices -> rows.filter { !InteractionUi.isQuestion(it) }
-            R.id.chip_open -> rows.filter { InteractionUi.waiting(it) }
-            else -> rows
-        }
+        val filter = InteractionFilter(
+            when (lastFilter) {
+                R.id.chip_questions -> InteractionFilter.Kind.QUESTIONS
+                R.id.chip_notices -> InteractionFilter.Kind.NOTICES
+                else -> InteractionFilter.Kind.ALL
+            },
+            bb.chipOpen.isChecked,
+        )
+        val shown = filter.apply(rows, InteractionUi::isQuestion, InteractionUi::waiting)
         adapter?.submitList(InteractionRow.of(shown))
         bb.empty.isVisible = shown.isEmpty()
         bb.list.isVisible = shown.isNotEmpty()
         if (shown.isEmpty()) {
             // Truly empty: "No cards yet" + Browse library. Empty only because of a filter: say so + Clear filter.
-            val chip = lastFilter
-            val none = all.isEmpty() || chip == R.id.chip_all || chip == View.NO_ID
+            val none = all.isEmpty() || !filter.narrowed
             bb.emptyTitle.isVisible = true
             bb.emptyTitle.text = getString(if (none) R.string.interactions_empty_none_title else R.string.interactions_empty_filtered_title)
             bb.emptyBody.text = when {
                 none -> getString(R.string.interactions_empty_none_body)
-                chip == R.id.chip_questions -> getString(R.string.interactions_empty_questions)
-                chip == R.id.chip_notices -> getString(R.string.interactions_empty_notices)
+                filter.kind == InteractionFilter.Kind.QUESTIONS -> getString(R.string.interactions_empty_questions)
+                filter.kind == InteractionFilter.Kind.NOTICES -> getString(R.string.interactions_empty_notices)
                 else -> getString(R.string.interactions_empty_open)
             }
             bb.emptyAction.setText(if (none) R.string.interactions_browse_library else R.string.interactions_clear_filter)

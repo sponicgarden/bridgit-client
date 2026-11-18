@@ -31,45 +31,64 @@
         android:layout_height="wrap_content"
         android:scrollbars="none">
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/filters"
+        <!-- A0405: one type per pill group. Kind and status are separate groups; the list shows both. -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            app:checkedChip="@id/filter_all"
-            app:selectionRequired="true"
-            app:singleLine="true"
-            app:singleSelection="true">
+            android:paddingEnd="16dp">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/filter_all"
-                style="@style/Widget.Bridgit.FilterChip"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/kind_filters"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/feedback_filter_all" />
+                android:tag="pills:kind"
+                app:checkedChip="@id/filter_all"
+                app:selectionRequired="true"
+                app:singleLine="true"
+                app:singleSelection="true">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/filter_bugs"
-                style="@style/Widget.Bridgit.FilterChip"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/filter_all"
+                    style="@style/Widget.Bridgit.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/feedback_filter_all" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/filter_bugs"
+                    style="@style/Widget.Bridgit.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/feedback_filter_bugs" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/filter_features"
+                    style="@style/Widget.Bridgit.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/feedback_filter_features" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/status_filters"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/feedback_filter_bugs" />
+                android:layout_marginStart="16dp"
+                android:tag="pills:status"
+                app:selectionRequired="false"
+                app:singleLine="true"
+                app:singleSelection="false">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/filter_features"
-                style="@style/Widget.Bridgit.FilterChip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/feedback_filter_features" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/filter_open"
-                style="@style/Widget.Bridgit.FilterChip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/feedback_filter_open" />
-        </com.google.android.material.chip.ChipGroup>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/filter_open"
+                    style="@style/Widget.Bridgit.FilterChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/feedback_filter_open" />
+            </com.google.android.material.chip.ChipGroup>
+        </LinearLayout>
     </HorizontalScrollView>
 
     <FrameLayout

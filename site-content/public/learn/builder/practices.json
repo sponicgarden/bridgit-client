@@ -619,6 +619,40 @@
       "device_verified": false
     },
     {
+      "id": "UI-003",
+      "revision": 1,
+      "dimension": "controls",
+      "tasks": [
+        "ui"
+      ],
+      "guidance": "Each pill or chip group holds one type: statuses, urgencies or one filter category. \"All\" may lead a group as its reset. Two categories are two separate groups that combine.",
+      "applicability": "ui",
+      "applies_when": "Every group of pills, chips, badges or tags",
+      "rationale": "A mixed group reads as one control while being several.",
+      "acceptance": [
+        "Inspect every pill, chip, badge and tag group. Verify each holds one type, that two categories appear as separate groups, and that their filters combine."
+      ],
+      "shared_default": "Pill group per category",
+      "checks": [
+        "pill-group-type"
+      ],
+      "enforcement": "review",
+      "exceptions_allowed": true,
+      "evidence": [
+        {
+          "application": "shared-practice-contract",
+          "finding": "One type per pill group. Kind and status filters are separate groups whose filters combine; a mode (Live) is not a filter.",
+          "basis": "policy",
+          "source": "docs/ui-spec.md"
+        }
+      ],
+      "applications": [
+        "shared-practice-contract"
+      ],
+      "observed_across_applications": false,
+      "device_verified": false
+    },
+    {
       "id": "A11Y-001",
       "revision": 1,
       "dimension": "accessibility",
@@ -1161,6 +1195,7 @@
     "ui": [
       "UI-001",
       "UI-002",
+      "UI-003",
       "A11Y-001",
       "A11Y-002",
       "LAYOUT-001"

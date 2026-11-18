@@ -144,6 +144,12 @@
       "finding": "Derive applicability from package and code. Emit pass, fail, exception, not-applicable, unverified or legacy-debt. Bind evidence to artifact and runtime hashes.",
       "basis": "policy",
       "source": "docs/applet-practices.md"
+    },
+    {
+      "practice": "UI-003",
+      "finding": "One type per pill group. Kind and status filters are separate groups whose filters combine; a mode (Live) is not a filter.",
+      "basis": "policy",
+      "source": "docs/ui-spec.md"
     }
   ]
 }

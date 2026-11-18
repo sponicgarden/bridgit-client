@@ -2545,7 +2545,7 @@ All endpoints use the paired agent's Authorization bearer key over the existing 
 | 429 | `image_quota_exceeded` | The account used its 40 monthly images | Wait until quota.resets_at |
 | 409 | `image_in_progress` | Image request is pending or its outcome is unknown | Retry only with the same Idempotency-Key |
 | 409 | `image_refused` | Azure refused the request without using an image slot | Correct the request before starting a new generation |
-| 409 | `idempotency_conflict` | This image key was used for different parameters | Use identical parameters for retries |
+| 409 | `idempotency_conflict` | This Idempotency-Key was already used for a different request | Use identical parameters for retries |
 | 502 | `image_provider_failed` | Azure could not generate the image | Inspect provider_status; never retry an unknown outcome with a new key |
 | 502 | `image_outcome_unknown` | Image generation outcome could not be confirmed | Retry only with the same Idempotency-Key |
 | 503 | `images_unavailable` | The configured Azure image task is unavailable | Check the configured model task and Azure deployment |

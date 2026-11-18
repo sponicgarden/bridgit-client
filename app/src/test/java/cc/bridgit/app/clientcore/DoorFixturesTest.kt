@@ -361,9 +361,14 @@ class DoorFixturesTest(private val path: String) {
             val e = entries.getJSONObject(i)
             val id = agent(e.getString("agent")).id
             val key = e.getString("key"); val route = e.getString("route")
-            assertTrue("$path: idempotency key $key was already claimed", cache.claim(id, key, route) == cc.bridgit.app.api.IdempotencyCache.Claim.New)
+            e.keys().forEach { if (it !in setOf("agent", "key", "route", "state", "body", "query")) fail("$path: the Android runner can't seed idempotency entry field '$it'") }
+            // The request the key was first sent with (A0334): its body and query, fingerprinted as ApiServer does.
+            val q = e.optJSONObject("query")?.let { o -> o.keys().asSequence().associateWith { o.getString(it) } } ?: emptyMap()
+            val fingerprint = cc.bridgit.app.api.IdempotencyCache.fingerprint(q, e.optJSONObject("body") ?: JSONObject())
+            assertTrue("$path: idempotency key $key was already claimed", cache.claim(id, key, route, fingerprint) == cc.bridgit.app.api.IdempotencyCache.Claim.New)
             when (val state = e.getString("state")) {
                 "running" -> {}
+                "done" -> cache.finish(id, key, 200, "application/json", JSONObject().put("ok", true).put("request_id", "fixture-first").toString().toByteArray(), emptyMap(), false)
                 // A finished result whose body didn't fit the 48 MB budget keeps only its marker, so a repeat is Expired.
                 "expired" -> cache.finish(id, key, 200, "application/json", ByteArray(48 * 1024 * 1024 + 1), emptyMap(), true)
                 else -> fail("$path: the Android runner can't seed idempotency state '$state'")

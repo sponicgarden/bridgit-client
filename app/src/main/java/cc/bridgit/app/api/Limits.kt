@@ -1,6 +1,9 @@
 package cc.bridgit.app.api
 
+import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
+import java.security.MessageDigest
 
 /**
  * Sliding one-minute windows (SEC-06, SEC-07, LOG-11). Keys are free-form
@@ -87,12 +90,15 @@ class WaitGate(private val perAgent: Int = 4, private val total: Int = 32) {
  * new keys are refused instead. Everything is lost if the process restarts.
  * A key belongs to the endpoint it was first used on ([route]); the same key on another
  * endpoint is [Claim.Mismatch], so a result is never replayed to the wrong request.
+ * It also belongs to the request it was first sent with ([fingerprint], A0334): the same key and endpoint
+ * with a different body or query is [Claim.Conflict] (409 idempotency_conflict), never a silent replay of
+ * the first result. An empty fingerprint (callers that have none) matches only another empty one.
  */
 class IdempotencyCache(private val clock: () -> Long = System::currentTimeMillis,
                        private val keepMs: Long = 24 * 3600_000L, private val mediaKeepMs: Long = 15 * 60_000L,
                        private val maxEntries: Int = 20_000, private val maxBodyBytes: Long = 48L * 1024 * 1024) {
     class Stored(val status: Int, val contentType: String, val body: ByteArray?, val headers: Map<String, String>,
-                 val doneAt: Long, val isMedia: Boolean, val route: String = "")
+                 val doneAt: Long, val isMedia: Boolean, val route: String = "", val fingerprint: String = "")
 
     sealed class Claim {
         object New : Claim()
@@ -101,21 +107,25 @@ class IdempotencyCache(private val clock: () -> Long = System::currentTimeMillis
         object Expired : Claim()
         object Full : Claim()
         object Mismatch : Claim()
+        /** Same key and endpoint, different request body or query (A0334). */
+        object Conflict : Claim()
     }
 
-    private val running = HashMap<String, String>()
+    private class Owner(val route: String, val fingerprint: String)
+    private val running = HashMap<String, Owner>()
     private val done = LinkedHashMap<String, Stored>()
     private var bodyBytes = 0L
 
     /** Atomically reserves (agent, key) before the work starts. */
     @Synchronized
-    fun claim(agentId: String, key: String, route: String = ""): Claim {
+    fun claim(agentId: String, key: String, route: String = "", fingerprint: String = ""): Claim {
         prune()
         val k = "$agentId\u0000$key"
-        done[k]?.let { return if (it.route != route) Claim.Mismatch else if (it.body == null) Claim.Expired else Claim.Done(it) }
-        running[k]?.let { return if (it != route) Claim.Mismatch else Claim.Running }
+        done[k]?.let { return when { it.route != route -> Claim.Mismatch; it.fingerprint != fingerprint -> Claim.Conflict
+            it.body == null -> Claim.Expired; else -> Claim.Done(it) } }
+        running[k]?.let { return when { it.route != route -> Claim.Mismatch; it.fingerprint != fingerprint -> Claim.Conflict; else -> Claim.Running } }
         if (done.size + running.size >= maxEntries) return Claim.Full
-        running[k] = route
+        running[k] = Owner(route, fingerprint)
         return Claim.New
     }
 
@@ -128,13 +138,14 @@ class IdempotencyCache(private val clock: () -> Long = System::currentTimeMillis
     fun finish(agentId: String, key: String, status: Int, contentType: String, body: ByteArray,
                headers: Map<String, String>, isMedia: Boolean) {
         val k = "$agentId\u0000$key"
-        val route = running.remove(k) ?: ""
+        val owner = running.remove(k)
         if (status !in 200..299) return
         prune()
         // Keep the body only while it fits the budget; the done marker is kept either way.
         val keepBody = bodyBytes + body.size <= maxBodyBytes
         if (keepBody) bodyBytes += body.size
-        done[k] = Stored(status, contentType, if (keepBody) body else null, if (keepBody) headers else emptyMap(), clock(), isMedia, route)
+        done[k] = Stored(status, contentType, if (keepBody) body else null, if (keepBody) headers else emptyMap(), clock(), isMedia,
+            owner?.route ?: "", owner?.fingerprint ?: "")
     }
 
     @Synchronized
@@ -151,13 +162,39 @@ class IdempotencyCache(private val clock: () -> Long = System::currentTimeMillis
             if (now - v.doneAt > keepMs) { it.remove(); bodyBytes -= v.body?.size ?: 0 }
             else if (v.isMedia && v.body != null && now - v.doneAt > mediaKeepMs) {
                 bodyBytes -= v.body.size
-                e.setValue(Stored(v.status, v.contentType, null, emptyMap(), v.doneAt, true, v.route))
+                e.setValue(Stored(v.status, v.contentType, null, emptyMap(), v.doneAt, true, v.route, v.fingerprint))
             }
         }
     }
 
     companion object {
         val KEY_RE = Regex("^[A-Za-z0-9_-]{8,128}$")
+
+        /**
+         * SHA-256 of the request a key is bound to (A0334): the query parameters and the JSON body in canonical
+         * form (object keys sorted at every depth, so key order and whitespace never matter), plus the raw
+         * upload's bytes when the body was streamed to a file.
+         */
+        fun fingerprint(query: Map<String, String>, body: JSONObject, raw: File? = null): String {
+            val md = MessageDigest.getInstance("SHA-256")
+            val q = JSONObject(); query.keys.sorted().forEach { q.put(it, query[it]) }
+            md.update(canonical(JSONObject().put("body", body).put("query", q)).toByteArray(Charsets.UTF_8))
+            raw?.takeIf { it.isFile }?.inputStream()?.use { input ->
+                md.update(0); val buf = ByteArray(64 * 1024)
+                while (true) { val n = input.read(buf); if (n < 0) break; md.update(buf, 0, n) }
+            }
+            return md.digest().joinToString("") { "%02x".format(it) }
+        }
+
+        /** JSON text with object keys sorted at every depth. */
+        fun canonical(v: Any?): String = when (v) {
+            null, JSONObject.NULL -> "null"
+            is JSONObject -> v.keys().asSequence().toList().sorted().joinToString(",", "{", "}") { JSONObject.quote(it) + ":" + canonical(v.opt(it)) }
+            is JSONArray -> (0 until v.length()).joinToString(",", "[", "]") { canonical(v.opt(it)) }
+            is String -> JSONObject.quote(v)
+            is Number -> JSONObject.numberToString(v)
+            else -> v.toString()
+        }
     }
 }
 

@@ -28,7 +28,10 @@
           "agent": "a",
           "key": "fixture-key-0004",
           "route": "POST /v1/log",
-          "state": "expired"
+          "state": "expired",
+          "body": {
+            "message": "fixture note"
+          }
         }
       ]
     }

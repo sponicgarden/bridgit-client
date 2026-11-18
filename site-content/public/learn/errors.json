@@ -40,7 +40,7 @@
   {
    "code": "idempotency_conflict",
    "you_should": "Use identical parameters for retries",
-   "meaning": "This image key was used for different parameters",
+   "meaning": "This Idempotency-Key was already used for a different request",
    "http": 409,
    "returned_today": true
   },

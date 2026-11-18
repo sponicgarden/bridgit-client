@@ -1,0 +1,55 @@
+{
+  "$schema": "../../../schemas/fixture.schema.json",
+  "id": "mcp-idempotency-same-body-replay",
+  "service": "core.dispatch",
+  "door": "mcp",
+  "title": "A used key sent again with the identical body replays the first result",
+  "step": "idempotency",
+  "principal": {
+    "agent": "a",
+    "source": "100.64.0.2"
+  },
+  "seed": {
+    "settings": {
+      "listener_enabled": true,
+      "email_verified": true
+    },
+    "agents": [
+      {
+        "ref": "a",
+        "caps": [
+          "log"
+        ]
+      }
+    ],
+    "idempotency": {
+      "entries": [
+        {
+          "agent": "a",
+          "key": "fixture-key-0336",
+          "route": "POST /v1/log",
+          "state": "done",
+          "body": {
+            "message": "first note"
+          }
+        }
+      ]
+    }
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/log",
+    "body": {
+      "message": "first note"
+    },
+    "idempotency_key": "fixture-key-0336"
+  },
+  "expect": {
+    "status": 200
+  },
+  "platforms": {
+    "android": "pass",
+    "apple": "todo",
+    "desktop": "todo"
+  }
+}

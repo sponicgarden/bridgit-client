@@ -38,9 +38,7 @@
   },
   "expect": {
     "status": 403,
-    "body_paths": {
-      "error": "feature_disabled"
-    }
+    "error": "feature_disabled"
   },
   "platforms": {
     "android": "pass",

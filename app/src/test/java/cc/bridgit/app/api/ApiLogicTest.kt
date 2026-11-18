@@ -80,6 +80,41 @@ class ApiLogicTest {
         assertEquals("still bound after the media body is dropped", IdempotencyCache.Claim.Mismatch, c.claim("a", "k1", "POST /interactions"))
     }
 
+    /** A0334: the same key and endpoint with a different body is a conflict, never a replay of the first result. */
+    @Test fun idempotencyKeyBelongsToItsBody() {
+        val c = IdempotencyCache(clock = { now })
+        val first = IdempotencyCache.fingerprint(emptyMap(), JSONObject().put("message", "hi").put("n", 1))
+        val reordered = IdempotencyCache.fingerprint(emptyMap(), JSONObject("{\"n\":1, \"message\":\"hi\"}"))
+        val changed = IdempotencyCache.fingerprint(emptyMap(), JSONObject().put("message", "bye").put("n", 1))
+        val otherQuery = IdempotencyCache.fingerprint(mapOf("size" to "thumb"), JSONObject().put("message", "hi").put("n", 1))
+        assertEquals("key order does not matter", first, reordered)
+        assertFalse(first == changed); assertFalse(first == otherQuery)
+        assertEquals(IdempotencyCache.Claim.New, c.claim("a", "k1", "POST /log", first))
+        assertEquals("running with another body", IdempotencyCache.Claim.Conflict, c.claim("a", "k1", "POST /log", changed))
+        assertEquals("still running with the same body", IdempotencyCache.Claim.Running, c.claim("a", "k1", "POST /log", reordered))
+        c.finish("a", "k1", 200, "application/json", "{}".toByteArray(), emptyMap(), false)
+        assertTrue("identical retry replays", c.claim("a", "k1", "POST /log", reordered) is IdempotencyCache.Claim.Done)
+        assertEquals("changed body after success", IdempotencyCache.Claim.Conflict, c.claim("a", "k1", "POST /log", changed))
+        assertEquals("changed query after success", IdempotencyCache.Claim.Conflict, c.claim("a", "k1", "POST /log", otherQuery))
+        assertEquals("endpoint is checked first", IdempotencyCache.Claim.Mismatch, c.claim("a", "k1", "POST /interactions", changed))
+        // A dropped media body keeps its fingerprint: a different request is still a conflict, the same one is expired.
+        c.claim("a", "m", "POST /camera/snapshot", first); c.finish("a", "m", 200, "image/jpeg", ByteArray(3), emptyMap(), true)
+        now += 16 * 60_000L
+        assertEquals(IdempotencyCache.Claim.Conflict, c.claim("a", "m", "POST /camera/snapshot", changed))
+        assertEquals(IdempotencyCache.Claim.Expired, c.claim("a", "m", "POST /camera/snapshot", first))
+    }
+
+    @Test fun idempotencyFingerprintCoversRawUploads() {
+        val dir = kotlin.io.path.createTempDirectory().toFile()
+        try {
+            val a = File(dir, "a").apply { writeBytes(byteArrayOf(1, 2, 3)) }
+            val b = File(dir, "b").apply { writeBytes(byteArrayOf(1, 2, 4)) }
+            val none = IdempotencyCache.fingerprint(emptyMap(), JSONObject())
+            assertFalse(IdempotencyCache.fingerprint(emptyMap(), JSONObject(), a) == IdempotencyCache.fingerprint(emptyMap(), JSONObject(), b))
+            assertFalse(none == IdempotencyCache.fingerprint(emptyMap(), JSONObject(), a))
+        } finally { dir.deleteRecursively() }
+    }
+
     @Test fun idempotencyMediaAndErrors() {
         val c = IdempotencyCache(clock = { now })
         c.claim("a", "m"); c.finish("a", "m", 200, "image/jpeg", ByteArray(10), emptyMap(), isMedia = true)

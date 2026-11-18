@@ -48,6 +48,7 @@
       "http": 409,
       "platforms": {
         "android": [
+          403,
           409
         ]
       }
@@ -1258,6 +1259,14 @@
         ]
       }
     },
+    "feature_disabled": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
     "feedback_unavailable": {
       "http": 503,
       "platforms": {
@@ -1484,7 +1493,7 @@
     "idempotency_conflict": {
       "http": 409,
       "guide": 6,
-      "meaning": "This image key was used for different parameters",
+      "meaning": "This Idempotency-Key was already used for a different request",
       "agent_should": "Use identical parameters for retries",
       "built": true,
       "platforms": {
@@ -2807,6 +2816,7 @@
       "http": 409,
       "platforms": {
         "android": [
+          403,
           409
         ]
       }
@@ -2862,6 +2872,30 @@
       "platforms": {
         "android": [
           409
+        ]
+      }
+    },
+    "open_app_for_camera": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "open_app_for_location": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
+        ]
+      }
+    },
+    "open_app_for_microphone": {
+      "http": 403,
+      "platforms": {
+        "android": [
+          403
         ]
       }
     },
@@ -3560,6 +3594,7 @@
       "http": 409,
       "platforms": {
         "android": [
+          403,
           409
         ]
       }

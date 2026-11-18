@@ -28,7 +28,10 @@
           "agent": "a",
           "key": "fixture-key-0003",
           "route": "POST /v1/log",
-          "state": "running"
+          "state": "running",
+          "body": {
+            "message": "fixture note"
+          }
         }
       ]
     }

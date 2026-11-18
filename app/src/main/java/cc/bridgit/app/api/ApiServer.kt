@@ -236,9 +236,11 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 if (!IdempotencyCache.KEY_RE.matches(idemKey)) { idemKey = null
                     throw ErrorCatalog.error("invalid_parameter", "Idempotency-Key must be 8-128 letters, digits, - or _ (a UUID works).") }
                 logParams.put("idempotency", "key")
-                when (val c = idempotency.claim(agent!!.id, idemKey, "${spec.method} ${spec.fullPath}")) {
+                val fingerprint = IdempotencyCache.fingerprint(call.request.queryParameters.entries().associate { it.key to it.value.joinToString("\u0000") }, body, rawFile)
+                when (val c = idempotency.claim(agent!!.id, idemKey, "${spec.method} ${spec.fullPath}", fingerprint)) {
                     is IdempotencyCache.Claim.Full -> { idemKey = null; throw ErrorCatalog.error("rate_limited", "Too many Idempotency-Keys in the last 24 h. Retry later.", mapOf("retry_after_s" to 60)) }
                     is IdempotencyCache.Claim.Mismatch -> { idemKey = null; throw ErrorCatalog.error("invalid_parameter", "This Idempotency-Key was already used for a different endpoint. Use a new key for each new request.") }
+                    is IdempotencyCache.Claim.Conflict -> { idemKey = null; throw ErrorCatalog.error("idempotency_conflict", "This Idempotency-Key was already used with a different request body. Resend the identical request to retry, or use a new key for a new request.") }
                     is IdempotencyCache.Claim.Running -> { idemKey = null; throw ErrorCatalog.error("in_progress", "A request with this Idempotency-Key is still running. Retry with the same key shortly.") }
                     is IdempotencyCache.Claim.Expired -> { idemKey = null; throw ErrorCatalog.error("idempotency_expired", "This Idempotency-Key was already used; its media result is no longer kept.") }
                     is IdempotencyCache.Claim.Done -> {
@@ -691,9 +693,10 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 if (!IdempotencyCache.KEY_RE.matches(idemKey)) { idemKey = null
                     throw ErrorCatalog.error("invalid_parameter", "idempotency_key must be 8-128 letters, digits, - or _ (a UUID works).") }
                 logParams.put("idempotency", "key")
-                when (val c = idempotency.claim(agent.id, idemKey, "${spec.method} ${spec.fullPath}")) {
+                when (val c = idempotency.claim(agent.id, idemKey, "${spec.method} ${spec.fullPath}", IdempotencyCache.fingerprint(queries, body))) {
                     is IdempotencyCache.Claim.Full -> { idemKey = null; throw ErrorCatalog.error("rate_limited", "Too many Idempotency-Keys in the last 24 h. Retry later.", mapOf("retry_after_s" to 60)) }
                     is IdempotencyCache.Claim.Mismatch -> { idemKey = null; throw ErrorCatalog.error("invalid_parameter", "This Idempotency-Key was already used for a different endpoint. Use a new key for each new request.") }
+                    is IdempotencyCache.Claim.Conflict -> { idemKey = null; throw ErrorCatalog.error("idempotency_conflict", "This Idempotency-Key was already used with a different request body. Resend the identical request to retry, or use a new key for a new request.") }
                     is IdempotencyCache.Claim.Running -> { idemKey = null; throw ErrorCatalog.error("in_progress", "A request with this idempotency_key is still running. Retry with the same key shortly.") }
                     is IdempotencyCache.Claim.Expired -> { idemKey = null; throw ErrorCatalog.error("idempotency_expired", "This idempotency_key was already used; its media result is no longer kept.") }
                     is IdempotencyCache.Claim.Done -> {

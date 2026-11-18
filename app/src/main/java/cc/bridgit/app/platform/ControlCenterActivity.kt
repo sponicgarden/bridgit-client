@@ -91,7 +91,7 @@ class ControlCenterActivity:AppCompatActivity() {
     private fun render() {
         if(!::screen.isInitialized) return
         val position=scroll.scrollY; root.removeAllViews()
-        text("${runtime.store.setting("device_name",Build.MODEL)} • ${BuildConfigInfo.versionName(this)} • ${if(BuildConfig.PRIVATE_CONTROL) "Private control build" else "Play feature set"}\nDevice: ${runtime.store.deviceId}")
+        text("${DeviceName.of(app)} • ${BuildConfigInfo.versionName(this)} • ${if(BuildConfig.PRIVATE_CONTROL) "Private control build" else "Play feature set"}\nDevice: ${runtime.store.deviceId}")
         // Waiting requests first: they expire in minutes and were buried under every grant switch (A0145).
         heading("Questions and approvals")
         val pending=runtime.pendingApprovals(); shownPending=pendingKey(pending)
@@ -100,7 +100,7 @@ class ControlCenterActivity:AppCompatActivity() {
         text("New capabilities start off. Enable a feature and separately grant it to a named control agent. Stop cancels active authority. Android permissions are always granted through Android.")
         button("Stop all control agent work") { runtime.stopAll(); app.policy.listenerEnabled=false; BridgeService.stop(this); render() }
         button("Refresh status and requests") { render() }
-        button("Name this device") { input("Device name",runtime.store.setting("device_name",Build.MODEL)) { DeviceName.set(app,it); render() } }
+        button("Name this device") { input("Device name",DeviceName.of(app)) { DeviceName.set(app,it); render() } }
         heading("Android access")
         button("Grant camera, microphone, photos and notifications") { requestAccess(Manifest.permission.POST_NOTIFICATIONS,Manifest.permission.CAMERA,Manifest.permission.RECORD_AUDIO,Manifest.permission.READ_MEDIA_IMAGES,Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) }
         button("Grant location") { requestAccess(Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION) }

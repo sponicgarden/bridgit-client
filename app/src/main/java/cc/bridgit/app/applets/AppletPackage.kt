@@ -309,7 +309,13 @@ object AppletPackage {
         }
         if (adapterFamily(adapter) == ADAPTER && watches.length() == 0 && !processing.has("schedule") && flows.isEmpty() && d.optJSONObject("ui")?.optJSONObject("card") == null)
             throw Bad("An applet needs at least one part: a watch, a schedule, a workflow or a card.")
-        return Package(d, digest(d))
+        val pkg = Package(d, digest(d))
+        // A0451: a declared privacy.camera must hold for the parts. Only packages that declare it are checked, so
+        // installed applets and recipes without one stay valid; validate warns about those (policyWarnings).
+        CameraPrivacy.parse(d)?.let { privacy ->
+            CameraPrivacy.problems(compile(pkg, runCatching { fill(pkg, null) }.getOrDefault(defaults)), privacy).firstOrNull()?.let { throw Bad(it) }
+        }
+        return pkg
     }
 
     /** A flow's trigger type and the `with` names a called trigger declares. */
@@ -881,8 +887,9 @@ object AppletPackage {
 
     /** A written `data_policy` that says less than the parts do (a warning for validate, not an error). */
     fun policyWarnings(d: JSONObject, plan: Plan): List<String> {
-        val dp = d.optJSONObject("data_policy") ?: return emptyList()
         val out = mutableListOf<String>()
+        if (runCatching { CameraPrivacy.parse(d) }.getOrNull() == null) out += CameraPrivacy.problems(plan, null)
+        val dp = d.optJSONObject("data_policy") ?: return out
         if (usesModels(plan) && dp.optJSONObject("device_only")?.optBoolean("remote_models", false) == false)
             out += "data_policy.device_only.remote_models says false, but the applet asks Jev or Clef. Leave data_policy out and validate fills it in."
         return out

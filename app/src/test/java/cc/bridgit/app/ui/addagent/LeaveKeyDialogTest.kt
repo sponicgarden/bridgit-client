@@ -31,6 +31,15 @@ class LeaveKeyDialogTest {
         assertFalse("Copy must show the usual confirmation", "quiet" in positive)
     }
 
+    @Test fun noWarningOnceTheAgentHasConnected() {
+        val d = dialog()
+        assertTrue("connected agents already hold the key", "WaitKind.CONNECTED" in d)
+        assertTrue(d.lines().any { "if (" in it && "!connected" in it && "!vm.acknowledged" in it })
+        val vm = File("src/main/java/cc/bridgit/app/ui/addagent/AddAgentViewModel.kt").readText()
+        val rotate = vm.substring(vm.indexOf("fun rotate()"), vm.indexOf("startWaiting()", vm.indexOf("fun rotate()")))
+        assertTrue("Rotate must reset the wait so a new key is warned about again", "_wait.value = Wait()" in rotate)
+    }
+
     @Test fun onlyTheExplicitButtonLeaves() {
         val d = dialog()
         assertFalse(".setNeutralButton" in d)

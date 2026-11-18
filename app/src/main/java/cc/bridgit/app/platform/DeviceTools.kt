@@ -51,7 +51,7 @@ class DeviceTools(private val app:BridgeApp) {
         val battery=app.registerReceiver(null,IntentFilter(Intent.ACTION_BATTERY_CHANGED)); val power=app.getSystemService(PowerManager::class.java)
         val sound=app.getSystemService(AudioManager::class.java); val network=app.getSystemService(ConnectivityManager::class.java)
         val caps=network.activeNetwork?.let(network::getNetworkCapabilities)
-        return JSONObject().put("device_id",runtime.store.deviceId).put("device_name",runtime.store.setting("device_name",Build.MODEL)).put("model",Build.MODEL).put("android_api",Build.VERSION.SDK_INT)
+        return JSONObject().put("device_id",runtime.store.deviceId).put("device_name",DeviceName.of(app)).put("model",Build.MODEL).put("android_api",Build.VERSION.SDK_INT)
             .put("as_of",System.currentTimeMillis()).put("battery_percent",battery?.getIntExtra(BatteryManager.EXTRA_LEVEL,-1) ?: -1).put("charging",battery?.getIntExtra(BatteryManager.EXTRA_PLUGGED,0)!=0)
             .put("screen_on",power.isInteractive).put("locked",app.getSystemService(KeyguardManager::class.java).isDeviceLocked).put("power_save",power.isPowerSaveMode).put("thermal_status",power.currentThermalStatus)
             .put("free_storage_bytes",app.filesDir.usableSpace).put("ringer_mode",sound.ringerMode).put("dnd",app.getSystemService(NotificationManager::class.java).currentInterruptionFilter)

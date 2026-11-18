@@ -6,7 +6,7 @@
   "device": {
     "install_id": null,
     "relay_device_id": null,
-    "name": "robolectric",
+    "name": "Robolectric robolectric",
     "device_type": "phone",
     "platform": "android",
     "os_version": "14",

@@ -452,10 +452,12 @@ class AddAgentFragment : Fragment() {
     /**
      * ✕, system back or Done on the prompt step: ask first if the key hasn't been taken (AGT-05).
      * Copy stays on the screen with the usual confirmation, so the key is never dropped unseen;
-     * dismissing the dialog also stays (A0217).
+     * dismissing the dialog also stays (A0217). Once the agent has called with this key it has the key, so
+     * leaving needs no warning (A11 test, 18 Nov 2026); Rotate resets the wait, so a new key is asked about again.
      */
     private fun onClose() {
-        if (vm.step.value == 4 && vm.key != null && !vm.acknowledged) {
+        val connected = vm.wait.value.kind == AddAgentViewModel.WaitKind.CONNECTED
+        if (vm.step.value == 4 && vm.key != null && !vm.acknowledged && !connected) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.addagent_leave_title)
                 .setMessage(R.string.addagent_leave_body)

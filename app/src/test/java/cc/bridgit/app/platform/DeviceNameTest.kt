@@ -1,7 +1,9 @@
 package cc.bridgit.app.platform
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Test
+import java.io.File
 
 class DeviceNameTest {
     @Test fun ownersAgentControlNameWins() =
@@ -23,5 +25,15 @@ class DeviceNameTest {
     @Test fun controlCharactersAreDroppedAndLongNamesCut() {
         assertEquals("A11 Blue Tab", DeviceName.pick(null, "A11 Blue Tab\u0007", "samsung", "SM-X238U"))
         assertEquals(DeviceName.MAX, DeviceName.pick("x".repeat(200), null, "samsung", "SM-X238U").length)
+    }
+
+    /** A11 test, 18 Nov 2026: phone.status, capabilities and /v1/device/profile said "SM-X238U" while every screen said "A11 Blue Tab". */
+    @Test fun everyAgentFacingNameUsesTheOneDeviceName() {
+        val sites = listOf("platform/DeviceTools.kt", "platform/Capabilities.kt", "platform/ControlCenterActivity.kt", "core/profile/AndroidProfile.kt")
+        for (f in sites) {
+            val src = File("src/main/java/cc/bridgit/app/$f").readText()
+            assertFalse(f, "setting(\"device_name\",Build.MODEL)" in src)
+            assertFalse(f, "?: android.os.Build.MODEL," in src)
+        }
     }
 }

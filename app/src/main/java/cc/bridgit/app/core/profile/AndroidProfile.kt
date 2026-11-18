@@ -74,7 +74,7 @@ object AndroidProfile {
         val device = ProfileBuilder.Device(
             installId = runCatching { cc.bridgit.app.feedback.InstallIdentity.status(app)?.installId }.getOrNull(),
             relayDeviceId = runCatching { cc.bridgit.app.relay.RelayStore(app).device }.getOrNull(),
-            name = names?.optString("friendly_name")?.takeIf { it.isNotEmpty() && it != "null" } ?: android.os.Build.MODEL,
+            name = names?.optString("friendly_name")?.takeIf { it.isNotEmpty() && it != "null" } ?: cc.bridgit.app.platform.DeviceName.of(app),
             deviceType = cc.bridgit.app.platform.DeviceType.of(app).wire,
             osVersion = android.os.Build.VERSION.RELEASE ?: "",
             appVersion = app.appVersion(),

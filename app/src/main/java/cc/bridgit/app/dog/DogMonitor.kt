@@ -1089,14 +1089,15 @@ class DogMonitor(private val app: BridgeApp) {
         var waited = 0
         while (BridgeService.running?.cameraReady != true && waited < 8_000) { delay(250); waited += 250 }
         val svc = BridgeService.running ?: throw ApiError(503, "service_start_blocked", "Bridgit isn't running. Open Bridgit.")
-        // Same lock as agents' camera calls, so the two never open the camera at once.
-        if (!app.registry.cameraLock.tryLock()) throw CameraBusy()
+        // The same camera broker as agents' camera calls, so the two never open the camera at once.
+        val lease = app.registry.camera.tryAcquire(cc.bridgit.app.core.camera.CameraLeases.Lease.OneOff("pet_monitor", "pet_monitor"),
+            cc.bridgit.app.core.camera.CameraBroker.lens(camera != DogCamera.FRONT)) ?: throw CameraBusy()
         val token = svc.captureStarted(app.getString(R.string.dog_title))
         try {
             return svc.camera.snapshot(rear = camera != DogCamera.FRONT, flash = false, spec = PHOTO).bytes
         } finally {
             svc.captureEnded(token)
-            app.registry.cameraLock.unlock()
+            app.registry.camera.release(lease)
         }
     }
 

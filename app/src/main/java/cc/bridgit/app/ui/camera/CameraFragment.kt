@@ -47,7 +47,9 @@ class CameraFragment : Fragment() {
     private var rear = true
     private var capture: ImageCapture? = null
     private var provider: ProcessCameraProvider? = null
-    private var locked = false
+    /** The camera lease this screen holds while it shows the camera (A0455). */
+    private var lease: cc.bridgit.app.core.camera.CameraBroker.Ticket? = null
+    private val locked get() = lease != null
     private var opening: Job? = null
     private var sent = 0
     /** Asked for the camera permission once on this view; after that only the tappable message asks again. */
@@ -142,11 +144,10 @@ class CameraFragment : Fragment() {
         if (locked || opening?.isActive == true) return
         opening = viewLifecycleOwner.lifecycleScope.launch {
             var waited = false
-            while (!app.registry.cameraLock.tryLock()) {
+            while (app.registry.camera.tryAcquire(cc.bridgit.app.core.camera.CameraLeases.Lease.Exclusive("camera_screen")).also { lease = it } == null) {
                 if (!waited) { showMessage(getString(R.string.camera_busy)); waited = true }
                 delay(700)
             }
-            locked = true
             // Clear only the "busy" note: the no-applet explanation stays until an applet checks photos.
             if (_b?.message?.text == getString(R.string.camera_busy)) hideMessage()
             val p = runCatching { withContext(Dispatchers.IO) { ProcessCameraProvider.getInstance(requireContext()).get() } }.getOrNull()
@@ -179,7 +180,7 @@ class CameraFragment : Fragment() {
         runCatching { provider?.unbindAll() }
         provider = null
         capture = null
-        if (locked) { locked = false; runCatching { app.registry.cameraLock.unlock() } }
+        if (locked) { app.registry.camera.release(lease); lease = null }
         notifyPip()
     }
 

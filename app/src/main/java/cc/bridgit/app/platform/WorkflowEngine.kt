@@ -459,6 +459,9 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
                     if(latest.optString("status")!="paused") runtime.store.save(agent,"workflow",latest.put("status","blocked").put("blocked_reason",e.code))
                 }
                 throw e
+            } finally {
+                // A camera applet's photos this run held but no keep_when row named are dropped, never stored (A0451).
+                runCatching { cc.bridgit.app.applets.AppletTableStore.of(runtime.app).endRun(agent,execution.getString("id")) }
             }
         } finally {
             if(runningJob!=null) active.remove(id,runningJob)
@@ -542,7 +545,12 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
                 }
                 photos[sid]=bytes
                 // keep: true stores it in the applet's own folder; "photo" stays the in-run ref, so ask_model still works.
-                val kept=if(step.optBoolean("keep")) try { cc.bridgit.app.applets.AppletTableStore.of(runtime.app).keepPhoto(agent,sid,bytes) } catch(e:cc.bridgit.app.applets.AppletTables.Refused) { throw ApiError(409,e.code,e.message ?: e.code) } else null
+                // A camera applet (privacy.camera, A0451) only holds it: it is written when a keep_when row of this run names it.
+                val kept=if(step.optBoolean("keep")) try {
+                    val tables=cc.bridgit.app.applets.AppletTableStore.of(runtime.app)
+                    val policy=cc.bridgit.app.applets.CameraPolicy.of(runtime.app.applets.forAgent(agent))
+                    if(policy!=null) tables.holdPhoto(policy,agent,runId,sid,bytes) else tables.keepPhoto(agent,sid,bytes)
+                } catch(e:cc.bridgit.app.applets.AppletTables.Refused) { throw ApiError(409,e.code,e.message ?: e.code) } else null
                 JSONObject().put("photo","photo:$sid").put("taken_at",isoAt(System.currentTimeMillis())).put("camera",camera).apply { if(kept!=null) put("kept",kept) }
             }
             "record" -> if(step.has("for_each")) recordRows(agent,runId,step,results,trigger) else recordRow(agent,runId,step,results,trigger)
@@ -565,7 +573,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
                         if (cc.bridgit.app.applets.ChefHelper.camera(latest) != camera || latest?.optLong("started_at") != settings?.optLong("started_at")) return JSONObject().put("skipped",true)
                         cc.bridgit.app.applets.ChefHelper.notePreview(runtime.app,agent,it,camera,settings?.optLong("started_at") ?: 0,timing.sessionS * 1000L)
                     }
-                } else ref?.let { cc.bridgit.app.applets.AppletTableStore.of(runtime.app).photoFile(agent,it)?.readBytes() }
+                } else ref?.let { cc.bridgit.app.applets.AppletTableStore.of(runtime.app).photoBytes(agent,it) }
                 if(bytes==null) throw ApiError(404,"photo_not_found","No kitchen photo")
                 countPaid(agent,record.getString("id"),definition)
                 withContext(Dispatchers.IO) { cc.bridgit.app.applets.ChefHelper.read(runtime.app,agent,record,bytes,step.optString("mode"),step.optString("area"),timing,signed) }
@@ -635,7 +643,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
         val ref=when(v) { is JSONObject -> v.optString("photo").ifEmpty { v.optString("kept") }; is String -> v; else -> "" }
         val bytes=when {
             ref.startsWith("photo:") -> photos[ref.removePrefix("photo:")]
-            ref.startsWith("kept:") -> cc.bridgit.app.applets.AppletTableStore.of(runtime.app).photoFile(agent,ref)?.readBytes()
+            ref.startsWith("kept:") -> cc.bridgit.app.applets.AppletTableStore.of(runtime.app).photoBytes(agent,ref)
             else -> null
         } ?: throw ApiError(404,"photo_not_found","The send has no photo: ${if(ref.isEmpty()) "the photo step didn't run or took none" else "$ref isn't on this phone"}")
         return sendJpeg(bytes)
@@ -720,7 +728,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
     private suspend fun appraise(agent:String,definition:JSONObject,record:JSONObject,step:JSONObject,results:Map<String,JSONObject>,trigger:JSONObject,signed:Boolean):JSONObject {
         val ref=cellValue(step.opt("photo"),null,results,trigger) as? String
         if(ref!=null && ref.startsWith("photo:")) throw ApiError(422,"invalid_photo","appraise needs a kept photo: add keep: true to the photo step")
-        val file=ref?.let { cc.bridgit.app.applets.AppletTableStore.of(runtime.app).photoFile(agent,it) } ?: throw ApiError(404,"photo_not_found","No kept photo ${ref ?: "(the reference is empty)"} on this phone")
+        val photo=ref?.let { cc.bridgit.app.applets.AppletTableStore.of(runtime.app).photoBytes(agent,it) } ?: throw ApiError(404,"photo_not_found","No kept photo ${ref ?: "(the reference is empty)"} on this phone")
         countPaid(agent,record.getString("id"),definition)
         val a=runtime.getAgent(agent)
         val hint=Outbound.Hint("TypeSafe Jev (via Bridgit team backend)","Workflow ${definition.optString("name")}: list the things in a photo",listOf(Categories.IMAGE))
@@ -731,7 +739,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
                 if (pin != null) runtime.app.budgetSync.confirmEditionBudget(instance,pin)
                 fun authorize() = cc.bridgit.app.applets.LibraryVision.verify(runtime.app,agent,instance,record,pin)
                 Outbound.on(Outbound.Actor.agent(agent,a.name),hint) {
-                    appraiser(runtime.app,file.readBytes(),step.optInt("max_items",20),pin,::authorize)
+                    appraiser(runtime.app,photo,step.optInt("max_items",20),pin,::authorize)
                 }.also { authorize() }
             }
         } catch(f:Jev.Failure) {

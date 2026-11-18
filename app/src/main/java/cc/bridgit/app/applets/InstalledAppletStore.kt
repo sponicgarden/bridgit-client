@@ -56,6 +56,8 @@ internal class InstalledAppletStore(context: Context) : SQLiteOpenHelper(context
     }
 
     fun save(record: JSONObject, advanceRevision: Boolean = true) {
+        // A camera applet's enforced privacy settings are stored with it, so they hold after a restart (A0451 §3.3).
+        CameraPolicy.stamp(record)
         val db = writableDatabase
         db.beginTransaction()
         try {

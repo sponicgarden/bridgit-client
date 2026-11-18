@@ -1,7 +1,7 @@
 package cc.bridgit.app.core.camera
 
 /**
- * Who holds the camera (A0455 phase 1): the hand-off rules the future `CameraBroker` will use instead of
+ * Who holds the camera (A0455 phase 1): the hand-off rules [CameraBroker] uses instead of the old
  * `registry.cameraLock`. Pure and synchronized, generic over the camera binding [B], following [cc.bridgit.app.capability.ArmSlot]:
  * every grant has a generation, and a release names it, so a late timer or a stale caller can never free a newer lease.
  *

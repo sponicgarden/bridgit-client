@@ -336,6 +336,19 @@ private suspend fun <T> ApiServer.withSensor(lock: Mutex, note: String, block: s
     }
 }
 
+/** [withSensor] for the camera: the same busy answer, with a [cc.bridgit.app.core.camera.CameraBroker] lease. */
+private suspend fun <T> ApiServer.withCamera(broker: cc.bridgit.app.core.camera.CameraBroker, lease: cc.bridgit.app.core.camera.CameraLeases.Lease,
+                                             lens: String, note: String, block: suspend () -> T): T {
+    val ticket = broker.tryAcquire(lease, lens) ?: throw ErrorCatalog.error("sensor_busy", "A capture is already running. Retry in a few seconds.")
+    val token = service.captureStarted(note)
+    try {
+        return block()
+    } finally {
+        service.captureEnded(token)
+        broker.release(ticket)
+    }
+}
+
 /** 8.2 Camera photo. */
 class CameraModule(app: BridgeApp, private val registry: Registry) : Capability(app) {
     override val id = "camera"
@@ -390,7 +403,8 @@ class CameraModule(app: BridgeApp, private val registry: Registry) : Capability(
                     api.service.camera.snapshot(which == "rear", flash, takeSpec, zoom, warm = armed.binding, allowLocked = lockedOk)
                 }
                 finally { registry.cameraArm.finish(api.service, armed) }
-            } else api.withSensor(registry.cameraLock, app.getString(R.string.notif_taking_photo, agentName)) {
+            } else api.withCamera(registry.camera, cc.bridgit.app.core.camera.CameraLeases.Lease.OneOff(agent?.id ?: "owner", "snapshot"),
+                    which, app.getString(R.string.notif_taking_photo, agentName)) {
                 api.service.camera.snapshot(which == "rear", flash, takeSpec, zoom, allowLocked = lockedOk)
             }
             val (img, peopleView) = if (view.people) cutPeople(shot, spec, view) else shot to null

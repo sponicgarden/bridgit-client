@@ -24,7 +24,8 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
+import cc.bridgit.app.core.camera.CameraBroker
+import cc.bridgit.app.core.camera.CameraLeases
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -102,10 +103,10 @@ object PoseRules {
 /**
  * On-phone body tracking for POST /v1/camera/pose/start: the camera streams small frames, ML Kit's pose
  * detector (bundled model, offline, free) finds 33 body points in each, and the session keeps every frame's
- * points, a fresh preview picture and a small picture every half second for a replay. Holds the camera lock
+ * points, a fresh preview picture and a small picture every half second for a replay. Holds a camera lease
  * and the capture notification while it runs. Nothing leaves the phone.
  */
-class PoseSessions(private val lock: Mutex) {
+class PoseSessions(private val broker: CameraBroker) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val sessions = LinkedHashMap<String, Session>()
 
@@ -164,13 +165,14 @@ class PoseSessions(private val lock: Mutex) {
         }
     }
 
-    /** Starts tracking; the camera lock must be free (sensor_busy otherwise). */
+    /** Starts tracking; the camera must be free (sensor_busy otherwise). */
     @OptIn(ExperimentalGetImage::class)
     suspend fun start(service: BridgeService, agentId: String, note: String, rear: Boolean, seconds: Int,
                       previewEveryMs: Int, previewEdge: Int): Session {
         val km = service.getSystemService(KeyguardManager::class.java)
         if (km.isDeviceLocked) throw ApiError(409, "device_locked", "Phone is locked. Unlock it, then retry.")
-        if (!lock.tryLock()) throw ApiError(409, "sensor_busy", "The camera is busy with another capture. Retry in a few seconds.")
+        val lease = broker.tryAcquire(CameraLeases.Lease.OneOff(agentId, "pose"), CameraBroker.lens(rear))
+            ?: throw ApiError(409, "sensor_busy", "The camera is busy with another capture. Retry in a few seconds.")
         val token = service.captureStarted(note)
         val now = System.currentTimeMillis()
         val s = Session("pose_" + java.lang.Long.toString(now, 36) + Integer.toString((Math.random() * 1296).toInt(), 36),
@@ -195,7 +197,7 @@ class PoseSessions(private val lock: Mutex) {
                     s.endedAt = System.currentTimeMillis()
                     if (s.running) s.state = if (s.stopRequested) "stopped" else "done"
                     service.captureEnded(token)
-                    lock.unlock()
+                    broker.release(lease)
                 }
             }
         }

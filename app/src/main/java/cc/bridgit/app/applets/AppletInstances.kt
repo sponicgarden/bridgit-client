@@ -1272,15 +1272,26 @@ class AppletInstances(private val app: BridgeApp) {
             }
         }
         scope.launch { delay(30_000); runCatching { refreshCards() } }
+        // Camera applets' material goes when its window passes (A0451 §3.3): on start, then every hour.
+        scope.launch {
+            delay(CAMERA_CLEAN_START_MS)
+            while (isActive) { runCatching { cleanTables(cameraOnly = true) }; delay(CAMERA_CLEAN_MS) }
+        }
     }
 
-    /** Table rows past their keep_days or max_rows, and kept photos no row uses, are deleted (every few hours). */
-    fun cleanTables() {
+    /**
+     * Table rows past their keep_days or max_rows, and kept photos no row uses, are deleted (every few hours). A camera
+     * applet's stored [CameraPolicy] shortens its keep_when tables' window and deletes unused photos at once;
+     * [cameraOnly] cleans just those applets (the hourly run).
+     */
+    fun cleanTables(cameraOnly: Boolean = false, now: Long = System.currentTimeMillis()) {
         val store = AppletTableStore.of(app)
         for (r in all()) {
             val agentId = r.optString("agent_id").takeIf { it.isNotEmpty() } ?: continue
+            val policy = CameraPolicy.of(r)
+            if (cameraOnly && policy == null) continue
             val tables = runCatching { AppletTables.parse(r.getJSONObject("definition").optJSONObject("processing") ?: JSONObject()) }.getOrDefault(emptyList())
-            runCatching { store.clean(agentId, tables) }
+            runCatching { store.clean(agentId, tables, now, policy) }
         }
     }
 
@@ -1341,6 +1352,8 @@ class AppletInstances(private val app: BridgeApp) {
         /** Platform grants for an applet's workflow last as long as the applet (removal revokes them). */
         const val GRANT_MS = 10L * 365 * 24 * 3600 * 1000
         const val CARD_CHECK_MS = 3L * 3600 * 1000
+        const val CAMERA_CLEAN_MS = 3600L * 1000
+        const val CAMERA_CLEAN_START_MS = 20_000L
         const val NOTIF_BASE = 47_000
     }
 }

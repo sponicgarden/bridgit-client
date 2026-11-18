@@ -63,7 +63,9 @@ class AppletCameraActivity : AppCompatActivity() {
     private var back = true
     private var capture: ImageCapture? = null
     private var provider: ProcessCameraProvider? = null
-    private var locked = false
+    /** The camera lease this screen holds while it shows the camera (A0455). */
+    private var lease: cc.bridgit.app.core.camera.CameraBroker.Ticket? = null
+    private val locked get() = lease != null
     private var opening: Job? = null
     private var taken = 0
     private var asked = false
@@ -161,11 +163,10 @@ class AppletCameraActivity : AppCompatActivity() {
         if (locked || opening?.isActive == true) return
         opening = lifecycleScope.launch {
             var waited = false
-            while (!app.registry.cameraLock.tryLock()) {
+            while (app.registry.camera.tryAcquire(cc.bridgit.app.core.camera.CameraLeases.Lease.Exclusive("applet_camera")).also { lease = it } == null) {
                 if (!waited) { showMessage(getString(R.string.camera_busy)); waited = true }
                 delay(700)
             }
-            locked = true
             if (message.text == getString(R.string.camera_busy)) hideMessage()
             val p = runCatching { withContext(Dispatchers.IO) { ProcessCameraProvider.getInstance(this@AppletCameraActivity).get() } }.getOrNull()
             if (p == null) { showMessage(getString(R.string.camera_failed, "no camera")); return@launch }
@@ -196,7 +197,7 @@ class AppletCameraActivity : AppCompatActivity() {
         opening?.cancel(); opening = null
         runCatching { provider?.unbindAll() }
         provider = null; capture = null
-        if (locked) { locked = false; runCatching { app.registry.cameraLock.unlock() } }
+        if (locked) { app.registry.camera.release(lease); lease = null }
     }
 
     /** One tap, one photo: captured to a file (CameraX writes its EXIF rotation) and queued; the shutter never waits. */

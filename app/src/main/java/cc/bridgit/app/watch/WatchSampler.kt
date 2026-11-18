@@ -61,7 +61,7 @@ class WatchSampler(private val app: BridgeApp) {
                     "proximity" -> single(Sensor.TYPE_PROXIMITY, "cm")
                     "battery" -> battery()
                     "device" -> device()
-                    "camera" -> (if(camera?.startsWith("lan:")==true) lanPhoto(camera,label,agentId) else photo(camera != "front", label, cameraWaitMs)).let { (json, bytes) -> photo = bytes; json }
+                    "camera" -> (if(camera?.startsWith("lan:")==true) lanPhoto(camera,label,agentId) else photo(camera != "front", label, cameraWaitMs, agentId)).let { (json, bytes) -> photo = bytes; json }
                     else -> unavailable("unknown")
                 }
             }.getOrElse { if(it is kotlinx.coroutines.CancellationException) throw it; unavailable(it.javaClass.simpleName) }
@@ -74,13 +74,13 @@ class WatchSampler(private val app: BridgeApp) {
      * A small photo (640 px, like the Pet monitor: enough for Clef and Jev, cheap). Best effort: a busy camera
      * (an agent's photo, the Pet monitor), a locked phone or Bridgit not running gives a reason instead.
      */
-    private suspend fun photo(rear: Boolean, label: String, waitMs: Long = CAMERA_WAIT_MS): Pair<JSONObject, ByteArray?> {
+    private suspend fun photo(rear: Boolean, label: String, waitMs: Long = CAMERA_WAIT_MS, agentId: String? = null): Pair<JSONObject, ByteArray?> {
         var waited = 0
         while (BridgeService.running?.cameraReady != true && waited < 3_000) { delay(250); waited += 250 }
         val svc = BridgeService.running ?: return unavailable("Bridgit isn't running") to null
         // Another watch or a quick agent photo may hold the camera for a moment: wait a little, don't skip.
-        val locked = if (waitMs <= 0) app.registry.cameraLock.tryLock() else withTimeoutOrNull(waitMs) { app.registry.cameraLock.lock() } != null
-        if (!locked) return unavailable("the camera is busy") to null
+        val lease = app.registry.camera.acquireWithin(waitMs, cc.bridgit.app.core.camera.CameraLeases.Lease.OneOff(agentId ?: "watch", "watch"),
+            cc.bridgit.app.core.camera.CameraBroker.lens(rear)) ?: return unavailable("the camera is busy") to null
         val token = svc.captureStarted(label)
         return try {
             val img = svc.camera.snapshot(rear = rear, flash = false, spec = PHOTO)
@@ -89,7 +89,7 @@ class WatchSampler(private val app: BridgeApp) {
             unavailable(if (e.code == "device_locked") "the phone is locked" else e.message ?: e.code) to null
         } finally {
             svc.captureEnded(token)
-            app.registry.cameraLock.unlock()
+            app.registry.camera.release(lease)
         }
     }
 

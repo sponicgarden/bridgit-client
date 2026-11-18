@@ -67,13 +67,13 @@ abstract class Capability(protected val app: BridgeApp) {
 
 /** Every capability module in this build. Unbuilt capabilities are simply absent. */
 class Registry(app: BridgeApp) {
-    /** One capture per sensor at a time (NFR-11). */
-    val cameraLock = Mutex()
+    /** One capture per sensor at a time (NFR-11). The camera's leases come from [camera] (A0455). */
+    val camera = cc.bridgit.app.core.camera.CameraBroker()
     val micLock = Mutex()
-    /** A camera warmed up ahead of a photo (POST /v1/camera/arm); holds [cameraLock] while armed. */
-    val cameraArm = CameraArm(cameraLock)
-    /** On-phone body tracking sessions (POST /v1/camera/pose/start); each holds [cameraLock] while it runs. */
-    val pose = PoseSessions(cameraLock)
+    /** A camera warmed up ahead of a photo (POST /v1/camera/arm); holds a [camera] lease while armed. */
+    val cameraArm = CameraArm(camera)
+    /** On-phone body tracking sessions (POST /v1/camera/pose/start); each holds a [camera] lease while it runs. */
+    val pose = PoseSessions(camera)
 
     val modules: List<Capability> = listOf(
         cc.bridgit.app.ssh.SshModule(app),

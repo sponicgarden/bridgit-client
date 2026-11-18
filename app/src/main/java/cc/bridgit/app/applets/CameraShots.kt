@@ -41,16 +41,23 @@ object CameraShots {
     /** Resizes and saves one shot for [t]; returns the row. Throws [AppletTables.Refused] with words for the owner. */
     fun save(app: BridgeApp, t: Target, jpeg: ByteArray, now: Long = System.currentTimeMillis()): JSONObject {
         val table = table(app, t.agentId, t.table) ?: throw AppletTables.Refused("table_gone", "This applet's table ${t.table} is gone.")
-        return save(AppletTableStore.of(app), t.agentId, table, t.photo, t.row, resize(jpeg, t.size), by(t.interactionId), now)
+        return save(AppletTableStore.of(app), t.agentId, table, t.photo, t.row, resize(jpeg, t.size), by(t.interactionId), now,
+            CameraPolicy.of(app.applets.forAgent(t.agentId)))
     }
 
-    /** Keeps [bytes] (already sized) and adds its row: the fixed values, the photo in [photo], `taken_at` if [table] has that time column. */
+    /**
+     * Keeps [bytes] (already sized) and adds its row: the fixed values, the photo in [photo], `taken_at` if [table] has
+     * that time column. For a camera applet ([policy], A0451) the shot goes through the privacy gate: [table] must be
+     * in keep_when, and the photo is written only with its row; a refused row leaves nothing behind (one discard).
+     */
     fun save(store: AppletTableStore, agentId: String, table: AppletTables.Table, photo: String, fixed: JSONObject, bytes: ByteArray, by: JSONObject,
-             now: Long = System.currentTimeMillis()): JSONObject {
-        val ref = store.keepPhoto(agentId, STEP, bytes)
+             now: Long = System.currentTimeMillis(), policy: CameraPolicy? = null): JSONObject {
+        if (policy != null && table.id !in policy.keepWhen) throw AppletTables.Refused("not_kept", "This applet's privacy settings don't keep photos in ${table.label}.")
+        val run = policy?.let { "camera:" + java.util.UUID.randomUUID() }
+        val ref = if (policy != null) store.holdPhoto(policy, agentId, run!!, STEP, bytes) else store.keepPhoto(agentId, STEP, bytes)
         val row = JSONObject(fixed.toString()).put(photo, ref)
         if (table.columns["taken_at"]?.type == "time" && (!row.has("taken_at") || row.isNull("taken_at"))) row.put("taken_at", isoAt(now))
-        // A row that fails leaves its kept photo unused; the daily clean-up deletes it after 7 days.
-        return store.add(agentId, table, row, by)
+        // Without a policy, a row that fails leaves its kept photo unused; the daily clean-up deletes it after 7 days.
+        return try { store.add(agentId, table, row, by, run) } finally { if (run != null) store.endRun(agentId, run, "row_refused") }
     }
 }

@@ -33,6 +33,8 @@ class Hardware(private val app: BridgeApp) {
     private val audio = app.getSystemService(AudioManager::class.java)
     private val cameras = app.getSystemService(CameraManager::class.java)
     private var torch: String? = null
+    /** The camera lease the flashlight holds while it is on (A0455). */
+    private var torchLease: cc.bridgit.app.core.camera.CameraBroker.Ticket? = null
     private var torchTimer: Runnable? = null
     private val ownTorchOff = mutableMapOf<String, Int>()
     private var ringTimer: Runnable? = null
@@ -78,7 +80,7 @@ class Hardware(private val app: BridgeApp) {
         if (torch != id) return
         torch = null
         torchTimer?.let(handler::removeCallbacks); torchTimer = null
-        app.registry.cameraLock.unlock()
+        app.registry.camera.release(torchLease); torchLease = null
         notification()
     }
     @Synchronized fun light(on: Boolean, seconds: Int): JSONObject {
@@ -87,15 +89,16 @@ class Hardware(private val app: BridgeApp) {
             torch?.let { id ->
                 ownTorchOff[id] = (ownTorchOff[id] ?: 0) + 1
                 runCatching { cameras.setTorchMode(id, false) }.onFailure { ownTorchOff[id] = (ownTorchOff[id] ?: 1) - 1 }
-                torch = null; app.registry.cameraLock.unlock()
+                torch = null; app.registry.camera.release(torchLease); torchLease = null
             }
         } else {
             val id = torch ?: torchCamera ?: throw ErrorCatalog.error("not_supported", "This device has no flashlight.")
-            if (torch == null && !app.registry.cameraLock.tryLock()) throw ErrorCatalog.error("sensor_busy", "Camera is in use.")
+            if (torch == null) torchLease = app.registry.camera.tryAcquire(cc.bridgit.app.core.camera.CameraLeases.Lease.OneOff("flashlight", "torch"))
+                ?: throw ErrorCatalog.error("sensor_busy", "Camera is in use.")
             try {
                 cameras.setTorchMode(id, true); torch = id
             } catch (e: Exception) {
-                if (torch == null) app.registry.cameraLock.unlock()
+                if (torch == null) { app.registry.camera.release(torchLease); torchLease = null }
                 throw ErrorCatalog.error("sensor_busy", "Android could not turn on the flashlight.")
             }
             torchTimer = Runnable { light(false, 1) }.also { handler.postDelayed(it, seconds * 1000L) }

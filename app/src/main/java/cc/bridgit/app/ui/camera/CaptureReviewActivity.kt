@@ -46,7 +46,9 @@ class CaptureReviewActivity:AppCompatActivity() {
     private var recording:Recording?=null
     private var photoBytes:ByteArray?=null
     private var rear=true
-    private var locked=false
+    /** The camera lease the viewfinder holds while it is open (A0455). */
+    private var lease:cc.bridgit.app.core.camera.CameraBroker.Ticket?=null
+    private val locked get()=lease!=null
     private var micLocked=false
     private var reviewing=false
     private var waitingPreview=false
@@ -162,8 +164,7 @@ class CaptureReviewActivity:AppCompatActivity() {
         opening=lifecycleScope.launch {
             try {
                 allowed()
-                withTimeout(15_000) { while(!app.registry.cameraLock.tryLock()) { status.text="Waiting for camera…";delay(100) } }
-                locked=true
+                withTimeout(15_000) { while(app.registry.camera.tryAcquire(cc.bridgit.app.core.camera.CameraLeases.Lease.Exclusive("viewfinder")).also { lease=it }==null) { status.text="Waiting for camera…";delay(100) } }
                 if(!resumed)throw ApiError(409,"capture_cancelled","The viewfinder is not visible")
                 val p=withContext(Dispatchers.IO) { ProcessCameraProvider.getInstance(this@CaptureReviewActivity).get() };provider=p
                 ensureActive();allowed();if(!resumed||request.result.isCompleted)throw ApiError(409,"capture_cancelled","The viewfinder is not visible")
@@ -279,7 +280,7 @@ class CaptureReviewActivity:AppCompatActivity() {
         timer?.cancel();timer=null
         recording?.close();recording=null
         provider?.let { p->previewUseCase?.let { p.unbind(it) };capture?.let { p.unbind(it) };video?.let { p.unbind(it) } };provider=null;previewUseCase=null;capture=null;video=null
-        if(locked) { locked=false;app.registry.cameraLock.unlock() }
+        if(locked) { app.registry.camera.release(lease);lease=null }
         if(micLocked) { micLocked=false;app.registry.micLock.unlock() }
     }
     companion object {

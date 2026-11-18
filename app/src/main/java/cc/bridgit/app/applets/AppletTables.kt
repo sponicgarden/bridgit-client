@@ -264,6 +264,8 @@ class AppletTableStore(private val app: BridgeApp) {
     private val writes = HashMap<String, ArrayDeque<Long>>()
     private val listeners = mutableListOf<(String) -> Unit>()
     private var lastStamp = 0L
+    /** Camera applets' gate (A0451): held flow photos and the privacy events of keeps, discards and deletes. */
+    val privacy = CameraPrivacyGate()
 
     fun addListener(l: (agentId: String) -> Unit) = synchronized(listeners) { listeners += l }
     fun removeListener(l: (agentId: String) -> Unit) = synchronized(listeners) { listeners -= l }
@@ -338,14 +340,45 @@ class AppletTableStore(private val app: BridgeApp) {
         file(agent, key).delete()
     }
 
-    /** Deletes the rows (records) and then each kept photo they used that no other row uses. */
-    private fun deleteRows(agent: String, rows: List<JSONObject>) {
+    /** Deletes the rows (records) and then each kept photo they used that no other row uses. Returns how many photos went. */
+    private fun deleteRows(agent: String, rows: List<JSONObject>): Int {
         val photos = rows.flatMap { refs(it) }.toSet()
         // One transaction: thousands of single deletes outside one hold the shared store far longer.
         val db = store.writableDatabase
         db.beginTransaction()
         try { rows.forEach { store.delete(it.getString("id"), agent) }; db.setTransactionSuccessful() } finally { db.endTransaction() }
-        photos.forEach { if (!used(agent, it)) dropPhoto(agent, it) }
+        var n = 0
+        photos.forEach { if (!used(agent, it)) { dropPhoto(agent, it); n++ } }
+        return n
+    }
+
+    /**
+     * Writes the photos [refs] that [privacy] holds for [run] (a camera applet's flow, A0451): only now, because a row
+     * of keep_when table [table] names them. Returns the claimed photos, written; [unclaim] undoes them if the row fails.
+     */
+    private fun claimHeld(agent: String, run: String?, table: String, refs: Collection<String>): List<CameraPrivacyGate.Held> {
+        val out = ArrayList<CameraPrivacyGate.Held>()
+        try {
+            for (ref in refs) {
+                if (!privacy.mayClaim(agent, run, table, ref)) continue
+                val h = privacy.claim(agent, ref) ?: continue
+                out += h
+                writePhoto(agent, h.stepId, h.bytes, h.key)
+            }
+        } catch (e: Exception) { unclaim(agent, table, out, "photo_not_written"); throw e }
+        return out
+    }
+
+    private fun unclaim(agent: String, table: String, claimed: List<CameraPrivacyGate.Held>, reason: String) =
+        claimed.forEach { h -> if (!used(agent, h.ref)) runCatching { dropPhoto(agent, h.ref) }; privacy.lost(h, table, reason) }
+
+    /** Refuses a row naming a photo that isn't kept: a held one outside keep_when or of another run gets the privacy words. */
+    private fun checkPhotos(agentId: String, run: String?, table: AppletTables.Table, photos: Collection<String>) {
+        photos.forEach { ref ->
+            if (store.find(photoId(agentId, ref.removePrefix("kept:")), agentId, PHOTO) != null || privacy.mayClaim(agentId, run, table.id, ref)) return@forEach
+            if (privacy.isHeld(agentId, ref)) refused("invalid_row", "The photo $ref is kept only in a row of this run's privacy.camera keep_when tables, not ${table.label}.")
+            refused("invalid_row", "The photo $ref isn't kept on this phone any more.")
+        }
     }
 
     // ---- rows ---------------------------------------------------------------------------------------------
@@ -355,13 +388,16 @@ class AppletTableStore(private val app: BridgeApp) {
      * [AppletTables.Refused]: invalid_row, row_too_large, rate_limited (60 a minute), quota_exceeded (5 MB of rows).
      * A full table (max_rows) drops its oldest rows to make room.
      */
-    fun add(agentId: String, table: AppletTables.Table, row: JSONObject, by: JSONObject): JSONObject = addMany(agentId, table, listOf(row), by).single()
+    fun add(agentId: String, table: AppletTables.Table, row: JSONObject, by: JSONObject, run: String? = runOf(by)): JSONObject = addMany(agentId, table, listOf(row), by, run).single()
+
+    /** The run a row is written by (its `by.run_id`): a camera applet's held photos are kept only by rows of their own run. */
+    private fun runOf(by: JSONObject) = by.optString("run_id").takeIf { it.isNotEmpty() }
 
     /**
      * Writes [rows] (1-[MAX_MANY]) of [table] at once, as [add] does one: every row is checked first, then all are
      * written in one transaction, so a refused row leaves none. Counts as one write for the 60-a-minute limit.
      */
-    fun addMany(agentId: String, table: AppletTables.Table, rows: List<JSONObject>, by: JSONObject): List<JSONObject> {
+    fun addMany(agentId: String, table: AppletTables.Table, rows: List<JSONObject>, by: JSONObject, run: String? = runOf(by)): List<JSONObject> {
         if (rows.size !in 1..MAX_MANY) refused("invalid_row", "Write 1-$MAX_MANY rows at once (not ${rows.size}).")
         // One write never empties a whole table to make room for itself: more rows than the table keeps is refused.
         if (rows.size > table.maxRows) refused("invalid_row", "${table.label} keeps at most ${table.maxRows} rows; this writes ${rows.size} at once.")
@@ -370,7 +406,7 @@ class AppletTableStore(private val app: BridgeApp) {
             values to table.columns.values.filter { it.type == "photo" }.mapNotNull { (values.opt(it.id) as? String) }.distinct()
         }
         val result = synchronized(store) {
-            checked.flatMap { it.second }.toSet().forEach { ref -> if (store.find(photoId(agentId, ref.removePrefix("kept:")), agentId, PHOTO) == null) refused("invalid_row", "The photo $ref isn't kept on this phone any more.") }
+            checkPhotos(agentId, run, table, checked.flatMap { it.second }.toSet())
             val now = System.currentTimeMillis()
             val recent = writes.getOrPut(agentId) { ArrayDeque() }
             while (recent.isNotEmpty() && recent.first() < now - 60_000) recent.removeFirst()
@@ -391,6 +427,8 @@ class AppletTableStore(private val app: BridgeApp) {
             val (_, total) = countWhere(agentId, ROW, "row:$agentId:")
             if (total - drop.sumOf { it.toString().length.toLong() } + size > AppletTables.MAX_APPLET_ROW_BYTES)
                 refused("quota_exceeded", "This applet's rows would pass ${AppletTables.MAX_APPLET_ROW_BYTES / 1_000_000} MB; delete some rows first.")
+            // Every check passed: a camera applet's held photos these rows name are written now, not before.
+            val claimed = claimHeld(agentId, run, table.id, checked.flatMap { it.second }.toSet())
             val db = store.writableDatabase
             db.beginTransaction()
             val saved = try {
@@ -398,7 +436,9 @@ class AppletTableStore(private val app: BridgeApp) {
                 val out = writing.map { view(store.save(agentId, ROW, it)) }
                 deleteRows(agentId, drop)
                 db.setTransactionSuccessful(); out
-            } finally { db.endTransaction() }
+            } catch (e: Exception) { db.endTransaction(); unclaim(agentId, table.id, claimed, "row_not_written"); throw e }
+            db.endTransaction()
+            claimed.forEach { privacy.kept(it, table.id) }
             if (counted) recent.addLast(now)
             saved
         }
@@ -427,10 +467,13 @@ class AppletTableStore(private val app: BridgeApp) {
             set.keys().forEach { k -> if (set.isNull(k)) merged.remove(k) else merged.put(k, set.get(k)) }
             val values = AppletTables.coerce(table, merged)
             val photos = table.columns.values.filter { it.type == "photo" }.mapNotNull { (values.opt(it.id) as? String) }.distinct()
-            photos.forEach { ref -> if (store.find(photoId(agentId, ref.removePrefix("kept:")), agentId, PHOTO) == null) refused("invalid_row", "The photo $ref isn't kept on this phone any more.") }
+            val run = runOf(by)
+            checkPhotos(agentId, run, table, photos)
             val record = JSONObject(old.toString()).put("values", values).put("photos", JSONArray(photos))
                 .put("edited_at", now).put("edited_by", by)
-            val saved = view(store.save(agentId, ROW, record))
+            val claimed = claimHeld(agentId, run, table.id, photos)
+            val saved = try { view(store.save(agentId, ROW, record)) } catch (e: Exception) { unclaim(agentId, table.id, claimed, "row_not_written"); throw e }
+            claimed.forEach { privacy.kept(it, table.id) }
             (refs(old) - photos.toSet()).forEach { ref ->
                 if (used(agentId, ref)) return@forEach
                 // An agent freed it: kept 7 more days (freed_at), then the sweep deletes it if still unused.
@@ -571,28 +614,39 @@ class AppletTableStore(private val app: BridgeApp) {
     /**
      * The daily clean-up: rows older than their table's keep_days, rows past max_rows (oldest first), and kept
      * photos no row has used for 7 days. Also drops photo records whose file is gone and files with no record.
+     * A camera applet's [policy] (A0451 §3.3): rows of its keep_when tables go once their effective window passes,
+     * with their photos, and a kept photo no row uses goes at once (no 7-day wait); each deletion is a privacy event.
      */
-    fun clean(agentId: String, tables: List<AppletTables.Table>, now: Long = System.currentTimeMillis()) {
+    fun clean(agentId: String, tables: List<AppletTables.Table>, now: Long = System.currentTimeMillis(), policy: CameraPolicy? = null) {
         var did = false
         synchronized(store) {
             for (t in tables) {
                 val p = prefix(agentId, t.id)
+                val days = policy?.days(t.id) ?: t.keepDays
+                var rows = 0; var photos = 0
                 while (true) {
-                    val old = select(agentId, ROW, p, " AND created<?", listOf((now - t.keepDays * 86_400_000L).toString()), "ASC", 1000)
+                    val old = select(agentId, ROW, p, " AND created<?", listOf((now - days * 86_400_000L).toString()), "ASC", 1000)
                     if (old.isEmpty()) break
-                    deleteRows(agentId, old); did = true
+                    photos += deleteRows(agentId, old); rows += old.size; did = true
                 }
+                if (policy != null) privacy.deleted(policy, agentId, t.id, rows, photos, "retention_window")
                 val count = count(agentId, t.id)
-                if (count > t.maxRows) { deleteRows(agentId, select(agentId, ROW, p, "", emptyList(), "ASC", count - t.maxRows)); did = true }
+                if (count > t.maxRows) {
+                    val n = deleteRows(agentId, select(agentId, ROW, p, "", emptyList(), "ASC", count - t.maxRows)); did = true
+                    if (policy != null) privacy.deleted(policy, agentId, t.id, count - t.maxRows, n, "max_rows")
+                }
             }
             val known = HashSet<String>()
             val inUse by lazy { usedRefs(agentId) }
+            val orphanMs = if (policy != null) 0L else AppletTables.ORPHAN_PHOTO_MS
+            var orphans = 0
             for (ph in select(agentId, PHOTO, photoId(agentId, ""), "", emptyList(), "ASC", 10_000)) {
                 val ref = ph.optString("ref"); val key = ref.removePrefix("kept:")
                 if (!file(agentId, key).exists()) { store.delete(ph.getString("id"), agentId); did = true; continue }
-                if (maxOf(ph.optLong("taken_at"), ph.optLong("freed_at")) < now - AppletTables.ORPHAN_PHOTO_MS && ref !in inUse) { dropPhoto(agentId, ref); did = true; continue }
+                if (maxOf(ph.optLong("taken_at"), ph.optLong("freed_at")) <= now - orphanMs && ref !in inUse) { dropPhoto(agentId, ref); did = true; orphans++; continue }
                 known += "$key.jpg"
             }
+            if (policy != null) privacy.deleted(policy, agentId, null, 0, orphans, "unused_photo")
             dir(agentId).listFiles()?.forEach { f -> if (f.name !in known && f.lastModified() < now - 3_600_000L) { f.delete(); did = true } }
         }
         if (did) changed(agentId)
@@ -605,37 +659,57 @@ class AppletTableStore(private val app: BridgeApp) {
      * the oldest photos no row uses go first; if that isn't enough, throws [AppletTables.Refused] `storage_full`.
      */
     fun keepPhoto(agentId: String, stepId: String, bytes: ByteArray): String {
-        val ref = synchronized(store) {
-            if (bytes.size > AppletTables.MAX_KEPT_PHOTO_BYTES) refused("storage_full", "This photo is larger than the ${AppletTables.MAX_KEPT_PHOTO_BYTES / (1024 * 1024)} MB kept photos may use.")
-            val all = select(agentId, PHOTO, photoId(agentId, ""), "", emptyList(), "ASC", 10_000)
-            var count = all.size; var total = all.sumOf { it.optLong("bytes") }
-            fun over() = count + 1 > AppletTables.MAX_KEPT_PHOTOS || total + bytes.size > AppletTables.MAX_KEPT_PHOTO_BYTES
-            if (over()) {
-                // One pass over the rows for the refs in use, then the oldest unused photos make room. Which ones
-                // go is worked out first, so a photo that can't fit deletes nothing.
-                val inUse = usedRefs(agentId)
-                val drop = ArrayList<JSONObject>()
-                for (p in all) {
-                    if (!over()) break
-                    if (p.optString("ref") in inUse) continue
-                    drop += p; count--; total -= p.optLong("bytes")
-                }
-                if (over()) refused("storage_full", "This applet keeps ${AppletTables.MAX_KEPT_PHOTOS} photos or ${AppletTables.MAX_KEPT_PHOTO_BYTES / (1024 * 1024)} MB at most, and its rows use them all; delete some rows first.")
-                drop.forEach { dropPhoto(agentId, it.optString("ref")) }
-            }
-            var key = stamp()
-            while (store.find(photoId(agentId, key)) != null || file(agentId, key).exists()) key = stamp()
-            val f = file(agentId, key)
-            f.parentFile?.mkdirs()
-            val tmp = File(f.parentFile, "$key.tmp")
-            tmp.writeBytes(bytes)
-            if (!tmp.renameTo(f)) { tmp.delete(); refused("storage_full", "The photo couldn't be saved on the phone.") }
-            store.save(agentId, PHOTO, JSONObject().put("id", photoId(agentId, key)).put("ref", "kept:$key").put("step", stepId)
-                .put("taken_at", System.currentTimeMillis()).put("bytes", bytes.size))
-            "kept:$key"
-        }
+        val ref = synchronized(store) { writePhoto(agentId, stepId, bytes, null) }
         changed(agentId)
         return ref
+    }
+
+    /**
+     * A camera applet's flow photo (A0451 §3.2): checked like [keepPhoto] but only held in memory under a reserved
+     * ref until a row of [run] in a keep_when table names it; [endRun] drops it otherwise. Returns the ref.
+     */
+    fun holdPhoto(policy: CameraPolicy, agentId: String, run: String, stepId: String, bytes: ByteArray): String = synchronized(store) {
+        if (bytes.size > AppletTables.MAX_KEPT_PHOTO_BYTES) refused("storage_full", "This photo is larger than the ${AppletTables.MAX_KEPT_PHOTO_BYTES / (1024 * 1024)} MB kept photos may use.")
+        var key = stamp()
+        while (store.find(photoId(agentId, key)) != null || file(agentId, key).exists() || privacy.isHeld(agentId, "kept:$key")) key = stamp()
+        privacy.hold(policy, agentId, run, stepId, key, bytes)
+    }
+
+    /** Run [run] of [agentId] ended: photos it held that no keep_when row named are dropped (one discard event). */
+    fun endRun(agentId: String, run: String, reason: String = "no_keep_when_row"): Int = privacy.endRun(agentId, run, reason)
+
+    /** A kept photo's bytes: a held one of a running flow, else its file. Null when neither. */
+    fun photoBytes(agentId: String, ref: String): ByteArray? = privacy.bytes(agentId, ref) ?: photoFile(agentId, ref)?.readBytes()
+
+    /** Writes a kept photo (under [fixedKey], a held photo's reserved key, or a new one); the caller holds the store lock. */
+    private fun writePhoto(agentId: String, stepId: String, bytes: ByteArray, fixedKey: String?): String {
+        if (bytes.size > AppletTables.MAX_KEPT_PHOTO_BYTES) refused("storage_full", "This photo is larger than the ${AppletTables.MAX_KEPT_PHOTO_BYTES / (1024 * 1024)} MB kept photos may use.")
+        val all = select(agentId, PHOTO, photoId(agentId, ""), "", emptyList(), "ASC", 10_000)
+        var count = all.size; var total = all.sumOf { it.optLong("bytes") }
+        fun over() = count + 1 > AppletTables.MAX_KEPT_PHOTOS || total + bytes.size > AppletTables.MAX_KEPT_PHOTO_BYTES
+        if (over()) {
+            // One pass over the rows for the refs in use, then the oldest unused photos make room. Which ones
+            // go is worked out first, so a photo that can't fit deletes nothing.
+            val inUse = usedRefs(agentId)
+            val drop = ArrayList<JSONObject>()
+            for (p in all) {
+                if (!over()) break
+                if (p.optString("ref") in inUse) continue
+                drop += p; count--; total -= p.optLong("bytes")
+            }
+            if (over()) refused("storage_full", "This applet keeps ${AppletTables.MAX_KEPT_PHOTOS} photos or ${AppletTables.MAX_KEPT_PHOTO_BYTES / (1024 * 1024)} MB at most, and its rows use them all; delete some rows first.")
+            drop.forEach { dropPhoto(agentId, it.optString("ref")) }
+        }
+        var key = fixedKey ?: stamp()
+        if (fixedKey == null) while (store.find(photoId(agentId, key)) != null || file(agentId, key).exists() || privacy.isHeld(agentId, "kept:$key")) key = stamp()
+        val f = file(agentId, key)
+        f.parentFile?.mkdirs()
+        val tmp = File(f.parentFile, "$key.tmp")
+        tmp.writeBytes(bytes)
+        if (!tmp.renameTo(f)) { tmp.delete(); refused("storage_full", "The photo couldn't be saved on the phone.") }
+        store.save(agentId, PHOTO, JSONObject().put("id", photoId(agentId, key)).put("ref", "kept:$key").put("step", stepId)
+            .put("taken_at", System.currentTimeMillis()).put("bytes", bytes.size))
+        return "kept:$key"
     }
 
     /** Kept photos (of flow step [stepId], or all), newest first: {ref, step, taken_at, bytes}. */

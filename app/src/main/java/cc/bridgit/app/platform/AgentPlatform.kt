@@ -189,8 +189,10 @@ class AgentPlatform(val app: BridgeApp) {
     suspend fun <T> capture(agent: String,id: String,block: suspend () -> T): T = coroutineScope {
         authorize(agent,id)
         if (app.getSystemService(KeyguardManager::class.java).isDeviceLocked) throw ApiError(409,"device_locked","Unlock the phone to capture")
-        val sensorLock=if(id in setOf("microphone.clip","speech.transcribe")) app.registry.micLock else app.registry.cameraLock
-        if (!sensorLock.tryLock()) throw ApiError(409,"sensor_busy","A sensor operation already owns the camera/microphone")
+        val mic=id in setOf("microphone.clip","speech.transcribe")
+        // The microphone keeps its mutex; the camera is leased from the broker (A0455), with the same busy answer.
+        val cameraLease=if(mic) null else app.registry.camera.tryAcquire(cc.bridgit.app.core.camera.CameraLeases.Lease.OneOff(agent,id))
+        if (if(mic) !app.registry.micLock.tryLock() else cameraLease==null) throw ApiError(409,"sensor_busy","A sensor operation already owns the camera/microphone")
         val credential = getAgent(agent).hash
         activeSensorAgent = agent; activeSensorScope = id
         val parent = currentCoroutineContext()[Job]!!
@@ -200,7 +202,7 @@ class AgentPlatform(val app: BridgeApp) {
         val service=BridgeService.running
         val captureToken=service?.captureStarted("${getAgent(agent).name}: ${id.substringBefore('.')}")
         try { block() }
-        finally { watchdog.cancel(); activeSensorAgent=null; activeSensorScope=null; if(captureToken!=null) service.captureEnded(captureToken); sensorLock.unlock() }
+        finally { watchdog.cancel(); activeSensorAgent=null; activeSensorScope=null; if(captureToken!=null) service.captureEnded(captureToken); if(mic) app.registry.micLock.unlock() else app.registry.camera.release(cameraLease) }
     }
     private fun sensitive(command: String,args: JSONObject): Boolean = OwnerApprovalPolicy.needsOwnerTap(command,args)
     fun mutate(agent: String, command: String,args: JSONObject,key: String,credential: String? = null,relayDeadline: Long? = null,relayJob: String? = null): JSONObject {

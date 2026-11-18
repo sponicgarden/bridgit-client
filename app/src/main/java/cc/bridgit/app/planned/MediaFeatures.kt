@@ -81,7 +81,8 @@ class VideoModule(app: BridgeApp) : Capability(app) {
         if (audio && (!app.settings.isOn("mic") || !app.listener.value.micReady || !app.granted(Manifest.permission.RECORD_AUDIO) || !app.agents.get(agent!!.id)!!.allows("mic"))) throw ErrorCatalog.error("permission_denied", "Enable microphone access for this agent and open the app first, or use audio=false.")
         val visible=cc.bridgit.app.capture.CapturePresentationRules.requiresViewfinder(invocation,body.optBoolean("viewfinder"))
         val countdown=Rules.integer(body.opt("countdown_seconds"),"countdown_seconds",0,10,0)
-        if (!visible&&!app.registry.cameraLock.tryLock()) throw ErrorCatalog.error("sensor_busy", "Camera in use.")
+        val cameraLease=if(visible) null else app.registry.camera.tryAcquire(cc.bridgit.app.core.camera.CameraLeases.Lease.OneOff(agent!!.id,"video"))
+            ?: throw ErrorCatalog.error("sensor_busy", "Camera in use.")
         val videoEpoch=AppletVideoSessions.begin(agent!!.id)
         var micLocked = false
         val file = File(app.cacheDir, "video-${System.nanoTime()}.mp4")
@@ -135,7 +136,7 @@ class VideoModule(app: BridgeApp) : Capability(app) {
             bytesOut = bytes.size.toLong()
             if (bytes.size > ApiServer.MAX_RAW) throw ErrorCatalog.error("payload_too_large", "Video exceeds 40 MB.")
             Reply.Bytes(bytes, "video/mp4", mapOf("X-Bridgit-Duration-Limit-Seconds" to seconds.toString()))
-        } finally { AppletVideoSessions.finish(agent!!.id); file.delete(); note?.let { api.service.captureEnded(it) }; if (micLocked) app.registry.micLock.unlock(); if(!visible) app.registry.cameraLock.unlock() }
+        } finally { AppletVideoSessions.finish(agent!!.id); file.delete(); note?.let { api.service.captureEnded(it) }; if (micLocked) app.registry.micLock.unlock(); if(!visible) app.registry.camera.release(cameraLease) }
     } }
 }
 

@@ -89,8 +89,9 @@ class MoreFragment : Fragment() {
         row(b.automatedContext, R.drawable.ic_mode_custom, R.string.automated_context) { startActivity(android.content.Intent(requireContext(), cc.bridgit.app.context.ContextActivity::class.java)) }
         row(b.about, R.drawable.ic_info, R.string.more_about) { showAbout() }
         for ((row, kind) in listOf(b.reportBug to IssueKind.BUG, b.requestFeature to IssueKind.FEATURE)) {
-            row.metrics.isVisible = true
-            row.metrics.setOnClickListener { findNavController().navigate(R.id.myIssues, androidx.core.os.bundleOf("issueKind" to kind.id)) }
+            // The counts sit under the title as one tap target; the chevron is the row's only trailing element.
+            row.summary.isVisible = true
+            row.summary.setOnClickListener { findNavController().navigate(R.id.myIssues, androidx.core.os.bundleOf("issueKind" to kind.id)) }
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -184,10 +185,13 @@ class MoreFragment : Fragment() {
         for ((row, kind, local) in listOf(Triple(bb.reportBug, IssueKind.BUG, summaries[0]), Triple(bb.requestFeature, IssueKind.FEATURE, summaries[1]))) {
             val mine = OwnerFeedbackCounts.Counts(local.first, local.second)
             val total = OwnerFeedbackCounts.total(owner, kind, mine)
-            val perDevice = OwnerFeedbackCounts.breakdown(owner, kind, mine)
+            // A0170: the owner's total across all their devices first, then each device's own counts.
+            val perDevice = OwnerFeedbackCounts.breakdown(owner, kind, mine) { n, c -> getString(R.string.more_issue_device, n, c.filed, c.fixed) }
             val headline = getString(R.string.more_issue_metrics, total.filed, total.fixed)
-            row.metrics.text = if (perDevice == null) headline else getString(R.string.more_issue_metrics_owner, headline, perDevice)
-            row.metrics.contentDescription = getString(R.string.more_issue_metrics_cd, row.title.text, total.filed, total.fixed) +
+            row.supporting.text = if (perDevice == null) headline else getString(R.string.more_issue_metrics_owner, headline)
+            row.breakdown.isVisible = perDevice != null
+            row.breakdown.text = perDevice
+            row.summary.contentDescription = getString(R.string.more_issue_metrics_cd, row.title.text, total.filed, total.fixed) +
                 (perDevice?.let { " " + getString(R.string.more_issue_metrics_devices_cd, it) } ?: "")
         }
         val hubInfo = app.hubLinks.hubs().associateBy { it.linkId }

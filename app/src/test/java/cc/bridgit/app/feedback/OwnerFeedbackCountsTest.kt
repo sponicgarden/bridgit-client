@@ -24,7 +24,7 @@ class OwnerFeedbackCountsTest {
         // This device has 4 local bugs (one not uploaded yet); the tab adds its 2.
         assertEquals(Counts(6, 2), OwnerFeedbackCounts.total(owner, IssueKind.BUG, Counts(4, 1)))
         assertEquals(Counts(1, 1), OwnerFeedbackCounts.total(owner, IssueKind.FEATURE, Counts(0, 0)))
-        assertEquals("pixel-pal 4 · 1, A9 Cream Tab 2 · 1", OwnerFeedbackCounts.breakdown(owner, IssueKind.BUG, Counts(4, 1)))
+        assertEquals("pixel-pal: 4 filed · 1 fixed; A9 Cream Tab: 2 filed · 1 fixed", OwnerFeedbackCounts.breakdown(owner, IssueKind.BUG, Counts(4, 1)))
     }
 
     @Test fun withoutAnAnswerOrWithOneDeviceItIsTheLocalCount() {

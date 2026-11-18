@@ -21,14 +21,61 @@
         app:tint="?attr/colorOnSurfaceVariant"
         xmlns:app="http://schemas.android.com/apk/res-auto" />
 
-    <TextView
-        android:id="@+id/title"
+    <!-- Title, and an optional supporting line under it (list-screens.md: secondary text below the title, never in
+         the trailing column; a long trailing text squeezed the title to nothing, A11 test 18 Nov 2026). -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:orientation="vertical"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:textAppearance="?attr/textAppearanceBodyLarge" />
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <!-- Feedback rows (Sol 6.1 design pass, docs/design/more-feedback/spec.md): the owner's total, then each
+             device's counts, one tap target that opens My reports. Gone on every other row. -->
+        <LinearLayout
+            android:id="@+id/summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/supporting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:importantForAccessibility="no"
+                android:maxLines="2"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <TextView
+                android:id="@+id/breakdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:importantForAccessibility="no"
+                android:maxLines="2"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
     <TextView
         android:id="@+id/metrics"
         android:layout_width="wrap_content"

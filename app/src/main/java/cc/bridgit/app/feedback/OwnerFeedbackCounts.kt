@@ -51,13 +51,16 @@ object OwnerFeedbackCounts {
     fun total(owner: Owner?, kind: IssueKind, local: Counts): Counts =
         (owner?.devices ?: emptyList()).filter { !it.thisDevice }.fold(local) { acc, d -> acc + d.of(kind) }
 
-    /** "pixel-pal 3 · 1, cream-tab 2 · 0": each device's filed · fixed, this device (local numbers) first. Null for one device. */
-    fun breakdown(owner: Owner?, kind: IssueKind, local: Counts): String? {
+    /**
+     * "pixel-pal: 3 filed · 1 fixed; cream-tab: 2 filed · 0 fixed": each device's counts, this device (local numbers)
+     * first. [item] words one device (the More page passes its string resource). Null for one device.
+     */
+    fun breakdown(owner: Owner?, kind: IssueKind, local: Counts,
+                  item: (String, Counts) -> String = { n, c -> "$n: ${c.filed} filed · ${c.fixed} fixed" }): String? {
         val devices = owner?.devices ?: return null
         if (devices.size < 2) return null
-        return devices.sortedByDescending { it.thisDevice }.joinToString(", ") { d ->
-            val c = if (d.thisDevice) local else d.of(kind)
-            "${d.name} ${c.filed} · ${c.fixed}"
+        return devices.sortedByDescending { it.thisDevice }.joinToString("; ") { d ->
+            item(d.name, if (d.thisDevice) local else d.of(kind))
         }
     }
 

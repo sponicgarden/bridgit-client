@@ -1,6 +1,6 @@
 {
- "documentation_revision": 138,
- "api_revision": 154,
+ "documentation_revision": 139,
+ "api_revision": 155,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "List the linked sources of a namespace: instrument, provider, custody, cap and whether the key is set. A key is never returned",

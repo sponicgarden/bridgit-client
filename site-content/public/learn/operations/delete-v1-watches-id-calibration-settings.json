@@ -1,0 +1,37 @@
+{
+ "documentation_revision": 139,
+ "api_revision": 155,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Reset this watch's audit share to the default",
+  "method": "DELETE",
+  "auth": true,
+  "mcp_tool": "watches_calibration_settings_delete",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "DELETE /v1/watches/w0123456789ab/calibration/settings",
+  "idempotent": true,
+  "path": "/v1/watches/{id}/calibration/settings",
+  "capability": "watches",
+  "returns": "the settings, as PUT returns them",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/watches/{id}/calibration/settings",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": ["not_found"],
+  "requires": null
+ }
+}

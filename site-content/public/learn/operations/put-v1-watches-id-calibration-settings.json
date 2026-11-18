@@ -1,0 +1,52 @@
+{
+ "documentation_revision": 139,
+ "api_revision": 155,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Set how often the paid model audits the free stage's answers for this watch",
+  "method": "PUT",
+  "auth": true,
+  "mcp_tool": "watches_calibration_settings_put",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [{
+   "name": "audit_share",
+   "description": "Share of free answers to audit, 0.005-0.5 (default 0.02); null resets it. Below 0.005 is refused: the audit is how misses are measured. Audits are paid and stay under max_paid_per_hour and the budget",
+   "type": "number",
+   "required": true
+  }],
+  "example": "PUT /v1/watches/w0123456789ab/calibration/settings {\"audit_share\":0.05}",
+  "idempotent": true,
+  "path": "/v1/watches/{id}/calibration/settings",
+  "capability": "watches",
+  "returns": "watch_id, audit_share, audit_share_set, audit_share_default, audit_share_min, audit_share_max, keep_days, max_records",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "audit_share": {
+     "description": "Share of free answers to audit, 0.005-0.5 (default 0.02); null resets it. Below 0.005 is refused: the audit is how misses are measured. Audits are paid and stay under max_paid_per_hour and the budget",
+     "type": "number"
+    },
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "id": {
+     "description": "The id in /v1/watches/{id}/calibration/settings",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "audit_share"
+   ]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

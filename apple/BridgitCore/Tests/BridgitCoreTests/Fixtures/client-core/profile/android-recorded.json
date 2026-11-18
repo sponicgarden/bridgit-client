@@ -2349,6 +2349,18 @@
         },
         {
           "method": "GET",
+          "path": "\/v1\/watches\/{id}\/calibration"
+        },
+        {
+          "method": "PUT",
+          "path": "\/v1\/watches\/{id}\/calibration\/settings"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/watches\/{id}\/calibration\/settings"
+        },
+        {
+          "method": "GET",
           "path": "\/v1\/situations"
         }
       ]

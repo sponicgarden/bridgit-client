@@ -86,6 +86,23 @@ class WatchModule(app: BridgeApp) : Capability(app) {
             if (t.length() == 0) throw ErrorCatalog.error("invalid_parameter", "This watch has no tally. Start one with tally {track} to count answers on the phone.")
             Reply.Json(t)
         }
+        endpoint(CALIBRATION) {
+            val days = query("days")?.let { it.toIntOrNull()?.takeIf { d -> d in 1..Calibration.MAX_WINDOW_DAYS } ?: throw ErrorCatalog.error("invalid_parameter", "days must be 1-${Calibration.MAX_WINDOW_DAYS}.") } ?: Calibration.DEFAULT_WINDOW_DAYS
+            Reply.Json(app.watches.calibrationOf(agent!!.id, path("id").orEmpty(), days)
+                ?: throw ErrorCatalog.error("not_found", "You have no running watch with that id."))
+        }
+        endpoint(CALIBRATION_SETTINGS) {
+            if (!body.has("audit_share")) throw ErrorCatalog.error("invalid_parameter", "Send audit_share (a number from ${Calibration.MIN_AUDIT_SHARE} to ${Calibration.MAX_AUDIT_SHARE}, or null for the default).")
+            val share = try { Calibration.parseAuditShare(body.opt("audit_share")) } catch (e: Calibration.Bad) { throw ErrorCatalog.error("invalid_parameter", e.message ?: "Bad audit_share.") }
+            val id = path("id").orEmpty()
+            message = "${agentName} set watch $id's audit share to ${share ?: "the default"}"
+            Reply.Json(app.watches.setAuditShare(agent!!.id, id, share) ?: throw ErrorCatalog.error("not_found", "You have no running watch with that id."))
+        }
+        endpoint(CALIBRATION_SETTINGS_CLEAR) {
+            val id = path("id").orEmpty()
+            message = "${agentName} reset watch $id's audit share"
+            Reply.Json(app.watches.setAuditShare(agent!!.id, id, null) ?: throw ErrorCatalog.error("not_found", "You have no running watch with that id."))
+        }
         endpoint(SITUATIONS) { Reply.Json(Situations.catalog()) }
         endpoint(LIST) {
             val list = app.watches.list(agent!!.id)
@@ -160,6 +177,22 @@ class WatchModule(app: BridgeApp) : Capability(app) {
         val SITUATIONS = EndpointSpec("GET", "/situations", "watches", "The library of common picture situations a watch can count (dog licking itself, pot boiling over, sunlight in the room, ...): send one as situation in POST /v1/watches, or describe your own in words",
             example = "GET /v1/situations",
             returns = "about, situations [{id, title, question, min, interval_s, gap_s, alert, counts_only_while}], custom {example, defaults}")
-        val ALL = listOf(CREATE, LIST, GET, DELETE, TALLY, PAUSE, SITUATIONS)
+        val CALIBRATION = EndpointSpec("GET", "/watches/{id}/calibration", "watches",
+            "How right the watch's cheap stages are, to tune it with: every stage that decides (the free change check, the sound match, the paid model, the paid cap) keeps a small record per reading on the phone (no photos or sound, ${Calibration.KEEP_DAYS} days, at most ${Calibration.MAX_RECORDS}). A sample of the readings the free stage answered is asked of the paid model anyway (audit_share, default 1 in 50, never below 1 in 200, paid and counted like any check), and this reports how often they disagreed",
+            query = listOf(Param("days", "integer", "The window, 1-${Calibration.MAX_WINDOW_DAYS} days (default ${Calibration.DEFAULT_WINDOW_DAYS})")),
+            example = "GET /v1/watches/w0123456789ab/calibration?days=7",
+            returns = "watch_id, label, task (the question the records are about), current {model, interval_s, local, max_paid_per_hour}, window_days, since, records, readings, settings {audit_share, audit_share_set, audit_share_default, audit_share_min, audit_share_max, keep_days, max_records}, stages [{stage: change_gate|sound_match|model|paid_cap|camera, service, count, decided, cost_usd, latency_ms_p50}], reuse {free_checks, answered_free, share}, audit {due, done, skipped, skipped_because, agreed, misses, miss_rate, miss_rate_interval_95 [low, high]}, calibration [{band (the reused answer's confidence), free_answers, audited, agreed, agreement}], health {no_photo, over_paid_cap, <model error>, dark_records}, by {camera, hour, light: {<key>: {decisions, audited, misses, miss_rate}}}, labels {sources, about}, notes [plain hints with their numbers]. A miss is an audit whose paid answer differed from the reused one; it can't show where the paid model itself is wrong. Change the watch with the routes you made it with",
+            errors = listOf("not_found", "invalid_parameter"))
+        val CALIBRATION_SETTINGS = EndpointSpec("PUT", "/watches/{id}/calibration/settings", "watches",
+            "Set how often the paid model audits the free stage's answers for this watch", idempotent = true,
+            body = listOf(Param("audit_share", "number", "Share of free answers to audit, ${Calibration.MIN_AUDIT_SHARE}-${Calibration.MAX_AUDIT_SHARE} (default ${Calibration.DEFAULT_AUDIT_SHARE}); null resets it. Below ${Calibration.MIN_AUDIT_SHARE} is refused: the audit is how misses are measured. Audits are paid and stay under max_paid_per_hour and the budget", true)),
+            example = "PUT /v1/watches/w0123456789ab/calibration/settings {\"audit_share\":0.05}",
+            returns = "watch_id, audit_share, audit_share_set, audit_share_default, audit_share_min, audit_share_max, keep_days, max_records",
+            errors = listOf("not_found", "invalid_parameter"))
+        val CALIBRATION_SETTINGS_CLEAR = EndpointSpec("DELETE", "/watches/{id}/calibration/settings", "watches",
+            "Reset this watch's audit share to the default", idempotent = true,
+            example = "DELETE /v1/watches/w0123456789ab/calibration/settings",
+            returns = "the settings, as PUT returns them", errors = listOf("not_found"))
+        val ALL = listOf(CREATE, LIST, GET, DELETE, TALLY, PAUSE, CALIBRATION, CALIBRATION_SETTINGS, CALIBRATION_SETTINGS_CLEAR, SITUATIONS)
     }
 }

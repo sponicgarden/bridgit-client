@@ -703,6 +703,10 @@ object ApiChanges {
         Revision(154, "1.8.0", "2026-11-18", listOf(
             Item("Email preview: render the styled HTML email (Bridgit's card design by default, or plain) and its plain-text alternative from text, markdown or your own HTML, without sending anything. Sending comes later", "/v1/email/preview"),
         )),
+        Revision(155, "2.0.0", "2026-11-18", listOf(
+            Item("Calibration (A0047): each watch keeps a small decision record per stage per reading on the phone (no media, 30 days), audits a sample of its free answers with the paid model (default 1 in 50, never below 1 in 200), and reports volume, cost, reuse, the audited miss rate with its interval, agreement by confidence band and the same by camera, hour and light", "/v1/watches/{id}/calibration"),
+            Item("Set or reset a watch's audit share", "/v1/watches/{id}/calibration/settings"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

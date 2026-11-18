@@ -1,0 +1,45 @@
+{
+ "documentation_revision": 139,
+ "api_revision": 155,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "How right the watch's cheap stages are, to tune it with: every stage that decides (the free change check, the sound match, the paid model, the paid cap) keeps a small record per reading on the phone (no photos or sound, 30 days, at most 20000). A sample of the readings the free stage answered is asked of the paid model anyway (audit_share, default 1 in 50, never below 1 in 200, paid and counted like any check), and this reports how often they disagreed",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "watches_calibration",
+  "query": [{
+   "name": "days",
+   "description": "The window, 1-30 days (default 7)",
+   "type": "integer",
+   "required": false
+  }],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/watches/w0123456789ab/calibration?days=7",
+  "idempotent": false,
+  "path": "/v1/watches/{id}/calibration",
+  "capability": "watches",
+  "returns": "watch_id, label, task (the question the records are about), current {model, interval_s, local, max_paid_per_hour}, window_days, since, records, readings, settings {audit_share, audit_share_set, audit_share_default, audit_share_min, audit_share_max, keep_days, max_records}, stages [{stage: change_gate|sound_match|model|paid_cap|camera, service, count, decided, cost_usd, latency_ms_p50}], reuse {free_checks, answered_free, share}, audit {due, done, skipped, skipped_because, agreed, misses, miss_rate, miss_rate_interval_95 [low, high]}, calibration [{band (the reused answer's confidence), free_answers, audited, agreed, agreement}], health {no_photo, over_paid_cap, <model error>, dark_records}, by {camera, hour, light: {<key>: {decisions, audited, misses, miss_rate}}}, labels {sources, about}, notes [plain hints with their numbers]. A miss is an audit whose paid answer differed from the reused one; it can't show where the paid model itself is wrong. Change the watch with the routes you made it with",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "days": {
+     "description": "The window, 1-30 days (default 7)",
+     "type": "integer"
+    },
+    "id": {
+     "description": "The id in /v1/watches/{id}/calibration",
+     "type": "string"
+    }
+   },
+   "required": ["id"]
+  },
+  "errors": [
+   "not_found",
+   "invalid_parameter"
+  ],
+  "requires": null
+ }
+}

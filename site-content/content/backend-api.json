@@ -37,6 +37,8 @@
       "/v1/applets/agents",
       "/v1/appraise",
       "/v1/appraise/library",
+      "/v1/benchmark/fleet",
+      "/v1/benchmark/rubric",
       "/v1/budgets/services",
       "/v1/budgets/settings",
       "/v1/budgets/sync",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 138,
- "api_revision": 154,
+ "documentation_revision": 139,
+ "api_revision": 155,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Change the budget time zone or a per-spend cap (per instrument or per source). Lowering is open to any configuration agent; raising or removing a cap needs the Budgets capability. A zone change never resets a period; explicit owner.configuration grant required",

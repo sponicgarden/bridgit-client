@@ -121,6 +121,9 @@ class Watches(private val app: BridgeApp) {
         val soundLock = kotlinx.coroutines.sync.Mutex()
         /** One photo check at a time: the watch's own and the owner's camera photos ([Watches.ownerPhoto]). */
         val checkLock = kotlinx.coroutines.sync.Mutex()
+        /** The calibration loop (A0047): this watch's decision records, and the agent's audit share (null = the default). */
+        @Volatile var decisions: Calibration.Log = Calibration.Log(null)
+        @Volatile var auditShare: Double? = null
 
         /** The tally summary (null without a tally). */
         fun tallySummary(now: Long = System.currentTimeMillis()): JSONObject? {
@@ -166,6 +169,7 @@ class Watches(private val app: BridgeApp) {
             .put("readings_held", synchronized(readings) { readings.size })
             .put("last_check", synchronized(recent) { recent.lastOrNull() } ?: JSONObject.NULL)
             .put("usage", usage())
+            .put("audit_share", auditShare ?: Calibration.DEFAULT_AUDIT_SHARE)
             .apply {
                 if (spec.sound != null) put("listening", listening ?: JSONObject.NULL).put("not_listening_reason", notListeningReason ?: JSONObject.NULL)
                 if (spec.tally != null) put("tally_today", todayLine() ?: JSONObject.NULL).put("rules_fired", rulesFired)
@@ -198,6 +202,9 @@ class Watches(private val app: BridgeApp) {
     private val watches = LinkedHashMap<String, Watch>()
     /** One JSON file per tally watch: weeks of episodes don't belong in SharedPreferences. */
     private val tallyDir = java.io.File(app.filesDir, "watch-tallies")
+    /** One file of decision records per watch (the calibration loop), as sensitive as the watch's history: deleted with it. */
+    private val decisionDir = java.io.File(app.filesDir, "watch-decisions")
+    private fun decisionLog(id: String) = Calibration.Log(java.io.File(decisionDir, "$id.jsonl"))
     /** Held while any watch runs: with the screen off the CPU would sleep and the checks would stop. */
     private val wake = (app.getSystemService(android.os.PowerManager::class.java)).newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "bridgit:watches")
         .apply { setReferenceCounted(false) }
@@ -228,6 +235,8 @@ class Watches(private val app: BridgeApp) {
             w.skippedCap = o.optInt("skipped_over_paid_cap"); w.rulesFired = o.optInt("rules_fired")
             w.budgetPausedUntil = o.optLong("budget_paused_until").takeIf { it > now } ?: 0L
             w.intervalOverrideS = o.optInt("interval_s_override", 0).takeIf { it > 0 }
+            w.auditShare = (o.opt("audit_share") as? Number)?.toDouble()?.coerceIn(Calibration.MIN_AUDIT_SHARE, Calibration.MAX_AUDIT_SHARE)
+            w.decisions = decisionLog(id)
             if (spec.tally != null) w.tally = loadTally(id) ?: WatchTally.State(w.createdAt)
             synchronized(watches) { watches[id] = w }
             if (now >= w.expiresAt && !renewed(w)) end(w, "expired", "The watch ran its time.") else w.job = scope.launch { loop(w) }
@@ -235,6 +244,7 @@ class Watches(private val app: BridgeApp) {
         val live = synchronized(watches) { watches.keys.toSet() }
         app.callbacks.watchSecretIds().filter { it !in live }.forEach { app.callbacks.removeWatchSecret(it) }
         tallyDir.listFiles()?.filter { it.nameWithoutExtension !in live }?.forEach { it.delete() }
+        decisionDir.listFiles()?.filter { it.name.substringBefore('.') !in live }?.forEach { it.delete() }
         updateWake()
         app.agents.addListener { onAgentsChanged() }
     }
@@ -317,6 +327,7 @@ class Watches(private val app: BridgeApp) {
             w = Watch("w" + UUID.randomUUID().toString().replace("-", "").take(12), agentId, agentName, request, spec, now, now + spec.expiresS * 1000L)
             w.userPaused = initiallyPaused || spec.startPaused
             if (spec.tally != null) w.tally = WatchTally.State(now)
+            w.decisions = decisionLog(w.id)
             watches[w.id] = w
         }
         val secret = spec.callbackUrl?.let { app.callbacks.newWatchSecret(w.id) }
@@ -492,7 +503,23 @@ class Watches(private val app: BridgeApp) {
         val print = cc.bridgit.app.sound.SoundPrint.of(wav)
         val similar = last != null && print != null && print.similar(w.soundPrint)
         print?.let { p -> w.soundPrint?.let { check.put("similarity", Math.round(p.cosine(it) * 100) / 100.0) } }
-        when (cc.bridgit.app.sound.SoundRules.decide(at, if (last != null) w.soundAt else 0L, opts.reuseMs, similar, w.paidLastHour(now), cap, w.pausedUntil)) {
+        val rid = readingId()
+        var audit: Pair<Jev.Answer, String>? = null
+        val decision = cc.bridgit.app.sound.SoundRules.decide(at, if (last != null) w.soundAt else 0L, opts.reuseMs, similar, w.paidLastHour(now), cap, w.pausedUntil)
+        when (decision) {
+            cc.bridgit.app.sound.SoundRules.Decision.COUNT -> {
+                val (ans, conf) = Calibration.primary(last, Calibration.task(w.spec))
+                val due = Calibration.auditDue(w.auditShare, roll())
+                val blocked = if (!due) null else auditBlocked(w, now, cap)
+                val record = decide(w, rid, at, Calibration.SOUND_MATCH, Calibration.SOUND_MATCH, source, null,
+                    Calibration.result(ans, conf, true, "sounds like the last sound checked"), final = !due || blocked != null,
+                    extra = if (!due) null else JSONObject().put("audit_due", true).apply { blocked?.let { put("audit_skipped", it) } })
+                if (due && blocked == null) audit = last!! to record.optString("id")
+            }
+            else -> {}
+        }
+        if (audit != null) check.put("audit", true)
+        else when (decision) {
             cc.bridgit.app.sound.SoundRules.Decision.COUNT -> {
                 val ago = (at - w.soundAt).coerceAtLeast(0) / 1000
                 w.checks++; w.checksLocal++; w.soundAt = maxOf(w.soundAt, at)
@@ -506,12 +533,14 @@ class Watches(private val app: BridgeApp) {
             cc.bridgit.app.sound.SoundRules.Decision.SKIP -> {
                 w.checks++; w.skippedCap++
                 val paused = now < w.pausedUntil
+                decide(w, rid, at, Calibration.PAID_CAP, null, source, null, Calibration.result(null, null, false, if (paused) "paused" else "max_paid_per_hour"), final = false)
                 remember(w, check.put("skipped", if (paused) "paused" else "max_paid_per_hour").put("paid", false)
                     .put("message", if (paused) "Paid checks are paused for a while (the model was busy or over its limit)." else "$cap paid checks in the last hour already (max_paid_per_hour); this sound wasn't checked."))
                 counted(w, null, at)
                 save(w); return
             }
-            cc.bridgit.app.sound.SoundRules.Decision.ASK -> {}
+            cc.bridgit.app.sound.SoundRules.Decision.ASK -> if (last != null)
+                decide(w, rid, at, Calibration.SOUND_MATCH, Calibration.SOUND_MATCH, source, null, Calibration.result("ask", null, false, "a different sound, or past reuse_s"), final = false)
         }
         val hint = Outbound.Hint("Cloudflare Clef (via Bridgit team backend)", "Watch ${w.id}: a loud sound clip and the agent's question",
             listOf(Categories.QUESTIONS, Categories.AGENT_STATE, Categories.AUDIO), action = budgetOf(w)?.second)
@@ -519,12 +548,18 @@ class Watches(private val app: BridgeApp) {
             withContext(Dispatchers.IO) { Outbound.on(Outbound.Actor.agent(w.agentId, w.agentName), hint) {
                 Jev.ask(app, state, w.spec.questions, route = Jev.CLEF_ROUTE, audio = listOf(cc.bridgit.app.sound.SoundCheck.dataUrl(wav)), authorized = ::eligible)
             } }
-        } catch (f: Jev.Failure) { failed(w, f, check, at, now); return }
+        } catch (f: Jev.Failure) {
+            decide(w, rid, at, Calibration.MODEL, w.spec.model, source, null, Calibration.result(null, null, false, f.reason).put("error", f.reason), final = false)
+            audit?.let { runCatching { w.decisions.attach(it.second, JSONObject().put("audit_skipped", "model_failed").put("final", true)) } }
+            failed(w, f, check, at, now); return
+        }
         w.checks++; w.failures = 0
         w.paidCall(now, answer.costUsd)
+        val agreed = decided(w, rid, at, answer, source, null, audit)
         val matched = WatchRules.matches(w.spec.conditions, answer)
         if (at >= w.soundAt) { w.soundAt = at; w.soundAnswer = answer; w.soundPrint = print; w.soundSource = source }
-        remember(w, check.put("answers", answer.answers).put("matched", matched).put("model", answer.model).put("paid", true).put("cost_usd", answer.costUsd))
+        remember(w, check.put("answers", answer.answers).put("matched", matched).put("model", answer.model).put("paid", true).put("cost_usd", answer.costUsd)
+            .apply { if (agreed != null) put("audit", JSONObject().put("agreed", agreed)) })
         counted(w, answer, at)
         if (matched && WatchRules.callbackDue(w.spec, w.lastMatchAt, now)) onMatch(w, answer, state, now, local = false)
         save(w)
@@ -616,21 +651,32 @@ class Watches(private val app: BridgeApp) {
         if (!WatchRules.shouldAsk(w.spec, readings.size, w.lastMatchAt, now, w.pausedUntil)) return
         val check = JSONObject().put("at", isoAt(now)).put("readings", readings.size).put("model", w.spec.model)
             .apply { w.sampleCamera?.let { put("camera",it) } }
+        val rid = readingId()
         if (w.spec.camera != null && sample.photo == null) {
             // No photo, no point paying: try again next reading. Not a failure (a locked phone isn't the watch's fault).
             val why = sample.reading.optJSONObject("camera")?.optString("reason").orEmpty()
+            decide(w, rid, now, Calibration.CAMERA, null, w.sampleCamera, null, Calibration.result(null, null, false, "no_photo${if (why.isNotEmpty()) ": $why" else ""}"), final = false)
             remember(w, check.put("error", "no_photo").put("message", "No photo this time${if (why.isNotEmpty()) ": $why" else ""}.").put("paid", false))
             counted(w, null, now)
             return
         }
         if (w.spec.model == "none") {
-            val changed = pictureChanged(w, grid, readings, now, check)
+            val changed = pictureChanged(w, grid, readings, now, check, rid)
             if (w.spec.people != null) people.afterCheck(w, sample.photo, shotAt, changed)
             return
         }
 
         val reused = if (w.spec.local.enabled && w.spec.camera != null) w.gate.reusable(grid, now, w.spec.model) else null
+        val share = sample.reading.optJSONObject("camera")?.opt("changed_share") as? Number
         if (reused != null) {
+            val (ans, conf) = Calibration.primary(reused, Calibration.task(w.spec))
+            // The audit sample: now and then the paid model is asked anyway, to measure how often reuse was wrong.
+            val due = Calibration.auditDue(w.auditShare, roll())
+            val blocked = if (!due) null else auditBlocked(w, now)
+            val gateRecord = decide(w, rid, now, Calibration.CHANGE_GATE, Calibration.CHANGE_GATE, w.sampleCamera, grid,
+                Calibration.result(ans, conf, true, "unchanged since the last paid check${share?.let { ", largest change $it" } ?: ""}"),
+                final = !due || blocked != null, extra = if (!due) null else JSONObject().put("audit_due", true).apply { blocked?.let { put("audit_skipped", it) } })
+            if (due && blocked == null) { askModel(w, sample.photo, readings, check.put("audit", true), now, grid, rid, reused to gateRecord.optString("id")); return }
             w.checks++; w.checksLocal++
             val state = WatchRules.state(w.spec, readings, now, ZoneId.systemDefault())
             w.lastState = state
@@ -642,8 +688,12 @@ class Watches(private val app: BridgeApp) {
             save(w)
             return
         }
+        if (w.spec.local.enabled && w.spec.camera != null)
+            decide(w, rid, now, Calibration.CHANGE_GATE, Calibration.CHANGE_GATE, w.sampleCamera, grid,
+                Calibration.result("ask", null, false, if (share == null) "no earlier paid photo to compare with" else "changed (largest change $share) or past max_reuse_s"), final = false)
         w.spec.maxPaidPerHour?.let { cap ->
             if (w.paidLastHour(now) >= cap) {
+                decide(w, rid, now, Calibration.PAID_CAP, null, w.sampleCamera, grid, Calibration.result(null, null, false, "max_paid_per_hour"), final = false)
                 w.checks++; w.skippedCap++
                 remember(w, check.put("skipped", "max_paid_per_hour").put("paid", false)
                     .put("message", "$cap paid checks in the last hour already (max_paid_per_hour); no model was asked."))
@@ -653,7 +703,60 @@ class Watches(private val app: BridgeApp) {
             }
         }
 
-        askModel(w, sample.photo, readings, check, now, grid)
+        askModel(w, sample.photo, readings, check, now, grid, rid)
+    }
+
+    /** Decides the audit sample's coin flips in tests. */
+    internal var roll: () -> Double = { kotlin.random.Random.nextDouble() }
+    private fun readingId() = "r" + UUID.randomUUID().toString().replace("-", "").take(12)
+
+    /** Why an audit that is due can't be paid for now (null: it can). The hourly cap and pauses still win over the audit. */
+    private fun auditBlocked(w: Watch, now: Long, cap: Int? = w.spec.maxPaidPerHour): String? = when {
+        w.budgetPaused(now) -> "applet_budget"
+        now < w.pausedUntil -> "model_busy"
+        cap != null && w.paidLastHour(now) >= cap -> "max_paid_per_hour"
+        else -> null
+    }
+
+    /** Writes one decision record for [w] (the calibration loop); never breaks the watch. */
+    private fun decide(w: Watch, readingId: String, at: Long, stage: String, service: String?, camera: String?, grid: IntArray?,
+                       result: JSONObject, final: Boolean, costUsd: Double = 0.0, latencyMs: Long? = null, extra: JSONObject? = null): JSONObject {
+        val r = Calibration.record("d" + UUID.randomUUID().toString().replace("-", "").take(12), readingId, at, w.id, Calibration.task(w.spec),
+            stage, service, camera, Calibration.conditions(grid, at, ZoneId.systemDefault()), costUsd, latencyMs, result, final)
+        extra?.keys()?.forEach { r.put(it, extra.get(it)) }
+        runCatching { w.decisions.add(r) }
+        return r
+    }
+
+    /** A paid answer: its record, and when it was an audit, the label on the free stage's record. Returns whether the audit agreed. */
+    private fun decided(w: Watch, rid: String, at: Long, answer: Jev.Answer, camera: String?, grid: IntArray?, audit: Pair<Jev.Answer, String>?, extra: JSONObject? = null): Boolean? {
+        val task = Calibration.task(w.spec)
+        val (ans, conf) = Calibration.primary(answer, task)
+        decide(w, rid, at, Calibration.MODEL, answer.model, camera, grid, Calibration.result(ans, conf, true, if (audit != null) "audit sample" else "asked"),
+            final = true, costUsd = answer.costUsd, latencyMs = answer.elapsedMs, extra = (extra ?: JSONObject()).apply { audit?.let { put("audit_of", it.second) } })
+        if (audit == null) return null
+        val agreed = WatchRules.sameAnswer(audit.first, answer)
+        runCatching { w.decisions.attach(audit.second, JSONObject().put("audit", Calibration.audit(ans, conf, agreed, at, answer.model))) }
+        return agreed
+    }
+
+    /** The calibration report of [agentId]'s watch [id] over [days] days; null if there's no such watch. */
+    fun calibrationOf(agentId: String, id: String, days: Int): JSONObject? {
+        val w = get(agentId, id) ?: return null
+        return Calibration.report(w.decisions.all(), System.currentTimeMillis(), days, w.auditShare).put("watch_id", w.id).put("label", w.spec.label)
+            .put("task", Calibration.task(w.spec) ?: JSONObject.NULL)
+            .put("current", JSONObject().put("model", w.spec.model).put("interval_s", w.intervalS)
+                .put("local", if (w.spec.camera != null) w.spec.local.json() else JSONObject.NULL)
+                .put("max_paid_per_hour", w.spec.maxPaidPerHour ?: JSONObject.NULL))
+    }
+
+    /** Sets (or with null clears) the audit share of [agentId]'s watch [id]; null if there's no such watch. */
+    fun setAuditShare(agentId: String, id: String, share: Double?): JSONObject? {
+        val w = get(agentId, id) ?: return null
+        w.auditShare = share
+        save(w)
+        app.log.system("audit", "watch", "Watch ${w.id} for ${w.agentName}: audit share ${share ?: "default (${Calibration.DEFAULT_AUDIT_SHARE})"}")
+        return Calibration.settings(w.auditShare).put("watch_id", w.id)
     }
 
     /**
@@ -691,12 +794,14 @@ class Watches(private val app: BridgeApp) {
         }
         val readings = synchronized(w.readings) { w.readings.toList().takeLast((w.spec.window - 1).coerceAtLeast(0)) } + reading
         w.pendingPhoto = jpeg.takeIf { photoWanted?.invoke(w) == true }
-        askModel(w, jpeg, readings, check.put("readings", readings.size), now, grid = null)
+        askModel(w, jpeg, readings, check.put("readings", readings.size), now, grid = null, rid = readingId())
         check
     }
 
     /** The paid model call shared by the watch's own photos and the owner's ([grid] null: don't train the change check). */
-    private suspend fun askModel(w: Watch, photo: ByteArray?, readings: List<JSONObject>, check: JSONObject, now: Long, grid: IntArray?) {
+    /** [audit]: this call is the audit sample of a reused answer (that answer and its decision record's id). */
+    private suspend fun askModel(w: Watch, photo: ByteArray?, readings: List<JSONObject>, check: JSONObject, now: Long, grid: IntArray?,
+                                 rid: String, audit: Pair<Jev.Answer, String>? = null) {
         val clef = w.spec.model == "clef"
         val ref = if (photo != null && !clef) "photo-${w.id}-${UUID.randomUUID().toString().take(8)}" else null
         val state = WatchRules.state(w.spec, readings, now, ZoneId.systemDefault(),
@@ -713,14 +818,23 @@ class Watches(private val app: BridgeApp) {
                     assets = if (ref != null && photo != null) JSONObject().put(ref, Jev.image(photo)) else null,
                     images = if (clef && photo != null) listOf(Jev.dataUrl(photo)) else null, authorized = { authorizeSample(w) })
             } }
-        } catch (f: Jev.Failure) { failed(w, f, check, now, now); return }
+        } catch (f: Jev.Failure) {
+            decide(w, rid, now, Calibration.MODEL, w.spec.model, check.optString("camera").ifEmpty { null }, grid,
+                Calibration.result(null, null, false, f.reason).put("error", f.reason), final = false)
+            audit?.let { runCatching { w.decisions.attach(it.second, JSONObject().put("audit_skipped", "model_failed").put("final", true)) } }
+            failed(w, f, check, now, now); return
+        }
         w.checks++; w.failures = 0
         w.paidCall(now, answer.costUsd)
-        // A paid call for a change that meant nothing teaches the change check to ignore those spots for a while.
-        val learned = grid != null && w.spec.camera != null && w.spec.local.enabled && w.gate.answered(grid, now, w.spec.model, answer, WatchRules::sameAnswer)
+        val agreed = decided(w, rid, now, answer, check.optString("camera").ifEmpty { null }, grid, audit,
+            extra = if (check.optString("source") == OWNER_SOURCE) JSONObject().put("source", OWNER_SOURCE) else null)
+        // A paid call for a change that meant nothing teaches the change check to ignore those spots for a while. An audit
+        // that agreed leaves the change check as it was (it only measures); one that disagreed gives it the new answer.
+        val gateGrid = if (agreed == true) null else grid
+        val learned = gateGrid != null && w.spec.camera != null && w.spec.local.enabled && w.gate.answered(gateGrid, now, w.spec.model, answer, WatchRules::sameAnswer)
         val matched = WatchRules.matches(w.spec.conditions, answer)
         remember(w, check.put("answers", answer.answers).put("matched", matched).put("model", answer.model).put("paid", true)
-            .put("cost_usd", answer.costUsd).apply { if (learned) put("learned_noise", true) })
+            .put("cost_usd", answer.costUsd).apply { if (learned) put("learned_noise", true); if (agreed != null) put("audit", JSONObject().put("agreed", agreed)) })
         counted(w, answer, now)
         if (matched && WatchRules.callbackDue(w.spec, w.lastMatchAt, now)) onMatch(w, answer, state, now, local = false)
         save(w)
@@ -825,7 +939,7 @@ class Watches(private val app: BridgeApp) {
 
     /** model none: no model, free. The first photo is the reference; a solid change from it calls the agent back. */
     /** Returns whether the picture changed. */
-    private fun pictureChanged(w: Watch, grid: IntArray?, readings: List<JSONObject>, now: Long, check: JSONObject): Boolean {
+    private fun pictureChanged(w: Watch, grid: IntArray?, readings: List<JSONObject>, now: Long, check: JSONObject, rid: String): Boolean {
         if (grid == null) { remember(w, check.put("error", "no_photo").put("message", "The photo couldn't be read.").put("paid", false)); return false }
         w.checks++; w.checksLocal++
         val ref = w.reference
@@ -837,6 +951,9 @@ class Watches(private val app: BridgeApp) {
         }
         val share = FrameDiff.largestPatch(grid, ref, cellChange = w.spec.local.cellChange)
         val changed = share >= w.spec.local.minPatch
+        decide(w, rid, now, Calibration.CHANGE_GATE, Calibration.CHANGE_GATE, w.sampleCamera, grid,
+            Calibration.result(if (changed) "changed" else "unchanged", null, true, "model none: largest change against the reference")
+                .put("changed_share", Math.round(share * 1000) / 1000.0), final = true)
         remember(w, check.put("paid", false).put("matched", changed).put("changed_share", Math.round(share * 1000) / 1000.0)
             .put("answered_locally", "change check on the phone (model none)"))
         if (changed) {
@@ -873,6 +990,7 @@ class Watches(private val app: BridgeApp) {
         if (w.spec.people != null) people.ended(w.id)
         val summary = w.tallySummary()
         java.io.File(tallyDir, "${w.id}.json").delete()
+        w.decisions.delete()
         updateWake()
         app.log.system("audit", "watch", "Watch ${w.id} for ${w.agentName} ended ($reason)")
         if (app.agents.get(w.agentId) != null)
@@ -1001,7 +1119,7 @@ class Watches(private val app: BridgeApp) {
             .put("user_paused",w.userPaused).put("created_at", w.createdAt).put("expires_at", w.expiresAt).put("checks", w.checks).put("matches", w.matches)
             .put("last_match_at", w.lastMatchAt).put("checks_local", w.checksLocal).put("checks_paid", w.checksPaid)
             .put("paid_cost_usd", w.paidCostUsd).put("skipped_over_paid_cap", w.skippedCap).put("rules_fired", w.rulesFired)
-            .apply { if (w.budgetPausedUntil > 0) put("budget_paused_until", w.budgetPausedUntil); w.intervalOverrideS?.let { put("interval_s_override", it) } }
+            .apply { if (w.budgetPausedUntil > 0) put("budget_paused_until", w.budgetPausedUntil); w.intervalOverrideS?.let { put("interval_s_override", it) }; w.auditShare?.let { put("audit_share", it) } }
             .toString()).apply()
     }
 

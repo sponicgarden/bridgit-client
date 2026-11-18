@@ -1,6 +1,6 @@
 {
- "documentation_revision": 138,
- "api_revision": 154,
+ "documentation_revision": 139,
+ "api_revision": 155,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read the Bridgit-funded limits as mirrored from the cloud, and the contract limits of the spending core. Nothing is mirrored on this build: no Bridgit-funded source exists on the device-held path",

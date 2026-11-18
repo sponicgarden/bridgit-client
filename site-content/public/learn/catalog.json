@@ -5102,6 +5102,36 @@
      "tool": "watches_pause"
     },
     {
+     "summary": "How right the watch's cheap stages are, to tune it with: every stage that decides (the free change check, the sound match, the paid model, the paid cap) keeps a small record per reading on the phone (no photos or sound, 30 days, at most 20000). A sample of the readings the free stage answered is asked of the paid model anyway (audit_share, default 1 in 50, never below 1 in 200, paid and counted like any check), and this reports how often they disagreed",
+     "path": "/v1/watches/{id}/calibration",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-watches-id-calibration.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-watches-id-calibration.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration"
+    },
+    {
+     "summary": "Set how often the paid model audits the free stage's answers for this watch",
+     "path": "/v1/watches/{id}/calibration/settings",
+     "method": "PUT",
+     "documentation": "https://bridgit.cc/learn/operations/put-v1-watches-id-calibration-settings.json",
+     "operation_url": "https://bridgit.cc/learn/operations/put-v1-watches-id-calibration-settings.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration_settings_put"
+    },
+    {
+     "summary": "Reset this watch's audit share to the default",
+     "path": "/v1/watches/{id}/calibration/settings",
+     "method": "DELETE",
+     "documentation": "https://bridgit.cc/learn/operations/delete-v1-watches-id-calibration-settings.json",
+     "operation_url": "https://bridgit.cc/learn/operations/delete-v1-watches-id-calibration-settings.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration_settings_delete"
+    },
+    {
      "summary": "The library of common picture situations a watch can count (dog licking itself, pot boiling over, sunlight in the room, ...): send one as situation in POST /v1/watches, or describe your own in words",
      "path": "/v1/situations",
      "method": "GET",
@@ -6772,6 +6802,36 @@
      "tool": "watches_pause"
     },
     {
+     "summary": "How right the watch's cheap stages are, to tune it with: every stage that decides (the free change check, the sound match, the paid model, the paid cap) keeps a small record per reading on the phone (no photos or sound, 30 days, at most 20000). A sample of the readings the free stage answered is asked of the paid model anyway (audit_share, default 1 in 50, never below 1 in 200, paid and counted like any check), and this reports how often they disagreed",
+     "path": "/v1/watches/{id}/calibration",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-watches-id-calibration.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-watches-id-calibration.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration"
+    },
+    {
+     "summary": "Set how often the paid model audits the free stage's answers for this watch",
+     "path": "/v1/watches/{id}/calibration/settings",
+     "method": "PUT",
+     "documentation": "https://bridgit.cc/learn/operations/put-v1-watches-id-calibration-settings.json",
+     "operation_url": "https://bridgit.cc/learn/operations/put-v1-watches-id-calibration-settings.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration_settings_put"
+    },
+    {
+     "summary": "Reset this watch's audit share to the default",
+     "path": "/v1/watches/{id}/calibration/settings",
+     "method": "DELETE",
+     "documentation": "https://bridgit.cc/learn/operations/delete-v1-watches-id-calibration-settings.json",
+     "operation_url": "https://bridgit.cc/learn/operations/delete-v1-watches-id-calibration-settings.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration_settings_delete"
+    },
+    {
      "summary": "The library of common picture situations a watch can count (dog licking itself, pot boiling over, sunlight in the room, ...): send one as situation in POST /v1/watches, or describe your own in words",
      "path": "/v1/situations",
      "method": "GET",
@@ -7305,6 +7365,36 @@
      "control_scope": null,
      "requires_power": null,
      "tool": "watches_pause"
+    },
+    {
+     "summary": "How right the watch's cheap stages are, to tune it with: every stage that decides (the free change check, the sound match, the paid model, the paid cap) keeps a small record per reading on the phone (no photos or sound, 30 days, at most 20000). A sample of the readings the free stage answered is asked of the paid model anyway (audit_share, default 1 in 50, never below 1 in 200, paid and counted like any check), and this reports how often they disagreed",
+     "path": "/v1/watches/{id}/calibration",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-watches-id-calibration.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-watches-id-calibration.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration"
+    },
+    {
+     "summary": "Set how often the paid model audits the free stage's answers for this watch",
+     "path": "/v1/watches/{id}/calibration/settings",
+     "method": "PUT",
+     "documentation": "https://bridgit.cc/learn/operations/put-v1-watches-id-calibration-settings.json",
+     "operation_url": "https://bridgit.cc/learn/operations/put-v1-watches-id-calibration-settings.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration_settings_put"
+    },
+    {
+     "summary": "Reset this watch's audit share to the default",
+     "path": "/v1/watches/{id}/calibration/settings",
+     "method": "DELETE",
+     "documentation": "https://bridgit.cc/learn/operations/delete-v1-watches-id-calibration-settings.json",
+     "operation_url": "https://bridgit.cc/learn/operations/delete-v1-watches-id-calibration-settings.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration_settings_delete"
     },
     {
      "summary": "The library of common picture situations a watch can count (dog licking itself, pot boiling over, sunlight in the room, ...): send one as situation in POST /v1/watches, or describe your own in words",
@@ -7912,6 +8002,36 @@
      "tool": "watches_pause"
     },
     {
+     "summary": "How right the watch's cheap stages are, to tune it with: every stage that decides (the free change check, the sound match, the paid model, the paid cap) keeps a small record per reading on the phone (no photos or sound, 30 days, at most 20000). A sample of the readings the free stage answered is asked of the paid model anyway (audit_share, default 1 in 50, never below 1 in 200, paid and counted like any check), and this reports how often they disagreed",
+     "path": "/v1/watches/{id}/calibration",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-watches-id-calibration.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-watches-id-calibration.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration"
+    },
+    {
+     "summary": "Set how often the paid model audits the free stage's answers for this watch",
+     "path": "/v1/watches/{id}/calibration/settings",
+     "method": "PUT",
+     "documentation": "https://bridgit.cc/learn/operations/put-v1-watches-id-calibration-settings.json",
+     "operation_url": "https://bridgit.cc/learn/operations/put-v1-watches-id-calibration-settings.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration_settings_put"
+    },
+    {
+     "summary": "Reset this watch's audit share to the default",
+     "path": "/v1/watches/{id}/calibration/settings",
+     "method": "DELETE",
+     "documentation": "https://bridgit.cc/learn/operations/delete-v1-watches-id-calibration-settings.json",
+     "operation_url": "https://bridgit.cc/learn/operations/delete-v1-watches-id-calibration-settings.json",
+     "control_scope": null,
+     "requires_power": null,
+     "tool": "watches_calibration_settings_delete"
+    },
+    {
      "summary": "The library of common picture situations a watch can count (dog licking itself, pot boiling over, sunlight in the room, ...): send one as situation in POST /v1/watches, or describe your own in words",
      "path": "/v1/situations",
      "method": "GET",
@@ -7953,8 +8073,8 @@
   "kind": "source_generated",
   "released": "Check public updater manifest; source documentation is not release evidence."
  },
- "documentation_revision": 138,
- "api_revision": 154,
+ "documentation_revision": 139,
+ "api_revision": 155,
  "installed_api_revision": null,
  "categories": [
   "sense",

@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 154). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 155). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,11 +14,12 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 154 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 155 (Bridgit 2.0 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 154
-- Email preview: render the styled HTML email (Bridgit's card design by default, or plain) and its plain-text alternative from text, markdown or your own HTML, without sending anything. Sending comes later (`/v1/email/preview`)
+## New in revision 155
+- Calibration (A0047): each watch keeps a small decision record per stage per reading on the phone (no media, 30 days), audits a sample of its free answers with the paid model (default 1 in 50, never below 1 in 200), and reports volume, cost, reuse, the audited miss rate with its interval, agreement by confidence band and the same by camera, hour and light (`/v1/watches/{id}/calibration`)
+- Set or reset a watch's audit share (`/v1/watches/{id}/calibration/settings`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -1829,6 +1830,25 @@ Body (JSON): `paused` (required) true pauses, false resumes.
 Returns: watch metadata including user_paused; watch.paused/watch.resumed events.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/watches/w123/pause {"paused":true}`
+
+### `GET /v1/watches/{id}/calibration`
+How right the watch's cheap stages are, to tune it with: every stage that decides (the free change check, the sound match, the paid model, the paid cap) keeps a small record per reading on the phone (no photos or sound, 30 days, at most 20000). A sample of the readings the free stage answered is asked of the paid model anyway (audit_share, default 1 in 50, never below 1 in 200, paid and counted like any check), and this reports how often they disagreed.
+Query: `days` The window, 1-30 days (default 7).
+Returns: watch_id, label, task (the question the records are about), current {model, interval_s, local, max_paid_per_hour}, window_days, since, records, readings, settings {audit_share, audit_share_set, audit_share_default, audit_share_min, audit_share_max, keep_days, max_records}, stages [{stage: change_gate|sound_match|model|paid_cap|camera, service, count, decided, cost_usd, latency_ms_p50}], reuse {free_checks, answered_free, share}, audit {due, done, skipped, skipped_because, agreed, misses, miss_rate, miss_rate_interval_95 [low, high]}, calibration [{band (the reused answer's confidence), free_answers, audited, agreed, agreement}], health {no_photo, over_paid_cap, <model error>, dark_records}, by {camera, hour, light: {<key>: {decisions, audited, misses, miss_rate}}}, labels {sources, about}, notes [plain hints with their numbers]. A miss is an audit whose paid answer differed from the reused one; it can't show where the paid model itself is wrong. Change the watch with the routes you made it with.
+Example: `GET /v1/watches/w0123456789ab/calibration?days=7`
+
+### `PUT /v1/watches/{id}/calibration/settings`
+Set how often the paid model audits the free stage's answers for this watch.
+Body (JSON): `audit_share` (required) Share of free answers to audit, 0.005-0.5 (default 0.02); null resets it. Below 0.005 is refused: the audit is how misses are measured. Audits are paid and stay under max_paid_per_hour and the budget.
+Returns: watch_id, audit_share, audit_share_set, audit_share_default, audit_share_min, audit_share_max, keep_days, max_records.
+Accepts `Idempotency-Key`.
+Example: `PUT /v1/watches/w0123456789ab/calibration/settings {"audit_share":0.05}`
+
+### `DELETE /v1/watches/{id}/calibration/settings`
+Reset this watch's audit share to the default.
+Returns: the settings, as PUT returns them.
+Accepts `Idempotency-Key`.
+Example: `DELETE /v1/watches/w0123456789ab/calibration/settings`
 
 ### `GET /v1/situations`
 The library of common picture situations a watch can count (dog licking itself, pot boiling over, sunlight in the room, ...): send one as situation in POST /v1/watches, or describe your own in words.

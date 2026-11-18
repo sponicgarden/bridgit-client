@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 154. Full index: https://bridgit.cc/learn/index.json.
+API revision 155. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -304,6 +304,9 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `watches_stop` | `DELETE /v1/watches/{id}` | Stop a watch (you get a watch.ended event with reason deleted) |
 | `watches_tally` | `GET /v1/watches/{id}/tally` | A tally watch's counts: today, the last 7 days, what's going on now, typical gaps, rules, and the episodes |
 | `watches_pause` | `POST /v1/watches/{id}/pause` | Pause or resume your watch without losing its tally; expiry is unchanged |
+| `watches_calibration` | `GET /v1/watches/{id}/calibration` | How right the watch's cheap stages are, to tune it with: every stage that decides (the free change check, the sound match, the paid model, the paid cap) keeps a small record per reading on the phone (no photos or sound, 30 days, at most 20000). A sample of the readings the free stage answered is asked of the paid model anyway (audit_share, default 1 in 50, never below 1 in 200, paid and counted like any check), and this reports how often they disagreed |
+| `watches_calibration_settings_put` | `PUT /v1/watches/{id}/calibration/settings` | Set how often the paid model audits the free stage's answers for this watch |
+| `watches_calibration_settings_delete` | `DELETE /v1/watches/{id}/calibration/settings` | Reset this watch's audit share to the default |
 | `situations` | `GET /v1/situations` | The library of common picture situations a watch can count (dog licking itself, pot boiling over, sunlight in the room, ...): send one as situation in POST /v1/watches, or describe your own in words |
 | `outbound_list` | `GET /v1/outbound` | Every call this phone made to a server off the device: destination, purpose, which agent caused it, the data categories sent, bytes, status, time, and a redacted preview of what was sent and received |
 | `outbound_summary` | `GET /v1/outbound/summary` | Analysis of what left the phone, in one call: a plain-language headline, totals, trends by hour or day, the biggest destinations, agents and calls, destinations first seen in the window, failures, and for each destination the data categories, purposes and agents it received |

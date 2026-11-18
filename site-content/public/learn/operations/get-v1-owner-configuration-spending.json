@@ -1,6 +1,6 @@
 {
- "documentation_revision": 137,
- "api_revision": 153,
+ "documentation_revision": 138,
+ "api_revision": 154,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read the spending core: whether it is on (owner setting spending.core_enabled), which namespaces this build has, and for namespace=sandbox its switches, journal state and time anchor. With no namespace it answers for live, which is not available yet",

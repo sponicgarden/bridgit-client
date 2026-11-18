@@ -700,6 +700,9 @@ object ApiChanges {
         Revision(153, "1.8.0", "2026-11-12", listOf(
             Item("The published build can't turn security.approvers_enabled on yet: the write answers platform_unsupported with reason not_available_in_this_build and remaining_step, and nothing in that write is applied. GET /v1/owner/configuration/approvers and the setting's row in GET /v1/owner/configuration say can_enable and enable_blocked_reason. Turning it off is unchanged; test builds can turn it on", "/v1/owner/configuration/settings"),
         )),
+        Revision(154, "1.8.0", "2026-11-18", listOf(
+            Item("Email preview: render the styled HTML email (Bridgit's card design by default, or plain) and its plain-text alternative from text, markdown or your own HTML, without sending anything. Sending comes later", "/v1/email/preview"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

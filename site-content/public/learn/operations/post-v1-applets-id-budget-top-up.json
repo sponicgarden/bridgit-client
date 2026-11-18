@@ -1,6 +1,6 @@
 {
- "documentation_revision": 137,
- "api_revision": 153,
+ "documentation_revision": 138,
+ "api_revision": 154,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Add money to one limit of an installed applet for the current period only (it ends at the reset); stopped checks resume at once",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 137,
- "api_revision": 153,
+ "documentation_revision": 138,
+ "api_revision": 154,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read what was spent in a namespace: per budget the portion, what is used and when it resets; per source the counts and amounts by state. It answers from the device's journal, with its age",

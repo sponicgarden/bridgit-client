@@ -36,6 +36,8 @@ object ApiAccess {
         "notifications", "ocr", "outbound", "owner_features", "phone", "platform", "portal", "ring", "schedule",
         "screen", "screen_share", "sensors", "settings", "shares", "sounds", "speaker", "ssh", "status", "tour",
         "usage", "video", "wakewords", "watches", "weather",
+        // 57 on: appended.
+        "email",
     )
     const val PLATFORM = "platform"
 

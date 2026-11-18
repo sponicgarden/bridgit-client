@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 153. Full index: https://bridgit.cc/learn/index.json.
+API revision 154. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -308,6 +308,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `outbound_list` | `GET /v1/outbound` | Every call this phone made to a server off the device: destination, purpose, which agent caused it, the data categories sent, bytes, status, time, and a redacted preview of what was sent and received |
 | `outbound_summary` | `GET /v1/outbound/summary` | Analysis of what left the phone, in one call: a plain-language headline, totals, trends by hour or day, the biggest destinations, agents and calls, destinations first seen in the window, failures, and for each destination the data categories, purposes and agents it received |
 | `outbound_entry` | `GET /v1/outbound/{id}` | One outbound entry with its previews |
+| `email_preview` | `POST /v1/email/preview` | Render an email without sending it: the subject, the styled HTML (Bridgit's card design by default) and the plain-text alternative. Nothing leaves the phone |
 | `portal_snapshot` | `GET /v1/portal/snapshot` | Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only. |
 | `portal_home` | `GET /v1/portal/home` | The phone's Home: device, battery, connections, every Home feature with its state, what's listening, and the APK's navigation. For the owner's Bridgit app on iPhone & iPad, over the relay; read-only. |
 | `portal_devices` | `GET /v1/portal/devices` | Remembered devices on the phone's current network, the same payload as GET /v1/lan/discovered; no scan, no switch needed (like the phone's Network devices screen). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only. |

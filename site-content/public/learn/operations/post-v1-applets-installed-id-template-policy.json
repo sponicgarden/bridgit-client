@@ -1,6 +1,6 @@
 {
- "documentation_revision": 137,
- "api_revision": 153,
+ "documentation_revision": 138,
+ "api_revision": 154,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Track, pause template updates, or detach and repurpose your applet; never pauses execution or deletes data. Detached copies cannot silently reattach",

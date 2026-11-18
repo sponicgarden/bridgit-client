@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 153). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 154). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,11 +14,11 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 153 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 154 (Bridgit 1.8 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 153
-- The published build can't turn security.approvers_enabled on yet: the write answers platform_unsupported with reason not_available_in_this_build and remaining_step, and nothing in that write is applied. GET /v1/owner/configuration/approvers and the setting's row in GET /v1/owner/configuration say can_enable and enable_blocked_reason. Turning it off is unchanged; test builds can turn it on (`/v1/owner/configuration/settings`)
+## New in revision 154
+- Email preview: render the styled HTML email (Bridgit's card design by default, or plain) and its plain-text alternative from text, markdown or your own HTML, without sending anything. Sending comes later (`/v1/email/preview`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -1851,6 +1851,12 @@ Example: `GET /v1/outbound/summary?period=today`
 One outbound entry with its previews.
 Returns: the entry.
 Example: `GET /v1/outbound/412`
+
+### `POST /v1/email/preview`
+Render an email without sending it: the subject, the styled HTML (Bridgit's card design by default) and the plain-text alternative. Nothing leaves the phone.
+Body (JSON): `subject` (required) 1-200 characters, one line; `text` Plain text body (up to 100 KB); `markdown` Markdown body: headings, bold, italic, links, lists, code (up to 100 KB); `html` Your own HTML body (up to 100 KB); scripts, iframes, forms, event handlers, remote styles and javascript: links are removed; `style` card (default): framed in the Bridgit card; plain: your body without the frame; `to` Optional recipients to check (1-20 addresses); nothing is sent to them.
+Returns: subject, style, html, text, html_bytes, to[] (when given, cleaned and de-duplicated), sent: false.
+Example: `POST /v1/email/preview {"subject": "Front door", "markdown": "**Someone** is at the door."}`
 
 ### `GET /v1/portal/snapshot`
 Home, agents, applets and the newest log entries in one call (saves relay quota). For the owner's Bridgit app on iPhone & iPad, over the relay; read-only..

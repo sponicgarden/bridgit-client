@@ -519,6 +519,25 @@
         }
       ]
     },
+    "v1.email": {
+      "runtime_id": "email",
+      "implemented": true,
+      "supported": true,
+      "enabled": true,
+      "ready": true,
+      "agent_allowed": false,
+      "callable": false,
+      "blocked_reason": "agent_not_allowed",
+      "constraints": {
+        "execution": []
+      },
+      "operations": [
+        {
+          "method": "POST",
+          "path": "\/v1\/email\/preview"
+        }
+      ]
+    },
     "v1.feedback": {
       "runtime_id": "feedback",
       "implemented": true,

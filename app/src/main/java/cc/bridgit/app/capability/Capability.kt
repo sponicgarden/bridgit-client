@@ -81,7 +81,7 @@ class Registry(app: BridgeApp) {
         cc.bridgit.app.appdevices.AppDeviceModule(app), cc.bridgit.app.lan.LanModule(app, "lan_discovery"), cc.bridgit.app.lan.LanModule(app, "lan_enrollment"), cc.bridgit.app.lan.LanModule(app, "lan_control"),
         cc.bridgit.app.lancamera.CameraAudioModule(app,"lan_camera_audio"), cc.bridgit.app.lancamera.CameraAudioModule(app,"lan_camera_speaker"),
         cc.bridgit.app.lancamera.LanCameraModule(app), StatusModule(app), CameraModule(app, this), MicModule(app, this), cc.bridgit.app.listen.WakeWordsModule(app), cc.bridgit.app.listen.SoundsModule(app), GalleryModule(app), ScreenModule(app), LogModule(app),
-        cc.bridgit.app.feedback.FeedbackModule(app), cc.bridgit.app.judgment.JudgmentModule(app), cc.bridgit.app.watch.WatchModule(app), cc.bridgit.app.outbound.OutboundModule(app),
+        cc.bridgit.app.feedback.FeedbackModule(app), cc.bridgit.app.judgment.JudgmentModule(app), cc.bridgit.app.watch.WatchModule(app), cc.bridgit.app.outbound.OutboundModule(app), cc.bridgit.app.email.EmailModule(app),
         cc.bridgit.app.interact.InteractionModule(app),
         LocationModule(app), cc.bridgit.app.weather.WeatherModule(app), SpeakerModule(app), cc.bridgit.app.tour.TourModule(app),
         cc.bridgit.app.planned.ScreenShareModule(app),

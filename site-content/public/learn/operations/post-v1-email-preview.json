@@ -1,0 +1,99 @@
+{
+ "documentation_revision": 138,
+ "api_revision": 154,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Render an email without sending it: the subject, the styled HTML (Bridgit's card design by default) and the plain-text alternative. Nothing leaves the phone",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "email_preview",
+  "query": [],
+  "control_scope": null,
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "subject",
+    "description": "1-200 characters, one line",
+    "type": "string",
+    "required": true
+   },
+   {
+    "name": "text",
+    "description": "Plain text body (up to 100 KB)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "markdown",
+    "description": "Markdown body: headings, bold, italic, links, lists, code (up to 100 KB)",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "html",
+    "description": "Your own HTML body (up to 100 KB); scripts, iframes, forms, event handlers, remote styles and javascript: links are removed",
+    "type": "string",
+    "required": false
+   },
+   {
+    "name": "style",
+    "description": "card (default): framed in the Bridgit card; plain: your body without the frame",
+    "type": "string",
+    "required": false,
+    "enum": [
+     "card",
+     "plain"
+    ]
+   },
+   {
+    "name": "to",
+    "description": "Optional recipients to check (1-20 addresses); nothing is sent to them",
+    "type": "array",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/email/preview {\"subject\": \"Front door\", \"markdown\": \"**Someone** is at the door.\"}",
+  "idempotent": false,
+  "path": "/v1/email/preview",
+  "capability": "email",
+  "returns": "subject, style, html, text, html_bytes, to[] (when given, cleaned and de-duplicated), sent: false",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "subject": {
+     "description": "1-200 characters, one line",
+     "type": "string"
+    },
+    "markdown": {
+     "description": "Markdown body: headings, bold, italic, links, lists, code (up to 100 KB)",
+     "type": "string"
+    },
+    "html": {
+     "description": "Your own HTML body (up to 100 KB); scripts, iframes, forms, event handlers, remote styles and javascript: links are removed",
+     "type": "string"
+    },
+    "style": {
+     "description": "card (default): framed in the Bridgit card; plain: your body without the frame",
+     "type": "string",
+     "enum": [
+      "card",
+      "plain"
+     ]
+    },
+    "text": {
+     "description": "Plain text body (up to 100 KB)",
+     "type": "string"
+    },
+    "to": {
+     "description": "Optional recipients to check (1-20 addresses); nothing is sent to them",
+     "type": "array",
+     "items": {"type": "object"}
+    }
+   },
+   "required": ["subject"]
+  },
+  "errors": ["invalid_parameter"],
+  "requires": null
+ }
+}

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 137,
- "api_revision": 153,
+ "documentation_revision": 138,
+ "api_revision": 154,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Top a budget up for the current period only: an increment with an id that raises this device's portion by its amount, applied once per Idempotency-Key, and under an agent ceiling drawn from this device's headroom balance; explicit owner.configuration grant required",

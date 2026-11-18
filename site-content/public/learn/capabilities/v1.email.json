@@ -1,0 +1,35 @@
+{
+ "detail_url": "/v1/discover?id=v1.email&detail=full",
+ "kind": "capability",
+ "documentation": "https://bridgit.cc/learn/capabilities/v1.email.json",
+ "title": "email",
+ "public_detail_url": "https://bridgit.cc/learn/capabilities/v1.email.json",
+ "prerequisites": ["Check v1.email supported, enabled, granted and ready; execute only with all required authorization."],
+ "combinations": [],
+ "operations": [{
+  "summary": "Render an email without sending it: the subject, the styled HTML (Bridgit's card design by default) and the plain-text alternative. Nothing leaves the phone",
+  "path": "/v1/email/preview",
+  "method": "POST",
+  "documentation": "https://bridgit.cc/learn/operations/post-v1-email-preview.json",
+  "operation_url": "https://bridgit.cc/learn/operations/post-v1-email-preview.json",
+  "control_scope": null,
+  "requires_power": null,
+  "tool": "email_preview"
+ }],
+ "documentation_revision": 138,
+ "api_revision": 154,
+ "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
+ "examples_url": null,
+ "id": "v1.email",
+ "state": {
+  "ready": null,
+  "blockers": ["device_state_unknown"],
+  "enabled": null,
+  "supported": null,
+  "granted": null
+ },
+ "detail": "full",
+ "installed_api_revision": null,
+ "category": "interact",
+ "capability_ids": ["v1.email"]
+}

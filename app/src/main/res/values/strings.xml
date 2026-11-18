@@ -160,6 +160,8 @@
     <string name="cap_feedback_desc">Bug reports and feature requests</string>
     <string name="cap_judgment">Decisions (Jev)</string>
     <string name="cap_outbound">Sent off the phone</string>
+    <string name="cap_email">Email</string>
+    <string name="cap_email_desc">Preview the styled email an agent would send; nothing is sent yet</string>
     <string name="cap_outbound_desc">A log of every call to a server off the phone: where, why, which control agent, what data</string>
     <string name="cap_watches">Watches</string>
     <string name="cap_watches_desc">Control agents get a callback when Jev decides the phone\'s readings answer their question, like \"on a bicycle?\"</string>

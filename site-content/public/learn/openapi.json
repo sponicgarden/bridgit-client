@@ -11321,6 +11321,54 @@
    },
    "tags": ["phone"]
   }},
+  "/v1/email/preview": {"post": {
+   "summary": "Render an email without sending it: the subject, the styled HTML (Bridgit's card design by default) and the plain-text alternative. Nothing leaves the phone",
+   "requestBody": {"content": {"application/json": {"schema": {
+    "type": "object",
+    "properties": {
+     "subject": {
+      "description": "1-200 characters, one line",
+      "type": "string"
+     },
+     "markdown": {
+      "description": "Markdown body: headings, bold, italic, links, lists, code (up to 100 KB)",
+      "type": "string"
+     },
+     "html": {
+      "description": "Your own HTML body (up to 100 KB); scripts, iframes, forms, event handlers, remote styles and javascript: links are removed",
+      "type": "string"
+     },
+     "style": {
+      "description": "card (default): framed in the Bridgit card; plain: your body without the frame",
+      "type": "string",
+      "enum": [
+       "card",
+       "plain"
+      ]
+     },
+     "text": {
+      "description": "Plain text body (up to 100 KB)",
+      "type": "string"
+     },
+     "to": {
+      "description": "Optional recipients to check (1-20 addresses); nothing is sent to them",
+      "type": "array",
+      "items": {"type": "object"}
+     }
+    },
+    "required": ["subject"]
+   }}}},
+   "operationId": "postEmailPreview",
+   "responses": {
+    "200": {"description": "subject, style, html, text, html_bytes, to[] (when given, cleaned and de-duplicated), sent: false"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
+    "401": {"description": "unauthorized"}
+   },
+   "tags": ["email"]
+  }},
   "/v1/satellites": {"get": {
    "summary": "The satellites (other Bridgit phones linked to this one) you may use, with what each offers. Any call takes header X-Bridgit-Target: <satellite id> (or query target=<id>) to run on that satellite instead of this phone; leave it out to use this phone.",
    "operationId": "getSatellites",
@@ -14052,7 +14100,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 153,
+  "x-api-revision": 154,
   "title": "Bridgit",
   "version": "1.8.0"
  }

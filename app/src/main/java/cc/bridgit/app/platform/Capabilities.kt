@@ -56,7 +56,10 @@ object Capabilities {
         if (!on) app.platform.invalidateScope(id)
         if (legacy == null) app.authority.switchChanged(id, on) // legacy switches report through Settings.onSwitch
     }
+    private fun visualUnavailable(app: BridgeApp, id: String) = cc.bridgit.app.headless.HeadlessMode.active(app) &&
+        id in setOf("interactions", "screen.observe", "screen.control")
     fun blockers(app: BridgeApp, cap: DeviceCapability): List<String> = buildList {
+        if (visualUnavailable(app, cap.id)) add("display_unavailable")
         if (cap.privateOnly && !BuildConfig.PRIVATE_CONTROL) add("private_build_required")
         if (!enabled(app,cap.id)) add("feature_disabled")
         if (cap.permission != null && !app.granted(cap.permission) && !(cap.id == "gallery.read" && Gallery(app).accessMode() != null)) add("permission_required")
@@ -75,7 +78,7 @@ object Capabilities {
         .put("app_version",BuildConfigInfo.versionName(app)).put("mode",if (BuildConfig.PRIVATE_CONTROL) "private" else "play")
         .put("grant_mode", if (app.agents.get(agent.id)?.maximumControl == true) "maximum" else "limited")
         .put("services",cc.bridgit.app.judgment.ServiceCatalog.links()).put("epoch",app.platform.epoch).put("capabilities",JSONArray(all.map { cap ->
-            JSONObject().put("id",cap.id).put("label",cap.label).put("version",1).put("supported",!cap.privateOnly || BuildConfig.PRIVATE_CONTROL)
+            JSONObject().put("id",cap.id).put("label",cap.label).put("version",1).put("supported",(!cap.privateOnly || BuildConfig.PRIVATE_CONTROL) && !visualUnavailable(app, cap.id))
                 .put("enabled",enabled(app,cap.id)).put("granted",app.platform.hasGrant(agent.id,cap.id))
                 .put("grant_lifetime", if (!grants.has(cap.id)) JSONObject.NULL else if (grants.optLong(cap.id) == Long.MAX_VALUE) "until_revoked" else "timed")
                 .put("grant_expires_at", if (!grants.has(cap.id) || grants.optLong(cap.id) == Long.MAX_VALUE) JSONObject.NULL else grants.getLong(cap.id))

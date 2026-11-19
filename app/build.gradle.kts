@@ -204,9 +204,9 @@ tasks.matching { it.name.startsWith("merge") && it.name.endsWith("AndroidTestAss
     .configureEach { dependsOn(prepareAppletDeviceFixtures) }
 
 val copyHelper by tasks.registering(Copy::class) {
-    from(rootProject.file("tools/bridgit"))
+    from(rootProject.file("tools/bridgit")) { rename { "bridgit-helper.py" } }
+    from(rootProject.file("tools/headless-setup.py"))
     into(layout.buildDirectory.dir("generated/helperAssets"))
-    rename { "bridgit-helper.py" }
 }
 // GET /v1/demo serves the first-run tour. site-content/public/demo/SKILL.md is the single source (the website
 // hosts the same file); this copies it into the APK's assets at build time.

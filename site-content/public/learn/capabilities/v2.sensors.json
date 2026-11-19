@@ -15,8 +15,8 @@
   "required_arguments": [],
   "tool": "sensors.read"
  }],
- "documentation_revision": 139,
- "api_revision": 155,
+ "documentation_revision": 141,
+ "api_revision": 157,
  "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
  "examples_url": null,
  "id": "v2.sensors",

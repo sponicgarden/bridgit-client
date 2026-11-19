@@ -1,6 +1,6 @@
 {
- "documentation_revision": 139,
- "api_revision": 155,
+ "documentation_revision": 141,
+ "api_revision": 157,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Create an owner budget. This device is its executor and holds the whole amount as a standing share. Needs the Budgets capability; explicit owner.configuration grant required",

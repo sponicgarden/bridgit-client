@@ -1,6 +1,6 @@
 {
- "documentation_revision": 139,
- "api_revision": 155,
+ "documentation_revision": 141,
+ "api_revision": 157,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Read the spend journal of a namespace: entries of the current epoch (or another) in order, as entry/1. It answers from the device, with or without a network",

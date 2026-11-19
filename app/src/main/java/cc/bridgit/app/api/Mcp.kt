@@ -86,7 +86,8 @@ class McpDispatch(private val api: ApiServer) {
                     val err = ErrorCatalog.error("invalid_parameter", e.message ?: "Bad arguments.")
                     return McpProtocol.result(m.id, McpTools.result(err.http, "application/json", err.toJson(r.requestId).toString().toByteArray()))
                 }
-                val out = api.dispatch(spec, agent, r.source, routed.queries, routed.pathParams, routed.body, routed.idempotencyKey)
+                val out = api.dispatch(cc.bridgit.app.core.request.CoreRequest.inProcess(cc.bridgit.app.core.request.CoreRequest.MCP, spec.method, spec.fullPath, r.source, routed.idempotencyKey),
+                    spec, agent, routed.queries, routed.pathParams, routed.body, via = "mcp")
                 McpProtocol.result(m.id, McpTools.result(out.status, out.contentType, out.bytes, out.headers,
                     McpTools.downloadUri(api.app.address().baseUrl, spec, routed.pathParams, routed.queries)))
             }
@@ -101,7 +102,8 @@ class McpDispatch(private val api: ApiServer) {
             catch (e: CardActions.Refused) { return McpApps.actResult(McpApps.refusedAct(e)) }
         // The card's id goes in the log only when the card is this agent's own.
         val card = args.optLong("interaction_id", 0L).takeIf { it > 0 && api.app.interactions.get(it)?.agentId == agent.id }
-        val out = api.dispatch(spec, agent, card?.let { "${r.source} card:$it" } ?: r.source, call.query, params, call.body, null, via = "mcp_app")
+        val out = api.dispatch(cc.bridgit.app.core.request.CoreRequest.inProcess(cc.bridgit.app.core.request.CoreRequest.MCP, spec.method, spec.fullPath, card?.let { "${r.source} card:$it" } ?: r.source, null),
+            spec, agent, call.query, params, call.body, via = "mcp_app")
         return McpApps.actResult(CardActions.result(out.status, out.contentType, out.bytes))
     }
 

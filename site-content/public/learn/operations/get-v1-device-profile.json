@@ -1,6 +1,6 @@
 {
- "documentation_revision": 139,
- "api_revision": 155,
+ "documentation_revision": 141,
+ "api_revision": 157,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "This device in one answer, the same shape on every Bridgit platform: what it is, whether it is online, every capability with why it can or can't be called now, and the set-up steps with their state",

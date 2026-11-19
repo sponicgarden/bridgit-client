@@ -16,7 +16,7 @@
  ],
  "operations": [
   {
-   "summary": "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
+   "summary": "Requires a usable display; headless devices return not_supported (reason display_unavailable) without creating an interaction. Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
    "path": "/v1/interactions",
    "method": "POST",
    "documentation": "https://bridgit.cc/learn/operations/post-v1-interactions.json",
@@ -96,8 +96,8 @@
    "tool": "callback_test"
   }
  ],
- "documentation_revision": 139,
- "api_revision": 155,
+ "documentation_revision": 141,
+ "api_revision": 157,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.interactions",

@@ -55,20 +55,71 @@ object LinkRelayClient {
      * removed it); an unreachable device throws satellite_offline, never "gone".
      */
     fun job(base: String, token: String, method: String, path: String, body: JSONObject?, readS: Long = 15): Pair<Int, JSONObject> {
-        require(isRelay(base) && path.startsWith("/v1/")) { "Not a relay link call" }
-        val wait = readS.coerceIn(5, 25)
         val req = JSONObject().put("method", method).put("path", path)
         if (body != null) req.put("body", body)
+        val (code, text) = sendJob(base, token, req, readS, cc.bridgit.app.outbound.Outbound.Actor.PHONE)
+        return decode(code, text)
+    }
+
+    /** Sends one job carrying [req] and waits for its answer: the relay's (status, text). */
+    private fun sendJob(base: String, token: String, req: JSONObject, readS: Long, actor: cc.bridgit.app.outbound.Outbound.Actor): Pair<Int, String> {
+        require(isRelay(base) && req.optString("path").startsWith("/v1/")) { "Not a relay link call" }
+        val wait = readS.coerceIn(5, 25)
         val job = JSONObject().put("deadline", System.currentTimeMillis() + (wait + 10) * 1000).put("request", req).toString()
-        var (code, text) = send("$base/jobs?wait=$wait", token, job)
+        var (code, text) = send("$base/jobs?wait=$wait", token, job, actor)
         var polls = 0
         while (code == 202 && polls++ < 5) {
             val id = runCatching { JSONObject(text).getString("job_id") }.getOrNull()?.takeIf { Regex("[A-Za-z0-9_-]{1,128}").matches(it) } ?: break
             if (transport == null) Thread.sleep(2000)
-            val r = send("$base/jobs/$id", token, null)
+            val r = send("$base/jobs/$id", token, null, actor)
             code = r.first; text = r.second
         }
-        return decode(code, text)
+        return code to text
+    }
+
+    // ---- Agent calls forwarded over the relay (A0335, docs/spec-linked-bridgits.md LNK-51) ----------------------
+
+    /** The only request headers a forwarded job carries: who it is for. Never a target, so a call passes on once (LNK-32). */
+    val FORWARD_HEADERS = setOf(SatellitePolicy.ON_BEHALF_HEADER, SatellitePolicy.ON_BEHALF_RUNTIME_HEADER, "Accept")
+
+    /** The other device's answer to a forwarded call, unchanged. */
+    class Answer(val status: Int, val contentType: String, val bytes: ByteArray, val headers: Map<String, String>)
+
+    /**
+     * The job request for an agent call forwarded to the linked Bridgit: method, path, query (without target), the
+     * allowlisted [headers], the JSON [body] and the forwarded idempotency key. Pure, so tests pin it down.
+     */
+    fun forwardRequest(method: String, path: String, query: List<Pair<String, String>>, headers: List<Pair<String, String>>,
+                       body: JSONObject?, idempotencyKey: String?): JSONObject {
+        val req = JSONObject().put("method", method).put("path", path)
+        val q = JSONObject(); query.forEach { (k, v) -> if (k != SatellitePolicy.TARGET_QUERY) q.put(k, v) }
+        if (q.length() > 0) req.put("query", q)
+        val h = JSONObject()
+        headers.forEach { (k, v) -> FORWARD_HEADERS.firstOrNull { it.equals(k, ignoreCase = true) }?.let { h.put(it, v) } }
+        if (h.length() > 0) req.put("headers", h)
+        if (body != null) req.put("body", body)
+        idempotencyKey?.let { req.put("idempotency_key", it) }
+        return req
+    }
+
+    /** Blocking. Runs [req] on the linked Bridgit at [base] for [actor]. Relay-level refusals throw [SatelliteClient.Failure]. */
+    fun forward(base: String, token: String, req: JSONObject, actor: cc.bridgit.app.outbound.Outbound.Actor, readS: Long = 25): Answer {
+        val (code, text) = sendJob(base, token, req, readS, actor)
+        return decodeAnswer(code, text)
+    }
+
+    /** The relay's answer to a forwarded job as the other device gave it, or the same [SatelliteClient.Failure]s as [decode]. */
+    fun decodeAnswer(code: Int, text: String): Answer {
+        val o = runCatching { JSONObject(text) }.getOrNull() ?: JSONObject()
+        val resp = o.optJSONObject("response") ?: run { decode(code, text); throw SatelliteClient.Failure("http_$code", "The relay answered HTTP $code.", code) }
+        val bytes = when {
+            resp.has("body_base64") -> java.util.Base64.getMimeDecoder().decode(resp.getString("body_base64"))
+            resp.has("body") -> resp.get("body").toString().toByteArray()
+            else -> ByteArray(0)
+        }
+        val headers = mutableMapOf<String, String>()
+        resp.optJSONObject("headers")?.let { h -> h.keys().forEach { k -> h.opt(k)?.takeIf { it !is JSONObject && it != JSONObject.NULL }?.let { headers[k] = it.toString() } } }
+        return Answer(resp.optInt("status", code), resp.optString("content_type").ifEmpty { "application/json" }, bytes, headers)
     }
 
     /** The relay's answer as (status, the other device's JSON), or a [SatelliteClient.Failure]. Pure, so tests pin it down. */
@@ -100,12 +151,12 @@ object LinkRelayClient {
     }
     private val JSON = "application/json".toMediaType()
 
-    private fun send(url: String, token: String, body: String?): Pair<Int, String> {
+    private fun send(url: String, token: String, body: String?, actor: cc.bridgit.app.outbound.Outbound.Actor): Pair<Int, String> {
         transport?.let { return it(url, token, body) }
         val b = Request.Builder().url(url).header("Authorization", "Bearer $token")
         if (body != null) b.post(body.toRequestBody(JSON)) else b.get()
         return try {
-            cc.bridgit.app.outbound.Outbound.on(cc.bridgit.app.outbound.Outbound.Actor.PHONE) {
+            cc.bridgit.app.outbound.Outbound.on(actor) {
                 http.newCall(b.build()).execute().use { r -> r.code to (r.body?.string().orEmpty()) }
             }
         } catch (e: java.io.IOException) {

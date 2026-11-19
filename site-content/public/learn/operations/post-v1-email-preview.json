@@ -1,6 +1,6 @@
 {
- "documentation_revision": 139,
- "api_revision": 155,
+ "documentation_revision": 141,
+ "api_revision": 157,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Render an email without sending it: the subject, the styled HTML (Bridgit's card design by default) and the plain-text alternative. Nothing leaves the phone",

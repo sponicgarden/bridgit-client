@@ -1136,6 +1136,9 @@
     "display_unavailable": {
       "http": 503,
       "platforms": {
+        "android": [
+          403
+        ],
         "apple": [
           503
         ]

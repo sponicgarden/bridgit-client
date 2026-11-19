@@ -1,5 +1,5 @@
 {
- "api_revision": 155,
+ "api_revision": 157,
  "changes": [
   {
    "date": "2026-10-27",
@@ -2549,6 +2549,44 @@
     }
    ],
    "revision": 155
+  },
+  {
+   "date": "2026-11-18",
+   "app_version": "2.0.0",
+   "items": [
+    {
+     "endpoint": null,
+     "what": "Linked Bridgits reached only over the relay: a call naming target= now runs there (JSON bodies; raw uploads still need Tailscale, reason relay_binary) instead of answering relay_only"
+    },
+    {
+     "endpoint": null,
+     "what": "Both devices' logs name the agent a linked call was for, with the model and harness it reported, and the device it came through"
+    }
+   ],
+   "revision": 156
+  },
+  {
+   "date": "2026-11-19",
+   "app_version": "2.0.0",
+   "items": [
+    {
+     "endpoint": "/v1/settings",
+     "what": "Headless Android mode: device.presentation is auto or headless, with authenticated read/write and reset to auto. Devices without a usable display start without WebView or native screens"
+    },
+    {
+     "endpoint": "/v1/health",
+     "what": "Health reports presentation and distinguishes USB loopback from Tailscale binding. USB HTTP/MCP requires the same keys and grants; no initial authority is created automatically"
+    },
+    {
+     "endpoint": "/v1/tools/headless-setup",
+     "what": "Owner USB enrollment helper, with explicit owner confirmation and private credential storage"
+    },
+    {
+     "endpoint": "/v1/interactions",
+     "what": "Headless devices refuse visual cards/text/screen capture before queuing them; use available microphone/speaker APIs"
+    }
+   ],
+   "revision": 157
   }
  ],
  "links": {

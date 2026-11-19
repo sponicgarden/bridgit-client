@@ -26,6 +26,8 @@ object SatellitePolicy {
     const val TARGET_HEADER = "X-Bridgit-Target"
     const val TARGET_QUERY = "target"
     const val ON_BEHALF_HEADER = "X-Bridgit-On-Behalf-Of"
+    /** The forwarding agent's self-reported model and harness (A0304), sent only beside [ON_BEHALF_HEADER]. */
+    const val ON_BEHALF_RUNTIME_HEADER = "X-Bridgit-On-Behalf-Runtime"
     const val HUB_NAME_HEADER = "X-Bridgit-Hub-Name"
     const val RAN_ON_HEADER = "X-Bridgit-Ran-On"
     const val SAT_REQUEST_ID_HEADER = "X-Bridgit-Satellite-Request-Id"
@@ -58,9 +60,38 @@ object SatellitePolicy {
         return id to name
     }
 
+    /** The model and harness an agent reported, as the target logs them beside [ON_BEHALF_HEADER]. Unverified. */
+    data class Runtime(val model: String, val harness: String?) {
+        /** "Meta Muse, Muse Wonder", or the model alone. */
+        val label: String get() = harness?.let { "$model, $it" } ?: model
+    }
+
+    /** "model=<pct>;harness=<pct>" for [ON_BEHALF_RUNTIME_HEADER]; null when the agent reported no valid model. */
+    fun onBehalfRuntime(model: String?, harness: String?): String? {
+        val m = model?.takeIf { cc.bridgit.app.core.validModel(it) } ?: return null
+        fun enc(v: String) = java.net.URLEncoder.encode(v, "UTF-8")
+        return "model=" + enc(m) + (harness?.takeIf { cc.bridgit.app.core.validHarness(it) }?.let { ";harness=" + enc(it) } ?: "")
+    }
+
+    /** Parses [ON_BEHALF_RUNTIME_HEADER]; a malformed header or model is dropped (null), a bad harness alone is left out. */
+    fun parseOnBehalfRuntime(v: String?): Runtime? {
+        val s = v?.trim()?.takeIf { it.isNotEmpty() && it.length <= 400 } ?: return null
+        val parts = s.split(';').mapNotNull { p ->
+            val i = p.indexOf('='); if (i <= 0) return null
+            val value = runCatching { java.net.URLDecoder.decode(p.substring(i + 1), "UTF-8") }.getOrNull() ?: return null
+            p.substring(0, i).trim() to value
+        }.toMap()
+        val model = parts["model"]?.takeIf { cc.bridgit.app.core.validModel(it) } ?: return null
+        return Runtime(model, parts["harness"]?.takeIf { cc.bridgit.app.core.validHarness(it) })
+    }
+
+    /** "Muse (Meta Muse, Muse Wonder) via Pixel": who a call that came over a link was for, as both logs name it. */
+    fun attributed(name: String, runtime: Runtime?, via: String): String =
+        name + (runtime?.let { " (${it.label})" } ?: "") + " via " + via
+
     /** Request headers never sent on: the caller's key, hop-by-hop headers, and the target itself. */
     val DROPPED_REQUEST_HEADERS = setOf("authorization", "host", "connection", "content-length", "transfer-encoding",
-        "x-bridgit-target", "x-bridgit-on-behalf-of", "x-bridgit-hub-name", "idempotency-key", "keep-alive", "upgrade", "te",
+        "x-bridgit-target", "x-bridgit-on-behalf-of", "x-bridgit-on-behalf-runtime", "x-bridgit-hub-name", "idempotency-key", "keep-alive", "upgrade", "te",
         "accept-encoding")
 
     /** Response headers not copied back from the satellite (the hub sets its own). */

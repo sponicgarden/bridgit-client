@@ -238,6 +238,16 @@
    "tool": null
   },
   {
+   "summary": "Owner USB setup helper for devices without a display. Enrollment needs the owner to click its local confirmation; keys are saved privately, never printed",
+   "path": "/v1/tools/headless-setup",
+   "method": "GET",
+   "documentation": "https://bridgit.cc/learn/operations/get-v1-tools-headless-setup.json",
+   "operation_url": "https://bridgit.cc/learn/operations/get-v1-tools-headless-setup.json",
+   "control_scope": null,
+   "requires_power": null,
+   "tool": "tools_headless_setup"
+  },
+  {
    "summary": "Fetch your key with a 6-digit code shown on the phone (alternative to the setup prompt)",
    "path": "/v1/pair",
    "method": "POST",
@@ -468,8 +478,8 @@
    "tool": "owner_configuration_links_disconnect_all"
   }
  ],
- "documentation_revision": 139,
- "api_revision": 155,
+ "documentation_revision": 141,
+ "api_revision": 157,
  "boundaries": "Documented public API; owner switches, grants and runtime checks still apply.",
  "examples_url": null,
  "id": "v1.status",

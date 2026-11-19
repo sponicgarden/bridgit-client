@@ -77,6 +77,7 @@ class SettingsController(private val app: BridgeApp) {
             } ?: JSONObject.NULL
             else -> when (key) {
                 "device.name" -> app.platform.store.setting("device_name", "")
+                "device.presentation" -> cc.bridgit.app.headless.HeadlessMode.mode(app)
                 "device.resource_monitor" -> s.resourceMonitor
                 "device.resource_monitor_interval" -> s.resourceMonitorInterval
                 "listener.enabled" -> s.listenerEnabled
@@ -199,6 +200,7 @@ class SettingsController(private val app: BridgeApp) {
             key == "captures.locked_camera_approval" -> s.capturesLockedCameraApproval = value as Boolean
             key == "device.name" -> cc.bridgit.app.platform.DeviceName.set(app, value as String)
             // A0189/A0190: the monitor follows these through Settings' listener (monitor.ResourceMonitor.sync).
+            key == "device.presentation" -> cc.bridgit.app.headless.HeadlessMode.set(app, value as String)
             key == "device.resource_monitor" -> s.resourceMonitor = value as Boolean
             key == "device.resource_monitor_interval" -> s.resourceMonitorInterval = value as String
             key == "privacy.log_visibility" -> s.logVisibility = value as String

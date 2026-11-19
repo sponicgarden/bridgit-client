@@ -19,13 +19,13 @@ object ListenerReport {
         !s.running -> "stopped"
         s.bindError != null && s.boundTo.isEmpty() -> "bind_failed"
         s.boundTo.isEmpty() -> "waiting_for_tailscale"
-        current.isNotEmpty() && s.boundTo.toSet() != current.toSet() -> "rebinding"
-        current.isEmpty() -> "rebinding"
+        s.boundTo.filter(cc.bridgit.app.core.Net::isTailnet).toSet() != current.toSet() -> "rebinding"
+        current.isEmpty() && "127.0.0.1" !in s.boundTo -> "rebinding"
         else -> "listening"
     }
 
     fun json(s: BridgeApp.ListenerState, current: List<String>, port: Int, tailscaleInstalled: Boolean): JSONObject =
-        JSONObject().put("state", state(s, current)).put("binds", BINDS)
+        JSONObject().put("state", state(s, current)).put("binds", if ("127.0.0.1" in s.boundTo) { if (s.boundTo.none(cc.bridgit.app.core.Net::isTailnet)) "loopback" else "tailscale_and_loopback" } else BINDS)
             .put("bound_to", JSONArray(s.boundTo)).put("port", port)
             .put("tailscale_addresses", JSONArray(current))
             .put("on_tailnet", current.isNotEmpty())

@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 155. Full index: https://bridgit.cc/learn/index.json.
+API revision 157. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -174,6 +174,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `samples` | `GET /v1/samples` | Complete interaction samples for every kind (notice, question, html, text): the POST /v1/interactions body, the reply and the answer it produces (JSON). For cards that decide or watch (Jev, Clef, the free camera change check), read https://bridgit.cc/learn/decisions.md |
 | `registry` | `GET /v1/registry` | The API registry: every API group with its fixed name and number, its calls, and the one permission that governs them (API access, on by default, all-or-nothing for now) |
 | `changes` | `GET /v1/changes` | What's new in the API since a revision you know |
+| `tools_headless_setup` | `GET /v1/tools/headless-setup` | Owner USB setup helper for devices without a display. Enrollment needs the owner to click its local confirmation; keys are saved privately, never printed |
 | `camera_snapshot` | `POST /v1/camera/snapshot` | Take a photo now. Works while the phone is locked; if the owner turned on captures.locked_camera_approval, a locked photo first waits up to 30 s for their Allow (approval_declined otherwise) |
 | `camera_arm` | `POST /v1/camera/arm` | Open the camera ahead of a photo, so your next snapshot fires in about 0.3 s |
 | `camera_pose_start` | `POST /v1/camera/pose/start` | Track a person's body for up to 2 minutes: the phone finds 33 body points in every camera frame (ML Kit, offline and free; no picture leaves the phone). Read the frames as they come with GET /v1/camera/pose/{id} |
@@ -200,7 +201,7 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `issues_status` | `POST /v1/issues/{id}/status` | Move an issue: in_progress, fixed, wont_fix or duplicate (agents in Bridgit Fixer Mode) (Bridgit Fixer Mode) |
 | `issues_followup` | `POST /v1/issues/{id}/followup` | Follow up on an issue you filed: a note ("still happens on 1.7.2"), and once it's marked fixed, won't fix or duplicate, outcome works (closes it) or still_broken (reopens it) |
 | `issues_file` | `POST /v1/issues` | Legacy phone-local issue filing (any agent; images only in Bridgit Fixer Mode). Control agents should file issues directly with Bridgit servers: https://bridgit.cc/learn/bugs.md. Send every bug and every feature request, however small, even if you doubt we can or will do it: we'd rather triage too many than miss one |
-| `interactions_send` | `POST /v1/interactions` | Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several) |
+| `interactions_send` | `POST /v1/interactions` | Requires a usable display; headless devices return not_supported (reason display_unavailable) without creating an interaction. Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several) |
 | `interactions_list` | `GET /v1/interactions` | Your interactions, newest first |
 | `interactions_get` | `GET /v1/interactions/{id}` | One of your interactions; with wait, holds until the owner answers or closes it |
 | `interactions_cancel` | `DELETE /v1/interactions/{id}` | Cancel one of your interactions |

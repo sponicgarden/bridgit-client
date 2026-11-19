@@ -35,7 +35,7 @@ class InteractionModule(app: BridgeApp) : Capability(app) {
 
     /** D26: POST /v1/text/stream calls per agent per second. */
     private val streamLimiter = RateLimiter(windowMs = 1000)
-    override fun blockedReason(): String? = if (!app.captureNotificationsOn()) "notifications_off" else null
+    override fun blockedReason(): String? = if (cc.bridgit.app.headless.HeadlessMode.active(app)) "display_unavailable" else if (!app.captureNotificationsOn()) "notifications_off" else null
 
     private fun fail(e: InteractionError): Nothing = when (e.code) {
         "not_found" -> throw ErrorCatalog.error("not_found", e.message ?: "Not found.")
@@ -87,6 +87,7 @@ class InteractionModule(app: BridgeApp) : Capability(app) {
 
     override fun Route.install(api: ApiServer) = with(api) {
         endpoint(Endpoints.INTERACTION_CREATE) {
+            if (cc.bridgit.app.headless.HeadlessMode.active(app)) throw ErrorCatalog.error("not_supported", "This device has no visual interaction surface. Use its microphone and speaker APIs.", mapOf("reason" to "display_unavailable"))
             // CAP-34: the raw HTML size is checked before anything else.
             (body.opt("html") as? String)?.let { h ->
                 if (h.length > CardRules.HTML_MAX_BYTES || h.toByteArray(Charsets.UTF_8).size > CardRules.HTML_MAX_BYTES)
@@ -171,6 +172,7 @@ class InteractionModule(app: BridgeApp) : Capability(app) {
         }
 
         endpoint(Endpoints.INTERACTION_RENOTIFY) {
+            if (cc.bridgit.app.headless.HeadlessMode.active(app)) throw ErrorCatalog.error("not_supported", "Headless devices cannot display cards or text panels.", mapOf("reason" to "display_unavailable"))
             if (!enabled) throw ErrorCatalog.error("capability_disabled", "Interactions are switched off.")
             if (!app.captureNotificationsOn()) throw ErrorCatalog.error("notifications_required", "Bridgit's notifications are off.")
             val id = path("id")?.toLongOrNull() ?: throw ErrorCatalog.error("invalid_parameter", "id must be an interaction id.")
@@ -188,6 +190,7 @@ class InteractionModule(app: BridgeApp) : Capability(app) {
         }
 
         endpoint(Endpoints.TEXT_STREAM) {
+            if (cc.bridgit.app.headless.HeadlessMode.active(app)) throw ErrorCatalog.error("not_supported", "Headless devices cannot display cards or text panels.", mapOf("reason" to "display_unavailable"))
             val a = agent!!
             if (!streamLimiter.tryAcquire(a.id, TextPanelRules.CALLS_PER_SECOND))
                 throw ErrorCatalog.error("rate_limited", "At most ${TextPanelRules.CALLS_PER_SECOND} stream calls a second. Send bigger chunks.", mapOf("retry_after_s" to 1))

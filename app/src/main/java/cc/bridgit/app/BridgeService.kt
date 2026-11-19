@@ -153,7 +153,9 @@ class BridgeService : LifecycleService() {
             server?.maintenance()
             lifecycleScope.launch(Dispatchers.IO) { runCatching { app.usage.flushIfDue() }; runCatching { cc.bridgit.app.satellite.SatelliteHub.refreshAllIfDue(app) }; runCatching { app.hubLinks.checkHubsIfDue() }; runCatching { app.links.checkIfDue() }; runCatching { cc.bridgit.app.feedback.DeviceNames.heartbeatIfDue(app) }; runCatching { cc.bridgit.app.feedback.DeviceSpecs.syncIfDue(app) } }
             if (why != "start" && why != "periodic") delay(1500) // let the VPN settle after a change
-            val addrs = tailscaleAddresses()
+            val headless = cc.bridgit.app.headless.HeadlessMode.active(app)
+            val tailnetAddrs = tailscaleAddresses()
+            val addrs = tailnetAddrs + if (headless) listOf("127.0.0.1") else emptyList()
             val port = app.settings.port
             if (addrs != boundTo || (server != null && (server!!.port != port || !server!!.running))) {
                 server?.stop(); server = null; boundTo = emptyList()
@@ -161,7 +163,7 @@ class BridgeService : LifecycleService() {
                     try {
                         ApiServer(this, addrs, port).also { it.start(); server = it }
                         boundTo = addrs
-                        val name = reverseName(addrs.first { !Net.isIpv6(it) || addrs.size == 1 })
+                        val name = addrs.firstOrNull { Net.isTailnet(it) && !Net.isIpv6(it) }?.let(::reverseName)
                         app.updateListener { it.copy(boundTo = addrs, port = port, magicDns = name, bindError = null) }
                         app.log.system("diagnostic", "service", "Listening on ${addrs.joinToString()} port $port ($why)")
                     } catch (e: Exception) {
@@ -175,7 +177,7 @@ class BridgeService : LifecycleService() {
                 }
                 refreshNotification()
             }
-            if (addrs.isNotEmpty()) reconnect.reset() else askTailscaleToReconnect()
+            if (tailnetAddrs.isNotEmpty()) reconnect.reset() else askTailscaleToReconnect()
         }
     }
 
@@ -380,7 +382,7 @@ class BootReceiver : BroadcastReceiver() {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED && intent.action != Intent.ACTION_MY_PACKAGE_REPLACED) return
         val app = context.applicationContext as BridgeApp
         // Bridgit updated itself without Android's confirm: open it again (Android doesn't).
-        if (intent.action == Intent.ACTION_MY_PACKAGE_REPLACED) cc.bridgit.app.update.UpdateInstaller.reopenAfterSessionInstall(app)
+        if (intent.action == Intent.ACTION_MY_PACKAGE_REPLACED && !cc.bridgit.app.headless.HeadlessMode.active(app)) cc.bridgit.app.update.UpdateInstaller.reopenAfterSessionInstall(app)
         // ADB setup (8.27): Wireless debugging turns off on reboot; with the secure-settings grant Bridgit turns it back on.
         if (BuildConfig.PRIVATE_CONTROL && app.settings.isOn("adb") && cc.bridgit.app.adb.AdbGrants.holdsSecureSettings(app))
             runCatching { android.provider.Settings.Global.putInt(app.contentResolver, cc.bridgit.app.adb.AdbClient.ADB_WIFI_ENABLED, 1) }

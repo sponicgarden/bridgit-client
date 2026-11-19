@@ -51,22 +51,25 @@ class PlatformApi(private val app: BridgeApp, private val v1: cc.bridgit.app.api
     }
     private fun query(call: ApplicationCall): JSONObject = JSONObject().apply { call.request.queryParameters.entries().forEach { (k,v) -> v.firstOrNull()?.let { put(k,it.toIntOrNull() ?: it) } } }
     private fun key(call: ApplicationCall) = call.request.headers["Idempotency-Key"] ?: ""
-    private fun authenticate(call: ApplicationCall): Policy.Agent = admit(call.request.local.remoteAddress) { call.request.headers[it] }
+    private fun authenticate(call: ApplicationCall): Policy.Agent =
+        admit(cc.bridgit.app.core.request.CoreRequest(cc.bridgit.app.core.request.CoreRequest.HTTP_V2, call.request.httpMethod.value, call.request.path(), call.request.local.remoteAddress) { call.request.headers[it] })
     /**
      * The door's own checks, in order, for a request from socket peer [source] with request headers [header].
      * [authenticate] runs it for every call; the Client Core door fixtures (DoorFixturesTest) drive it directly.
      */
-    internal fun admit(source: String, header: (String) -> String?): Policy.Agent {
-        if (!cc.bridgit.app.core.Net.isTailnet(source)) throw ApiError(403,"forbidden_source","Private network only")
+    internal fun admit(r: cc.bridgit.app.core.request.CoreRequest): Policy.Agent {
+        val source = r.source
+        val header = r.header
+        if (!cc.bridgit.app.headless.HeadlessMode.accepts(app, source)) throw ApiError(403,"forbidden_source","Private network only")
         val origin=header("Origin")
         if(origin != null) throw ApiError(403,"origin_not_allowed","Browser origins cannot call the agent API")
         val src=source
         if(limiter.count("platform_auth:$src")>=5) throw ApiError(429,"rate_limited","Too many failed sign-ins")
-        val token=header("Authorization")?.takeIf { it.startsWith("Bearer ") }?.substring(7)?.trim()
+        val token=r.bearer
         val a=app.policy.authenticate(token) ?: run { limiter.record("platform_auth:$src"); throw ApiError(401,"unauthorized","Missing or invalid token") }
         if(!limiter.tryAcquire("platform_calls:${a.id}",300)) throw ApiError(429,"rate_limited","At most 300 platform requests per agent per minute")
         requireDevice(a.id,src)
-        cc.bridgit.app.api.ApiAccess.require(app.agents.get(a.id))
+        cc.bridgit.app.core.authority.Grants.requireApiAccess(app.agents.get(a.id))
         app.agents.recordUse(a.id,src)
         header("X-Bridgit-Model")?.let { m ->
             app.agents.reportModel(a.id, m, header("X-Bridgit-Harness"))

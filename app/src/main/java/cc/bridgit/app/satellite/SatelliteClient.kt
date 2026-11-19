@@ -60,7 +60,7 @@ object SatelliteClient {
     fun newCall(base: String, key: String, method: String, path: String, query: List<Pair<String, String>>,
                 headers: List<Pair<String, String>>, body: RequestBody?, toHub: Boolean = false): Call {
         paused(toHub)
-        require(!LinkRelayClient.isRelay(base)) { "Forwarded calls don't go over the relay yet" }
+        require(!LinkRelayClient.isRelay(base)) { "Relay links forward with LinkRelayClient.forward" }
         val url = base.toHttpUrl().newBuilder().encodedPath(path).apply { query.forEach { (k, v) -> addQueryParameter(k, v) } }.build()
         val b = Request.Builder().url(url).header("Authorization", "Bearer $key")
         headers.forEach { (k, v) -> b.addHeader(k, v) }
@@ -69,7 +69,7 @@ object SatelliteClient {
     }
 
     /** The owner's pause switches (More › Linked devices): no call leaves this phone for a paused side. */
-    private fun paused(toHub: Boolean) {
+    internal fun paused(toHub: Boolean) {
         if (toHub && LinkPause.hubsPaused) throw Failure("paused", LinkPause.HUBS_MESSAGE)
         if (!toHub && LinkPause.satellites) throw Failure("paused", LinkPause.SATELLITES_MESSAGE)
     }

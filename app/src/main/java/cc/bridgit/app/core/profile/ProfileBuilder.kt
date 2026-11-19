@@ -23,7 +23,15 @@ object ProfileBuilder {
                       val appVersion: String, val apiRevision: Int, val services: List<String>, val hardware: Map<String, String>)
 
     data class Capability(val id: String, val enabled: Boolean, val ready: Boolean, val agentAllowed: Boolean, val blockedReason: String?,
-                          val execution: List<String>, val operations: List<Pair<String, String>>)
+                          val execution: List<String>, val operations: List<Operation>)
+
+    /**
+     * One operation of a capability (architecture 4.5, A0333): what it asks beyond its module (a control [scope], a
+     * [power]) and, for this caller, whether that is held ([agentAllowed]) and what else blocks it ([blockedReason]),
+     * worked out from state without running the operation.
+     */
+    data class Operation(val method: String, val path: String, val scope: String? = null, val power: String? = null,
+                         val agentAllowed: Boolean = true, val blockedReason: String? = null)
 
     fun capability(c: Capability): JSONObject {
         val supported = c.blockedReason !in UNSUPPORTED
@@ -33,7 +41,17 @@ object ProfileBuilder {
             .put("ready", c.ready).put("agent_allowed", c.agentAllowed).put("callable", callable)
             .put("blocked_reason", blocked ?: JSONObject.NULL)
             .put("constraints", JSONObject().put("execution", JSONArray(c.execution)))
-            .put("operations", JSONArray(c.operations.map { (m, p) -> JSONObject().put("method", m).put("path", p) }))
+            .put("operations", JSONArray(c.operations.map { operation(it, callable, blocked) }))
+    }
+
+    /** An operation is callable only when its capability is; the capability's blocker comes first, then the operation's own. */
+    fun operation(o: Operation, capabilityCallable: Boolean, capabilityBlocked: String?): JSONObject {
+        val blocked = capabilityBlocked ?: (if (!o.agentAllowed) "agent_not_allowed" else o.blockedReason)
+        return JSONObject().put("method", o.method).put("path", o.path)
+            .apply { o.scope?.let { put("scope", it) }; o.power?.let { put("power", it) } }
+            .put("agent_allowed", o.agentAllowed && capabilityBlocked != "agent_not_allowed")
+            .put("callable", capabilityCallable && o.agentAllowed && o.blockedReason == null)
+            .put("blocked_reason", blocked ?: JSONObject.NULL)
     }
 
     fun build(revision: Int, nowMs: Long, device: Device, online: Boolean, inForeground: Boolean,

@@ -32,7 +32,7 @@ object ConfigurationTools {
         val query = (given - required).associateWith { k -> params.opt(k)?.toString()?.takeIf { it.length <= 128 } ?: throw ErrorCatalog.error("invalid_parameter", "$k is too long") }
         val body = if (args.has("body")) args.optJSONObject("body") ?: throw ErrorCatalog.error("invalid_parameter", "body must be an object") else JSONObject()
         if ((spec.method == "GET" || spec.body.isEmpty()) && body.length() > 0) throw ErrorCatalog.error("invalid_parameter", "This operation takes no body")
-        val result = api.dispatch(spec, caller, "control:${caller.id}", query, path, body, key, "control-configuration")
+        val result = api.dispatch(cc.bridgit.app.core.request.CoreRequest.inProcess(cc.bridgit.app.core.request.CoreRequest.HTTP_V2, spec.method, spec.fullPath, "control:${caller.id}", key), spec, caller, query, path, body, "control-configuration")
         val json = JSONObject(String(result.bytes))
         if (result.status !in 200..299) throw cc.bridgit.app.api.ApiError(result.status, json.optString("error", "configuration_failed"), json.optString("message", "Configuration failed"))
         return json

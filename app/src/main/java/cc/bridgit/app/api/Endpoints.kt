@@ -132,6 +132,8 @@ object Endpoints {
         example = "GET /v1/changes?since=2", returns = "api_revision, app_version, changes[revision, app_version, date, items[what, endpoint]], links")
     val HELPER = EndpointSpec("GET", "/tools/bridgit", "status", "The `bridgit` command-line helper (Python, no secrets inside)",
         auth = false, example = "GET /v1/tools/bridgit", returns = "text/x-python")
+    val HEADLESS_HELPER = EndpointSpec("GET", "/tools/headless-setup", "status", "Owner USB setup helper for devices without a display. Enrollment needs the owner to click its local confirmation; keys are saved privately, never printed",
+        auth = false, example = "GET /v1/tools/headless-setup", returns = "text/x-python; run with --serial SERIAL; --status reads without enrollment")
     /** Deprecated alias of [HELPER] from before the Bridget → Bridgit rename (API revision 17). */
     val HELPER_LEGACY = EndpointSpec("GET", "/tools/bridget", "status", "Deprecated: the old address of GET /v1/tools/bridgit, same helper",
         auth = false, example = "GET /v1/tools/bridget", returns = "text/x-python")
@@ -339,7 +341,7 @@ object Endpoints {
     val FEEDBACK_TEAM_KEY = legacy(ISSUES_TEAM_KEY, "/feedback/team-key")
     val FEEDBACK_LEGACY = listOf(FEEDBACK_LIST, FEEDBACK_TEAM_KEY, FEEDBACK_GET, FEEDBACK_STATUS, FEEDBACK_FOLLOWUP, FEEDBACK_POST)
 
-    val INTERACTION_CREATE = EndpointSpec("POST", "/interactions", "interactions", "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
+    val INTERACTION_CREATE = EndpointSpec("POST", "/interactions", "interactions", "Requires a usable display; headless devices return not_supported (reason display_unavailable) without creating an interaction. Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
         idempotent = true, privateFields = setOf("text", "image", "html"),
         body = listOf(
             Param("kind", "string", "notice (one-way), question, html (a card you draw; answer comes from Bridgit.respond), pieces (a card the phone draws from pieces and sources; no HTML) or text (a live text panel you stream into with /v1/text/stream)",
@@ -370,14 +372,14 @@ object Endpoints {
             "presentation (standard|full_screen), viewport {width_px, height_px, width_dp, height_dp, density} (the exact canvas the card's page gets in that presentation), aspect_mismatch? {content, viewport, advice} (the page's declared shape differs from the canvas by more than 10 %)}. " +
             "When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix. " +
             "ignored? {field: why}: request fields Bridgit did not use (display is reply-only; ask for an edge-to-edge card with presentation)",
-        errors = listOf("capability_disabled", "notifications_required", "invalid_parameter", "payload_too_large", "too_many_open", "photo_not_found"))
+        errors = listOf("not_supported", "capability_disabled", "notifications_required", "invalid_parameter", "payload_too_large", "too_many_open", "photo_not_found"))
     val TEXT_STREAM = EndpointSpec("POST", "/text/stream", "interactions", "Add text to your live text panel (an interaction of kind text); it scrolls on the phone as it arrives",
         privateFields = setOf("append"),
         body = listOf(Param("interaction_id", "string", "The panel's interaction_id", required = true),
             Param("append", "string", "Text to add, up to 16 KB per call (the panel keeps the last 200 KB)"),
             Param("done", "boolean", "true: the stream is finished; the panel stays until the owner closes it")),
         example = "POST /v1/text/stream {\"interaction_id\":\"42\",\"append\":\"Claude: running the tests now...\\n\"}",
-        returns = "interaction_id, length, status", errors = listOf("not_found", "invalid_parameter", "conflict", "rate_limited"))
+        returns = "interaction_id, length, status", errors = listOf("not_supported", "not_found", "invalid_parameter", "conflict", "rate_limited"))
     val CALLBACK_TEST = EndpointSpec("POST", "/callback/test", "interactions", "Send a signed test event to the callback URL the owner set for you",
         example = "POST /v1/callback/test", returns = "delivered, http_status, host", errors = listOf("not_found", "callback_failed"))
     val MCP = EndpointSpec("POST", "/mcp", "status", "Model Context Protocol (Streamable HTTP, JSON replies): every endpoint you can use is an MCP tool",
@@ -399,7 +401,7 @@ object Endpoints {
         "Notify the owner again about one of your pending or seen cards. Opening a card clears its alert; only this explicit request restores it. Preserves seen status, answers and expiry; does not open the screen or speak. Closed or expired cards are refused",
         idempotent = true,
         example = "POST /v1/interactions/12/renotify {}", returns = "the interaction, notification_requested",
-        errors = listOf("not_found", "conflict", "capability_disabled", "notifications_required"))
+        errors = listOf("not_supported", "not_found", "conflict", "capability_disabled", "notifications_required"))
     val EVENTS = EndpointSpec("GET", "/events", "interactions", "Your events, oldest first: answers, closes, expiries, switch changes. interaction.renotified records an explicit card reminder. Repeated phone answers emit interaction.answered with resubmission=true and previous_answer; agents decide whether to accept the change. An answer given after the question expired comes as interaction.answered with late=true. action.executed: one of your HTML cards ran Bridgit.act (interaction_id, method, path, status, ok, error)",
         query = listOf(Param("since", "string", "next_cursor from the last call; omit for the newest 50 (still oldest first)"),
             Param("wait", "integer", "With since: hold up to 55 s for a new event"), Param("types", "string", "Comma list, e.g. interaction.answered"),
@@ -507,7 +509,7 @@ object Endpoints {
         returns = "changed[key, from, to], unchanged, settings (as in GET)",
         errors = listOf("capability_disabled", "forbidden", "setting_locked", "access_needed", "invalid_parameter"))
 
-    val all = cc.bridgit.app.ssh.SshModule.ALL + cc.bridgit.app.lancamera.CameraAudioModule.ALL + cc.bridgit.app.ownerapi.OwnerFeatureEndpoints.ALL + cc.bridgit.app.appdevices.AppDeviceModule.ALL + cc.bridgit.app.lan.LanModule.ALL + cc.bridgit.app.lancamera.LanCameraModule.ALL + listOf(SPEECH_HEAR, SPEECH_SPEAK, SPEECH_MODELS, SERVICES, HEALTH, DEVICE_PROFILE, DEVICE_DISPLAY, DEVICE_RESOURCES, DEVICES, CAPABILITIES, LIMITS, DISCOVER, DISCOVERY_REPORT, GUIDE, START, WELCOME, DEMO, SAMPLES, OPENAPI, REGISTRY, CHANGES, HELPER, HELPER_LEGACY, PAIR, SNAPSHOT, CAMERA_ARM, POSE_START, POSE_READ, POSE_FRAME, POSE_STOP, MIC, GALLERY_RECENT, GALLERY_PHOTO,
+    val all = cc.bridgit.app.ssh.SshModule.ALL + cc.bridgit.app.lancamera.CameraAudioModule.ALL + cc.bridgit.app.ownerapi.OwnerFeatureEndpoints.ALL + cc.bridgit.app.appdevices.AppDeviceModule.ALL + cc.bridgit.app.lan.LanModule.ALL + cc.bridgit.app.lancamera.LanCameraModule.ALL + listOf(SPEECH_HEAR, SPEECH_SPEAK, SPEECH_MODELS, SERVICES, HEALTH, DEVICE_PROFILE, DEVICE_DISPLAY, DEVICE_RESOURCES, DEVICES, CAPABILITIES, LIMITS, DISCOVER, DISCOVERY_REPORT, GUIDE, START, WELCOME, DEMO, SAMPLES, OPENAPI, REGISTRY, CHANGES, HELPER, HELPER_LEGACY, HEADLESS_HELPER, PAIR, SNAPSHOT, CAMERA_ARM, POSE_START, POSE_READ, POSE_FRAME, POSE_STOP, MIC, GALLERY_RECENT, GALLERY_PHOTO,
         IMAGE_LAST, SCREEN_CAPTURE, LOG, LOG_ENTRY, LOG_STATS, LOG_LATENCY, LOG_EXPORT, DEVICE_LOG, DEVICE_EXITS, LOG_NOTE, AUDIT, ISSUES_LIST, ISSUES_TEAM_KEY, ISSUES_GET, ISSUES_STATUS, ISSUES_FOLLOWUP, ISSUES_POST, FEEDBACK_LIST, FEEDBACK_TEAM_KEY, FEEDBACK_GET, FEEDBACK_STATUS, FEEDBACK_FOLLOWUP, FEEDBACK_POST,
         INTERACTION_CREATE, INTERACTION_LIST, INTERACTION_GET, INTERACTION_CANCEL, INTERACTION_RENOTIFY, EVENTS, TEXT_STREAM, CALLBACK_TEST, MCP,
         LOCATION, SPEAKER_PLAY, SPEAKER_SAY, SPEAKER_STATUS, SPEAKER_STOP, TOUR_GET, TOUR_PHOTO, TOUR_END, ME, OWNER_EMAIL, OWNER_EMAIL_SET, LISTEN, LISTEN_CLIP, SOUNDS, SOUNDS_CLIP, CAPTURES_STORAGE_GET, CAPTURES_STORAGE_SET, CAPTURES_LIST, CAPTURES_GET, CAPTURES_DELETE, SETTINGS_GET, SETTINGS_SET) + cc.bridgit.app.capability.SettingsConfigurationApi.ALL + cc.bridgit.app.planned.PlannedEndpoints.all + cc.bridgit.app.schedule.ScheduleEndpoints.all + cc.bridgit.app.weather.WeatherEndpoints.WEATHER + cc.bridgit.app.adb.AdbModule.ENDPOINTS + listOf(cc.bridgit.app.judgment.JudgmentModule.JUDGMENT, cc.bridgit.app.judgment.JudgmentModule.IMAGE_GENERATE, cc.bridgit.app.judgment.JudgmentModule.IMAGE_USAGE) + cc.bridgit.app.judgment.ContextServices.ALL + cc.bridgit.app.watch.WatchModule.ALL + cc.bridgit.app.outbound.OutboundModule.ALL + cc.bridgit.app.email.EmailModule.ALL + cc.bridgit.app.portal.PortalEndpoints.ALL + cc.bridgit.app.satellite.SatelliteEndpoints.ALL + cc.bridgit.app.applets.AppletEndpoints.ALL + cc.bridgit.app.applets.BudgetEndpoints.ALL + cc.bridgit.app.applets.AppletPortalEndpoints.ALL + cc.bridgit.app.applets.AppletData.ALL + cc.bridgit.app.platform.ConnectionsApi.ALL + cc.bridgit.app.context.ContextApi.ALL + cc.bridgit.app.platform.ModesApi.ALL + cc.bridgit.app.vision.FindCropModule.ALL

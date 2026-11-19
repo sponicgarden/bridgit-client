@@ -17,6 +17,7 @@
     ],
     "hardware": {
       "camera": "absent",
+      "display": "present",
       "location": "absent",
       "microphone": "absent",
       "speaker": "absent"
@@ -43,11 +44,17 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/adb\/setup"
+          "path": "\/v1\/adb\/setup",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/adb\/status"
+          "path": "\/v1\/adb\/status",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -66,19 +73,31 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/applet-devices"
+          "path": "\/v1\/applet-devices",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applet-devices"
+          "path": "\/v1\/applet-devices",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/app-devices"
+          "path": "\/v1\/app-devices",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/app-devices"
+          "path": "\/v1\/app-devices",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -97,43 +116,73 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/applet\/records"
+          "path": "\/v1\/applet\/records",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applet\/records\/{key}"
+          "path": "\/v1\/applet\/records\/{key}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applet\/records\/{key}"
+          "path": "\/v1\/applet\/records\/{key}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/applet\/records\/{key}"
+          "path": "\/v1\/applet\/records\/{key}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applet\/portal\/record"
+          "path": "\/v1\/applet\/portal\/record",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applet\/tables"
+          "path": "\/v1\/applet\/tables",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applet\/tables\/{table}\/rows"
+          "path": "\/v1\/applet\/tables\/{table}\/rows",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applet\/tables\/{table}\/rows"
+          "path": "\/v1\/applet\/tables\/{table}\/rows",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "PATCH",
-          "path": "\/v1\/applet\/tables\/{table}\/rows\/{row}"
+          "path": "\/v1\/applet\/tables\/{table}\/rows\/{row}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/applet\/tables\/{table}\/rows\/{row}"
+          "path": "\/v1\/applet\/tables\/{table}\/rows\/{row}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -152,91 +201,157 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/applets\/catalog"
+          "path": "\/v1\/applets\/catalog",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/installed\/{id}\/development"
+          "path": "\/v1\/applets\/installed\/{id}\/development",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/installed\/{id}\/template-policy"
+          "path": "\/v1\/applets\/installed\/{id}\/template-policy",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/installed\/{id}\/template-upgrade"
+          "path": "\/v1\/applets\/installed\/{id}\/template-upgrade",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/context"
+          "path": "\/v1\/applets\/context",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/practices"
+          "path": "\/v1\/applets\/practices",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/validate"
+          "path": "\/v1\/applets\/validate",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/install"
+          "path": "\/v1\/applets\/install",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/installed"
+          "path": "\/v1\/applets\/installed",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/installed\/{id}"
+          "path": "\/v1\/applets\/installed\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/installed\/{id}\/update"
+          "path": "\/v1\/applets\/installed\/{id}\/update",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/installed\/{id}\/pause"
+          "path": "\/v1\/applets\/installed\/{id}\/pause",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/applets\/installed\/{id}"
+          "path": "\/v1\/applets\/installed\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/installed\/{id}\/data"
+          "path": "\/v1\/applets\/installed\/{id}\/data",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/installed\/{id}\/records"
+          "path": "\/v1\/applets\/installed\/{id}\/records",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/installed\/{id}\/data\/export"
+          "path": "\/v1\/applets\/installed\/{id}\/data\/export",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/installed\/{id}\/photos\/{photo}"
+          "path": "\/v1\/applets\/installed\/{id}\/photos\/{photo}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows"
+          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows"
+          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "PATCH",
-          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows\/{row}"
+          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows\/{row}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows\/{row}"
+          "path": "\/v1\/applets\/installed\/{id}\/tables\/{table}\/rows\/{row}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/{id}\/budget"
+          "path": "\/v1\/applets\/{id}\/budget",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -255,23 +370,38 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/applets\/portals"
+          "path": "\/v1\/applets\/portals",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/{id}\/portal\/open"
+          "path": "\/v1\/applets\/{id}\/portal\/open",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/{id}\/portal"
+          "path": "\/v1\/applets\/{id}\/portal",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/{id}\/portal\/call"
+          "path": "\/v1\/applets\/{id}\/portal\/call",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/{id}\/portal\/close"
+          "path": "\/v1\/applets\/{id}\/portal\/close",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -290,15 +420,24 @@
       "operations": [
         {
           "method": "PUT",
-          "path": "\/v1\/applets\/{id}\/budget"
+          "path": "\/v1\/applets\/{id}\/budget",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/applets\/{id}\/budget\/top-up"
+          "path": "\/v1\/applets\/{id}\/budget\/top-up",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "PUT",
-          "path": "\/v1\/applets\/{id}\/actions\/{action}"
+          "path": "\/v1\/applets\/{id}\/actions\/{action}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -321,27 +460,45 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/camera\/snapshot"
+          "path": "\/v1\/camera\/snapshot",
+          "agent_allowed": true,
+          "callable": false,
+          "blocked_reason": "permission:CAMERA"
         },
         {
           "method": "POST",
-          "path": "\/v1\/camera\/arm"
+          "path": "\/v1\/camera\/arm",
+          "agent_allowed": true,
+          "callable": false,
+          "blocked_reason": "permission:CAMERA"
         },
         {
           "method": "POST",
-          "path": "\/v1\/camera\/pose\/start"
+          "path": "\/v1\/camera\/pose\/start",
+          "agent_allowed": true,
+          "callable": false,
+          "blocked_reason": "permission:CAMERA"
         },
         {
           "method": "GET",
-          "path": "\/v1\/camera\/pose\/{id}"
+          "path": "\/v1\/camera\/pose\/{id}",
+          "agent_allowed": true,
+          "callable": false,
+          "blocked_reason": "permission:CAMERA"
         },
         {
           "method": "GET",
-          "path": "\/v1\/camera\/pose\/{id}\/picture"
+          "path": "\/v1\/camera\/pose\/{id}\/picture",
+          "agent_allowed": true,
+          "callable": false,
+          "blocked_reason": "permission:CAMERA"
         },
         {
           "method": "POST",
-          "path": "\/v1\/camera\/pose\/{id}\/stop"
+          "path": "\/v1\/camera\/pose\/{id}\/stop",
+          "agent_allowed": true,
+          "callable": false,
+          "blocked_reason": "permission:CAMERA"
         }
       ]
     },
@@ -360,23 +517,38 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/captures\/storage"
+          "path": "\/v1\/captures\/storage",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/captures\/storage"
+          "path": "\/v1\/captures\/storage",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/captures"
+          "path": "\/v1\/captures",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/captures\/{id}"
+          "path": "\/v1\/captures\/{id}",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/captures\/{id}"
+          "path": "\/v1\/captures\/{id}",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         }
       ]
     },
@@ -395,11 +567,17 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/clipboard"
+          "path": "\/v1\/clipboard",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/clipboard\/{id}"
+          "path": "\/v1\/clipboard\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -418,23 +596,38 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/connections"
+          "path": "\/v1\/connections",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/connections\/send"
+          "path": "\/v1\/connections\/send",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/connections\/configure"
+          "path": "\/v1\/connections\/configure",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/connections\/{id}"
+          "path": "\/v1\/connections\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/connections\/{id}\/rotate"
+          "path": "\/v1\/connections\/{id}\/rotate",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -453,7 +646,10 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/context"
+          "path": "\/v1\/context",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -472,23 +668,38 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/phone\/dnd"
+          "path": "\/v1\/phone\/dnd",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/phone\/sound"
+          "path": "\/v1\/phone\/sound",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/phone\/brightness"
+          "path": "\/v1\/phone\/brightness",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/phone\/power"
+          "path": "\/v1\/phone\/power",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/phone\/undo"
+          "path": "\/v1\/phone\/undo",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -507,15 +718,24 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/downloads"
+          "path": "\/v1\/downloads",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/downloads\/{id}"
+          "path": "\/v1\/downloads\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/downloads\/{id}"
+          "path": "\/v1\/downloads\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -534,7 +754,10 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/email\/preview"
+          "path": "\/v1\/email\/preview",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -553,43 +776,73 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/issues"
+          "path": "\/v1\/issues",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/issues\/team-key"
+          "path": "\/v1\/issues\/team-key",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/issues\/{id}"
+          "path": "\/v1\/issues\/{id}",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/issues\/{id}\/followup"
+          "path": "\/v1\/issues\/{id}\/followup",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/issues"
+          "path": "\/v1\/issues",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/feedback"
+          "path": "\/v1\/feedback",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/feedback\/team-key"
+          "path": "\/v1\/feedback\/team-key",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/feedback\/{id}"
+          "path": "\/v1\/feedback\/{id}",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/feedback\/{id}\/followup"
+          "path": "\/v1\/feedback\/{id}\/followup",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/feedback"
+          "path": "\/v1\/feedback",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         }
       ]
     },
@@ -608,19 +861,31 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/files"
+          "path": "\/v1\/files",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/files\/{id}"
+          "path": "\/v1\/files\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/files\/{id}"
+          "path": "\/v1\/files\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/files"
+          "path": "\/v1\/files",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -639,27 +904,45 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/images\/find"
+          "path": "\/v1\/images\/find",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/images\/crop"
+          "path": "\/v1\/images\/crop",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/images\/appraise"
+          "path": "\/v1\/images\/appraise",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/images\/engines"
+          "path": "\/v1\/images\/engines",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/images\/engines\/check"
+          "path": "\/v1\/images\/engines\/check",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/images\/engines\/download"
+          "path": "\/v1\/images\/engines\/download",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -678,11 +961,17 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/flashlight"
+          "path": "\/v1\/flashlight",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/flashlight"
+          "path": "\/v1\/flashlight",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -701,15 +990,24 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/gallery\/recent"
+          "path": "\/v1\/gallery\/recent",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/gallery\/photo\/{id}"
+          "path": "\/v1\/gallery\/photo\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/image\/last"
+          "path": "\/v1\/image\/last",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -728,11 +1026,17 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/gallery\/videos\/recent"
+          "path": "\/v1\/gallery\/videos\/recent",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/gallery\/video\/{id}"
+          "path": "\/v1\/gallery\/video\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -751,7 +1055,10 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/health\/records"
+          "path": "\/v1\/health\/records",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -770,35 +1077,59 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/interactions"
+          "path": "\/v1\/interactions",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/interactions"
+          "path": "\/v1\/interactions",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/interactions\/{id}"
+          "path": "\/v1\/interactions\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/interactions\/{id}"
+          "path": "\/v1\/interactions\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/interactions\/{id}\/renotify"
+          "path": "\/v1\/interactions\/{id}\/renotify",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/events"
+          "path": "\/v1\/events",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/text\/stream"
+          "path": "\/v1\/text\/stream",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/callback\/test"
+          "path": "\/v1\/callback\/test",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -817,43 +1148,73 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/judgment"
+          "path": "\/v1\/judgment",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/images\/generations"
+          "path": "\/v1\/images\/generations",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/images\/usage"
+          "path": "\/v1\/images\/usage",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/services\/context"
+          "path": "\/v1\/services\/context",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/story"
+          "path": "\/v1\/story",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/story\/generate"
+          "path": "\/v1\/story\/generate",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/story\/stop"
+          "path": "\/v1\/story\/stop",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/story\/image"
+          "path": "\/v1\/story\/image",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/story\/presentation"
+          "path": "\/v1\/story\/presentation",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/story\/reveal"
+          "path": "\/v1\/story\/reveal",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -872,51 +1233,87 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/lan-cameras"
+          "path": "\/v1\/lan-cameras",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/lan-cameras\/snapshot"
+          "path": "\/v1\/lan-cameras\/snapshot",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/lan-cameras\/move"
+          "path": "\/v1\/lan-cameras\/move",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/lan-cameras\/probe"
+          "path": "\/v1\/lan-cameras\/probe",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/lan-cameras\/framing\/config"
+          "path": "\/v1\/lan-cameras\/framing\/config",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/lan-cameras\/framing"
+          "path": "\/v1\/lan-cameras\/framing",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/lan-cameras\/framing"
+          "path": "\/v1\/lan-cameras\/framing",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/lan-cameras\/framing\/{id}"
+          "path": "\/v1\/lan-cameras\/framing\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/lan-cameras\/framing\/{id}\/cancel"
+          "path": "\/v1\/lan-cameras\/framing\/{id}\/cancel",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/lan-cameras\/framing\/{id}\/photo"
+          "path": "\/v1\/lan-cameras\/framing\/{id}\/photo",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/lan-cameras\/{id}\/controls"
+          "path": "\/v1\/lan-cameras\/{id}\/controls",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/lan-cameras\/applet-views\/{instance}\/{view}"
+          "path": "\/v1\/lan-cameras\/applet-views\/{instance}\/{view}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -935,7 +1332,10 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/lan-cameras\/audio\/record"
+          "path": "\/v1\/lan-cameras\/audio\/record",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -954,11 +1354,17 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/lan-cameras\/audio\/play"
+          "path": "\/v1\/lan-cameras\/audio\/play",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/lan-cameras\/talk-account"
+          "path": "\/v1\/lan-cameras\/talk-account",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -977,15 +1383,24 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/lan\/devices"
+          "path": "\/v1\/lan\/devices",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/lan\/devices\/action"
+          "path": "\/v1\/lan\/devices\/action",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/lan\/devices\/log"
+          "path": "\/v1\/lan\/devices\/log",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1004,27 +1419,45 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/lan\/discovered"
+          "path": "\/v1\/lan\/discovered",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/lan\/catalog"
+          "path": "\/v1\/lan\/catalog",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/lan\/brands\/{id}\/logo"
+          "path": "\/v1\/lan\/brands\/{id}\/logo",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/lan\/discover"
+          "path": "\/v1\/lan\/discover",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/lan\/packs"
+          "path": "\/v1\/lan\/packs",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/lan\/packs\/check"
+          "path": "\/v1\/lan\/packs\/check",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1043,11 +1476,17 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/lan\/devices\/enroll"
+          "path": "\/v1\/lan\/devices\/enroll",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/lan\/devices\/remove"
+          "path": "\/v1\/lan\/devices\/remove",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1070,7 +1509,10 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/location"
+          "path": "\/v1\/location",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1089,31 +1531,52 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/log"
+          "path": "\/v1\/log",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/log\/{id}"
+          "path": "\/v1\/log\/{id}",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/log\/stats"
+          "path": "\/v1\/log\/stats",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/log\/latency"
+          "path": "\/v1\/log\/latency",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/log\/export"
+          "path": "\/v1\/log\/export",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/log"
+          "path": "\/v1\/log",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/audit"
+          "path": "\/v1\/audit",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         }
       ]
     },
@@ -1136,11 +1599,17 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/speech\/hear"
+          "path": "\/v1\/speech\/hear",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/mic\/record"
+          "path": "\/v1\/mic\/record",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1159,11 +1628,17 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/mode"
+          "path": "\/v1\/mode",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/mode"
+          "path": "\/v1\/mode",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1182,7 +1657,10 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/notifications"
+          "path": "\/v1\/notifications",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1201,7 +1679,10 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/ocr"
+          "path": "\/v1\/ocr",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1220,15 +1701,24 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/outbound"
+          "path": "\/v1\/outbound",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/outbound\/summary"
+          "path": "\/v1\/outbound\/summary",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/outbound\/{id}"
+          "path": "\/v1\/outbound\/{id}",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         }
       ]
     },
@@ -1247,347 +1737,672 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/app\/foreground\/targets"
+          "path": "\/v1\/app\/foreground\/targets",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/app\/foreground"
+          "path": "\/v1\/app\/foreground",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/services\/models"
+          "path": "\/v1\/services\/models",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/services\/models\/{applet_id}\/{task_key}"
+          "path": "\/v1\/services\/models\/{applet_id}\/{task_key}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/services\/budgets"
+          "path": "\/v1\/services\/budgets",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/features"
+          "path": "\/v1\/owner\/features",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets"
+          "path": "\/v1\/applets",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/dog-monitor"
+          "path": "\/v1\/applets\/dog-monitor",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/dog-monitor\/history"
+          "path": "\/v1\/applets\/dog-monitor\/history",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/applets\/dog-monitor\/frame"
+          "path": "\/v1\/applets\/dog-monitor\/frame",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/resources"
+          "path": "\/v1\/resources",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/resource-jobs"
+          "path": "\/v1\/resource-jobs",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/resource-jobs\/{id}"
+          "path": "\/v1\/resource-jobs\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/resource-jobs\/{id}"
+          "path": "\/v1\/resource-jobs\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/remote-view"
+          "path": "\/v1\/remote-view",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/callback"
+          "path": "\/v1\/callback",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/delivery"
+          "path": "\/v1\/delivery",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/settings"
+          "path": "\/v1\/owner\/settings",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configure"
+          "path": "\/v1\/owner\/configure",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/approvals"
+          "path": "\/v1\/owner\/configuration\/approvals",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/approvals\/{kind}\/{id}"
+          "path": "\/v1\/owner\/configuration\/approvals\/{kind}\/{id}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/approvals\/{kind}\/{id}"
+          "path": "\/v1\/owner\/configuration\/approvals\/{kind}\/{id}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration"
+          "path": "\/v1\/owner\/configuration",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/settings"
+          "path": "\/v1\/owner\/configuration\/settings",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/actions"
+          "path": "\/v1\/owner\/configuration\/actions",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/keys"
+          "path": "\/v1\/owner\/configuration\/keys",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/keys\/{provider}"
+          "path": "\/v1\/owner\/configuration\/keys\/{provider}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/owner\/configuration\/keys\/{provider}"
+          "path": "\/v1\/owner\/configuration\/keys\/{provider}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/connections"
+          "path": "\/v1\/owner\/configuration\/connections",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/connections"
+          "path": "\/v1\/owner\/configuration\/connections",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "PATCH",
-          "path": "\/v1\/owner\/configuration\/connections\/{id}"
+          "path": "\/v1\/owner\/configuration\/connections\/{id}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/owner\/configuration\/connections\/{id}"
+          "path": "\/v1\/owner\/configuration\/connections\/{id}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/connections\/{id}\/rotate"
+          "path": "\/v1\/owner\/configuration\/connections\/{id}\/rotate",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/callbacks"
+          "path": "\/v1\/owner\/configuration\/callbacks",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/callbacks\/{agent}"
+          "path": "\/v1\/owner\/configuration\/callbacks\/{agent}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/owner\/configuration\/callbacks\/{agent}"
+          "path": "\/v1\/owner\/configuration\/callbacks\/{agent}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/notifications\/{agent}"
+          "path": "\/v1\/owner\/configuration\/notifications\/{agent}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/notifications\/{agent}"
+          "path": "\/v1\/owner\/configuration\/notifications\/{agent}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/email"
+          "path": "\/v1\/owner\/configuration\/email",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/email"
+          "path": "\/v1\/owner\/configuration\/email",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/name"
+          "path": "\/v1\/owner\/configuration\/name",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/name"
+          "path": "\/v1\/owner\/configuration\/name",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/owner\/configuration\/name"
+          "path": "\/v1\/owner\/configuration\/name",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/specs"
+          "path": "\/v1\/owner\/configuration\/specs",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/specs"
+          "path": "\/v1\/owner\/configuration\/specs",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/feeding"
+          "path": "\/v1\/owner\/configuration\/feeding",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/feeding"
+          "path": "\/v1\/owner\/configuration\/feeding",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/modes"
+          "path": "\/v1\/owner\/configuration\/modes",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/modes"
+          "path": "\/v1\/owner\/configuration\/modes",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/listening"
+          "path": "\/v1\/owner\/configuration\/listening",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/listening"
+          "path": "\/v1\/owner\/configuration\/listening",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/permissions"
+          "path": "\/v1\/owner\/configuration\/permissions",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/permissions\/device"
+          "path": "\/v1\/owner\/configuration\/permissions\/device",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/permissions\/linked\/{id}"
+          "path": "\/v1\/owner\/configuration\/permissions\/linked\/{id}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/links"
+          "path": "\/v1\/owner\/configuration\/links",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/links\/codes"
+          "path": "\/v1\/owner\/configuration\/links\/codes",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/owner\/configuration\/links\/codes\/{id}"
+          "path": "\/v1\/owner\/configuration\/links\/codes\/{id}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/links\/claims"
+          "path": "\/v1\/owner\/configuration\/links\/claims",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/links\/{id}\/directions\/{direction}"
+          "path": "\/v1\/owner\/configuration\/links\/{id}\/directions\/{direction}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/links\/{id}\/tier"
+          "path": "\/v1\/owner\/configuration\/links\/{id}\/tier",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/links\/{id}\/undo"
+          "path": "\/v1\/owner\/configuration\/links\/{id}\/undo",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/links\/pause-all"
+          "path": "\/v1\/owner\/configuration\/links\/pause-all",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/links\/log"
+          "path": "\/v1\/owner\/configuration\/links\/log",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/approvers"
+          "path": "\/v1\/owner\/configuration\/approvers",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/approvers"
+          "path": "\/v1\/owner\/configuration\/approvers",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/approvers\/recovery"
+          "path": "\/v1\/owner\/configuration\/approvers\/recovery",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/approvers\/recovery"
+          "path": "\/v1\/owner\/configuration\/approvers\/recovery",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/owner\/configuration\/approvers\/recovery"
+          "path": "\/v1\/owner\/configuration\/approvers\/recovery",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/spending"
+          "path": "\/v1\/owner\/configuration\/spending",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/spending"
+          "path": "\/v1\/owner\/configuration\/spending",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/spending\/sources"
+          "path": "\/v1\/owner\/configuration\/spending\/sources",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/spending\/sources"
+          "path": "\/v1\/owner\/configuration\/spending\/sources",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/owner\/configuration\/spending\/sources\/{id}"
+          "path": "\/v1\/owner\/configuration\/spending\/sources\/{id}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/spending\/rules"
+          "path": "\/v1\/owner\/configuration\/spending\/rules",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/spending\/rules"
+          "path": "\/v1\/owner\/configuration\/spending\/rules",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/spending\/budgets"
+          "path": "\/v1\/owner\/configuration\/spending\/budgets",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/spending\/budgets"
+          "path": "\/v1\/owner\/configuration\/spending\/budgets",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "PATCH",
-          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}"
+          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}"
+          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}\/topups"
+          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}\/topups",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}\/gate"
+          "path": "\/v1\/owner\/configuration\/spending\/budgets\/{id}\/gate",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/spending\/allowances"
+          "path": "\/v1\/owner\/configuration\/spending\/allowances",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/spending\/journal"
+          "path": "\/v1\/owner\/configuration\/spending\/journal",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/spending\/journal"
+          "path": "\/v1\/owner\/configuration\/spending\/journal",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/spending\/summary"
+          "path": "\/v1\/owner\/configuration\/spending\/summary",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/configuration\/spending\/limits"
+          "path": "\/v1\/owner\/configuration\/spending\/limits",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1606,15 +2421,24 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/phone\/status"
+          "path": "\/v1\/phone\/status",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/phone\/battery"
+          "path": "\/v1\/phone\/battery",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/phone\/context"
+          "path": "\/v1\/phone\/context",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1633,55 +2457,94 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/portal\/snapshot"
+          "path": "\/v1\/portal\/snapshot",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/portal\/home"
+          "path": "\/v1\/portal\/home",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/portal\/devices"
+          "path": "\/v1\/portal\/devices",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/portal\/applets\/inventory"
+          "path": "\/v1\/portal\/applets\/inventory",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/portal\/applets\/watches"
+          "path": "\/v1\/portal\/applets\/watches",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/portal\/brands\/{id}\/logo"
+          "path": "\/v1\/portal\/brands\/{id}\/logo",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/portal\/logs"
+          "path": "\/v1\/portal\/logs",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/portal\/agents"
+          "path": "\/v1\/portal\/agents",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/portal\/applets"
+          "path": "\/v1\/portal\/applets",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/portal\/theme"
+          "path": "\/v1\/portal\/theme",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/portal\/photo\/targets"
+          "path": "\/v1\/portal\/photo\/targets",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/portal\/photo"
+          "path": "\/v1\/portal\/photo",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/portal\/updates"
+          "path": "\/v1\/portal\/updates",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1700,11 +2563,17 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/phone\/ring"
+          "path": "\/v1\/phone\/ring",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/phone\/ring"
+          "path": "\/v1\/phone\/ring",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1723,39 +2592,66 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/schedule\/manifest"
+          "path": "\/v1\/schedule\/manifest",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/schedule"
+          "path": "\/v1\/schedule",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/schedule"
+          "path": "\/v1\/schedule",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/schedule\/run\/{id}"
+          "path": "\/v1\/schedule\/run\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/schedule\/pause"
+          "path": "\/v1\/schedule\/pause",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/schedule"
+          "path": "\/v1\/schedule",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/schedule\/assets"
+          "path": "\/v1\/schedule\/assets",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/schedule\/assets\/{name}"
+          "path": "\/v1\/schedule\/assets\/{name}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/schedule\/assets\/{name}"
+          "path": "\/v1\/schedule\/assets\/{name}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1774,7 +2670,10 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/screen\/capture"
+          "path": "\/v1\/screen\/capture",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1797,19 +2696,31 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/screen\/grant"
+          "path": "\/v1\/screen\/grant",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/screen\/grants"
+          "path": "\/v1\/screen\/grants",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/screen\/share\/capture"
+          "path": "\/v1\/screen\/share\/capture",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/screen\/grant"
+          "path": "\/v1\/screen\/grant",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1828,7 +2739,10 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/sensors"
+          "path": "\/v1\/sensors",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1847,31 +2761,52 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/settings"
+          "path": "\/v1\/settings",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/settings"
+          "path": "\/v1\/settings",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/settings\/modes"
+          "path": "\/v1\/settings\/modes",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/settings\/modes"
+          "path": "\/v1\/settings\/modes",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/settings\/ai-keys"
+          "path": "\/v1\/settings\/ai-keys",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/settings\/ai-keys"
+          "path": "\/v1\/settings\/ai-keys",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/settings\/capture-upload"
+          "path": "\/v1\/settings\/capture-upload",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1890,15 +2825,24 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/shares"
+          "path": "\/v1\/shares",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/shares\/{id}"
+          "path": "\/v1\/shares\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/shares\/{id}"
+          "path": "\/v1\/shares\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1921,11 +2865,17 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/sounds"
+          "path": "\/v1\/sounds",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/sounds\/clip\/{id}"
+          "path": "\/v1\/sounds\/clip\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1944,23 +2894,38 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/speech\/speak"
+          "path": "\/v1\/speech\/speak",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/speaker\/play"
+          "path": "\/v1\/speaker\/play",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/speaker\/say"
+          "path": "\/v1\/speaker\/say",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/speaker"
+          "path": "\/v1\/speaker",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/speaker"
+          "path": "\/v1\/speaker",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -1979,31 +2944,52 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/ssh\/connections"
+          "path": "\/v1\/ssh\/connections",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/ssh\/probe"
+          "path": "\/v1\/ssh\/probe",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/ssh\/connections\/save"
+          "path": "\/v1\/ssh\/connections\/save",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/ssh\/connections\/remove"
+          "path": "\/v1\/ssh\/connections\/remove",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/ssh\/test"
+          "path": "\/v1\/ssh\/test",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/ssh\/exec"
+          "path": "\/v1\/ssh\/exec",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/ssh\/files"
+          "path": "\/v1\/ssh\/files",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -2022,187 +3008,332 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/agent\/profile"
+          "path": "\/v1\/agent\/profile",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/agent\/profile"
+          "path": "\/v1\/agent\/profile",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/speech\/models"
+          "path": "\/v1\/speech\/models",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/services"
+          "path": "\/v1\/services",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/health"
+          "path": "\/v1\/health",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/device\/profile"
+          "path": "\/v1\/device\/profile",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/device\/display"
+          "path": "\/v1\/device\/display",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/device\/resources"
+          "path": "\/v1\/device\/resources",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/devices"
+          "path": "\/v1\/devices",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/capabilities"
+          "path": "\/v1\/capabilities",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/limits"
+          "path": "\/v1\/limits",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/discover"
+          "path": "\/v1\/discover",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/discover\/report"
+          "path": "\/v1\/discover\/report",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/guide"
+          "path": "\/v1\/guide",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/start"
+          "path": "\/v1\/start",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/welcome"
+          "path": "\/v1\/welcome",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/demo"
+          "path": "\/v1\/demo",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/samples"
+          "path": "\/v1\/samples",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/openapi.json"
+          "path": "\/v1\/openapi.json",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/registry"
+          "path": "\/v1\/registry",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/changes"
+          "path": "\/v1\/changes",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/tools\/bridgit"
+          "path": "\/v1\/tools\/bridgit",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/tools\/bridget"
+          "path": "\/v1\/tools\/bridget",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
+        },
+        {
+          "method": "GET",
+          "path": "\/v1\/tools\/headless-setup",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/pair"
+          "path": "\/v1\/pair",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/mcp"
+          "path": "\/v1\/mcp",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/me"
+          "path": "\/v1\/me",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/owner\/email"
+          "path": "\/v1\/owner\/email",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/email"
+          "path": "\/v1\/owner\/email",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/satellites"
+          "path": "\/v1\/satellites",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/satellite\/claim"
+          "path": "\/v1\/satellite\/claim",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/satellite\/manifest"
+          "path": "\/v1\/satellite\/manifest",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/satellite\/hub-info"
+          "path": "\/v1\/satellite\/hub-info",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/satellite\/hub"
+          "path": "\/v1\/satellite\/hub",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/satellite\/hub\/photo"
+          "path": "\/v1\/satellite\/hub\/photo",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/satellite\/hub\/portal-login"
+          "path": "\/v1\/satellite\/hub\/portal-login",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/satellite\/unlink"
+          "path": "\/v1\/satellite\/unlink",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/satellite\/hub\/unlink"
+          "path": "\/v1\/satellite\/hub\/unlink",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/satellite\/hub\/agents"
+          "path": "\/v1\/satellite\/hub\/agents",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/satellite\/hub\/agents\/{id}\/pause"
+          "path": "\/v1\/satellite\/hub\/agents\/{id}\/pause",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/links"
+          "path": "\/v1\/links",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/link\/claim"
+          "path": "\/v1\/link\/claim",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/link\/events"
+          "path": "\/v1\/link\/events",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "GET",
-          "path": "\/v1\/link\/peers"
+          "path": "\/v1\/link\/peers",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/link\/disconnect"
+          "path": "\/v1\/link\/disconnect",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/links\/{id}\/disconnect"
+          "path": "\/v1\/owner\/configuration\/links\/{id}\/disconnect",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         },
         {
           "method": "POST",
-          "path": "\/v1\/owner\/configuration\/links\/disconnect-all"
+          "path": "\/v1\/owner\/configuration\/links\/disconnect-all",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
         }
       ]
     },
@@ -2221,15 +3352,24 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/tour"
+          "path": "\/v1\/tour",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/tour\/photo\/{n}"
+          "path": "\/v1\/tour\/photo\/{n}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/tour"
+          "path": "\/v1\/tour",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -2248,7 +3388,10 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/usage"
+          "path": "\/v1\/usage",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -2271,15 +3414,24 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/camera\/video"
+          "path": "\/v1\/camera\/video",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/camera\/video"
+          "path": "\/v1\/camera\/video",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/camera\/video\/review"
+          "path": "\/v1\/camera\/video\/review",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -2302,11 +3454,17 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/listen"
+          "path": "\/v1\/listen",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/listen\/clip\/{id}"
+          "path": "\/v1\/listen\/clip\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -2325,43 +3483,73 @@
       "operations": [
         {
           "method": "POST",
-          "path": "\/v1\/watches"
+          "path": "\/v1\/watches",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/watches"
+          "path": "\/v1\/watches",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/watches\/{id}"
+          "path": "\/v1\/watches\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/watches\/{id}"
+          "path": "\/v1\/watches\/{id}",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/watches\/{id}\/tally"
+          "path": "\/v1\/watches\/{id}\/tally",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "POST",
-          "path": "\/v1\/watches\/{id}\/pause"
+          "path": "\/v1\/watches\/{id}\/pause",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/watches\/{id}\/calibration"
+          "path": "\/v1\/watches\/{id}\/calibration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "PUT",
-          "path": "\/v1\/watches\/{id}\/calibration\/settings"
+          "path": "\/v1\/watches\/{id}\/calibration\/settings",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "DELETE",
-          "path": "\/v1\/watches\/{id}\/calibration\/settings"
+          "path": "\/v1\/watches\/{id}\/calibration\/settings",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         },
         {
           "method": "GET",
-          "path": "\/v1\/situations"
+          "path": "\/v1\/situations",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     },
@@ -2380,7 +3568,10 @@
       "operations": [
         {
           "method": "GET",
-          "path": "\/v1\/weather"
+          "path": "\/v1\/weather",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
         }
       ]
     }

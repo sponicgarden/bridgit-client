@@ -5181,6 +5181,24 @@
    "requires": null
   },
   {
+   "summary": "Owner USB setup helper for devices without a display. Enrollment needs the owner to click its local confirmation; keys are saved privately, never printed",
+   "method": "GET",
+   "auth": false,
+   "mcp_tool": "tools_headless_setup",
+   "query": [],
+   "control_scope": null,
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/tools/headless-setup",
+   "idempotent": false,
+   "path": "/v1/tools/headless-setup",
+   "capability": "status",
+   "returns": "text/x-python; run with --serial SERIAL; --status reads without enrollment",
+   "errors": [],
+   "requires": null
+  },
+  {
    "summary": "Fetch your key with a 6-digit code shown on the phone (alternative to the setup prompt)",
    "method": "POST",
    "auth": false,
@@ -6877,7 +6895,7 @@
    "requires": null
   },
   {
-   "summary": "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
+   "summary": "Requires a usable display; headless devices return not_supported (reason display_unavailable) without creating an interaction. Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
    "method": "POST",
    "auth": true,
    "mcp_tool": "interactions_send",
@@ -7028,6 +7046,7 @@
    "capability": "interactions",
    "returns": "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen (Bridgit came to the front over other apps; it says nothing about the card's layout, which is presentation), missing?: [open_on_arrival, display_over_other_apps], fix?, presentation (standard|full_screen), viewport {width_px, height_px, width_dp, height_dp, density} (the exact canvas the card's page gets in that presentation), aspect_mismatch? {content, viewport, advice} (the page's declared shape differs from the canvas by more than 10 %)}. When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix. ignored? {field: why}: request fields Bridgit did not use (display is reply-only; ask for an edge-to-edge card with presentation)",
    "errors": [
+    "not_supported",
     "capability_disabled",
     "notifications_required",
     "invalid_parameter",
@@ -7128,6 +7147,7 @@
    "capability": "interactions",
    "returns": "the interaction, notification_requested",
    "errors": [
+    "not_supported",
     "not_found",
     "conflict",
     "capability_disabled",
@@ -7216,6 +7236,7 @@
    "capability": "interactions",
    "returns": "interaction_id, length, status",
    "errors": [
+    "not_supported",
     "not_found",
     "invalid_parameter",
     "conflict",
@@ -13299,7 +13320,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 155,
- "count": 385,
+ "api_revision": 157,
+ "count": 386,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

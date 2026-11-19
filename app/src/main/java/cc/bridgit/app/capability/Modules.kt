@@ -69,7 +69,7 @@ class StatusModule(app: BridgeApp) : Capability(app) {
     override val titleRes = R.string.cap_status
     override val descriptionRes = R.string.cap_status_desc
     override val group = "status"
-    override val endpoints = listOf(Endpoints.SERVICES, Endpoints.SPEECH_MODELS, Endpoints.HEALTH, Endpoints.DEVICE_DISPLAY, Endpoints.DEVICE_RESOURCES, Endpoints.DEVICES, Endpoints.CAPABILITIES, Endpoints.LIMITS, Endpoints.DISCOVER, Endpoints.DISCOVERY_REPORT, Endpoints.GUIDE, Endpoints.START, Endpoints.WELCOME, Endpoints.DEMO, Endpoints.SAMPLES, Endpoints.OPENAPI, Endpoints.REGISTRY, Endpoints.CHANGES, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.PAIR, Endpoints.MCP, Endpoints.ME, Endpoints.OWNER_EMAIL, Endpoints.OWNER_EMAIL_SET) + cc.bridgit.app.satellite.SatelliteEndpoints.ALL
+    override val endpoints = listOf(Endpoints.SERVICES, Endpoints.SPEECH_MODELS, Endpoints.HEALTH, Endpoints.DEVICE_DISPLAY, Endpoints.DEVICE_RESOURCES, Endpoints.DEVICES, Endpoints.CAPABILITIES, Endpoints.LIMITS, Endpoints.DISCOVER, Endpoints.DISCOVERY_REPORT, Endpoints.GUIDE, Endpoints.START, Endpoints.WELCOME, Endpoints.DEMO, Endpoints.SAMPLES, Endpoints.OPENAPI, Endpoints.REGISTRY, Endpoints.CHANGES, Endpoints.HELPER, Endpoints.HELPER_LEGACY, Endpoints.HEADLESS_HELPER, Endpoints.PAIR, Endpoints.MCP, Endpoints.ME, Endpoints.OWNER_EMAIL, Endpoints.OWNER_EMAIL_SET) + cc.bridgit.app.satellite.SatelliteEndpoints.ALL
 
     /** GET /v1/owner/email and the health block: where the owner's email verification stands. */
     private fun ownerEmailJson(): JSONObject {
@@ -144,6 +144,7 @@ class StatusModule(app: BridgeApp) : Capability(app) {
             val level = bat?.let { val l = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1); val s = it.getIntExtra(BatteryManager.EXTRA_SCALE, 100); if (l >= 0) l * 100 / s else null }
             val s = app.listener.value
             Reply.Json(JSONObject().put("status", "ok").put("app", "Bridgit").put("app_version", app.appVersion())
+                .put("presentation", cc.bridgit.app.headless.HeadlessMode.status(app))
                 // A0093: which build answers (several can share a phone), the same name Android lists it under.
                 .put("build_type", cc.bridgit.app.BuildConfig.BUILD_TYPE).put("distribution", cc.bridgit.app.BuildConfig.FLAVOR)
                 .put("build_tag", cc.bridgit.app.BuildConfig.BUILD_TAG.ifEmpty { null } ?: JSONObject.NULL)
@@ -302,6 +303,10 @@ class StatusModule(app: BridgeApp) : Capability(app) {
         }
         endpoint(Endpoints.HELPER, block = helper)
         endpoint(Endpoints.HELPER_LEGACY, block = helper)
+        endpoint(Endpoints.HEADLESS_HELPER) {
+            Reply.Bytes(app.assets.open("headless-setup.py").use { it.readBytes() }, "text/x-python; charset=utf-8",
+                mapOf("Content-Disposition" to "attachment; filename=\"headless-setup.py\""))
+        }
         cc.bridgit.app.satellite.SatelliteEndpoints.install(this@install, api, app)
         endpoint(Endpoints.PAIR) {
             if (!app.pairing.isOpen()) throw ErrorCatalog.error("pairing_closed", "No pairing window is open. Ask the owner to open one (Add agent, then Pair with code).")

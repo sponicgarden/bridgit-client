@@ -1609,6 +1609,10 @@
    "operationId": "postInteractionsIdRenotify",
    "responses": {
     "200": {"description": "the interaction, notification_requested"},
+    "422": {
+     "description": "not_supported",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    },
     "401": {"description": "unauthorized"},
     "403": {
      "description": "capability_disabled, notifications_required",
@@ -3529,7 +3533,7 @@
   }},
   "/v1/interactions": {
    "post": {
-    "summary": "Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
+    "summary": "Requires a usable display; headless devices return not_supported (reason display_unavailable) without creating an interaction. Send the owner a notice, a question (buttons, text reply, choice, links), an HTML card or a live text panel. Default to a styled HTML card (kind html, from GET /v1/samples, e.g. html-yes-no) for every test, yes/no, choice, notice or form; a native question or notice is the fallback. Normal priority and no speech. Sending isn't seeing or answering: wait with GET /v1/interactions/{id}?wait=55 (or one /v1/events loop for several)",
     "requestBody": {"content": {"application/json": {"schema": {
      "type": "object",
      "properties": {
@@ -3640,7 +3644,7 @@
     "responses": {
      "200": {"description": "interaction_id, status, expires_at, display {shown_as: full_screen|bridgit_open|notification, full_screen (Bridgit came to the front over other apps; it says nothing about the card's layout, which is presentation), missing?: [open_on_arrival, display_over_other_apps], fix?, presentation (standard|full_screen), viewport {width_px, height_px, width_dp, height_dp, density} (the exact canvas the card's page gets in that presentation), aspect_mismatch? {content, viewport, advice} (the page's declared shape differs from the canvas by more than 10 %)}. When full_screen is false and missing is set, only a notification was shown; pass fix on to the owner. no_takeover=true returns notification without missing or fix. ignored? {field: why}: request fields Bridgit did not use (display is reply-only; ask for an edge-to-edge card with presentation)"},
      "422": {
-      "description": "invalid_parameter",
+      "description": "not_supported, invalid_parameter",
       "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
      },
      "401": {"description": "unauthorized"},
@@ -7417,7 +7421,7 @@
    "responses": {
     "200": {"description": "interaction_id, length, status"},
     "422": {
-     "description": "invalid_parameter",
+     "description": "not_supported, invalid_parameter",
      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
     },
     "401": {"description": "unauthorized"},
@@ -13602,6 +13606,19 @@
    }],
    "tags": ["lan_camera_speaker"]
   }},
+  "/v1/tools/headless-setup": {"get": {
+   "summary": "Owner USB setup helper for devices without a display. Enrollment needs the owner to click its local confirmation; keys are saved privately, never printed",
+   "security": [],
+   "operationId": "getToolsHeadlessSetup",
+   "responses": {
+    "200": {"description": "text/x-python; run with --serial SERIAL; --status reads without enrollment"},
+    "422": {
+     "description": "invalid_parameter",
+     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+    }
+   },
+   "tags": ["status"]
+  }},
   "/v1/owner/configuration/callbacks": {"get": {
    "summary": "Callback presence per agent; receiver secret and destination remain write-only",
    "x-bridgit-control-scope": "owner.configuration",
@@ -14202,7 +14219,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 155,
+  "x-api-revision": 157,
   "title": "Bridgit",
   "version": "2.0.0"
  }

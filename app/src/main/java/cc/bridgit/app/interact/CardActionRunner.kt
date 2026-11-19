@@ -65,7 +65,7 @@ object CardActionRunner {
         try {
             val (spec, params) = CardActions.match(app.registry.modules.flatMap { it.endpoints }, c)
             val api = api() ?: throw CardActions.Refused("service_start_blocked", "Bridgit is off, so ${what}s can't run.")
-            val out = api.dispatch(spec, agent, source, c.query, params, c.body, null, via = via)
+            val out = api.dispatch(cc.bridgit.app.core.request.CoreRequest.inProcess(cc.bridgit.app.core.request.CoreRequest.PORTAL_BRIDGE, spec.method, spec.fullPath, source, null), spec, agent, c.query, params, c.body, via = via)
             return CardActions.result(out.status, out.contentType, out.bytes, toPage = via != "watch")
         } catch (e: CardActions.Refused) {
             // Refused before any endpoint ran: dispatch wrote no log entry, so this one does.

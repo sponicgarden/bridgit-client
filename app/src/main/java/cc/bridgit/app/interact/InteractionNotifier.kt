@@ -162,6 +162,7 @@ object InteractionNotifier {
     /** Registered in BridgeApp: runs on the thread that changed the store, so it stays cheap. */
     fun onChange(ctx: Context, i: Interaction, what: String) {
         val app = ctx.applicationContext as BridgeApp
+        if (cc.bridgit.app.headless.HeadlessMode.active(app)) return
         runCatching {
             when (what) {
                 "created" -> {

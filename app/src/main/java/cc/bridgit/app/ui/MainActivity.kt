@@ -29,6 +29,7 @@ import androidx.navigation.ui.setupWithNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import cc.bridgit.app.BridgeApp
@@ -61,10 +62,15 @@ class MainActivity : AppCompatActivity() {
     private var panelChosen: Long? = null
     private val panelSeen = HashSet<Long>()
     private var navInset = 0
+    private var headlessLaunch = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        if (cc.bridgit.app.headless.HeadlessMode.active(app)) {
+            headlessLaunch = true
+            return
+        }
         val launchBranding = savedInstanceState == null && intent.action == Intent.ACTION_MAIN &&
             intent.hasCategory(Intent.CATEGORY_LAUNCHER)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -204,6 +210,11 @@ class MainActivity : AppCompatActivity() {
     /** The feedback notification (FBK-11) opens its issue. */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        if (headlessLaunch || cc.bridgit.app.headless.HeadlessMode.active(app)) {
+            headlessLaunch = true
+            startHeadless()
+            return
+        }
         setIntent(intent)
         if (intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_LAUNCHER) &&
             nav.currentDestination?.id !in SETUP) {
@@ -375,6 +386,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (headlessLaunch || cc.bridgit.app.headless.HeadlessMode.active(app)) {
+            headlessLaunch = true
+            startHeadless()
+            return
+        }
         MainActivityState.inFront = true
         // A visible start lets Android grant the camera and microphone service types (ARC-03).
         if (app.settings.listenerEnabled && app.agents.count > 0) {
@@ -385,6 +401,18 @@ class MainActivity : AppCompatActivity() {
         cc.bridgit.app.update.UpdateInstaller.clearUpdatedNotice(this) // the "tap to open" notice after an update
         UpdateDialog.resumeAfterPermission(this) // back from "Install unknown apps"
         UpdateDialog.autoCheckIfDue(this) // UPD-02: at most once a day, only when the app is opened.
+    }
+
+    private fun startHeadless() {
+        cc.bridgit.app.headless.HeadlessMode.launch(app)
+        if (!app.settings.listenerEnabled) finish() else lifecycleScope.launch {
+            // Keep the explicit foreground launch until Android processes the service promotion.
+            // A missing OS permission or a refused promotion remains discoverably blocked.
+            kotlinx.coroutines.withTimeoutOrNull(1500) {
+                app.listener.first { it.running && !it.startedInBackground }
+            }
+            finish()
+        }
     }
 
     /**
@@ -433,6 +461,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
+        if (headlessLaunch) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) return // auto-enter, set by updatePip()
         val camera = liveCamera() ?: return
         runCatching { enterPictureInPictureMode(pipParams(camera)) }
@@ -440,6 +469,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        if (headlessLaunch) return
         applyPipChrome(isInPictureInPictureMode)
     }
 

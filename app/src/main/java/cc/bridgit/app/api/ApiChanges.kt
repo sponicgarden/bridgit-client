@@ -707,6 +707,16 @@ object ApiChanges {
             Item("Calibration (A0047): each watch keeps a small decision record per stage per reading on the phone (no media, 30 days), audits a sample of its free answers with the paid model (default 1 in 50, never below 1 in 200), and reports volume, cost, reuse, the audited miss rate with its interval, agreement by confidence band and the same by camera, hour and light", "/v1/watches/{id}/calibration"),
             Item("Set or reset a watch's audit share", "/v1/watches/{id}/calibration/settings"),
         )),
+        Revision(156, "2.0.0", "2026-11-18", listOf(
+            Item("Linked Bridgits reached only over the relay: a call naming target= now runs there (JSON bodies; raw uploads still need Tailscale, reason relay_binary) instead of answering relay_only", null),
+            Item("Both devices' logs name the agent a linked call was for, with the model and harness it reported, and the device it came through", null),
+        )),
+        Revision(157, "2.0.0", "2026-11-19", listOf(
+            Item("Headless Android mode: device.presentation is auto or headless, with authenticated read/write and reset to auto. Devices without a usable display start without WebView or native screens", "/v1/settings"),
+            Item("Health reports presentation and distinguishes USB loopback from Tailscale binding. USB HTTP/MCP requires the same keys and grants; no initial authority is created automatically", "/v1/health"),
+            Item("Owner USB enrollment helper, with explicit owner confirmation and private credential storage", "/v1/tools/headless-setup"),
+            Item("Headless devices refuse visual cards/text/screen capture before queuing them; use available microphone/speaker APIs", "/v1/interactions"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

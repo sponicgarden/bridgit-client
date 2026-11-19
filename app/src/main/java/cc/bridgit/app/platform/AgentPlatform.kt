@@ -70,25 +70,10 @@ class AgentPlatform(val app: BridgeApp) {
         val live = app.agents.get(agent)?.takeUnless { it.suspended } ?: return false
         return (Capabilities.legacy(id)?.let { live.allows(it.key) } ?: true) && store.allowed(agent,id)
     }
-    fun authorize(agent: String, id: String) {
-        if(!app.settings.listenerEnabled) throw ApiError(403,"listener_paused","Resume the listener on the phone")
-        val cap = Capabilities.all.firstOrNull { it.id == id } ?: throw ApiError(422,"unknown_scope","Unknown capability")
-        val superConfiguration = app.agents.get(agent)?.let { live -> live.superPowers && live.allows("settings") && app.settings.isOn("settings_api") &&
-            cc.bridgit.app.ui.home.HomeStates.controlAgents(app).any { it.id == agent } } == true
-        val accessUrl = "/v1/owner/configuration/access"
-        if (!hasGrant(agent,id)) {
-            if (id == "owner.configuration" && superConfiguration) throw ApiError(403,"agent_not_allowed",
-                "This Super agent can grant its configuration scope through $accessUrl; no phone approval is needed",
-                mapOf("configuration_access_url" to accessUrl, "user_action_required" to false))
-            throw ApiError(403,"agent_not_allowed","The owner or an existing Super agent must grant $id to this agent")
-        }
-        val blockers = Capabilities.blockers(app,cap)
-        if (blockers.isNotEmpty()) {
-            if (superConfiguration && blockers.all { it == "feature_disabled" }) throw ApiError(403,blockers.first(),
-                "This Super agent can enable ${cap.label} through $accessUrl/features; no phone approval is needed",
-                mapOf("blockers" to JSONArray(blockers), "configuration_access_url" to accessUrl, "user_action_required" to false))
-            throw ApiError(403,blockers.first(),"Open Agent permissions on the phone: ${cap.label}",mapOf("blockers" to JSONArray(blockers),"user_action_required" to true))
-        }
+    /** A v2 control scope: listener on, scope known, granted, nothing blocking it. The checks live in core.authority.Grants (A0332). */
+    fun authorize(agent: String, id: String) = cc.bridgit.app.core.authority.Grants.requireScope(grants, agent, id)
+    private val grants = object : cc.bridgit.app.core.authority.Grants.State by cc.bridgit.app.core.authority.AndroidGrantState(app) {
+        override fun hasGrant(agentId: String, scope: String) = this@AgentPlatform.hasGrant(agentId, scope)
     }
     fun grant(agent: String,id: String,until: Long) { require(Capabilities.all.any { it.id == id }); if (until != Long.MAX_VALUE) app.agents.update(agent) { it.copy(maximumControl = false) }; store.grant(agent,id,until); store.emit(agent,"grant.changed",id) }
     fun revoke(agent: String,id: String? = null) {

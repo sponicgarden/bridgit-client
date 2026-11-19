@@ -113,6 +113,7 @@ class ScreenModule(app: BridgeApp) : Capability(app) {
     override val switchKey = "screen"
     override val endpoints = listOf(Endpoints.SCREEN_CAPTURE)
     override fun blockedReason() = when {
+        cc.bridgit.app.headless.HeadlessMode.active(app) -> "display_unavailable"
         Build.VERSION.SDK_INT < 30 -> "android_version"
         !ScreenshotService.isEnabled(app) -> "accessibility_off"
         !app.captureNotificationsOn() -> "notifications_off"
@@ -139,6 +140,7 @@ class ScreenModule(app: BridgeApp) : Capability(app) {
 
     override fun Route.install(api: ApiServer) = with(api) {
         endpoint(Endpoints.SCREEN_CAPTURE) {
+            if (cc.bridgit.app.headless.HeadlessMode.active(app)) throw ErrorCatalog.error("not_supported", "Headless devices have no screen to capture.", mapOf("reason" to "display_unavailable"))
             val mode = body.optString("mode", "private")
             if (mode != "private") throw ErrorCatalog.error("invalid_parameter", "mode must be \"private\" (system mode isn't built yet).")
             val spec = Sizing.resolve({ arg(it) }, "agent")

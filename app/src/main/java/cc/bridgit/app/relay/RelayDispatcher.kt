@@ -14,12 +14,17 @@ class RelayDispatcher(private val app:BridgeApp,private val api:ApiServer) {
     suspend fun dispatch(config:JSONObject,request:JSONObject,deadline:Long,created:Long,relayJob:String,caller:JSONObject?=null):JSONObject =
         dispatchEffective(cc.bridgit.app.ownerapi.ConfigurationDelegation.effective(app, config), request, deadline, created, relayJob, caller)
     private suspend fun dispatchEffective(config:JSONObject,request:JSONObject,deadline:Long,created:Long,relayJob:String,caller:JSONObject?):JSONObject {
-        val id=config.getString("id");val agent=app.agents.get(id) ?: throw ApiError(401,"agent_revoked","Agent removed")
-        if(!app.settings.listenerEnabled||!RelayStore(app).enabled||agent.keyHash!=config.getString("generation"))throw ApiError(403,"agent_revoked","Relay authority changed")
-        // A0120: API access off refuses every relay call; a linked Bridgit's own plumbing still runs, as when paused.
-        if(!agent.apiAccess&&!(app.links.isLinkAgent(id)&&request.optString("path") in cc.bridgit.app.link.LinkPolicy.PLUMBING.map { "/v1$it" }))throw cc.bridgit.app.api.ApiAccess.refusal(agent)
-        if(!limiter.tryAcquire("relay:$id",300))throw ApiError(429,"rate_limited","At most 300 relay requests per minute")
-        if(agent.caps==null)throw ApiError(403,"explicit_grants_required","Relay agents need explicit grants")
+        val id=config.getString("id")
+        val link=linkHeaders(id,request)
+        // The job as the relay door's CoreRequest (A0332): its source names the relay mode and agent, as the log always did.
+        val core=cc.bridgit.app.core.request.CoreRequest(cc.bridgit.app.core.request.CoreRequest.RELAY_JOB,request.optString("method"),request.optString("path"),"relay:${config.optString("mode")}:$id") { name ->
+            if(name.equals(cc.bridgit.app.core.request.CoreRequest.IDEMPOTENCY_KEY,ignoreCase=true)) request.optString("idempotency_key").ifEmpty { null }
+            // A linked Bridgit's forwarded call (A0335): who it is for, from the job's allowlisted headers.
+            else link.entries.firstOrNull { it.key.equals(name,ignoreCase=true) }?.value }
+        // The agent steps (agent_live, relay_authority, api_access, rate, explicit_grants) live in core.authority.Grants.
+        val agent=cc.bridgit.app.core.authority.Grants.requireRelayAgent(cc.bridgit.app.core.authority.AndroidGrantState(app),id,{ config.getString("generation") },
+            relayAuthority=app.settings.listenerEnabled&&RelayStore(app).enabled,
+            linkPlumbing=core.path in cc.bridgit.app.link.LinkPolicy.PLUMBING.map { "/v1$it" }) { limiter.tryAcquire("relay:$id",300) }
         if(deadline<=System.currentTimeMillis())throw ApiError(409,"deadline_expired","Job expired")
         val method0=request.optString("method");val path0=request.optString("path")
         // Linked Bridgits (§4.1): a link code's claim-only agent may only claim, once, before the code expires.
@@ -85,8 +90,14 @@ class RelayDispatcher(private val app:BridgeApp,private val api:ApiServer) {
         val (spec,params)=route
         if(!spec.auth||spec.path=="/mcp"||(!maximum && (spec.privileged||spec.capability=="feedback"||"$method ${spec.fullPath}" !in strings(config,"routes"))))throw ApiError(403,"relay_route_excluded","Owner has not permitted this relay route")
         if(spec.capture||spec.capability in setOf("speaker","video","screen","mic","camera","ring","torch","controls","clipboard"))requireLive(created)
-        val out=api.dispatch(spec,agent,"relay:${config.getString("mode")}:$id",query.keys().asSequence().associateWith { query.get(it).toString() },params,body,request.optString("idempotency_key").ifEmpty { null },"relay:${config.getString("mode")}")
+        val out=api.dispatch(core.copy(method=spec.method,path=spec.fullPath),spec,agent,query.keys().asSequence().associateWith { query.get(it).toString() },params,body,"relay:${config.getString("mode")}")
         return JSONObject().put("status",out.status).put("content_type",out.contentType).put("body_base64",Sealed.b64(out.bytes)).put("headers",JSONObject(out.headers))
+    }
+    /** A linked Bridgit's forwarded call (A0335): who it is for, from the job's allowlisted headers. Nobody else's job carries them. */
+    internal fun linkHeaders(id:String,request:JSONObject):Map<String,String> {
+        if(!app.links.isLinkAgent(id))return emptyMap()
+        val h=request.optJSONObject("headers") ?: return emptyMap()
+        return h.keys().asSequence().mapNotNull { k -> cc.bridgit.app.satellite.LinkRelayClient.FORWARD_HEADERS.firstOrNull { it.equals(k,ignoreCase=true) }?.let { it to h.optString(k).take(400) } }.toMap()
     }
     private suspend fun command(id:String,c:JSONObject,name:String,args:JSONObject,key:String,deadline:Long,created:Long,relayJob:String):JSONObject {
         if(name !in allowedTools(c, app.agents.get(id)?.maximumControl == true && !PortalData.isPortalConfig(strings(c,"routes"),strings(c,"tools"))))throw ApiError(403,"relay_tool_excluded","Owner has not permitted this tool")

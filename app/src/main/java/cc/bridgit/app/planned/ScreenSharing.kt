@@ -55,7 +55,7 @@ class ScreenShareModule(app: BridgeApp) : Capability(app) {
     override val group = "photos"
     override val switchKey = "screen_share"
     override val endpoints = listOf(PlannedEndpoints.SCREEN_GRANT, PlannedEndpoints.SCREEN_GRANTS, PlannedEndpoints.SHARE_CAPTURE, PlannedEndpoints.SHARE_STOP)
-    override fun blockedReason() = if (!app.captureNotificationsOn()) "notifications_off" else null
+    override fun blockedReason() = if (cc.bridgit.app.headless.HeadlessMode.active(app)) "display_unavailable" else if (!app.captureNotificationsOn()) "notifications_off" else null
     override fun Route.install(api: ApiServer) = with(api) {
         endpoint(PlannedEndpoints.SCREEN_GRANT) {
             requireUsable()
@@ -76,7 +76,7 @@ class ScreenShareModule(app: BridgeApp) : Capability(app) {
             val bytes = projection.capture()
             Reply.Bytes(bytes, "image/jpeg")
         }
-        endpoint(PlannedEndpoints.SHARE_STOP) { requireUsable(); app.screenGrants.activeFor(agent!!.id)?.stopSelf(); Reply.Json(JSONObject().put("stopped", true)) }
+        endpoint(PlannedEndpoints.SHARE_STOP) { if (!cc.bridgit.app.headless.HeadlessMode.active(app)) requireUsable(); app.screenGrants.activeFor(agent!!.id)?.stopSelf(); Reply.Json(JSONObject().put("stopped", true)) }
     }
 }
 /** One MediaProjection per owner grant and one VirtualDisplay per Android consent token (API 34+). */

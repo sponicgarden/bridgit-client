@@ -1,6 +1,6 @@
 {
  "shape": "{\"error\": \"<code>\", \"message\": \"...\", \"request_id\": \"...\", ...extra fields}",
- "api_revision": 155,
+ "api_revision": 157,
  "errors": [
   {
    "code": "model_unavailable",

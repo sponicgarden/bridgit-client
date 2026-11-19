@@ -150,7 +150,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
         val rid = newRequestId()
         val source = sourceOf(call)
         call.response.header("X-Request-Id", rid)
-        val err = if (!Net.isTailnet(source)) ErrorCatalog.error("forbidden_source", "Only devices on the owner's Tailscale network may call Bridgit.")
+        val err = if (!cc.bridgit.app.headless.HeadlessMode.accepts(app, source)) ErrorCatalog.error("forbidden_source", "Only devices on the owner's Tailscale network may call Bridgit.")
         else ErrorCatalog.error("not_found", "No such endpoint. GET /v1/guide lists them all.")
         call.respondText(err.toJson(rid).toString(), ContentType.Application.Json, HttpStatusCode.fromValue(err.http))
         app.log.append(LogEntry(ts = System.currentTimeMillis(), channel = "audit", kind = "request", level = "warn",
@@ -180,6 +180,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
         var ranOn: String? = null
         var forwardedOut = 0L
         var onBehalf: Pair<String, String>? = null
+        var runtime: cc.bridgit.app.satellite.SatellitePolicy.Runtime? = null
         val inFlight = app.latency.begin()
         try {
             val admitted = admitHttp(cc.bridgit.app.core.request.CoreRequest("http_v1", spec.method, spec.fullPath, source) { call.request.headers[it] },
@@ -187,6 +188,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 onHeader = { k, v -> call.response.header(k, v) })
             agent = admitted.agent
             onBehalf = admitted.onBehalf
+            if (onBehalf != null) runtime = cc.bridgit.app.satellite.SatellitePolicy.parseOnBehalfRuntime(call.request.headers[cc.bridgit.app.satellite.SatellitePolicy.ON_BEHALF_RUNTIME_HEADER])
             if (spec.idempotencyRequired && call.request.headers["Idempotency-Key"].isNullOrBlank())
                 throw ErrorCatalog.error("invalid_parameter", "Idempotency-Key is required for this operation")
             // Satellites (docs/spec-satellites.md, mode A): a target runs the call on a satellite instead of here.
@@ -312,7 +314,8 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
             app.latency.record(ApiLatency.Call(ts = started, api = OpenApi.opId(spec), method = spec.method, path = spec.fullPath, via = "http",
                 requestId = rid, agentId = agent?.id, agent = name, durationMs = tookMs, http = http, result = result,
                 bytesIn = bytesIn, bytesOut = r?.bytesOut ?: forwardedOut, inFlight = inFlight, ranOn = ranOn))
-            val msg = r?.message ?: describe(name, spec, http, result) + (ranOn?.let { " on $it" } ?: "")
+            val who = agent?.name?.let { n -> onBehalf?.let { cc.bridgit.app.satellite.SatellitePolicy.attributed(it.second, runtime, n.removePrefix("Hub ")) } } ?: name
+            val msg = r?.message ?: describe(who, spec, http, result) + (ranOn?.let { " on $it" } ?: "")
             app.log.append(LogEntry(
                 ts = started, channel = "audit", kind = if (spec.path == "/pair") "pairing" else "request",
                 level = when { http >= 500 -> "error"; http >= 400 -> "warn"; else -> "info" },
@@ -321,9 +324,13 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 bytesOut = r?.bytesOut ?: forwardedOut, durationMs = tookMs, requestId = rid,
                 message = Redactor.string(msg, 300),
                 data = (r?.data ?: JSONObject()).also { d -> revokedReason?.let { d.put("reason", it) }; ranOn?.let { d.put("ran_on", it) }
-                    onBehalf?.let { d.put("on_behalf_of", JSONObject().put("id", it.first).put("name", it.second)) } }.let { Redactor.params(it) }))
+                    onBehalf?.let { d.put("on_behalf_of", onBehalfJson(it, runtime)) } }.let { Redactor.params(it) }))
         }
     }
+
+    /** The agent a link call was for, with the model and harness it reported on its own device (A0304; unverified). */
+    private fun onBehalfJson(who: Pair<String, String>, runtime: cc.bridgit.app.satellite.SatellitePolicy.Runtime?): JSONObject =
+        JSONObject().put("id", who.first).put("name", who.second).also { o -> runtime?.let { o.put("model", it.model); it.harness?.let { h -> o.put("harness", h) } } }
 
     /** SEC-07 capture limits, per agent and per source address. */
     /** [sub]: on a satellite, the hub agent a hub-link call is for, so each hub agent has its own bucket (SAT-37); the per-address limit still caps the hub as a whole. */
@@ -413,14 +420,18 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
         // sat: ids keep their satellite error codes (aliases, LNK-49); names use the link ones.
         val old = cc.bridgit.app.satellite.SatelliteLink.ID_RE.matches(target)
         if (!P.forwardable(spec)) throw ErrorCatalog.error(if (old) "not_on_satellite" else "not_on_target", "${spec.method} ${spec.fullPath} can't run on a linked device yet. Leave target out to run it on this device.")
-        // Linked over the relay only (no Tailscale): the link itself works, but calls aren't forwarded over the relay yet.
-        if (cc.bridgit.app.satellite.LinkRelayClient.isRelay(sat.base)) throw ErrorCatalog.error(if (old) "not_on_satellite" else "not_on_target",
-            "${sat.name} is linked over the relay, and calls aren't passed to a linked device over the relay yet. Turn Tailscale on on both devices to use it, or leave target out to run it on this device.",
-            mapOf("reason" to "relay_only"))
+        // Linked over the relay only (no Tailscale): JSON calls go as one relay job; raw uploads can't yet (A0335).
+        val relay = cc.bridgit.app.satellite.LinkRelayClient.isRelay(sat.base)
+        val ctype0 = call.request.headers["Content-Type"]
+        if (relay && spec.method != "GET" && spec.method != "DELETE" && !ctype0.isNullOrBlank() && !ctype0.startsWith("application/json"))
+            throw ErrorCatalog.error(if (old) "not_on_satellite" else "not_on_target",
+                "${sat.name} is linked over the relay, which carries only JSON requests to it so far. Send this upload with Tailscale on on both devices, or leave target out to run it on this device.",
+                mapOf("reason" to "relay_binary"))
         if (!limiter.tryAcquire("sat-fwd:${agent.id}", RateLimiter.SATELLITE_CALLS_PER_AGENT))
             throw ErrorCatalog.error("rate_limited", "At most ${RateLimiter.SATELLITE_CALLS_PER_AGENT} satellite calls per minute per agent.",
                 mapOf("retry_after_s" to limiter.retryAfterS("sat-fwd:${agent.id}")))
         chargeCapture(spec, agent, source)
+        if (relay) return forwardOverRelay(call, spec, agent, target, sat, old)
         var file: java.io.File? = null
         try {
             val ctype = call.request.headers["Content-Type"]
@@ -437,6 +448,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 if (lk !in P.DROPPED_REQUEST_HEADERS && !lk.startsWith("x-bridgit-") && !lk.startsWith("x-bridget-")) vs.forEach { headers += k to it }
             }
             headers += P.ON_BEHALF_HEADER to P.onBehalfOf(agent.id, agent.name)
+            P.onBehalfRuntime(agent.model, agent.harness)?.let { headers += P.ON_BEHALF_RUNTIME_HEADER to it }
             call.request.headers["Idempotency-Key"]?.trim()?.let { k ->
                 if (!IdempotencyCache.KEY_RE.matches(k)) throw ErrorCatalog.error("invalid_parameter", "Idempotency-Key must be 8-128 letters, digits, - or _ (a UUID works).")
                 if (spec.idempotent) headers += "Idempotency-Key" to P.forwardedIdempotencyKey(agent.id, k)
@@ -509,6 +521,81 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
         } finally { file?.delete() }
     }
 
+    /**
+     * [forwardToSatellite] for a linked Bridgit reached only over the relay (A0335): the same checks have passed; the
+     * call goes as one relay job with only the allowlisted headers (who it is for, never a target: LNK-32), and the
+     * other device's answer comes back unchanged. Pausing or narrowing the agent stops the wait, as over Tailscale.
+     */
+    private suspend fun forwardOverRelay(call: ApplicationCall, spec: EndpointSpec, agent: Agent, target: String,
+                                         sat: cc.bridgit.app.link.Links.Reach, old: Boolean): Forwarded {
+        val P = cc.bridgit.app.satellite.SatellitePolicy
+        val R = cc.bridgit.app.satellite.LinkRelayClient
+        val raw = if (spec.method == "GET" || spec.method == "DELETE") null else readBody(call, MAX_BODY)
+        val body = raw?.takeIf { it.isNotEmpty() }?.let { parseBody(it) }
+        val headers = mutableListOf<Pair<String, String>>()
+        call.request.headers["Accept"]?.let { headers += "Accept" to it }
+        headers += P.ON_BEHALF_HEADER to P.onBehalfOf(agent.id, agent.name)
+        P.onBehalfRuntime(agent.model, agent.harness)?.let { headers += P.ON_BEHALF_RUNTIME_HEADER to it }
+        val idem = call.request.headers["Idempotency-Key"]?.trim()?.let { k ->
+            if (!IdempotencyCache.KEY_RE.matches(k)) throw ErrorCatalog.error("invalid_parameter", "Idempotency-Key must be 8-128 letters, digits, - or _ (a UUID works).")
+            k.takeIf { spec.idempotent }?.let { P.forwardedIdempotencyKey(agent.id, it) }
+        }
+        val query = call.request.queryParameters.entries().filter { it.key != P.TARGET_QUERY }.flatMap { e -> e.value.map { e.key to it } }
+        val req = R.forwardRequest(spec.method, call.request.path(), query, headers, body, idem)
+        val bytesIn = raw?.size?.toLong() ?: 0L
+        try { cc.bridgit.app.satellite.SatelliteClient.paused(sat.toHub) } catch (e: cc.bridgit.app.satellite.SatelliteClient.Failure) {
+            throw ErrorCatalog.error("forbidden", e.message ?: "Linked devices are paused here.", mapOf("reason" to "paused"))
+        }
+        var revoked = false
+        val answer = coroutineScope {
+            val job = async(Dispatchers.IO) {
+                runInterruptible { R.forward(sat.base, sat.key, req, cc.bridgit.app.outbound.Outbound.Actor.agent(agent.id, agent.name)) }
+            }
+            val watcher = launch {
+                while (isActive && job.isActive) {
+                    delay(200)
+                    val live = app.agents.get(agent.id)
+                    if (live == null || live.keyHash != agent.keyHash || live.suspended || !live.allows(spec.capability) || !sat.stillAllowed(agent.id)) {
+                        revoked = true; job.cancel(); break
+                    }
+                }
+            }
+            try { job.await() }
+            catch (e: CancellationException) {
+                currentCoroutineContext().ensureActive()
+                if (!revoked) throw e
+                requireGrant(agent, spec)
+                throw ErrorCatalog.error("conflict", "Authorization changed while this request was running. Start a new request if it is still wanted.")
+            } catch (e: cc.bridgit.app.satellite.SatelliteClient.Failure) {
+                when (e.code) {
+                    "satellite_offline" -> { sat.offline()
+                        throw ErrorCatalog.error(if (old) "satellite_offline" else "target_offline", "${sat.name} didn't answer over the relay. Retry later; the owner may need to open Bridgit on it.",
+                            mapOf("last_seen" to (sat.lastSeen.takeIf { it > 0 }), "retry_after_s" to 30)) }
+                    "rate_limited" -> throw ErrorCatalog.error("rate_limited", e.message ?: "The relay is busy for this link.", mapOf("retry_after_s" to 30))
+                    else -> throw ApiError(502, "upstream_failed", "The relay refused the call to ${sat.name}: ${e.message}", mapOf("upstream_error" to e.code))
+                }
+            } finally { watcher.cancel() }
+        }
+        sat.seen(answer.status)
+        answer.headers.forEach { (k, v) ->
+            val lk = k.lowercase()
+            when {
+                lk == "x-request-id" -> call.response.header(P.SAT_REQUEST_ID_HEADER, v)
+                lk in P.DROPPED_RESPONSE_HEADERS -> {}
+                else -> runCatching { call.response.header(k, v) }
+            }
+        }
+        call.response.header(P.RAN_ON_HEADER, if (old) sat.id else sat.rec.peerName ?: target)
+        val ct = runCatching { ContentType.parse(answer.contentType) }.getOrNull() ?: ContentType.Application.Json
+        call.respondBytes(answer.bytes, ct, HttpStatusCode.fromValue(answer.status))
+        if (answer.status in 200..299) return Forwarded(answer.status, "ok", bytesIn, answer.bytes.size.toLong())
+        val err = runCatching { JSONObject(String(answer.bytes)) }.getOrNull()
+        val code = err?.optString("error")?.takeIf { it.isNotEmpty() }
+        // LNK-30: the other device disconnected while this one was offline: mark this side off too.
+        if (code == "link_revoked") runCatching { app.links.farRevoked(sat.rec, err.optString("scope").ifEmpty { null }) }
+        return Forwarded(answer.status, code ?: "satellite_http_${answer.status}", bytesIn, answer.bytes.size.toLong())
+    }
+
     // ---- In-process dispatch for MCP tool calls (API-15) -------------------------------------
 
     /** Every registered handler, filled while routing is installed, so MCP can run an endpoint without HTTP. */
@@ -564,7 +651,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                            onHeader: (String, String) -> Unit = { _, _ -> }): Admission {
         var agent: Agent? = null
         var onBehalf: Pair<String, String>? = null
-        if (!Net.isTailnet(r.source)) throw ErrorCatalog.error("forbidden_source", "Only devices on the owner's Tailscale network may call Bridgit.")
+        if (!cc.bridgit.app.headless.HeadlessMode.accepts(app, r.source)) throw ErrorCatalog.error("forbidden_source", "Only devices on the owner's Tailscale network may call Bridgit.")
         if (spec.auth) {
             val token = r.bearer
             when (val a = app.agents.authenticate(token)) {
@@ -627,22 +714,12 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
             throw ErrorCatalog.error("capability_disabled", "The capability is off; cached responses are unavailable.")
     }
 
+    /** The grant steps (authorization.json grant.*), shared by every door that reaches a v1 handler; they live in core.authority.Grants (A0332). */
     private fun requireGrant(agent: Agent, spec: EndpointSpec, allowListenerPaused: Boolean = false) {
-        val live = app.agents.get(agent.id) ?: throw ErrorCatalog.error("unauthorized", "Agent removed.")
-        if (live.keyHash != agent.keyHash) throw ErrorCatalog.error("unauthorized", "Agent key was rotated during the request.")
-        // A paused link agent still makes the link's own calls (events, disconnect), so both sides stay in step.
-        val plumbing = cc.bridgit.app.link.LinkPolicy.isPlumbing(spec) && app.links.isLinkAgent(live.id)
-        if (!live.apiAccess && !plumbing) throw ApiAccess.refusal(live)
-        if (live.paused && !plumbing)
-            throw ErrorCatalog.error("forbidden", "The owner paused ${live.name} on this phone. Wait until they resume you; don't retry before then.",
-            mapOf("reason" to "agent_paused"))
-        if (!live.allows(spec.capability)) throw ErrorCatalog.error("agent_not_allowed", "This agent does not have ${spec.capability} access. Ask the owner to update its permissions on the phone.")
-        spec.controlScope?.let { scope ->
-            if (scope == "owner.configuration") cc.bridgit.app.ownerapi.ConfigurationAccess(app, live).require(allowListenerPaused)
-            else app.platform.authorize(live.id, scope)
-        }
-        app.alerts.checkAgentCall(exempt = cc.bridgit.app.alerts.EmailGate.exempt(spec.capability))
+        cc.bridgit.app.core.authority.Grants.requireGrant(grantState, agent, cc.bridgit.app.core.authority.Grants.Target(spec.capability, spec.controlScope,
+            cc.bridgit.app.link.LinkPolicy.isPlumbing(spec), cc.bridgit.app.alerts.EmailGate.exempt(spec.capability)), allowListenerPaused)
     }
+    private val grantState by lazy { cc.bridgit.app.core.authority.AndroidGrantState(app) }
 
     private fun handlerKey(spec: EndpointSpec) = "${spec.method} ${spec.path}"
 
@@ -659,7 +736,17 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
      * The caller (POST /v1/mcp) has already passed the source and key checks for [agent].
      */
     suspend fun dispatch(spec: EndpointSpec, agent: Agent, source: String, queries: Map<String, String>,
-                         pathParams: Map<String, String>, body: JSONObject, idempotencyKey: String?, via: String = "mcp"): Outcome {
+                         pathParams: Map<String, String>, body: JSONObject, idempotencyKey: String?, via: String = "mcp"): Outcome =
+        dispatch(cc.bridgit.app.core.request.CoreRequest.inProcess(cc.bridgit.app.core.request.CoreRequest.doorOf(via), spec.method, spec.fullPath, source, idempotencyKey),
+            spec, agent, queries, pathParams, body, via)
+
+    /**
+     * The in-process doors' entry (A0332): [r] is the call as its door translated it (door, source, Idempotency-Key),
+     * then the same steps as above. [via] is the log marker (mcp, mcp_app, relay:sealed, schedule, ...).
+     */
+    suspend fun dispatch(r0: cc.bridgit.app.core.request.CoreRequest, spec: EndpointSpec, agent: Agent, queries: Map<String, String>,
+                         pathParams: Map<String, String>, body: JSONObject, via: String): Outcome {
+        val source = r0.source
         val started = System.currentTimeMillis()
         val rid = newRequestId()
         val logParams = JSONObject()
@@ -670,25 +757,29 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
             logParams.put(k, spec.loggedParam(k, v))
         }
         logParams.put("via", via)
-        val r = Req(spec, agent, rid, source, body, null, queries, pathParams) { name ->
-            when { name.equals("Content-Type",ignoreCase=true) -> "application/json"; name.equals("Idempotency-Key",ignoreCase=true) -> idempotencyKey; else -> null }
-        }
+        val r = Req(spec, agent, rid, source, body, null, queries, pathParams, r0.header)
         r.viaMcp = true
         r.invocation = via
         var http = 200
         var result = "ok"
         var idemKey: String? = null
+        var onBehalf: Pair<String, String>? = null
+        var runtime: cc.bridgit.app.satellite.SatellitePolicy.Runtime? = null
         val inFlight = app.latency.begin()
         try {
-            // A linked Bridgit over the relay gets the same link checks as over Tailscale.
-            if (app.links.isLinkAgent(agent.id)) linkAgentCall(spec, agent) { null }
+            // A linked Bridgit over the relay gets the same link checks as over Tailscale, and says who it calls for (A0335).
+            if (app.links.isLinkAgent(agent.id)) {
+                fun header(n: String) = r0.header(n)
+                onBehalf = linkAgentCall(spec, agent) { header(it) }
+                if (onBehalf != null) runtime = cc.bridgit.app.satellite.SatellitePolicy.parseOnBehalfRuntime(header(cc.bridgit.app.satellite.SatellitePolicy.ON_BEHALF_RUNTIME_HEADER))
+            }
             requireGrant(agent, spec)
             if(cc.bridgit.app.capture.CapturePresentationRules.requiresViewfinder(via) && spec.path in setOf("/camera/arm","/camera/pose/start","/lan-cameras/snapshot")) throw ApiError(409,"viewfinder_required","Person-started captures must use the visible camera capture and review flow")
             if (body.toString().toByteArray(Charsets.UTF_8).size > spec.maxBody) throw ErrorCatalog.error("payload_too_large", "Request exceeds this operation’s body limit")
             val block = handlers[handlerKey(spec)] ?: throw ErrorCatalog.error("not_found", "No such endpoint.")
             spec.power?.let { PowerGate.require(agent, it, spec.fullPath) }
-            if (spec.idempotencyRequired && idempotencyKey.isNullOrBlank()) throw ErrorCatalog.error("invalid_parameter", "idempotency_key is required for this operation")
-            idemKey = idempotencyKey?.trim()?.takeIf { spec.idempotent && !spec.backendIdempotency }
+            if (spec.idempotencyRequired && r0.idempotencyKey.isNullOrBlank()) throw ErrorCatalog.error("invalid_parameter", "idempotency_key is required for this operation")
+            idemKey = r0.idempotencyKey?.trim()?.takeIf { spec.idempotent && !spec.backendIdempotency }
             if (idemKey != null) {
                 if (!IdempotencyCache.KEY_RE.matches(idemKey)) { idemKey = null
                     throw ErrorCatalog.error("invalid_parameter", "idempotency_key must be 8-128 letters, digits, - or _ (a UUID works).") }
@@ -719,7 +810,7 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 }
             }
             admits[handlerKey(spec)]?.invoke(queries, agent)
-            chargeCapture(spec, agent, source)
+            chargeCapture(spec, agent, source, onBehalf?.first)
             val (status, ctype, bytes, headers) = render(runGuarded(r, block), rid)
             http = status
             if (r.bytesOut == 0L) r.bytesOut = bytes.size.toLong()
@@ -747,15 +838,16 @@ class ApiServer(val service: BridgeService, private val hosts: List<String>, val
                 bytesIn = body.toString().length.toLong(), bytesOut = r.bytesOut, inFlight = inFlight))
             // Relay and card calls share this path; the log says which one it was.
             val viaLabel = if (via == "mcp") "MCP" else via
-            val msg = r.message?.let { if ("MCP" in it || viaLabel in it) it else "$it (via $viaLabel)" } ?: (describe(agent.name, spec, http, result) + " (via $viaLabel)")
+            val who = onBehalf?.let { cc.bridgit.app.satellite.SatellitePolicy.attributed(it.second, runtime, agent.name.removePrefix("Hub ")) } ?: agent.name
+            val msg = r.message?.let { if ("MCP" in it || viaLabel in it) it else "$it (via $viaLabel)" } ?: (describe(who, spec, http, result) + " (via $viaLabel)")
             app.log.append(LogEntry(
                 ts = started, channel = "audit", kind = "request",
                 level = when { http >= 500 -> "error"; http >= 400 -> "warn"; else -> "info" },
-                agentId = agent.id, agent = agent.name, sourceIp = source, method = spec.method, endpoint = spec.fullPath,
+                agentId = agent.id, agent = onBehalf?.let { "${it.second} via ${agent.name.removePrefix("Hub ")}" } ?: agent.name, sourceIp = source, method = spec.method, endpoint = spec.fullPath,
                 params = Redactor.params(logParams), http = http, result = result, bytesIn = body.toString().length.toLong(),
                 bytesOut = r.bytesOut, durationMs = tookMs, requestId = rid,
                 message = Redactor.string(msg, 300),
-                data = (r.data ?: JSONObject()).put("via", via).let { Redactor.params(it) }))
+                data = (r.data ?: JSONObject()).put("via", via).also { d -> onBehalf?.let { d.put("on_behalf_of", onBehalfJson(it, runtime)) } }.let { Redactor.params(it) }))
         }
     }
 

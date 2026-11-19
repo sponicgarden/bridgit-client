@@ -21,6 +21,16 @@ class ListenerReportTest {
         assertEquals("listening", ListenerReport.state(ListenerState(running = true, boundTo = listOf("fd7a:115c:a1e0::1", "100.94.27.79")), listOf("100.94.27.79", "fd7a:115c:a1e0::1")))
     }
 
+    @Test fun usbReportsActualBindingsIncludingTailnetReconnection() {
+        val loopback = ListenerState(running = true, boundTo = listOf("127.0.0.1"), port = 8734)
+        assertEquals("listening", ListenerReport.state(loopback, emptyList()))
+        assertEquals("loopback", ListenerReport.json(loopback, emptyList(), 8734, false).getString("binds"))
+        val stale = loopback.copy(boundTo = ts + "127.0.0.1")
+        assertEquals("rebinding", ListenerReport.state(stale, emptyList()))
+        assertEquals("tailscale_and_loopback", ListenerReport.json(stale, emptyList(), 8734, true).getString("binds"))
+        assertEquals("listening", ListenerReport.state(stale, ts))
+    }
+
     @Test fun json() {
         val j = ListenerReport.json(ListenerState(running = true, boundTo = ts, port = 8734, magicDns = "pixel.tail1234.ts.net"), ts, 8734, true)
         assertEquals("listening", j.getString("state"))

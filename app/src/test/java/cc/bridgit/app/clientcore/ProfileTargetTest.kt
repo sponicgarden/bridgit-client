@@ -21,9 +21,12 @@ class ProfileTargetTest {
         val device = ProfileBuilder.Device("bgi_fixturetablet", null, "Fixture tablet", "tablet", "15", "1.8.0", 149, listOf("host"),
             mapOf("camera" to "present", "microphone" to "present", "speaker" to "present", "location" to "present"))
         val caps = listOf(
-            ProfileBuilder.Capability("status", true, true, true, null, emptyList(), listOf("GET" to "/v1/health")),
+            // A0333: per operation, its own scope or power, and what the caller holds and what blocks it.
+            ProfileBuilder.Capability("status", true, true, true, null, emptyList(), listOf(ProfileBuilder.Operation("GET", "/v1/health"),
+                ProfileBuilder.Operation("POST", "/v1/owner/configuration/access", scope = "owner.configuration", agentAllowed = false),
+                ProfileBuilder.Operation("POST", "/v1/fixer/restart", power = "fixer_mode", blockedReason = "listener_paused"))),
             ProfileBuilder.Capability("camera", true, false, true, "permission:android.permission.CAMERA", ProfileBuilder.SENSOR_EXECUTION,
-                listOf("POST" to "/v1/camera/snapshot")),
+                listOf(ProfileBuilder.Operation("POST", "/v1/camera/snapshot"))),
         )
         val built = ProfileBuilder.build(3, java.time.Instant.parse("2026-11-11T08:00:00.400Z").toEpochMilli(), device, true, false, caps, SetupState.json(facts))
         assertEquals(canon(target), canon(built))

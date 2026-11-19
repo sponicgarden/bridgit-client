@@ -486,8 +486,8 @@ class Schedules(private val app: BridgeApp) {
                 val (spec, params) = match(d.method, d.path) ?: throw Fail("not_found", "${d.method} ${d.path} no longer exists.")
                 routeProblem(agent, d.method, d.path)?.let { throw Fail("agent_not_allowed", it) }
                 // Required-key endpoints get a stable slot key. Other calls rely on the existing slot checkpoint.
-                val out = api(svc).dispatch(spec, agent, "schedule", d.query, params, JSONObject(d.body.toString()),
-                    if (spec.idempotencyRequired) "schedule-${agent.id}-${a.id}-$slot" else null, via = "schedule")
+                val out = api(svc).dispatch(cc.bridgit.app.core.request.CoreRequest.inProcess(cc.bridgit.app.core.request.CoreRequest.APPLET_STEP, spec.method, spec.fullPath, "schedule",
+                    if (spec.idempotencyRequired) "schedule-${agent.id}-${a.id}-$slot" else null), spec, agent, d.query, params, JSONObject(d.body.toString()), via = "schedule")
                 ev.put("http", out.status)
                 if (out.status !in 200..299) {
                     val err = runCatching { JSONObject(String(out.bytes)) }.getOrNull()

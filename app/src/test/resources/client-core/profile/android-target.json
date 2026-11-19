@@ -47,7 +47,10 @@
       "operations": [
         {
           "method": "POST",
-          "path": "/v1/camera/snapshot"
+          "path": "/v1/camera/snapshot",
+          "agent_allowed": true,
+          "callable": false,
+          "blocked_reason": "permission:android.permission.CAMERA"
         }
       ]
     },
@@ -66,7 +69,26 @@
       "operations": [
         {
           "method": "GET",
-          "path": "/v1/health"
+          "path": "/v1/health",
+          "agent_allowed": true,
+          "callable": true,
+          "blocked_reason": null
+        },
+        {
+          "method": "POST",
+          "path": "/v1/owner/configuration/access",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/fixer/restart",
+          "power": "fixer_mode",
+          "agent_allowed": true,
+          "callable": false,
+          "blocked_reason": "listener_paused"
         }
       ]
     }

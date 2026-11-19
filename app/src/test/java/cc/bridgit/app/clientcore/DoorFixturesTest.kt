@@ -282,7 +282,7 @@ class DoorFixturesTest(private val path: String) {
         val method = request.getString("method"); val route = request.getString("path")
         if (method != "POST" || route != "/v2/call") fail("$path: the Android http_v2 driver runs only POST /v2/call")
         suspend fun once(): Answer = try {
-            val a = platform.admit(source) { h -> headers[h] }
+            val a = platform.admit(cc.bridgit.app.core.request.CoreRequest("http_v2", method, route, source) { h -> headers[h] })
             Answer(200, platform.callTool(a, JSONObject((request.optJSONObject("body") ?: JSONObject()).toString()), request.optString("idempotency_key").ifEmpty { null }, JSONObject()))
         } catch (e: ApiError) { Answer(e.http, e.toJson("fixture")) }
         repeat(priorRequests) { once() }

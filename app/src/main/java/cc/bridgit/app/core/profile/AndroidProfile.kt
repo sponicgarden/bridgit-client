@@ -2,7 +2,11 @@ package cc.bridgit.app.core.profile
 
 import android.content.pm.PackageManager
 import cc.bridgit.app.BridgeApp
+import cc.bridgit.app.api.ApiError
+import cc.bridgit.app.api.EndpointSpec
 import cc.bridgit.app.api.Endpoints
+import cc.bridgit.app.core.authority.AndroidGrantState
+import cc.bridgit.app.core.authority.Grants
 import cc.bridgit.app.core.Agent
 import cc.bridgit.app.capability.appVersion
 import org.json.JSONObject
@@ -65,7 +69,7 @@ object AndroidProfile {
     private fun hardware(app: BridgeApp): Map<String, String> {
         val pm = app.packageManager
         fun has(feature: String) = if (pm.hasSystemFeature(feature)) "present" else "absent"
-        return mapOf("camera" to has(PackageManager.FEATURE_CAMERA_ANY), "microphone" to has(PackageManager.FEATURE_MICROPHONE),
+        return mapOf("display" to (if (cc.bridgit.app.headless.HeadlessMode.displayAvailable(app)) "present" else "absent"), "camera" to has(PackageManager.FEATURE_CAMERA_ANY), "microphone" to has(PackageManager.FEATURE_MICROPHONE),
             "speaker" to has(PackageManager.FEATURE_AUDIO_OUTPUT), "location" to has(PackageManager.FEATURE_LOCATION))
     }
 
@@ -83,6 +87,7 @@ object AndroidProfile {
             hardware = hardware(app),
         )
         val ops = Endpoints.all.groupBy { it.capability }
+        val grants = AndroidGrantState(app)
         val caps = app.registry.modules.map { m ->
             val st = m.status()
             ProfileBuilder.Capability(m.id, enabled = m.switchKey == null || st.enabled, ready = st.ready,
@@ -90,7 +95,7 @@ object AndroidProfile {
                 execution = if (m.id in SENSORS) ProfileBuilder.SENSOR_EXECUTION else emptyList(),
                 // Caller-filtered: an operation that needs a power the caller lacks (Fixer Mode, Super Powers) isn't listed.
                 operations = (ops[m.id] ?: emptyList()).filter { spec -> spec.power == null || agent?.has(spec.power) == true }
-                    .map { it.method to it.fullPath })
+                    .map { operation(grants, agent, it) })
         }
         val setup = SetupState.json(setupFacts(app))
         val online = app.settings.listenerEnabled
@@ -102,9 +107,30 @@ object AndroidProfile {
         // The revision follows what the device is, not who asks: the per-caller fields and foreground state are left out.
         // Digest every operation and the device's own blocked reason (agent_allowed true leaves blocked_reason as the device's).
         val stable = ProfileBuilder.build(0, 0L, device, online, false,
-            caps.map { c -> c.copy(agentAllowed = true, operations = (ops[c.id] ?: emptyList()).map { it.method to it.fullPath }) }, setup)
+            caps.map { c -> c.copy(agentAllowed = true, operations = (ops[c.id] ?: emptyList()).map { stableOperation(it) }) }, setup)
         return body.put("profile_revision", revision(app, stable))
     }
+
+    /**
+     * A0333: the operation's own scope and power, and for [agent] whether its control scope is held and what blocks it,
+     * from the same checks the doors run (core.authority.Grants), read-only: the email gate, which starts a clock, is left out.
+     */
+    internal fun operation(grants: Grants.State, agent: Agent?, spec: EndpointSpec): ProfileBuilder.Operation {
+        val base = stableOperation(spec)
+        val scope = spec.controlScope ?: return base.copy(agentAllowed = agent != null)
+        agent ?: return base.copy(agentAllowed = false)
+        val refusal = try {
+            if (scope == Grants.OWNER_CONFIGURATION) Grants.requireConfiguration(grants, agent) else Grants.requireScope(grants, agent.id, scope)
+            null
+        } catch (e: ApiError) { e.code }
+        return base.copy(agentAllowed = refusal !in NOT_HELD, blockedReason = refusal?.takeIf { it !in NOT_HELD })
+    }
+    /** Refusals that mean the caller doesn't hold the operation's scope, rather than "held but blocked now". */
+    private val NOT_HELD = setOf("agent_not_allowed", "forbidden", "unauthorized")
+
+    /** The operation as the device describes it to anyone: the caller-specific fields as for an allowed caller. */
+    private fun stableOperation(spec: EndpointSpec) =
+        ProfileBuilder.Operation(spec.method, spec.fullPath, scope = spec.controlScope, power = spec.power?.id)
 
     /** Goes up by one whenever what the device reports (apart from times and caller-specific fields) changes. */
     @Synchronized

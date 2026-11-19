@@ -53,6 +53,7 @@ object SettingsCatalog {
     /** The fixed settings, in the order the phone's Settings screen shows them. */
     val fixed: List<SettingDef> = listOf(
         SettingDef("device.name", "string", "Device display name, up to 60 characters; empty text clears the override"),
+        e("device.presentation", "Presentation on next app launch: auto detects devices without a usable display; headless never loads the GUI. Reset to auto. USB forwarding still requires an agent key", cc.bridgit.app.headless.HeadlessPolicy.MODES),
         b("device.resource_monitor", "Monitor resources: Bridgit samples its own CPU, memory, network, disk, storage and wakeup proxy over time (never other apps). Off by default; read the log with GET /v1/device/resources"),
         e("device.resource_monitor_interval", "How often Monitor resources samples: 1s or 10s for live diagnosis, 1m (default) or 1h for cheap always-on watching", cc.bridgit.app.monitor.ResourceLog.INTERVALS),
         b("listener.enabled", "Always-on listener: Bridgit answers agents"),

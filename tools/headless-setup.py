@@ -76,6 +76,13 @@ def enroll(args, super_powers):
         raise
 
 
+def owner_post_allowed(path, nonce, origin, expected_origin, form, csrf):
+    # Embedded browsers may omit Origin or use a sandboxed opaque origin. A second,
+    # independent secret is carried only in the same-origin form, never in the URL.
+    return (path == "/" + nonce and origin in (None, "null", expected_origin)
+            and secrets.compare_digest(form.get("csrf", [""])[0], csrf))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--serial", required=True)
@@ -96,6 +103,7 @@ def main():
     if args.output.exists() or args.output.is_symlink():
         parser.error("Credential file already exists; use it instead of enrolling again")
     nonce = secrets.token_urlsafe(32)
+    csrf = secrets.token_urlsafe(32)
     completed = False
 
     class Handler(BaseHTTPRequestHandler):
@@ -122,13 +130,13 @@ def main():
                       "button{font:inherit;padding:14px 24px;background:#bce6b7;border:0;border-radius:12px}label{display:block;margin:22px 0}</style>"
                       "<h1>Connect " + html.escape(args.name) + "</h1><p>Device: " + html.escape(args.serial) + "</p>"
                       "<p>Grant this control agent app settings, supported capabilities, and microphone access until revoked. Android permissions remain in force.</p>"
-                      "<form method=post><label><input type=checkbox name=super value=yes checked> Agent Super Powers</label>"
+                      "<form method=post><input type=hidden name=csrf value='" + csrf + "'><label><input type=checkbox name=super value=yes checked> Agent Super Powers</label>"
                       "<button>Connect control agent</button></form>")
 
         def do_POST(self):
             nonlocal completed
             expected_origin = f"http://127.0.0.1:{self.server.server_port}"
-            if completed or self.path != "/" + nonce or self.headers.get("Origin") != expected_origin:
+            if completed or self.path != "/" + nonce:
                 self.page("Request refused", 403)
                 return
             try:
@@ -136,6 +144,9 @@ def main():
                 if not 0 <= length <= 256:
                     raise ValueError()
                 form = urllib.parse.parse_qs(self.rfile.read(length).decode())
+                if not owner_post_allowed(self.path, nonce, self.headers.get("Origin"), expected_origin, form, csrf):
+                    self.page("Request refused", 403)
+                    return
                 body = enroll(args, form.get("super") == ["yes"])
                 completed = True
                 setup_pending = not body.get("grants_applied", False)

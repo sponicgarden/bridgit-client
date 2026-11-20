@@ -36,7 +36,7 @@ object FlowSteps {
         "wait" to (setOf("seconds") to null),
         "stop" to (emptySet<String>() to null),
         "notice" to (setOf("title", "text", "priority") to "interactions"),
-        "speak" to (setOf("text", "allow_cloud") to "audio.speak"),
+        "speak" to (setOf("text", "allow_cloud", "engine") to "audio.speak"),
         "hear" to (setOf("duration_seconds", "language", "allow_cloud") to "microphone.clip"),
         "ring" to (setOf("seconds") to "phone.control"),
         "alert" to (setOf("text", "destinations") to "alerts"),
@@ -181,6 +181,10 @@ object FlowSteps {
                 "wait" -> { if (!step.has("seconds")) bad("$at: seconds is required (1-300)"); extra += whole(step, "seconds", 1, 1, 300, at) }
                 "ring" -> whole(step, "seconds", 10, 1, 30, at)
                 "hear", "speak" -> {
+                    if(type == "speak" && step.has("engine")) {
+                        if(step.opt("engine") !in setOf("registry", "device")) bad("$at: engine must be registry or device")
+                        if(step.optString("engine") == "device" && step.optBoolean("allow_cloud")) bad("$at: device speech cannot allow cloud synthesis")
+                    }
                     step.opt("allow_cloud")?.let { if (it !is Boolean) bad("$at: allow_cloud must be a boolean") }
                     if (type == "hear") {
                         whole(step, "duration_seconds", 5, 1, 30, at)
@@ -561,7 +565,13 @@ object FlowSteps {
                 else -> answers.put(q, answer.answers.opt(q))
             }
         }
-        return JSONObject().put("answers", answers).put("confidence", confidence).put("model", answer.model).put("cost_usd", answer.costUsd)
+        return JSONObject().put("answers", answers).put("confidence", confidence).put("model", answer.model).put("model_name", modelName(answer.model)).put("cost_usd", answer.costUsd)
+    }
+
+    /** A spoken label derived from the actual response model; unknown identities stay visible. */
+    internal fun modelName(model: String): String = when (val id = model.removePrefix("openrouter:")) {
+        "z-ai/glm-5.3-flash" -> "GLM 5.3 Flash"
+        else -> id.substringAfterLast('/').replace('-', ' ')
     }
 
     // ---- plain words ------------------------------------------------------------------------------------------
@@ -610,6 +620,7 @@ object FlowSteps {
         "geofence" -> "When the phone arrives within ${t.optInt("radius_m", 200)} m of a place"
         "applet.event", "application.event" -> "When ${t.optString("applet_id", t.optString("application_id", "an applet")).ifEmpty { "an applet" }} sends an event"
         "watch" -> if (t.optString("on", "match") == "rule") "When its watch's rule \"${t.optString("rule")}\" fires" else "When its watch sees a match"
+        "wake_word" -> "When its assigned wake word is heard"
         "called" -> "When it's started"
         "mode" -> t.optString("to").ifEmpty { null }?.let { "When the phone's mode changes to $it" } ?: "When the phone's mode changes"
         else -> "When it's started"

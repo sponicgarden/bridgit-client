@@ -1,6 +1,6 @@
 {
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Start enrolling this device as its own approver while the list is empty: makes the approver key and asks for the owner's screen-lock check on this device, which is the one human step. Needs a verified alert email and a screen lock; explicit owner.configuration grant required",

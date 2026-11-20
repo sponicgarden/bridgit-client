@@ -1,6 +1,6 @@
 {
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "The Bridgit Interface Guide: this agent's full briefing (connection, rules, first calls, first replies, pointers), built live for this device and agent; the short setup prompt points here (plain text)",

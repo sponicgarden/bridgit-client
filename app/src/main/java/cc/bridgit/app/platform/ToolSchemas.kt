@@ -48,6 +48,7 @@ object ToolSchemas {
     val PERIPHERAL_ACTIONS = listOf("ble.scan", "ble.read", "ble.write", "usb.transfer")
 
     private fun spec(name: String): Spec = when (name) {
+        "workflow.list" -> Spec(linkedMapOf("after" to str("next_cursor from the previous page"), "limit" to int("Page size",1,100)), description="Your workflows, with next_cursor pagination; no fixed workflow-count limit")
         "app.foreground.targets" -> Spec(emptyMap(), description="Discover Bridgit screens, your cards, installed applet pages and consumer portals available to this control agent. No navigation or capture.")
         "app.foreground" -> Spec(linkedMapOf("reason" to str("Required audit reason",256),
             "target" to obj(linkedMapOf("type" to str(enum=listOf("screen","card","applet","portal")), "id" to str("Exact id from app.foreground.targets",200)),listOf("type","id"))), listOf("reason"),

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "An already authorized Super agent replaces grants or changes roles for an existing paired control agent, including its own configuration bootstrap; applets, portals and device peers excluded",

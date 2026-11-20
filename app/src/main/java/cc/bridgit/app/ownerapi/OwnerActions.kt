@@ -337,7 +337,6 @@ class OwnerActions(private val app: BridgeApp) {
                 "tour.start" -> { o.only("kinds","interval_s"); if(o.strings("kinds",8).let { it.isEmpty() || it.any { k -> k !in cc.bridgit.app.tour.TourKinds.all } }) throw ErrorCatalog.error("invalid_parameter","Choose tour topics."); if(o.whole("interval_s",60,30,300) !in cc.bridgit.app.tour.TourKinds.intervals) throw ErrorCatalog.error("invalid_parameter","Use a supported tour interval.") }
                 "wake.configure" -> {
                     o.only("words"); val a=o.optJSONArray("words") ?: throw ErrorCatalog.error("invalid_parameter","words must be a list.")
-                    if(a.length()>WakeRules.MAX_WORDS) throw ErrorCatalog.error("invalid_parameter","Too many wake words.")
                     for(i in 0 until a.length()) { val w=a.optJSONObject(i) ?: throw ErrorCatalog.error("invalid_parameter","Each word must have phrase and send_clip."); w.only("phrase","send_clip"); w.text("phrase",80); if(w.has("send_clip") && w.opt("send_clip") !is Boolean) throw ErrorCatalog.error("invalid_parameter","send_clip must be boolean.") }
                 }
                 "sounds.configure" -> { o.only("enabled","sensitivity","send_clip"); bool("enabled"); bool("send_clip"); if(o.has("sensitivity") && o.text("sensitivity") !in SoundConfig.SENSITIVITIES) throw ErrorCatalog.error("invalid_parameter","Unknown sensitivity.") }

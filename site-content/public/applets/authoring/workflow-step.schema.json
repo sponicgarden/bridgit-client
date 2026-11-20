@@ -755,7 +755,10 @@
             }
           ]
         },
-        "view": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,31}$" },
+        "view": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        },
         "keep": {
           "type": "boolean"
         }
@@ -1131,6 +1134,13 @@
         },
         "allow_cloud": {
           "type": "boolean"
+        },
+        "engine": {
+          "enum": [
+            "registry",
+            "device"
+          ],
+          "description": "registry (default) resolves account model preference; device binds explicitly to the installed offline Android voice without a network model-resolution hop."
         }
       },
       "required": [

@@ -1,5 +1,5 @@
 {
- "api_revision": 157,
+ "api_revision": 158,
  "changes": [
   {
    "date": "2026-10-27",
@@ -2587,6 +2587,25 @@
     }
    ],
    "revision": 157
+  },
+  {
+   "date": "2026-11-19",
+   "app_version": "2.0.0",
+   "items": [
+    {
+     "endpoint": "/v2/call",
+     "what": "Native wake_word flow trigger starts only the recipient's authorized workflows with the locally recognized transcript; no polling, HTTP event injection or chat relay"
+    },
+    {
+     "endpoint": "/v2/call",
+     "what": "Flow speak engine=device explicitly uses the installed offline voice without a model-registry network hop; default registry behavior is preserved"
+    },
+    {
+     "endpoint": "/v1/settings",
+     "what": "Authenticated listening.end_silence_ms setting (300\u20133000 ms, default 1500) tunes wake-command endpoint latency"
+    }
+   ],
+   "revision": 158
   }
  ],
  "links": {

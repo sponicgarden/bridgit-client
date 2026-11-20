@@ -18,7 +18,7 @@ class WakeRulesTest {
     @Test fun validatesPhrases() {
         assertNull(problem(emptyList(), "Hey Bridget"))
         assertNotNull(problem(emptyList(), "  "))
-        assertTrue(problem(emptyList(), "bridget")!!.contains("two words"))
+        assertNull(problem(emptyList(), "model"))
         assertNotNull(problem(emptyList(), "one two three four five"))
         val one = listOf(WakeWord("hey bridget", "a1"))
         assertTrue(problem(one, "HEY BRIDGET")!!.contains("already"))
@@ -26,7 +26,7 @@ class WakeRulesTest {
         assertNull(problem(one, "hey bridge"))
         assertEquals("Pick an agent.", problem(emptyList(), "hey bridget", agent = "gone"))
         val ten = (1..10).map { WakeWord("word$it please", "a1") }
-        assertTrue(problem(ten, "hey bridget")!!.contains("up to 10"))
+        assertNull(problem(ten, "model"))
         assertTrue(problem(emptyList(), "hey bridgit") { it != "bridgit" }!!.contains("\"bridgit\""))
         assertNull(problem(emptyList(), "hey bridget") { true })
     }

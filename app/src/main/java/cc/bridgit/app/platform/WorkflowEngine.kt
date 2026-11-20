@@ -59,6 +59,35 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
     private val active=java.util.concurrent.ConcurrentHashMap<String,Job>()
     private val sampler by lazy { WatchSampler(runtime.app) }
 
+    private var routeRevision = -1L
+    private var wakeRoutes = emptyMap<Pair<String,String>,List<String>>()
+    private var scheduledRoutes = emptyList<String>()
+    /** Built on definition/status changes, not on each utterance or run counter update. */
+    private fun refreshRoutes() {
+        if(routeRevision == runtime.store.workflowRevision) return
+        val rows = runtime.store.workflows().filter { it.optString("status") == "active" }
+        wakeRoutes = rows.filter { it.optJSONObject("definition")?.optJSONObject("trigger")?.optString("type") == "wake_word" }
+            .groupBy { it.getString("agent_id") to cc.bridgit.app.listen.WakeRules.normalize(it.getJSONObject("definition").getJSONObject("trigger").optString("phrase")) }
+            .mapValues { (_, values) -> values.map { it.getString("id") } }
+        scheduledRoutes = rows.filter { !eventDriven(it.optJSONObject("definition")?.optJSONObject("trigger")?.optString("type")) }.map { it.getString("id") }
+        routeRevision = runtime.store.workflowRevision
+    }
+    private fun wakeTargets(agent: String, phrase: String): List<JSONObject> = synchronized(runtime.store) {
+        refreshRoutes()
+        ((wakeRoutes[agent to ""] ?: emptyList()) + (wakeRoutes[agent to cc.bridgit.app.listen.WakeRules.normalize(phrase)] ?: emptyList()))
+            .distinct().mapNotNull { runtime.store.find(it,agent,"workflow") }
+    }
+    private fun scheduledTargets(): List<JSONObject> = synchronized(runtime.store) {
+        refreshRoutes(); scheduledRoutes.mapNotNull { runtime.store.find(it,kind="workflow") }
+    }
+    private fun requireWakeAuthority(agent: String, data: JSONObject?) {
+        val live = runtime.app.agents.get(agent) ?: throw ApiError(403,"agent_not_allowed","Wake-word recipient was removed")
+        if(live.suspended || !live.allows("wakewords") || !runtime.app.settings.isOn("wakewords") ||
+            runtime.app.wake.activeWords().none { it.agentId == agent && cc.bridgit.app.listen.WakeRules.normalize(it.phrase) == data?.optString("wake_word") })
+            throw ApiError(403,"agent_not_allowed","Wake-word authority or assignment changed")
+        runtime.authorize(agent,"microphone.clip")
+    }
+
     fun simulate(args:JSONObject):JSONObject {
         args.only("flow","fixtures","trigger")
         val flow=args.optJSONObject("flow") ?: throw ApiError(422,"invalid_workflow","flow must be a workflow definition")
@@ -89,7 +118,6 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
         b.optJSONObject("trigger")?.takeIf { it.optString("type")=="watch" }?.let { t ->
             if(runtime.app.watches.get(agent,t.getString("watch"))==null) throw ApiError(422,"invalid_workflow","trigger.watch ${t.getString("watch")} isn't one of your running watches")
         }
-        if(runtime.store.list(agent,"workflow").size>=8) throw ApiError(429,"workflow_limit","At most eight workflow proposals per agent")
         return runtime.store.save(agent,"workflow",JSONObject().put("definition",b).put("digest",checked.getString("digest")).put("required_scopes",checked.getJSONArray("required_scopes")).put("summary",checked.getString("summary")).put("status","awaiting_owner").put("revision",1).put("identity",AgentBranding.json(runtime.getAgent(agent))).apply { if(packageFlow!=null) put("package_flow",packageFlow) }).also { runtime.store.emit(agent,"workflow.proposed",it.getString("id")); PlatformNotifications.show(runtime.app,it); runtime.changed() }
     }
     fun activate(id:String) = synchronized(runtime.store) {
@@ -118,7 +146,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
         job?.join()
     }
 
-    fun pauseAgent(agent:String) { runtime.store.list(agent,"workflow").filter { it.optString("status")=="active" }.forEach { pause(agent,it.getString("id")) } }
+    fun pauseAgent(agent:String) { runtime.store.workflows(agent).filter { it.optString("status")=="active" }.forEach { pause(agent,it.getString("id")) } }
 
     /** The newest runs of workflow [id], step by step. */
     fun runs(agent:String,id:String,limit:Int):JSONObject {
@@ -131,7 +159,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
         val scheduler=runtime.app.getSystemService(JobScheduler::class.java)
         scheduler.schedule(JobInfo.Builder(8702,ComponentName(runtime.app,WorkflowJobService::class.java)).setPersisted(true).setPeriodic(15*60*1000L).build())
     }
-    private fun eventDriven(type:String?) = ApplicationEvents.isAppletEvent(type) || type=="watch" || type=="called" || type=="battery" || type=="mode"
+    private fun eventDriven(type:String?) = ApplicationEvents.isAppletEvent(type) || type=="watch" || type=="called" || type=="battery" || type=="mode" || type=="wake_word"
 
     /**
      * The workflow [ref] names for [agent]: its id, or (for an installed applet's own parts) the package flow name
@@ -139,7 +167,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
      */
     fun resolve(agent:String,ref:String):JSONObject? {
         runtime.store.find(ref,agent,"workflow")?.let { return it }
-        return runtime.store.list(agent,"workflow",1000).filter { it.optString("package_flow")==ref }.maxByOrNull { it.optLong("created_at") }
+        return runtime.store.workflows(agent).filter { it.optString("package_flow")==ref }.maxByOrNull { it.optLong("created_at") }
     }
 
     /** Whether [ref] names one of [agent]'s workflows that a rule, schedule or button may start (a called or button trigger). Null when it may; else why not. */
@@ -211,7 +239,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
         // this reading is the back-up for when the listener wasn't running.
         val sticky=runtime.app.registerReceiver(null,IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         val power=if(sticky!=null) PowerState.observe(runtime.app,sticky.getIntExtra(BatteryManager.EXTRA_PLUGGED,0)!=0) else PowerState.load(runtime.app)
-        for(record in runtime.store.list(kind="workflow").filter { it.optString("status")=="active" }) {
+        for(record in scheduledTargets()) {
             val id=record.getString("id"); val agent=record.getString("agent_id"); val trigger=record.getJSONObject("definition").getJSONObject("trigger")
             if(eventDriven(trigger.optString("type"))) continue
             val now=System.currentTimeMillis()
@@ -285,7 +313,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
      */
     fun onBattery(events:List<String>,reading:BatteryRules.Reading) {
         val names=events.map { it.removePrefix("battery.") }.toSet()
-        val hits=runtime.store.list(kind="workflow").filter { r ->
+        val hits=runtime.store.workflows().filter { r ->
             val t=r.optJSONObject("definition")?.optJSONObject("trigger")
             r.optString("status")=="active" && t?.optString("type")=="battery" && t.optString("on") in names
         }
@@ -303,7 +331,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
      * given) match, with {from, to, by} as `$trigger`. Busy flows drop the start, as for battery triggers.
      */
     fun onMode(from:String,to:String,by:Modes.By) {
-        val hits=runtime.store.list(kind="workflow").filter { r ->
+        val hits=runtime.store.workflows().filter { r ->
             val t=r.optJSONObject("definition")?.optJSONObject("trigger")
             r.optString("status")=="active" && t?.optString("type")=="mode" && (!t.has("to") || t.optString("to")==to) && (!t.has("from") || t.optString("from")==from)
         }
@@ -321,7 +349,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
      * is still running is dropped and counted (`dropped_runs`), not queued.
      */
     fun onWatch(agent:String,watchId:String,on:String,rule:String?,data:JSONObject) {
-        val hits=runtime.store.list(agent,"workflow").filter { r ->
+        val hits=runtime.store.workflows(agent).filter { r ->
             val t=r.optJSONObject("definition")?.optJSONObject("trigger")
             r.optString("status")=="active" && t?.optString("type")=="watch" && t.optString("watch")==watchId && t.optString("on","match")==on && (on!="rule" || t.optString("rule")==rule)
         }
@@ -331,6 +359,27 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
             active[id]=runtime.scope.launch { runCatching { runOnce(agent,id,null,data) } }
         }
     }
+    /** Only the native recognizer calls this, with its real recipient-scoped event. No HTTP event bridge. */
+    internal fun onWakeWord(event: cc.bridgit.app.interact.Event) {
+        if (event.type != "listen.heard") return
+        val agent = event.agentId
+        val data = JSONObject(event.data.toString()).put("caller", "wake_word").put("event_id", event.id.toString())
+        for (r in wakeTargets(agent, event.data.optString("wake_word"))) {
+            val id = r.getString("id")
+            val job = synchronized(runtime.store) {
+                val latest = runtime.store.require(id, agent, "workflow")
+                if (latest.optString("status") != "active" || latest.optString("event_generation") != r.optString("event_generation") || event.id <= latest.optLong("last_wake_event_id", 0)) null
+                else if (busy(id)) { dropped(agent, id); null }
+                else {
+                    runtime.store.save(agent, "workflow", latest.put("last_wake_event_id", event.id))
+                    runtime.scope.launch(start = CoroutineStart.LAZY) {
+                        runCatching { runOnce(agent, id, event.id.toString(), JSONObject(data.toString()).put("wake_generation",r.optString("event_generation"))) }
+                    }.also { active[id] = it; it.start() }
+                }
+            }
+        }
+    }
+
     /** Whether workflow [id] is running now (a batch waits for it instead of being dropped). */
     fun busy(id:String):Boolean = active[id]?.isActive==true || locks[id]?.isLocked==true
     private fun dropped(agent:String,id:String) = synchronized(runtime.store) {
@@ -389,6 +438,13 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
             scopes.forEach { if(!runtime.hasGrant(agent,it)) throw ApiError(403,"agent_not_allowed","Owner must grant $it to this agent") }
             val definition=record.getJSONObject("definition"); val trigger=definition.getJSONObject("trigger")
             appletOnly(agent,definition)
+            if(trigger.optString("type") == "wake_word") {
+                if(eventId == null || eventId != record.optLong("last_wake_event_id").toString() || triggerData?.optString("wake_generation") != record.optString("event_generation"))
+                    throw ApiError(409, "event_required", "This workflow requires a native wake-word event for its own agent")
+                if(trigger.has("phrase") && cc.bridgit.app.listen.WakeRules.normalize(trigger.getString("phrase")) != triggerData?.optString("wake_word"))
+                    throw ApiError(409,"event_required","Wake phrase does not match this workflow")
+                requireWakeAuthority(agent, triggerData)
+            }
             if(ApplicationEvents.isAppletEvent(trigger.optString("type"))) {
                 runtime.applicationEvents.permitted(agent,trigger)
                 if(eventId==null || eventId!=record.optString("last_event_id")) throw ApiError(409,"event_required","This workflow requires a matching applet event")
@@ -428,6 +484,7 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
                         run.run(
                             beforeStep = {
                                 if(ApplicationEvents.isAppletEvent(trigger.optString("type"))) runtime.applicationEvents.permitted(agent,trigger)
+                                if(trigger.optString("type") == "wake_word") requireWakeAuthority(agent, triggerJson)
                                 if(runtime.store.require(id,agent).optString("status")!="active") throw CancellationException("Workflow paused")
                             },
                             facts = { facts.at() },
@@ -483,7 +540,9 @@ class WorkflowEngine(private val runtime:AgentPlatform) {
             "notice" -> runtime.interaction(agent,JSONObject().put("kind","notice").put("title",text("title",120).ifBlank { definition.optString("name") }).put("text",text("text",4096))
                 .apply { if(step.optString("priority")=="urgent") put("priority","urgent") })
                 .let { JSONObject().put("interaction_id",it.getString("id")) }
-            "speak" -> runtime.tools.action(agent,JSONObject().put("type","speak").put("text",text("text",600)).put("allow_cloud",step.optBoolean("allow_cloud",false)))
+            "speak" -> runtime.tools.speakFromFlow(agent, text("text",600), step.optBoolean("allow_cloud",false), step.optString("engine") == "device") {
+                if(definition.optJSONObject("trigger")?.optString("type") == "wake_word") requireWakeAuthority(agent,trigger)
+            }
             "hear" -> runtime.tools.hear(agent, step)
             "ring" -> { runtime.tools.action(agent,JSONObject().put("type","ring").put("duration_seconds",step.optInt("seconds",10))); JSONObject() }
             "alert" -> runtime.delivery.trigger(agent,JSONObject().put("destinations",step.getJSONArray("destinations")).put("text",text("text",1024).ifBlank { definition.optString("name") }),fromWorkflow=true)

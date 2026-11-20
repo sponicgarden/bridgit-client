@@ -85,7 +85,7 @@ class AppletAuthoringValidationTest {
             check(runCatching { validate() }.isFailure) { "$type accepted an undocumented field" }
         }
         check(documented == setOf("button","called","charging","power","battery","sun","interval","geofence",
-            "watch","mode","applet.event","application.event"))
+            "watch","mode","wake_word","applet.event","application.event"))
     }
 
     @Test fun validateAndExportContract() {

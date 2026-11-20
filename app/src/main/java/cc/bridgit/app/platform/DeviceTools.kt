@@ -152,16 +152,28 @@ class DeviceTools(private val app:BridgeApp) {
             else -> throw ApiError(422,"unsupported_action","Unknown device action")
         }
     }
-    private suspend fun speak(agent: String, text: String, language: String, allowCloud: Boolean): JSONObject {
+    /** An explicitly device-bound flow avoids a network model-resolution hop; queue and grants are unchanged. */
+    internal suspend fun speakFromFlow(agent: String, text: String, allowCloud: Boolean, deviceOnly: Boolean, authorized: () -> Unit): JSONObject {
+        runtime.authorize(agent, "audio.speak")
+        if(text.isBlank() || text.length > 600) throw ApiError(422, "invalid_parameter", "Speech takes 1 to 600 characters")
+        return speak(agent, text, Locale.getDefault().toLanguageTag(), allowCloud, deviceOnly, authorized)
+    }
+    private suspend fun speak(agent: String, text: String, language: String, allowCloud: Boolean, deviceOnly: Boolean = false, authorized: () -> Unit = {}): JSONObject {
         val preparation = app.speaker.beginPreparation(agent)
         val file = app.speaker.newFile("audio")
         var owned = false
         try {
             app.speaker.admit(agent, "after_current")
-            val selection = cc.bridgit.app.speech.SpeechEngine.select(app, "speak", allowCloud)
-            val meta = cc.bridgit.app.speech.SpeechEngine.synth(app, selection, text, file, language)
+            val meta = if(deviceOnly) {
+                if(!app.speaker.tts.synth(text, file, language, 1f, 1f)) throw ApiError(503, "speech_unavailable", "No installed offline voice produced audio")
+                JSONObject().put("model", "android-offline").put("processing", "device").put("cost_usd", 0)
+            } else {
+                val selection = cc.bridgit.app.speech.SpeechEngine.select(app, "speak", allowCloud)
+                cc.bridgit.app.speech.SpeechEngine.synth(app, selection, text, file, language)
+            }
             runtime.authorize(agent, "audio.speak")
-            val item = cc.bridgit.app.capability.SpeakerQueue.Item(java.util.UUID.randomUUID().toString(), agent, runtime.getAgent(agent).name, file, text.take(500), null, false, spoken = true)
+            authorized()
+            val item = cc.bridgit.app.capability.SpeakerQueue.Item(java.util.UUID.randomUUID().toString(), agent, runtime.getAgent(agent).name, file, text.take(500), null, false, spoken = true, canPlay = { runCatching { authorized(); true }.getOrDefault(false) })
             val position = app.speaker.enqueue(item, "after_current", preparation); owned = true
             return JSONObject().put("play_id", item.id).put("position", position).put("status", cc.bridgit.app.capability.SpeakerRules.replyStatus(position, app.speaker.quiet())).put("speech", meta)
         } finally { app.speaker.endPreparation(preparation); if (!owned) file.delete() }

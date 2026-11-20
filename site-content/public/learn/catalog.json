@@ -2792,6 +2792,36 @@
      "tool": "owner_configure"
     },
     {
+     "summary": "Read the existing owner control agent's cloud relay transport status",
+     "path": "/v1/owner/configuration/relay",
+     "method": "GET",
+     "documentation": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-relay.json",
+     "operation_url": "https://bridgit.cc/learn/operations/get-v1-owner-configuration-relay.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_relay_get"
+    },
+    {
+     "summary": "Enable/disable the built-in relay or set/rotate this already paired control agent's write-only connector credential; existing Super authority and explicit capabilities required; signed-only policy is preserved; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/relay",
+     "method": "POST",
+     "documentation": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-relay.json",
+     "operation_url": "https://bridgit.cc/learn/operations/post-v1-owner-configuration-relay.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_relay_post"
+    },
+    {
+     "summary": "Remove this existing control agent's relay credential; direct pairing remains; explicit owner.configuration grant required; no per-change phone approval",
+     "path": "/v1/owner/configuration/relay",
+     "method": "DELETE",
+     "documentation": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-relay.json",
+     "operation_url": "https://bridgit.cc/learn/operations/delete-v1-owner-configuration-relay.json",
+     "control_scope": "owner.configuration",
+     "requires_power": null,
+     "tool": "owner_configuration_relay_delete"
+    },
+    {
      "summary": "List app-owned requests a delegated control agent can approve or decline",
      "path": "/v1/owner/configuration/approvals",
      "method": "GET",
@@ -8083,8 +8113,8 @@
   "kind": "source_generated",
   "released": "Check public updater manifest; source documentation is not release evidence."
  },
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "installed_api_revision": null,
  "categories": [
   "sense",

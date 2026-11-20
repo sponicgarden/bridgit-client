@@ -1870,6 +1870,30 @@
         },
         {
           "method": "GET",
+          "path": "\/v1\/owner\/configuration\/relay",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
+        },
+        {
+          "method": "POST",
+          "path": "\/v1\/owner\/configuration\/relay",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
+        },
+        {
+          "method": "DELETE",
+          "path": "\/v1\/owner\/configuration\/relay",
+          "scope": "owner.configuration",
+          "agent_allowed": false,
+          "callable": false,
+          "blocked_reason": "agent_not_allowed"
+        },
+        {
+          "method": "GET",
           "path": "\/v1\/owner\/configuration\/approvals",
           "scope": "owner.configuration",
           "agent_allowed": false,

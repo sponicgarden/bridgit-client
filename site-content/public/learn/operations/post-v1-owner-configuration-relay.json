@@ -1,0 +1,61 @@
+{
+ "documentation_revision": 142,
+ "api_revision": 158,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Enable/disable the built-in relay or set/rotate this already paired control agent's write-only connector credential; existing Super authority and explicit capabilities required; signed-only policy is preserved; explicit owner.configuration grant required; no per-change phone approval",
+  "method": "POST",
+  "auth": true,
+  "mcp_tool": "owner_configuration_relay_post",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [
+   {
+    "name": "enabled",
+    "description": "Enable the built-in relay or pause all relay access",
+    "type": "boolean",
+    "required": false
+   },
+   {
+    "name": "token",
+    "description": "Receiver-generated rly_ plus 40-196 random URL-safe characters; replaces the caller's relay credential",
+    "type": "string",
+    "required": false
+   }
+  ],
+  "example": "POST /v1/owner/configuration/relay {\"enabled\":true}",
+  "idempotent": true,
+  "path": "/v1/owner/configuration/relay",
+  "capability": "owner_features",
+  "returns": "same sanitized status; no initial key pairing, role or OS authority created",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {
+    "idempotency_key": {
+     "description": "Any UUID; repeating the call with the same key within 24 h returns the first result instead of acting twice",
+     "type": "string"
+    },
+    "enabled": {
+     "description": "Enable the built-in relay or pause all relay access",
+     "type": "boolean"
+    },
+    "token": {
+     "description": "Receiver-generated rly_ plus 40-196 random URL-safe characters; replaces the caller's relay credential",
+     "type": "string"
+    }
+   },
+   "required": ["idempotency_key"]
+  },
+  "errors": [
+   "invalid_parameter",
+   "forbidden",
+   "agent_not_allowed",
+   "not_found",
+   "conflict",
+   "upstream_failed"
+  ],
+  "requires": null
+ }
+}

@@ -15,8 +15,8 @@
   "required_arguments": [],
   "tool": "events"
  }],
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "boundaries": "Public control tool; inspect its schema and /v2/capabilities. Owner approval may be required.",
  "examples_url": null,
  "id": "v2.events.read",

@@ -1,6 +1,6 @@
 {
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Cancel a pending approver recovery: the agent that started it withdraws it at once; anyone else's cancel asks a listed approver for the owner's check; explicit owner.configuration grant required",

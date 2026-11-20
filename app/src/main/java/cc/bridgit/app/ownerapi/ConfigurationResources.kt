@@ -146,7 +146,6 @@ class ConfigurationResources(private val app: BridgeApp, private val caller: Age
         val words = if (body.has("wake_words")) {
             if (!live.allows("wakewords")) throw ErrorCatalog.error("agent_not_allowed", "Wake-word access is required")
             val input = body.optJSONArray("wake_words") ?: throw ErrorCatalog.error("invalid_parameter", "wake_words must be an array")
-            if (input.length() > cc.bridgit.app.listen.WakeRules.MAX_WORDS) throw ErrorCatalog.error("invalid_parameter", "Too many wake words")
             val next = mutableListOf<cc.bridgit.app.listen.WakeWord>()
             for (i in 0 until input.length()) {
                 val w = input.optJSONObject(i) ?: throw ErrorCatalog.error("invalid_parameter", "Each wake word must be an object")

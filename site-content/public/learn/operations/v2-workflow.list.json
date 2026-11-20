@@ -1,6 +1,6 @@
 {
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "source": "Commands + ToolSchemas + PlatformApi.openApi",
  "operation": {
   "path": "/v2/call",
@@ -16,9 +16,21 @@
    "instructions": "Send JSON {tool, arguments}. HTTP retry identity belongs in the Idempotency-Key header, never arguments.idempotency_key; MCP uses idempotency_key inside its tool arguments.",
    "method": "POST",
    "arguments_schema": {
+    "description": "Your workflows, with next_cursor pagination; no fixed workflow-count limit",
     "additionalProperties": false,
     "type": "object",
-    "properties": {},
+    "properties": {
+     "limit": {
+      "description": "Page size",
+      "maximum": 100,
+      "type": "integer",
+      "minimum": 1
+     },
+     "after": {
+      "description": "next_cursor from the previous page",
+      "type": "string"
+     }
+    },
     "required": []
    },
    "request_schema": {
@@ -27,9 +39,21 @@
     "required": ["tool"],
     "properties": {
      "arguments": {
+      "description": "Your workflows, with next_cursor pagination; no fixed workflow-count limit",
       "additionalProperties": false,
       "type": "object",
-      "properties": {},
+      "properties": {
+       "limit": {
+        "description": "Page size",
+        "maximum": 100,
+        "type": "integer",
+        "minimum": 1
+       },
+       "after": {
+        "description": "next_cursor from the previous page",
+        "type": "string"
+       }
+      },
       "required": []
      },
      "tool": {
@@ -41,9 +65,21 @@
    }
   },
   "mcp_input_schema": {
+   "description": "Your workflows, with next_cursor pagination; no fixed workflow-count limit",
    "additionalProperties": false,
    "type": "object",
-   "properties": {},
+   "properties": {
+    "limit": {
+     "description": "Page size",
+     "maximum": 100,
+     "type": "integer",
+     "minimum": 1
+    },
+    "after": {
+     "description": "next_cursor from the previous page",
+     "type": "string"
+    }
+   },
    "required": []
   },
   "mcp": {

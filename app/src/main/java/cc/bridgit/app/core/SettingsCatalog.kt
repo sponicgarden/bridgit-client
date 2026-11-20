@@ -76,6 +76,7 @@ object SettingsCatalog {
         e("alerts.state", "Whether bridgit.cc has confirmed alerts.email", listOf("none", "pending", "confirmed"), SettingLock.STATUS),
         e("appearance.theme", "App theme", listOf("system", "light", "dark")),
         i("speaker.volume_ceiling", "Agents' audio never plays louder than this percent of the media volume", 10, 100),
+        i("listening.end_silence_ms", "Silence ending a wake-word command, milliseconds (default 1500)", 300, 3000),
         SettingDef("listening.wake_words", "array", "Wake words: [{phrase, agent_id, send_clip}]", lock = SettingLock.OWNER),
         SettingDef("listening.sounds", "object", "Listen for any sounds: {agent_id, sensitivity, send_clip}, or null", lock = SettingLock.OWNER),
         b("captures.agent_files", "Agents may save their captures to the phone's Downloads/Bridgit folder (each picks with POST /v1/captures/storage)"),

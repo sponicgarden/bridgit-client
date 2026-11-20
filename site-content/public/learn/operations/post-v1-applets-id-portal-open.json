@@ -1,6 +1,6 @@
 {
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Bring an installed applet's portal to the front of the screen (any applet), as if the owner tapped Open. Waits for its page to load and expose its functions",

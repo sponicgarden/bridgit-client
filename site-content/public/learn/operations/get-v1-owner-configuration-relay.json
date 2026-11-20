@@ -1,0 +1,28 @@
+{
+ "documentation_revision": 142,
+ "api_revision": 158,
+ "source": "Endpoints.all + Learn.endpoints + McpTools",
+ "operation": {
+  "summary": "Read the existing owner control agent's cloud relay transport status",
+  "method": "GET",
+  "auth": true,
+  "mcp_tool": "owner_configuration_relay_get",
+  "query": [],
+  "control_scope": "owner.configuration",
+  "developer_only": false,
+  "capture": false,
+  "body": [],
+  "example": "GET /v1/owner/configuration/relay",
+  "idempotent": false,
+  "path": "/v1/owner/configuration/relay",
+  "capability": "owner_features",
+  "returns": "enabled,enrolled,base_url,credential_configured,signed_only,status; no credential",
+  "mcp_input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": []
+  },
+  "errors": [],
+  "requires": null
+ }
+}

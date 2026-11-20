@@ -24,7 +24,9 @@
     },
     "wait": {
       "scope": null,
-      "fields": ["seconds"]
+      "fields": [
+        "seconds"
+      ]
     },
     "ask_model": {
       "scope": "decisions",
@@ -36,7 +38,9 @@
     },
     "ring": {
       "scope": "phone.control",
-      "fields": ["seconds"]
+      "fields": [
+        "seconds"
+      ]
     },
     "photo": {
       "scope": "camera.snapshot",
@@ -109,6 +113,7 @@
       "scope": "audio.speak",
       "fields": [
         "allow_cloud",
+        "engine",
         "text"
       ]
     },
@@ -125,7 +130,9 @@
     },
     "event": {
       "scope": null,
-      "fields": ["text"]
+      "fields": [
+        "text"
+      ]
     },
     "kitchen": {
       "scope": "decisions",
@@ -139,7 +146,9 @@
     },
     "set_mode": {
       "scope": "modes.set",
-      "fields": ["mode"]
+      "fields": [
+        "mode"
+      ]
     },
     "send": {
       "scope": "connections.send",

@@ -3,7 +3,7 @@
 One file installs a whole applet on a Bridgit phone. The owner approves it once, on one review screen. The phone then creates every part itself and keeps it running with no agent online.
 
 - Format: the template registry's own `bridgit-template/1` definition, with `runtime.adapter: "bridgit.package.v1"`. Android also accepts the legacy `android.package.v1` name.
-- Parts: up to 5 watches, one schedule, a single `processing.workflow` or up to four named `processing.flows`, up to 3 tables and one card. All are optional, but there must be at least one.
+- Parts: up to 5 watches, one schedule, a single `processing.workflow` or named `processing.flows`, up to 3 tables and one card. All are optional, but there must be at least one.
 - Blanks: typed values the owner (or you) fill in: camera, interval, sensitivity, time and so on.
 - Ready-made examples: every recipe has one at `https://bridgit.cc/recipes/<id>/applet.json`, for example [room-change-watcher](https://bridgit.cc/recipes/room-change-watcher/applet.json) or [situation-counter](https://bridgit.cc/recipes/situation-counter/applet.json) (needs API revision 71: its `situation` blank takes a library id from `GET /v1/situations` or the owner's own words).
 - Needs API revision 69 or later (`GET /v1/health` → `api_revision`).
@@ -85,7 +85,7 @@ Leave out `observation_schema`, `metrics`, `lifecycle`, `migration` and `data_po
 
 ## Flows
 
-A flow is a trigger, then 1 to 32 steps the phone runs on its own. Put one in `processing.workflow`, or up to 4 in `processing.flows` (each with an `id`, lowercase, 1-24 characters). The owner's review shows each flow as one plain sentence.
+A flow is a trigger, then 1 to 32 steps the phone runs on its own. Put one in `processing.workflow`, or named flows in `processing.flows` (each with an `id`, lowercase, 1-24 characters). The owner's review shows each flow as one plain sentence.
 
 ```json
 "processing": {"flows": [{"id": "dinner", "name": "Dinner check",
@@ -381,3 +381,11 @@ Use `tally.typical_gap_basis: "continuous_seen"` when an interval between two ep
 ## Required practice contract
 
 Before creating or changing an applet, read [the practice contract](https://bridgit.cc/learn/builder/applet-practices.md) and [catalog](https://bridgit.cc/learn/builder/practices.json). Record the catalog review in `ui.practices`. The validator reports applicable practices, defaults and checks. Run the named behavioral checks; unverified is not passed. Use a justified exception only for its exact target. Reassess exceptions when the target changes.
+
+### Voice flows
+
+`{"type":"wake_word","phrase":"model"}` starts directly from the native local wake recognizer. Omit `phrase` to accept any owner-assigned phrase for this applet. The trigger provides `transcript`, `wake_word` and native `event_id`. Declare `wakewords`, `microphone.clip` and `events.read`; the owner's wake-word assignment must point to the installed applet principal. Posting application events or manually running the flow cannot simulate a wake receipt. Removal, pause or reassignment stops subsequent steps.
+
+There is no fixed phrase, flow-per-applet or flow-per-agent count cap. Package byte limits and device resources still bound capacity. `workflow.list` is paginated with `limit` (1–100), `after` and `next_cursor`; follow every page.
+
+For short voice responses use `speak` with `engine:"device"` and an installed offline voice. This avoids a model-registry request. `ask_model` exposes the actual `model` identity and a spoken `model_name`; append the latter to identify the model used. Choice questions without criteria support free-form short replies. `listening.end_silence_ms` (300–3000, default 1500) controls local utterance endpointing; shorten it carefully because pauses may split speech. Bridgit suppresses wake recognition during its own speaker playback and a short drain interval.

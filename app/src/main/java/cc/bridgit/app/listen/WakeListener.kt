@@ -161,7 +161,7 @@ class WakeListener(private val app: BridgeApp) {
         val m = if (run.words.isEmpty()) null else withContext(Dispatchers.IO) { model.load() }
         while (currentCoroutineContext().isActive) {
             val why = pausedReason()
-            if (why != null) { if (_state.value != State.Paused(why)) setState(State.Paused(why)); delay(1_000); continue }
+            if (why != null) { if (_state.value != State.Paused(why)) setState(State.Paused(why)); delay(if(why == "playback") 50 else 1_000); continue }
             if (!listenUntilPaused(m, run)) delay(5_000)
         }
     }
@@ -222,6 +222,12 @@ class WakeListener(private val app: BridgeApp) {
                             .onFailure { app.log.system("diagnostic", "sounds", "Loud-sound subscriber $id failed: ${it.javaClass.simpleName}", level = "warn") } } }
                     null -> c.pcm?.write(buf, 0, n)
                 }
+                // Keep sound monitoring alive; only the wake recognizer discards our speaker audio.
+                if (app.speakerReady() && app.speaker.suppressWakeRecognition()) {
+                    spotter?.reset(); ring.clear(); fed = 0; quiet = 0
+                    if (app.registry.micLock.isLocked || pausedReason() != null) return true
+                    continue
+                }
                 // Silence never reaches Vosk; when sound starts, it gets up to 300 ms of what came just before.
                 if (spotter == null || !gate.feed(level)) {
                     quiet++
@@ -257,7 +263,7 @@ class WakeListener(private val app: BridgeApp) {
         setState(State.Hearing(WakeRules.normalize(wake.phrase)))
         tick()
         val pcm = ByteArrayOutputStream()
-        val det = WakeRules.PauseDetector(FRAME_MS)
+        val det = WakeRules.PauseDetector(FRAME_MS, pauseMs = app.platform.store.setting("wake_end_silence_ms", "1500").toLongOrNull()?.coerceIn(300, 3000) ?: 1500L)
         val free = Recognizer(m, RATE.toFloat())
         var end: WakeRules.PauseDetector.End? = null
         try {
@@ -274,7 +280,7 @@ class WakeListener(private val app: BridgeApp) {
                 if (n == 0) continue
                 pcm.write(buf, 0, n); free.acceptWaveForm(buf, n)
                 end = det.feed(WakeRules.rms(buf, n))
-                if (app.registry.micLock.isLocked || pausedReason() == "call") break
+                if (app.registry.micLock.isLocked || (pausedReason() == "call" || (app.speakerReady() && app.speaker.suppressWakeRecognition()))) break
             }
             val voskText = runCatching { JSONObject(free.finalResult).optString("text") }.getOrDefault("")
             val bytes = pcm.toByteArray()
@@ -301,8 +307,9 @@ class WakeListener(private val app: BridgeApp) {
         val stored = if (wake.sendClip && pcm.isNotEmpty()) keepClip(agent.id, CaptureRules.WAKE_CLIP, pcm, heardAt, seconds) else null
         val clipId = stored?.optString("capture_id")
         val phrase = WakeRules.normalize(wake.phrase)
-        app.interactions.event(agent.id, "listen.heard", WakeRules.heardEvent(wake, transcript, isoAt(heardAt), endedBy, seconds, recogniser, clipId)
+        val event = app.interactions.event(agent.id, "listen.heard", WakeRules.heardEvent(wake, transcript, isoAt(heardAt), endedBy, seconds, recogniser, clipId)
             .apply { if (stored != null) put("capture", stored) })
+        app.platform.workflows.onWakeWord(event)
         app.log.system("audit", "wakewords", "Heard \"$phrase\" for ${agent.name}: \"${WakeRules.forLog(transcript)}\"",
             data = cc.bridgit.app.log.LogFacts.wakeHeard(agent.id, endedBy, clipId != null, WakeRules.forLog(transcript), recogniser))
         lastHit = LastHit(phrase, agent.name, WakeRules.forLog(transcript), heardAt)

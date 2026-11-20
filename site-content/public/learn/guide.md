@@ -1,6 +1,6 @@
 # Bridgit guide
 
-Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 157). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
+Reference published at https://bridgit.cc/learn/guide.md, built from the latest Bridgit code (API revision 158). It describes endpoints, cards and errors and asks nothing of the reader; tasks come from the owner. Everything else an agent needs to learn Bridgit, with no key and no phone: https://bridgit.cc/learn/index.json (also https://bridgit.cc/llms.txt).
 
 Your phone's own copy (`GET /v1/guide`) adds what is switched on there and its exact address. If `GET /v1/health` reports a lower `api_revision`, the phone runs an older Bridgit: endpoints added since then (see https://bridgit.cc/learn/changes.json) answer `not_found` until the owner updates it.
 
@@ -14,14 +14,13 @@ Send `Authorization: Bearer <your key>` on every call except `GET /v1/tools/brid
 Every response carries an `X-Request-Id` header (JSON replies also a `request_id` field) that matches a log entry.
 MCP clients can use `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies, same Bearer key): every endpoint below except pairing, the helper and the OpenAPI file is a tool, e.g. `camera_snapshot`, `image_last`, `interactions_send`; side-effecting tools take an `idempotency_key` argument. A second MCP server, `/mcp` on the same port, has the agent control tools: on-device OCR, barcodes, translation and dictation, using apps on screen, workflows, alerts, notifications and peripherals (https://bridgit.cc/learn/control.md).
 
-API revision 157 (Bridgit 2.0 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
+API revision 158 (Bridgit 2.0 line). Every reply carries `X-Bridgit-API-Revision`; after Bridgit is updated,
 replies carry `X-Bridgit-Whats-New` until you read this guide or `GET /v1/changes?since=<your revision>`.
 
-## New in revision 157
-- Headless Android mode: device.presentation is auto or headless, with authenticated read/write and reset to auto. Devices without a usable display start without WebView or native screens (`/v1/settings`)
-- Health reports presentation and distinguishes USB loopback from Tailscale binding. USB HTTP/MCP requires the same keys and grants; no initial authority is created automatically (`/v1/health`)
-- Owner USB enrollment helper, with explicit owner confirmation and private credential storage (`/v1/tools/headless-setup`)
-- Headless devices refuse visual cards/text/screen capture before queuing them; use available microphone/speaker APIs (`/v1/interactions`)
+## New in revision 158
+- Native wake_word flow trigger starts only the recipient's authorized workflows with the locally recognized transcript; no polling, HTTP event injection or chat relay (`/v2/call`)
+- Flow speak engine=device explicitly uses the installed offline voice without a model-registry network hop; default registry behavior is preserved (`/v2/call`)
+- Authenticated listening.end_silence_ms setting (300–3000 ms, default 1500) tunes wake-command endpoint latency (`/v1/settings`)
 
 ## Start here
 1. `GET /v1/health`: confirm your agent, `base_url`, `api_revision` and `agent_control.mode`. Public docs can describe a newer build: compare with https://bridgit.cc/learn/changes.json; an old phone's own change log cannot list future revisions. The installed phone's guide, capabilities and replies govern actual support.
@@ -284,6 +283,24 @@ Body (JSON): `action` (required) Action from GET /v1/owner/features; `options` (
 Returns: durable v2 operation: accepted/completed/failed; inspect /v2/operations/{id} or MCP bridgit_operation_get; resource operations return a resource job id.
 Accepts `Idempotency-Key`.
 Example: `POST /v1/owner/configure {"action":"resource.download","options":{"resource":"wake-english"}}`
+
+### `GET /v1/owner/configuration/relay`
+Read the existing owner control agent's cloud relay transport status.
+Returns: enabled,enrolled,base_url,credential_configured,signed_only,status; no credential.
+Example: `GET /v1/owner/configuration/relay`
+
+### `POST /v1/owner/configuration/relay`
+Enable/disable the built-in relay or set/rotate this already paired control agent's write-only connector credential; existing Super authority and explicit capabilities required; signed-only policy is preserved; explicit owner.configuration grant required; no per-change phone approval.
+Body (JSON): `enabled` Enable the built-in relay or pause all relay access; `token` Receiver-generated rly_ plus 40-196 random URL-safe characters; replaces the caller's relay credential.
+Returns: same sanitized status; no initial key pairing, role or OS authority created.
+Accepts `Idempotency-Key`.
+Example: `POST /v1/owner/configuration/relay {"enabled":true}`
+
+### `DELETE /v1/owner/configuration/relay`
+Remove this existing control agent's relay credential; direct pairing remains; explicit owner.configuration grant required; no per-change phone approval.
+Returns: sanitized relay status.
+Accepts `Idempotency-Key`.
+Example: `DELETE /v1/owner/configuration/relay `
 
 ### `GET /v1/owner/configuration/access`
 Existing Super agents can inspect and delegate app-owned feature switches, capabilities, roles and control grants without a separate configuration grant.

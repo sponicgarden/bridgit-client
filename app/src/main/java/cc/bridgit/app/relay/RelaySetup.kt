@@ -24,7 +24,7 @@ object RelaySetup {
      * self-enrolment); with a one-time code from the relay's owner page it uses that. A phone the relay already
      * knows just reconnects.
      */
-    fun turnOn(app: BridgeApp, store: RelayStore, code: String = "") {
+    fun turnOn(app: BridgeApp, store: RelayStore, code: String = "", authorized: () -> Unit = {}) {
         if (store.base.isEmpty()) store.base = store.defaultBase().ifEmpty { throw AddressProblem(app.getString(R.string.relay_no_address), missing = true) }
         if (!store.base.endsWith("/d/${store.device}")) throw AddressProblem(app.getString(R.string.relay_address_helper, store.device), missing = false)
         if (!store.enrolled || code.isNotEmpty()) {
@@ -38,6 +38,7 @@ object RelaySetup {
             }
             store.enrolled = true
         }
+        authorized()
         store.enabled = true
         app.settings.listenerEnabled = true
         BridgeService.start(app)

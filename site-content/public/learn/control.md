@@ -1,6 +1,6 @@
 # Bridgit agent control tools
 
-API revision 157. Full index: https://bridgit.cc/learn/index.json.
+API revision 158. Full index: https://bridgit.cc/learn/index.json.
 
 Bridgit has two sets of tools on the same phone, with the same key and the same Tailscale address:
 
@@ -231,7 +231,7 @@ Every tool by name. The scope is what the owner switches on for you in Agent per
 | `bridgit_translation_run` | read | translation | **`source`**, **`target`**, **`text`** |
 | `bridgit_ui_action` | action | screen.control | **`fence`**, **`idempotency_key`**, **`observation_id`**, **`session_id`**, **`type`**, `direction`, `expect`, `ref`, `text` |
 | `bridgit_ui_sequence` | action | screen.control | **`fence`**, **`idempotency_key`**, **`session_id`**, **`steps`** |
-| `bridgit_workflow_list` | read | workflows | none |
+| `bridgit_workflow_list` | read | workflows | `after`, `limit` |
 | `bridgit_workflow_pause` | action | workflows | **`id`**, **`idempotency_key`** |
 | `bridgit_workflow_propose` | action | workflows | **`idempotency_key`**, **`name`**, **`steps`**, **`trigger`**, `cooldown_s`, `max_paid_per_day`, `max_runs_per_day`, `only_if`, `ui` |
 | `bridgit_workflow_run` | action | workflows | **`id`**, **`idempotency_key`**, `with` |
@@ -251,4 +251,5 @@ Bold arguments are always required. Some depend on the call:
 - `bridgit_images_ocr`: Give exactly one of file_id, gallery_id or image_base64.
 - `bridgit_peripheral_action`: ble.read needs address, service_uuid and characteristic_uuid; ble.write also needs data_base64; usb.transfer needs device_id.
 - `bridgit_ui_action`: ref is required for tap, long_press, set_text and scroll; text is required for set_text.
+- `bridgit_workflow_list`: Your workflows, with next_cursor pagination; no fixed workflow-count limit.
 - `bridgit_workflow_simulate`: Preview a flow with fixtures. Returns simulated, status, steps and would. No device actions or paid calls..

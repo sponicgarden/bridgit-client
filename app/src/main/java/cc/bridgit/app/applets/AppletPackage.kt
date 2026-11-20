@@ -62,7 +62,6 @@ object AppletPackage {
     private val TYPES = setOf("object", "array", "string", "number", "integer", "boolean", "null")
     private val PROCESSING_KEYS = setOf("watches", "schedule", "workflow", "flows", "native", "tables")
     /** Flows per package (docs/applet-vocabulary.md): inside the per-principal cap of 8 workflows even mid-update. */
-    const val MAX_FLOWS = 4
     private val FLOW_ID = Regex("^[a-z][a-z0-9_]{0,23}$")
     /** The flow `processing.workflow` stands for. */
     const val MAIN_FLOW = "main"
@@ -222,7 +221,7 @@ object AppletPackage {
         processing.opt("workflow")?.let { if (it !is JSONObject) throw Bad("processing.workflow must be a workflow.propose body.") }
         if (processing.has("workflow") && processing.has("flows")) throw Bad("Use processing.workflow (one flow) or processing.flows, not both.")
         val flowList = processing.opt("flows")?.let { f ->
-            if (f !is JSONArray || f.length() !in 1..MAX_FLOWS) throw Bad("processing.flows must be a list of 1-$MAX_FLOWS flows, each a workflow.propose body plus id.")
+            if (f !is JSONArray || f.length() < 1) throw Bad("processing.flows must be a nonempty list of workflows, each a workflow.propose body plus id.")
             f
         }
         // Package flow name → (trigger type, the with names it takes): what a {"$flow": …} may name.
@@ -596,7 +595,10 @@ object AppletPackage {
         }
         plan.card?.let { c -> out += "interactions"; out += c.cardCapabilities; c.calls.forEach { call -> callCap(call)?.let { out += it } }; if (c.usesCamera) out += "camera" }
         if (lanPhotos(plan).isNotEmpty()) out += "lan_camera"
-        for ((_, f) in plan.flows) out += workflowScopes(f)
+        for ((_, f) in plan.flows) {
+            out += workflowScopes(f)
+            if (f.optJSONObject("trigger")?.optString("type") == "wake_word") out += "wakewords"
+        }
         if (plan.native != null) out += "camera"
         return out
     }

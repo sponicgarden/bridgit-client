@@ -10,6 +10,7 @@ import java.util.UUID
 
 /** Durable, bounded records; callers never receive another agent's rows. */
 class PlatformStore(context: Context, name: String = "agent-platform.db") : SQLiteOpenHelper(context, name, null, 1) {
+    @Volatile var workflowRevision: Long = 0; private set
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("CREATE TABLE records(id TEXT PRIMARY KEY, agent TEXT NOT NULL, kind TEXT NOT NULL, value TEXT NOT NULL, created INTEGER NOT NULL)")
         db.execSQL("CREATE INDEX record_owner ON records(agent,kind,created)")
@@ -36,6 +37,7 @@ class PlatformStore(context: Context, name: String = "agent-platform.db") : SQLi
         val created = previous?.optLong("created_at") ?: System.currentTimeMillis()
         value.put("created_at", created)
         writableDatabase.execSQL("INSERT OR REPLACE INTO records VALUES(?,?,?,?,?)", arrayOf(id, agent, kind, value.toString(), created))
+        if(kind == "workflow" && (previous == null || previous.optString("status") != value.optString("status") || previous.optString("digest") != value.optString("digest"))) workflowRevision++
         return copy(value)
     }
     @Synchronized fun find(id: String, agent: String? = null, kind: String? = null): JSONObject? = readableDatabase.rawQuery("SELECT value FROM records WHERE id=?", arrayOf(id)).use { c ->
@@ -47,6 +49,13 @@ class PlatformStore(context: Context, name: String = "agent-platform.db") : SQLi
         agent?.let { predicates.add("agent=?"); args.add(it) }; kind?.let { predicates.add("kind=?"); args.add(it) }
         val where = if (predicates.isEmpty()) "" else " WHERE " + predicates.joinToString(" AND ")
         return readableDatabase.rawQuery("SELECT value FROM records$where ORDER BY created DESC LIMIT ${limit.coerceIn(1,1000)}", args.toTypedArray()).use { c -> buildList { while(c.moveToNext()) add(JSONObject(c.getString(0))) } }
+    }
+    /** Native routing needs every definition, independent of the paginated public listing. */
+    @Synchronized fun workflows(agent: String? = null): List<JSONObject> {
+        val where = if(agent == null) "kind='workflow'" else "kind='workflow' AND agent=?"
+        return readableDatabase.rawQuery("SELECT value FROM records WHERE $where ORDER BY id", if(agent == null) emptyArray() else arrayOf(agent)).use { c ->
+            buildList { while(c.moveToNext()) add(JSONObject(c.getString(0))) }
+        }
     }
     /** Keeps only the newest [keep] finished records of [kind] for [agent], so run history can't fill the store. */
     @Synchronized fun trimFinished(agent: String, kind: String, keep: Int, finished: Set<String>) {
@@ -63,8 +72,8 @@ class PlatformStore(context: Context, name: String = "agent-platform.db") : SQLi
     @Synchronized fun usage(agent: String, kind: String): Pair<Int, Long> =
         readableDatabase.rawQuery("SELECT COUNT(*), COALESCE(SUM(LENGTH(value)),0) FROM records WHERE agent=? AND kind=?", arrayOf(agent, kind)).use { it.moveToFirst(); it.getInt(0) to it.getLong(1) }
     /** Every record [agent] has, of any kind (applet removal). */
-    @Synchronized fun deleteAll(agent: String) { writableDatabase.delete("records", "agent=?", arrayOf(agent)) }
-    @Synchronized fun delete(id: String, agent: String) { writableDatabase.delete("records", "id=? AND agent=?", arrayOf(id,agent)) }
+    @Synchronized fun deleteAll(agent: String) { writableDatabase.delete("records", "agent=?", arrayOf(agent)); workflowRevision++ }
+    @Synchronized fun delete(id: String, agent: String) { writableDatabase.delete("records", "id=? AND agent=?", arrayOf(id,agent)); workflowRevision++ }
     @Synchronized fun emit(agent: String, type: String, resource: String = "", payload: JSONObject? = null): Long {
         val data = JSONObject().put("type",type).put("resource_id",resource).put("at",System.currentTimeMillis())
         payload?.let { data.put("data", it) }

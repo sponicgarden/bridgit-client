@@ -717,6 +717,11 @@ object ApiChanges {
             Item("Owner USB enrollment helper, with explicit owner confirmation and private credential storage", "/v1/tools/headless-setup"),
             Item("Headless devices refuse visual cards/text/screen capture before queuing them; use available microphone/speaker APIs", "/v1/interactions"),
         )),
+        Revision(158, "2.0.0", "2026-11-19", listOf(
+            Item("Native wake_word flow trigger starts only the recipient's authorized workflows with the locally recognized transcript; no polling, HTTP event injection or chat relay", "/v2/call"),
+            Item("Flow speak engine=device explicitly uses the installed offline voice without a model-registry network hop; default registry behavior is preserved", "/v2/call"),
+            Item("Authenticated listening.end_silence_ms setting (300–3000 ms, default 1500) tunes wake-command endpoint latency", "/v1/settings"),
+        )),
     )
 
     val CURRENT: Int = revisions.maxOf { it.revision }

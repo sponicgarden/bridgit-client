@@ -4584,14 +4584,6 @@
         ]
       }
     },
-    "workflow_limit": {
-      "http": 429,
-      "platforms": {
-        "android": [
-          429
-        ]
-      }
-    },
     "workflow_not_active": {
       "http": 403,
       "platforms": {

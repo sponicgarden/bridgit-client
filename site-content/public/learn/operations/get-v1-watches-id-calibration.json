@@ -1,6 +1,6 @@
 {
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "How right the watch's cheap stages are, to tune it with: every stage that decides (the free change check, the sound match, the paid model, the paid cap) keeps a small record per reading on the phone (no photos or sound, 30 days, at most 20000). A sample of the readings the free stage answered is asked of the paid model anyway (audit_share, default 1 in 50, never below 1 in 200, paid and counted like any check), and this reports how often they disagreed",

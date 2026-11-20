@@ -48,6 +48,29 @@ class UnattendedConfigurationTest {
     }
     private fun o(text: String) = JSONObject(text)
 
+    @Test fun relayCredentialRequiresExistingSuperAuthorityAndIsWriteOnlyRotatableAndRevocable() = runBlocking {
+        val relay = ConfigurationRelay(app, caller)
+        rejected("capability_disabled") { runBlocking { relay.update(o("""{"token":"rly_${"a".repeat(48)}"}""")) } }
+        app.settings.setOn("settings_api", true)
+        app.agents.update(caller.id) { it.copy(superPowers = true, caps = it.caps!! + "settings") }
+        val one = "rly_" + "a".repeat(48)
+        val two = "rly_" + "b".repeat(48)
+        val first = relay.update(JSONObject().put("token",one))
+        assertTrue(first.getBoolean("credential_configured")); assertFalse(first.toString().contains(one))
+        val before = cc.bridgit.app.relay.RelayStore(app).agents().single().getString("token_hash")
+        relay.update(JSONObject().put("token",one))
+        assertEquals(before, cc.bridgit.app.relay.RelayStore(app).agents().single().getString("token_hash"))
+        relay.update(JSONObject().put("token",two))
+        assertNotEquals(before, cc.bridgit.app.relay.RelayStore(app).agents().single().getString("token_hash"))
+        app.settings.securityRelaySignedOnly = true
+        rejected("forbidden") { runBlocking { relay.update(JSONObject().put("token",one)) } }
+        assertTrue(app.settings.securityRelaySignedOnly)
+        assertFalse(relay.clear().getBoolean("credential_configured"))
+        assertNotNull(app.agents.get(caller.id))
+        app.agents.update(caller.id) { it.copy(paused = true) }
+        rejected("unauthorized") { relay.status() }
+    }
+
     @Test fun explicitConfigurationGrantProjectsOnlyConfigurationAndRevocationRemovesIt() {
         val original = o("""{"id":"${caller.id}","generation":"${caller.keyHash}","routes":["GET /v1/status"],"tools":["phone.status"]}""")
         val effective = ConfigurationDelegation.effective(app, original)

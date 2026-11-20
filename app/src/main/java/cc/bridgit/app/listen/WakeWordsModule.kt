@@ -27,7 +27,7 @@ class WakeWordsModule(app: BridgeApp) : Capability(app) {
     override val permissions = listOf(Manifest.permission.RECORD_AUDIO)
     override val endpoints = listOf(Endpoints.LISTEN, Endpoints.LISTEN_CLIP)
     override fun blockedReason() = app.wake.missing()
-    override fun details() = JSONObject().put("wake_words", app.wake.activeWords().size).put("max_wake_words", WakeRules.MAX_WORDS)
+    override fun details() = JSONObject().put("wake_words", app.wake.activeWords().size).put("max_wake_words", JSONObject.NULL)
         .put("model_ready", app.wake.model.ready).put("on_device_transcription", cc.bridgit.app.planned.Transcriber.available(app))
 
     override fun Route.install(api: ApiServer) = with(api) {

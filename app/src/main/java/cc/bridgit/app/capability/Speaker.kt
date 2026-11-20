@@ -169,6 +169,8 @@ class SpeakerQueue(private val app: BridgeApp) {
     private val limiter = RateLimiter(windowMs = 3_600_000L)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     val tts by lazy { TtsFiles(app) }
+    private val wakePlayback = cc.bridgit.app.listen.WakeRules.PlaybackGate()
+    fun suppressWakeRecognition() = wakePlayback.blocked(android.os.SystemClock.elapsedRealtime())
 
     private val thread = HandlerThread("bridgit-speaker").apply { start() }
     private val handler = Handler(thread.looper)
@@ -391,6 +393,7 @@ class SpeakerQueue(private val app: BridgeApp) {
             finished(item); return
         }
         if (pausedByFocus || pausedByCall || inCall()) { pausedByCall = pausedByCall || inCall(); paused = true; changed(); return }
+        wakePlayback.update(true, android.os.SystemClock.elapsedRealtime())
         mp.start(); paused = false
     }
 
@@ -409,6 +412,7 @@ class SpeakerQueue(private val app: BridgeApp) {
     }
 
     private fun teardown() {
+        wakePlayback.update(false, android.os.SystemClock.elapsedRealtime())
         player?.let { runCatching { it.stop() }; runCatching { it.release() } }
         player = null; playerItem = null; prepared = false
     }
@@ -416,10 +420,11 @@ class SpeakerQueue(private val app: BridgeApp) {
     private fun resumeIfPossible() {
         val mp = player ?: return
         if (!prepared || pausedByFocus || pausedByCall || inCall()) return
-        if (!mp.isPlaying) { mp.start(); paused = false; changed() }
+        if (!mp.isPlaying) { wakePlayback.update(true, android.os.SystemClock.elapsedRealtime()); mp.start(); paused = false; changed() }
     }
 
     private fun pausePlayer() {
+        wakePlayback.update(false, android.os.SystemClock.elapsedRealtime())
         player?.let { if (prepared && it.isPlaying) it.pause() }
         if (player != null) { paused = true; changed() }
     }

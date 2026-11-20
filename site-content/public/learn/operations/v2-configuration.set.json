@@ -1,6 +1,6 @@
 {
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "source": "Commands + ToolSchemas + PlatformApi.openApi",
  "operation": {
   "path": "/v2/call",
@@ -31,6 +31,8 @@
       "description": "Exact method and path template from configuration discovery; GET defaults to its index",
       "type": "string",
       "enum": [
+       "POST /v1/owner/configuration/relay",
+       "DELETE /v1/owner/configuration/relay",
        "POST /v1/owner/configuration/access/features",
        "POST /v1/owner/configuration/access/agents/{agent}",
        "POST /v1/owner/configuration/approvals/{kind}/{id}",
@@ -106,6 +108,8 @@
         "description": "Exact method and path template from configuration discovery; GET defaults to its index",
         "type": "string",
         "enum": [
+         "POST /v1/owner/configuration/relay",
+         "DELETE /v1/owner/configuration/relay",
          "POST /v1/owner/configuration/access/features",
          "POST /v1/owner/configuration/access/agents/{agent}",
          "POST /v1/owner/configuration/approvals/{kind}/{id}",
@@ -185,6 +189,8 @@
      "description": "Exact method and path template from configuration discovery; GET defaults to its index",
      "type": "string",
      "enum": [
+      "POST /v1/owner/configuration/relay",
+      "DELETE /v1/owner/configuration/relay",
       "POST /v1/owner/configuration/access/features",
       "POST /v1/owner/configuration/access/agents/{agent}",
       "POST /v1/owner/configuration/approvals/{kind}/{id}",

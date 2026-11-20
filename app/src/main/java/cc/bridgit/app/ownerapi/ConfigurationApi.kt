@@ -104,7 +104,12 @@ object ConfigurationEndpoints {
     val PERMISSIONS_LINKED = write("POST", "/permissions/linked/{id}", "Replace a linked device's permissions on this phone (a portal viewer, hub or satellite), within what its pairing gave it; Superpowers required, as for agent grants",
         listOf(Param("capabilities", "array", "Permission ids, a subset of can_be_given; [] removes all but the always-allowed ones", true)),
         "{\"capabilities\":[\"portal\"]}", "the linked device as in GET plus changed; forbidden beyond can_be_given")
-    val ALL = listOf(ACCESS, ACCESS_FEATURES, ACCESS_AGENT, APPROVALS, APPROVAL, APPROVAL_DECIDE, INDEX, SETTINGS, ACTION, KEYS, KEY_SET, KEY_DELETE, CONNECTIONS, CONNECTION_CREATE, CONNECTION_UPDATE, CONNECTION_DELETE, CONNECTION_ROTATE,
+    val RELAY = read("/relay", "Read the existing owner control agent's cloud relay transport status", "enabled,enrolled,base_url,credential_configured,signed_only,status; no credential")
+    val RELAY_SET = write("POST", "/relay", "Enable/disable the built-in relay or set/rotate this already paired control agent's write-only connector credential; existing Super authority and explicit capabilities required; signed-only policy is preserved",
+        listOf(Param("enabled", "boolean", "Enable the built-in relay or pause all relay access"), Param("token", "string", "Receiver-generated rly_ plus 40-196 random URL-safe characters; replaces the caller's relay credential")),
+        "{\"enabled\":true}", "same sanitized status; no initial key pairing, role or OS authority created")
+    val RELAY_DELETE = write("DELETE", "/relay", "Remove this existing control agent's relay credential; direct pairing remains", emptyList(), "", "sanitized relay status")
+    val ALL = listOf(RELAY, RELAY_SET, RELAY_DELETE, ACCESS, ACCESS_FEATURES, ACCESS_AGENT, APPROVALS, APPROVAL, APPROVAL_DECIDE, INDEX, SETTINGS, ACTION, KEYS, KEY_SET, KEY_DELETE, CONNECTIONS, CONNECTION_CREATE, CONNECTION_UPDATE, CONNECTION_DELETE, CONNECTION_ROTATE,
         CALLBACKS, CALLBACK_SET, CALLBACK_DELETE, NOTIFICATIONS, NOTIFICATIONS_SET, EMAIL, EMAIL_SET, NAME, NAME_SET, NAME_DELETE, SPECS, SPECS_SET, FEEDING, FEEDING_SET, MODES, MODES_SET, LISTENING, LISTENING_SET, PERMISSIONS, PERMISSIONS_DEVICE, PERMISSIONS_LINKED) +
         ConfigurationLinks.CONFIG + ConfigurationApprovers.ALL + ConfigurationSpending.ALL
 }
@@ -118,7 +123,7 @@ fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
             .put("connections_url", "/v1/owner/configuration/connections").put("callbacks_url", "/v1/owner/configuration/callbacks")
             .put("notifications_url", "/v1/owner/configuration/notifications/{agent}").put("feeding_url", "/v1/owner/configuration/feeding")
             .put("email_url", "/v1/owner/configuration/email").put("name_url", "/v1/owner/configuration/name").put("specs_url", "/v1/owner/configuration/specs").put("links_url", "/v1/owner/configuration/links").put("approvers_url", "/v1/owner/configuration/approvers").put("spending_url", "/v1/owner/configuration/spending").put("modes_url", "/v1/owner/configuration/modes")
-            .put("listening_url", "/v1/owner/configuration/listening").put("permissions_url", "/v1/owner/configuration/permissions").put("human_authority", JSONArray(listOf("first Super Powers authority and initial key pairing", "OS consent", "account sign-in/verification", "biometric/security controls"))))
+            .put("relay_url", "/v1/owner/configuration/relay").put("listening_url", "/v1/owner/configuration/listening").put("permissions_url", "/v1/owner/configuration/permissions").put("human_authority", JSONArray(listOf("first Super Powers authority and initial key pairing", "OS consent", "account sign-in/verification", "biometric/security controls"))))
     }
     endpoint(ConfigurationEndpoints.ACCESS) { Reply.Json(SuperAgentAccess(app, agent!!).get()) }
     endpoint(ConfigurationEndpoints.ACCESS_FEATURES) { Reply.Json(SuperAgentAccess(app, agent!!).features(body)) }
@@ -156,6 +161,9 @@ fun Route.installConfiguration(api: ApiServer, app: BridgeApp) = with(api) {
     endpoint(ConfigurationEndpoints.FEEDING_SET) { Reply.Json(ConfigurationResources(app, agent!!).feeding(body)) }
     endpoint(ConfigurationEndpoints.MODES) { Reply.Json(ConfigurationResources(app, agent!!).modes()) }
     endpoint(ConfigurationEndpoints.MODES_SET) { Reply.Json(ConfigurationResources(app, agent!!).modes(body)) }
+    endpoint(ConfigurationEndpoints.RELAY) { Reply.Json(ConfigurationRelay(app, agent!!).status()) }
+    endpoint(ConfigurationEndpoints.RELAY_SET) { Reply.Json(ConfigurationRelay(app, agent!!).update(body)) }
+    endpoint(ConfigurationEndpoints.RELAY_DELETE) { Reply.Json(ConfigurationRelay(app, agent!!).clear()) }
     endpoint(ConfigurationEndpoints.LISTENING) { Reply.Json(ConfigurationResources(app, agent!!).listening()) }
     endpoint(ConfigurationEndpoints.LISTENING_SET) { Reply.Json(ConfigurationResources(app, agent!!).listening(body)) }
     endpoint(ConfigurationEndpoints.PERMISSIONS) { Reply.Json(ConfigurationPermissions(app, agent!!).get()) }

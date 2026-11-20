@@ -1,6 +1,6 @@
 # Bridgit as an MCP server
 
-API revision 157. Full index: https://bridgit.cc/learn/index.json.
+API revision 158. Full index: https://bridgit.cc/learn/index.json.
 
 Endpoint: `http://<phone>:<port>/v1/mcp` (Streamable HTTP, JSON replies), with the same `Authorization: Bearer <your key>` header as the REST API. Every endpoint is a tool, except MCP itself, pairing, the helper download and the OpenAPI file. Side-effecting tools take an `idempotency_key` argument.
 
@@ -54,6 +54,9 @@ The phone also runs a second MCP server, `POST /mcp`, for the agent control tool
 | `delivery` | `GET /v1/delivery` | Your alert/callback delivery status and permitted destination ids |
 | `owner_settings` | `GET /v1/owner/settings` | Supplemental owner settings, model-key presence and consent requirements |
 | `owner_configure` | `POST /v1/owner/configure` | Apply an app-owned configuration change with the separate owner.configuration grant; Android consent and sign-in still require the owner |
+| `owner_configuration_relay_get` | `GET /v1/owner/configuration/relay` | Read the existing owner control agent's cloud relay transport status |
+| `owner_configuration_relay_post` | `POST /v1/owner/configuration/relay` | Enable/disable the built-in relay or set/rotate this already paired control agent's write-only connector credential; existing Super authority and explicit capabilities required; signed-only policy is preserved; explicit owner.configuration grant required; no per-change phone approval |
+| `owner_configuration_relay_delete` | `DELETE /v1/owner/configuration/relay` | Remove this existing control agent's relay credential; direct pairing remains; explicit owner.configuration grant required; no per-change phone approval |
 | `owner_configuration_access` | `GET /v1/owner/configuration/access` | Existing Super agents can inspect and delegate app-owned feature switches, capabilities, roles and control grants without a separate configuration grant (Agent Super Powers) |
 | `owner_configuration_access_features` | `POST /v1/owner/configuration/access/features` | Super agent changes app-owned enabled device features; actual Android consent remains required (Agent Super Powers) |
 | `owner_configuration_access_agents` | `POST /v1/owner/configuration/access/agents/{agent}` | An already authorized Super agent replaces grants or changes roles for an existing paired control agent, including its own configuration bootstrap; applets, portals and device peers excluded (Agent Super Powers) |

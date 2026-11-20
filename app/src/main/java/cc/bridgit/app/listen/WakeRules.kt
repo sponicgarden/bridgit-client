@@ -28,7 +28,6 @@ data class SoundConfig(val agentId: String, val sensitivity: String = "normal", 
  * grammar, matching a spotter result, when the follow-up ends, and what `listen.heard` carries.
  */
 object WakeRules {
-    const val MAX_WORDS = 10
     const val MAX_SECONDS = 60
     /** A pause this long after speech ends what follows the wake word. */
     const val PAUSE_MS = 1_500L
@@ -55,9 +54,7 @@ object WakeRules {
         val words = p.split(' ').filter { it.isNotEmpty() }
         return when {
             words.isEmpty() -> "Type a wake word."
-            words.size < 2 -> "Use at least two words, like \"hey bridget\": one word on its own is heard by mistake too often."
             words.size > 4 -> "Keep it to four words or fewer."
-            existing.size >= MAX_WORDS -> "You can have up to $MAX_WORDS wake words."
             existing.any { normalize(it.phrase) == p } -> "\"$p\" is already a wake word."
             existing.any { overlaps(normalize(it.phrase), p) } -> "\"$p\" overlaps another wake word; make them start differently."
             !agentExists(w.agentId) -> "Pick an agent."
@@ -104,7 +101,7 @@ object WakeRules {
      * Decides when what follows a wake word is over, from one loudness reading per audio frame. The noise
      * floor adapts to the room, so a fan or traffic doesn't count as speech.
      */
-    class PauseDetector(private val frameMs: Long, private val maxMs: Long = MAX_SECONDS * 1000L) {
+    class PauseDetector(private val frameMs: Long, private val maxMs: Long = MAX_SECONDS * 1000L, private val pauseMs: Long = PAUSE_MS) {
         enum class End { PAUSE, MAX, NO_SPEECH }
         private var elapsed = 0L
         private var quietFor = 0L
@@ -122,7 +119,7 @@ object WakeRules {
             if (speech) { spoke = true; quietFor = 0 } else quietFor += frameMs
             return when {
                 elapsed >= maxMs -> End.MAX
-                spoke && quietFor >= PAUSE_MS -> End.PAUSE
+                spoke && quietFor >= pauseMs -> End.PAUSE
                 !spoke && elapsed >= NO_SPEECH_MS -> End.NO_SPEECH
                 else -> null
             }
@@ -216,6 +213,17 @@ object WakeRules {
         PauseDetector.End.PAUSE -> "pause"
         PauseDetector.End.MAX -> "max_seconds"
         PauseDetector.End.NO_SPEECH -> "no_speech"
+    }
+
+    /** Stops our own speaker audio from becoming another wake command. Uses a monotonic clock. */
+    class PlaybackGate(private val drainMs: Long = 300) {
+        private var playing = false
+        private var until = 0L
+        @Synchronized fun update(active: Boolean, now: Long) {
+            if(playing && !active) until = now + drainMs
+            playing = active
+        }
+        @Synchronized fun blocked(now: Long) = playing || now < until
     }
 
     /** CAP-48: the `listen.heard` event. Nothing from before the wake word is ever in it. */

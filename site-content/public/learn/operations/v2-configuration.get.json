@@ -1,6 +1,6 @@
 {
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "source": "Commands + ToolSchemas + PlatformApi.openApi",
  "operation": {
   "path": "/v2/call",
@@ -28,6 +28,7 @@
       "description": "Exact method and path template from configuration discovery; GET defaults to its index",
       "type": "string",
       "enum": [
+       "GET /v1/owner/configuration/relay",
        "GET /v1/owner/configuration/access",
        "GET /v1/owner/configuration/approvals",
        "GET /v1/owner/configuration/approvals/{kind}/{id}",
@@ -82,6 +83,7 @@
         "description": "Exact method and path template from configuration discovery; GET defaults to its index",
         "type": "string",
         "enum": [
+         "GET /v1/owner/configuration/relay",
          "GET /v1/owner/configuration/access",
          "GET /v1/owner/configuration/approvals",
          "GET /v1/owner/configuration/approvals/{kind}/{id}",
@@ -139,6 +141,7 @@
      "description": "Exact method and path template from configuration discovery; GET defaults to its index",
      "type": "string",
      "enum": [
+      "GET /v1/owner/configuration/relay",
       "GET /v1/owner/configuration/access",
       "GET /v1/owner/configuration/approvals",
       "GET /v1/owner/configuration/approvals/{kind}/{id}",

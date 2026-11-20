@@ -956,6 +956,87 @@
    "requires": null
   },
   {
+   "summary": "Read the existing owner control agent's cloud relay transport status",
+   "method": "GET",
+   "auth": true,
+   "mcp_tool": "owner_configuration_relay_get",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "GET /v1/owner/configuration/relay",
+   "idempotent": false,
+   "path": "/v1/owner/configuration/relay",
+   "capability": "owner_features",
+   "returns": "enabled,enrolled,base_url,credential_configured,signed_only,status; no credential",
+   "errors": [],
+   "requires": null
+  },
+  {
+   "summary": "Enable/disable the built-in relay or set/rotate this already paired control agent's write-only connector credential; existing Super authority and explicit capabilities required; signed-only policy is preserved; explicit owner.configuration grant required; no per-change phone approval",
+   "method": "POST",
+   "auth": true,
+   "mcp_tool": "owner_configuration_relay_post",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [
+    {
+     "name": "enabled",
+     "description": "Enable the built-in relay or pause all relay access",
+     "type": "boolean",
+     "required": false
+    },
+    {
+     "name": "token",
+     "description": "Receiver-generated rly_ plus 40-196 random URL-safe characters; replaces the caller's relay credential",
+     "type": "string",
+     "required": false
+    }
+   ],
+   "example": "POST /v1/owner/configuration/relay {\"enabled\":true}",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/relay",
+   "capability": "owner_features",
+   "returns": "same sanitized status; no initial key pairing, role or OS authority created",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "not_found",
+    "conflict",
+    "upstream_failed"
+   ],
+   "requires": null
+  },
+  {
+   "summary": "Remove this existing control agent's relay credential; direct pairing remains; explicit owner.configuration grant required; no per-change phone approval",
+   "method": "DELETE",
+   "auth": true,
+   "mcp_tool": "owner_configuration_relay_delete",
+   "query": [],
+   "control_scope": "owner.configuration",
+   "developer_only": false,
+   "capture": false,
+   "body": [],
+   "example": "DELETE /v1/owner/configuration/relay ",
+   "idempotent": true,
+   "path": "/v1/owner/configuration/relay",
+   "capability": "owner_features",
+   "returns": "sanitized relay status",
+   "errors": [
+    "invalid_parameter",
+    "forbidden",
+    "agent_not_allowed",
+    "not_found",
+    "conflict",
+    "upstream_failed"
+   ],
+   "requires": null
+  },
+  {
    "summary": "Existing Super agents can inspect and delegate app-owned feature switches, capabilities, roles and control grants without a separate configuration grant",
    "method": "GET",
    "auth": true,
@@ -13320,7 +13401,7 @@
   }
  ],
  "auth": "Authorization: Bearer <your key> on every call where auth is true",
- "api_revision": 157,
- "count": 386,
+ "api_revision": 158,
+ "count": 389,
  "base_url": "http://<phone>:<port> (the phone's address from your setup prompt)"
 }

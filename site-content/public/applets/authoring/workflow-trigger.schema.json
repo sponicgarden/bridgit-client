@@ -616,6 +616,31 @@
           ]
         }
       }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "wake_word"
+        },
+        "phrase": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "description": "Optional owner-assigned phrase filter; omitted matches any native phrase for this recipient."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "examples": [
+        {
+          "type": "wake_word",
+          "phrase": "model"
+        }
+      ],
+      "description": "Native recognized speech for the flow agent\u2019s owner-assigned wake phrase. Requires microphone.clip, events.read and the legacy wakewords grant. No fabricated HTTP events or polling."
     }
   ]
 }

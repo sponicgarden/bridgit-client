@@ -36,6 +36,14 @@ object WorkflowDefinition {
         when(type) {
             "applet.event", "application.event" -> ApplicationEvents.validateTrigger(trigger)
             "button","charging" -> trigger.only("type")
+            "wake_word" -> {
+                trigger.only("type", "phrase")
+                if(trigger.has("phrase")) {
+                    val phrase = trigger.opt("phrase") as? String ?: throw ApiError(422,"invalid_workflow","trigger.phrase must be text")
+                    if(cc.bridgit.app.listen.WakeRules.problem(emptyList(), cc.bridgit.app.listen.WakeWord(phrase,"recipient"), { true }, null) != null)
+                        throw ApiError(422,"invalid_workflow","trigger.phrase must be a valid wake phrase")
+                }
+            }
             "power" -> {
                 trigger.only("type","on","for_s")
                 if(trigger.opt("on") !in PowerRules.ONS) throw ApiError(422,"invalid_workflow","trigger.on must be ${PowerRules.ONS.joinToString(", ")}")
@@ -73,7 +81,7 @@ object WorkflowDefinition {
                 trigger.only("type","to","from")
                 for(k in listOf("to","from")) trigger.opt(k)?.let { if(it !is String || !Modes.NAME.matches(it)) throw ApiError(422,"invalid_workflow","trigger.$k must be a mode, like \"away\" (${Modes.DEFAULTS.joinToString()} or one the owner added)") }
             }
-            else -> throw ApiError(422,"invalid_workflow","Triggers: button, interval, power, battery, sun, charging, geofence, watch, called, mode, applet.event (legacy application.event)")
+            else -> throw ApiError(422,"invalid_workflow","Triggers: button, interval, power, battery, sun, charging, geofence, watch, called, mode, wake_word, applet.event (legacy application.event)")
         }
         if(b.has("cooldown_s")) {
             b.whole("cooldown_s",0,0,86400)
@@ -97,6 +105,7 @@ object WorkflowDefinition {
             scopes.add("events.read")
             if(trigger.getString("transport")=="notification") scopes.add("notifications.read")
         }
+        if(type=="wake_word") scopes.addAll(setOf("microphone.clip", "events.read"))
         scopes.addAll(checked.scopes)
         val ui=b.optJSONObject("ui")
         if(ui!=null) { ui.only("template","title","text"); if(ui.text("template",16) !in setOf("button","status","help")) throw ApiError(422,"invalid_workflow","Unknown native template"); ui.text("title",120,""); ui.text("text",1024,"") }

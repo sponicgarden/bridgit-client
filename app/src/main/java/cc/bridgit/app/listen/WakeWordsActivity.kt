@@ -214,7 +214,7 @@ class WakeWordsActivity : AppCompatActivity() {
 
     private fun renderWords() {
         val words = app.wake.words()
-        b.count.text = if (words.isEmpty()) getString(R.string.wake_none) else getString(R.string.wake_count, words.size, WakeRules.MAX_WORDS)
+        b.count.text = if (words.isEmpty()) getString(R.string.wake_none) else getString(R.string.wake_count, words.size)
         b.words.removeAllViews()
         for (w in words) {
             val r = WakeWordRowBinding.inflate(layoutInflater, b.words, false)
@@ -231,7 +231,7 @@ class WakeWordsActivity : AppCompatActivity() {
             b.words.addView(r.root)
         }
         val agents = cc.bridgit.app.ui.home.HomeStates.controlAgents(app)
-        b.addCard.isVisible = words.size < WakeRules.MAX_WORDS && agents.isNotEmpty()
+        b.addCard.isVisible = agents.isNotEmpty()
         val names = agents.map { it.name }
         b.agent.setSimpleItems(names.toTypedArray())
         agentIndex = agentIndex.coerceIn(0, maxOf(0, names.size - 1))

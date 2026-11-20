@@ -105,7 +105,7 @@
     <string name="wake_section_words">Your wake words</string>
     <string name="wake_section_model">Speech model</string>
     <string name="wake_section_model_start">Start here</string>
-    <string name="wake_count">%1$d of %2$d. Each one goes to the control agent you pick.</string>
+    <string name="wake_count">%1$d wake words</string>
     <string name="wake_none">No wake words yet. Add one below.</string>
     <string name="wake_add_title">Add a wake word</string>
     <string name="wake_phrase_hint">Wake word</string>

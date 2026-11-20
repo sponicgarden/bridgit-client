@@ -1967,6 +1967,110 @@
    ],
    "tags": ["applet_install"]
   }},
+  "/v1/owner/configuration/relay": {
+   "post": {
+    "summary": "Enable/disable the built-in relay or set/rotate this already paired control agent's write-only connector credential; existing Super authority and explicit capabilities required; signed-only policy is preserved; explicit owner.configuration grant required; no per-change phone approval",
+    "x-bridgit-control-scope": "owner.configuration",
+    "requestBody": {"content": {"application/json": {"schema": {
+     "type": "object",
+     "properties": {
+      "enabled": {
+       "description": "Enable the built-in relay or pause all relay access",
+       "type": "boolean"
+      },
+      "token": {
+       "description": "Receiver-generated rly_ plus 40-196 random URL-safe characters; replaces the caller's relay credential",
+       "type": "string"
+      }
+     },
+     "required": []
+    }}}},
+    "operationId": "postOwnerConfigurationRelay",
+    "responses": {
+     "200": {"description": "same sanitized status; no initial key pairing, role or OS authority created"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "403": {
+      "description": "forbidden, agent_not_allowed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "502": {
+      "description": "upstream_failed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   },
+   "get": {
+    "summary": "Read the existing owner control agent's cloud relay transport status",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "getOwnerConfigurationRelay",
+    "responses": {
+     "200": {"description": "enabled,enrolled,base_url,credential_configured,signed_only,status; no credential"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"}
+    },
+    "tags": ["owner_features"]
+   },
+   "delete": {
+    "summary": "Remove this existing control agent's relay credential; direct pairing remains; explicit owner.configuration grant required; no per-change phone approval",
+    "x-bridgit-control-scope": "owner.configuration",
+    "operationId": "deleteOwnerConfigurationRelay",
+    "responses": {
+     "200": {"description": "sanitized relay status"},
+     "422": {
+      "description": "invalid_parameter",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "401": {"description": "unauthorized"},
+     "403": {
+      "description": "forbidden, agent_not_allowed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "502": {
+      "description": "upstream_failed",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "404": {
+      "description": "not_found",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     },
+     "409": {
+      "description": "conflict",
+      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+     }
+    },
+    "parameters": [{
+     "schema": {"type": "string"},
+     "in": "header",
+     "name": "Idempotency-Key",
+     "description": "Any UUID; a repeat within 24 h returns the first result",
+     "required": true
+    }],
+    "tags": ["owner_features"]
+   }
+  },
   "/v1/feedback/{id}/status": {"post": {
    "summary": "Deprecated: the old address of POST /v1/issues/{id}/status, same behaviour",
    "requestBody": {"content": {"application/json": {"schema": {
@@ -14219,7 +14323,7 @@
  "info": {
   "x-learn": "https://bridgit.cc/learn/index.json",
   "description": "The owner's phone, for their AI agents. Over Tailscale, or Bridgit's relay for relay agents; one key per agent; everything logged.",
-  "x-api-revision": 157,
+  "x-api-revision": 158,
   "title": "Bridgit",
   "version": "2.0.0"
  }

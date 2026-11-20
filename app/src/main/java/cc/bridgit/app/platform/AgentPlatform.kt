@@ -314,7 +314,13 @@ class AgentPlatform(val app: BridgeApp) {
             "file.list" -> files.list(agent)
             "file.get" -> files.get(agent,args.text("id"))
             "alert.list" -> delivery.list(agent)
-            "workflow.list" -> JSONObject().put("workflows",JSONArray(store.list(agent,"workflow")))
+            "workflow.list" -> {
+                args.only("after", "limit")
+                val limit = args.whole("limit",100,1,100)
+                val rows = store.keyed(agent,"workflow","",args.optString("after"),limit+1)
+                JSONObject().put("workflows",JSONArray(rows.take(limit)))
+                    .put("next_cursor",if(rows.size > limit) rows[limit-1].getString("id") else JSONObject.NULL)
+            }
             "workflow.validate" -> workflows.validate(args)
             "workflow.simulate" -> {
                 if (!simulationLimiter.tryAcquire(agent, 30)) {

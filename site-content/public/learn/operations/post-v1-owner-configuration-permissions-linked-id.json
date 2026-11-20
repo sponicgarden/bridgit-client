@@ -1,6 +1,6 @@
 {
- "documentation_revision": 141,
- "api_revision": 157,
+ "documentation_revision": 142,
+ "api_revision": 158,
  "source": "Endpoints.all + Learn.endpoints + McpTools",
  "operation": {
   "summary": "Replace a linked device's permissions on this phone (a portal viewer, hub or satellite), within what its pairing gave it; Superpowers required, as for agent grants; explicit owner.configuration grant required; no per-change phone approval",

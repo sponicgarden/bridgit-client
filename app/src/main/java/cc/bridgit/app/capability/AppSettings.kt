@@ -100,6 +100,7 @@ class SettingsController(private val app: BridgeApp) {
                 "alerts.state" -> s.alertState
                 "appearance.theme" -> s.appearance
                 "speaker.volume_ceiling" -> s.speakerCeiling
+                "listening.end_silence_ms" -> app.platform.store.setting("wake_end_silence_ms", "1500").toIntOrNull() ?: 1500
                 "listening.wake_words" -> runCatching { JSONArray(s.wakeWords) }.getOrDefault(JSONArray())
                 "listening.sounds" -> s.soundsConfig.takeIf { it.isNotBlank() }?.let { runCatching { JSONObject(it) }.getOrNull() } ?: JSONObject.NULL
                 "captures.agent_files" -> s.capturesAgentFiles
@@ -200,6 +201,7 @@ class SettingsController(private val app: BridgeApp) {
             key == "captures.locked_camera_approval" -> s.capturesLockedCameraApproval = value as Boolean
             key == "device.name" -> cc.bridgit.app.platform.DeviceName.set(app, value as String)
             // A0189/A0190: the monitor follows these through Settings' listener (monitor.ResourceMonitor.sync).
+            key == "listening.end_silence_ms" -> app.platform.store.setting("wake_end_silence_ms", value.toString(), true)
             key == "device.presentation" -> cc.bridgit.app.headless.HeadlessMode.set(app, value as String)
             key == "device.resource_monitor" -> s.resourceMonitor = value as Boolean
             key == "device.resource_monitor_interval" -> s.resourceMonitorInterval = value as String

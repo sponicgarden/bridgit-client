@@ -251,7 +251,7 @@ class AppletModule(app: BridgeApp) : Capability(app) {
     }
 
     /** What an agent sees of an instance: no full definition (it sent it), ids of what runs. */
-    private fun view(r: JSONObject) = JSONObject().put("id", r.getString("id")).put("package_id", r.optString("package_id")).put("name", r.optString("name"))
+    private fun view(r: JSONObject) = JSONObject().put("agent_id", r.optString("agent_id")).put("id", r.getString("id")).put("package_id", r.optString("package_id")).put("name", r.optString("name"))
         .put("lifecycle", r.optJSONObject("lifecycle") ?: AppletLifecycle.json(AppletLifecycle.read(r, emptyList())))
         .put("lifecycle_errors", r.optJSONObject("lifecycle_errors") ?: JSONObject())
         .put("run_mode", r.optJSONObject("definition")?.let(AppletPackage::runMode) ?: "unspecified")

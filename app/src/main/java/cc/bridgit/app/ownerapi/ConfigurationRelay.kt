@@ -38,7 +38,7 @@ class ConfigurationRelay(private val app: BridgeApp, private val caller: Agent) 
         require()
         if (token != null) {
             // Maximum-control and delegated configuration projections remain native dispatcher decisions.
-            store.addAgentHash(caller.id, setOf("GET /v1/applets/installed", "GET /v1/owner/configuration/listening", "POST /v1/owner/configuration/listening"), RelayStore.hash(token))
+            store.addAgentHash(caller.id, setOf("GET /v1/services", "GET /v1/applets/installed", "GET /v1/applets/installed/{id}/development", "GET /v1/owner/configuration/listening", "POST /v1/owner/configuration/listening"), RelayStore.hash(token))
             BridgeService.running?.relay?.wake()
         }
         if (enabled == false) {

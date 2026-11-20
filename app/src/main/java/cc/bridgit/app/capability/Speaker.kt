@@ -507,6 +507,7 @@ class SpeakerQueue(private val app: BridgeApp) {
  * serialised (language, rate, pitch and voice are engine-wide settings).
  */
 class TtsFiles(private val ctx: Context) {
+    private val phraseCache = SpeechPhraseCache(File(ctx.cacheDir, "offline-speech-phrases"))
     private var tts: TextToSpeech? = null
     private var ready = CompletableDeferred<Boolean>()
     private val pending = ConcurrentHashMap<String, CompletableDeferred<Boolean>>()
@@ -552,6 +553,8 @@ class TtsFiles(private val ctx: Context) {
         val t = tts!!
         val id = UUID.randomUUID().toString()
         val done = CompletableDeferred<Boolean>()
+        var cacheVoice: String? = null
+        var cacheHit = false
         pending[id] = done
         try {
             // Off the main thread: these are calls into the speech service, and listing voices can take seconds
@@ -559,7 +562,8 @@ class TtsFiles(private val ctx: Context) {
             val started = withContext(Dispatchers.IO) {
                 val locale = language?.let { java.util.Locale.forLanguageTag(it) } ?: java.util.Locale.getDefault()
                 if (t.setLanguage(locale) < TextToSpeech.LANG_AVAILABLE) return@withContext false
-                t.setSpeechRate(rate); t.setPitch(pitch)
+                val rateSet = t.setSpeechRate(rate) == TextToSpeech.SUCCESS
+                val pitchSet = t.setPitch(pitch) == TextToSpeech.SUCCESS
                 // Prefer a voice that doesn't need the network (Codex review: TTS may use network voices); looked up once per language.
                 val tag = locale.toLanguageTag()
                 val v = if (voices.containsKey(tag)) voices[tag] else {
@@ -568,12 +572,23 @@ class TtsFiles(private val ctx: Context) {
                     offline.firstOrNull { it.name == t.defaultVoice?.name } ?: offline.sortedWith(compareByDescending<android.speech.tts.Voice> { it.quality }.thenBy { it.latency }).firstOrNull()
                 }.also { voices[tag] = it }
                 if (v == null) return@withContext false
-                t.voice = v
+                val voiceSet = t.setVoice(v) == TextToSpeech.SUCCESS
+                val actualVoice = t.voice ?: return@withContext false
+                if (actualVoice.isNetworkConnectionRequired) return@withContext false
+                val engine = run {
+                    val name = t.defaultEngine
+                    val version = runCatching { ctx.packageManager.getPackageInfo(name, 0).longVersionCode }.getOrDefault(0)
+                    "$name:$version"
+                }
+                cacheVoice = if (rateSet && pitchSet && voiceSet) "$engine:${actualVoice.name}:$tag:$rate:$pitch" else null
+                cacheHit = cacheVoice?.let { phraseCache.restore(it, text, out) } == true
+                if (cacheHit) { done.complete(true); return@withContext true }
                 t.synthesizeToFile(text, null, out, id) == TextToSpeech.SUCCESS
             }
             if (!started) return false
             val ok = withTimeoutOrNull(30_000) { done.await() } == true && out.length() > 0
             if (!ok) runCatching { t.stop() }
+            if (ok && !cacheHit) withContext(Dispatchers.IO) { cacheVoice?.let { phraseCache.remember(it, text, out) } }
             ok
         } catch (e: CancellationException) {
             runCatching { t.stop() }; throw e

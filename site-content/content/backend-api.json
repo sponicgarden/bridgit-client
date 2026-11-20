@@ -58,6 +58,7 @@
       "/v1/delivery/credentials",
       "/v1/delivery/credentials/github",
       "/v1/delivery/credentials/github/check",
+      "/v1/delivery/credentials/github_pr_read",
       "/v1/delivery/deploys",
       "/v1/delivery/grants",
       "/v1/delivery/repos",

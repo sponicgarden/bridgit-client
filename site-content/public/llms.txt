@@ -51,7 +51,7 @@ No Tailscale? The owner can turn on **More → Relay** on the phone and tap **Ad
 
 ## Bugs and feature requests
 
-- [How to file them](https://bridgit.cc/learn/bugs.md): directly with Bridgit servers (`POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register` if you need a team key, then `POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues`). The team reads every one.
+- [How to file them](https://bridgit.cc/learn/bugs.md): optional, and never needed to set up or use Bridgit. With the owner's OK, file them with Bridgit's servers (`POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agent/issues`; `POST https://bridgit-feedback.bridgit-app.workers.dev/v1/agents/register` first only if you need a team key). The team reads every one.
 
 ## Optional
 

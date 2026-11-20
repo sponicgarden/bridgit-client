@@ -357,7 +357,7 @@ class RelayActivity : AppCompatActivity() {
         val details = JSONObject().put("base", store.base).put("device_id", store.device).put("agent_id", a.id)
             .put("generation", a.keyHash).put("mode", mode).put("token", token)
             .put("phone_hpke_public", Sealed.publicKey(store.hpke())).put("mcp_url", store.base + "/mcp").put("allowlist", config).toString(2)
-        val prompt = if (mode == "connector") getString(R.string.relay_prompt, store.base, token, relayCalls(), details) else details
+        val prompt = if (mode == "connector") cc.bridgit.app.api.SetupPrompt.relayConnector(store.base, token, relayCalls(), details) else details
         render()
         val routes = o.routes.indices.count { selected[it] }; val tools = o.tools.indices.count { selected[o.routes.size + it] }
         val access = if (routes == o.routes.size && tools == o.tools.size) getString(R.string.relay_access_all)

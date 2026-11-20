@@ -8,11 +8,12 @@
  "inputs": {
   "app/build.gradle.kts": "e6a5489b2547ae13955cef0b267ea18c80211b046fc0a870892be07a485443ef",
   "tools/bridgit": "51cdb509b66428a147926f5d1a92aa6498d2a7514b45cdc04e7331243640333a",
-  "app/src/main/java/cc/bridgit/app/api/SelfDescription.kt": "49c6eb40aef309a8caba39210e8f49c3c8ef9e747f50b6cf0ff64e44fe45d6c0",
+  "app/src/main/java/cc/bridgit/app/api/SelfDescription.kt": "a5eac1daf8c15fdbc9faf4600c1f48db22f7accd770e49dd0da1ea474d9bfe1a",
   "app/src/main/java/cc/bridgit/app/adb/AdbSetupHelp.kt": "abc90047e9d71b9cc918a16de6790eae11558b91e4cd475174b4600749557a7e",
-  "app/src/test/java/cc/bridgit/app/api/LearnTest.kt": "793aee02cbd8e1c737ec483df13307dea5b8baf4ff7fa233e6a17d1c86ded9e0",
+  "app/src/test/java/cc/bridgit/app/api/LearnTest.kt": "2b24e7750d0cb983418479d144143e6640010823068dc03d17336411fc547ebe",
   "app/src/main/java/cc/bridgit/app/api/Playbook.kt": "fcd33e5a3be86a3207b25c37697464c43df1905e7ab435b637ed3a2b5e257ad8",
-  "app/src/main/java/cc/bridgit/app/api/Learn.kt": "932a8e6ae31406a53aa3a60937c7a905af89abb6e2613f5797d9c779b11a47a5"
+  "app/src/main/java/cc/bridgit/app/api/Learn.kt": "932a8e6ae31406a53aa3a60937c7a905af89abb6e2613f5797d9c779b11a47a5",
+  "app/src/main/java/cc/bridgit/app/core/contract/SetupPromptText.kt": "19cfbdd0cb1a8dbc9c825d75db34e4e7c811aa74db39fc229d1f59d892e51f1c"
  },
  "generator": "SetupPrompt.build (private distribution)"
 }

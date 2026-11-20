@@ -31,6 +31,8 @@ object ContractVocab {
     val SETUP_PROMPT_SECTIONS: List<String> = listOf("IDENTITY", "CONNECTION", "RULES", "FIRST CALLS, IN ORDER", "GOTCHAS", "AFTER YOU'RE CONNECTED", "POINTERS")
     val SETUP_PROMPT_IDENTITY: List<String> = listOf("Device domain name", "Friendly name", "Model", "Agent name", "Owner")
     val SETUP_PROMPT_FIRST_CALLS: List<String> = listOf("GET /v1/health", "POST /v1/me", "GET /v1/capabilities", "GET /v1/limits", "GET /v1/start", "GET /v1/discover")
+    /** The briefing's character budget (AGT-10): every briefing, worst case included, stays under it. */
+    const val SETUP_PROMPT_BUDGET_CHARS = 6500
 
     /** vocab/media-sources.json: source kinds, then the provenance rules in order (first match wins). */
     data class MediaSourceRule(val kind: String, val packages: Set<String>, val pathPrefixes: List<String>, val pathContains: List<String>)

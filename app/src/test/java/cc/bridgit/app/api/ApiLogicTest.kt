@@ -19,7 +19,7 @@ import java.io.File
  * Sizing: upscaling; wrong aspect ratio; presets ignored; explicit values not overriding presets; bad values accepted.
  * Error catalog: a code used by the app missing from the spec (or the other way round); HTTP status mismatch.
  * Setup prompt: key missing or present twice; wrong port/host; userspace prompt without the helper; direct
- *   prompt over the 3,000-character budget (AGT-10); capture calls listed while switched off (AGT-07).
+ *   prompt over the character budget (AGT-10, ContractVocab.SETUP_PROMPT_BUDGET_CHARS); capture calls listed while switched off (AGT-07).
  * Guide / openapi: an endpoint missing; invalid structure; a secret leaking in.
  * Demo script: a demo names an endpoint that doesn't exist; a switched-off or ungranted demo offered as ready;
  *   the setup prompt or guide not pointing at it.
@@ -210,7 +210,7 @@ class ApiLogicTest {
         assertTrue("24-hour email rule", p.contains("owner_email.status") && p.contains("POST /v1/owner/email") && p.contains("24 hours"))
         assertTrue(p.contains("GET /v1/limits"))
         println("setup prompt length: ${p.length}")
-        assertTrue("AGT-10 budget: ${p.length}", p.length < 6000)
+        assertTrue("AGT-10 budget: ${p.length}", p.length < cc.bridgit.app.core.contract.ContractVocab.SETUP_PROMPT_BUDGET_CHARS)
         // AGT-09 order, and the first calls in their order
         val order = sections.map { p.indexOf(it) }
         assertTrue(order.none { it < 0 }); assertEquals(order.sorted(), order)
@@ -239,7 +239,7 @@ class ApiLogicTest {
             val first = p.lineSequence().first { it.startsWith("1. GET /v1/health:") }
             assertTrue(first, first.contains("This device's domain name is kitchen-tab") && first.contains("never register another name"))
             assertFalse("a named device is never told to register", first.contains("register it") || first.contains("register a name"))
-            assertTrue("A0213 budget: ${p.length}", p.length < 6000)
+            assertTrue("A0213 budget: ${p.length}", p.length < cc.bridgit.app.core.contract.ContractVocab.SETUP_PROMPT_BUDGET_CHARS)
         }
     }
 
@@ -283,11 +283,13 @@ class ApiLogicTest {
         assertTrue(first.startsWith("FIRST CALLS, IN ORDER\n1. GET /v1/health"))
         val p = SetupPrompt.build("Muse", Keys.generate(), Connection.DIRECT, addr, "Pixel", caps("camera"), null)
         assertTrue("prompt embeds the block verbatim", p.contains(first))
-        val relay = java.io.File("src/main/res/values/strings_relay.xml").readText()
-        val text = Regex("<string name=\"relay_prompt\">(.*?)</string>", RegexOption.DOT_MATCHES_ALL).find(relay)!!.groupValues[1]
+        val text = SetupPrompt.relayConnector("https://relay.example.invalid/v1/agent", "brg_relayFixture", first, "{\"setup\":1}")
         assertFalse("no longer sends agents to the whole guide first", text.contains("Start with GET /v1/guide"))
-        assertTrue("takes the first-calls block (%3) before the details (%4)", text.indexOf("%3\$s") in 0 until text.indexOf("%4\$s"))
-        assertTrue(text.contains("request.path"))
+        assertFalse("A0240: the relay example call is the first call, not the 300 KB guide", text.contains("\"path\": \"/v1/guide\""))
+        assertTrue(text.contains("\"path\": \"/v1/health\""))
+        assertTrue("takes the first-calls block before the details", text.indexOf(first) in 0 until text.indexOf("{\"setup\":1}"))
+        assertTrue(text.contains("request.path") && text.contains("POST https://relay.example.invalid/v1/agent/jobs?wait=30"))
+        assertEquals("key exactly once", 1, Regex("brg_relayFixture").findAll(text).count())
     }
 
     @Test fun setupPromptIdempotencyListMatchesEndpoints() {
@@ -338,14 +340,14 @@ class ApiLogicTest {
             secret)
         assertEquals("secret exactly once", 1, Regex(Regex.escape(secret)).findAll(p).count())
         assertTrue(p.contains("CALLBACK SECRET\n- $secret\n- Keep it like your key"))
-        assertTrue("AGT-10 budget: ${p.length}", p.length < 6000)
+        assertTrue("AGT-10 budget: ${p.length}", p.length < cc.bridgit.app.core.contract.ContractVocab.SETUP_PROMPT_BUDGET_CHARS)
         assertTrue(p.indexOf("CALLBACK SECRET") in p.indexOf("RULES")..p.indexOf("AFTER YOU'RE CONNECTED"))
         // Worst case (AGT-10): longest name, MagicDNS + IP fallback, every feature on, callback secret, direct and relay.
         for (connection in listOf(Connection.DIRECT, Connection.RELAY)) {
             val worst = SetupPrompt.build("A".repeat(24), key, connection, addr, "Samsung SM-X238U",
                 caps("gallery", "camera", "mic"), null, secret)
             println("setup prompt worst case ($connection, private=${cc.bridgit.app.BuildConfig.PRIVATE_CONTROL}): ${worst.length}")
-            assertTrue("AGT-10 worst case $connection: ${worst.length}", worst.length < 6000)
+            assertTrue("AGT-10 worst case $connection: ${worst.length}", worst.length < cc.bridgit.app.core.contract.ContractVocab.SETUP_PROMPT_BUDGET_CHARS)
         }
         assertFalse(SetupPrompt.build("Grok", key, Connection.DIRECT, addr, "Pixel", caps(), null).contains("CALLBACK"))
     }

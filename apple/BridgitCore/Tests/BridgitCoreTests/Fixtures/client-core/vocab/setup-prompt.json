@@ -9,8 +9,9 @@
   "copies": {
     "android": "app/src/main/java/cc/bridgit/app/core/contract/ContractVocab.kt"
   },
-  "rule": "The setup prompt keeps the current design (owner, 11 Nov 2026): the pasted short form, then the Bridgit Interface Guide at GET /v1/welcome with these sections in this order, the IDENTITY fields in this order, and these first calls in this order. Changing any of them is a contract change that needs the owner. Whole-text fixtures are in setup-prompt/.",
+  "rule": "The setup prompt keeps the current design (owner, 11 Nov 2026): the pasted short form, then the Bridgit Interface Guide at GET /v1/welcome with these sections in this order, the IDENTITY fields in this order, and these first calls in this order. Changing any of them is a contract change that needs the owner. Whole-text fixtures are in setup-prompt/. The text itself comes from the prompt database (PGE01, owner 20 Nov 2026, A0240) through setup-prompt/pge01.json. budget_chars: every briefing, worst case included, stays under it (AGT-10; 6,500 since owner 20 Nov 2026, A0336).",
   "data": {
+    "budget_chars": 6500,
     "sections": [
       "IDENTITY",
       "CONNECTION",

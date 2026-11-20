@@ -50,4 +50,23 @@ final class HostAgentSetupPromptTests: XCTestCase {
         XCTAssertEqual(HostAgentSetupPrompt.build(setupJSON: sealed, agentName: "Any"), sealed)
         XCTAssertEqual(HostAgentSetupPrompt.build(setupJSON: "not json", agentName: "Any"), "not json")
     }
+
+    /// A0240: the Apple prompt as whole texts (contracts/client-core/setup-prompt/apple-host-*.txt). Its sentences come from
+    /// the prompt database (PGE01); after an intended text change, take the snapshot and refresh these files in the same PR:
+    /// BRIDGIT_SETUP_PROMPT_REFRESH=<checkout>/contracts/client-core/setup-prompt swift test --filter HostAgentSetupPromptTests,
+    /// then node tools/client-core/gen.mjs.
+    func testPromptsMatchTheContractTexts() throws {
+        let refresh = ProcessInfo.processInfo.environment["BRIDGIT_SETUP_PROMPT_REFRESH"]
+        for (name, fields, agent) in HostSetupPromptCases.all {
+            let json = try record(fields)
+            if let refresh {
+                try (HostAgentSetupPrompt.build(setupJSON: json, agentName: agent) + "\n").write(toFile: refresh + "/" + name, atomically: true, encoding: .utf8)
+                continue
+            }
+            let url = try XCTUnwrap(Bundle.module.url(forResource: (name as NSString).deletingPathExtension, withExtension: "txt",
+                                                      subdirectory: "Fixtures/client-core/setup-prompt"), name)
+            XCTAssertEqual(HostAgentSetupPrompt.build(setupJSON: json, agentName: agent) + "\n", try String(contentsOf: url, encoding: .utf8), name)
+        }
+        XCTAssertEqual(SetupPromptText.promptKey, "bridgit.agent_key_setup")
+    }
 }

@@ -58,7 +58,6 @@
     <string name="relay_share">Share</string>
     <string name="relay_copied">Setup copied</string>
     <string name="relay_done">Done</string>
-    <string name="relay_prompt">You can use my Android phone through Bridgit\'s relay (no Tailscale needed).\n\nSend each request as POST %1$s/jobs?wait=30 with the header \"Authorization: Bearer %2$s\" and a JSON body like {\"deadline\": &lt;now in ms + 120000&gt;, \"request\": {\"method\": \"GET\", \"path\": \"/v1/guide\"}}. The phone\'s answer is in response.body_base64. Every path below goes in request.path.\n\n%3$s\n\nSetup details:\n%4$s</string>
     <string name="relay_setup_ready">%1$s can now reach this phone</string>
     <string name="relay_setup_sub">No Tailscale needed. Give %1$s the setup and it can start right away.</string>
     <string name="relay_copy_for">Copy setup for %1$s</string>

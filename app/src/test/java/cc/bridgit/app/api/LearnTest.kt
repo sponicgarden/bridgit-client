@@ -63,7 +63,7 @@ class LearnTest {
             .digest(text.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
         val sources = listOf("app/build.gradle.kts", "app/src/main/java/cc/bridgit/app/api/SelfDescription.kt",
             "app/src/main/java/cc/bridgit/app/api/Learn.kt", "app/src/main/java/cc/bridgit/app/api/Playbook.kt",
-            "app/src/main/java/cc/bridgit/app/adb/AdbSetupHelp.kt", "tools/bridgit",
+            "app/src/main/java/cc/bridgit/app/adb/AdbSetupHelp.kt", "app/src/main/java/cc/bridgit/app/core/contract/SetupPromptText.kt", "tools/bridgit",
             "app/src/test/java/cc/bridgit/app/api/LearnTest.kt")
         val inputs = JSONObject(); sources.forEach { inputs.put(it, hash(File("../$it").readText())) }
         val outputs = JSONObject(); files.filterKeys { it.startsWith("learn/pairing-") || it in listOf("learn/introduction.txt", "learn/evaluate.md") }

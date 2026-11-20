@@ -9,6 +9,7 @@ const requiredInputs = [
   'app/src/main/java/cc/bridgit/app/api/Learn.kt',
   'app/src/main/java/cc/bridgit/app/api/Playbook.kt',
   'app/src/main/java/cc/bridgit/app/adb/AdbSetupHelp.kt',
+  'app/src/main/java/cc/bridgit/app/core/contract/SetupPromptText.kt',
   'tools/bridgit',
   'app/src/test/java/cc/bridgit/app/api/LearnTest.kt',
 ];

@@ -52,10 +52,13 @@ class CameraAudioProtocolTest {
                 write(packet(i,i*160))
             }
         }.toByteArray()
-        val wire=Wire(response(1,headers="Content-Type: application/sdp\r\n",body=sdp)+response(2,headers="Session: abc\r\nTransport: RTP/AVP/TCP;interleaved=0-1\r\n")+response(3)+media)
-        CameraRtsp("192.168.1.85","owner","secret",factory(wire),1500){Thread.sleep(5)}.use {
+        var now=0L;var checks=0
+        // Each read takes 20 µs of camera time, so the byte-level 100 ms guard runs as it would on a real stream.
+        val wire=Wire(response(1,headers="Content-Type: application/sdp\r\n",body=sdp)+response(2,headers="Session: abc\r\nTransport: RTP/AVP/TCP;interleaved=0-1\r\n")+response(3)+media){now+=20_000}
+        CameraRtsp("192.168.1.85","owner","secret",factory(wire),1500,clock={now}){checks++;now+=5_000_000}.use {
             assertEquals(16000,it.record(it.describe().single(),1).size)
         }
+        assertTrue("$checks permission checks",checks<20)
     }
     @Test fun revocationWhileMediaIsBufferedDiscardsTheClip() {
         var revoked=false
@@ -74,9 +77,9 @@ class CameraAudioProtocolTest {
         }
     }
     @Test fun revocationInterruptsAHeaderEvenWhenBytesKeepArriving() {
-        var revoked=false
-        val wire=Wire(response(1,headers="X-Long: ${"a".repeat(200)}\r\n")){n->Thread.sleep(3);if(n==20)revoked=true}
-        assertThrows(IllegalStateException::class.java){CameraRtsp("192.168.1.85","owner","secret",factory(wire),2000){check(!revoked)}.use{it.describe()}}
+        var revoked=false;var now=0L
+        val wire=Wire(response(1,headers="X-Long: ${"a".repeat(200)}\r\n")){n->now+=3_000_000;if(n==20)revoked=true}
+        assertThrows(IllegalStateException::class.java){CameraRtsp("192.168.1.85","owner","secret",factory(wire),2000,clock={now}){check(!revoked)}.use{it.describe()}}
         assertTrue(wire.count<100);assertTrue(wire.ended)
     }
     @Test fun cancellationClosesSocketEvenWhenAnOutputWriteBlocks() {

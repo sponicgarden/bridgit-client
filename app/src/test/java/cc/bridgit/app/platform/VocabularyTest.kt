@@ -214,7 +214,10 @@ class VocabularyTest {
         bad(withFlows(pet(), o("flow" to o("\$flow" to "dinner")), dinner, JSONObject(dinner.toString())), "is used twice")
         bad(withFlows(pet(), o("flow" to o("\$flow" to "dinner")), JSONObject(dinner.toString()).put("id", "Dinner!")), "lowercase")
         bad(withFlows(pet(), o("flow" to o("\$flow" to "dinner")), dinner).also { it.getJSONObject("processing").put("workflow", called(notice())) }, "not both")
-        bad(withFlows(pet(), o("flow" to o("\$flow" to "dinner")), dinner, dinner.put("id", "b"), JSONObject(dinner.toString()).put("id", "c"), JSONObject(dinner.toString()).put("id", "d"), JSONObject(dinner.toString()).put("id", "e")), "1-4 flows")
+        // No fixed flow count since the wake-word flows (#1398); an empty list is still refused.
+        val five = AppletPackage.check(withFlows(pet(), o("flow" to o("\$flow" to "dinner")), dinner, *listOf("b", "c", "d", "e").map { dinner.put("id", it) }.toTypedArray()))
+        assertEquals(listOf("dinner", "b", "c", "d", "e"), AppletPackage.compile(five, AppletPackage.fill(five, null)).flows.map { it.first })
+        bad(withFlows(pet(), o("flow" to o("\$flow" to "dinner"))), "nonempty list")
         // A $flow outside a do is refused.
         bad(withFlows(pet(), o("flow" to o("\$flow" to "dinner")), JSONObject(dinner.toString()).put("name", o("\$flow" to "dinner"))), "goes in a do")
     }

@@ -13,10 +13,11 @@ import cc.bridgit.app.outbound.Outbound
 class CameraRtsp(private val host: String, private val username: String, private val password: String,
     sockets: SocketFactory, maxMs: Long, cancellationJob:kotlinx.coroutines.Job?=null,
     /** Bytes received (video included) before the connection gives up; long streams pass a bigger budget. */
-    private val maxBytes: Int = 16*1024*1024, private val authorized: () -> Unit) : java.io.Closeable {
+    private val maxBytes: Int = 16*1024*1024, private val clock: () -> Long = System::nanoTime,
+    private val authorized: () -> Unit) : java.io.Closeable {
     private val socket: Socket = run { require(LanCamera.localHost(host));authorized();sockets.createSocket() }
     private val cancellationHandle=cancellationJob?.invokeOnCompletion(onCancelling=true,invokeImmediately=true){cause->if(cause!=null)runCatching{socket.close()}}
-    private val end = System.nanoTime() + maxMs*1_000_000
+    private val end = clock() + maxMs*1_000_000
     private val watchdog: Thread
     private var input: java.io.InputStream
     private val output: java.io.OutputStream
@@ -36,13 +37,13 @@ class CameraRtsp(private val host: String, private val username: String, private
         catch(e: Exception) { cancellationHandle?.dispose();socket.close(); throw e }
         watchdog=Thread { try { Thread.sleep(maxMs); socket.close() } catch(_:InterruptedException) {} }.apply { isDaemon=true; name="camera-rtsp-deadline"; start() }
     }
-    private fun check() { authorized(); if(System.nanoTime()>=end) throw CameraFailure("Camera audio deadline exceeded.") }
+    private fun check() { authorized(); if(clock()>=end) throw CameraFailure("Camera audio deadline exceeded.") }
     private var lastGuard=0L
     private var receivedBytes=0
     private fun byte(): Int {
         while(true) {
-            if(System.nanoTime()-lastGuard>100_000_000L){check();lastGuard=System.nanoTime()}
-            if(System.nanoTime()>=end) throw CameraFailure("Camera audio deadline exceeded.")
+            if(clock()-lastGuard>100_000_000L){check();lastGuard=clock()}
+            if(clock()>=end) throw CameraFailure("Camera audio deadline exceeded.")
             try { val b=input.read(); if(++receivedBytes>maxBytes)throw CameraFailure("Camera stream exceeded the bounded transfer budget."); if(b<0) throw CameraFailure("Camera closed its audio stream."); return b }
             catch(_:java.net.SocketTimeoutException) { check() }
         }
@@ -162,10 +163,10 @@ class CameraRtsp(private val host: String, private val username: String, private
         require(track.supported && track.direction in listOf("recvonly","sendrecv") && forMs>0)
         setup(track)
         if(input !is java.io.BufferedInputStream) input=input.buffered(64*1024)
-        val until=System.nanoTime()+forMs*1_000_000
-        var keepalive=System.nanoTime()+keepaliveMs*1_000_000
-        while(System.nanoTime()<until) {
-            if(System.nanoTime()>=keepalive) { write("OPTIONS",base); keepalive=System.nanoTime()+keepaliveMs*1_000_000 }
+        val until=clock()+forMs*1_000_000
+        var keepalive=clock()+keepaliveMs*1_000_000
+        while(clock()<until) {
+            if(clock()>=keepalive) { write("OPTIONS",base); keepalive=clock()+keepaliveMs*1_000_000 }
             val first=byte()
             if(first!=36) { val r=response(first); if(r.status!=200)diagnostics.put("keepalive_status",r.status); continue }
             val channel=byte(); val length=(byte() shl 8) or byte(); val packet=exact(length)

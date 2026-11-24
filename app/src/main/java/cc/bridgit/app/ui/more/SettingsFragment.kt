@@ -194,7 +194,8 @@ class SettingsFragment : Fragment() {
         b.checkUpdates.value.text = if (UpdateDialog.isDebugBuild) getString(R.string.update_debug) else app.appVersion()
         autoUpdateInstallSwitch()
         autoUpdateOffersSwitch()
-        row(b.commit, R.string.settings_commit, mono = true, onClick = null)
+        // The published source this build comes from (moved here with the More › About dialog, 24 Nov 2026).
+        row(b.commit, R.string.settings_commit, mono = true) { openUrl(R.string.settings_source_url) }
         b.commit.value.text = if (BuildConfig.DIRTY_BUILD) getString(R.string.more_dirty, BuildConfig.GIT_COMMIT) else BuildConfig.GIT_COMMIT
         val cert = certificateSha256()
         row(b.cert, R.string.settings_cert, mono = true) {

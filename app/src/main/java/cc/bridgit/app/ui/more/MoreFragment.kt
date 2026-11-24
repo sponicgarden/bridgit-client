@@ -22,13 +22,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import cc.bridgit.app.BridgeApp
 import cc.bridgit.app.BuildConfig
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.view.isVisible
 import cc.bridgit.app.R
-import cc.bridgit.app.ui.home.UiActions
 import cc.bridgit.app.capability.appVersion
 import cc.bridgit.app.databinding.FragmentMoreBinding
 import cc.bridgit.app.databinding.MoreRowBinding
@@ -62,7 +60,6 @@ class MoreFragment : Fragment() {
             findNavController().navigate(R.id.access, androidx.core.os.bundleOf(AccessFragment.ARG_KIND to AccessFragment.SOFTWARE))
         }
         row(b.sshConnections, R.drawable.ic_computer, R.string.ssh_title) { findNavController().navigate(R.id.sshConnections) }
-        row(b.networkDevices, R.drawable.ic_computer, R.string.network_devices_title) { findNavController().navigate(R.id.networkDevices) }
         row(b.setupSteps, R.drawable.ic_settings, R.string.setup_steps_title) { startActivity(android.content.Intent(requireContext(), cc.bridgit.app.ui.setup.SetupStepsActivity::class.java)) }
         row(b.tailscaleSetup, R.drawable.ic_shield, R.string.more_tailscale_setup) { findNavController().navigate(R.id.tailscaleSetup) }
         if (cc.bridgit.app.BuildConfig.PRIVATE_CONTROL) row(b.adbSetup, R.drawable.ic_settings, R.string.more_adb_setup) { findNavController().navigate(R.id.adbSetup) }
@@ -87,7 +84,6 @@ class MoreFragment : Fragment() {
         // The installed version, in quieter type right after the title (5 Nov 2026).
         b.checkUpdates.title.text = withVersion(getString(R.string.more_check_updates))
         row(b.automatedContext, R.drawable.ic_mode_custom, R.string.automated_context) { startActivity(android.content.Intent(requireContext(), cc.bridgit.app.context.ContextActivity::class.java)) }
-        row(b.about, R.drawable.ic_info, R.string.more_about) { showAbout() }
         for ((row, kind) in listOf(b.reportBug to IssueKind.BUG, b.requestFeature to IssueKind.FEATURE)) {
             // The counts sit under the title as one tap target; the chevron is the row's only trailing element.
             row.summary.isVisible = true
@@ -143,7 +139,7 @@ class MoreFragment : Fragment() {
         for (entry in menuEntries) {
             if (!entry.binding.root.isVisible) continue
             val aliases = when (entry.binding) {
-                b.deviceMonitor -> "camera cameras monitor"
+                b.deviceMonitor -> "camera cameras monitor network devices lan list"
                 b.portal -> "portal portals satellites linked phones devices"
                 b.openActivity -> "history log requests"
                 b.access -> "permissions hardware"
@@ -247,17 +243,6 @@ class MoreFragment : Fragment() {
             setSpan(android.text.style.ForegroundColorSpan(muted), start, length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(android.text.style.TypefaceSpan("sans-serif-light"), start, length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
-    }
-
-    private fun showAbout() {
-        val app = requireActivity().application as BridgeApp
-        val commit = if (BuildConfig.DIRTY_BUILD) getString(R.string.more_dirty, BuildConfig.GIT_COMMIT) else BuildConfig.GIT_COMMIT
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.more_about_title)
-            .setMessage(getString(R.string.more_about_body, app.appVersion(), BuildConfig.BUILD_TYPE, commit))
-            .setPositiveButton(R.string.ok, null)
-            .setNeutralButton(R.string.settings_privacy_policy) { _, _ -> UiActions.openPrivacyPolicy(requireContext()) }
-            .show()
     }
 
     override fun onDestroyView() { super.onDestroyView(); menuEntries.clear(); _b = null }

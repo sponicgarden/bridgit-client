@@ -140,13 +140,10 @@
     <string name="more_software_access">Software access</string>
     <string name="more_adb_setup">ADB setup</string>
     <string name="more_settings">Settings</string>
-    <string name="more_about">About</string>
     <string name="more_report_bug">Report a bug</string>
     <string name="more_request_feature">Request a feature</string>
     <string name="more_my_issues">My issues</string>
     <string name="more_check_updates">Check for updates</string>
-    <string name="more_about_title">Bridgit: Agentic Android Device Bridge</string>
-    <string name="more_about_body">Version %1$s (%2$s)\nCommit %3$s\n\nSource code: github.com/sponicgarden/bridgit-client</string>
     <string name="more_dirty">%1$s (dirty)</string>
 
     <!-- Features (UI-18) -->
@@ -216,6 +213,7 @@
     <string name="settings_terms">Terms of use</string>
     <string name="settings_privacy_url" translatable="false">https://bridgit.cc/privacy/</string>
     <string name="settings_terms_url" translatable="false">https://bridgit.cc/terms/</string>
+    <string name="settings_source_url" translatable="false">https://github.com/sponicgarden/bridgit-client</string>
     <string name="health_rationale">Health access in Bridgit\n\nBridgit reads only the steps, sleep and heart-rate source records you grant. It never writes health data. Reads require the Health Connect feature switch and the calling control agent\'s grant. Data is returned to that control agent on request; its provider may retain a copy. No health records are retained by Bridgit. Revoke permissions in Health Connect at any time.\n\nPrivacy policy: %1$s</string>
     <string name="settings_no_browser">No browser to open %1$s</string>
     <string name="settings_reset">Reset</string>

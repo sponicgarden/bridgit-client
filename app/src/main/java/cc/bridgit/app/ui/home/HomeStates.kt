@@ -84,9 +84,6 @@ object HomeStates {
             .put(JSONArray().put("Private Tunnel").put(if (ip != null) "Open" else "Down"))
             .put(JSONArray().put("Key").put("Created")))
         return JSONObject()
-            // Owner, 4 Nov 2026: external devices left Home for the Devices tab's Map and List.
-            // The key stays (empty) so the page and the Portal viewer keep their shape.
-            .put("externalDevices", JSONArray())
             .put("emailReminder", app.alerts.gate().showReminder)
             .put("agent", agent?.name ?: JSONObject.NULL)
             .put("called", (agent?.lastUsedAt ?: 0L) > 0L)

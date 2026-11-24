@@ -132,7 +132,7 @@ button[aria-pressed="true"] { border-color: var(--lock); color: var(--lock); }
 .ext.off .logo { opacity: .25; filter: grayscale(1); }
 .ext[data-agent].empty .box { fill: none; stroke: var(--muted); stroke-dasharray: 3 3; }
 .ext[data-agent].empty .logo, .ext[data-agent].empty .ms, .ext[data-agent].empty .cap2,
-.ext[data-agent].empty .access-dot, .ext[data-agent].empty .badge, .ext[data-agent].empty .connection-halo { display: none !important; }
+.ext[data-agent].empty .badge, .ext[data-agent].empty .connection-halo { display: none !important; }
 .ext.waiting .logo { opacity: .45; }
 .ext.waiting .cap2 { fill: var(--lock); }
 .tunnel.waiting { stroke-dasharray: 2 3 !important; opacity: .45 !important; }
@@ -275,7 +275,6 @@ svg#scene { width: 100%; height: 100%; display: block; background: var(--void); 
 #log .dimt { color: var(--dim); }
 #log .offt { color: var(--offink); }
 
-/* Version B is opt-in; Version A keeps the released visual treatment. */
 #missingAccess { max-width: min(360px, calc(100vw - 40px)); max-height: 80vh; overflow: auto; padding: 22px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 16px; }
 #missingAccess::backdrop { background: #02050bcc; }
 #missingAccess h2 { margin: 0 0 8px; font-size: 20px; }
@@ -283,52 +282,7 @@ svg#scene { width: 100%; height: 100%; display: block; background: var(--void); 
 #missingAccessList { display: grid; gap: 10px; margin-bottom: 12px; }
 #missingAccessList button { min-height: 64px; text-align: left; white-space: normal; }
 #missingAccessList small { display: block; margin-top: 6px; }
-#designChoice { max-width: min(360px, calc(100vw - 40px)); padding: 22px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 16px; }
-#designChoice::backdrop { background: #02050bcc; }
-#designChoice h2 { margin: 0 0 8px; font-size: 20px; }
-#designChoice p { color: var(--muted); font-size: 13px; }
-#designChoice .choices { display: grid; gap: 10px; }
-#designChoice button { min-height: 48px; text-align: left; }
-#designChoice button small { display: block; margin-top: 6px; color: var(--muted); }
-#designChoice #cancelDesign { margin-top: 12px; }
-.b-only { display: none; }
-body.design-b .b-only { display: block; }
-body.design-b #scene rect[fill="url(#dots)"] { opacity: .22; }
-body.design-b .trace.set { opacity: .18; }
-body.design-b .trace.active { opacity: .8; }
-body.design-b .trace.off { opacity: .18; }
-body.design-b .node.off .ring { stroke: var(--c); opacity: .55; }
-body.design-b .node.blocked .ring { stroke: var(--c); stroke-dasharray: none; fill: var(--panel); }
-body.design-b .node.blocked .ms { fill: var(--ink); }
-body.design-b .node.blocked .nlabel { fill: var(--ink); }
-.access-dot { display: none; fill: var(--lock); stroke: var(--void); stroke-width: 1.5; }
-body.design-b .blocked .access-dot { display: block; }
-body.design-b .ext.blocked .box { stroke: var(--c); }
-body.design-b [data-node="settings"] { display: none; }
-body.design-b #rerun { border-color: var(--line); color: var(--muted); font-weight: 500; }
-body.design-b .legendrow { display: none; }
-#compactSummary { margin: 6px 16px 10px; color: var(--muted); font: 12px/1.4 var(--mono); text-align: center; }
-#groupLabels text { fill: var(--muted); font: 9px var(--mono); letter-spacing: .05em; text-anchor: middle; }
-#groupLabels line { stroke: var(--line); stroke-width: 1; }
-#featureDetail { margin: 8px 12px; padding: 12px 14px; max-width: 380px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
-#featureDetail[hidden] { display: none; }
-#featureDetail h3 { margin: 0; font-size: 14px; }
-#featureDetail p { margin: 4px 0; color: var(--muted); font-size: 12px; }
-#featureDetail ul { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 8px 0; list-style: none; }
-#featureDetail li { padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; }
-#featureDetail button { min-height: 40px; }
-body.design-b #scene.inspect .node:not(.selected), body.design-b #scene.inspect .ext:not(.selected) { opacity: .22 !important; }
-body.design-b #scene.inspect .trace:not(.selected) { opacity: .05; }
-body.design-b #scene .trace.selected { opacity: .85; stroke-width: 1.6; }
-body.design-b .node.selected .ring { stroke-width: 2; }
 
-#externalDevices { margin: 0 12px 10px; }
-#externalDevices h2 { color: var(--muted); font: 500 11px var(--mono); margin: 4px 0 8px; }
-#externalDeviceList { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-#externalDeviceList button { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 2px 8px; min-width: 150px; max-width: 220px; text-align: left; }
-#externalDeviceList .device-icon { grid-row: span 2; align-self: center; font: 24px "Material Symbols Outlined"; color: var(--senses); }
-#externalDeviceList strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
-#externalDeviceList small { color: var(--muted); font-size: 10px; line-height: 1.4; }
 /* One high-visibility orange dotted style, matching the Jev connection.
    Hidden/unscanned tunnels keep their inline opacity: 0. */
 #scene .tunnel[data-orange="true"],
@@ -385,8 +339,7 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
 </style>
 </head>
 <body>
-<div class="hdrline"><span class="left"><span id="hdr"></span><button id="addAgent" class="hbtn" type="button" aria-label="Add control agent" hidden><span class="gl" aria-hidden="true">+</span>Add Control Agent</button></span><span class="right"><button id="designSettings" class="b-only" type="button" aria-label="Device controls">⚙</button><span id="hdrCount"></span><button id="rerun" class="hbtn" type="button" aria-label="Rerun diagnostics"><span class="gl" aria-hidden="true">↻</span>Rerun</button></span></div>
-<section id="externalDevices" hidden aria-label="External devices"><h2>External devices</h2><div id="externalDeviceList"></div></section>
+<div class="hdrline"><span class="left"><span id="hdr"></span><button id="addAgent" class="hbtn" type="button" aria-label="Add control agent" hidden><span class="gl" aria-hidden="true">+</span>Add Control Agent</button></span><span class="right"><span id="hdrCount"></span><button id="rerun" class="hbtn" type="button" aria-label="Rerun diagnostics"><span class="gl" aria-hidden="true">↻</span>Rerun</button></span></div>
 <div id="status">
   <div id="final" hidden></div>
 </div>
@@ -427,9 +380,6 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
         </svg></div>
 <!-- Diagnostics and all retained activity, with older database pages loaded on scroll. -->
 <dialog id="missingAccess" aria-labelledby="missingAccessTitle"><h2 id="missingAccessTitle">Needs access</h2><p>These features are switched on but still need setup. Other feature switches do not affect this count.</p><div id="missingAccessList"></div><button id="closeMissingAccess" type="button">Close</button></dialog>
-<dialog id="designChoice" aria-labelledby="designTitle"><h2 id="designTitle">Choose a design</h2><p>Rerun the same diagnostics with either layout.</p><div class="choices"><button id="chooseA" type="button">Version A · Current<small>The original circle and styling</small></button><button id="chooseB" type="button">Version B · Refined<small>Grouped services, quieter lines, feature details</small></button></div><button id="cancelDesign" type="button">Cancel</button></dialog>
-<div id="featureDetail" class="b-only" hidden><h3 id="featureTitle"></h3><p id="featureStatus"></p><p>Uses</p><ul id="dependencyList"></ul><button id="openFeature" type="button">Open feature</button> <button id="closeFeature" type="button">Close</button></div>
-<div id="compactSummary" class="b-only" aria-live="polite"></div>
 <div class="legendrow"><span><i class="k-on"></i><span id="legendOn">Connected</span></span><span><i class="k-off"></i><span id="legendOff">Off</span></span><span id="legendNeed" class="need"><i class="k-need"></i><span id="legendNeedCount">Needs access</span></span></div>
 <div id="homeStatus" aria-label="Applet status">
   <section id="appletPanel" aria-label="Applets"><div id="appletBar" aria-hidden="true"><span>Applets</span></div><div id="appletStatus" role="group" aria-label="Active applets"></div></section>
@@ -492,23 +442,7 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
   var EXTS = [TAILSCALE, JEV, CLEF, WEATHER];
   var ALL = NODES.concat(EXTS);
   var TOTAL = ALL.length;
-  var ENABLE_DESIGN_COMPARISON = false; // Retain Version B for future iterations.
-  var design = "a", originalOrder = NODES.slice(), selectedFeature = null;
-  var refinedOrder = ["camera", "video", "photos", "screen", "mic", "voicerec", "sounds", "battery", "location", "motion", "notifs", "touch", "speaker", "ring", "torch", "ask", "bugs", "settings"];
-  var dependencies = {
-    voicerec: [["Microphone", "mic"], ["Wake-word model"], ["Speech recognizer"]],
-    mic: [["Microphone permission"]], camera: [["Camera permission"]],
-    video: [["Camera", "camera"], ["Video recording"]],
-    photos: [["Photo library access"], ["Text reader"]], screen: [["Screenshot service"]],
-    sounds: [["Microphone", "mic"], ["Sound monitor"]], battery: [["Battery status"]],
-    location: [["Location permission"]], motion: [["Device sensors"]], notifs: [["Notification access"]],
-    touch: [["Wireless debugging"], ["ADB connection"]], speaker: [["Speech engine"], ["Audio playback"]],
-    settings: [["System settings access"], ["Do Not Disturb access"]], ring: [["Speaker", "speaker"], ["Vibration"]],
-    torch: [["Camera flash", "camera"]], ask: [["Notifications", "notifs"], ["Card viewer"]],
-    bugs: [["Feedback service"]], weather: [["Location", "location"], ["MET Norway service"]],
-    tailscale: [["Private network"]], jev: [["TypeSafe service"]], clef: [["Cloudflare service"]]
-  };
-  function ringParts() { return placed.filter(function (n) { return design !== "b" || n.id !== "settings"; }); }
+  function ringParts() { return placed; }
 
 
 
@@ -554,9 +488,7 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     n.trace = el("line", { "class": "trace", "data-node": n.id, "data-orange": n.grp === "Talks With You" ? "true" : "false", style: "--c:" + n.color }, gTraces);
     n.g = el("g", { "class": "node", "data-node": n.id, style: "--c:" + n.color }, gNodes);
     el("circle", { r: 21.5, "class": "halo" }, n.g);
-    el("circle", { cx: 13, cy: -13, r: 4, "class": "access-dot" }, n.g);
     n.ringEl = el("circle", { r: 17, "class": "ring" }, n.g);
-    n.g.appendChild(n.g.querySelector(".access-dot"));
     n.iconEl = el("text", { "class": "ms", y: 0.5 }, n.g); n.iconEl.textContent = n.icon;
     n.labels = n.label.map(function (t) { var e = el("text", { "class": "nlabel" }, n.g); e.textContent = t; return e; });
     n.badge = el("g", { "class": "badge", opacity: 0 }, n.g);
@@ -641,7 +573,6 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     else el("text", { "class": "ms", y: .5 }, g).textContent = item.icon;
     var t1 = el("text", { "class": "cap1", y: -37, "text-anchor": "middle" }, g); t1.textContent = item.label ? item.label[0] : "";
     var t2 = el("text", { "class": "cap2", y: -27, "text-anchor": "middle" }, g); t2.textContent = item.sub;
-    el("circle", { cx: 17, cy: -17, r: 4, "class": "access-dot" }, g);
     item.g = g; item.t1 = t1; item.t2 = t2; item.hex = HEX[item.grp]; item.color = COLORS[item.grp];
     item.badge = el("g", { "class": "badge", transform: "translate(18 -18)", opacity: 0, style: "--c:" + COLORS[item.grp] }, g);
     el("rect", { x: -12, y: -8, width: 24, height: 16, rx: 8 }, item.badge); item.badgeT = el("text", { y: 0.5 }, item.badge);
@@ -752,7 +683,6 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     $("legendNeedCount").textContent = blocked + " Needs access";
     $("legendOff").textContent = offLegend(off);
     setNeedLink(blocked > 0);
-    updateSummary();
     var known = ALL.filter(function(n){return stateOf(n.id) !== "unreported";}).length;
     var scannedKnown = results.filter(function(v){return v !== "unreported";}).length;
     hdrCount.textContent = playing ? reportedOnly ? scannedKnown + "/" + known + " reported" : results.length + "/" + TOTAL : "";
@@ -864,11 +794,10 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     var st = stateOf(n.id);
     n.g.classList.add("testing"); n.g.style.opacity = 1;
     n.x = BAYX; n.y = BAYY; n.sc = BAY_SCALE; drawNode(n);
-    var sl = missingState(st) || design === "b" && n.id === "settings" ? null : scanline(n, my);
+    var sl = missingState(st) ? null : scanline(n, my);
     try { await runChecks(n, n.label.join(" "), st, my); } finally { if (sl) sl.remove(); }
     n.g.classList.remove("testing");
     placed.push(n);
-    if (design === "b" && n.id === "settings") { lockOn(n); return; }
     await new Promise(function (res) { relayout(missingState(st) ? 0 : 1400, n, function () { lockOn(n); res(); }); });
     if (my !== run) throw "stopped";
   }
@@ -935,17 +864,6 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     if (agentName && agentCalled) AGENT.g.classList.add("on"); else AGENT.g.classList.remove("on");
     tLink.classList.toggle("waiting", !!agentName && !agentCalled);
   }
-  function showExternalDevices(devices) {
-    var section = $("externalDevices"), list = $("externalDeviceList");
-    section.hidden = !devices.length; list.textContent = "";
-    devices.forEach(function (device) {
-      var button = document.createElement("button"); button.type = "button";
-      var icon = document.createElement("span"); icon.className = "device-icon"; icon.setAttribute("aria-hidden", "true"); icon.textContent = "videocam";
-      var name = document.createElement("strong"); name.textContent = device.name;
-      var status = document.createElement("small"); status.textContent = device.status;
-      button.append(icon, name, status); button.addEventListener("click", function () { A.open("externalCameras"); }); list.appendChild(button);
-    });
-  }
   function setAgents(opts) {
     agentsReported = !reportedOnly || opts.agentsReported === true;
     agentCalledReported = !reportedOnly || typeof opts.called === "boolean";
@@ -974,7 +892,6 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     $("legendOff").textContent = offLegend(switchedOff);
     $("legendNeedCount").textContent = blocked + " Needs access";
     setNeedLink(blocked > 0);
-    updateSummary();
     if (agentName && !agentCalled && agentCalledReported) div("t3", "Waiting for " + agentName + "'s first call.");
     gFinal.hidden = !gFinal.childNodes.length; renderPause();
   }
@@ -1042,7 +959,7 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
   // opts.nodes: { camera: "on" | "off" | "blocked" }, missing = on. opts.checks: { camera: [[label, value, "warn"?], ...] }
   // replaces the example readings with the phone's real ones.
   async function setup(opts) {
-    clearSelection(); reset(); opts = opts || {}; playing = true;
+    reset(); opts = opts || {}; playing = true;
     $("emailReminder").hidden = !opts.emailReminder;
     var my = run;
     reportedOnly = opts.reportedOnly === true;
@@ -1050,7 +967,6 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     state = opts.nodes || {};
     if (reportedOnly || opts.checks) ALL.forEach(function (n) { if (reportedOnly) n.checks = opts.checks && opts.checks[n.id] || []; else if (opts.checks[n.id]) n.checks = opts.checks[n.id]; });
     setAgents(opts);
-    if (opts.externalDevices || reportedOnly) showExternalDevices(opts.externalDevices || []);
     AGENT.t1.textContent = agentName || ""; agentLogo(); agentLook();
     try {
       hdr.textContent = "Device Diagnostics Running"; hdr.classList.add("pulse"); setCount(); runningCard();
@@ -1216,7 +1132,6 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     if (entry.agent) firstCall(entry.agent);
     var n = nodeFor(entry);
     if (!n || stateOf(n.id) !== "on") return;
-    if (design === "b" && n.id === "settings") return;
     bump(n);
     if (n.trace) { n.trace.classList.add("active"); clearTimeout(n.traceTimer); n.traceTimer = setTimeout(function () { n.trace.classList.remove("active"); }, 1200); }
     var now = performance.now();
@@ -1290,13 +1205,6 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     tWeather.setAttribute("d", "M" + WEATHER.x + " " + boxBottom + " V" + laneWeather + " H" + CLEF.x);
     WEATHER.packetPath.setAttribute("d", tWeather.getAttribute("d") + " V" + laneClef + " H" + JEV.x + " V" + laneJev + " H" + (CX + 3) + " V" + (CY - 42));
     tRoute.setAttribute("d", "M" + AGENT.x + " " + BAND_Y + " V" + laneLink + " H" + TAILSCALE.x + " V" + (tsY + 20) + " H" + (CX - 3) + " V" + (CY - 42));
-    if (design === "b") {
-      var labels = $("groupLabels"); labels.textContent = "";
-      [["Control agent", AGENT.x], ["Services", CLEF.x]].forEach(function (entry) { el("text", { x: entry[1], y: 25 }, labels).textContent = entry[0]; });
-      [(AGENT.x + JEV.x) / 2].forEach(function (x) { el("line", { x1: x, x2: x, y1: 18, y2: 82 }, labels); });
-      // Align the service names above a shared tile baseline.
-      [JEV, CLEF, WEATHER].forEach(function (item) { item.t1.setAttribute("y", -37); item.t2.setAttribute("y", -27); });
-    }
     TRACK = buildTrack();
     var parts = ringParts(), positions = slots(parts.length);
     parts.forEach(function (n, i) {
@@ -1344,44 +1252,7 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     baseFinal();
     if (pendingOpts && !playing) { var o = pendingOpts; pendingOpts = null; setTimeout(function () { apply(o); }, 0); }
   };
-  var groupLabels = el("g", { id: "groupLabels", "class": "b-only" }, band);
-  function updateSummary() {
-    if (!$("compactSummary")) return;
-    var blocked = ALL.filter(function (n) { return stateOf(n.id) === "blocked"; }).length;
-    var off = ALL.filter(function (n) { return stateOf(n.id) === "off"; }).length;
-    $("compactSummary").textContent = "B · " + (playing ? "Checking · " + linked + "/" + TOTAL : linked + " connected" + (blocked ? " · " + blocked + " need access" : "") + (off ? " · " + off + " off" : "") + (reportedOnly ? " · " + ALL.filter(function(n){return stateOf(n.id) === "unreported";}).length + " not reported" : ""));
-  }
-  function clearSelection() {
-    selectedFeature = null; $("featureDetail").hidden = true; svg.classList.remove("inspect");
-    ALL.concat([AGENT]).forEach(function (n) { if (n.g) n.g.classList.remove("selected"); if (n.trace) n.trace.classList.remove("selected"); });
-  }
-  function inspectFeature(n) {
-    clearSelection(); selectedFeature = n; svg.classList.add("inspect");
-    var deps = dependencies[n.id] || [["Private network", "tailscale"]];
-    var ids = [n.id].concat(deps.map(function (d) { return d[1]; }));
-    ALL.concat([AGENT]).forEach(function (item) { if (ids.indexOf(item.id) !== -1) { item.g.classList.add("selected"); if (item.trace) item.trace.classList.add("selected"); } });
-    $("featureTitle").textContent = n === AGENT ? agentName || "Control agent" : n.label.join(" ");
-    $("featureStatus").textContent = n === AGENT ? (paused ? "Paused" : reportedOnly && !agentsReported ? "Not reported" : missingState(stateOf("tailscale")) ? "Network " + stateWord(stateOf("tailscale")).toLowerCase() : stateOf("tailscale") !== "on" ? "Network disconnected" : agentCalled ? "Connected" : !agentCalledReported ? "Call status not reported" : "Waiting for first call") : stateWord(stateOf(n.id));
-    $("dependencyList").textContent = "";
-    deps.forEach(function (d) { var li = document.createElement("li"); li.textContent = d[0]; $("dependencyList").appendChild(li); });
-    $("featureDetail").hidden = false;
-  }
-  function chooseDesign(value) {
-    design = value; clearSelection(); document.body.classList.toggle("design-b", design === "b");
-    NODES = originalOrder.slice();
-    if (design === "b") NODES.sort(function (a, b) { return refinedOrder.indexOf(a.id) - refinedOrder.indexOf(b.id); });
-    $("groupLabels").textContent = "";
-    $("rerun").setAttribute("aria-label", "Rerun diagnostics · Version " + design.toUpperCase());
-    resizeScene(); $("designChoice").close();
-    if (A.rerun) A.rerun();
-  }
-  $("rerun").addEventListener("click", function () { if (!ENABLE_DESIGN_COMPARISON) { if (A.rerun) A.rerun(); return; } $("chooseA").setAttribute("aria-pressed", design === "a"); $("chooseB").setAttribute("aria-pressed", design === "b"); $("designChoice").showModal(); });
-  $("chooseA").addEventListener("click", function () { chooseDesign("a"); });
-  $("chooseB").addEventListener("click", function () { chooseDesign("b"); });
-  $("cancelDesign").addEventListener("click", function () { $("designChoice").close(); });
-  $("designSettings").addEventListener("click", function () { A.open("settings"); });
-  $("openFeature").addEventListener("click", function () { if (selectedFeature) A.open(selectedFeature.id); });
-  $("closeFeature").addEventListener("click", clearSelection);
+  $("rerun").addEventListener("click", function () { if (A.rerun) A.rerun(); });
   $("emailReminder").addEventListener("click", function (e) { e.stopPropagation(); A.open("email"); });
   $("addAgent").addEventListener("click", function () { A.open("addAgent"); });
   svg.addEventListener("click", function (e) {
@@ -1389,8 +1260,7 @@ body.reported-state.native-large-type #appletPanel { min-height: calc(64px * var
     var t = e.target.closest ? e.target : null;
     if (!t) return;
     var hit = ALL.concat([AGENT]).filter(function (n) { return n.g && n.g.contains(t); })[0];
-    if (hit) { if (design === "b") inspectFeature(hit); else A.open(hit.id); }
-    else if (design === "b") clearSelection();
+    if (hit) A.open(hit.id);
   });
   // Live events: entries are matched and drawn as they come; finishing the setup is not needed first.
   function setTextScale(value) {

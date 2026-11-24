@@ -293,7 +293,6 @@ class PortalModule(app: BridgeApp) : Capability(app) {
         add("access", R.string.more_access, "verified_user", "more")
         add("software_access", R.string.more_software_access, "verified_user", "more")
         add("ssh_connections", R.string.ssh_title, "laptop", "more")
-        add("network_devices", R.string.network_devices_title, "laptop", "more")
         add("tailscale_setup", R.string.more_tailscale_setup, "verified_user", "more")
         if (BuildConfig.PRIVATE_CONTROL) add("adb_setup", R.string.more_adb_setup, "settings", "more")
         add("relay", R.string.more_relay, "verified_user", "more")
@@ -304,7 +303,6 @@ class PortalModule(app: BridgeApp) : Capability(app) {
         add("report_bug", R.string.more_report_bug, "bug_report", "more")
         add("request_feature", R.string.more_request_feature, "lightbulb", "more")
         add("my_reports", R.string.more_my_issues, "history", "more")
-        add("about", R.string.more_about, "info", "more")
         add("what_can", R.string.more_what_can, "lightbulb", "more")
         return out
     }

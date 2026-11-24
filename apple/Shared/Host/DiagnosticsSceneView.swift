@@ -167,10 +167,10 @@ private struct DiagnosticsWebView: DiagnosticsRepresentable {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hexagon.dispatchEvent(new MouseEvent('click', {bubbles: true})); }
         });
         sidebar.appendChild(header);
-        ['homeStatus', 'logBox', 'externalDevices', 'status'].forEach(function(id) {
+        ['homeStatus', 'logBox', 'status'].forEach(function(id) {
           sidebar.appendChild(document.getElementById(id));
         });
-        ['stage', 'featureDetail', 'compactSummary'].forEach(function(id) {
+        ['stage'].forEach(function(id) {
           map.appendChild(document.getElementById(id));
         });
         map.appendChild(document.querySelector('.legendrow'));
@@ -186,7 +186,7 @@ private struct DiagnosticsWebView: DiagnosticsRepresentable {
           #desktopDiagnosticsTitle { font: 500 11px/1.4 system-ui, sans-serif; }
           #desktopActivity #hdr[hidden] { display: none; }
           #desktopActivity .hdrline .right:empty { display: none; }
-          #desktopActivity #homeStatus, #desktopActivity #logBox, #desktopActivity #externalDevices { margin: 0; }
+          #desktopActivity #homeStatus, #desktopActivity #logBox { margin: 0; }
           #desktopActivity #homeStatus { flex: 0 0 auto; }
           #desktopActivity #appletStatus { flex-direction: column; overflow-x: hidden; }
           #desktopActivity .applet-item { white-space: normal; }

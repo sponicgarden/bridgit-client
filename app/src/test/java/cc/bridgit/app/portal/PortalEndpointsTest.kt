@@ -149,7 +149,7 @@ class PortalEndpointsTest {
         // The Home scene's own inputs: node states for every scene node, check lines, agents (portal viewers left out), status.
         val scene = home.getJSONObject("scene")
         val opts = scene.getJSONObject("options")
-        listOf("externalDevices", "emailReminder", "agent", "called", "agents", "nodes", "checks").forEach { assertTrue(it, opts.has(it)) }
+        listOf("emailReminder", "agent", "called", "agents", "nodes", "checks").forEach { assertTrue(it, opts.has(it)) }
         listOf("camera", "voicerec", "tailscale", "clef", "jev", "weather", "agent").forEach { assertTrue(it, opts.getJSONObject("nodes").has(it)) }
         assertFalse(opts.getJSONArray("agents").toString().contains("Bridgit viewer"))
         assertEquals(0, home.getInt("agents_count"))

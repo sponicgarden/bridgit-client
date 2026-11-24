@@ -333,7 +333,6 @@ class HomeFragment : Fragment() {
         when (id) {
             "email" -> EmailPrompt.ask(this) { requestRender() }
             "addAgent" -> findNavController().navigate(R.id.addAgent)
-            "externalCameras" -> findNavController().navigate(R.id.cameras)
             "applets" -> goTab(R.id.interactions, bundleOf("showApplets" to true))
             "voicerec", "sounds" -> startActivity(android.content.Intent(requireContext(), cc.bridgit.app.listen.WakeWordsActivity::class.java))
             "touch" -> findNavController().navigate(R.id.adbSetup)

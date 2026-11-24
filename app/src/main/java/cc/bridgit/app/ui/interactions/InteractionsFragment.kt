@@ -79,8 +79,9 @@ class InteractionsFragment : Fragment() {
             arguments?.getBoolean("showCards") == true -> TAB_CARDS
             else -> -1
         }
-        if (savedInstanceState?.containsKey(KEY_LIBRARY) == true) library = savedInstanceState.getBoolean(KEY_LIBRARY)
-        else if (arguments?.getBoolean("showCards") == true) library = false // "See questions" means the inbox
+        // Owner, 24 Nov 2026: Library (the bundled sample cards) is hidden until real preloaded cards back it.
+        library = if (LIBRARY_SHOWN && savedInstanceState?.containsKey(KEY_LIBRARY) == true) savedInstanceState.getBoolean(KEY_LIBRARY)
+            else if (LIBRARY_SHOWN && arguments?.getBoolean("showCards") != true) null else false // "See questions" means the inbox
         // One-time Home shortcuts; later tab restores keep the owner's choice.
         arguments?.remove("showApplets"); arguments?.remove("showCards"); arguments?.remove("showPortals")
     }
@@ -158,8 +159,9 @@ class InteractionsFragment : Fragment() {
         b.cardsMode.addOnButtonCheckedListener { _, id, checked ->
             if (checked) { val lib = id == R.id.cards_mode_library; if (library != lib) { library = lib; showCardsMode() } }
         }
+        b.cardsMode.isVisible = LIBRARY_SHOWN
         b.emptyAction.setOnClickListener {
-            if (all.isEmpty()) { library = true; showCardsMode() } else { b.chips.check(R.id.chip_all); b.chipOpen.isChecked = false }
+            if (all.isEmpty()) { if (LIBRARY_SHOWN) { library = true; showCardsMode() } } else { b.chips.check(R.id.chip_all); b.chipOpen.isChecked = false }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -277,6 +279,7 @@ class InteractionsFragment : Fragment() {
                 else -> getString(R.string.interactions_empty_open)
             }
             bb.emptyAction.setText(if (none) R.string.interactions_browse_library else R.string.interactions_clear_filter)
+            bb.emptyAction.isVisible = !none || LIBRARY_SHOWN
         }
     }
 
@@ -357,6 +360,8 @@ class InteractionsFragment : Fragment() {
         const val KEY_OPEN = "interactions.expanded.open"
         const val KEY_TAB = "interactions.tab"
         const val KEY_LIBRARY = "interactions.cards.library"
+        /** Cards › Library: hidden by the owner on 24 Nov 2026 until preloaded cards for agents exist. */
+        const val LIBRARY_SHOWN = false
         const val TAB_PORTALS = 0
         const val TAB_CONFIG = 1
         const val TAB_CARDS = 2

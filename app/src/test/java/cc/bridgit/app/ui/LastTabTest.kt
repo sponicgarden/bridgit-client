@@ -25,4 +25,11 @@ class LastTabTest {
         assertNull(LastTab.restore("addAgent", plainLaunch = true, current = "interactions", start = "interactions", tabs = tabs))
         assertNull(LastTab.restore("tailscaleSetup", plainLaunch = true, current = "interactions", start = "interactions", tabs = tabs))
     }
+
+    @Test fun hiddenCameraTabIsNotReopened() {
+        val shown = LastTab.shown(tabs, cameraShown = false)
+        assertNull(LastTab.restore("camera", plainLaunch = true, current = "interactions", start = "interactions", tabs = shown))
+        assertEquals("camera", LastTab.restore("camera", plainLaunch = true, current = "interactions", start = "interactions",
+            tabs = LastTab.shown(tabs, cameraShown = true)))
+    }
 }

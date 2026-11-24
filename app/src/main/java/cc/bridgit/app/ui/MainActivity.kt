@@ -94,6 +94,7 @@ class MainActivity : AppCompatActivity() {
             MainActivityState.cardId = if(dest.id==R.id.interactionDetail) args?.getLong("interactionId") else null
             runCatching { app.usage.count("screen:" + resources.getResourceEntryName(dest.id)) }
             if (dest.id in TOP_LEVEL) runCatching { LastTab.save(this, resources.getResourceEntryName(dest.id)) }
+            if (dest.id in TOP_LEVEL) syncCameraTab()
             hubBar?.onDestination(dest.id in HUB_TABS, dest.id !in NO_DEVICE_BAR, home = dest.id == R.id.home)
             b.bottomNav.isVisible = dest.id in TOP_LEVEL && !isInPictureInPictureMode
             applyPanelInset()
@@ -104,7 +105,8 @@ class MainActivity : AppCompatActivity() {
             navInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
             v.updatePadding(bottom = navInset); applyPanelInset(); insets
         }
-        if (savedInstanceState == null) { route(); openIssueFrom(intent); val arrival = wakeFor(intent); openInteractionFrom(intent, arrival); openTourFrom(intent); openDogFrom(intent); openOwnerSetupFrom(intent); openAgentFrom(intent); openPortalFrom(intent); openForegroundScreen(intent); reopenLastTab(launchBranding) }
+        if (savedInstanceState == null) { route(); openIssueFrom(intent); val arrival = wakeFor(intent); openInteractionFrom(intent, arrival); openTourFrom(intent); openDogFrom(intent); openOwnerSetupFrom(intent); openAgentFrom(intent); openPortalFrom(intent); openForegroundScreen(intent); syncCameraTab(); reopenLastTab(launchBranding) }
+        watchCameraTab()
         watchInteractionsBadge()
         watchTextPanel()
         if (isInPictureInPictureMode) applyPipChrome(true)
@@ -347,11 +349,35 @@ class MainActivity : AppCompatActivity() {
 
     /** A0138: a plain launch from the launcher reopens the tab the owner last used. */
     private fun reopenLastTab(plainLaunch: Boolean) {
-        val tabs = TOP_LEVEL.associateBy { resources.getResourceEntryName(it) }
+        val all = TOP_LEVEL.associateBy { resources.getResourceEntryName(it) }
+        val shown = LastTab.shown(all.keys, b.bottomNav.menu.findItem(R.id.camera)?.isVisible == true)
+        val tabs = all.filterKeys { it in shown }
         val current = nav.currentDestination?.id?.let { runCatching { resources.getResourceEntryName(it) }.getOrNull() }
         val start = resources.getResourceEntryName(nav.graph.startDestinationId)
         val tab = LastTab.restore(LastTab.saved(this), plainLaunch, current, start, tabs.keys) ?: return
         tabs[tab]?.let { b.bottomNav.selectedItemId = it }
+    }
+
+    /**
+     * Owner, 24 Nov 2026: the Camera tab shows only while an applet checks photos, on this phone or its hub (the
+     * same list the shutter sends to). Leaving it hidden while it is open moves to the start tab.
+     */
+    private fun syncCameraTab() {
+        val item = b.bottomNav.menu.findItem(R.id.camera) ?: return
+        val shown = runCatching { app.ownerPhotos.cameraTargets().isNotEmpty() }.getOrDefault(false)
+        if (item.isVisible == shown) return
+        item.isVisible = shown
+        if (!shown && nav.currentDestination?.id == R.id.camera) b.bottomNav.selectedItemId = nav.graph.startDestinationId
+    }
+
+    /** Photo applets come and go while Bridgit is open (an agent installs one, a hub adds one): re-check. */
+    private fun watchCameraTab() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { cc.bridgit.app.satellite.HubLinks.changes.collect { syncCameraTab() } }
+                while (true) { syncCameraTab(); kotlinx.coroutines.delay(CAMERA_TAB_RECHECK_MS) }
+            }
+        }
     }
 
     /** First run, or back to an unfinished setup prompt after a crash (AGT-05a). */
@@ -509,6 +535,7 @@ class MainActivity : AppCompatActivity() {
         val TOP_LEVEL = setOf(R.id.home, R.id.interactions, R.id.camera, R.id.agents, R.id.more)
         /** The tabs that show the hub while a satellite is switched to it, under [HubBar]. */
         val HUB_TABS = setOf(R.id.home, R.id.interactions, R.id.camera, R.id.agents, R.id.cameras)
+        private const val CAMERA_TAB_RECHECK_MS = 5_000L
         /** Full-screen setup and tour screens: no device bar. */
         private val NO_DEVICE_BAR = setOf(R.id.addAgent, R.id.pairCode, R.id.firstRun, R.id.tour)
         /** Setup screens nothing may open over. */

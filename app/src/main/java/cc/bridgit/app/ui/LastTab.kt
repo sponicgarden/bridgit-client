@@ -17,6 +17,11 @@ object LastTab {
     fun saved(context: Context): String? =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, null)
 
+    /** Owner, 24 Nov 2026: the Camera tab shows only while an applet checks photos, so it can't be reopened otherwise. */
+    fun shown(tabs: Set<String>, cameraShown: Boolean): Set<String> = if (cameraShown) tabs else tabs - CAMERA
+
+    const val CAMERA = "camera"
+
     /** The tab a plain launch reopens, or null to stay where the launch put Bridgit. */
     fun restore(saved: String?, plainLaunch: Boolean, current: String?, start: String, tabs: Set<String>): String? =
         saved?.takeIf { plainLaunch && current == start && it != start && it in tabs }

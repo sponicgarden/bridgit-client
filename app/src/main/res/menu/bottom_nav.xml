@@ -4,7 +4,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@id/interactions" android:icon="@drawable/ic_nav_home" android:title="@string/nav_interactions" />
     <item android:id="@id/home" android:icon="@drawable/ic_nav_device" android:title="@string/nav_home" />
-    <item android:id="@id/camera" android:icon="@drawable/ic_nav_camera" android:title="@string/nav_camera" />
+    <!-- Shown by MainActivity only while an applet checks photos (owner, 24 Nov 2026). -->
+    <item android:id="@id/camera" android:icon="@drawable/ic_nav_camera" android:title="@string/nav_camera" android:visible="false" />
     <item android:id="@id/agents" android:icon="@drawable/ic_nav_agents" android:title="@string/nav_agents" app:contentDescription="@string/nav_agents_full" app:tooltipText="@string/nav_agents_full" />
     <item android:id="@id/more" android:icon="@drawable/ic_nav_more" android:title="@string/nav_more" />
 </menu>

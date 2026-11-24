@@ -64,16 +64,6 @@
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
-            <TextView
-                android:id="@+id/breakdown"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:importantForAccessibility="no"
-                android:maxLines="2"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
     <TextView

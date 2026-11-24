@@ -175,20 +175,13 @@ class MoreFragment : Fragment() {
     private suspend fun refreshSummaries() {
         val app = requireActivity().application as BridgeApp
         val summaries = withContext(Dispatchers.IO) { listOf(IssueKind.BUG, IssueKind.FEATURE).map { app.feedback.summary(it) } }
-        // A0170: the headline is the owner's total across all their devices, each device's own counts underneath.
+        // A0170: one line, the owner's total across all their devices (no per-device breakdown).
         val owner = withContext(Dispatchers.IO) { OwnerFeedbackCounts.cached(app) }
         val bb = _b ?: return
         for ((row, kind, local) in listOf(Triple(bb.reportBug, IssueKind.BUG, summaries[0]), Triple(bb.requestFeature, IssueKind.FEATURE, summaries[1]))) {
-            val mine = OwnerFeedbackCounts.Counts(local.first, local.second)
-            val total = OwnerFeedbackCounts.total(owner, kind, mine)
-            // A0170: the owner's total across all their devices first, then each device's own counts.
-            val perDevice = OwnerFeedbackCounts.breakdown(owner, kind, mine) { n, c -> getString(R.string.more_issue_device, n, c.filed, c.fixed) }
-            val headline = getString(R.string.more_issue_metrics, total.filed, total.fixed)
-            row.supporting.text = if (perDevice == null) headline else getString(R.string.more_issue_metrics_owner, headline)
-            row.breakdown.isVisible = perDevice != null
-            row.breakdown.text = perDevice
-            row.summary.contentDescription = getString(R.string.more_issue_metrics_cd, row.title.text, total.filed, total.fixed) +
-                (perDevice?.let { " " + getString(R.string.more_issue_metrics_devices_cd, it) } ?: "")
+            val total = OwnerFeedbackCounts.total(owner, kind, OwnerFeedbackCounts.Counts(local.first, local.second))
+            row.supporting.text = getString(R.string.more_issue_metrics, total.filed, total.fixed)
+            row.summary.contentDescription = getString(R.string.more_issue_metrics_cd, row.title.text, total.filed, total.fixed)
         }
         val hubInfo = app.hubLinks.hubs().associateBy { it.linkId }
         val counts = LinkedDeviceCounts.count(

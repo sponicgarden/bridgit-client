@@ -51,19 +51,6 @@ object OwnerFeedbackCounts {
     fun total(owner: Owner?, kind: IssueKind, local: Counts): Counts =
         (owner?.devices ?: emptyList()).filter { !it.thisDevice }.fold(local) { acc, d -> acc + d.of(kind) }
 
-    /**
-     * "pixel-pal: 3 filed · 1 fixed; cream-tab: 2 filed · 0 fixed": each device's counts, this device (local numbers)
-     * first. [item] words one device (the More page passes its string resource). Null for one device.
-     */
-    fun breakdown(owner: Owner?, kind: IssueKind, local: Counts,
-                  item: (String, Counts) -> String = { n, c -> "$n: ${c.filed} filed · ${c.fixed} fixed" }): String? {
-        val devices = owner?.devices ?: return null
-        if (devices.size < 2) return null
-        return devices.sortedByDescending { it.thisDevice }.joinToString("; ") { d ->
-            item(d.name, if (d.thisDevice) local else d.of(kind))
-        }
-    }
-
     /** The last answer, or null. */
     fun cached(app: BridgeApp): Owner? = FeedbackUploader.prefs(app).getString(CACHE, null)?.let(::parse)
 

@@ -24,15 +24,12 @@ class OwnerFeedbackCountsTest {
         // This device has 4 local bugs (one not uploaded yet); the tab adds its 2.
         assertEquals(Counts(6, 2), OwnerFeedbackCounts.total(owner, IssueKind.BUG, Counts(4, 1)))
         assertEquals(Counts(1, 1), OwnerFeedbackCounts.total(owner, IssueKind.FEATURE, Counts(0, 0)))
-        assertEquals("pixel-pal: 4 filed · 1 fixed; A9 Cream Tab: 2 filed · 1 fixed", OwnerFeedbackCounts.breakdown(owner, IssueKind.BUG, Counts(4, 1)))
     }
 
     @Test fun withoutAnAnswerOrWithOneDeviceItIsTheLocalCount() {
         assertEquals(Counts(3, 1), OwnerFeedbackCounts.total(null, IssueKind.BUG, Counts(3, 1)))
-        assertNull(OwnerFeedbackCounts.breakdown(null, IssueKind.BUG, Counts(3, 1)))
         val one = OwnerFeedbackCounts.parse("""{"owner_linked":false,"devices":[{"domain":"lone-tab","label":null,"this_device":true,"bug":{"filed":1,"fixed":0}}]}""")
         assertEquals(Counts(3, 1), OwnerFeedbackCounts.total(one, IssueKind.BUG, Counts(3, 1)))
-        assertNull(OwnerFeedbackCounts.breakdown(one, IssueKind.BUG, Counts(3, 1)))
         assertNull(OwnerFeedbackCounts.parse("not json"))
         assertNull(OwnerFeedbackCounts.parse("""{"error":"unauthorized"}"""))
     }

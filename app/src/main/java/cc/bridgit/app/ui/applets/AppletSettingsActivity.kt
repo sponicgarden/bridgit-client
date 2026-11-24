@@ -1,5 +1,6 @@
 package cc.bridgit.app.ui.applets
 
+import cc.bridgit.app.ui.common.WebViews
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
@@ -41,7 +42,7 @@ class AppletSettingsActivity : AppCompatActivity() {
             setNavigationContentDescription(R.string.cd_back)
             setNavigationOnClickListener { finish() }
         }
-        val browser = WebView(this).apply {
+        val browser = WebViews.create { WebView(this).apply {
             setBackgroundColor(paper)
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
@@ -57,7 +58,7 @@ class AppletSettingsActivity : AppCompatActivity() {
                     return true
                 }
             }
-        }
+        } } ?: run { finish(); return }
         web = browser
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL

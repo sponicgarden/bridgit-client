@@ -1,5 +1,6 @@
 package cc.bridgit.app.lancamera
 
+import cc.bridgit.app.ui.common.WebViews
 import android.os.Bundle
 import android.text.InputType
 import android.view.TextureView
@@ -86,14 +87,14 @@ class LanCamerasFragment : Fragment(), cc.bridgit.app.lan.NetworkDevicesFragment
         top.addView(track, LinearLayout.LayoutParams(0, dp(52), 1f))
         root.addView(top, LinearLayout.LayoutParams(-1, -2))
         val frame = FrameLayout(requireContext())
-        val s = DevicesScene(requireContext(), app, ::openFromMap)
-        frame.addView(s, FrameLayout.LayoutParams(-1, -1))
+        val s = WebViews.create { DevicesScene(requireContext(), app, ::openFromMap) }
+        if (s != null) frame.addView(s, FrameLayout.LayoutParams(-1, -1))
         frame.addView(list, FrameLayout.LayoutParams(-1, -1))
         val rl = ScrollView(requireContext()).apply { visibility = View.GONE; setBackgroundColor(c(R.color.b_surface)) }
         remoteList = rl
         frame.addView(rl, FrameLayout.LayoutParams(-1, -1))
         scene = s
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, s.backCallback)
+        if (s != null) requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, s.backCallback)
         root.addView(frame, LinearLayout.LayoutParams(-1, 0, 1f))
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -101,11 +102,11 @@ class LanCamerasFragment : Fragment(), cc.bridgit.app.lan.NetworkDevicesFragment
         }
         render()
         val discovered = arguments?.getString("discoveredHost")
-        val start = if (discovered != null) TAB_LIST else prefs().getInt(KEY_TAB, TAB_MAP).coerceIn(TAB_MAP, TAB_LIST)
+        val start = if (discovered != null || s == null) TAB_LIST else prefs().getInt(KEY_TAB, TAB_MAP).coerceIn(TAB_MAP, TAB_LIST)
         tabBar.getTabAt(start)?.select()
         showTab(start)
         // The opening animation plays the first time the map is shown in each app run; later visits open on the finished map.
-        s.load(play = start == TAB_MAP && !mapPlayedThisRun)
+        s?.load(play = start == TAB_MAP && !mapPlayedThisRun)
         if (start == TAB_MAP) mapPlayedThisRun = true
         tabBar.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(t: TabLayout.Tab) {

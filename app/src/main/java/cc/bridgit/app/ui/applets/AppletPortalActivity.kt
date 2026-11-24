@@ -1,5 +1,6 @@
 package cc.bridgit.app.ui.applets
 
+import cc.bridgit.app.ui.common.WebViews
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -125,8 +126,9 @@ class AppletPortalActivity : AppCompatActivity(), AppletPortals.Host {
             if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) app.appletPortals.onScreen(id, this@AppletPortalActivity, true)
             if (kind == "html") {
                 val html = card.html ?: run { gone(); return@launch }
-                val v = CardWebView(this@AppletPortalActivity, onRespond = { data -> answer(card.id, data) }, onCrash = { crashed() },
-                    interactionId = card.id, portal = app.appletPortals.bridge(id) { this@AppletPortalActivity.takeIf { web != null } })
+                val v = WebViews.create { CardWebView(this@AppletPortalActivity, onRespond = { data -> answer(card.id, data) }, onCrash = { crashed() },
+                    interactionId = card.id, portal = app.appletPortals.bridge(id) { this@AppletPortalActivity.takeIf { web != null } }) }
+                    ?: run { crashed(); return@launch }
                 v.contentDescription = getString(R.string.applet_portal_desc, r.optString("name"))
                 web = v
                 content.addView(v, ViewGroup.LayoutParams(-1, -1))

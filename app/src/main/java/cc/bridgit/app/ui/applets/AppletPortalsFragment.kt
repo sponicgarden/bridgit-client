@@ -1,5 +1,6 @@
 package cc.bridgit.app.ui.applets
 
+import cc.bridgit.app.ui.common.WebViews
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -158,7 +159,7 @@ class AppletPortalsFragment : Fragment() {
         if (onlyIfChanged && p.id == current && web != null) return
         current = p.id
         visibleIdentity = null
-        val w = web ?: makeWebView().also { web = it; b.portalFrame.addView(it, ViewGroup.LayoutParams(-1, -1)) }
+        val w = web ?: (WebViews.create { makeWebView() } ?: return).also { web = it; b.portalFrame.addView(it, ViewGroup.LayoutParams(-1, -1)) }
         // Signed in to the app, signed in to the portal (owner, 4 Nov 2026): with no bridgit.cc session yet, ask the
         // backend for a one-use code first and hand it to the page; without one the page shows its sign-in card.
         val opening = ++opens

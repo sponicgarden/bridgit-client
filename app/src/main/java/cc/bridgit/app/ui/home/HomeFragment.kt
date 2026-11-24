@@ -1,5 +1,6 @@
 package cc.bridgit.app.ui.home
 
+import cc.bridgit.app.ui.common.WebViews
 import cc.bridgit.app.power.DefaultAccess
 import android.Manifest
 import android.os.Bundle
@@ -195,8 +196,8 @@ class HomeFragment : Fragment() {
         val remote = remoteHome(links)
         shownDevice = remote?.device
         showPortalHeader(remote)
-        val s = DiagnosticsScene(requireContext(), app, onOpen = ::openFromScene, onPauseAsked = ::setPaused,
-            remote = remote, onRemoteStatus = { at, error -> remote?.let { showPortalStatus(it, at, error) } })
+        val s = WebViews.create { DiagnosticsScene(requireContext(), app, onOpen = ::openFromScene, onPauseAsked = ::setPaused,
+            remote = remote, onRemoteStatus = { at, error -> remote?.let { showPortalStatus(it, at, error) } }) } ?: return
         b.sceneFrame.addView(s, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         // The full run plays once per app start; later visits open on the finished map (Rerun, or an agent's
         // device_diagnostics request, plays it again).

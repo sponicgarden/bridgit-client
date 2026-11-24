@@ -8,7 +8,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <WebView
+    <!-- Page 1's WebView is added in code (FirstRunFragment.showIntro): inflating one here crashed devices
+         without a WebView provider (C0888). Without one, page 1 uses the native page below. -->
+    <FrameLayout
         android:id="@+id/introWeb"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

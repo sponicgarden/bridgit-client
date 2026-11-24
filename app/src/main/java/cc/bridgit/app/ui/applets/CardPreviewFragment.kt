@@ -1,5 +1,6 @@
 package cc.bridgit.app.ui.applets
 
+import cc.bridgit.app.ui.common.WebViews
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,7 +41,8 @@ class CardPreviewFragment : Fragment() {
         val c = AppletCardsFragment.load(requireContext()).firstOrNull { it.id == id }
         if (c == null) { findNavController().navigateUp(); return }
         b.toolbar.title = c.title
-        val v = CardWebView(requireContext(), onRespond = { data -> answered(data) }, onCrash = { findNavController().navigateUp() })
+        val v = WebViews.create { CardWebView(requireContext(), onRespond = { data -> answered(data) }, onCrash = { findNavController().navigateUp() }) }
+            ?: run { findNavController().navigateUp(); return }
         v.contentDescription = c.title
         b.cardFrame.addView(v, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         v.load(c.html)

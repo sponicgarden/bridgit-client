@@ -1,5 +1,6 @@
 package cc.bridgit.app.ui.interactions
 
+import cc.bridgit.app.ui.common.WebViews
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -409,7 +410,8 @@ class InteractionDetailFragment : Fragment() {
             slot.clipToOutline = true
         }
         val id = i.id
-        val v = CardWebView(ctx, onRespond = { data -> answerCard(id, data) }, onCrash = { cardCrashed(id) }, interactionId = id)
+        val v = WebViews.create { CardWebView(ctx, onRespond = { data -> answerCard(id, data) }, onCrash = { cardCrashed(id) }, interactionId = id) }
+            ?: run { cardCrashed(id); return }
         v.contentDescription = getString(R.string.interactions_card_desc, InteractionUi.agentName(i))
         slot.addView(v, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         v.load(html, fullScreen = fullScreenOn)

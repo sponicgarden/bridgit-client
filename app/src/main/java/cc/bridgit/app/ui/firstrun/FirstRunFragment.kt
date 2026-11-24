@@ -10,6 +10,7 @@ import android.text.style.TypefaceSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -38,6 +39,7 @@ import cc.bridgit.app.capability.Perms
 import cc.bridgit.app.capability.granted
 import cc.bridgit.app.databinding.FirstrunCapRowBinding
 import cc.bridgit.app.databinding.FirstrunPageBinding
+import cc.bridgit.app.ui.common.WebViews
 import cc.bridgit.app.databinding.FragmentFirstRunBinding
 import cc.bridgit.app.ui.common.themeColor
 import cc.bridgit.app.ui.home.UiActions
@@ -192,9 +194,13 @@ class FirstRunFragment : Fragment() {
     }
 
     /** Page 1 is a styled HTML page; strings and theme colours are filled in here so it matches the app. */
-    private fun showIntro(p: FirstrunPageBinding) {
-        val web = p.introWeb
-        if (web.tag == INTRO_LOADED) return
+    /** Returns false when the device has no usable WebView (C0888): page 1 then uses the native page. */
+    private fun showIntro(p: FirstrunPageBinding): Boolean {
+        val frame = p.introWeb
+        val web = frame.getChildAt(0) as? WebView
+            ?: WebViews.create { WebView(frame.context) }?.also { frame.addView(it, ViewGroup.LayoutParams(-1, -1)) }
+            ?: return false
+        if (web.tag == INTRO_LOADED) return true
         val ctx = web.context
         web.setBackgroundColor(ctx.themeColor(M.attr.colorSurface))
         web.settings.javaScriptEnabled = false
@@ -224,6 +230,7 @@ class FirstRunFragment : Fragment() {
             .replace("{{IDEAS}}", ideas)
         web.loadDataWithBaseURL("file:///android_asset/firstrun/", html, "text/html", "utf-8", null)
         web.tag = INTRO_LOADED
+        return true
     }
 
     private inner class Holder(val p: FirstrunPageBinding) : RecyclerView.ViewHolder(p.root)
@@ -236,9 +243,10 @@ class FirstRunFragment : Fragment() {
 
         override fun onBindViewHolder(h: Holder, position: Int) {
             val p = h.p
-            p.introWeb.isVisible = position == INTRO
-            p.nativePage.isVisible = position != INTRO
-            if (position == INTRO) { showIntro(p); return }
+            val web = position == INTRO && showIntro(p)
+            p.introWeb.isVisible = web
+            p.nativePage.isVisible = !web
+            if (web) return
             p.title.setText(TITLES[position])
             p.capRows.isVisible = position == CAPS_PAGE
             if (position == CAPS_PAGE && p.capRows.childCount == 0) {
@@ -291,7 +299,7 @@ class FirstRunFragment : Fragment() {
         private const val SETUP_PAGE = 2
         private const val FINISH_PAGE = 3
         private const val INTRO_LOADED = "intro-loaded"
-        private val TITLES = intArrayOf(0, R.string.firstrun_caps_heading, R.string.firstrun_p2_title, R.string.firstrun_p3_title)
+        private val TITLES = intArrayOf(R.string.firstrun_p1_headline, R.string.firstrun_caps_heading, R.string.firstrun_p2_title, R.string.firstrun_p3_title)
         /** Page 2 rows: only features the What-can screen lists as available now. */
         private val CAPS = listOf(
             Triple(R.drawable.ic_camera, R.string.firstrun_cap_see_title, R.string.firstrun_cap_see_body),
@@ -303,6 +311,6 @@ class FirstRunFragment : Fragment() {
             Triple(R.drawable.ic_nav_interactions, R.string.firstrun_cap_ask_title, R.string.firstrun_cap_ask_body),
         )
         /** 0 = no body text on that page. */
-        private val BODIES = intArrayOf(0, R.string.firstrun_caps_body, R.string.firstrun_p2_body, 0)
+        private val BODIES = intArrayOf(R.string.firstrun_p1_body, R.string.firstrun_caps_body, R.string.firstrun_p2_body, 0)
     }
 }
